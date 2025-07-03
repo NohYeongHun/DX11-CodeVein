@@ -1,6 +1,6 @@
-#pragma once
+﻿#pragma once
 
-#include "Prototype_Manager.h"
+//#include "Prototype_Manager.h"
 
 NS_BEGIN(Engine)
 
@@ -63,6 +63,13 @@ public:
 	/* 2. Drawing Font */
 	HRESULT Render_Font(const _wstring& strFontTag, const _tchar* pText, const _float2& vPosition, _fvector vColor, _float fRotation = 0.f, const _float2& vOrigin = {}, _float fScale = 0);
 #pragma endregion
+
+#pragma region COLLIDER_MANAGER
+public:
+	HRESULT Add_Collider_To_Layer(COLLIDERLAYER eColliderLayer, class CCollider* pCollider);
+	HRESULT Remove_Collider_To_Layer(COLLIDERLAYER eColliderLayer, class CCollider* pCollider);
+#pragma endregion
+
 //
 //#pragma region PICKING 
 //	void Transform_Picking_ToLocalSpace(class CTransform* pTransformCom);
@@ -78,6 +85,7 @@ private:
 	class CTimer_Manager*		m_pTimer_Manager = { nullptr };
 	class CPicking*				m_pPicking = { nullptr };
 	class CFont_Manager*		m_pFont_Manager = { nullptr };
+	class CCollider_Manager* m_pCollider_Manager = { nullptr };
 
 public:
 	void Release_Engine();

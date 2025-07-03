@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Base.h"
 #include "Graphic_Device.h"
 #include "GameInstance.h"
@@ -10,7 +10,8 @@
 #include "Renderer.h"
 #pragma region COMPONENT
 #include "Component.h"
-//#include "Collider.h"
+#include "Collider.h"
+#include "Collider_Manager.h"
 #include "Shader.h"
 #include "VIBuffer.h"
 #include "VIBuffer_Rect.h"

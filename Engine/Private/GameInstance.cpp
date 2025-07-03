@@ -1,4 +1,4 @@
-#include "GameInstance.h"
+ï»¿#include "GameInstance.h"
 
 //#include "Graphic_Device.h"
 //#include "Level_Manager.h"
@@ -51,13 +51,17 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11De
 	m_pFont_Manager = CFont_Manager::Create(*ppDevice, *ppContext);
 	if (nullptr == m_pFont_Manager)
 		return E_FAIL;
+	
+	m_pCollider_Manager = CCollider_Manager::Create(EngineDesc.iNumLevels);
+	if (nullptr == m_pCollider_Manager)
+		return E_FAIL;
 
 	return S_OK;
 }
 
 void CGameInstance::Update_Engine(_float fTimeDelta)
 {
-	/* ³» °ÔÀÓ³»¿¡¼­ ¹Ýº¹ÀûÀÎ °»½ÅÀÌ ÇÊ¿äÇÑ °´Ã¼µéÀÌ ÀÖ´Ù¶ó¸é °»½ÅÀ» ¿©±â¿¡¼­ ¸ð¾Æ¼­ ¼öÇàÇÏ³®. */
+	/* ë‚´ ê²Œìž„ë‚´ì—ì„œ ë°˜ë³µì ì¸ ê°±ì‹ ì´ í•„ìš”í•œ ê°ì²´ë“¤ì´ ìžˆë‹¤ë¼ë©´ ê°±ì‹ ì„ ì—¬ê¸°ì—ì„œ ëª¨ì•„ì„œ ìˆ˜í–‰í•˜ë‚Ÿ. */
 	m_pObject_Manager->Priority_Update(fTimeDelta);
 
 	/*m_pPicking->Update();*/
@@ -70,7 +74,7 @@ void CGameInstance::Update_Engine(_float fTimeDelta)
 
 HRESULT CGameInstance::Clear_Resources(_uint iClearLevelID)
 {
-	/* ±âÁ¸·¹º§¿ë ÀÚ¿øµéÀ» ³¯¸°´Ù. */
+	/* ê¸°ì¡´ë ˆë²¨ìš© ìžì›ë“¤ì„ ë‚ ë¦°ë‹¤. */
 	m_pPrototype_Manager->Clear(iClearLevelID);
 
 	m_pObject_Manager->Clear(iClearLevelID);
@@ -94,7 +98,7 @@ HRESULT CGameInstance::Draw()
 		nullptr == m_pRenderer)
 		return E_FAIL;
 
-	/* ¹é¹öÆÛ¿¡ ±×¸±°ÍµéÀ» ±×¸°´Ù. */
+	/* ë°±ë²„í¼ì— ê·¸ë¦´ê²ƒë“¤ì„ ê·¸ë¦°ë‹¤. */
 	m_pRenderer->Draw();
 
 	if (FAILED(m_pLevel_Manager->Render()))
@@ -203,6 +207,9 @@ void CGameInstance::Compute_TimeDelta(const _wstring& strTimerTag)
 	m_pTimer_Manager->Compute_TimeDelta(strTimerTag);
 }
 
+#pragma endregion
+
+#pragma region FONT_MANAGER
 HRESULT CGameInstance::Load_Font(const _wstring& strFontID, const _tchar* pFontFilePath)
 {
 	if (nullptr == m_pFont_Manager)
@@ -218,8 +225,24 @@ HRESULT CGameInstance::Render_Font(const _wstring& strFontTag, const _tchar* pTe
 
 	return m_pFont_Manager->Render_Font(strFontTag, pText, vPosition, vColor, fRotation, vOrigin, fScale);
 }
-
 #pragma endregion
+
+
+#pragma region COLLIDER_MANAGER
+
+HRESULT CGameInstance::Add_Collider_To_Layer(COLLIDERLAYER eColliderLayer, CCollider* pCollider)
+{
+	return m_pCollider_Manager->Add_Collider_To_Layer(eColliderLayer, pCollider);
+}
+
+HRESULT CGameInstance::Remove_Collider_To_Layer(COLLIDERLAYER eColliderLayer, CCollider* pCollider)
+{
+	return m_pCollider_Manager->Remove_Collider_To_Layer(eColliderLayer, pCollider);
+}
+#pragma endregion
+
+
+
 //
 //void CGameInstance::Transform_Picking_ToLocalSpace(CTransform* pTransformCom)
 //{
@@ -240,6 +263,7 @@ void CGameInstance::Release_Engine()
 	//Safe_Release(m_pPicking);
 	Safe_Release(m_pTimer_Manager);
 	Safe_Release(m_pRenderer);
+	Safe_Release(m_pCollider_Manager);
 	Safe_Release(m_pObject_Manager);
 	Safe_Release(m_pPrototype_Manager);
 	Safe_Release(m_pLevel_Manager);
