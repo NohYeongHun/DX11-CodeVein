@@ -44,7 +44,11 @@ private:
 
 
 private:
-
+	CLoader_Logo m_cLoader_Logo;
+	CLoader_GamePlay m_cLoader_GamePlay;
+	
+	
+private:
 	HRESULT Loading_For_Logo_Level();
 	HRESULT Loading_For_GamePlay_Level();
 

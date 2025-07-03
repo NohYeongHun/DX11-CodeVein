@@ -1,10 +1,10 @@
-#include "Level_Loading.h"
+ï»¿#include "Level_Loading.h"
 
-#include "Loader.h"
-#include "GameInstance.h"
-
-#include "Level_Logo.h"
-#include "Level_GamePlay.h"
+//#include "Loader.h"
+//#include "GameInstance.h"
+//
+//#include "Level_Logo.h"
+//#include "Level_GamePlay.h"
 
 CLevel_Loading::CLevel_Loading(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel { pDevice, pContext }
@@ -15,11 +15,11 @@ HRESULT CLevel_Loading::Initialize(LEVEL eNextLevelID)
 {
 	m_eNextLevelID = eNextLevelID;	 
 
-	/* ÇöÀç ·¹º§À» ±¸¼ºÇØÁÖ±â À§ÇÑ °´Ã¼µéÀ» »ý¼ºÇÑ´Ù. */
+	/* í˜„ìž¬ ë ˆë²¨ì„ êµ¬ì„±í•´ì£¼ê¸° ìœ„í•œ ê°ì²´ë“¤ì„ ìƒì„±í•œë‹¤. */
 	if (FAILED(Ready_GameObjects()))
 		return E_FAIL;
 
-	/* ´ÙÀ½ ·¹º§À» À§ÇÑ ·ÎµùÀÛ¾÷À» ½ÃÀÛ ÇÑ´Ù. */
+	/* ë‹¤ìŒ ë ˆë²¨ì„ ìœ„í•œ ë¡œë”©ìž‘ì—…ì„ ì‹œìž‘ í•œë‹¤. */
 	if (FAILED(Ready_LoadingThread()))
 		return E_FAIL;
 	
@@ -50,7 +50,7 @@ void CLevel_Loading::Update(_float fTimeDelta)
 
 HRESULT CLevel_Loading::Render()
 {
-	/* »ý¼ºÇØ³õÀº °´Ã¼µéÀ» ·»´õÇÑ´Ù. */
+	/* ìƒì„±í•´ë†“ì€ ê°ì²´ë“¤ì„ ë Œë”í•œë‹¤. */
 	m_pLoader->Show_LoadingText();
 
 	return S_OK;

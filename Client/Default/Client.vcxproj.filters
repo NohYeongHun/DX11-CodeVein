@@ -28,6 +28,12 @@
     <Filter Include="02.GameObject">
       <UniqueIdentifier>{85081ef4-12c5-4457-a79f-32e32125ccd1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="97. Imgui">
+      <UniqueIdentifier>{a3dbed13-1654-421e-99af-8738d71e4f06}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Levels\Loading\Loader\Personal">
+      <UniqueIdentifier>{91b5ea89-f2b5-4bb5-a0be-5e14f3856d01}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -65,6 +71,45 @@
     </ClInclude>
     <ClInclude Include="..\Public\ClientPch.h">
       <Filter>99.Defines</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\imstb_truetype.h">
+      <Filter>97. Imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\imconfig.h">
+      <Filter>97. Imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\imgui.h">
+      <Filter>97. Imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Imgui_Define.h">
+      <Filter>97. Imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\imgui_impl_dx11.h">
+      <Filter>97. Imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\imgui_impl_win32.h">
+      <Filter>97. Imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\imgui_internal.h">
+      <Filter>97. Imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Imgui_Manager.h">
+      <Filter>97. Imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\imstb_rectpack.h">
+      <Filter>97. Imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\imstb_textedit.h">
+      <Filter>97. Imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Loader_GamePlay.h">
+      <Filter>01.Levels\Loading\Loader\Personal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Loader_Logo.h">
+      <Filter>01.Levels\Loading\Loader\Personal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Loader_Personal.h">
+      <Filter>01.Levels\Loading\Loader\Personal</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -104,6 +149,39 @@
     </ClCompile>
     <ClCompile Include="..\Private\ClientPch.cpp">
       <Filter>99.Defines</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\imgui.cpp">
+      <Filter>97. Imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\imgui_demo.cpp">
+      <Filter>97. Imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\imgui_draw.cpp">
+      <Filter>97. Imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\imgui_impl_dx11.cpp">
+      <Filter>97. Imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\imgui_impl_win32.cpp">
+      <Filter>97. Imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Imgui_Manager.cpp">
+      <Filter>97. Imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\imgui_tables.cpp">
+      <Filter>97. Imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\imgui_widgets.cpp">
+      <Filter>97. Imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Loader_GamePlay.cpp">
+      <Filter>01.Levels\Loading\Loader\Personal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Loader_Logo.cpp">
+      <Filter>01.Levels\Loading\Loader\Personal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Loader_Personal.cpp">
+      <Filter>01.Levels\Loading\Loader\Personal</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
