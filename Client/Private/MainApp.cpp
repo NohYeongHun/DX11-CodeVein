@@ -1,4 +1,4 @@
-
+﻿
 #include "MainApp.h"
 #include "GameInstance.h"
 
@@ -12,6 +12,11 @@ CMainApp::CMainApp()
 
 HRESULT CMainApp::Initialize()
 {
+#ifdef _DEBUG
+	AllocConsole();
+#endif // DEBUG
+
+	
 	ENGINE_DESC		EngineDesc{};
 
 	EngineDesc.hInst = g_hInst;
@@ -46,6 +51,8 @@ HRESULT CMainApp::Render()
 
 	m_pGameInstance->Draw();
 
+	m_pImGui_Manager->Render();
+
 	m_pGameInstance->Render_End();
 
 	return S_OK;
@@ -54,6 +61,8 @@ HRESULT CMainApp::Render()
 
 HRESULT CMainApp::Ready_Prototype_ForStatic()
 {
+	m_pImGui_Manager = CImgui_Manager::Get_Instance(m_pDevice, m_pContext);
+
 	D3D11_INPUT_ELEMENT_DESC Elements[] =
 	{
 		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
@@ -99,6 +108,12 @@ CMainApp* CMainApp::Create()
 void CMainApp::Free()
 {
 	__super::Free();
+
+#ifdef _DEBUG
+	FreeConsole();
+#endif // DEBUG
+
+	Safe_Release(m_pImGui_Manager);
 
 	Safe_Release(m_pDevice);
 	Safe_Release(m_pContext);

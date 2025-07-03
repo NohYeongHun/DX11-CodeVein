@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "Client_Defines.h"
 #include "Base.h"
@@ -24,6 +24,8 @@ private:
 	CGameInstance*			m_pGameInstance = { nullptr };
 	ID3D11Device*			m_pDevice = { nullptr };
 	ID3D11DeviceContext*	m_pContext = { nullptr };
+
+	CImgui_Manager* m_pImGui_Manager = { nullptr };
 
 private:
 	HRESULT Ready_Prototype_ForStatic();
