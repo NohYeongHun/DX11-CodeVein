@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "Component.h"
 
@@ -19,7 +19,8 @@ public:
 	HRESULT Begin(_uint iPassIndex);
 
 	HRESULT Bind_Matrix(const _char* pConstantName, const _float4x4* pMatrix);
-
+	HRESULT Bind_SRV(const _char* pConstantName, ID3D11ShaderResourceView* pSRV);
+	
 private:
 	ID3DX11Effect*				m_pEffect = { nullptr };
 

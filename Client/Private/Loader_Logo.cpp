@@ -1,32 +1,39 @@
-#include "Loader_Logo.h"
+ï»¿#include "Loader_Logo.h"
 
 HRESULT CLoader_Logo::Loading_Resource(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
 {
-	if (FAILED(Add_Prototype_Component(pDevice, pContext, pGameInstance)))
+	if (FAILED(Add_Prototype_Title(pDevice, pContext, pGameInstance)))
 	{
-		MSG_BOX(TEXT("Create Failed Loading : Logo Component "));
-		return E_FAIL;
-	}
-		
-
-	if (FAILED(Add_Prototype_GameObject(pDevice, pContext, pGameInstance)))
-	{
-		MSG_BOX(TEXT("Create Failed Loading : Logo GameObject "));
-		return E_FAIL;
-	}
-	
-	if (FAILED(Add_Prototype_Block(pDevice, pContext, pGameInstance)))
-	{
-		MSG_BOX(TEXT("Create Failed Loading : Logo Block "));
+		MSG_BOX(TEXT("Create Failed Loading : Title Component "));
 		return E_FAIL;
 	}
 
 	return S_OK;
 }
 
+HRESULT CLoader_Logo::Add_Prototype_Title(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
+{
+
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LOGO), TEXT("Prototype_GameObject_BackGround"),
+		CBackGround::Create(pDevice, pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level)
+		, TEXT("Prototype_Component_Texture_Title")
+		, CTexture::Create(pDevice, pContext, TEXT("../Bin/Resources/Textures/Title/Logo%d.png"), 2))))
+		return E_FAIL;
+
+	//if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LOGO), TEXT("Prototype_Component_Texture_BackGround"),
+	//	CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Default%d.jpg"), 2))))
+
+	
+
+	return S_OK;
+}
+
 HRESULT CLoader_Logo::Add_Prototype_Component(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
 {
-	// lstrcpy(m_szLoadingText, TEXT("ÅØ½ºÃÄ¸¦ ·ÎµùÁßÀÔ´Ï´Ù."));
+	// lstrcpy(m_szLoadingText, TEXT("í…ìŠ¤ì³ë¥¼ ë¡œë”©ì¤‘ìž…ë‹ˆë‹¤."));
 	///* Prototype_Component_Texture_Terrain */
 	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LEVEL_GAMEPLAY), TEXT("Prototype_Component_Texture_Terrain"),
 	//	CTexture::Create(m_pDevice, m_pContext, TEXTURE::RECT, TEXT("../Bin/Resources/Textures/Terrain/Tile0.jpg"), 1))))
@@ -48,7 +55,7 @@ HRESULT CLoader_Logo::Add_Prototype_Component(ID3D11Device* pDevice, ID3D11Devic
 	//	CTexture::Create(m_pDevice, m_pContext, TEXTURE::CUBE, TEXT("../Bin/Resources/Textures/SkyBox/Sky_%d.dds"), 4))))
 	//	return E_FAIL;
 
-	// lstrcpy(m_szLoadingText, TEXT("¸ðµ¨À» ·ÎµùÁßÀÔ´Ï´Ù."));
+	// lstrcpy(m_szLoadingText, TEXT("ëª¨ë¸ì„ ë¡œë”©ì¤‘ìž…ë‹ˆë‹¤."));
 	///* Prototype_Component_VIBuffer_Terrain */
 	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LEVEL_GAMEPLAY), TEXT("Prototype_Component_VIBuffer_Terrain"),
 	//	CVIBuffer_Terrain::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Terrain/Height1.bmp")))))
@@ -60,9 +67,9 @@ HRESULT CLoader_Logo::Add_Prototype_Component(ID3D11Device* pDevice, ID3D11Devic
 	//	return E_FAIL;
 
 	//
-	//lstrcpy(m_szLoadingText, TEXT("½¦ÀÌ´õ¸¦ ·ÎµùÁßÀÔ´Ï´Ù."));
+	//lstrcpy(m_szLoadingText, TEXT("ì‰ì´ë”ë¥¼ ë¡œë”©ì¤‘ìž…ë‹ˆë‹¤."));
 	//
-	//lstrcpy(m_szLoadingText, TEXT("°ÔÀÓ¿ÀºêÁ§Æ®¸¦ ·ÎµùÁßÀÔ´Ï´Ù."));
+	//lstrcpy(m_szLoadingText, TEXT("ê²Œìž„ì˜¤ë¸Œì íŠ¸ë¥¼ ë¡œë”©ì¤‘ìž…ë‹ˆë‹¤."));
 
 	///* Prototype_GameObject_Terrain*/
 	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LEVEL_GAMEPLAY), TEXT("Prototype_GameObject_Terrain"),
@@ -95,15 +102,12 @@ HRESULT CLoader_Logo::Add_Prototype_Component(ID3D11Device* pDevice, ID3D11Devic
 	//	return E_FAIL;
 
 
-	// lstrcpy(m_szLoadingText, TEXT("·ÎµùÀÌ ¿Ï·áµÇ¾ú½À´Ï´Ù."));
+	// lstrcpy(m_szLoadingText, TEXT("ë¡œë”©ì´ ì™„ë£Œë˜ì—ˆìŠµë‹ˆë‹¤."));
 	return S_OK;
 }
 
 HRESULT CLoader_Logo::Add_Prototype_GameObject(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
 {
-	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LOGO), TEXT("Prototype_GameObject_BackGround"),
-		CBackGround::Create(pDevice, pContext))))
-		return E_FAIL;
 
 	return S_OK;
 }

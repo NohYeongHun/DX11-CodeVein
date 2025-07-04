@@ -1,4 +1,4 @@
-
+ï»¿
 #include "MainApp.h"
 #include "GameInstance.h"
 
@@ -51,7 +51,7 @@ HRESULT CMainApp::Render()
 
 	m_pGameInstance->Render_Begin(&vClearColor);
 	
-	// Render Begin Render End »çÀÌ¿¡ ³Ö¾î¾ßÇÔ.
+	// Render Begin Render End ì‚¬ì´ì— ë„£ì–´ì•¼í•¨.
 #ifdef _DEBUG
 	m_pImGui_Manager->Render_Begin();
 #endif // _DEBUG
@@ -102,15 +102,15 @@ HRESULT CMainApp::Ready_Fonts()
 
 HRESULT CMainApp::Ready_Console()
 {
-	AllocConsole(); // ÄÜ¼Ö Ã¢ »ı¼º
+	AllocConsole(); // ì½˜ì†” ì°½ ìƒì„±
 
-	// ÄÜ¼Ö ÀÔÃâ·Â ¸®µğ·º¼Ç
+	// ì½˜ì†” ì…ì¶œë ¥ ë¦¬ë””ë ‰ì…˜
 	FILE* fDummy;
 	freopen_s(&fDummy, "CONOUT$", "w", stdout); // std::cout
 	freopen_s(&fDummy, "CONOUT$", "w", stderr); // std::cerr
 	freopen_s(&fDummy, "CONIN$", "r", stdin);   // std::cin
 
-	std::ios::sync_with_stdio(); // iostream µ¿±âÈ­
+	std::ios::sync_with_stdio(); // iostream ë™ê¸°í™”
 
 	std::cout << "Console created!" << std::endl;
 	return S_OK;

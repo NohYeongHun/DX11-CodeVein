@@ -15,6 +15,7 @@
 #include "Shader.h"
 #include "VIBuffer.h"
 #include "VIBuffer_Rect.h"
+#include "Texture.h"
 
 #pragma endregion
 

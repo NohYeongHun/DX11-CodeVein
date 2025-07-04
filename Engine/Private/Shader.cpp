@@ -1,4 +1,4 @@
-#include "Shader.h"
+﻿#include "Shader.h"
 
 CShader::CShader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CComponent { pDevice, pContext }
@@ -7,7 +7,7 @@ CShader::CShader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 }
 
 CShader::CShader(const CShader& Prototype)
-	: CComponent{ Prototype }
+	: CComponent(Prototype ) 
 	, m_pEffect { Prototype.m_pEffect }
 	, m_iNumPasses { Prototype.m_iNumPasses }
 	, m_InputLayouts { Prototype.m_InputLayouts }
@@ -42,7 +42,7 @@ HRESULT CShader::Initialize_Prototype(const _tchar* pShaderFilePath, const D3D11
 
 	m_iNumPasses = TechniqueDesc.Passes;
 
-	for (size_t i = 0; i < m_iNumPasses; i++)
+	for (_uint i = 0; i < m_iNumPasses; i++)
 	{
 		ID3DX11EffectPass* pPass = pTechnique->GetPassByIndex(i);
 		if (nullptr == pPass)
@@ -93,6 +93,20 @@ HRESULT CShader::Bind_Matrix(const _char* pConstantName, const _float4x4* pMatri
 		return E_FAIL;
 
 	return pMatrixVariable->SetMatrix(reinterpret_cast<const _float*>(pMatrix));	
+}
+
+HRESULT CShader::Bind_SRV(const _char* pConstantName, ID3D11ShaderResourceView* pSRV)
+{
+
+	ID3DX11EffectVariable* pVariable = m_pEffect->GetVariableByName(pConstantName);
+	if (nullptr == pVariable)
+		return E_FAIL;
+
+	ID3DX11EffectShaderResourceVariable* pShaderResourceVariable = pVariable->AsShaderResource();
+	if (nullptr == pShaderResourceVariable)
+		return E_FAIL;
+
+	return pShaderResourceVariable->SetResource(pSRV);
 }
 
 CShader* CShader::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _tchar* pShaderFilePath, const D3D11_INPUT_ELEMENT_DESC* pElements, _uint iNumElements)
