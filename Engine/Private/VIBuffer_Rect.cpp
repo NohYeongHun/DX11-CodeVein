@@ -1,4 +1,4 @@
-#include "VIBuffer_Rect.h"
+﻿#include "VIBuffer_Rect.h"
 
 CVIBuffer_Rect::CVIBuffer_Rect(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CVIBuffer { pDevice, pContext }
@@ -6,7 +6,7 @@ CVIBuffer_Rect::CVIBuffer_Rect(ID3D11Device* pDevice, ID3D11DeviceContext* pCont
 }
 
 CVIBuffer_Rect::CVIBuffer_Rect(const CVIBuffer_Rect& Prototype)
-	: CVIBuffer{ Prototype }
+	: CVIBuffer( Prototype )
 {
 }
 

@@ -79,6 +79,9 @@
     <Filter Include="01.Utility\03.Component\Collider\Manager">
       <UniqueIdentifier>{89e88c9f-7acb-431a-8608-e0dac7b8eda7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.Utility\03.Component\Texture">
+      <UniqueIdentifier>{1cd242c3-494b-45ba-9de4-2e55003a74a8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Timer.cpp">
@@ -239,8 +242,5 @@
     <ClInclude Include="..\Public\Collider.h">
       <Filter>01.Utility\03.Component\Collider</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
 </Project>

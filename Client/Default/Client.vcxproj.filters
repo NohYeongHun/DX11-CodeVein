@@ -34,6 +34,9 @@
     <Filter Include="01.Levels\Loading\Loader\Personal">
       <UniqueIdentifier>{91b5ea89-f2b5-4bb5-a0be-5e14f3856d01}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02.GameObject\UI">
+      <UniqueIdentifier>{6977d529-b211-4a58-b875-96b4d144dec0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -188,8 +191,5 @@
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPosTex.hlsl">
       <Filter>98.Default</Filter>
     </FxCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
 </Project>
