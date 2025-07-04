@@ -37,6 +37,9 @@
 
 #pragma region GAMEOBJECT
 #include "BackGround.h"
+#include "TitleBackGround.h"
+#include "TitleText.h"
+#include "Title.h"
 #pragma endregion
 
 

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "Client_Defines.h"
 #include "Level.h"
@@ -17,7 +17,7 @@ public:
 	virtual HRESULT Render() override;
 
 private:
-	HRESULT Ready_Layer_BackGround(const _wstring& strLayerTag);
+	HRESULT Ready_Layer_Title(const _wstring& strLayerTag);
 
 public:
 	static CLevel_Logo* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

@@ -1,21 +1,21 @@
-﻿#include "BackGround.h"
+﻿#include "TitleBackGround.h"
 
-CBackGround::CBackGround(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-    : CUIObject { pDevice, pContext }
+CTitleBackGround::CTitleBackGround(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+    : CUIObject{ pDevice, pContext }
 {
 }
 
-CBackGround::CBackGround(const CBackGround& Prototype)
-    : CUIObject(Prototype )
+CTitleBackGround::CTitleBackGround(const CTitleBackGround& Prototype)
+    : CUIObject(Prototype)
 {
 }
 
-HRESULT CBackGround::Initialize_Prototype()
+HRESULT CTitleBackGround::Initialize_Prototype()
 {
     return S_OK;
 }
 
-HRESULT CBackGround::Initialize(void* pArg)
+HRESULT CTitleBackGround::Initialize(void* pArg)
 {
     UIOBJECT_DESC               Desc{};
     Desc.fX = g_iWinSizeX >> 1;
@@ -32,23 +32,23 @@ HRESULT CBackGround::Initialize(void* pArg)
     return S_OK;
 }
 
-void CBackGround::Priority_Update(_float fTimeDelta)
+void CTitleBackGround::Priority_Update(_float fTimeDelta)
 {
     int a = 10;
 }
 
-void CBackGround::Update(_float fTimeDelta)
+void CTitleBackGround::Update(_float fTimeDelta)
 {
     int a = 10;
 }
 
-void CBackGround::Late_Update(_float fTimeDelta)
+void CTitleBackGround::Late_Update(_float fTimeDelta)
 {
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::UI, this)))
         return;
 }
 
-HRESULT CBackGround::Render()
+HRESULT CTitleBackGround::Render()
 {
     /*
     m_pShaderCom->Bind_Texture();*/
@@ -66,7 +66,7 @@ HRESULT CBackGround::Render()
     if (FAILED(m_pTextureCom->Bind_Shader_Resource(m_pShaderCom, "g_Texture", 0)))
         return E_FAIL;
 
-    m_pShaderCom->Begin(0);    
+    m_pShaderCom->Begin(0);
 
     m_pVIBufferCom->Bind_Resources();
 
@@ -75,7 +75,7 @@ HRESULT CBackGround::Render()
     return S_OK;
 }
 
-HRESULT CBackGround::Ready_Components()
+HRESULT CTitleBackGround::Ready_Components()
 {
     if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxPosTex"),
         TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom), nullptr)))
@@ -92,38 +92,37 @@ HRESULT CBackGround::Ready_Components()
     return S_OK;
 }
 
-CBackGround* CBackGround::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CTitleBackGround* CTitleBackGround::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-    CBackGround* pInstance = new CBackGround(pDevice, pContext);
+    CTitleBackGround* pInstance = new CTitleBackGround(pDevice, pContext);
 
     if (FAILED(pInstance->Initialize_Prototype()))
     {
-        MSG_BOX(TEXT("Failed to Created : CBackGround"));
+        MSG_BOX(TEXT("Failed to Created : CTitleBackGround"));
         Safe_Release(pInstance);
     }
 
     return pInstance;
 }
 
-CGameObject* CBackGround::Clone(void* pArg)
+CGameObject* CTitleBackGround::Clone(void* pArg)
 {
-    CBackGround* pInstance = new CBackGround(*this);
+    CTitleBackGround* pInstance = new CTitleBackGround(*this);
 
     if (FAILED(pInstance->Initialize(pArg)))
     {
-        MSG_BOX(TEXT("Failed to Created : CBackGround"));
+        MSG_BOX(TEXT("Failed to Created : CTitleBackGround"));
         Safe_Release(pInstance);
     }
 
     return pInstance;
 }
 
-void CBackGround::Free()
+void CTitleBackGround::Free()
 {
     __super::Free();
 
     Safe_Release(m_pVIBufferCom);
-
     Safe_Release(m_pShaderCom);
     Safe_Release(m_pTextureCom);
 }

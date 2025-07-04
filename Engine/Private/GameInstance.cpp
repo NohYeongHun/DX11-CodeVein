@@ -139,6 +139,15 @@ HRESULT CGameInstance::Open_Level(_uint iLevelID, CLevel* pNewLevel)
 	return m_pLevel_Manager->Open_Level(iLevelID, pNewLevel);
 }
 
+/* 현재 레벨 확인. */
+_uint CGameInstance::Get_CurrentLevelID()
+{
+	if (nullptr == m_pLevel_Manager)
+		return 0;
+
+	return m_pLevel_Manager->Get_CurrentLevelID();
+}
+
 #pragma endregion
 
 #pragma region PROTOTYPE_MANAGER

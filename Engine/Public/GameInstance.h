@@ -29,6 +29,7 @@ public:
 #pragma region LEVEL_MANAGER
 public:
 	HRESULT Open_Level(_uint iLevelID, class CLevel* pNewLevel);
+	_uint Get_CurrentLevelID();
 #pragma endregion
 
 #pragma region PROTOTYPE_MANAGER
@@ -85,7 +86,7 @@ private:
 	class CTimer_Manager*		m_pTimer_Manager = { nullptr };
 	class CPicking*				m_pPicking = { nullptr };
 	class CFont_Manager*		m_pFont_Manager = { nullptr };
-	class CCollider_Manager* m_pCollider_Manager = { nullptr };
+	class CCollider_Manager*	m_pCollider_Manager = { nullptr };
 
 public:
 	void Release_Engine();

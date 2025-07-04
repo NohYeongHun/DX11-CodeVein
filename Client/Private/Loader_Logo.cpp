@@ -14,14 +14,41 @@ HRESULT CLoader_Logo::Loading_Resource(ID3D11Device* pDevice, ID3D11DeviceContex
 HRESULT CLoader_Logo::Add_Prototype_Title(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
 {
 
-	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LOGO), TEXT("Prototype_GameObject_BackGround"),
-		CBackGround::Create(pDevice, pContext))))
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LOGO), TEXT("Prototype_GameObject_Title"),
+		CTitle::Create(pDevice, pContext))))
 		return E_FAIL;
 
 	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level)
 		, TEXT("Prototype_Component_Texture_Title")
-		, CTexture::Create(pDevice, pContext, TEXT("../Bin/Resources/Textures/Title/Logo%d.png"), 2))))
+		, CTexture::Create(pDevice, pContext, TEXT("../Bin/Resources/Textures/Title/Logo%d.png"), 1))))
 		return E_FAIL;
+
+
+#pragma region Title BackGround
+	//if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LOGO), TEXT("Prototype_GameObject_Title"),
+	//	CTitle::Create(pDevice, pContext))))
+	//	return E_FAIL;
+
+	/*if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level)
+		, TEXT("Prototype_Component_Texture_Title_BackGround")
+		, CTexture::Create(pDevice, pContext, TEXT("../Bin/Resources/Textures/Title/Text%d.png"), 4))))
+		return E_FAIL;*/
+
+#pragma endregion
+
+
+#pragma region Title Text
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LOGO), TEXT("Prototype_GameObject_TitleText"),
+		CTitleText::Create(pDevice, pContext))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level)
+		, TEXT("Prototype_Component_Texture_Title_Text")
+		, CTexture::Create(pDevice, pContext, TEXT("../Bin/Resources/Textures/Title/Text%d.png"), 5))))
+		return E_FAIL;
+#pragma endregion
+
+
 
 	//if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LOGO), TEXT("Prototype_Component_Texture_BackGround"),
 	//	CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Default%d.jpg"), 2))))

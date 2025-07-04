@@ -1,4 +1,4 @@
-#ifndef Engine_Typedef_h__
+ï»¿#ifndef Engine_Typedef_h__
 #define Engine_Typedef_h__
 
 namespace Engine
@@ -25,22 +25,22 @@ namespace Engine
 	typedef		float						_float;	
 	typedef		double						_double;
 
-	/* ÀúÀå¿ë º¤ÅÍ¿Í Çà·Ä */
+	/* ì €ì¥ìš© ë²¡í„°ì™€ í–‰ë ¬ */
 	typedef		XMFLOAT2					_float2;
 	typedef		XMFLOAT3					_float3;
 	typedef		XMFLOAT4					_float4;
 	typedef		XMFLOAT4X4					_float4x4;
 
-	/* ¿¬»ê¿ë º¤ÅÍ¿Í Çà·Ä 64ºñÆ® È¯°æ¿¡¼­ SIMD(º´·Ä)¿¬»ê */
-	typedef		XMVECTOR					_vector;
-	typedef		FXMVECTOR					_fvector;
-	typedef		GXMVECTOR					_gvector;
-	typedef		HXMVECTOR					_hvector;
-	typedef		CXMVECTOR					_cvector;
+	/* ì—°ì‚°ìš© ë²¡í„°ì™€ í–‰ë ¬ 64ë¹„íŠ¸ í™˜ê²½ì—ì„œ SIMD(ë³‘ë ¬)ì—°ì‚° */
+	typedef		XMVECTOR					_vector; 
+	typedef		FXMVECTOR					_fvector; // 3
+	typedef		GXMVECTOR					_gvector; // 4,
+	typedef		HXMVECTOR					_hvector; // 5, 6
+	typedef		CXMVECTOR					_cvector; // 7ì´ìƒ
 
-	typedef		XMMATRIX					_matrix;
-	typedef		FXMMATRIX					_fmatrix;
-	typedef		CXMMATRIX					_cmatrix;
+	typedef		XMMATRIX					_matrix; // ê·¸ëƒ¥
+	typedef		FXMMATRIX					_fmatrix; // 1, 2
+	typedef		CXMMATRIX					_cmatrix; // 3ì´ìƒ
 	
 
 

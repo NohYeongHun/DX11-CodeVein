@@ -1,8 +1,5 @@
-#include "Level_Logo.h"
+ï»¿#include "Level_Logo.h"
 
-#include "GameInstance.h"
-
-#include "Level_Loading.h"
 
 CLevel_Logo::CLevel_Logo(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel { pDevice, pContext }
@@ -12,10 +9,10 @@ CLevel_Logo::CLevel_Logo(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 HRESULT CLevel_Logo::Initialize()
 {
 
-	/* ÇöÀç ·¹º§À» ±¸¼ºÇØÁÖ±â À§ÇÑ °´Ã¼µéÀ» »ý¼ºÇÑ´Ù. */
-	if (FAILED(Ready_Layer_BackGround(TEXT("Layer_BackGround"))))
+	/* í˜„ìž¬ ë ˆë²¨ì„ êµ¬ì„±í•´ì£¼ê¸° ìœ„í•œ ê°ì²´ë“¤ì„ ìƒì„±í•œë‹¤. */
+	if (FAILED(Ready_Layer_Title(TEXT("Layer_Title"))))
 		return E_FAIL;
-
+	
 	
 	return S_OK;
 }
@@ -33,15 +30,15 @@ void CLevel_Logo::Update(_float fTimeDelta)
 
 HRESULT CLevel_Logo::Render()
 {
-	SetWindowText(g_hWnd, TEXT("·Î°í·¹º§ÀÔ´Ï´Ù."));
+	SetWindowText(g_hWnd, TEXT("ë¡œê³ ë ˆë²¨ìž…ë‹ˆë‹¤."));
 
 	return S_OK;
 }
 
-HRESULT CLevel_Logo::Ready_Layer_BackGround(const _wstring& strLayerTag)
+HRESULT CLevel_Logo::Ready_Layer_Title(const _wstring& strLayerTag)
 {
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::LOGO), strLayerTag,
-		ENUM_CLASS(LEVEL::LOGO), TEXT("Prototype_GameObject_BackGround"))))
+		ENUM_CLASS(LEVEL::LOGO), TEXT("Prototype_GameObject_Title"))))
 		return E_FAIL;
 
 	return S_OK;
