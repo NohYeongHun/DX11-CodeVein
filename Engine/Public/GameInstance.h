@@ -47,6 +47,9 @@ public:
 #pragma region RENDERER
 public:
 	HRESULT Add_RenderGroup(RENDERGROUP eRenderGroup, class CGameObject* pRenderObject);
+	HRESULT Apply_BlendeState();
+	HRESULT Apply_DepthStencilOff();
+	HRESULT Apply_DefaultStates();
 #pragma endregion
 //
 #pragma region TIMER_MANAGER

@@ -196,6 +196,21 @@ HRESULT CGameInstance::Add_RenderGroup(RENDERGROUP eRenderGroup, CGameObject* pR
 	return m_pRenderer->Add_RenderGroup(eRenderGroup, pRenderObject);
 }
 
+HRESULT CGameInstance::Apply_BlendeState()
+{
+	return m_pRenderer->Apply_BlendeState();
+}
+
+HRESULT CGameInstance::Apply_DepthStencilOff()
+{
+	return m_pRenderer->Apply_DepthStencilOff();
+}
+
+HRESULT CGameInstance::Apply_DefaultStates()
+{
+	return m_pRenderer->Apply_DefaultStates();
+}
+
 
 #pragma endregion
 

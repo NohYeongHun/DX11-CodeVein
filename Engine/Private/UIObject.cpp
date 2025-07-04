@@ -176,11 +176,20 @@ HRESULT CUIObject::Begin()
 
 	XMStoreFloat4x4(&m_RenderMatrix, matWorld);
 
+
+	/* Alpha Blend On, DepthStencil Off*/
+	m_pGameInstance->Apply_BlendeState();
+	m_pGameInstance->Apply_DepthStencilOff();
+
+
 	return S_OK;
 }
 
 HRESULT CUIObject::End()
 {
+	/* Defautl Setting 설정 */
+	m_pGameInstance->Apply_DefaultStates();
+
 	return S_OK;
 }
 

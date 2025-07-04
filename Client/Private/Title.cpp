@@ -35,7 +35,7 @@ HRESULT CTitle::Initialize(void* pArg)
         return E_FAIL;
 
     
-    m_fFrameTime = m_pGameInstance->Get_TimeDelta(TEXT("Timer_60"));
+    m_pGameInstance->Get_TimeDelta(TEXT("Timer_60"));
    
 
     return S_OK;
@@ -69,29 +69,22 @@ HRESULT CTitle::Render()
     * Transform의 월드 행렬에는 Parent의 월드행렬이 모두 곱해져 있어야 한다.
     */
 
-    //if (FAILED(m_pTransformCom->Bind_Shader_Resource(m_pShaderCom, "g_WorldMatrix")))
+    //if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &m_RenderMatrix)))
     //    return E_FAIL;
-
-    if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &m_RenderMatrix)))
-        return E_FAIL;
-
-    // 갱신된 WorldMatrix로 설정된다.
-    //if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", m_pTransformCom->Get_WorldMatrix())))
+    //
+    //if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix)))
     //    return E_FAIL;
-    
-    if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix)))
-        return E_FAIL;
-    if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
-        return E_FAIL;
-    
-    if (FAILED(m_pTextureCom->Bind_Shader_Resource(m_pShaderCom, "g_Texture", 0)))
-        return E_FAIL;
-    
-    m_pShaderCom->Begin(0);    
-    
-    m_pVIBufferCom->Bind_Resources();
-    
-    m_pVIBufferCom->Render();
+    //if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
+    //    return E_FAIL;
+    //
+    //if (FAILED(m_pTextureCom->Bind_Shader_Resource(m_pShaderCom, "g_Texture", 0)))
+    //    return E_FAIL;
+    //
+    //m_pShaderCom->Begin(0);    
+    //
+    //m_pVIBufferCom->Bind_Resources();
+    //
+    //m_pVIBufferCom->Render();
 
     return S_OK;
 }
@@ -117,14 +110,17 @@ HRESULT CTitle::Ready_Childs()
 {
     // AddChild();
 
-    UIOBJECT_DESC        TitleTextDesc{};
-    TitleTextDesc.fX = 100;
+    CTitleText::TITLETEXT_DESC TitleTextDesc{};
+    TitleTextDesc.fX = 0;
+    TitleTextDesc.fY = 0;
+    TitleTextDesc.fSizeX = 1280;
+    TitleTextDesc.fSizeY = 280;
+    
+
+    CUIObject* pUIObject = nullptr;
+    TitleTextDesc.iTextureIndex = 0;
     TitleTextDesc.fY = 100;
-    TitleTextDesc.fSizeX = 400;
-    TitleTextDesc.fSizeY = 200;
-
-
-    CUIObject* pUIObject = dynamic_cast<CUIObject*>(
+    pUIObject = dynamic_cast<CUIObject*>(
         m_pGameInstance->Clone_Prototype(
             PROTOTYPE::GAMEOBJECT
             , ENUM_CLASS(LEVEL::LOGO)
@@ -134,6 +130,21 @@ HRESULT CTitle::Ready_Childs()
         return E_FAIL;
 
     AddChild(pUIObject);
+
+    pUIObject = nullptr;
+    TitleTextDesc.iTextureIndex = 3;
+    TitleTextDesc.fY = 150;
+    pUIObject = dynamic_cast<CUIObject*>(
+        m_pGameInstance->Clone_Prototype(
+            PROTOTYPE::GAMEOBJECT
+            , ENUM_CLASS(LEVEL::LOGO)
+            , TEXT("Prototype_GameObject_TitleText"), &TitleTextDesc));
+
+    if (nullptr == pUIObject)
+        return E_FAIL;
+
+    AddChild(pUIObject);
+    
 
     return S_OK;
 }

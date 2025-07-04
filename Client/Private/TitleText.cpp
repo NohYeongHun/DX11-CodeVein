@@ -18,19 +18,21 @@ HRESULT CTitleText::Initialize_Prototype()
 
 HRESULT CTitleText::Initialize(void* pArg)
 {
-    UIOBJECT_DESC               Desc{};
-    Desc.fX = 400;
-    Desc.fY = 0;
-    Desc.fSizeX = 200;
-    Desc.fSizeY = 200;
-
-    if (FAILED(__super::Initialize(&Desc)))
+    if (nullptr == pArg)
         return E_FAIL;
+
+    TITLETEXT_DESC* pDesc = static_cast<TITLETEXT_DESC*>(pArg);
+    
+
+    if (FAILED(__super::Initialize(pDesc)))
+        return E_FAIL;
+
+    m_iTextureIndex = pDesc->iTextureIndex;
 
     if (FAILED(Ready_Components()))
         return E_FAIL;
 
-    m_fFrameTime = m_pGameInstance->Get_TimeDelta(TEXT("Timer_60"));
+    //m_fChangeTime = m_pGameInstance->Get_TimeDelta(TEXT("Timer_60"));
 
     return S_OK;
 }
@@ -49,6 +51,11 @@ void CTitleText::Late_Update(_float fTimeDelta)
 {
     __super::Late_Update(fTimeDelta);
 
+    if (m_fChangeTime <= 5.f)
+        m_fChangeTime += fTimeDelta;
+    else
+        m_fChangeTime = 0.f;
+
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::UI, this)))
         return;
 }
@@ -65,15 +72,27 @@ HRESULT CTitleText::Render()
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
         return E_FAIL;
 
-    if (FAILED(m_pTextureCom->Bind_Shader_Resource(m_pShaderCom, "g_Texture", 4)))
+    if (FAILED(m_pShaderCom->Bind_Int("g_iTextureIndex", m_iTextureIndex)))
         return E_FAIL;
 
-    m_pShaderCom->Begin(0);
+    if (FAILED(m_pShaderCom->Bind_Int("g_fTime", m_fChangeTime)))
+        return E_FAIL;
+
+
+    if (FAILED(m_pTextureCom->Bind_Shader_Resource(m_pShaderCom, "g_Texture", m_iTextureIndex)))
+        return E_FAIL;
+
+    m_pShaderCom->Begin(1);
 
     m_pVIBufferCom->Bind_Resources();
 
+
+    
+
+
     m_pVIBufferCom->Render();
 
+    
     __super::End();
 
     return S_OK;

@@ -1,10 +1,10 @@
-#pragma once
+ï»¿#pragma once
 
 #include "Base.h"
 
-/* Ãß°¡ÇÏ´Â ±â´É. */
-/* È­¸é¿¡ ±×·ÁÁú °´Ã¼µéÀ» ±×¸®´Â ¼ø¼­´ë·Î ºĞ·ùÇÏ¿© º¸°üÇÑ Å¬·¡½º */
-/* º¸°üÇÑ ¼ø¼­´ë·Î °´«b¸£ÀÇ ·»´õÄİÀ» ÇØÁØ´Ù. */
+/* ì¶”ê°€í•˜ëŠ” ê¸°ëŠ¥. */
+/* í™”ë©´ì— ê·¸ë ¤ì§ˆ ê°ì²´ë“¤ì„ ê·¸ë¦¬ëŠ” ìˆœì„œëŒ€ë¡œ ë¶„ë¥˜í•˜ì—¬ ë³´ê´€í•œ í´ë˜ìŠ¤ */
+/* ë³´ê´€í•œ ìˆœì„œëŒ€ë¡œ ê°ì²»ë¥´ì˜ ë Œë”ì½œì„ í•´ì¤€ë‹¤. */
 
 NS_BEGIN(Engine)
 
@@ -16,8 +16,17 @@ private:
 
 public:
 	HRESULT Initialize();
+
+#pragma region ENGINEì— ì œê³µ
 	HRESULT Add_RenderGroup(RENDERGROUP eRenderGroup, class CGameObject* pRenderObject);
 	HRESULT Draw();
+
+	HRESULT Apply_BlendeState();
+	HRESULT Apply_DepthStencilOff();
+	HRESULT Apply_DefaultStates();
+#pragma endregion
+
+	
 
 private:
 	ID3D11Device*							m_pDevice = { nullptr };
@@ -25,12 +34,22 @@ private:
 
 	list<class CGameObject*>				m_RenderObjects[ENUM_CLASS(RENDERGROUP::END)];
 
+#pragma region BlendState ì„¤ì •.
+	ID3D11BlendState* m_pAlphaBlend = nullptr;
+	ID3D11DepthStencilState* m_pDepthOff = nullptr;
+	ID3D11DepthStencilState* m_pDepthOn = nullptr;
+
+#pragma endregion
+
+
 private:
 	HRESULT Render_Priority();
 	HRESULT Render_NonBlend();
 	HRESULT Render_Blend();
 	HRESULT Render_UI();
 
+private:
+	HRESULT Ready_Render_State();
 
 public:
 	static CRenderer* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
