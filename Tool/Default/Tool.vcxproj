@@ -159,7 +159,7 @@
     <ClInclude Include="..\Public\imstb_rectpack.h" />
     <ClInclude Include="..\Public\imstb_textedit.h" />
     <ClInclude Include="..\Public\imstb_truetype.h" />
-    <ClInclude Include="..\Public\MainApp.h" />
+    <ClInclude Include="..\Public\Tool_MainApp.h" />
     <ClInclude Include="..\public\Map_Tool.h" />
     <ClInclude Include="..\Public\ToolPch.h" />
     <ClInclude Include="..\Public\Tool_Defines.h" />
@@ -179,7 +179,7 @@
     <ClCompile Include="..\Private\Imgui_Manager.cpp" />
     <ClCompile Include="..\Private\imgui_tables.cpp" />
     <ClCompile Include="..\Private\imgui_widgets.cpp" />
-    <ClCompile Include="..\Private\MainApp.cpp" />
+    <ClCompile Include="..\Private\Tool_MainApp.cpp" />
     <ClCompile Include="..\private\Map_Tool.cpp" />
     <ClCompile Include="..\Private\ToolPch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

@@ -46,7 +46,7 @@ HRESULT CTexture::Initialize_Prototype(const _tchar* pTextureFilePath, _uint iNu
     return S_OK;
 }
 
-HRESULT CTexture::Initialize(void* pArg)
+HRESULT CTexture::Initialize_Clone(void* pArg)
 {
     return S_OK;
 }
@@ -74,7 +74,7 @@ CTexture* CTexture::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext,
 CTexture* CTexture::Clone(void* pArg)
 {
     CTexture* pInstance = new CTexture(*this);
-    if (FAILED(pInstance->Initialize(pArg)))
+    if (FAILED(pInstance->Initialize_Clone(pArg)))
     {
         MSG_BOX(TEXT("Clone Failed : CTexture"));
         Safe_Release(pInstance);

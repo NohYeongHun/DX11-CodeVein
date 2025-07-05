@@ -19,7 +19,7 @@ private:
 	virtual ~CLevel_Loading() = default;
 
 public:
-	virtual HRESULT Initialize(LEVEL eNextLevelID);
+	virtual HRESULT Initialize_Clone(LEVEL eNextLevelID);
 	virtual void Update(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
 

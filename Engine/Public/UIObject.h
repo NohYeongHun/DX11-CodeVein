@@ -24,7 +24,7 @@ protected:
 
 public:
 	virtual HRESULT Initialize_Prototype();
-	virtual HRESULT Initialize(void* pArg);
+	virtual HRESULT Initialize_Clone(void* pArg);
 	virtual void Priority_Update(_float fTimeDelta);
 	virtual void Update(_float fTimeDelta);
 	virtual void Late_Update(_float fTimeDelta);
@@ -45,7 +45,7 @@ public:
 
 
 protected:
-	CUIObject* m_pParent = { nullptr };
+	CUIObject*				m_pParent = { nullptr };
 	vector<CUIObject*>		m_Children = {};
 	_float4x4				m_RenderMatrix = {}; // 부모의 행렬을 곱한 최종 렌더링 위치.
 	_float4x4				m_ViewMatrix = {};

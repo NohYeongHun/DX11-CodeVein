@@ -79,7 +79,7 @@ HRESULT CVIBuffer_Rect::Initialize_Prototype()
 	return S_OK;
 }
 
-HRESULT CVIBuffer_Rect::Initialize(void* pArg)
+HRESULT CVIBuffer_Rect::Initialize_Clone(void* pArg)
 {
 	return S_OK;
 }
@@ -101,7 +101,7 @@ CComponent* CVIBuffer_Rect::Clone(void* pArg)
 {
 	CVIBuffer_Rect* pInstance = new CVIBuffer_Rect(*this);
 
-	if (FAILED(pInstance->Initialize(pArg)))
+	if (FAILED(pInstance->Initialize_Clone(pArg)))
 	{
 		MSG_BOX(TEXT("Failed to Cloned : CVIBuffer_Rect"));
 		Safe_Release(pInstance);

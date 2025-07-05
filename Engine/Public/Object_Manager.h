@@ -1,9 +1,9 @@
-#pragma once
+ï»¿#pragma once
 
 #include "Base.h"
 
-/* »çº» °ÔÀÓ¿ÀºêÁ§Æ®¸¦ »ý¼ºÇÏ¿© º¸°üÇÑ´Ù. */
-/* º¸°ü : ·¹º§º°·Î, »ç¿ëÀÚÀÇ Á¤ÀÇ¿¡ µû¶ó ±×·ìÁö¾î¼­ */
+/* ì‚¬ë³¸ ê²Œìž„ì˜¤ë¸Œì íŠ¸ë¥¼ ìƒì„±í•˜ì—¬ ë³´ê´€í•œë‹¤. */
+/* ë³´ê´€ : ë ˆë²¨ë³„ë¡œ, ì‚¬ìš©ìžì˜ ì •ì˜ì— ë”°ë¼ ê·¸ë£¹ì§€ì–´ì„œ */
 
 
 NS_BEGIN(Engine)

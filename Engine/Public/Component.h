@@ -13,7 +13,7 @@ protected:
 
 public:
 	virtual HRESULT Initialize_Prototype();
-	virtual HRESULT Initialize(void* pArg);
+	virtual HRESULT Initialize_Clone(void* pArg);
 
 protected:
 	ID3D11Device*					m_pDevice = { nullptr };

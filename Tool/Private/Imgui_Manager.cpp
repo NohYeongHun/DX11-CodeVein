@@ -69,7 +69,7 @@ void CImgui_Manager::Render_End()
     ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 }
 
-HRESULT CImgui_Manager::Initialize(HWND hWnd, ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+HRESULT CImgui_Manager::Initialize_Clone(HWND hWnd, ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
     // 1. 컨텍스트 생성.
     IMGUI_CHECKVERSION();
@@ -95,7 +95,7 @@ HRESULT CImgui_Manager::Initialize(HWND hWnd, ID3D11Device* pDevice, ID3D11Devic
 CImgui_Manager* CImgui_Manager::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
     CImgui_Manager* pInstance = new CImgui_Manager(pDevice, pContext);
-    if (FAILED(pInstance->Initialize(g_hWnd, pDevice, pContext)))
+    if (FAILED(pInstance->Initialize_Clone(g_hWnd, pDevice, pContext)))
     {
         MSG_BOX(TEXT("Create Failed : CImgui_Manager"));
         Safe_Release(pInstance);

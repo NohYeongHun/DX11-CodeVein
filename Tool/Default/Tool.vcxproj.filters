@@ -78,7 +78,7 @@
     <ClInclude Include="..\Public\imstb_truetype.h">
       <Filter>97. Imgui\Dependency</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\MainApp.h">
+    <ClInclude Include="..\Public\Tool_MainApp.h">
       <Filter>00. MainApp</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Map_Tool.h">
@@ -130,7 +130,7 @@
     <ClCompile Include="..\Private\imgui_impl_dx11.cpp">
       <Filter>97. Imgui\Dependency</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\MainApp.cpp">
+    <ClCompile Include="..\Private\Tool_MainApp.cpp">
       <Filter>00. MainApp</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Map_Tool.cpp">

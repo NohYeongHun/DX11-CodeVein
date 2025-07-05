@@ -9,7 +9,7 @@ private:
 	virtual ~CMap_Tool() = default;
 
 public:
-	HRESULT Initialize();
+	HRESULT Initialize_Clone();
 	
 public:
 	void ImGui_Render();

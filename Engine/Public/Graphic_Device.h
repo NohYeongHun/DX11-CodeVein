@@ -17,7 +17,7 @@ private:
 public:
 	/* 그래픽 디바이스의 초기화. */
 	/* 장치객체를 생성한다. */
-	HRESULT Initialize(HWND hWnd, WINMODE isWindowed, _uint iWinSizeX, _uint iWinSizeY,
+	HRESULT Initialize_Clone(HWND hWnd, WINMODE isWindowed, _uint iWinSizeX, _uint iWinSizeY,
 		_Inout_ ID3D11Device** ppDevice, _Inout_ ID3D11DeviceContext** ppContext);
 
 

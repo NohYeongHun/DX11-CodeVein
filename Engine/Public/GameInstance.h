@@ -74,6 +74,12 @@ public:
 	HRESULT Remove_Collider_To_Layer(COLLIDERLAYER eColliderLayer, class CCollider* pCollider);
 #pragma endregion
 
+#pragma region TEXTURE_MANAGER
+public:
+	HRESULT Add_Texture(_uint iLevelIndex, const _wstring& strPrototypeTag, const _wstring& strTextureTag);
+	void	Change_Texture_ToGameObject(class CGameObject* pGameObject, const _wstring& strComponentTag, class CComponent** ppOut, _uint iLevelIndex, const _wstring& strTextureTag);
+#pragma endregion
+
 //
 //#pragma region PICKING 
 //	void Transform_Picking_ToLocalSpace(class CTransform* pTransformCom);
@@ -90,6 +96,7 @@ private:
 	class CPicking*				m_pPicking = { nullptr };
 	class CFont_Manager*		m_pFont_Manager = { nullptr };
 	class CCollider_Manager*	m_pCollider_Manager = { nullptr };
+	class CTexture_Manager*		m_pTexture_Manager = { nullptr };
 
 public:
 	void Release_Engine();

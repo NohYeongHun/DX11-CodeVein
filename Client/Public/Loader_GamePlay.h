@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Loader_Personal.h"
 
 NS_BEGIN(Client)
@@ -16,8 +16,8 @@ public:
 private:
     HRESULT Add_Prototype_Component(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance);
     HRESULT Add_Prototype_GameObject(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance);
-    HRESULT Add_Prototype_Block(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance);
-    HRESULT Add_Prototype_Platform(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance);
+    //HRESULT Add_Prototype_GameObject(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance);
+    
     
 
 };

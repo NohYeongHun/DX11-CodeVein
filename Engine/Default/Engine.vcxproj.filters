@@ -82,6 +82,9 @@
     <Filter Include="01.Utility\03.Component\Texture">
       <UniqueIdentifier>{1cd242c3-494b-45ba-9de4-2e55003a74a8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.Utility\03.Component\Texture\Manager">
+      <UniqueIdentifier>{00f42107-0aaa-41ed-a991-1c54fcb90b42}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Timer.cpp">
@@ -155,6 +158,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Texture.cpp">
       <Filter>01.Utility\03.Component\Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Texture_Manager.cpp">
+      <Filter>01.Utility\03.Component\Texture\Manager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -247,6 +253,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\Texture.h">
       <Filter>01.Utility\03.Component\Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Texture_Manager.h">
+      <Filter>01.Utility\03.Component\Texture\Manager</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

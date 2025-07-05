@@ -7,7 +7,7 @@ CGraphic_Device::CGraphic_Device()
 	
 }
 
-HRESULT CGraphic_Device::Initialize(HWND hWnd, WINMODE isWindowed, _uint iWinSizeX, _uint iWinSizeY, _Inout_ ID3D11Device** ppDevice, _Inout_ ID3D11DeviceContext** ppContext)
+HRESULT CGraphic_Device::Initialize_Clone(HWND hWnd, WINMODE isWindowed, _uint iWinSizeX, _uint iWinSizeY, _Inout_ ID3D11Device** ppDevice, _Inout_ ID3D11DeviceContext** ppContext)
 {
 	_uint		iFlag = 0;
 
@@ -229,7 +229,7 @@ CGraphic_Device * CGraphic_Device::Create(HWND hWnd, WINMODE isWindowed, _uint i
 {
 	CGraphic_Device*		pInstance = new CGraphic_Device();
 
-	if (FAILED(pInstance->Initialize(hWnd, isWindowed, iWinSizeX, iWinSizeY, ppDevice, ppDeviceContextOut)))
+	if (FAILED(pInstance->Initialize_Clone(hWnd, isWindowed, iWinSizeX, iWinSizeY, ppDevice, ppDeviceContextOut)))
 	{
 		MSG_BOX(TEXT("Failed to Created : CGraphic_Device"));
 		Safe_Release(pInstance);

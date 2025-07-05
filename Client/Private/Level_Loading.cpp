@@ -11,7 +11,7 @@ CLevel_Loading::CLevel_Loading(ID3D11Device* pDevice, ID3D11DeviceContext* pCont
 {
 }
 
-HRESULT CLevel_Loading::Initialize(LEVEL eNextLevelID)
+HRESULT CLevel_Loading::Initialize_Clone(LEVEL eNextLevelID)
 {
 	m_eNextLevelID = eNextLevelID;	 
 
@@ -74,7 +74,7 @@ CLevel_Loading* CLevel_Loading::Create(ID3D11Device* pDevice, ID3D11DeviceContex
 {
 	CLevel_Loading* pInstance = new CLevel_Loading(pDevice, pContext);
 
-	if (FAILED(pInstance->Initialize(eNextLevelID)))
+	if (FAILED(pInstance->Initialize_Clone(eNextLevelID)))
 	{
 		MSG_BOX(TEXT("Failed to Created : CLevel_Loading"));
 		Safe_Release(pInstance);

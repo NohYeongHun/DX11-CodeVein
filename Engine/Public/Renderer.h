@@ -15,7 +15,7 @@ private:
 	virtual ~CRenderer() = default;
 
 public:
-	HRESULT Initialize();
+	HRESULT Initialize_Clone();
 
 #pragma region ENGINE에 제공
 	HRESULT Add_RenderGroup(RENDERGROUP eRenderGroup, class CGameObject* pRenderObject);

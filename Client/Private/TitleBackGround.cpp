@@ -15,7 +15,7 @@ HRESULT CTitleBackGround::Initialize_Prototype()
     return S_OK;
 }
 
-HRESULT CTitleBackGround::Initialize(void* pArg)
+HRESULT CTitleBackGround::Initialize_Clone(void* pArg)
 {
     UIOBJECT_DESC               Desc{};
     Desc.fX = g_iWinSizeX >> 1;
@@ -23,7 +23,7 @@ HRESULT CTitleBackGround::Initialize(void* pArg)
     Desc.fSizeX = g_iWinSizeX;
     Desc.fSizeY = g_iWinSizeY;
 
-    if (FAILED(__super::Initialize(&Desc)))
+    if (FAILED(__super::Initialize_Clone(&Desc)))
         return E_FAIL;
 
     if (FAILED(Ready_Components()))
@@ -109,7 +109,7 @@ CGameObject* CTitleBackGround::Clone(void* pArg)
 {
     CTitleBackGround* pInstance = new CTitleBackGround(*this);
 
-    if (FAILED(pInstance->Initialize(pArg)))
+    if (FAILED(pInstance->Initialize_Clone(pArg)))
     {
         MSG_BOX(TEXT("Failed to Created : CTitleBackGround"));
         Safe_Release(pInstance);

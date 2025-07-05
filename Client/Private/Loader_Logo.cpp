@@ -14,7 +14,7 @@ HRESULT CLoader_Logo::Loading_Resource(ID3D11Device* pDevice, ID3D11DeviceContex
 HRESULT CLoader_Logo::Add_Prototype_Title(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
 {
 
-	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LOGO), TEXT("Prototype_GameObject_Title"),
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level), TEXT("Prototype_GameObject_Title"),
 		CTitle::Create(pDevice, pContext))))
 		return E_FAIL;
 

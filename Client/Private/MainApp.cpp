@@ -8,7 +8,7 @@ CMainApp::CMainApp()
 	Safe_AddRef(m_pGameInstance);
 }
 
-HRESULT CMainApp::Initialize()
+HRESULT CMainApp::Initialize_Clone()
 {
 #ifdef _DEBUG
 	AllocConsole();
@@ -75,10 +75,97 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 		CVIBuffer_Rect::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
-	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LEVEL_STATIC), TEXT("Prototype_Component_Transform"),
-	//	CTransform::Create(m_pDevice, m_pContext))))
-	//	return E_FAIL;
 
+	//. 자주 사용하는 얘들 모아둔다.
+	if (FAILED(Ready_Textures()))
+		return E_FAIL;
+
+	if (FAILED(Ready_Fonts()))
+		return E_FAIL;
+
+	if (FAILED(Ready_HUD()))
+		return E_FAIL;
+
+	
+	
+	
+#pragma endregion
+
+
+	return S_OK;
+}
+
+HRESULT CMainApp::Ready_HUD()
+{
+#pragma region HUD 객체
+
+	// Skill Slot UI Texture
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
+		, TEXT("Prototype_Component_Texture_SkillSlot")
+		, CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/User/SkillSlot/SkillSlot%d.png"), 3))))
+		return E_FAIL;
+
+	// Skill Slot
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_SkillIcon"),
+		CSkillIcon::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_SkillSlot"),
+		CSkillSlot::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_SkillPanel"),
+		CSkillPanel::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	// Status 
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
+		, TEXT("Prototype_Component_Texture_HPBar")
+		, CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/User/HPBar/HPBar%d.png"), 2))))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_HPBar"),
+		CHPBar::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_StatusPanel"),
+		CStatusPanel::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_HUD"),
+		CHUD::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CMainApp::Ready_Fonts()
+{
+	if (FAILED(m_pGameInstance
+		->Load_Font(
+			TEXT("HUD_TEXT")
+			, TEXT("../../Resources/Font/CodeVein.spritefont"))))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+// Prototype Manager, Texture Manager에서 사용할 것들. => 미리 생성하고 자주 사용할 것들.
+HRESULT CMainApp::Ready_Textures()
+{
+	// Skill Icon UI Texture
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
+		, TEXT("Prototype_Component_Texture_Action_SkillIcon")
+		, CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/User/SkillIcon/Action/Action%d.png"), 12))))
+		return E_FAIL;
+
+	// Skill Icon을 Texture Manager에 추가 해둡니다.
+	if(FAILED(m_pGameInstance->Add_Texture(ENUM_CLASS(LEVEL::STATIC),
+		TEXT("Prototype_Component_Texture_Action_SkillIcon"), 
+		TEXT("Action_SkillIcon"))))
+		return E_FAIL;
+
+	
 	return S_OK;
 }
 
@@ -94,7 +181,7 @@ CMainApp* CMainApp::Create()
 {
 	CMainApp* pInstance = new CMainApp();
 
-	if (FAILED(pInstance->Initialize()))
+	if (FAILED(pInstance->Initialize_Clone()))
 	{
 		MSG_BOX(TEXT("Failed to Created : CMainApp"));
 		Safe_Release(pInstance);

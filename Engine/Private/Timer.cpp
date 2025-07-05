@@ -10,7 +10,7 @@ CTimer::CTimer()
 }
 
 
-HRESULT CTimer::Initialize()
+HRESULT CTimer::Initialize_Clone()
 {
 	/* 현재 cpu카운팅한 숫자. */
 	QueryPerformanceCounter(&m_FrameTime);			// 1077
@@ -42,7 +42,7 @@ CTimer* CTimer::Create()
 {
 	CTimer* pInstance = new CTimer();
 
-	if (FAILED(pInstance->Initialize()))
+	if (FAILED(pInstance->Initialize_Clone()))
 	{
 		MSG_BOX(TEXT("Failed to Created : CTimer"));
 		Safe_Release(pInstance);

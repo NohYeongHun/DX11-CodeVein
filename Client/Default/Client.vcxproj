@@ -157,6 +157,8 @@
     <ClInclude Include="..\public\BackGround.h" />
     <ClInclude Include="..\Public\ClientPch.h" />
     <ClInclude Include="..\Public\Client_Defines.h" />
+    <ClInclude Include="..\Public\HPBar.h" />
+    <ClInclude Include="..\Public\HUD.h" />
     <ClInclude Include="..\Public\imconfig.h" />
     <ClInclude Include="..\Public\imgui.h" />
     <ClInclude Include="..\Public\Imgui_Define.h" />
@@ -175,6 +177,10 @@
     <ClInclude Include="..\Public\Loader_Logo.h" />
     <ClInclude Include="..\Public\Loader_Personal.h" />
     <ClInclude Include="..\Public\MainApp.h" />
+    <ClInclude Include="..\Public\SkillIcon.h" />
+    <ClInclude Include="..\Public\SkillPanel.h" />
+    <ClInclude Include="..\Public\SkillSlot.h" />
+    <ClInclude Include="..\Public\StatusPanel.h" />
     <ClInclude Include="..\Public\Title.h" />
     <ClInclude Include="..\Public\TitleBackGround.h" />
     <ClInclude Include="..\Public\TitleText.h" />
@@ -188,6 +194,8 @@
     <ClCompile Include="..\Private\ClientPch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="..\Private\HPBar.cpp" />
+    <ClCompile Include="..\Private\HUD.cpp" />
     <ClCompile Include="..\Private\imgui.cpp" />
     <ClCompile Include="..\Private\imgui_demo.cpp" />
     <ClCompile Include="..\Private\imgui_draw.cpp" />
@@ -204,6 +212,10 @@
     <ClCompile Include="..\Private\Loader_Logo.cpp" />
     <ClCompile Include="..\Private\Loader_Personal.cpp" />
     <ClCompile Include="..\Private\MainApp.cpp" />
+    <ClCompile Include="..\Private\SkillIcon.cpp" />
+    <ClCompile Include="..\Private\SkillPanel.cpp" />
+    <ClCompile Include="..\Private\SkillSlot.cpp" />
+    <ClCompile Include="..\Private\StatusPanel.cpp" />
     <ClCompile Include="..\Private\Title.cpp" />
     <ClCompile Include="..\Private\TitleBackGround.cpp" />
     <ClCompile Include="..\Private\TitleText.cpp" />

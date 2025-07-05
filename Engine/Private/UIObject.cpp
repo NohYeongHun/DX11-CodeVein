@@ -8,6 +8,7 @@ CUIObject::CUIObject(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 
 CUIObject::CUIObject(const CUIObject& Prototype)
 	: CGameObject( Prototype )
+	, m_RenderMatrix { Prototype.m_RenderMatrix }
 {
 }
 
@@ -17,12 +18,12 @@ HRESULT CUIObject::Initialize_Prototype()
 	return S_OK;
 }
 
-HRESULT CUIObject::Initialize(void* pArg)
+HRESULT CUIObject::Initialize_Clone(void* pArg)
 {
 	if (nullptr == pArg)
 		return E_FAIL;
 
-	if (FAILED(__super::Initialize(pArg)))
+	if (FAILED(__super::Initialize_Clone(pArg)))
 		return E_FAIL;
 
 	UIOBJECT_DESC* pDesc = static_cast<UIOBJECT_DESC*>(pArg);

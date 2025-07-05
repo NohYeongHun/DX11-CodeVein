@@ -14,7 +14,7 @@ HRESULT CTransform::Initialize_Prototype()
 	return S_OK;
 }
 
-HRESULT CTransform::Initialize(void* pArg)
+HRESULT CTransform::Initialize_Clone(void* pArg)
 {
 	if (nullptr == pArg)
 		return S_OK;

@@ -13,7 +13,7 @@ CLevel::CLevel(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 
 }
 
-HRESULT CLevel::Initialize()
+HRESULT CLevel::Initialize_Clone()
 {
 	return S_OK;
 }

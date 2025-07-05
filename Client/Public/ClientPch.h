@@ -16,11 +16,6 @@
 #include "Loader.h"
 #pragma endregion
 
-
-
-
-
-
 #pragma region LEVEL
 #include "Level_Loading.h"
 #include "Level_Logo.h"
@@ -40,6 +35,15 @@
 #include "TitleBackGround.h"
 #include "TitleText.h"
 #include "Title.h"
+#include "HUD.h"
+#include "SkillIcon.h"
+#include "SkillSlot.h"
+#include "SkillPanel.h"
+
+#include "HPBar.h"
+#include "StatusPanel.h"
+
+
 #pragma endregion
 
 

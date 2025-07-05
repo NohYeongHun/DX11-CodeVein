@@ -13,7 +13,7 @@ private:
 
 public:
 	virtual HRESULT Initialize_Prototype(const _tchar* pShaderFilePath, const D3D11_INPUT_ELEMENT_DESC* pElements, _uint iNumElements);
-	virtual HRESULT Initialize(void* pArg);
+	virtual HRESULT Initialize_Clone(void* pArg);
 
 public:
 	HRESULT Begin(_uint iPassIndex);

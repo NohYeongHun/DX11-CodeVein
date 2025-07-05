@@ -62,7 +62,7 @@ HRESULT CShader::Initialize_Prototype(const _tchar* pShaderFilePath, const D3D11
 	return S_OK;
 }
 
-HRESULT CShader::Initialize(void* pArg)
+HRESULT CShader::Initialize_Clone(void* pArg)
 {
 	return S_OK;
 }
@@ -153,7 +153,7 @@ CComponent* CShader::Clone(void* pArg)
 {
 	CShader* pInstance = new CShader(*this);
 
-	if (FAILED(pInstance->Initialize(pArg)))
+	if (FAILED(pInstance->Initialize_Clone(pArg)))
 	{
 		MSG_BOX(TEXT("Failed to Cloned : CShader"));
 		Safe_Release(pInstance);

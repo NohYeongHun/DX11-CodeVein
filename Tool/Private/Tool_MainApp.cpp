@@ -1,14 +1,13 @@
-﻿
-#include "MainApp.h"
+﻿#include "Tool_MainApp.h"
 #include "GameInstance.h"
 
-CMainApp::CMainApp()
+CTool_MainApp::CTool_MainApp()
 	: m_pGameInstance{ CGameInstance::GetInstance() }
 {
 	Safe_AddRef(m_pGameInstance);
 }
 
-HRESULT CMainApp::Initialize()
+HRESULT CTool_MainApp::Initialize_Clone()
 {
 	ENGINE_DESC		EngineDesc{};
 
@@ -37,12 +36,12 @@ HRESULT CMainApp::Initialize()
 	return S_OK;
 }
 
-void CMainApp::Update(_float fTimeDelta)
+void CTool_MainApp::Update(_float fTimeDelta)
 {
 	m_pGameInstance->Update_Engine(fTimeDelta);
 }
 
-HRESULT CMainApp::Render()
+HRESULT CTool_MainApp::Render()
 {
 	
 	_float4		vClearColor = _float4(0.f, 0.f, 1.f, 1.f);
@@ -71,7 +70,7 @@ HRESULT CMainApp::Render()
 }
 
 
-HRESULT CMainApp::Ready_Prototype_ForStatic()
+HRESULT CTool_MainApp::Ready_Prototype_ForStatic()
 {
 	m_pImGui_Manager = CImgui_Manager::Get_Instance(m_pDevice, m_pContext);
 
@@ -88,8 +87,9 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 	return S_OK;
 }
 
+
 /* Font Rendering */
-HRESULT CMainApp::Ready_Fonts()
+HRESULT CTool_MainApp::Ready_Fonts()
 {
 	if (FAILED(m_pGameInstance
 		->Load_Font(
@@ -100,7 +100,7 @@ HRESULT CMainApp::Ready_Fonts()
 	return S_OK;
 }
 
-HRESULT CMainApp::Ready_Console()
+HRESULT CTool_MainApp::Ready_Console()
 {
 	AllocConsole(); // 콘솔 창 생성
 
@@ -117,20 +117,20 @@ HRESULT CMainApp::Ready_Console()
 }
 
 
-CMainApp* CMainApp::Create()
+CTool_MainApp* CTool_MainApp::Create()
 {
-	CMainApp* pInstance = new CMainApp();
+	CTool_MainApp* pInstance = new CTool_MainApp();
 
-	if (FAILED(pInstance->Initialize()))
+	if (FAILED(pInstance->Initialize_Clone()))
 	{
-		MSG_BOX(TEXT("Failed to Created : CMainApp"));
+		MSG_BOX(TEXT("Failed to Created : CTool_MainApp"));
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-void CMainApp::Free()
+void CTool_MainApp::Free()
 {
 	__super::Free();
 

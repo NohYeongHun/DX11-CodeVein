@@ -19,7 +19,7 @@ unsigned int APIENTRY LoadingMain(void* pArg)
 }
 
 
-HRESULT CLoader::Initialize(LEVEL eNextLevelID)
+HRESULT CLoader::Initialize_Clone(LEVEL eNextLevelID)
 {
 	m_eNextLevelID = eNextLevelID;
 
@@ -95,7 +95,7 @@ CLoader* CLoader::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, L
 {
 	CLoader* pInstance = new CLoader(pDevice, pContext);
 
-	if (FAILED(pInstance->Initialize(eNextLevelID)))
+	if (FAILED(pInstance->Initialize_Clone(eNextLevelID)))
 	{
 		MSG_BOX(TEXT("Failed to Created : CLoader"));
 		Safe_Release(pInstance);

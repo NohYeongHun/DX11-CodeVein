@@ -16,6 +16,7 @@
 #include "VIBuffer.h"
 #include "VIBuffer_Rect.h"
 #include "Texture.h"
+#include "Texture_Manager.h"
 
 #pragma endregion
 

@@ -12,7 +12,7 @@ CMap_Tool::CMap_Tool(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 }
 
 
-HRESULT CMap_Tool::Initialize()
+HRESULT CMap_Tool::Initialize_Clone()
 {
     if(FAILED(Ready_Imgui()))
         return E_FAIL;
@@ -114,7 +114,7 @@ HRESULT CMap_Tool::Ready_Imgui()
 CMap_Tool* CMap_Tool::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
     CMap_Tool* pInstance = new CMap_Tool(pDevice, pContext);
-    if (FAILED(pInstance->Initialize()))
+    if (FAILED(pInstance->Initialize_Clone()))
     {
         MSG_BOX(TEXT("Create Failed : CMap_Tool"));
         Safe_Release(pInstance);

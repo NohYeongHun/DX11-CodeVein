@@ -16,7 +16,7 @@ private:
 	virtual ~CMainApp() = default;
 
 public:
-	HRESULT Initialize();
+	HRESULT Initialize_Clone();
 	void Update(_float fTimeDelta);
 	HRESULT Render();
 
@@ -29,7 +29,11 @@ private:
 
 private:
 	HRESULT Ready_Prototype_ForStatic();
+
+	HRESULT Ready_HUD();
 	HRESULT Ready_Fonts();
+
+	HRESULT Ready_Textures();
 	HRESULT Start_Level(LEVEL eStartLevelID);
 
 public:

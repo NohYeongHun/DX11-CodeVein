@@ -46,7 +46,7 @@ public:
 
 public:
 	virtual HRESULT Initialize_Prototype();
-	virtual HRESULT Initialize(void* pArg);
+	virtual HRESULT Initialize_Clone(void* pArg);
 
 public:
 	HRESULT Bind_Shader_Resource(class CShader* pShader, const _char* pConstantName);

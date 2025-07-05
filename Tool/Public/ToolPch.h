@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "EnginePch.h"
 #include "Tool_Defines.h"
 
@@ -10,5 +10,5 @@
 #include "ImGuiFileDialogConfig.h"
 #pragma endregion
 
-#include "MainApp.h"
+#include "Tool_MainApp.h"
 #include "Map_Tool.h"

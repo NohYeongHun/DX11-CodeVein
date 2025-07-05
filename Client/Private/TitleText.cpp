@@ -16,7 +16,7 @@ HRESULT CTitleText::Initialize_Prototype()
     return S_OK;
 }
 
-HRESULT CTitleText::Initialize(void* pArg)
+HRESULT CTitleText::Initialize_Clone(void* pArg)
 {
     if (nullptr == pArg)
         return E_FAIL;
@@ -24,7 +24,7 @@ HRESULT CTitleText::Initialize(void* pArg)
     TITLETEXT_DESC* pDesc = static_cast<TITLETEXT_DESC*>(pArg);
     
 
-    if (FAILED(__super::Initialize(pDesc)))
+    if (FAILED(__super::Initialize_Clone(pDesc)))
         return E_FAIL;
 
     m_iTextureIndex = pDesc->iTextureIndex;
@@ -75,7 +75,7 @@ HRESULT CTitleText::Render()
     if (FAILED(m_pShaderCom->Bind_Int("g_iTextureIndex", m_iTextureIndex)))
         return E_FAIL;
 
-    if (FAILED(m_pShaderCom->Bind_Int("g_fTime", m_fChangeTime)))
+    if (FAILED(m_pShaderCom->Bind_Float("g_fTime", m_fChangeTime)))
         return E_FAIL;
 
 
@@ -85,10 +85,6 @@ HRESULT CTitleText::Render()
     m_pShaderCom->Begin(1);
 
     m_pVIBufferCom->Bind_Resources();
-
-
-    
-
 
     m_pVIBufferCom->Render();
 
@@ -132,7 +128,7 @@ CGameObject* CTitleText::Clone(void* pArg)
 {
     CTitleText* pInstance = new CTitleText(*this);
 
-    if (FAILED(pInstance->Initialize(pArg)))
+    if (FAILED(pInstance->Initialize_Clone(pArg)))
     {
         MSG_BOX(TEXT("Failed to Clone : CTitleText"));
         Safe_Release(pInstance);

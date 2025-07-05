@@ -1,13 +1,5 @@
 ﻿#include "GameInstance.h"
 
-//#include "Graphic_Device.h"
-//#include "Level_Manager.h"
-//#include "Object_Manager.h"
-//#include "Prototype_Manager.h"
-//#include "Renderer.h"
-//#include "Timer_Manager.h"
-//#include "Picking.h"
-
 IMPLEMENT_SINGLETON(CGameInstance)
 
 CGameInstance::CGameInstance()
@@ -54,6 +46,11 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11De
 	
 	m_pCollider_Manager = CCollider_Manager::Create(EngineDesc.iNumLevels);
 	if (nullptr == m_pCollider_Manager)
+		return E_FAIL;
+
+	// Texture 자원 공유용
+	m_pTexture_Manager = CTexture_Manager::Create(EngineDesc.iNumLevels);
+	if (nullptr == m_pTexture_Manager)
 		return E_FAIL;
 
 	return S_OK;
@@ -251,8 +248,7 @@ HRESULT CGameInstance::Render_Font(const _wstring& strFontTag, const _tchar* pTe
 }
 #pragma endregion
 
-
-#pragma region COLLIDER_MANAGER
+ #pragma region COLLIDER_MANAGER
 
 HRESULT CGameInstance::Add_Collider_To_Layer(COLLIDERLAYER eColliderLayer, CCollider* pCollider)
 {
@@ -263,8 +259,21 @@ HRESULT CGameInstance::Remove_Collider_To_Layer(COLLIDERLAYER eColliderLayer, CC
 {
 	return m_pCollider_Manager->Remove_Collider_To_Layer(eColliderLayer, pCollider);
 }
+
 #pragma endregion
 
+
+#pragma region TEXTURE_MANAGER
+HRESULT CGameInstance::Add_Texture(_uint iLevelIndex, const _wstring& strPrototypeTag, const _wstring& strTextureTag)
+{
+	return m_pTexture_Manager->Add_Texture(iLevelIndex, strPrototypeTag, strTextureTag);
+}
+
+void CGameInstance::Change_Texture_ToGameObject(class CGameObject* pGameObject, const _wstring& strComponentTag, class CComponent** ppOut, _uint iLevelIndex, const _wstring& strTextureTag)
+{
+	m_pTexture_Manager->Change_Texture_ToGameObject(pGameObject, strComponentTag, ppOut, iLevelIndex, strTextureTag);
+}
+#pragma endregion
 
 
 //
@@ -289,16 +298,18 @@ void CGameInstance::Release_Engine()
 	Safe_Release(m_pRenderer);
 	Safe_Release(m_pCollider_Manager);
 	Safe_Release(m_pObject_Manager);
+	Safe_Release(m_pTexture_Manager);
+
 	Safe_Release(m_pPrototype_Manager);
 	Safe_Release(m_pLevel_Manager);
 	Safe_Release(m_pFont_Manager);
+	
 	Safe_Release(m_pGraphic_Device);
+	
 	
 }
 
 void CGameInstance::Free()
 {
 	__super::Free();
-
-
 }

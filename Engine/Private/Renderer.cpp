@@ -10,7 +10,7 @@ CRenderer::CRenderer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 
 }
 
-HRESULT CRenderer::Initialize()
+HRESULT CRenderer::Initialize_Clone()
 {
     if (FAILED(Ready_Render_State()))
         return E_FAIL;
@@ -171,7 +171,7 @@ CRenderer* CRenderer::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContex
 {
     CRenderer* pInstance = new CRenderer(pDevice, pContext);
 
-    if (FAILED(pInstance->Initialize()))
+    if (FAILED(pInstance->Initialize_Clone()))
     {
         MSG_BOX(TEXT("Failed to Created : CRenderer"));
         Safe_Release(pInstance);

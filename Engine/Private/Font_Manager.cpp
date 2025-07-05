@@ -1,4 +1,4 @@
-
+ï»¿
 CFont_Manager::CFont_Manager(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : m_pDevice { pDevice }
     , m_pContext { pContext}
@@ -11,15 +11,15 @@ CFont_Manager::CFont_Manager(ID3D11Device* pDevice, ID3D11DeviceContext* pContex
 
 HRESULT CFont_Manager::Initialize()
 {
-    // Text¸¦ ±×¸± SpriteBatch »ı¼º.
+    // Textë¥¼ ê·¸ë¦´ SpriteBatch ìƒì„±.
     return S_OK;
 }
 
-#pragma region ENGINE Á¦°ø
+#pragma region ENGINE ì œê³µ
 
 HRESULT CFont_Manager::Load_Font(const _wstring& strFontID, const _tchar* pFontFilePath)
 {
-    // ÀÌ¹Ì ÀÖ´Ù¸é?
+    // ì´ë¯¸ ìˆë‹¤ë©´?
     CFont* pFont = Find_Font(strFontID);
     if (nullptr != pFont)
         return E_FAIL;

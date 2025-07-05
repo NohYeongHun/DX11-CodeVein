@@ -1,4 +1,4 @@
-#include "GameObject.h"
+﻿#include "GameObject.h"
 
 #include "GameInstance.h"
 
@@ -36,13 +36,13 @@ HRESULT CGameObject::Initialize_Prototype()
 	return S_OK;
 }
 
-HRESULT CGameObject::Initialize(void* pArg)
+HRESULT CGameObject::Initialize_Clone(void* pArg)
 {
 	m_pTransformCom = CTransform::Create(m_pDevice, m_pContext);
 	if (nullptr == m_pTransformCom)
 		return E_FAIL;
 
-	if (FAILED(m_pTransformCom->Initialize(pArg)))
+	if (FAILED(m_pTransformCom->Initialize_Clone(pArg)))
 		return E_FAIL;	
 
 	m_Components.emplace(TEXT("Com_Transform"), m_pTransformCom);		
@@ -83,6 +83,27 @@ HRESULT CGameObject::Add_Component(_uint iPrototypeLevelIndex, const _wstring& s
 	*ppOut = pComponent;
 
 	Safe_AddRef(pComponent);
+
+	return S_OK;
+}
+
+// 여기서 바인딩한 Component에 AddRef 설정.
+HRESULT CGameObject::Change_Component(const _wstring& strComponentTag, CComponent** ppOut, CComponent* pChangeComponent)
+{
+	CComponent* pComponent = Get_Component(strComponentTag);
+
+	if (nullptr != pComponent)
+	{
+		// 기존 컴포넌트를 지우기?
+		Safe_Release(pComponent);
+		m_Components.erase(strComponentTag);
+	}
+
+	m_Components.emplace(strComponentTag, pChangeComponent);
+
+	*ppOut = pChangeComponent;
+	Safe_AddRef(pChangeComponent);
+	
 
 	return S_OK;
 }

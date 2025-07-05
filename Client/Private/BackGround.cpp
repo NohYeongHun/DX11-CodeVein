@@ -15,7 +15,7 @@ HRESULT CBackGround::Initialize_Prototype()
     return S_OK;
 }
 
-HRESULT CBackGround::Initialize(void* pArg)
+HRESULT CBackGround::Initialize_Clone(void* pArg)
 {
     UIOBJECT_DESC               Desc{};
     Desc.fX = g_iWinSizeX >> 1;
@@ -23,7 +23,7 @@ HRESULT CBackGround::Initialize(void* pArg)
     Desc.fSizeX = g_iWinSizeX;
     Desc.fSizeY = g_iWinSizeY;
 
-    if (FAILED(__super::Initialize(&Desc)))
+    if (FAILED(__super::Initialize_Clone(&Desc)))
         return E_FAIL;
 
     if (FAILED(Ready_Components()))
@@ -109,7 +109,7 @@ CGameObject* CBackGround::Clone(void* pArg)
 {
     CBackGround* pInstance = new CBackGround(*this);
 
-    if (FAILED(pInstance->Initialize(pArg)))
+    if (FAILED(pInstance->Initialize_Clone(pArg)))
     {
         MSG_BOX(TEXT("Failed to Created : CBackGround"));
         Safe_Release(pInstance);

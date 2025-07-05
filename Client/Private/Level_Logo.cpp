@@ -6,7 +6,7 @@ CLevel_Logo::CLevel_Logo(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
 }
 
-HRESULT CLevel_Logo::Initialize()
+HRESULT CLevel_Logo::Initialize_Clone()
 {
 
 	/* 현재 레벨을 구성해주기 위한 객체들을 생성한다. */
@@ -49,7 +49,7 @@ CLevel_Logo* CLevel_Logo::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pCo
 {
 	CLevel_Logo* pInstance = new CLevel_Logo(pDevice, pContext);
 
-	if (FAILED(pInstance->Initialize()))
+	if (FAILED(pInstance->Initialize_Clone()))
 	{
 		MSG_BOX(TEXT("Failed to Created : CLevel_Logo"));
 		Safe_Release(pInstance);

@@ -20,10 +20,11 @@ protected:
 
 public:
 	class CComponent* Get_Component(const _wstring& strComponentTag);
+	HRESULT Change_Component(const _wstring& strComponentTag, CComponent** ppOut, CComponent* pChangeComponent);
 
 public:
 	virtual HRESULT Initialize_Prototype();
-	virtual HRESULT Initialize(void* pArg);
+	virtual HRESULT Initialize_Clone(void* pArg);
 	virtual void Priority_Update(_float fTimeDelta);
 	virtual void Update(_float fTimeDelta);
 	virtual void Late_Update(_float fTimeDelta);
@@ -43,6 +44,8 @@ protected:
 	/*자식의 멤버변수에도 저장한다. */
 	HRESULT Add_Component(_uint iPrototypeLevelIndex, const _wstring& strPrototypeTag, 
 		const _wstring& strComponentTag, CComponent** ppOut, void* pArg = nullptr);
+
+
 
 public:	
 	virtual CGameObject* Clone(void* pArg) = 0;

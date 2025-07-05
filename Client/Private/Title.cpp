@@ -17,15 +17,15 @@ HRESULT CTitle::Initialize_Prototype()
     return S_OK;
 }
 
-HRESULT CTitle::Initialize(void* pArg)
+HRESULT CTitle::Initialize_Clone(void* pArg)
 {
     UIOBJECT_DESC               Desc{};
     Desc.fX = g_iWinSizeX >> 1;
     Desc.fY = g_iWinSizeY >> 1;
-    Desc.fSizeX = g_iWinSizeX >> 2;
-    Desc.fSizeY = g_iWinSizeY >> 2;
+    Desc.fSizeX = 0;
+    Desc.fSizeY = 0;
    
-    if (FAILED(__super::Initialize(&Desc)))
+    if (FAILED(__super::Initialize_Clone(&Desc)))
         return E_FAIL;
 
     if (FAILED(Ready_Components()))
@@ -35,7 +35,7 @@ HRESULT CTitle::Initialize(void* pArg)
         return E_FAIL;
 
     
-    m_pGameInstance->Get_TimeDelta(TEXT("Timer_60"));
+    //m_pGameInstance->Get_TimeDelta(TEXT("Timer_60"));
    
 
     return S_OK;
@@ -55,13 +55,13 @@ void CTitle::Late_Update(_float fTimeDelta)
 {
     __super::Late_Update(fTimeDelta);
 
-    if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::UI, this)))
-        return;
+    /*if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::UI, this)))
+        return;*/
 }
 
 HRESULT CTitle::Render()
 {
-    __super::Begin();
+    //__super::Begin();
 
     /*
     * 해당 위치의 월드 행렬에서 부모기준 위치 변경이 완료되어 있어야한다.
@@ -91,25 +91,23 @@ HRESULT CTitle::Render()
 
 HRESULT CTitle::Ready_Components()
 {
-    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxPosTex"),
-        TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom), nullptr)))
-        return E_FAIL;
-
-    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_VIBuffer_Rect"),
-        TEXT("Com_VIBuffer"), reinterpret_cast<CComponent**>(&m_pVIBufferCom), nullptr)))
-        return E_FAIL;
-
-    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::LOGO), TEXT("Prototype_Component_Texture_Title"),
-        TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom), nullptr)))
-        return E_FAIL;
+    //if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxPosTex"),
+    //    TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom), nullptr)))
+    //    return E_FAIL;
+    //
+    //if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_VIBuffer_Rect"),
+    //    TEXT("Com_VIBuffer"), reinterpret_cast<CComponent**>(&m_pVIBufferCom), nullptr)))
+    //    return E_FAIL;
+    //
+    //if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::LOGO), TEXT("Prototype_Component_Texture_Title"),
+    //    TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom), nullptr)))
+    //    return E_FAIL;
 
     return S_OK;
 }
 
 HRESULT CTitle::Ready_Childs()
 {
-    // AddChild();
-
     CTitleText::TITLETEXT_DESC TitleTextDesc{};
     TitleTextDesc.fX = 0;
     TitleTextDesc.fY = 0;
@@ -130,6 +128,8 @@ HRESULT CTitle::Ready_Childs()
         return E_FAIL;
 
     AddChild(pUIObject);
+    m_pTitleText = pUIObject;
+
 
     pUIObject = nullptr;
     TitleTextDesc.iTextureIndex = 3;
@@ -144,6 +144,7 @@ HRESULT CTitle::Ready_Childs()
         return E_FAIL;
 
     AddChild(pUIObject);
+    m_pTitleLine = pUIObject;
     
 
     return S_OK;
@@ -166,7 +167,7 @@ CGameObject* CTitle::Clone(void* pArg)
 {
     CTitle* pInstance = new CTitle(*this);
 
-    if (FAILED(pInstance->Initialize(pArg)))
+    if (FAILED(pInstance->Initialize_Clone(pArg)))
     {
         MSG_BOX(TEXT("Failed to Cloned : CTitle"));
         Safe_Release(pInstance);
@@ -178,7 +179,6 @@ CGameObject* CTitle::Clone(void* pArg)
 void CTitle::Free()
 {
     __super::Free();
-
     Safe_Release(m_pVIBufferCom);
 
     Safe_Release(m_pShaderCom);

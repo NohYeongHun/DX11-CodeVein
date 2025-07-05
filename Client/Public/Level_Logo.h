@@ -12,7 +12,7 @@ private:
 	virtual ~CLevel_Logo() = default;
 
 public:
-	virtual HRESULT Initialize() override;
+	virtual HRESULT Initialize_Clone() override;
 	virtual void Update(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
 
