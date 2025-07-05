@@ -79,38 +79,11 @@ void CUIObject::Late_Update(_float fTimeDelta)
 
 HRESULT CUIObject::Render()
 {
-	for (auto& pChild : m_Children)
-		pChild->Render();
+	/*for (auto& pChild : m_Children)
+		pChild->Render();*/
 
 	return S_OK;
 }
-
-/* 현재 객체의 월드 매트릭스 반환 */
-//_fmatrix CUIObject::Get_WorldMatrix()
-//{
-//	//m_pTransformCom->Scale(_float3(m_fSizeX, m_fSizeY, 1.f));
-//
-//	/* 최상위 부모 객체의 경우에는 World 기준 좌표 배정을 합니다.
-//	* 최상위가 아닌 경우에는 객체의 World 기준 좌표 배정은
-//	* 이렇게하면 Transform은 실제 렌더 위치를 갖는게 아님.
-//	*/
-//	/*if (m_pParent)
-//		m_pTransformCom->Set_State(STATE::POSITION, XMVectorSet(m_fX, m_fY, 0.f, 1.f));
-//	else 
-//		m_pTransformCom->Set_State(STATE::POSITION, XMVectorSet(m_fX - m_iWinSizeX * 0.5f, -m_fY + m_iWinSizeY * 0.5f, 0.f, 1.f));*/
-//
-//	/*_matrix matWorld = XMMatrixIdentity();
-//	_matrix local = XMLoadFloat4x4(&matWorld);
-//
-//	_vector vPos = m_pTransformCom->Get_State(STATE::POSITION);
-//	_float4 fPos = {};
-//
-//	XMStoreFloat4(&fPos, vPos);
-//
-//	memcpy(&local.r[3], &fPos, sizeof(fPos));*/
-//
-//	//return local;
-//}
 
 _fmatrix CUIObject::Get_RenderMatrix()
 {

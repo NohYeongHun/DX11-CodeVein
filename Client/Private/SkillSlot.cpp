@@ -32,6 +32,7 @@ HRESULT CSkillSlot::Initialize_Clone(void* pArg)
     if (FAILED(Ready_Childs()))
         return E_FAIL;
 
+
     return S_OK;
 }
 
@@ -48,10 +49,16 @@ void CSkillSlot::Update(_float fTimeDelta)
 
 void CSkillSlot::Late_Update(_float fTimeDelta)
 {
-    __super::Late_Update(fTimeDelta);
-
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::UI, this)))
         return;
+
+    __super::Late_Update(fTimeDelta);
+
+
+    if (m_fTime >= 1.f)
+        m_fTime = 0.f;
+    else
+        m_fTime += fTimeDelta;
 }
 
 HRESULT CSkillSlot::Render()
@@ -69,10 +76,16 @@ HRESULT CSkillSlot::Render()
     if (FAILED(m_pShaderCom->Bind_Int("g_iTextureIndex", m_iTextureIndex)))
         return E_FAIL;
 
+    if (FAILED(m_pShaderCom->Bind_Float("g_fTime", m_fTime)))
+        return E_FAIL;
+
     if (FAILED(m_pTextureCom->Bind_Shader_Resource(m_pShaderCom, "g_Texture", m_iTextureIndex)))
         return E_FAIL;
 
-    m_pShaderCom->Begin(1);
+    //if (FAILED(m_pTextureCom->Bind_Shader_Resource(m_pShaderCom, "g_NextTexture", m_iTextureIndex + 1)))
+    //    return E_FAIL;
+
+    m_pShaderCom->Begin(2);
 
     m_pVIBufferCom->Bind_Resources();
 

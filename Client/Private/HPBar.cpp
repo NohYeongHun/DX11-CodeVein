@@ -22,6 +22,8 @@ HRESULT CHPBar::Initialize_Clone(void* pArg)
         return E_FAIL;
 
     m_iTextureIndex = 0;
+    m_iMaxHp = 500;
+    m_iHp    = m_iMaxHp;
 
     if (FAILED(Ready_Components()))
         return E_FAIL;
@@ -72,23 +74,26 @@ HRESULT CHPBar::Render()
 
     m_pVIBufferCom->Render();
 
-    // Font_Manager에 등록된 Key, 
-
-
-    // Y 좌표 비교 -540 == 1080(윈도우) | 540 == 0(윈도우)
-    // X 좌표 비교 -960 == 0 (윈도우) | 960 == 1920(윈도우)
-
-    _float fScreenX = m_RenderMatrix._41 + (g_iWinSizeX >> 1) + 200.f;
-    _float fScreenY = (g_iWinSizeY >> 1) - m_RenderMatrix._42 - 200.f;
-
-    _float2 vPosition = { 0.f , 0.f};
-    // Window 좌표계 기준 출력. (0, 0이 좌측 상단)
-    m_pGameInstance->Render_Font(TEXT("HUD_TEXT"), TEXT("845/845")
-        , vPosition, XMVectorSet(1.f, 1.f, 1.f, 1.f));
+    Render_HP();
 
     __super::End();
 
     return S_OK;
+}
+
+void CHPBar::Render_HP()
+{
+    _float fScreenX = m_RenderMatrix._41 + (g_iWinSizeX >> 1) + 100.f;
+    _float fScreenY = (g_iWinSizeY >> 1) - m_RenderMatrix._42 - 15.f;
+
+    _float2 vPosition = { fScreenX , fScreenY };
+    // Window 좌표계 기준 출력. (0, 0이 좌측 상단)
+
+    wchar_t szBuffer[64] = {};
+    swprintf_s(szBuffer, L"%d / %d", m_iHp, m_iMaxHp);
+
+    m_pGameInstance->Render_Font(TEXT("HUD_TEXT"), szBuffer
+        , vPosition, XMVectorSet(1.f, 1.f, 1.f, 1.f));
 }
 
 HRESULT CHPBar::Ready_Components()

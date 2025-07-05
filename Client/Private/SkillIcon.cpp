@@ -34,6 +34,8 @@ HRESULT CSkillIcon::Initialize_Clone(void* pArg)
     if (FAILED(Ready_Components(pDesc)))
         return E_FAIL;
 
+    m_pTransformCom->Scale(_float3(0.7f, 0.7f, 1.f));
+
 
     return S_OK;
 }
@@ -51,10 +53,10 @@ void CSkillIcon::Update(_float fTimeDelta)
 
 void CSkillIcon::Late_Update(_float fTimeDelta)
 {
-    __super::Late_Update(fTimeDelta);
-
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::UI, this)))
         return;
+
+    __super::Late_Update(fTimeDelta);
 }
 
 HRESULT CSkillIcon::Render()

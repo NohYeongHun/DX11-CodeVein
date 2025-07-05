@@ -51,6 +51,20 @@ HRESULT CHUD::Initialize_Clone(void* pArg)
     if (FAILED(Ready_Childs()))
         return E_FAIL;
 
+
+    Change_Skill(SKILL_PANEL1, 0, TEXT("Action_SkillIcon"), 0);
+    Change_Skill(SKILL_PANEL1, 1, TEXT("Action_SkillIcon"), 1);
+    Change_Skill(SKILL_PANEL1, 2, TEXT("Action_SkillIcon"), 2);
+    Change_Skill(SKILL_PANEL1, 3, TEXT("Action_SkillIcon"), 3);
+
+    Change_Skill(SKILL_PANEL2, 0, TEXT("Action_SkillIcon"), 4);
+    Change_Skill(SKILL_PANEL2, 1, TEXT("Action_SkillIcon"), 5);
+    Change_Skill(SKILL_PANEL2, 2, TEXT("Action_SkillIcon"), 6);
+    Change_Skill(SKILL_PANEL2, 3, TEXT("Action_SkillIcon"), 7);
+
+
+
+
     return S_OK;
 }
 

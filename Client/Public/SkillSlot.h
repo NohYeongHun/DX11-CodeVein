@@ -40,6 +40,7 @@ private:
 	CTexture* m_pTextureCom = { nullptr };
 
 	_uint m_iTextureIndex = {};
+	_float m_fTime = {};
 
 
 private:

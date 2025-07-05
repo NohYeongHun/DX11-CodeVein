@@ -22,13 +22,17 @@ public:
 	virtual void Late_Update(_float fTimeDelta);
 	virtual HRESULT Render();
 
+public:
+	void Render_HP();
 
 private:
 	CShader* m_pShaderCom = { nullptr };
 	CVIBuffer_Rect* m_pVIBufferCom = { nullptr };
 	CTexture* m_pTextureCom = { nullptr };
 
-	_uint m_iTextureIndex = {};
+	_uint  m_iTextureIndex = {};
+	_uint  m_iHp = {};
+	_uint  m_iMaxHp = {};
 
 
 private:
