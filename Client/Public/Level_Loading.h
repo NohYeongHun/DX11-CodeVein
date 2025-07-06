@@ -26,8 +26,12 @@ public:
 private:
 	LEVEL				m_eNextLevelID = { LEVEL::END };
 	class CLoader*		m_pLoader = { nullptr };
+	vector<EventType>	m_Events = {};
+
 
 private:
+	HRESULT Ready_LoadingBackGround(const _wstring& strLayerTag);
+	HRESULT Ready_LoadingScene();
 	HRESULT Ready_GameObjects();
 	HRESULT Ready_LoadingThread();
 

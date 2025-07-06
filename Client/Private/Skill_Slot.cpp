@@ -1,26 +1,38 @@
-﻿#include "SkillSlot.h"
+﻿#include "Skill_Slot.h"
 
-CSkillSlot::CSkillSlot(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CSkill_Slot::CSkill_Slot(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CUIObject(pDevice, pContext)
 {
 }
 
-CSkillSlot::CSkillSlot(const CSkillSlot& Prototype)
+CSkill_Slot::CSkill_Slot(const CSkill_Slot& Prototype)
     : CUIObject(Prototype)
 {
 }
 
-void CSkillSlot::Change_Skill(const _wstring& strTextureTag, _uint iTextureIndex)
+void CSkill_Slot::Change_Skill(const _wstring& strTextureTag, _uint iTextureIndex)
 {
     m_pSkill->Change_Skill(strTextureTag, iTextureIndex);
 }
 
-HRESULT CSkillSlot::Initialize_Prototype()
+void CSkill_Slot::Execute_Skill()
+{
+    if (nullptr == m_pSkill && m_IsCoolTime)
+        return;
+
+    // 스킬 실행.
+    m_IsCoolTime = true;
+    m_fTime = 0.f;
+
+    // 실제 스킬 실행 로직은?
+}
+
+HRESULT CSkill_Slot::Initialize_Prototype()
 {
     return S_OK;
 }
 
-HRESULT CSkillSlot::Initialize_Clone(void* pArg)
+HRESULT CSkill_Slot::Initialize_Clone(void* pArg)
 {
     if (FAILED(__super::Initialize_Clone(pArg)))
         return E_FAIL;
@@ -32,36 +44,43 @@ HRESULT CSkillSlot::Initialize_Clone(void* pArg)
     if (FAILED(Ready_Childs()))
         return E_FAIL;
 
-
     return S_OK;
 }
 
-void CSkillSlot::Priority_Update(_float fTimeDelta)
+void CSkill_Slot::Priority_Update(_float fTimeDelta)
 {
     __super::Priority_Update(fTimeDelta);
 }
 
 
-void CSkillSlot::Update(_float fTimeDelta)
+void CSkill_Slot::Update(_float fTimeDelta)
 {
     __super::Update(fTimeDelta);
+
+    // CoolTime인데 시간이 다되었으면.
+    if (m_IsCoolTime)
+    {
+        m_fTime += fTimeDelta;
+
+        if (m_fTime >= m_fCoolTime)
+        {
+            m_fTime = 0.f;
+            m_IsCoolTime = false;
+        }
+    }
 }
 
-void CSkillSlot::Late_Update(_float fTimeDelta)
+void CSkill_Slot::Late_Update(_float fTimeDelta)
 {
-    if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::UI, this)))
+    if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::STATIC_UI, this)))
         return;
 
     __super::Late_Update(fTimeDelta);
 
-
-    if (m_fTime >= 1.f)
-        m_fTime = 0.f;
-    else
-        m_fTime += fTimeDelta;
+    
 }
 
-HRESULT CSkillSlot::Render()
+HRESULT CSkill_Slot::Render()
 {
     __super::Begin();
 
@@ -76,7 +95,17 @@ HRESULT CSkillSlot::Render()
     if (FAILED(m_pShaderCom->Bind_Int("g_iTextureIndex", m_iTextureIndex)))
         return E_FAIL;
 
-    if (FAILED(m_pShaderCom->Bind_Float("g_fTime", m_fTime)))
+
+    _float fFillRatio = 1.f;
+    if (m_IsCoolTime)                        // 쿨타임이면 0~1로 노말라이즈
+    {
+        if (m_fCoolTime > 0.f)
+            fFillRatio = Clamp(m_fTime / m_fCoolTime, 0.f, 1.f);
+        else
+            fFillRatio = 1.f;                // 방어 코드: 쿨타임 값이 0이면 그냥 다 찬 걸로
+    }
+
+    if (FAILED(m_pShaderCom->Bind_Float("g_fFillRatio", fFillRatio)))
         return E_FAIL;
 
     if (FAILED(m_pTextureCom->Bind_Shader_Resource(m_pShaderCom, "g_Texture", m_iTextureIndex)))
@@ -97,9 +126,9 @@ HRESULT CSkillSlot::Render()
     return S_OK;
 }
 
-HRESULT CSkillSlot::Ready_Childs()
+HRESULT CSkill_Slot::Ready_Childs()
 {
-    CSkillIcon::SKILLICON_DESC Desc{};
+    CSkill_Icon::SKILLICON_DESC Desc{};
     // 정중앙 위치
     Desc.fX = 0;
     Desc.fY = 0; 
@@ -118,12 +147,12 @@ HRESULT CSkillSlot::Ready_Childs()
         return E_FAIL;
 
     AddChild(pUIObject);
-    m_pSkill = static_cast<CSkillIcon*>(pUIObject);
+    m_pSkill = static_cast<CSkill_Icon*>(pUIObject);
 
     return S_OK;
 }
 
-HRESULT CSkillSlot::Ready_Components(SKILLSLOT_DESC* pDesc)
+HRESULT CSkill_Slot::Ready_Components(SKILLSLOT_DESC* pDesc)
 {
     if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxPosTex"),
         TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom), nullptr)))
@@ -140,31 +169,37 @@ HRESULT CSkillSlot::Ready_Components(SKILLSLOT_DESC* pDesc)
     return S_OK;
 }
 
-CSkillSlot* CSkillSlot::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+
+CSkill_Slot* CSkill_Slot::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-    CSkillSlot* pInstance = new CSkillSlot(pDevice, pContext);
+    CSkill_Slot* pInstance = new CSkill_Slot(pDevice, pContext);
     if (FAILED(pInstance->Initialize_Prototype()))
     {
-        MSG_BOX(TEXT("Create Failed : CSkillSlot"));
+        MSG_BOX(TEXT("Create Failed : CLoading_Slot"));
         Safe_Release(pInstance);
     }
 
     return pInstance;
 }
 
-CGameObject* CSkillSlot::Clone(void* pArg)
+CGameObject* CSkill_Slot::Clone(void* pArg)
 {
-    CSkillSlot* pInstance = new CSkillSlot(*this);
+    CSkill_Slot* pInstance = new CSkill_Slot(*this);
     if (FAILED(pInstance->Initialize_Clone(pArg)))
     {
-        MSG_BOX(TEXT("Clone Failed : CSkillSlot"));
+        MSG_BOX(TEXT("Clone Failed : CLoading_Slot"));
         Safe_Release(pInstance);
     }
 
     return pInstance;
 }
 
-void CSkillSlot::Free()
+void CSkill_Slot::Destroy()
+{
+    __super::Destroy();
+}
+
+void CSkill_Slot::Free()
 {
     __super::Free();
     Safe_Release(m_pVIBufferCom);

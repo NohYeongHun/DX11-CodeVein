@@ -1,16 +1,16 @@
-﻿#include "SkillIcon.h"
+﻿#include "Skill_Icon.h"
 
-CSkillIcon::CSkillIcon(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CSkill_Icon::CSkill_Icon(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CUIObject(pDevice, pContext)
 {
 }
 
-CSkillIcon::CSkillIcon(const CSkillIcon& Prototype)
+CSkill_Icon::CSkill_Icon(const CSkill_Icon& Prototype)
     : CUIObject(Prototype)
 {
 }
 
-void CSkillIcon::Change_Skill(const _wstring& strTextureTag, _uint iTextureIndex)
+void CSkill_Icon::Change_Skill(const _wstring& strTextureTag, _uint iTextureIndex)
 {
     m_iTextureIndex = iTextureIndex;
 
@@ -20,12 +20,12 @@ void CSkillIcon::Change_Skill(const _wstring& strTextureTag, _uint iTextureIndex
         , strTextureTag);
 }
 
-HRESULT CSkillIcon::Initialize_Prototype()
+HRESULT CSkill_Icon::Initialize_Prototype()
 {
     return S_OK;
 }
 
-HRESULT CSkillIcon::Initialize_Clone(void* pArg)
+HRESULT CSkill_Icon::Initialize_Clone(void* pArg)
 {
     if (FAILED(__super::Initialize_Clone(pArg)))
         return E_FAIL;
@@ -40,26 +40,26 @@ HRESULT CSkillIcon::Initialize_Clone(void* pArg)
     return S_OK;
 }
 
-void CSkillIcon::Priority_Update(_float fTimeDelta)
+void CSkill_Icon::Priority_Update(_float fTimeDelta)
 {
     __super::Priority_Update(fTimeDelta);
 }
 
 
-void CSkillIcon::Update(_float fTimeDelta)
+void CSkill_Icon::Update(_float fTimeDelta)
 {
     __super::Update(fTimeDelta);
 }
 
-void CSkillIcon::Late_Update(_float fTimeDelta)
+void CSkill_Icon::Late_Update(_float fTimeDelta)
 {
-    if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::UI, this)))
+    if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::STATIC_UI, this)))
         return;
 
     __super::Late_Update(fTimeDelta);
 }
 
-HRESULT CSkillIcon::Render()
+HRESULT CSkill_Icon::Render()
 {
     // Texture가 없을 수도 있음.
     if (m_pTextureCom == nullptr)
@@ -83,7 +83,7 @@ HRESULT CSkillIcon::Render()
     if (FAILED(m_pTextureCom->Bind_Shader_Resource(m_pShaderCom, "g_Texture", m_iTextureIndex)))
         return E_FAIL;
 
-    m_pShaderCom->Begin(1);
+    m_pShaderCom->Begin(0);
 
     m_pVIBufferCom->Bind_Resources();
 
@@ -95,7 +95,7 @@ HRESULT CSkillIcon::Render()
     return S_OK;
 }
 
-HRESULT CSkillIcon::Ready_Components(SKILLICON_DESC* pDesc)
+HRESULT CSkill_Icon::Ready_Components(SKILLICON_DESC* pDesc)
 {
     if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxPosTex"),
         TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom), nullptr)))
@@ -108,31 +108,36 @@ HRESULT CSkillIcon::Ready_Components(SKILLICON_DESC* pDesc)
     return S_OK;
 }
 
-CSkillIcon* CSkillIcon::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CSkill_Icon* CSkill_Icon::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-    CSkillIcon* pInstance = new CSkillIcon(pDevice, pContext);
+    CSkill_Icon* pInstance = new CSkill_Icon(pDevice, pContext);
     if (FAILED(pInstance->Initialize_Prototype()))
     {
-        MSG_BOX(TEXT("Create Failed : CSkillSlot"));
+        MSG_BOX(TEXT("Create Failed : CLoading_Slot"));
         Safe_Release(pInstance);
     }
 
     return pInstance;
 }
 
-CGameObject* CSkillIcon::Clone(void* pArg)
+CGameObject* CSkill_Icon::Clone(void* pArg)
 {
-    CSkillIcon* pInstance = new CSkillIcon(*this);
+    CSkill_Icon* pInstance = new CSkill_Icon(*this);
     if (FAILED(pInstance->Initialize_Clone(pArg)))
     {
-        MSG_BOX(TEXT("Clone Failed : CSkillSlot"));
+        MSG_BOX(TEXT("Clone Failed : CLoading_Slot"));
         Safe_Release(pInstance);
     }
 
     return pInstance;
 }
 
-void CSkillIcon::Free()
+void CSkill_Icon::Destroy()
+{
+    __super::Destroy();
+}
+
+void CSkill_Icon::Free()
 {
     __super::Free();
     Safe_Release(m_pVIBufferCom);

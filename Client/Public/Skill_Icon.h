@@ -6,7 +6,7 @@ NS_BEGIN(Client)
 /*
 * 스킬 아이콘 객체는 누가 가지고 관리하고 있다가 교체해줘야하지?
 */
-class CSkillIcon final : public CUIObject
+class CSkill_Icon final : public CUIObject
 {
 public:
 	typedef struct tagSkillIconDesc : CUIObject::UIOBJECT_DESC
@@ -15,9 +15,9 @@ public:
 	}SKILLICON_DESC;
 
 private:
-	CSkillIcon(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	CSkillIcon(const CSkillIcon& Prototype);
-	virtual ~CSkillIcon() = default;
+	CSkill_Icon(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CSkill_Icon(const CSkill_Icon& Prototype);
+	virtual ~CSkill_Icon() = default;
 
 public:
 	void Change_Skill(const _wstring& strTextureTag , _uint iTextureIndex);
@@ -37,13 +37,17 @@ private:
 
 	_uint m_iTextureIndex = {};
 
+	/* 스킬 정보? */
+	
+
 
 private:
 	HRESULT Ready_Components(SKILLICON_DESC* pDesc);
 
 public:
-	static CSkillIcon* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CSkill_Icon* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;
+	virtual void Destroy() override;
 	virtual void Free() override;
 
 };

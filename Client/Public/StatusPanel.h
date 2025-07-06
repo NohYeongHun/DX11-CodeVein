@@ -28,7 +28,7 @@ public:
 
 private:
 	_uint m_iSkillSlot = {};
-	vector<class CSkillSlot*> m_SkillSlots = {};
+	vector<class CSkill_Slot*> m_SkillSlots = {};
 
 private:
 	HRESULT Ready_Components();
@@ -37,6 +37,7 @@ private:
 public:
 	static CStatusPanel* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;
+	virtual void Destroy() override;
 	virtual void Free() override;
 
 };

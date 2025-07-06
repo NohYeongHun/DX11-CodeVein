@@ -49,6 +49,9 @@
     <Filter Include="02. GameObject\UI\Player\Status">
       <UniqueIdentifier>{fef56ff8-d94e-4d31-92e7-1d66e7c6f7b7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. GameObject\UI\Loading">
+      <UniqueIdentifier>{8c701e3d-252e-4e7a-9364-b8c965c04254}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -129,7 +132,7 @@
     <ClInclude Include="..\Public\Title.h">
       <Filter>02. GameObject\UI\Title</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\TitleBackGround.h">
+    <ClInclude Include="..\Public\Title_BackGround.h">
       <Filter>02. GameObject\UI\Title</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\TitleText.h">
@@ -138,13 +141,13 @@
     <ClInclude Include="..\Public\HUD.h">
       <Filter>02. GameObject\UI\Player</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\SkillPanel.h">
+    <ClInclude Include="..\Public\Skill_Panel.h">
       <Filter>02. GameObject\UI\Player\Skill</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\SkillSlot.h">
+    <ClInclude Include="..\Public\Skill_Slot.h">
       <Filter>02. GameObject\UI\Player\Skill</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\SkillIcon.h">
+    <ClInclude Include="..\Public\Skill_Icon.h">
       <Filter>02. GameObject\UI\Player\Skill</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\StatusPanel.h">
@@ -152,6 +155,15 @@
     </ClInclude>
     <ClInclude Include="..\Public\HPBar.h">
       <Filter>02. GameObject\UI\Player\Status</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Loading_BackGround.h">
+      <Filter>02. GameObject\UI\Loading</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Loading_Panel.h">
+      <Filter>02. GameObject\UI\Loading</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Loading_Slot.h">
+      <Filter>02. GameObject\UI\Loading</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -228,7 +240,7 @@
     <ClCompile Include="..\Private\Title.cpp">
       <Filter>02. GameObject\UI\Title</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\TitleBackGround.cpp">
+    <ClCompile Include="..\Private\Title_BackGround.cpp">
       <Filter>02. GameObject\UI\Title</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\TitleText.cpp">
@@ -237,13 +249,13 @@
     <ClCompile Include="..\Private\HUD.cpp">
       <Filter>02. GameObject\UI\Player</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\SkillIcon.cpp">
+    <ClCompile Include="..\Private\Skill_Icon.cpp">
       <Filter>02. GameObject\UI\Player\Skill</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\SkillPanel.cpp">
+    <ClCompile Include="..\Private\Skill_Panel.cpp">
       <Filter>02. GameObject\UI\Player\Skill</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\SkillSlot.cpp">
+    <ClCompile Include="..\Private\Skill_Slot.cpp">
       <Filter>02. GameObject\UI\Player\Skill</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\StatusPanel.cpp">
@@ -251,6 +263,15 @@
     </ClCompile>
     <ClCompile Include="..\Private\HPBar.cpp">
       <Filter>02. GameObject\UI\Player\Status</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Loading_BackGround.cpp">
+      <Filter>02. GameObject\UI\Loading</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Loading_Panel.cpp">
+      <Filter>02. GameObject\UI\Loading</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Loading_Slot.cpp">
+      <Filter>02. GameObject\UI\Loading</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

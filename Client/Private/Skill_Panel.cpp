@@ -1,28 +1,33 @@
-﻿#include "SkillPanel.h"
+﻿#include "Skill_Panel.h"
 
-CSkillPanel::CSkillPanel(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CSkill_Panel::CSkill_Panel(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CUIObject(pDevice, pContext)
 {
 }
 
-CSkillPanel::CSkillPanel(const CSkillPanel& Prototype)
+CSkill_Panel::CSkill_Panel(const CSkill_Panel& Prototype)
     : CUIObject(Prototype)
     , m_iSkillSlot { Prototype.m_iSkillSlot }
 {
 }
 
-void CSkillPanel::Change_Skill(_uint iSkillSlot, const _wstring& strTextureTag, _uint iTextureIndex)
+void CSkill_Panel::Change_Skill(_uint iSkillSlot, const _wstring& strTextureTag, _uint iTextureIndex)
 {
     m_SkillSlots[iSkillSlot]->Change_Skill(strTextureTag, iTextureIndex);
 }
 
-HRESULT CSkillPanel::Initialize_Prototype()
+void CSkill_Panel::Execute_Skill(_uint iSkillSlot)
+{
+    m_SkillSlots[iSkillSlot]->Execute_Skill();
+}
+
+HRESULT CSkill_Panel::Initialize_Prototype()
 {
     m_iSkillSlot = 4;
     return S_OK;
 }
 
-HRESULT CSkillPanel::Initialize_Clone(void* pArg)
+HRESULT CSkill_Panel::Initialize_Clone(void* pArg)
 {
     if (nullptr == pArg)
         return E_FAIL;
@@ -43,22 +48,22 @@ HRESULT CSkillPanel::Initialize_Clone(void* pArg)
     return S_OK;
 }
 
-void CSkillPanel::Priority_Update(_float fTimeDelta)
+void CSkill_Panel::Priority_Update(_float fTimeDelta)
 {
     __super::Priority_Update(fTimeDelta);
 }
 
-void CSkillPanel::Update(_float fTimeDelta)
+void CSkill_Panel::Update(_float fTimeDelta)
 {
     __super::Update(fTimeDelta);
 }
 
-void CSkillPanel::Late_Update(_float fTimeDelta)
+void CSkill_Panel::Late_Update(_float fTimeDelta)
 {
     __super::Late_Update(fTimeDelta);
 }
 
-HRESULT CSkillPanel::Render()
+HRESULT CSkill_Panel::Render()
 {
 
     return S_OK;
@@ -66,20 +71,20 @@ HRESULT CSkillPanel::Render()
 
 
 
-HRESULT CSkillPanel::Ready_Components()
+HRESULT CSkill_Panel::Ready_Components()
 {
 
     return S_OK;
 }
 
-HRESULT CSkillPanel::Ready_Childs(SKILLPANEL_DESC* pDesc)
+HRESULT CSkill_Panel::Ready_Childs(SKILLPANEL_DESC* pDesc)
 {
     // Panel 객체는 위치만 존재하고 Skill Slot을 소유하는 객체임.
 
     _float fSizeX = pDesc->fSkillSizeX;
     _float fSizeY = pDesc->fSkillSizeY;
 
-    CSkillSlot::SKILLSLOT_DESC Desc{};
+    CSkill_Slot::SKILLSLOT_DESC Desc{};
     Desc.fX = 0;
     Desc.fY = 0;
     Desc.fSizeX = fSizeX;
@@ -105,7 +110,7 @@ HRESULT CSkillPanel::Ready_Childs(SKILLPANEL_DESC* pDesc)
             return E_FAIL;
 
         AddChild(pUIObject);
-        m_SkillSlots.push_back(static_cast<CSkillSlot*>(pUIObject));
+        m_SkillSlots.push_back(static_cast<CSkill_Slot*>(pUIObject));
     }
 
     
@@ -113,31 +118,36 @@ HRESULT CSkillPanel::Ready_Childs(SKILLPANEL_DESC* pDesc)
     return S_OK;
 }
 
-CSkillPanel* CSkillPanel::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CSkill_Panel* CSkill_Panel::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-    CSkillPanel* pInstance = new CSkillPanel(pDevice, pContext);
+    CSkill_Panel* pInstance = new CSkill_Panel(pDevice, pContext);
     if (FAILED(pInstance->Initialize_Prototype()))
     {
-        MSG_BOX(TEXT("Create Failed : CSkillPanel"));
+        MSG_BOX(TEXT("Create Failed : CLoading_Panel"));
         Safe_Release(pInstance);
     }
 
     return pInstance;
 }
 
-CGameObject* CSkillPanel::Clone(void* pArg)
+CGameObject* CSkill_Panel::Clone(void* pArg)
 {
-    CSkillPanel* pInstance = new CSkillPanel(*this);
+    CSkill_Panel* pInstance = new CSkill_Panel(*this);
     if (FAILED(pInstance->Initialize_Clone(pArg)))
     {
-        MSG_BOX(TEXT("Clone Failed : CSkillPanel"));
+        MSG_BOX(TEXT("Clone Failed : CLoading_Panel"));
         Safe_Release(pInstance);
     }
 
     return pInstance;
 }
 
-void CSkillPanel::Free()
+void CSkill_Panel::Destroy()
+{
+    __super::Destroy();
+}
+
+void CSkill_Panel::Free()
 {
     __super::Free();
 }

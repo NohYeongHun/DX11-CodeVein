@@ -53,11 +53,19 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11De
 	if (nullptr == m_pTexture_Manager)
 		return E_FAIL;
 
+	// Level과 관련 없이 보관하고. 
+	// 이벤트 객체를 소유한 객체가 지워질 때 이벤트 매니저에서도 소멸되어야 한다.
+	m_pEvent_Manager = CEvent_Manager::Create();
+	if (nullptr == m_pEvent_Manager)
+		return E_FAIL;
+
 	return S_OK;
 }
 
 void CGameInstance::Update_Engine(_float fTimeDelta)
 {
+	m_fTimeDelta = fTimeDelta;
+
 	/* 내 게임내에서 반복적인 갱신이 필요한 객체들이 있다라면 갱신을 여기에서 모아서 수행하낟. */
 	m_pObject_Manager->Priority_Update(fTimeDelta);
 
@@ -273,6 +281,17 @@ void CGameInstance::Change_Texture_ToGameObject(class CGameObject* pGameObject, 
 {
 	m_pTexture_Manager->Change_Texture_ToGameObject(pGameObject, strComponentTag, ppOut, iLevelIndex, strTextureTag);
 }
+
+void CGameInstance::Subscribe(EventType id, CBase* pOwner, void* data, FCallback&& fn)
+{
+	m_pEvent_Manager->Subscribe(id, pOwner, data, std::move(fn));
+}
+
+
+void CGameInstance::UnSubscribe(EventType id, CBase* pOwner)
+{
+	m_pEvent_Manager->UnSubscribe(id, pOwner);
+}
 #pragma endregion
 
 
@@ -294,6 +313,7 @@ void CGameInstance::Release_Engine()
 	Release();
 
 	//Safe_Release(m_pPicking);
+	
 	Safe_Release(m_pTimer_Manager);
 	Safe_Release(m_pRenderer);
 	Safe_Release(m_pCollider_Manager);
@@ -303,6 +323,7 @@ void CGameInstance::Release_Engine()
 	Safe_Release(m_pPrototype_Manager);
 	Safe_Release(m_pLevel_Manager);
 	Safe_Release(m_pFont_Manager);
+	Safe_Release(m_pEvent_Manager);
 	
 	Safe_Release(m_pGraphic_Device);
 	

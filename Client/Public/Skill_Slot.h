@@ -5,7 +5,7 @@ NS_BEGIN(Client)
 /*
 * 스킬 슬롯 객체는 스킬 아이콘 객체를 소유하게.
 */
-class CSkillSlot final : public CUIObject
+class CSkill_Slot final : public CUIObject
 {
 
 public:
@@ -15,12 +15,13 @@ public:
 	}SKILLSLOT_DESC;
 
 private:
-	CSkillSlot(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	CSkillSlot(const CSkillSlot& Prototype);
-	virtual ~CSkillSlot() = default;
+	CSkill_Slot(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CSkill_Slot(const CSkill_Slot& Prototype);
+	virtual ~CSkill_Slot() = default;
 
 public:
 	void Change_Skill(const _wstring& strTextureTag, _uint iTextureIndex);
+	void Execute_Skill();
 
 public:
 	virtual HRESULT Initialize_Prototype();
@@ -34,12 +35,15 @@ public:
 	HRESULT Ready_Childs();
 
 private:
-	class CSkillIcon* m_pSkill = { nullptr };
+	class CSkill_Icon* m_pSkill = { nullptr };
 	CShader* m_pShaderCom = { nullptr };
 	CVIBuffer_Rect* m_pVIBufferCom = { nullptr };
 	CTexture* m_pTextureCom = { nullptr };
 
 	_uint m_iTextureIndex = {};
+
+	_bool  m_IsCoolTime = { false };
+	_float m_fCoolTime = { 2.f };
 	_float m_fTime = {};
 
 
@@ -47,8 +51,9 @@ private:
 	HRESULT Ready_Components(SKILLSLOT_DESC* pDesc);
 
 public:
-	static CSkillSlot* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CSkill_Slot* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;
+	virtual void Destroy() override;
 	virtual void Free() override;
 
 };

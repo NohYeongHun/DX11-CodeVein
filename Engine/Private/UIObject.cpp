@@ -63,15 +63,15 @@ void CUIObject::Priority_Update(_float fTimeDelta)
 
 void CUIObject::Update(_float fTimeDelta)
 {
+	// 부모 Transform 갱신 이후에 자식 객체 Update()
+	Update_Transform();
+
 	for (auto* child : m_Children)
 		child->Update(fTimeDelta);
 }
 
 void CUIObject::Late_Update(_float fTimeDelta)
 {
-	// 부모 Transform 갱신 이후에 자식 객체 Late_Update()
-	Update_Transform(); 
-
 	for (auto& pChild : m_Children)
 		pChild->Late_Update(fTimeDelta);
 	
@@ -165,6 +165,11 @@ HRESULT CUIObject::End()
 	m_pGameInstance->Apply_DefaultStates();
 
 	return S_OK;
+}
+
+void CUIObject::Destroy()
+{
+	__super::Destroy();
 }
 
 void CUIObject::Free()

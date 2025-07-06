@@ -32,16 +32,19 @@
 
 #pragma region GAMEOBJECT
 #include "BackGround.h"
-#include "TitleBackGround.h"
+#include "Title_BackGround.h"
 #include "TitleText.h"
 #include "Title.h"
 #include "HUD.h"
-#include "SkillIcon.h"
-#include "SkillSlot.h"
-#include "SkillPanel.h"
+#include "Skill_Icon.h"
+#include "Skill_Slot.h"
+#include "Skill_Panel.h"
 
 #include "HPBar.h"
 #include "StatusPanel.h"
+#include "Loading_BackGround.h"
+#include "Loading_Panel.h"
+#include "Loading_Slot.h"
 
 
 #pragma endregion

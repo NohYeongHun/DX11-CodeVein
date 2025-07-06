@@ -41,6 +41,7 @@ private:
 public:
 	static CHPBar* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;
+	virtual void Destroy() override;
 	virtual void Free() override;
 
 };

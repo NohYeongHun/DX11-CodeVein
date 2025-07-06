@@ -2,12 +2,12 @@
 #include "UIObject.h"
 
 NS_BEGIN(Client)
-class CTitleBackGround final : public CUIObject
+class CTitle_BackGround final : public CUIObject
 {
 private:
-	CTitleBackGround(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	CTitleBackGround(const CTitleBackGround& Prototype);
-	virtual ~CTitleBackGround() = default;
+	CTitle_BackGround(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CTitle_BackGround(const CTitle_BackGround& Prototype);
+	virtual ~CTitle_BackGround() = default;
 
 public:
 	virtual HRESULT Initialize_Prototype();
@@ -26,7 +26,7 @@ private:
 	HRESULT Ready_Components();
 
 public:
-	static CTitleBackGround* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CTitle_BackGround* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;
 	virtual void Free() override;
 

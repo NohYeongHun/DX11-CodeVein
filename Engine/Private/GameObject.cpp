@@ -108,6 +108,10 @@ HRESULT CGameObject::Change_Component(const _wstring& strComponentTag, CComponen
 	return S_OK;
 }
 
+void CGameObject::Destroy()
+{
+}
+
 void CGameObject::Free()
 {
 	__super::Free();

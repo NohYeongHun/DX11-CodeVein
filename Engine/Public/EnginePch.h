@@ -1,6 +1,15 @@
 ﻿#pragma once
+#include "Engine_Defines.h"
 #include "Base.h"
 #include "Graphic_Device.h"
+
+#pragma region EVENT
+
+//#include "Event_Type.h"
+//#include "Event_Listener.h"
+#include "Event_Manager.h"
+#pragma endregion
+
 #include "GameInstance.h"
 #include "Timer.h"
 #include "Timer_Manager.h"
@@ -17,7 +26,6 @@
 #include "VIBuffer_Rect.h"
 #include "Texture.h"
 #include "Texture_Manager.h"
-
 #pragma endregion
 
 
@@ -29,14 +37,14 @@
 #include "UIObject.h"
 #pragma endregion
 
-
-
-
 #include "Prototype_Manager.h"
-
-
-
 #include "Font.h"
 #include "Font_Manager.h"
+
+
+
+
+
+
 
 

@@ -58,7 +58,6 @@ void CStatusPanel::Late_Update(_float fTimeDelta)
 
 HRESULT CStatusPanel::Render()
 {
-
     return S_OK;
 }
 
@@ -117,6 +116,11 @@ CGameObject* CStatusPanel::Clone(void* pArg)
     }
 
     return pInstance;
+}
+
+void CStatusPanel::Destroy()
+{
+    __super::Destroy();
 }
 
 void CStatusPanel::Free()

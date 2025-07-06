@@ -41,6 +41,9 @@ HRESULT CRenderer::Draw()
     if (FAILED(Render_UI()))
         return E_FAIL;
 
+    if (FAILED(Render_StaticUI()))
+        return E_FAIL;
+
     return S_OK;
 }
 
@@ -127,6 +130,21 @@ HRESULT CRenderer::Render_UI()
     }
 
     m_RenderObjects[ENUM_CLASS(RENDERGROUP::UI)].clear();
+
+    return S_OK;
+}
+
+HRESULT CRenderer::Render_StaticUI()
+{
+    for (auto& pRenderObject : m_RenderObjects[ENUM_CLASS(RENDERGROUP::STATIC_UI)])
+    {
+        if (nullptr != pRenderObject)
+            pRenderObject->Render();
+
+        Safe_Release(pRenderObject);
+    }
+
+    m_RenderObjects[ENUM_CLASS(RENDERGROUP::STATIC_UI)].clear();
 
     return S_OK;
 }

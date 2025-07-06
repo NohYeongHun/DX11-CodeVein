@@ -30,6 +30,10 @@ HRESULT CMainApp::Initialize_Clone()
 	if (FAILED(Ready_Prototype_ForStatic()))
 		return E_FAIL;
 
+
+	if (FAILED(Ready_Clone_ForStatic()))
+		return E_FAIL;
+
 	if (FAILED(Start_Level(LEVEL::LOGO)))
 		return E_FAIL;	
 
@@ -77,16 +81,14 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 
 
 	//. 자주 사용하는 얘들 모아둔다.
-	if (FAILED(Ready_Textures()))
+	if (FAILED(Ready_Prototype_Fonts()))
 		return E_FAIL;
 
-	if (FAILED(Ready_Fonts()))
+	if (FAILED(Ready_Prototype_HUD()))
 		return E_FAIL;
 
-	if (FAILED(Ready_HUD()))
+	if (FAILED(Ready_Prototype_Loading()))
 		return E_FAIL;
-
-	
 	
 	
 #pragma endregion
@@ -95,7 +97,7 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 	return S_OK;
 }
 
-HRESULT CMainApp::Ready_HUD()
+HRESULT CMainApp::Ready_Prototype_HUD()
 {
 #pragma region HUD 객체
 
@@ -105,17 +107,27 @@ HRESULT CMainApp::Ready_HUD()
 		, CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/User/SkillSlot/SkillSlot%d.png"), 3))))
 		return E_FAIL;
 
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
+		, TEXT("Prototype_Component_Texture_Action_SkillIcon")
+		, CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/User/SkillIcon/Action/Action%d.png"), 12))))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Texture(ENUM_CLASS(LEVEL::STATIC),
+		TEXT("Prototype_Component_Texture_Action_SkillIcon"),
+		TEXT("Action_SkillIcon"))))
+		return E_FAIL;
+
 	// Skill Slot
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_SkillIcon"),
-		CSkillIcon::Create(m_pDevice, m_pContext))))
+		CSkill_Icon::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_SkillSlot"),
-		CSkillSlot::Create(m_pDevice, m_pContext))))
+		CSkill_Slot::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_SkillPanel"),
-		CSkillPanel::Create(m_pDevice, m_pContext))))
+		CSkill_Panel::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
 	// Status 
@@ -139,7 +151,7 @@ HRESULT CMainApp::Ready_HUD()
 	return S_OK;
 }
 
-HRESULT CMainApp::Ready_Fonts()
+HRESULT CMainApp::Ready_Prototype_Fonts()
 {
 	if (FAILED(m_pGameInstance
 		->Load_Font(
@@ -150,22 +162,65 @@ HRESULT CMainApp::Ready_Fonts()
 	return S_OK;
 }
 
-// Prototype Manager, Texture Manager에서 사용할 것들. => 미리 생성하고 자주 사용할 것들.
-HRESULT CMainApp::Ready_Textures()
+HRESULT CMainApp::Ready_Prototype_Loading()
 {
-	// Skill Icon UI Texture
+	// 1. Texture
+ 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
+		, TEXT("Prototype_Component_Texture_Loading_BackGround")
+		, CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Loading/Loading_BackGround%d.png"), 1))))
+		return E_FAIL;
+
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
-		, TEXT("Prototype_Component_Texture_Action_SkillIcon")
-		, CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/User/SkillIcon/Action/Action%d.png"), 12))))
+		, TEXT("Prototype_Component_Texture_Loading_Slot")
+		, CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Loading/Loading_Slot%d.png"), 1))))
 		return E_FAIL;
 
-	// Skill Icon을 Texture Manager에 추가 해둡니다.
-	if(FAILED(m_pGameInstance->Add_Texture(ENUM_CLASS(LEVEL::STATIC),
-		TEXT("Prototype_Component_Texture_Action_SkillIcon"), 
-		TEXT("Action_SkillIcon"))))
+
+
+	// 2. 객체
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Loading_BackGround"),
+		CLoading_BackGround::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Loading_Panel"),
+		CLoading_Panel::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Loading_Slot"),
+		CLoading_Slot::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CMainApp::Ready_Clone_ForStatic()
+{
+	// 생성은 하되 비활성화 해두어야 합니다.
+	if (FAILED(Ready_Clone_HUD(TEXT("Layer_HUD"))))
+		return E_FAIL;
 	
+	// 생성은 하되 비활성화 해두어야 합니다.
+	if (FAILED(Ready_Clone_Loading(TEXT("Layer_Loading"))))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CMainApp::Ready_Clone_HUD(const _wstring& strLayerTag)
+{
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::STATIC), strLayerTag,
+		ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_HUD"))))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CMainApp::Ready_Clone_Loading(const _wstring& strLayerTag)
+{
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::STATIC), strLayerTag,
+		ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Loading_BackGround"))))
+		return E_FAIL;
+
 	return S_OK;
 }
 

@@ -5,14 +5,14 @@ NS_BEGIN(Client)
 class CHUD final : public CUIObject
 {
 public:
-	enum SKILLPANEL
+	enum SKILLPANEL : _uint
 	{
 		SKILL_PANEL1 = 0,
 		SKILL_PANEL2 = 1,
 		SKILL_PANEL_END = 2
 	};
 
-	enum STATUSPANEL
+	enum STATUSPANEL : _uint
 	{
 		STATUS_PANEL1 = 0,
 		STATUS_PANEL_END = 1
@@ -29,7 +29,9 @@ public:
 
 public:
 	// 몇 번째 스킬 패널의 몇번 슬롯에 Skill을 변경할 것인지? => 나중에 이벤트 버스로 호출.
-	void Change_Skill(SKILLPANEL eSkillPanel, _uint iSkillSlot, const _wstring& strTextureTag, _uint iTextureIndex);
+	void Change_Skill(_uint iSkillPanel, _uint iSkillSlot, const _wstring& strTextureTag, _uint iTextureIndex);
+	// 스킬 사용 함수. => 이벤트 버스로 호출.
+	void Execute_Skill(_uint iSkillPanel, _uint iSkillSlot);
 
 public:
 	virtual HRESULT Initialize_Prototype();
@@ -43,17 +45,20 @@ private:
 	HRESULT Ready_Childs();
 	HRESULT Ready_SkillPanel();
 	HRESULT Ready_StatusPanel();
+	HRESULT Ready_Events();
 
 
 private:
-	vector<class CSkillPanel*> m_SkillPanels = {};
+	vector<class CSkill_Panel*> m_SkillPanels = {};
 	vector<class CStatusPanel*> m_StatusPanels = {};
 
+	vector<EventType> m_Events = {};
 	_bool m_IsVisibility = { };
 
 public:
 	static CHUD* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;
+	virtual void Destroy() override;
 	virtual void Free() override;
 
 };

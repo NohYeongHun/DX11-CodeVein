@@ -1,10 +1,5 @@
 ﻿#include "Level_Loading.h"
 
-//#include "Loader.h"
-//#include "GameInstance.h"
-//
-//#include "Level_Logo.h"
-//#include "Level_GamePlay.h"
 
 CLevel_Loading::CLevel_Loading(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel { pDevice, pContext }
@@ -13,7 +8,11 @@ CLevel_Loading::CLevel_Loading(ID3D11Device* pDevice, ID3D11DeviceContext* pCont
 
 HRESULT CLevel_Loading::Initialize_Clone(LEVEL eNextLevelID)
 {
+
 	m_eNextLevelID = eNextLevelID;	 
+
+	if (FAILED(Ready_LoadingScene()))
+		return E_FAIL;
 
 	/* 현재 레벨을 구성해주기 위한 객체들을 생성한다. */
 	if (FAILED(Ready_GameObjects()))
@@ -56,6 +55,20 @@ HRESULT CLevel_Loading::Render()
 	return S_OK;
 }
 
+HRESULT CLevel_Loading::Ready_LoadingBackGround(const _wstring& strLayerTag)
+{
+	return S_OK;
+}
+
+HRESULT CLevel_Loading::Ready_LoadingScene()
+{
+	LOADINGEVENT_DESC Desc{};
+	Desc.isVisibility = true;
+	m_pGameInstance->Publish<LOADINGEVENT_DESC>(EventType::LOAIDNG_DISPLAY, &Desc);
+
+	return S_OK;
+}
+
 HRESULT CLevel_Loading::Ready_GameObjects()
 {
 	return S_OK;
@@ -87,6 +100,10 @@ CLevel_Loading* CLevel_Loading::Create(ID3D11Device* pDevice, ID3D11DeviceContex
 void CLevel_Loading::Free()
 {
 	__super::Free();
+
+	LOADINGEVENT_DESC Desc{};
+	Desc.isVisibility = false;
+	m_pGameInstance->Publish<LOADINGEVENT_DESC>(EventType::LOAIDNG_DISPLAY, &Desc);
 
 	Safe_Release(m_pLoader);
 

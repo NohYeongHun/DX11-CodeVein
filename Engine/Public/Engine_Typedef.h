@@ -42,7 +42,8 @@ namespace Engine
 	typedef		FXMMATRIX					_fmatrix; // 1, 2
 	typedef		CXMMATRIX					_cmatrix; // 3이상
 	
-
+	// CallBack
+	using FCallback = std::function<void(void*)>;
 
 }
 

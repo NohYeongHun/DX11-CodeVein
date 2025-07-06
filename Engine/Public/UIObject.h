@@ -63,6 +63,7 @@ protected:
 
 public:
 	virtual CGameObject* Clone(void* pArg) = 0;
+	virtual void Destroy() override;
 	virtual void Free() override;
 };
 

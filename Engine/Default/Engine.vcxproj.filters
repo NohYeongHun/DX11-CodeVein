@@ -85,6 +85,12 @@
     <Filter Include="01.Utility\03.Component\Texture\Manager">
       <UniqueIdentifier>{00f42107-0aaa-41ed-a991-1c54fcb90b42}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.Utility\06. Event">
+      <UniqueIdentifier>{ccf9b0ee-5262-4448-b391-aeb33132704e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\06. Event\Manager">
+      <UniqueIdentifier>{f412eda4-288d-4f78-b366-2fa6aabf81bf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Timer.cpp">
@@ -161,6 +167,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\Texture_Manager.cpp">
       <Filter>01.Utility\03.Component\Texture\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Event_Manager.cpp">
+      <Filter>01.Utility\06. Event\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Event_Listener.cpp">
+      <Filter>01.Utility\06. Event</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -239,9 +251,6 @@
     <ClInclude Include="..\Public\EnginePch.h">
       <Filter>99.Defines</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Font.h">
-      <Filter>01.Utility\05. Font</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\Font_Manager.h">
       <Filter>01.Utility\05. Font\Manager</Filter>
     </ClInclude>
@@ -257,5 +266,22 @@
     <ClInclude Include="..\Public\Texture_Manager.h">
       <Filter>01.Utility\03.Component\Texture\Manager</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Font.h">
+      <Filter>01.Utility\05. Font</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Event_Manager.h">
+      <Filter>01.Utility\06. Event\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Event_Listener.h">
+      <Filter>01.Utility\06. Event</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Event_Type.h">
+      <Filter>01.Utility\06. Event</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="GameInstance.inl">
+      <Filter>01.Utility\00.GameInstance</Filter>
+    </None>
   </ItemGroup>
 </Project>

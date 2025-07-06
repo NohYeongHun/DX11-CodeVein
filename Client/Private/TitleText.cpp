@@ -75,14 +75,14 @@ HRESULT CTitleText::Render()
     if (FAILED(m_pShaderCom->Bind_Int("g_iTextureIndex", m_iTextureIndex)))
         return E_FAIL;
 
-    if (FAILED(m_pShaderCom->Bind_Float("g_fTime", m_fChangeTime)))
-        return E_FAIL;
+    /*if (FAILED(m_pShaderCom->Bind_Float("g_fTime", m_fChangeTime)))
+        return E_FAIL;*/
 
 
     if (FAILED(m_pTextureCom->Bind_Shader_Resource(m_pShaderCom, "g_Texture", m_iTextureIndex)))
         return E_FAIL;
 
-    m_pShaderCom->Begin(1);
+    m_pShaderCom->Begin(0);
 
     m_pVIBufferCom->Bind_Resources();
 

@@ -47,6 +47,7 @@ private:
 	HRESULT Render_NonBlend();
 	HRESULT Render_Blend();
 	HRESULT Render_UI();
+	HRESULT Render_StaticUI();
 
 private:
 	HRESULT Ready_Render_State();

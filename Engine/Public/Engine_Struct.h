@@ -1,4 +1,4 @@
-#ifndef Engine_Struct_h__
+﻿#ifndef Engine_Struct_h__
 #define Engine_Struct_h__
 
 
@@ -20,7 +20,10 @@ namespace Engine
 		XMFLOAT2		vTexcoord;
 	}VTXPOSTEX;
 	
+
+
 }
 
+#include "Event_Type.h"
 
 #endif // Engine_Struct_h__
