@@ -6,6 +6,8 @@ enum class EventType : _uint
 	SKILL_CHANGE = 2,
 	SKILL_EXECUTE = 3,
 	LOAIDNG_DISPLAY = 4,
+	LOADING_END = 5,
+	OPEN_LEVEL = 6,
 	EVENT_END
 };
 
@@ -15,7 +17,7 @@ typedef struct tagHUDEventDesc
 	_bool isVisibility;
 }HUDEVENT_DESC;
 
-typedef struct tagSkillChangeDesc
+typedef struct tagSkillEventDesc
 {
 	_uint iSkillPanelIdx = {};
 	_uint iSlotIdx = {};

@@ -83,12 +83,12 @@ public:
 #pragma endregion
 
 #pragma region EVENT_MANAGER
-	void Subscribe(EventType id, CBase* pOwner, void* data, FCallback&& fn);
+	void Subscribe(EventType id, FCallback&& fn);
 
 	template<typename T>
 	void Publish(EventType id, T* msg);
 
-	void UnSubscribe(EventType id, CBase* pOwner);
+	void UnSubscribe(EventType id);
 #pragma endregion
 
 

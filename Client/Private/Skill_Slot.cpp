@@ -17,14 +17,20 @@ void CSkill_Slot::Change_Skill(const _wstring& strTextureTag, _uint iTextureInde
 
 void CSkill_Slot::Execute_Skill()
 {
-    if (nullptr == m_pSkill && m_IsCoolTime)
+    // 이미 쿨타임이 돌고있다면?
+    if (nullptr == m_pSkill || m_IsCoolTime)
         return;
 
     // 스킬 실행.
     m_IsCoolTime = true;
     m_fTime = 0.f;
 
-    // 실제 스킬 실행 로직은?
+    // 실제 스킬 실행 로직도 나중에 아래에 추가.
+
+    /*
+    * 실행 로직 예정. => 아님 이 때 Event를 Push 하던가?
+    * 이벤트를 던져서 플레이어가 스킬 쓰게 하던가?
+    */
 }
 
 HRESULT CSkill_Slot::Initialize_Prototype()
@@ -76,8 +82,6 @@ void CSkill_Slot::Late_Update(_float fTimeDelta)
         return;
 
     __super::Late_Update(fTimeDelta);
-
-    
 }
 
 HRESULT CSkill_Slot::Render()
@@ -110,9 +114,6 @@ HRESULT CSkill_Slot::Render()
 
     if (FAILED(m_pTextureCom->Bind_Shader_Resource(m_pShaderCom, "g_Texture", m_iTextureIndex)))
         return E_FAIL;
-
-    //if (FAILED(m_pTextureCom->Bind_Shader_Resource(m_pShaderCom, "g_NextTexture", m_iTextureIndex + 1)))
-    //    return E_FAIL;
 
     m_pShaderCom->Begin(2);
 
@@ -204,6 +205,5 @@ void CSkill_Slot::Free()
     __super::Free();
     Safe_Release(m_pVIBufferCom);
     Safe_Release(m_pShaderCom);
-    
     Safe_Release(m_pTextureCom);
 }

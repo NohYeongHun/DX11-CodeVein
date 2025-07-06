@@ -17,6 +17,8 @@ public:
 	const _bool Get_Visibility();
 	void Set_Visibility(_bool IsVIsibility);
 
+	void Loading_End();
+
 
 public:
 	virtual HRESULT Initialize_Prototype();
@@ -30,7 +32,10 @@ private:
 	CShader* m_pShaderCom = { nullptr };
 	CVIBuffer_Rect* m_pVIBufferCom = { nullptr };
 	CTexture* m_pTextureCom = { nullptr };
-	_bool m_IsVisibility = { };
+	_bool m_IsVisibility = { false };
+
+	_bool m_IsLoadingFadeOut = { false };
+	_float m_fFade = {};
 
 	_uint m_iTextureIndex = {};
 	vector<EventType> m_Events = {};

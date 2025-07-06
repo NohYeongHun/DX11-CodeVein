@@ -1,4 +1,4 @@
-CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+ï»¿CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: m_pDevice{ pDevice }
 	, m_pContext { pContext }
 	, m_pGameInstance { CGameInstance::GetInstance() }
@@ -25,10 +25,10 @@ HRESULT CLoader::Initialize_Clone(LEVEL eNextLevelID)
 
 	InitializeCriticalSection(&m_CriticalSection);
 
-	/* ½º·¹µå¸¦ »ı¼ºÇÏ°í */
-	/* »ı¼ºÇÑ ½º·¹µå°¡ ·ÎµùÀ» ÇÒ ¼ö ÀÖµµ·Ï Ã³¸®ÇÑ´Ù. */
+	/* ìŠ¤ë ˆë“œë¥¼ ìƒì„±í•˜ê³  */
+	/* ìƒì„±í•œ ìŠ¤ë ˆë“œê°€ ë¡œë”©ì„ í•  ìˆ˜ ìˆë„ë¡ ì²˜ë¦¬í•œë‹¤. */
 
-	/* ½ºÅÃ ¸Ş¸ğ¸®¸¦ Á¦¿ÜÇÑ ±âÅ¸ ´Ù¸¥ ¸Ş¸ğ¸®°ø°£(Èü, µ¥ÀÌÅÍ, ÄÚµå, ) Àº ½º·¹µå°£ ¼­·Î °øÀ¯ÇÑ´Ù. */
+	/* ìŠ¤íƒ ë©”ëª¨ë¦¬ë¥¼ ì œì™¸í•œ ê¸°íƒ€ ë‹¤ë¥¸ ë©”ëª¨ë¦¬ê³µê°„(í™, ë°ì´í„°, ì½”ë“œ, ) ì€ ìŠ¤ë ˆë“œê°„ ì„œë¡œ ê³µìœ í•œë‹¤. */
 	m_hThread = (HANDLE)_beginthreadex(nullptr, 0, LoadingMain, this, 0, nullptr);
 	if (0 == m_hThread)
 		return E_FAIL;
@@ -65,30 +65,58 @@ HRESULT CLoader::Loading()
 HRESULT CLoader::Loading_For_Logo_Level()
 {
 
-	lstrcpy(m_szLoadingText, TEXT("·Î°í ·¹º§À» ·ÎµùÁßÀÔ´Ï´Ù."));
+	lstrcpy(m_szLoadingText, TEXT("ë¡œê³  ë ˆë²¨ì„ ë¡œë”©ì¤‘ì…ë‹ˆë‹¤."));
 
 	if (FAILED(m_cLoader_Logo
 		.Loading_Resource(m_pDevice, m_pContext, m_pGameInstance)))
 		return E_FAIL;
 
-	lstrcpy(m_szLoadingText, TEXT("·Î°í ·¹º§ ·ÎµùÀÌ ¿Ï·áµÇ¾ú½À´Ï´Ù."));
+	for (_uint i = 0; i < 99999; i++)
+	{
+		int a = 10;
+	}
+	for (_uint i = 0; i < 99999; i++)
+	{
+		int a = 10;
+	}
+	for (_uint i = 0; i < 99999; i++)
+	{
+		int a = 10;
+	}
+	for (_uint i = 0; i < 99999; i++)
+	{
+		int a = 10;
+	}
+	for (_uint i = 0; i < 99999; i++)
+	{
+		int a = 10;
+	}
+	for (_uint i = 0; i < 99999; i++)
+	{
+		int a = 10;
+	}
+	lstrcpy(m_szLoadingText, TEXT("ë¡œê³  ë ˆë²¨ ë¡œë”©ì´ ì™„ë£Œë˜ì—ˆìŠµë‹ˆë‹¤."));
 
 	m_isFinished = true;
+	
 	
 	return S_OK;
 }
 
 HRESULT CLoader::Loading_For_GamePlay_Level()
 {
-	lstrcpy(m_szLoadingText, TEXT("°ÔÀÓÇÃ·¹ÀÌ ·¹º§À» ·ÎµùÁßÀÔ´Ï´Ù."));
+	lstrcpy(m_szLoadingText, TEXT("ê²Œì„í”Œë ˆì´ ë ˆë²¨ì„ ë¡œë”©ì¤‘ì…ë‹ˆë‹¤."));
 
 	if (FAILED(m_cLoader_GamePlay
 		.Loading_Resource(m_pDevice, m_pContext, m_pGameInstance)))
 		return E_FAIL;
 
-	lstrcpy(m_szLoadingText, TEXT("°ÔÀÓÇÃ·¹ÀÌ ·¹º§ ·ÎµùÀÌ ¿Ï·áµÇ¾ú½À´Ï´Ù."));
+	
+
+	lstrcpy(m_szLoadingText, TEXT("ê²Œì„í”Œë ˆì´ ë ˆë²¨ ë¡œë”©ì´ ì™„ë£Œë˜ì—ˆìŠµë‹ˆë‹¤."));
 
 	m_isFinished = true;
+
 	return S_OK;
 }
 CLoader* CLoader::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, LEVEL eNextLevelID)

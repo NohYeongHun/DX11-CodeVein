@@ -232,7 +232,7 @@ HRESULT CHUD::Ready_Events()
 #pragma region HUD DISPLAY
 
     // Event 등록
-    m_pGameInstance->Subscribe(EventType::HUD_DISPLAY, this, nullptr, [this](void* pData)
+    m_pGameInstance->Subscribe(EventType::HUD_DISPLAY, [this](void* pData)
         {
             HUDEVENT_DESC* desc = static_cast<HUDEVENT_DESC*>(pData);
             this->Set_Visibility(desc->isVisibility);   // 멤버 함수 호출
@@ -244,7 +244,7 @@ HRESULT CHUD::Ready_Events()
 
 #pragma region SKILL_CHANGE
    
-    m_pGameInstance->Subscribe(EventType::SKILL_CHANGE, this, nullptr, [this](void* pData)
+    m_pGameInstance->Subscribe(EventType::SKILL_CHANGE, [this](void* pData)
         {
             SKILLEVENT_DESC* desc = static_cast<SKILLEVENT_DESC*>(pData);
             this->Change_Skill(
@@ -260,7 +260,7 @@ HRESULT CHUD::Ready_Events()
 #pragma endregion
 
 #pragma region SKILL_EXECUTE
-     m_pGameInstance->Subscribe(EventType::SKILL_EXECUTE, this, nullptr, [this](void* pData)
+     m_pGameInstance->Subscribe(EventType::SKILL_EXECUTE, [this](void* pData)
         {
             SKILLEVENT_DESC* desc = static_cast<SKILLEVENT_DESC*>(pData);
             this->Execute_Skill(
@@ -307,7 +307,7 @@ void CHUD::Destroy()
     __super::Destroy();
 
     for (auto& val : m_Events)
-        m_pGameInstance->UnSubscribe(val, this);
+        m_pGameInstance->UnSubscribe(val);
 }
 
 void CHUD::Free()
