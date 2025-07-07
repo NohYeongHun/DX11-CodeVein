@@ -1,6 +1,6 @@
-#pragma once
+ï»¿#pragma once
 
-/* ¿øÇüÀ¸·Î Ãß°¡µÉ Å¬·¡½º Å¸ÀÔÀ» È®ÀÎÇÒ ¼ö ÀÖµµ·Ï ¸ğµç Á¾·ùÀÇ ¿øÇü Å¬·¡½º Çì´õ¸¦ ÀÎÅ¬·çµå ÇØ³õ´Â´Ù. */
+/* ì›í˜•ìœ¼ë¡œ ì¶”ê°€ë  í´ë˜ìŠ¤ íƒ€ì…ì„ í™•ì¸í•  ìˆ˜ ìˆë„ë¡ ëª¨ë“  ì¢…ë¥˜ì˜ ì›í˜• í´ë˜ìŠ¤ í—¤ë”ë¥¼ ì¸í´ë£¨ë“œ í•´ë†“ëŠ”ë‹¤. */
 //#include "VIBuffer_Terrain.h"
 #include "VIBuffer_Rect.h"
 //#include "VIBuffer_Cube.h"
@@ -8,8 +8,8 @@
 //#include "Texture.h"
 #include "Shader.h"
 
-/* ¿øÇü°´Ã¼(°ÔÀÓ¿ÀºêÁ§Æ®, ÄÄÆ÷³ÍÆ®)¸¦ ·¹º§º°·Î ±¸ºĞÇÏ¿© º¸°üÇÑ´Ù. */
-/* º¹Á¦ÇÏ¿© ¸¸µé¾îÁø »çº»°´Ã¼¸¦ ¸®ÅÏ. */
+/* ì›í˜•ê°ì²´(ê²Œì„ì˜¤ë¸Œì íŠ¸, ì»´í¬ë„ŒíŠ¸)ë¥¼ ë ˆë²¨ë³„ë¡œ êµ¬ë¶„í•˜ì—¬ ë³´ê´€í•œë‹¤. */
+/* ë³µì œí•˜ì—¬ ë§Œë“¤ì–´ì§„ ì‚¬ë³¸ê°ì²´ë¥¼ ë¦¬í„´. */
 
 NS_BEGIN(Engine)
 
@@ -24,6 +24,7 @@ public:
 	HRESULT Add_Prototype(_uint iPrototypeLevelIndex, const _wstring& strPrototypeTag, class CBase* pPrototype);
 	class CBase* Clone_Prototype(PROTOTYPE ePrototype, _uint iPrototypeLevelIndex, const _wstring& strPrototypeTag, void* pArg);
 	void Clear(_uint iLevelIndex);
+
 private:
 	_uint											m_iNumLevels = {  };
 	map<const _wstring, class CBase*>*				m_pPrototypes = { nullptr };

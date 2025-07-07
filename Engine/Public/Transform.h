@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "Component.h"
 
@@ -19,6 +19,13 @@ private:
 	virtual ~CTransform() = default;
 
 public:	
+	
+
+	const _float4x4* Get_WorldMatrix()
+	{
+		return &m_WorldMatrix;
+	}
+
 	_vector Get_State(STATE eState) const {
 		return XMLoadFloat4(reinterpret_cast<const _float4*>(&m_WorldMatrix.m[ENUM_CLASS(eState)]));
 	}	
@@ -35,9 +42,11 @@ public:
 		XMStoreFloat4(reinterpret_cast<_float4*>(&m_WorldMatrix.m[ENUM_CLASS(eState)]), vState);
 	}
 
+
+
 public:
 	virtual HRESULT Initialize_Prototype();
-	virtual HRESULT Initialize(void* pArg);
+	virtual HRESULT Initialize_Clone(void* pArg);
 
 public:
 	HRESULT Bind_Shader_Resource(class CShader* pShader, const _char* pConstantName);
@@ -53,11 +62,13 @@ public:
 	void Turn(_fvector vAxis, _float fTimeDelta);
 	void LookAt(_fvector vAt);
 	void Chase(_fvector vTargetPos, _float fTimeDelta, _float fLimit = 0.f);
+
 private:
 	_float4x4				m_WorldMatrix = {};
 	_float					m_fSpeedPerSec = {};
 	_float					m_fRotationPerSec = {};
 	_float3					m_vAngles = {};
+
 public:
 	static CTransform* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CComponent* Clone(void* pArg) { return nullptr; };

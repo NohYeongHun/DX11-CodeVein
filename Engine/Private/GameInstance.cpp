@@ -1,13 +1,5 @@
 ﻿#include "GameInstance.h"
 
-//#include "Graphic_Device.h"
-//#include "Level_Manager.h"
-//#include "Object_Manager.h"
-//#include "Prototype_Manager.h"
-//#include "Renderer.h"
-//#include "Timer_Manager.h"
-//#include "Picking.h"
-
 IMPLEMENT_SINGLETON(CGameInstance)
 
 CGameInstance::CGameInstance()
@@ -56,11 +48,24 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11De
 	if (nullptr == m_pCollider_Manager)
 		return E_FAIL;
 
+	// Texture 자원 공유용
+	m_pTexture_Manager = CTexture_Manager::Create(EngineDesc.iNumLevels);
+	if (nullptr == m_pTexture_Manager)
+		return E_FAIL;
+
+	// Level과 관련 없이 보관하고. 
+	// 이벤트 객체를 소유한 객체가 지워질 때 이벤트 매니저에서도 소멸되어야 한다.
+	m_pEvent_Manager = CEvent_Manager::Create();
+	if (nullptr == m_pEvent_Manager)
+		return E_FAIL;
+
 	return S_OK;
 }
 
 void CGameInstance::Update_Engine(_float fTimeDelta)
 {
+	m_fTimeDelta = fTimeDelta;
+
 	/* 내 게임내에서 반복적인 갱신이 필요한 객체들이 있다라면 갱신을 여기에서 모아서 수행하낟. */
 	m_pObject_Manager->Priority_Update(fTimeDelta);
 
@@ -139,6 +144,15 @@ HRESULT CGameInstance::Open_Level(_uint iLevelID, CLevel* pNewLevel)
 	return m_pLevel_Manager->Open_Level(iLevelID, pNewLevel);
 }
 
+/* 현재 레벨 확인. */
+_uint CGameInstance::Get_CurrentLevelID()
+{
+	if (nullptr == m_pLevel_Manager)
+		return 0;
+
+	return m_pLevel_Manager->Get_CurrentLevelID();
+}
+
 #pragma endregion
 
 #pragma region PROTOTYPE_MANAGER
@@ -187,6 +201,21 @@ HRESULT CGameInstance::Add_RenderGroup(RENDERGROUP eRenderGroup, CGameObject* pR
 	return m_pRenderer->Add_RenderGroup(eRenderGroup, pRenderObject);
 }
 
+HRESULT CGameInstance::Apply_BlendeState()
+{
+	return m_pRenderer->Apply_BlendeState();
+}
+
+HRESULT CGameInstance::Apply_DepthStencilOff()
+{
+	return m_pRenderer->Apply_DepthStencilOff();
+}
+
+HRESULT CGameInstance::Apply_DefaultStates()
+{
+	return m_pRenderer->Apply_DefaultStates();
+}
+
 
 #pragma endregion
 
@@ -227,8 +256,7 @@ HRESULT CGameInstance::Render_Font(const _wstring& strFontTag, const _tchar* pTe
 }
 #pragma endregion
 
-
-#pragma region COLLIDER_MANAGER
+ #pragma region COLLIDER_MANAGER
 
 HRESULT CGameInstance::Add_Collider_To_Layer(COLLIDERLAYER eColliderLayer, CCollider* pCollider)
 {
@@ -239,8 +267,32 @@ HRESULT CGameInstance::Remove_Collider_To_Layer(COLLIDERLAYER eColliderLayer, CC
 {
 	return m_pCollider_Manager->Remove_Collider_To_Layer(eColliderLayer, pCollider);
 }
+
 #pragma endregion
 
+
+#pragma region TEXTURE_MANAGER
+HRESULT CGameInstance::Add_Texture(_uint iLevelIndex, const _wstring& strPrototypeTag, const _wstring& strTextureTag)
+{
+	return m_pTexture_Manager->Add_Texture(iLevelIndex, strPrototypeTag, strTextureTag);
+}
+
+void CGameInstance::Change_Texture_ToGameObject(class CGameObject* pGameObject, const _wstring& strComponentTag, class CComponent** ppOut, _uint iLevelIndex, const _wstring& strTextureTag)
+{
+	m_pTexture_Manager->Change_Texture_ToGameObject(pGameObject, strComponentTag, ppOut, iLevelIndex, strTextureTag);
+}
+
+void CGameInstance::Subscribe(EventType id, uint32_t iID, FCallback&& fn)
+{
+	m_pEvent_Manager->Subscribe(id, iID, std::move(fn));
+}
+
+
+void CGameInstance::UnSubscribe(EventType id, uint32_t iID)
+{
+	m_pEvent_Manager->UnSubscribe(id, iID);
+}
+#pragma endregion
 
 
 //
@@ -261,20 +313,24 @@ void CGameInstance::Release_Engine()
 	Release();
 
 	//Safe_Release(m_pPicking);
+	
 	Safe_Release(m_pTimer_Manager);
 	Safe_Release(m_pRenderer);
 	Safe_Release(m_pCollider_Manager);
 	Safe_Release(m_pObject_Manager);
+	Safe_Release(m_pTexture_Manager);
+
 	Safe_Release(m_pPrototype_Manager);
 	Safe_Release(m_pLevel_Manager);
 	Safe_Release(m_pFont_Manager);
+	Safe_Release(m_pEvent_Manager);
+	
 	Safe_Release(m_pGraphic_Device);
+	
 	
 }
 
 void CGameInstance::Free()
 {
 	__super::Free();
-
-
 }

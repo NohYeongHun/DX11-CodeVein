@@ -24,7 +24,7 @@ protected:
 
 public:
 	virtual HRESULT Initialize_Prototype(COLLIDERSHAPE eColliderType);
-	virtual HRESULT Initialize(void* pArg);
+	virtual HRESULT Initialize_Clone(void* pArg);
 
 public:
 	void Update(_fmatrix WorldMatrix); // 현재 콜라이더의 주인 객체로부터 Update를 받는다.?

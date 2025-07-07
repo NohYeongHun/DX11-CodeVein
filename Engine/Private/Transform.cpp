@@ -1,5 +1,4 @@
-#include "Transform.h"
-#include "Shader.h"
+﻿#include "Transform.h"
 
 CTransform::CTransform(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CComponent { pDevice, pContext }
@@ -15,7 +14,7 @@ HRESULT CTransform::Initialize_Prototype()
 	return S_OK;
 }
 
-HRESULT CTransform::Initialize(void* pArg)
+HRESULT CTransform::Initialize_Clone(void* pArg)
 {
 	if (nullptr == pArg)
 		return S_OK;
@@ -33,6 +32,9 @@ HRESULT CTransform::Bind_Shader_Resource(CShader* pShader, const _char* pConstan
 	return pShader->Bind_Matrix(pConstantName, &m_WorldMatrix);
 }
 
+/* 크기 1기준으로 들어온 vScale 값을 곱해줍니다. 
+* => 누적이 아닙니다. 
+*/
 void CTransform::Scale(_float3 vScale)
 {
 	Set_State(STATE::RIGHT, XMVector3Normalize(Get_State(STATE::RIGHT)) * vScale.x);
@@ -40,6 +42,10 @@ void CTransform::Scale(_float3 vScale)
 	Set_State(STATE::LOOK, XMVector3Normalize(Get_State(STATE::LOOK)) * vScale.z);
 }
 
+/*
+* 크기 기준으로 계속 곱해진다. 
+* => 누적 곱.
+*/
 void CTransform::Scaling(_float3 vScale)
 {
 	Set_State(STATE::RIGHT, Get_State(STATE::RIGHT) * vScale.x);

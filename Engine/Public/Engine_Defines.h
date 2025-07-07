@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #pragma warning(disable : 4251)
 
@@ -7,9 +7,14 @@
 #include <d3dcompiler.h>
 
 #include "Fx11/d3dx11effect.h"
+#include <DirectXTK/SpriteBatch.h>
+#include <DirectXTK/SpriteFont.h>
+#include <DirectXTK/DDSTextureLoader.h>
+#include <DirectXTK/WICTextureLoader.h>
 
 using namespace DirectX;
 
+#include <memory>
 #include <vector>
 #include <list>
 #include <map>
@@ -27,13 +32,12 @@ using namespace std;
 
 #include "Engine_Enum.h"
 #include "Engine_Macro.h"
-#include "Engine_Struct.h"
 #include "Engine_Typedef.h"
+#include "Engine_Struct.h"
 #include "Engine_Function.h"
 
 
-#include <SpriteBatch.h>
-#include <SpriteFont.h>
+
 
 #ifdef _DEBUG
 

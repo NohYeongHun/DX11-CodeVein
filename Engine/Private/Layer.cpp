@@ -1,4 +1,4 @@
-#include "Layer.h"
+﻿#include "Layer.h"
 
 #include "GameObject.h"
 
@@ -54,7 +54,11 @@ void CLayer::Free()
 	__super::Free();
 
 	for (auto& pGameObject : m_GameObjects)
+	{
+		pGameObject->Destroy(); // 해제 전에 해결해야할 제거 작업을 미리 정의?
 		Safe_Release(pGameObject);
+	}
+		
 
 	m_GameObjects.clear();
 	

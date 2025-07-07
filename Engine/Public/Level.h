@@ -13,7 +13,7 @@ protected:
 	virtual ~CLevel() = default;
 
 public:
-	virtual HRESULT Initialize();
+	virtual HRESULT Initialize_Clone();
 	virtual void Update(_float fTimeDelta);
 	virtual HRESULT Render();
 

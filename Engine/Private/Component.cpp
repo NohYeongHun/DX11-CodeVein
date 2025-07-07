@@ -29,7 +29,7 @@ HRESULT CComponent::Initialize_Prototype()
 	return S_OK;
 }
 
-HRESULT CComponent::Initialize(void* pArg)
+HRESULT CComponent::Initialize_Clone(void* pArg)
 {
 
 

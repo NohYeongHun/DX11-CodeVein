@@ -53,7 +53,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     }
 
     // 1. MainApp 생성
-    CMainApp* pMainApp = CMainApp::Create();
+    CTool_MainApp* pMainApp = CTool_MainApp::Create();
     if (nullptr == pMainApp)
         return FALSE;
 

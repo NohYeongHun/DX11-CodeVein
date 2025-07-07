@@ -1,8 +1,6 @@
 ﻿
 #include "MainApp.h"
-#include "GameInstance.h"
 
-#include "Level_Loading.h"
 
 CMainApp::CMainApp()
 	: m_pGameInstance{ CGameInstance::GetInstance() }
@@ -10,7 +8,7 @@ CMainApp::CMainApp()
 	Safe_AddRef(m_pGameInstance);
 }
 
-HRESULT CMainApp::Initialize()
+HRESULT CMainApp::Initialize_Clone()
 {
 #ifdef _DEBUG
 	AllocConsole();
@@ -30,6 +28,10 @@ HRESULT CMainApp::Initialize()
 		return E_FAIL;
 
 	if (FAILED(Ready_Prototype_ForStatic()))
+		return E_FAIL;
+
+
+	if (FAILED(Ready_Clone_ForStatic()))
 		return E_FAIL;
 
 	if (FAILED(Start_Level(LEVEL::LOGO)))
@@ -77,9 +79,147 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 		CVIBuffer_Rect::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
-	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LEVEL_STATIC), TEXT("Prototype_Component_Transform"),
-	//	CTransform::Create(m_pDevice, m_pContext))))
-	//	return E_FAIL;
+
+	//. 자주 사용하는 얘들 모아둔다.
+	if (FAILED(Ready_Prototype_Fonts()))
+		return E_FAIL;
+
+	if (FAILED(Ready_Prototype_HUD()))
+		return E_FAIL;
+
+	if (FAILED(Ready_Prototype_Loading()))
+		return E_FAIL;
+	
+	
+#pragma endregion
+
+
+	return S_OK;
+}
+
+HRESULT CMainApp::Ready_Prototype_HUD()
+{
+#pragma region HUD 객체
+
+	// Skill Slot UI Texture
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
+		, TEXT("Prototype_Component_Texture_SkillSlot")
+		, CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/User/SkillSlot/SkillSlot%d.png"), 3))))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
+		, TEXT("Prototype_Component_Texture_Action_SkillIcon")
+		, CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/User/SkillIcon/Action/Action%d.png"), 12))))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Texture(ENUM_CLASS(LEVEL::STATIC),
+		TEXT("Prototype_Component_Texture_Action_SkillIcon"),
+		TEXT("Action_SkillIcon"))))
+		return E_FAIL;
+
+	// Skill Slot
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_SkillIcon"),
+		CSkill_Icon::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_SkillSlot"),
+		CSkill_Slot::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_SkillPanel"),
+		CSkill_Panel::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	// Status 
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
+		, TEXT("Prototype_Component_Texture_HPBar")
+		, CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/User/HPBar/HPBar%d.png"), 2))))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_HPBar"),
+		CHPBar::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_StatusPanel"),
+		CStatusPanel::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_HUD"),
+		CHUD::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CMainApp::Ready_Prototype_Fonts()
+{
+	if (FAILED(m_pGameInstance
+		->Load_Font(
+			TEXT("HUD_TEXT")
+			, TEXT("../../Resources/Font/CodeVein.spritefont"))))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CMainApp::Ready_Prototype_Loading()
+{
+	// 1. Texture
+ 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
+		, TEXT("Prototype_Component_Texture_Loading_BackGround")
+		, CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Loading/Loading_BackGround%d.png"), 1))))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
+		, TEXT("Prototype_Component_Texture_Loading_Slot")
+		, CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Loading/Loading_Slot%d.png"), 1))))
+		return E_FAIL;
+
+
+
+	// 2. 객체
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Loading_BackGround"),
+		CLoading_BackGround::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Loading_Panel"),
+		CLoading_Panel::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Loading_Slot"),
+		CLoading_Slot::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CMainApp::Ready_Clone_ForStatic()
+{
+	// 생성은 하되 비활성화 해두어야 합니다.
+	if (FAILED(Ready_Clone_HUD(TEXT("Layer_HUD"))))
+		return E_FAIL;
+	
+	// 생성은 하되 비활성화 해두어야 합니다.
+	if (FAILED(Ready_Clone_Loading(TEXT("Layer_Loading"))))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CMainApp::Ready_Clone_HUD(const _wstring& strLayerTag)
+{
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::STATIC), strLayerTag,
+		ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_HUD"))))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CMainApp::Ready_Clone_Loading(const _wstring& strLayerTag)
+{
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::STATIC), strLayerTag,
+		ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Loading_BackGround"))))
+		return E_FAIL;
 
 	return S_OK;
 }
@@ -96,7 +236,7 @@ CMainApp* CMainApp::Create()
 {
 	CMainApp* pInstance = new CMainApp();
 
-	if (FAILED(pInstance->Initialize()))
+	if (FAILED(pInstance->Initialize_Clone()))
 	{
 		MSG_BOX(TEXT("Failed to Created : CMainApp"));
 		Safe_Release(pInstance);

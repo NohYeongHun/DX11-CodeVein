@@ -1,4 +1,4 @@
-#include "VIBuffer_Rect.h"
+﻿#include "VIBuffer_Rect.h"
 
 CVIBuffer_Rect::CVIBuffer_Rect(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CVIBuffer { pDevice, pContext }
@@ -6,7 +6,7 @@ CVIBuffer_Rect::CVIBuffer_Rect(ID3D11Device* pDevice, ID3D11DeviceContext* pCont
 }
 
 CVIBuffer_Rect::CVIBuffer_Rect(const CVIBuffer_Rect& Prototype)
-	: CVIBuffer{ Prototype }
+	: CVIBuffer( Prototype )
 {
 }
 
@@ -37,10 +37,10 @@ HRESULT CVIBuffer_Rect::Initialize_Prototype()
 	pVertices[1].vTexcoord = _float2(1.f, 0.f);
 
 	pVertices[2].vPosition = _float3(0.5f, -0.5f, 0.f);
-	pVertices[2].vTexcoord = _float2(0.f, 1.f);
+	pVertices[2].vTexcoord = _float2(1.f, 1.f);
 
 	pVertices[3].vPosition = _float3(-0.5f, -0.5f, 0.f);
-	pVertices[3].vTexcoord = _float2(1.f, 1.f);
+	pVertices[3].vTexcoord = _float2(0.f, 1.f);
 
 	D3D11_SUBRESOURCE_DATA	VBInitialData{};
 	VBInitialData.pSysMem = pVertices;
@@ -79,7 +79,7 @@ HRESULT CVIBuffer_Rect::Initialize_Prototype()
 	return S_OK;
 }
 
-HRESULT CVIBuffer_Rect::Initialize(void* pArg)
+HRESULT CVIBuffer_Rect::Initialize_Clone(void* pArg)
 {
 	return S_OK;
 }
@@ -101,7 +101,7 @@ CComponent* CVIBuffer_Rect::Clone(void* pArg)
 {
 	CVIBuffer_Rect* pInstance = new CVIBuffer_Rect(*this);
 
-	if (FAILED(pInstance->Initialize(pArg)))
+	if (FAILED(pInstance->Initialize_Clone(pArg)))
 	{
 		MSG_BOX(TEXT("Failed to Cloned : CVIBuffer_Rect"));
 		Safe_Release(pInstance);

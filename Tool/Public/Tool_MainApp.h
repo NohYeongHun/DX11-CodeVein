@@ -1,16 +1,16 @@
-#pragma once
+Ôªø#pragma once
 #include "Tool_Defines.h"
 #include "Base.h"
 
 NS_BEGIN(Tool)
-class CMainApp final : public CBase
+class CTool_MainApp final : public CBase
 {
 private:
-	CMainApp();
-	virtual ~CMainApp() = default;
+	CTool_MainApp();
+	virtual ~CTool_MainApp() = default;
 
 public:
-	HRESULT Initialize();
+	HRESULT Initialize_Clone();
 	void Update(_float fTimeDelta);
 	HRESULT Render();
 
@@ -25,13 +25,13 @@ private:
 
 private:
 	HRESULT Ready_Prototype_ForStatic();
-	HRESULT Ready_Fonts(); // Font_Managerø° Font∏¶ √ﬂ∞°«—¥Ÿ.
+	HRESULT Ready_Fonts(); // Font_ManagerÏóê FontÎ•º Ï∂îÍ∞ÄÌïúÎã§.
 	HRESULT Ready_Console();
 
 	//HRESULT Start_Level(LEVEL eStartLevelID);
 
 public:
-	static CMainApp* Create();
+	static CTool_MainApp* Create();
 	virtual void Free() override;
 
 };

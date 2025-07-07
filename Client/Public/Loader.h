@@ -20,7 +20,7 @@ private:
 	/* 세마포어 , 뮤텍스, 크리티컬섹션 */
 
 public:
-	HRESULT Initialize(LEVEL eNextLevelID);
+	HRESULT Initialize_Clone(LEVEL eNextLevelID);
 	HRESULT Loading();
 
 	_bool isFinished() {

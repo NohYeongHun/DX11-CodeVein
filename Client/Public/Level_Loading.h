@@ -19,17 +19,24 @@ private:
 	virtual ~CLevel_Loading() = default;
 
 public:
-	virtual HRESULT Initialize(LEVEL eNextLevelID);
+	virtual HRESULT Initialize_Clone(LEVEL eNextLevelID);
 	virtual void Update(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
+
+	void Open_Level();
 
 private:
 	LEVEL				m_eNextLevelID = { LEVEL::END };
 	class CLoader*		m_pLoader = { nullptr };
+	vector<pair<EventType, uint32_t>> m_Events = {};
+
 
 private:
+	HRESULT Ready_LoadingBackGround(const _wstring& strLayerTag);
+	HRESULT Ready_LoadingScene();
 	HRESULT Ready_GameObjects();
 	HRESULT Ready_LoadingThread();
+	HRESULT Ready_Events();
 
 public:
 	static CLevel_Loading* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, LEVEL eNextLevelID);

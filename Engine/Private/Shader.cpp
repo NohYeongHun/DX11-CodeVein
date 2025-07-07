@@ -1,4 +1,4 @@
-#include "Shader.h"
+﻿#include "Shader.h"
 
 CShader::CShader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CComponent { pDevice, pContext }
@@ -7,7 +7,7 @@ CShader::CShader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 }
 
 CShader::CShader(const CShader& Prototype)
-	: CComponent{ Prototype }
+	: CComponent(Prototype ) 
 	, m_pEffect { Prototype.m_pEffect }
 	, m_iNumPasses { Prototype.m_iNumPasses }
 	, m_InputLayouts { Prototype.m_InputLayouts }
@@ -42,7 +42,7 @@ HRESULT CShader::Initialize_Prototype(const _tchar* pShaderFilePath, const D3D11
 
 	m_iNumPasses = TechniqueDesc.Passes;
 
-	for (size_t i = 0; i < m_iNumPasses; i++)
+	for (_uint i = 0; i < m_iNumPasses; i++)
 	{
 		ID3DX11EffectPass* pPass = pTechnique->GetPassByIndex(i);
 		if (nullptr == pPass)
@@ -52,7 +52,6 @@ HRESULT CShader::Initialize_Prototype(const _tchar* pShaderFilePath, const D3D11
 		pPass->GetDesc(&PassDesc);
 
 		ID3D11InputLayout* pInputLayout = { nullptr };
-
 		if (FAILED(m_pDevice->CreateInputLayout(pElements, iNumElements, PassDesc.pIAInputSignature, PassDesc.IAInputSignatureSize, &pInputLayout)))
 			return E_FAIL;
 
@@ -62,7 +61,7 @@ HRESULT CShader::Initialize_Prototype(const _tchar* pShaderFilePath, const D3D11
 	return S_OK;
 }
 
-HRESULT CShader::Initialize(void* pArg)
+HRESULT CShader::Initialize_Clone(void* pArg)
 {
 	return S_OK;
 }
@@ -95,6 +94,47 @@ HRESULT CShader::Bind_Matrix(const _char* pConstantName, const _float4x4* pMatri
 	return pMatrixVariable->SetMatrix(reinterpret_cast<const _float*>(pMatrix));	
 }
 
+HRESULT CShader::Bind_SRV(const _char* pConstantName, ID3D11ShaderResourceView* pSRV)
+{
+
+	ID3DX11EffectVariable* pVariable = m_pEffect->GetVariableByName(pConstantName);
+	if (nullptr == pVariable)
+		return E_FAIL;
+
+	ID3DX11EffectShaderResourceVariable* pShaderResourceVariable = pVariable->AsShaderResource();
+	if (nullptr == pShaderResourceVariable)
+		return E_FAIL;
+
+	return pShaderResourceVariable->SetResource(pSRV);
+}
+
+HRESULT CShader::Bind_Int(const _char* pConstantName, _uint iValue)
+{
+	ID3DX11EffectVariable* pVariable = m_pEffect->GetVariableByName(pConstantName);
+	if (nullptr == pVariable)
+		return E_FAIL;
+
+	ID3DX11EffectScalarVariable* pScalarVariable = pVariable->AsScalar();
+	if (nullptr == pScalarVariable)
+		return E_FAIL;
+
+	return pScalarVariable->SetInt(iValue);
+}
+
+HRESULT CShader::Bind_Float(const _char* pConstantName, _float fValue)
+{
+	ID3DX11EffectVariable* pVariable = m_pEffect->GetVariableByName(pConstantName);
+	if (nullptr == pVariable)
+		return E_FAIL;
+
+	ID3DX11EffectScalarVariable* pScalarVariable = pVariable->AsScalar();
+	if (nullptr == pScalarVariable)
+		return E_FAIL;
+
+	return pScalarVariable->SetFloat(fValue);
+}
+
+
 CShader* CShader::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _tchar* pShaderFilePath, const D3D11_INPUT_ELEMENT_DESC* pElements, _uint iNumElements)
 {
 	CShader* pInstance = new CShader(pDevice, pContext);
@@ -112,7 +152,7 @@ CComponent* CShader::Clone(void* pArg)
 {
 	CShader* pInstance = new CShader(*this);
 
-	if (FAILED(pInstance->Initialize(pArg)))
+	if (FAILED(pInstance->Initialize_Clone(pArg)))
 	{
 		MSG_BOX(TEXT("Failed to Cloned : CShader"));
 		Safe_Release(pInstance);

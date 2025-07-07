@@ -1,8 +1,8 @@
-#pragma once
+ï»¿#pragma once
 
 #include "Transform.h"
 
-/* °ÔÀÓ¿ÀºêÁ§Æ®µéÀÇ ºÎ¸ğ°¡ µÇ´Â Å¬·¡½º. */
+/* ê²Œì„ì˜¤ë¸Œì íŠ¸ë“¤ì˜ ë¶€ëª¨ê°€ ë˜ëŠ” í´ë˜ìŠ¤. */
 
 NS_BEGIN(Engine)
 
@@ -19,11 +19,13 @@ protected:
 	virtual ~CGameObject() = default;
 
 public:
+	
 	class CComponent* Get_Component(const _wstring& strComponentTag);
+	HRESULT Change_Component(const _wstring& strComponentTag, CComponent** ppOut, CComponent* pChangeComponent);
 
 public:
 	virtual HRESULT Initialize_Prototype();
-	virtual HRESULT Initialize(void* pArg);
+	virtual HRESULT Initialize_Clone(void* pArg);
 	virtual void Priority_Update(_float fTimeDelta);
 	virtual void Update(_float fTimeDelta);
 	virtual void Late_Update(_float fTimeDelta);
@@ -38,14 +40,18 @@ protected:
 	map<const _wstring, class CComponent*>		m_Components;
 
 protected:
-	/*¿øÇüÄÄÆ÷³ÍÆ®¸¦ Ã£¾Æ¼­ º¹Á¦ÇÑ´Ù. */
-	/*mapÄÁÅ×ÀÌ³Ê¿¡ º¸°üÇÑ´Ù.  */
-	/*ÀÚ½ÄÀÇ ¸â¹öº¯¼ö¿¡µµ ÀúÀåÇÑ´Ù. */
+	/*ì›í˜•ì»´í¬ë„ŒíŠ¸ë¥¼ ì°¾ì•„ì„œ ë³µì œí•œë‹¤. */
+	/*mapì»¨í…Œì´ë„ˆì— ë³´ê´€í•œë‹¤.  */
+	/*ìì‹ì˜ ë©¤ë²„ë³€ìˆ˜ì—ë„ ì €ì¥í•œë‹¤. */
 	HRESULT Add_Component(_uint iPrototypeLevelIndex, const _wstring& strPrototypeTag, 
 		const _wstring& strComponentTag, CComponent** ppOut, void* pArg = nullptr);
 
+
+
+
 public:	
 	virtual CGameObject* Clone(void* pArg) = 0;
+	virtual void Destroy(); 
 	virtual void Free() override;
 
 };

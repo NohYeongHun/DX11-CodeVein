@@ -1,4 +1,4 @@
-#include "Level_GamePlay.h"
+ï»¿#include "Level_GamePlay.h"
 
 #include "GameInstance.h"
 
@@ -9,12 +9,15 @@ CLevel_GamePlay::CLevel_GamePlay(ID3D11Device* pDevice, ID3D11DeviceContext* pCo
 {
 }
 
-HRESULT CLevel_GamePlay::Initialize()
+HRESULT CLevel_GamePlay::Initialize_Clone()
 {
+	if (FAILED(Ready_HUD()))
+		return E_FAIL;
+
 	if (FAILED(Ready_Lights()))
 		return E_FAIL;
 
-	/* ÇöÀç ·¹º§À» ±¸¼ºÇØÁÖ±â À§ÇÑ °´Ã¼µéÀ» »ý¼ºÇÑ´Ù. */
+	/* í˜„ìž¬ ë ˆë²¨ì„ êµ¬ì„±í•´ì£¼ê¸° ìœ„í•œ ê°ì²´ë“¤ì„ ìƒì„±í•œë‹¤. */
 	if (FAILED(Ready_Layer_Camera(TEXT("Layer_Camera"))))
 		return E_FAIL;
 
@@ -43,7 +46,18 @@ void CLevel_GamePlay::Update(_float fTimeDelta)
 
 HRESULT CLevel_GamePlay::Render()
 {
-	SetWindowText(g_hWnd, TEXT("°ÔÀÓÇÃ·¹ÀÌ·¹º§ÀÔ´Ï´Ù."));
+	SetWindowText(g_hWnd, TEXT("ê²Œìž„í”Œë ˆì´ë ˆë²¨ìž…ë‹ˆë‹¤."));
+
+	return S_OK;
+}
+
+HRESULT CLevel_GamePlay::Ready_HUD()
+{
+	HUDEVENT_DESC Desc{};
+	Desc.isVisibility = true;
+	 
+	// ì´ë²¤íŠ¸ ì‹¤í–‰ì´ì§€ êµ¬ë…ì´ì•„ë‹˜.
+	m_pGameInstance->Publish<HUDEVENT_DESC>(EventType::HUD_DISPLAY,  & Desc);
 
 	return S_OK;
 }
@@ -94,7 +108,7 @@ CLevel_GamePlay* CLevel_GamePlay::Create(ID3D11Device* pDevice, ID3D11DeviceCont
 {
 	CLevel_GamePlay* pInstance = new CLevel_GamePlay(pDevice, pContext);
 
-	if (FAILED(pInstance->Initialize()))
+	if (FAILED(pInstance->Initialize_Clone()))
 	{
 		MSG_BOX(TEXT("Failed to Created : CLevel_GamePlay"));
 		Safe_Release(pInstance);

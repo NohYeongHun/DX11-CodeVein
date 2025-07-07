@@ -1,8 +1,8 @@
-#pragma once
+ï»¿#pragma once
 #include "Base.h"
 
 /*
-* ÆùÆ®¸¸ µû·Î °ü¸®ÇÏ´Â ¸Å´ÏÀú.
+* í°íŠ¸ë§Œ ë”°ë¡œ ê´€ë¦¬í•˜ëŠ” ë§¤ë‹ˆì €.
 */
 NS_BEGIN(Engine)
 class CFont_Manager final : public CBase
@@ -14,7 +14,7 @@ private:
 public:
 	HRESULT Initialize();
 
-#pragma region ENGINE Á¦°ø
+#pragma region ENGINE ì œê³µ
 public:
 	/* 1. Load Font */
 	HRESULT Load_Font(const _wstring& strFontID, const _tchar* pFontFilePath);

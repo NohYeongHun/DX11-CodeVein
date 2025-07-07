@@ -1,8 +1,4 @@
-#include "Prototype_Manager.h"
-#include "GameObject.h"
-#include "Component.h"
-
-#include "GameInstance.h"
+ï»¿#include "Prototype_Manager.h"
 
 CPrototype_Manager::CPrototype_Manager()	
 {
@@ -64,7 +60,7 @@ void CPrototype_Manager::Clear(_uint iLevelIndex)
 
 CBase* CPrototype_Manager::Find_Prototype(_uint iPrototypeLevelIndex, const _wstring& strPrototypeTag)
 {
-	/* ÀÌÁøÅ½»ö */
+	/* ì´ì§„íƒìƒ‰ */
 	auto	iter = m_pPrototypes[iPrototypeLevelIndex].find(strPrototypeTag);
 
 	if (iter == m_pPrototypes[iPrototypeLevelIndex].end())

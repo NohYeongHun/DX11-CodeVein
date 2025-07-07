@@ -157,6 +157,8 @@
     <ClInclude Include="..\public\BackGround.h" />
     <ClInclude Include="..\Public\ClientPch.h" />
     <ClInclude Include="..\Public\Client_Defines.h" />
+    <ClInclude Include="..\Public\HPBar.h" />
+    <ClInclude Include="..\Public\HUD.h" />
     <ClInclude Include="..\Public\imconfig.h" />
     <ClInclude Include="..\Public\imgui.h" />
     <ClInclude Include="..\Public\Imgui_Define.h" />
@@ -174,7 +176,17 @@
     <ClInclude Include="..\Public\Loader_GamePlay.h" />
     <ClInclude Include="..\Public\Loader_Logo.h" />
     <ClInclude Include="..\Public\Loader_Personal.h" />
+    <ClInclude Include="..\Public\Loading_BackGround.h" />
+    <ClInclude Include="..\Public\Loading_Panel.h" />
+    <ClInclude Include="..\Public\Loading_Slot.h" />
     <ClInclude Include="..\Public\MainApp.h" />
+    <ClInclude Include="..\Public\Skill_Icon.h" />
+    <ClInclude Include="..\Public\Skill_Panel.h" />
+    <ClInclude Include="..\Public\Skill_Slot.h" />
+    <ClInclude Include="..\Public\StatusPanel.h" />
+    <ClInclude Include="..\Public\Title.h" />
+    <ClInclude Include="..\Public\Title_BackGround.h" />
+    <ClInclude Include="..\Public\TitleText.h" />
     <ClInclude Include="Client.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="Resource.h" />
@@ -185,6 +197,8 @@
     <ClCompile Include="..\Private\ClientPch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="..\Private\HPBar.cpp" />
+    <ClCompile Include="..\Private\HUD.cpp" />
     <ClCompile Include="..\Private\imgui.cpp" />
     <ClCompile Include="..\Private\imgui_demo.cpp" />
     <ClCompile Include="..\Private\imgui_draw.cpp" />
@@ -200,7 +214,17 @@
     <ClCompile Include="..\Private\Loader_GamePlay.cpp" />
     <ClCompile Include="..\Private\Loader_Logo.cpp" />
     <ClCompile Include="..\Private\Loader_Personal.cpp" />
+    <ClCompile Include="..\Private\Loading_BackGround.cpp" />
+    <ClCompile Include="..\Private\Loading_Panel.cpp" />
+    <ClCompile Include="..\Private\Loading_Slot.cpp" />
     <ClCompile Include="..\Private\MainApp.cpp" />
+    <ClCompile Include="..\Private\Skill_Icon.cpp" />
+    <ClCompile Include="..\Private\Skill_Panel.cpp" />
+    <ClCompile Include="..\Private\Skill_Slot.cpp" />
+    <ClCompile Include="..\Private\StatusPanel.cpp" />
+    <ClCompile Include="..\Private\Title.cpp" />
+    <ClCompile Include="..\Private\Title_BackGround.cpp" />
+    <ClCompile Include="..\Private\TitleText.cpp" />
     <ClCompile Include="Client.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -213,17 +237,6 @@
   <ItemGroup>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPosTex.hlsl" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <ImportGroup Label="ExtensionTargets">
-    <Import Project="..\..\packages\directxtk_desktop_win10.2025.3.21.2\build\native\directxtk_desktop_win10.targets" Condition="Exists('..\..\packages\directxtk_desktop_win10.2025.3.21.2\build\native\directxtk_desktop_win10.targets')" />
-  </ImportGroup>
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>이 프로젝트는 이 컴퓨터에 없는 NuGet 패키지를 참조합니다. 해당 패키지를 다운로드하려면 NuGet 패키지 복원을 사용하십시오. 자세한 내용은 http://go.microsoft.com/fwlink/?LinkID=322105를 참조하십시오. 누락된 파일은 {0}입니다.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\..\packages\directxtk_desktop_win10.2025.3.21.2\build\native\directxtk_desktop_win10.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\directxtk_desktop_win10.2025.3.21.2\build\native\directxtk_desktop_win10.targets'))" />
-  </Target>
+  <ImportGroup Label="ExtensionTargets" />
 </Project>

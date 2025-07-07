@@ -16,11 +16,6 @@
 #include "Loader.h"
 #pragma endregion
 
-
-
-
-
-
 #pragma region LEVEL
 #include "Level_Loading.h"
 #include "Level_Logo.h"
@@ -37,6 +32,21 @@
 
 #pragma region GAMEOBJECT
 #include "BackGround.h"
+#include "Title_BackGround.h"
+#include "TitleText.h"
+#include "Title.h"
+#include "HUD.h"
+#include "Skill_Icon.h"
+#include "Skill_Slot.h"
+#include "Skill_Panel.h"
+
+#include "HPBar.h"
+#include "StatusPanel.h"
+#include "Loading_BackGround.h"
+#include "Loading_Panel.h"
+#include "Loading_Slot.h"
+
+
 #pragma endregion
 
 

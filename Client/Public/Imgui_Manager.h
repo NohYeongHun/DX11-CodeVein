@@ -15,7 +15,7 @@ public:
 	void Render_End();
 
 public:
-	HRESULT Initialize(HWND hWnd, ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	HRESULT Initialize_Clone(HWND hWnd, ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 
 private:
 	class CGameInstance* m_pGameInstance = { nullptr };

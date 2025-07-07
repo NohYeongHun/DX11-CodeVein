@@ -49,9 +49,6 @@
     <Filter Include="01.Utility\02.GameObject\Manager\Layer">
       <UniqueIdentifier>{be18ebfd-3363-4685-83f6-c948aa2290ea}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01.Utility\04.Prototypes">
-      <UniqueIdentifier>{ed302dd2-ef7d-4d86-a247-b9658d5f090c}</UniqueIdentifier>
-    </Filter>
     <Filter Include="01.Utility\02.GameObject\UIObject">
       <UniqueIdentifier>{5c88d794-9383-4a8a-8347-680051d0a38c}</UniqueIdentifier>
     </Filter>
@@ -78,6 +75,21 @@
     </Filter>
     <Filter Include="01.Utility\03.Component\Collider\Manager">
       <UniqueIdentifier>{89e88c9f-7acb-431a-8608-e0dac7b8eda7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\03.Component\Texture">
+      <UniqueIdentifier>{1cd242c3-494b-45ba-9de4-2e55003a74a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\03.Component\Texture\Manager">
+      <UniqueIdentifier>{00f42107-0aaa-41ed-a991-1c54fcb90b42}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\06. Event">
+      <UniqueIdentifier>{ccf9b0ee-5262-4448-b391-aeb33132704e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\06. Event\Manager">
+      <UniqueIdentifier>{f412eda4-288d-4f78-b366-2fa6aabf81bf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01.Utility\04. Prototypes">
+      <UniqueIdentifier>{ed302dd2-ef7d-4d86-a247-b9658d5f090c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -115,7 +127,7 @@
       <Filter>01.Utility\02.GameObject\Manager\Layer</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Prototype_Manager.cpp">
-      <Filter>01.Utility\04.Prototypes</Filter>
+      <Filter>01.Utility\04. Prototypes</Filter>
     </ClCompile>
     <ClCompile Include="..\private\UIObject.cpp">
       <Filter>01.Utility\02.GameObject\UIObject</Filter>
@@ -149,6 +161,18 @@
     </ClCompile>
     <ClCompile Include="..\Private\Collider.cpp">
       <Filter>01.Utility\03.Component\Collider</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Texture.cpp">
+      <Filter>01.Utility\03.Component\Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Texture_Manager.cpp">
+      <Filter>01.Utility\03.Component\Texture\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Event_Manager.cpp">
+      <Filter>01.Utility\06. Event\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\IdGen.cpp">
+      <Filter>01.Utility\02.GameObject</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -207,7 +231,7 @@
       <Filter>01.Utility\02.GameObject\Manager\Layer</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Prototype_Manager.h">
-      <Filter>01.Utility\04.Prototypes</Filter>
+      <Filter>01.Utility\04. Prototypes</Filter>
     </ClInclude>
     <ClInclude Include="..\public\UIObject.h">
       <Filter>01.Utility\02.GameObject\UIObject</Filter>
@@ -227,9 +251,6 @@
     <ClInclude Include="..\Public\EnginePch.h">
       <Filter>99.Defines</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Font.h">
-      <Filter>01.Utility\05. Font</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\Font_Manager.h">
       <Filter>01.Utility\05. Font\Manager</Filter>
     </ClInclude>
@@ -239,8 +260,28 @@
     <ClInclude Include="..\Public\Collider.h">
       <Filter>01.Utility\03.Component\Collider</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Texture.h">
+      <Filter>01.Utility\03.Component\Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Texture_Manager.h">
+      <Filter>01.Utility\03.Component\Texture\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Font.h">
+      <Filter>01.Utility\05. Font</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Event_Manager.h">
+      <Filter>01.Utility\06. Event\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Event_Type.h">
+      <Filter>01.Utility\06. Event</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\IdGen.h">
+      <Filter>01.Utility\02.GameObject</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <None Include="GameInstance.inl">
+      <Filter>01.Utility\00.GameInstance</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -1,13 +1,13 @@
-#pragma once
+ï»¿#pragma once
 
 #include "../Default/framework.h"
 #include <process.h>
 
-/* Å¬¶óÀÌ¾ðÆ®¿¡¼­ »ç¿ëÇÒ ¼ö ÀÖ´Â °øÅëÀûÀÎ Á¤ÀÇ¸¦ ¸ð¾Æ³õÀº ÆÄÀÏ */
+/* í´ë¼ì´ì–¸íŠ¸ì—ì„œ ì‚¬ìš©í•  ìˆ˜ ìžˆëŠ” ê³µí†µì ì¸ ì •ì˜ë¥¼ ëª¨ì•„ë†“ì€ íŒŒì¼ */
 namespace Client
 {
-	const unsigned int			g_iWinSizeX = 1280;
-	const unsigned int			g_iWinSizeY = 720;
+	const unsigned int			g_iWinSizeX = 1920;
+	const unsigned int			g_iWinSizeY = 1080;
 
 	enum class LEVEL { STATIC, LOADING, LOGO, GAMEPLAY, END };
 }
@@ -16,19 +16,19 @@ extern HWND g_hWnd;
 extern HINSTANCE g_hInst;
 using namespace Client;
 
-/* Á¶¸í. */
+/* ì¡°ëª…. */
 
-/* 1. ¶Ë½Ñ³ð(³²). */
-/* 1. ÇÇÇØÀÇ½Ä°©.(¿©) */
-/* 1. ÃßÃµºô·±.(¿©) */
-/* 1. ¿©¹Ì»õ, ³²¹Ì»õ */
-/* 1. º¯ÅÂ¹üÁËÀÚ»õ³¢ 1, 2 .(³²) */
-/* 1. ¾ß°×¸¸µçÁß2º´.(³²) */
-/* 1. ÂøÇÑ»Ú¶ôÁö.(³²) */
-/* 1. ¿©¿Õ¹ú°ú ¾ÆÀÌµé(³²µé) */
-/* 1. °ÔÀÌ.(³²) */
-/* 1. ÄÚ½ºÇÁ·¹.(³², ¿©) */
-/* 1. ¾î¼ÒÆ®¶ô. */
-/* 1. ¼­¿ï°ÔÀÓ¾ÆÄ«µ¥¹Ì */
-/* 1. Áê½ÅÀÇ °ú°Å */
-/* 1. Áê½ÅÀÇ Å»ÇÇ. (Ææ¼Ç, ¾Ö°ß ³îÀÌÅÍ, ¾Ö°ß Ä«Æä, ) */
+/* 1. ë˜¥ì‹¼ë†ˆ(ë‚¨). */
+/* 1. í”¼í•´ì˜ì‹ê°‘.(ì—¬) */
+/* 1. ì¶”ì²œë¹ŒëŸ°.(ì—¬) */
+/* 1. ì—¬ë¯¸ìƒˆ, ë‚¨ë¯¸ìƒˆ */
+/* 1. ë³€íƒœë²”ì£„ìžìƒˆë¼ 1, 2 .(ë‚¨) */
+/* 1. ì•¼ê²œë§Œë“ ì¤‘2ë³‘.(ë‚¨) */
+/* 1. ì°©í•œì˜ë½ì§€.(ë‚¨) */
+/* 1. ì—¬ì™•ë²Œê³¼ ì•„ì´ë“¤(ë‚¨ë“¤) */
+/* 1. ê²Œì´.(ë‚¨) */
+/* 1. ì½”ìŠ¤í”„ë ˆ.(ë‚¨, ì—¬) */
+/* 1. ì–´ì†ŒíŠ¸ë½. */
+/* 1. ì„œìš¸ê²Œìž„ì•„ì¹´ë°ë¯¸ */
+/* 1. ì¥¬ì‹ ì˜ ê³¼ê±° */
+/* 1. ì¥¬ì‹ ì˜ íƒˆí”¼. (íŽœì…˜, ì• ê²¬ ë†€ì´í„°, ì• ê²¬ ì¹´íŽ˜, ) */

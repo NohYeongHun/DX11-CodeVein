@@ -1,9 +1,9 @@
-#pragma once
+ï»¿#pragma once
 
-/* ¸ðµç Å¬·¡½ºÀÇ ºÎ¸ð°¡ µÇ´Â Å¬·¡½º */
-/* ¸ðµç Å¬·¡½º¿¡°Ô µ¿ÀÏÇÑ ±â´ÉÀ» Á¦°øÇØÁÖ°íÀÚÇÑ´Ù.  */
-/* µ¿ÀÏÇÑ ±â´É : ·¹ÆÛ·±½º Ä«¿îÆ®¸¦ °ü¸®ÇÑ´Ù. */
-/* ·¹ÆÛ·±½º Ä«¿îÆ® : ÂüÁ¶ °¹¼ö( °´Ã¼ÀÇ ÁÖ¼Ò¸¦ º¸°üÇÏ´Â Æ÷ÀÎÅÍÇü º¯¼öÀÇ °¹¼ö ) */
+/* ëª¨ë“  í´ëž˜ìŠ¤ì˜ ë¶€ëª¨ê°€ ë˜ëŠ” í´ëž˜ìŠ¤ */
+/* ëª¨ë“  í´ëž˜ìŠ¤ì—ê²Œ ë™ì¼í•œ ê¸°ëŠ¥ì„ ì œê³µí•´ì£¼ê³ ìží•œë‹¤.  */
+/* ë™ì¼í•œ ê¸°ëŠ¥ : ë ˆí¼ëŸ°ìŠ¤ ì¹´ìš´íŠ¸ë¥¼ ê´€ë¦¬í•œë‹¤. */
+/* ë ˆí¼ëŸ°ìŠ¤ ì¹´ìš´íŠ¸ : ì°¸ì¡° ê°¯ìˆ˜( ê°ì²´ì˜ ì£¼ì†Œë¥¼ ë³´ê´€í•˜ëŠ” í¬ì¸í„°í˜• ë³€ìˆ˜ì˜ ê°¯ìˆ˜ ) */
 
 #include "Engine_Defines.h"
 
@@ -16,14 +16,18 @@ protected:
 	virtual ~CBase() = default;
 
 public:
-	/* ÂüÁ¶°¹¼ö¸¦ Áõ°¡½ÃÅ°°í Áõ°¡ÇÑ °á°ú¸¦ ¸®ÅÏÇÏ³®. */
+	/* ì°¸ì¡°ê°¯ìˆ˜ë¥¼ ì¦ê°€ì‹œí‚¤ê³  ì¦ê°€í•œ ê²°ê³¼ë¥¼ ë¦¬í„´í•˜ë‚Ÿ. */
 	unsigned int AddRef();
 
-	/* ÂüÁ¶°¹¼ö¸¦ °¨¼Ò½ÃÅ°°Å³ª »èÁ¦ÇÏ°í °¨¼ÒÇÏ±â ÀÌÀüÀÇ °ªÀ» ¸®ÅÏÇÑ´Ù. */
+	/* ì°¸ì¡°ê°¯ìˆ˜ë¥¼ ê°ì†Œì‹œí‚¤ê±°ë‚˜ ì‚­ì œí•˜ê³  ê°ì†Œí•˜ê¸° ì´ì „ì˜ ê°’ì„ ë¦¬í„´í•œë‹¤. */
 	unsigned int Release();
+
+
+	const uint32_t Get_ID() { return m_iID; }
 
 private:
 	unsigned int m_iRefCnt = {};
+	uint32_t m_iID = {};
 
 public:
 	virtual void Free();

@@ -1,4 +1,4 @@
-#include "Font.h"
+ï»¿#include "Font.h"
 
 CFont::CFont(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : m_pDevice{ pDevice }
@@ -11,18 +11,20 @@ CFont::CFont(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 }
 
 
-HRESULT CFont::Initialize(const _tchar* pFontFilePath)
+HRESULT CFont::Initialize_Clone(const _tchar* pFontFilePath)
 {
     m_pFont = new SpriteFont(m_pDevice, pFontFilePath);
     m_pBatch = new SpriteBatch(m_pContext);
 
+    
+
     return S_OK;
 }
 
-/* Font Ãâ·Â. */
+/* Font ì¶œë ¥. */
 HRESULT CFont::Render(const _tchar* pText, const _float2& vPosition, _fvector vColor, _float fRotation, const _float2& vOrigin, _float fScale)
 {
-    // Draw Call ½ÃÀÛ.
+    // Draw Call ì‹œìž‘.
     m_pBatch->Begin();
 
     if (m_pFont)
@@ -30,21 +32,10 @@ HRESULT CFont::Render(const _tchar* pText, const _float2& vPosition, _fvector vC
             m_pBatch,
             pText,
             vPosition,
-            vColor,
-            fRotation
+            vColor
         );
 
-        //m_pFont->DrawString(
-        //    m_pBatch,
-        //    pText,
-        //    vPosition,
-        //    vColor,
-        //    fRotation,
-        //    vOrigin,
-        //    fScale
-        //);
-
-    // Draw Call ³¡.
+    // Draw Call ë.
     m_pBatch->End();
 
     return S_OK;
@@ -54,7 +45,7 @@ HRESULT CFont::Render(const _tchar* pText, const _float2& vPosition, _fvector vC
 CFont* CFont::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _tchar* pFontFilePath)
 {
     CFont* pInstance = new CFont(pDevice, pContext);
-    if (FAILED(pInstance->Initialize(pFontFilePath)))
+    if (FAILED(pInstance->Initialize_Clone(pFontFilePath)))
     {
         Safe_Release(pInstance);
         MSG_BOX(TEXT("Create Failed : CFont"));

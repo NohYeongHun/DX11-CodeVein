@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "Base.h"
 
 NS_BEGIN(Engine)
@@ -9,10 +9,10 @@ private:
 	virtual ~CFont() = default;
 
 public:
-	HRESULT Initialize(const _tchar* pFontFilePath);
+	HRESULT Initialize_Clone(const _tchar* pFontFilePath);
 
-	/* Render ½Ã¸¶´Ù Text º¯°æ. */
-	virtual HRESULT Render(const _tchar* pText, const _float2& vPosition, _fvector vColor, _float fRotation, const _float2& vOrigin, _float fScale);
+	/* Render ì‹œë§ˆë‹¤ Text ë³€ê²½. */
+	virtual HRESULT Render(const _tchar* pText, const _float2& vPosition, _fvector vColor, _float fRotation, const _float2& vOrigin, _float fScale = 1.f);
 
 private:
 	class CGameInstance* m_pGameInstance = { nullptr };

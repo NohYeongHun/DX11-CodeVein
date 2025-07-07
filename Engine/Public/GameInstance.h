@@ -13,6 +13,8 @@ private:
 
 #pragma region ENGINE
 public:
+	_float Get_TimeDelta() { return m_fTimeDelta; }
+
 	HRESULT Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11Device** ppDevice, ID3D11DeviceContext** ppContext);
 	void Update_Engine(_float fTimeDelta);
 	HRESULT Clear_Resources(_uint iClearLevelID);
@@ -29,6 +31,7 @@ public:
 #pragma region LEVEL_MANAGER
 public:
 	HRESULT Open_Level(_uint iLevelID, class CLevel* pNewLevel);
+	_uint Get_CurrentLevelID();
 #pragma endregion
 
 #pragma region PROTOTYPE_MANAGER
@@ -46,6 +49,9 @@ public:
 #pragma region RENDERER
 public:
 	HRESULT Add_RenderGroup(RENDERGROUP eRenderGroup, class CGameObject* pRenderObject);
+	HRESULT Apply_BlendeState();
+	HRESULT Apply_DepthStencilOff();
+	HRESULT Apply_DefaultStates();
 #pragma endregion
 //
 #pragma region TIMER_MANAGER
@@ -70,6 +76,22 @@ public:
 	HRESULT Remove_Collider_To_Layer(COLLIDERLAYER eColliderLayer, class CCollider* pCollider);
 #pragma endregion
 
+#pragma region TEXTURE_MANAGER
+public:
+	HRESULT Add_Texture(_uint iLevelIndex, const _wstring& strPrototypeTag, const _wstring& strTextureTag);
+	void	Change_Texture_ToGameObject(class CGameObject* pGameObject, const _wstring& strComponentTag, class CComponent** ppOut, _uint iLevelIndex, const _wstring& strTextureTag);
+#pragma endregion
+
+#pragma region EVENT_MANAGER
+	void Subscribe(EventType id, _uint iID, FCallback&& fn);
+
+	template<typename T>
+	void Publish(EventType id, T* msg);
+
+	void UnSubscribe(EventType id, _uint iID);
+#pragma endregion
+
+
 //
 //#pragma region PICKING 
 //	void Transform_Picking_ToLocalSpace(class CTransform* pTransformCom);
@@ -85,11 +107,19 @@ private:
 	class CTimer_Manager*		m_pTimer_Manager = { nullptr };
 	class CPicking*				m_pPicking = { nullptr };
 	class CFont_Manager*		m_pFont_Manager = { nullptr };
-	class CCollider_Manager* m_pCollider_Manager = { nullptr };
+	class CCollider_Manager*	m_pCollider_Manager = { nullptr };
+	class CTexture_Manager*		m_pTexture_Manager = { nullptr };
+	class CEvent_Manager*		m_pEvent_Manager = { nullptr };
+	_float m_fTimeDelta = {};
+
 
 public:
 	void Release_Engine();
 	virtual void Free() override;
 };
+
+
+#include "GameInstance.inl"
+
 
 NS_END
