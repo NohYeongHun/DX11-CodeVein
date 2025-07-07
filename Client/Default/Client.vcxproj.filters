@@ -52,6 +52,9 @@
     <Filter Include="02. GameObject\UI\Loading">
       <UniqueIdentifier>{8c701e3d-252e-4e7a-9364-b8c965c04254}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. GameObject\Terrain">
+      <UniqueIdentifier>{3727b5a4-f518-4921-b16e-f758ebb9cff7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -165,6 +168,9 @@
     <ClInclude Include="..\Public\Loading_Slot.h">
       <Filter>02. GameObject\UI\Loading</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Terrain.h">
+      <Filter>02. GameObject\Terrain</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -273,9 +279,15 @@
     <ClCompile Include="..\Private\Loading_Slot.cpp">
       <Filter>02. GameObject\UI\Loading</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Terrain.cpp">
+      <Filter>02. GameObject\Terrain</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPosTex.hlsl">
+      <Filter>98. Default</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxNorTex.hlsl">
       <Filter>98. Default</Filter>
     </FxCompile>
   </ItemGroup>

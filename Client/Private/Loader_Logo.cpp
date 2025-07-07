@@ -38,7 +38,7 @@ HRESULT CLoader_Logo::Add_Prototype_Title(ID3D11Device* pDevice, ID3D11DeviceCon
 
 
 #pragma region Title Text
-	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LOGO), TEXT("Prototype_GameObject_TitleText"),
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level), TEXT("Prototype_GameObject_TitleText"),
 		CTitleText::Create(pDevice, pContext))))
 		return E_FAIL;
 

@@ -14,6 +14,9 @@ HRESULT CLevel_GamePlay::Initialize_Clone()
 	if (FAILED(Ready_HUD()))
 		return E_FAIL;
 
+	if (FAILED(Ready_Layer_Terrain(TEXT("Layer_Terrain"))))
+		return E_FAIL;
+
 	if (FAILED(Ready_Lights()))
 		return E_FAIL;
 
@@ -58,6 +61,15 @@ HRESULT CLevel_GamePlay::Ready_HUD()
 	 
 	// 이벤트 실행이지 구독이아님.
 	m_pGameInstance->Publish<HUDEVENT_DESC>(EventType::HUD_DISPLAY,  & Desc);
+
+	return S_OK;
+}
+
+HRESULT CLevel_GamePlay::Ready_Layer_Terrain(const _wstring& strLayerTag)
+{
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel), strLayerTag,
+		ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_Terrain"))))
+		return E_FAIL;
 
 	return S_OK;
 }

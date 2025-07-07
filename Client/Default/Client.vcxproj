@@ -184,6 +184,7 @@
     <ClInclude Include="..\Public\Skill_Panel.h" />
     <ClInclude Include="..\Public\Skill_Slot.h" />
     <ClInclude Include="..\Public\StatusPanel.h" />
+    <ClInclude Include="..\Public\Terrain.h" />
     <ClInclude Include="..\Public\Title.h" />
     <ClInclude Include="..\Public\Title_BackGround.h" />
     <ClInclude Include="..\Public\TitleText.h" />
@@ -222,6 +223,7 @@
     <ClCompile Include="..\Private\Skill_Panel.cpp" />
     <ClCompile Include="..\Private\Skill_Slot.cpp" />
     <ClCompile Include="..\Private\StatusPanel.cpp" />
+    <ClCompile Include="..\Private\Terrain.cpp" />
     <ClCompile Include="..\Private\Title.cpp" />
     <ClCompile Include="..\Private\Title_BackGround.cpp" />
     <ClCompile Include="..\Private\TitleText.cpp" />
@@ -235,6 +237,7 @@
     <Image Include="small.ico" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxNorTex.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPosTex.hlsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

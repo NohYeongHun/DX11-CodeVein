@@ -132,8 +132,6 @@ void CLevel_Loading::Free()
 	LOADINGEVENT_DESC Desc{};
 	Desc.isVisibility = false;
 	m_pGameInstance->Publish<LOADINGEVENT_DESC>(EventType::LOAIDNG_DISPLAY,  & Desc);
-
-
 	
 	// 3. 지울 때 제거
 	for (auto& Event : m_Events)

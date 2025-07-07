@@ -12,7 +12,6 @@ public:
 
 	struct FEntry
 	{
-		//CBase* pOwner;		// 누가 등록했는지
 		FCallback   Fn;     // 실행 함수
 	};
 

@@ -18,6 +18,7 @@ public:
 private:
 	HRESULT Ready_Lights();
 	HRESULT Ready_HUD();
+	HRESULT Ready_Layer_Terrain(const _wstring& strLayerTag);
 	HRESULT Ready_Layer_Camera(const _wstring& strLayerTag);
 	HRESULT Ready_Layer_BackGround(const _wstring& strLayerTag);
 	HRESULT Ready_Layer_Player(const _wstring& strLayerTag);
