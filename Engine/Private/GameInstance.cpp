@@ -282,15 +282,15 @@ void CGameInstance::Change_Texture_ToGameObject(class CGameObject* pGameObject, 
 	m_pTexture_Manager->Change_Texture_ToGameObject(pGameObject, strComponentTag, ppOut, iLevelIndex, strTextureTag);
 }
 
-void CGameInstance::Subscribe(EventType id, FCallback&& fn)
+void CGameInstance::Subscribe(EventType id, uint32_t iID, FCallback&& fn)
 {
-	m_pEvent_Manager->Subscribe(id, std::move(fn));
+	m_pEvent_Manager->Subscribe(id, iID, std::move(fn));
 }
 
 
-void CGameInstance::UnSubscribe(EventType id)
+void CGameInstance::UnSubscribe(EventType id, uint32_t iID)
 {
-	m_pEvent_Manager->UnSubscribe(id);
+	m_pEvent_Manager->UnSubscribe(id, iID);
 }
 #pragma endregion
 

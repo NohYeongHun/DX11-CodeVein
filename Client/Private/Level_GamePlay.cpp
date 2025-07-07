@@ -56,12 +56,8 @@ HRESULT CLevel_GamePlay::Ready_HUD()
 	HUDEVENT_DESC Desc{};
 	Desc.isVisibility = true;
 	 
-	m_pGameInstance->Publish<HUDEVENT_DESC>(EventType::HUD_DISPLAY, &Desc);
-
-	// 이 행위 자체가. HUD객체를 새로 생성하는거라. 이렇게 하면 안될듯?
-	/*if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel), strLayerTag,
-		ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_HUD"))))
-		return E_FAIL;*/
+	// 이벤트 실행이지 구독이아님.
+	m_pGameInstance->Publish<HUDEVENT_DESC>(EventType::HUD_DISPLAY,  & Desc);
 
 	return S_OK;
 }

@@ -19,6 +19,7 @@ protected:
 	virtual ~CGameObject() = default;
 
 public:
+	
 	class CComponent* Get_Component(const _wstring& strComponentTag);
 	HRESULT Change_Component(const _wstring& strComponentTag, CComponent** ppOut, CComponent* pChangeComponent);
 

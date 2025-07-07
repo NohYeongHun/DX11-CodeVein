@@ -26,7 +26,7 @@ private:
 
 private:
 	LEVEL m_eCurLevel = { LEVEL::GAMEPLAY };
-
+	vector<pair<EventType, uint32_t>> m_Events = {};
 
 public:
 	static CLevel_GamePlay* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

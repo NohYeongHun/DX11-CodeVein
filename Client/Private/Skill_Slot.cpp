@@ -15,7 +15,7 @@ void CSkill_Slot::Change_Skill(const _wstring& strTextureTag, _uint iTextureInde
     m_pSkill->Change_Skill(strTextureTag, iTextureIndex);
 }
 
-void CSkill_Slot::Execute_Skill()
+void CSkill_Slot::Execute_Skill(_float fSkillCoolTime)
 {
     // 이미 쿨타임이 돌고있다면?
     if (nullptr == m_pSkill || m_IsCoolTime)
@@ -24,6 +24,7 @@ void CSkill_Slot::Execute_Skill()
     // 스킬 실행.
     m_IsCoolTime = true;
     m_fTime = 0.f;
+    m_fCoolTime = fSkillCoolTime;
 
     // 실제 스킬 실행 로직도 나중에 아래에 추가.
 

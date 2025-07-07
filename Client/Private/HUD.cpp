@@ -27,9 +27,9 @@ void CHUD::Change_Skill(_uint iSkillPanel, _uint iSkillSlot, const _wstring& str
     m_SkillPanels[iSkillPanel]->Change_Skill(iSkillSlot, strTextureTag, iTextureIndex);
 }
 
-void CHUD::Execute_Skill(_uint iSkillPanel, _uint iSkillSlot)
+void CHUD::Execute_Skill(_uint iSkillPanel, _uint iSkillSlot, _float fSkillCoolTime)
 {
-    m_SkillPanels[iSkillPanel]->Execute_Skill(iSkillSlot);
+    m_SkillPanels[iSkillPanel]->Execute_Skill(iSkillSlot, fSkillCoolTime);
 }
 
 
@@ -76,7 +76,7 @@ void CHUD::Update(_float fTimeDelta)
     if (!m_IsVisibility)
         return;
 
-    SKILLEVENT_DESC Desc{};
+    SKILLCHANGE_DESC Desc{};
     Desc.iSkillPanelIdx = SKILL_PANEL1;
     Desc.pText = TEXT("Action_SkillIcon");
     
@@ -84,7 +84,7 @@ void CHUD::Update(_float fTimeDelta)
     {
         Desc.iSlotIdx = 0;
         Desc.iTextureIdx = 0;
-        m_pGameInstance->Publish(EventType::SKILL_CHANGE, &Desc);
+        m_pGameInstance->Publish(EventType::SKILL_CHANGE, & Desc);
     }
     if (GetAsyncKeyState('2') & 0x8000)
     {
@@ -108,8 +108,10 @@ void CHUD::Update(_float fTimeDelta)
     // 마우스 왼쪽 클릭 시 쿨타임 돌게하기.
     if (GetAsyncKeyState(VK_LBUTTON) & 0x8000)
     {
+        SKILLEXECUTE_DESC Desc{};
         Desc.iSkillPanelIdx = SKILL_PANEL1;
         Desc.iSlotIdx = 1;
+        Desc.fSkillCoolTime = 3.f;
         m_pGameInstance->Publish(EventType::SKILL_EXECUTE, &Desc);
     }
 
@@ -232,7 +234,7 @@ HRESULT CHUD::Ready_Events()
 #pragma region HUD DISPLAY
 
     // Event 등록
-    m_pGameInstance->Subscribe(EventType::HUD_DISPLAY, [this](void* pData)
+    m_pGameInstance->Subscribe(EventType::HUD_DISPLAY, Get_ID(), [this](void* pData)
         {
             HUDEVENT_DESC* desc = static_cast<HUDEVENT_DESC*>(pData);
             this->Set_Visibility(desc->isVisibility);   // 멤버 함수 호출
@@ -244,9 +246,9 @@ HRESULT CHUD::Ready_Events()
 
 #pragma region SKILL_CHANGE
    
-    m_pGameInstance->Subscribe(EventType::SKILL_CHANGE, [this](void* pData)
+    m_pGameInstance->Subscribe(EventType::SKILL_CHANGE, Get_ID(), [this](void* pData)
         {
-            SKILLEVENT_DESC* desc = static_cast<SKILLEVENT_DESC*>(pData);
+            SKILLCHANGE_DESC* desc = static_cast<SKILLCHANGE_DESC*>(pData);
             this->Change_Skill(
                 desc->iSkillPanelIdx,
                 desc->iSlotIdx
@@ -260,12 +262,13 @@ HRESULT CHUD::Ready_Events()
 #pragma endregion
 
 #pragma region SKILL_EXECUTE
-     m_pGameInstance->Subscribe(EventType::SKILL_EXECUTE, [this](void* pData)
+     m_pGameInstance->Subscribe(EventType::SKILL_EXECUTE, Get_ID(), [this](void* pData)
         {
-            SKILLEVENT_DESC* desc = static_cast<SKILLEVENT_DESC*>(pData);
+            SKILLEXECUTE_DESC* desc = static_cast<SKILLEXECUTE_DESC*>(pData);
             this->Execute_Skill(
                 desc->iSkillPanelIdx,
-                desc->iSlotIdx);  // 멤버 함수 호출
+                desc->iSlotIdx, 
+                desc->fSkillCoolTime);  // 멤버 함수 호출
         });
 
     // Event 목록 관리.
@@ -307,7 +310,7 @@ void CHUD::Destroy()
     __super::Destroy();
 
     for (auto& val : m_Events)
-        m_pGameInstance->UnSubscribe(val);
+        m_pGameInstance->UnSubscribe(val, Get_ID());
 }
 
 void CHUD::Free()

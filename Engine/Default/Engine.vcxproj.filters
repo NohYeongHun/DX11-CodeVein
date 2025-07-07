@@ -49,9 +49,6 @@
     <Filter Include="01.Utility\02.GameObject\Manager\Layer">
       <UniqueIdentifier>{be18ebfd-3363-4685-83f6-c948aa2290ea}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01.Utility\04.Prototypes">
-      <UniqueIdentifier>{ed302dd2-ef7d-4d86-a247-b9658d5f090c}</UniqueIdentifier>
-    </Filter>
     <Filter Include="01.Utility\02.GameObject\UIObject">
       <UniqueIdentifier>{5c88d794-9383-4a8a-8347-680051d0a38c}</UniqueIdentifier>
     </Filter>
@@ -91,6 +88,9 @@
     <Filter Include="01.Utility\06. Event\Manager">
       <UniqueIdentifier>{f412eda4-288d-4f78-b366-2fa6aabf81bf}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01.Utility\04. Prototypes">
+      <UniqueIdentifier>{ed302dd2-ef7d-4d86-a247-b9658d5f090c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Timer.cpp">
@@ -127,7 +127,7 @@
       <Filter>01.Utility\02.GameObject\Manager\Layer</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Prototype_Manager.cpp">
-      <Filter>01.Utility\04.Prototypes</Filter>
+      <Filter>01.Utility\04. Prototypes</Filter>
     </ClCompile>
     <ClCompile Include="..\private\UIObject.cpp">
       <Filter>01.Utility\02.GameObject\UIObject</Filter>
@@ -171,8 +171,8 @@
     <ClCompile Include="..\Private\Event_Manager.cpp">
       <Filter>01.Utility\06. Event\Manager</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Event_Listener.cpp">
-      <Filter>01.Utility\06. Event</Filter>
+    <ClCompile Include="..\Private\IdGen.cpp">
+      <Filter>01.Utility\02.GameObject</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -231,7 +231,7 @@
       <Filter>01.Utility\02.GameObject\Manager\Layer</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Prototype_Manager.h">
-      <Filter>01.Utility\04.Prototypes</Filter>
+      <Filter>01.Utility\04. Prototypes</Filter>
     </ClInclude>
     <ClInclude Include="..\public\UIObject.h">
       <Filter>01.Utility\02.GameObject\UIObject</Filter>
@@ -272,11 +272,11 @@
     <ClInclude Include="..\Public\Event_Manager.h">
       <Filter>01.Utility\06. Event\Manager</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Event_Listener.h">
-      <Filter>01.Utility\06. Event</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\Event_Type.h">
       <Filter>01.Utility\06. Event</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\IdGen.h">
+      <Filter>01.Utility\02.GameObject</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -30,6 +30,7 @@
 
 
 #pragma region GAMEOBJECT
+#include "IdGen.h"
 #include "GameObject.h"
 #include "Transform.h"
 #include "Layer.h"

@@ -28,7 +28,7 @@ public:
 private:
 	LEVEL				m_eNextLevelID = { LEVEL::END };
 	class CLoader*		m_pLoader = { nullptr };
-	vector<EventType>	m_Events = {};
+	vector<pair<EventType, uint32_t>> m_Events = {};
 
 
 private:

@@ -23,7 +23,7 @@ private:
 
 public:
 	void Change_Skill(_uint iSkillSlot, const _wstring& strTextureTag, _uint iTextureIndex);
-	void Execute_Skill(_uint iSkillSlot);
+	void Execute_Skill(_uint iSkillSlot, _float fSkillCoolTime);
 
 public:
 	virtual HRESULT Initialize_Prototype();

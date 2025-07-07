@@ -76,7 +76,7 @@ HRESULT CLevel_Loading::Ready_LoadingScene()
 {
 	LOADINGEVENT_DESC Desc{};
 	Desc.isVisibility = true;
-	m_pGameInstance->Publish<LOADINGEVENT_DESC>(EventType::LOAIDNG_DISPLAY, &Desc);
+	m_pGameInstance->Publish<LOADINGEVENT_DESC>(EventType::LOAIDNG_DISPLAY, & Desc);
 
 	return S_OK;
 }
@@ -98,13 +98,13 @@ HRESULT CLevel_Loading::Ready_LoadingThread()
 HRESULT CLevel_Loading::Ready_Events()
 {
 	// Event 등록
-	m_pGameInstance->Subscribe(EventType::OPEN_LEVEL, [this](void* pData)
+	m_pGameInstance->Subscribe(EventType::OPEN_LEVEL, Get_ID(), [this](void* pData)
 		{
 			this->Open_Level();
 		});
 
 	// Event 목록 관리.
-	m_Events.push_back(EventType::OPEN_LEVEL);
+	m_Events.emplace_back(EventType::OPEN_LEVEL, Get_ID());
 
 	return S_OK;
 }
@@ -131,13 +131,13 @@ void CLevel_Loading::Free()
 	// 2. Loading Display를 종료한다. => Level Loading이 끝나면.
 	LOADINGEVENT_DESC Desc{};
 	Desc.isVisibility = false;
-	m_pGameInstance->Publish<LOADINGEVENT_DESC>(EventType::LOAIDNG_DISPLAY, &Desc);
+	m_pGameInstance->Publish<LOADINGEVENT_DESC>(EventType::LOAIDNG_DISPLAY,  & Desc);
 
+
+	
 	// 3. 지울 때 제거
 	for (auto& Event : m_Events)
-	{
-		m_pGameInstance->UnSubscribe(Event);
-	}
+		m_pGameInstance->UnSubscribe(Event.first, Event.second);
 	
 
 	Safe_Release(m_pLoader);

@@ -38,7 +38,7 @@ private:
 	_float m_fFade = {};
 
 	_uint m_iTextureIndex = {};
-	vector<EventType> m_Events = {};
+	vector<pair<EventType, uint32_t>> m_Events = {};
 
 	// 패널은 한개.
 	vector<class CLoading_Panel*> m_LoadingPanels = {};

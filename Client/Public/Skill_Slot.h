@@ -21,7 +21,7 @@ private:
 
 public:
 	void Change_Skill(const _wstring& strTextureTag, _uint iTextureIndex);
-	void Execute_Skill();
+	void Execute_Skill(_float fSkillCoolTime);
 
 public:
 	virtual HRESULT Initialize_Prototype();
@@ -43,7 +43,7 @@ private:
 	_uint m_iTextureIndex = {};
 
 	_bool  m_IsCoolTime = { false };
-	_float m_fCoolTime = { 2.f };
+	_float m_fCoolTime = { 0.f };
 	_float m_fTime = {};
 
 

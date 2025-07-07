@@ -1,9 +1,9 @@
-#include "../Public/Base.h"
+ï»¿#include "../Public/Base.h"
 
 CBase::CBase()
+	: m_iID{ CIdGen::Next() }
 {
-	int a = 10;
-	int b = 10;
+
 }
 
 unsigned int CBase::AddRef()
@@ -17,7 +17,7 @@ unsigned int CBase::Release()
 	{
 		Free();
 
-		/* »èÁ¦ÇÑ´Ù. */
+		/* ì‚­ì œí•œë‹¤. */
 		delete this;
 
 		return 0;

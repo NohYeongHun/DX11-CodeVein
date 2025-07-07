@@ -17,13 +17,21 @@ typedef struct tagHUDEventDesc
 	_bool isVisibility;
 }HUDEVENT_DESC;
 
-typedef struct tagSkillEventDesc
+typedef struct tagSkillChangeDesc
 {
 	_uint iSkillPanelIdx = {};
 	_uint iSlotIdx = {};
 	const _tchar* pText = {};
 	_uint iTextureIdx = {};
-}SKILLEVENT_DESC;
+}SKILLCHANGE_DESC;
+
+
+typedef struct tagSkillExecuteDesc
+{
+	_uint iSkillPanelIdx = {};
+	_uint iSlotIdx = {};
+	_float fSkillCoolTime = {};
+}SKILLEXECUTE_DESC;
 
 #pragma endregion
 

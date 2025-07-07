@@ -16,9 +16,9 @@ void CSkill_Panel::Change_Skill(_uint iSkillSlot, const _wstring& strTextureTag,
     m_SkillSlots[iSkillSlot]->Change_Skill(strTextureTag, iTextureIndex);
 }
 
-void CSkill_Panel::Execute_Skill(_uint iSkillSlot)
+void CSkill_Panel::Execute_Skill(_uint iSkillSlot, _float fSkillCoolTime)
 {
-    m_SkillSlots[iSkillSlot]->Execute_Skill();
+    m_SkillSlots[iSkillSlot]->Execute_Skill(fSkillCoolTime);
 }
 
 HRESULT CSkill_Panel::Initialize_Prototype()

@@ -19,24 +19,32 @@ public:
 
 #pragma region Engine에 제공.
 public:
-	void Subscribe(EventType id,  FCallback&& fn);
+	void Subscribe(EventType id, _uint iID, FCallback&& fn);
 
+	// 브로드캐스트(모든 오브젝트) 버전
 	template<typename T>
-	void Publish(EventType id, T* pMsg)
+	void Publish(EventType id, T* pMsg)   // ← iID 인자 생략
 	{
-		auto it = m_Table.find(id);
-		if (it == m_Table.end()) return;
+		auto evIt = m_Table.find(id);
+		if (evIt == m_Table.end()) return;
 
-		// 콜백 순회
-		for (auto& entry : it->second)
-			if (entry.Fn) entry.Fn(static_cast<void*>(pMsg));
+		vector<FCallback> callList;
+		callList.reserve(evIt->second.size());
+
+		for (auto& kv : evIt->second)
+			if (kv.second.Fn) callList.emplace_back(kv.second.Fn);
+
+		// 복사본 순회 ― 원본이 지워져도 OK
+		for (auto& fn : callList)
+			fn(static_cast<void*>(pMsg));
 	}
-	void UnSubscribe(EventType id);
+
+	void UnSubscribe(EventType id, _uint iID);
 
 #pragma endregion
 
 private:
-	unordered_map<EventType, std::vector<FEntry>> m_Table;
+	unordered_map<EventType, unordered_map<_uint, FEntry>> m_Table;
 
 public:
 	static CEvent_Manager* Create();

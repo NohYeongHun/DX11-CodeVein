@@ -65,6 +65,14 @@ HRESULT CLoading_BackGround::Initialize_Clone(void* pArg)
 
 void CLoading_BackGround::Priority_Update(_float fTimeDelta)
 {
+    if (m_IsLoadingFadeOut && m_fFade >= 5.f)
+    {
+        // Loading이 끝나는 시점에 
+        m_pGameInstance->Publish<CLevel_Loading>(EventType::OPEN_LEVEL, nullptr);
+        m_IsLoadingFadeOut = false;
+        m_fFade = 0.f;
+    }
+
     if (!m_IsVisibility)
         return;
 
@@ -76,20 +84,6 @@ void CLoading_BackGround::Update(_float fTimeDelta)
     if (!m_IsVisibility)
         return;
     __super::Update(fTimeDelta);
-
-
-    if (m_fFade < 5.f)
-    {
-        if (m_IsLoadingFadeOut)
-            m_fFade += fTimeDelta;
-    }
-    else if (m_IsLoadingFadeOut && m_fFade >= 5.f)
-    {
-        // Loading이 끝나는 시점.
-        m_pGameInstance->Publish<CLevel_Loading>(EventType::OPEN_LEVEL, nullptr);
-        m_IsLoadingFadeOut = false;
-        m_fFade = 0.f;
-    }
 }
 
 void CLoading_BackGround::Late_Update(_float fTimeDelta)
@@ -102,7 +96,11 @@ void CLoading_BackGround::Late_Update(_float fTimeDelta)
 
     __super::Late_Update(fTimeDelta);
 
-    
+    if (m_fFade < 5.f)
+    {
+        if (m_IsLoadingFadeOut)
+            m_fFade += fTimeDelta;
+    }
 }
 
 HRESULT CLoading_BackGround::Render()
@@ -169,23 +167,23 @@ HRESULT CLoading_BackGround::Ready_Events()
 #pragma region Loading Display
 
     // Event 등록
-    m_pGameInstance->Subscribe(EventType::LOAIDNG_DISPLAY, [this](void* pData)
+    m_pGameInstance->Subscribe(EventType::LOAIDNG_DISPLAY, Get_ID(), [this](void* pData)
         {
             LOADINGEVENT_DESC* desc = static_cast<LOADINGEVENT_DESC*>(pData);
             this->Set_Visibility(desc->isVisibility);   // 멤버 함수 호출
         });
 
     // Event 목록 관리.
-    m_Events.push_back(EventType::LOAIDNG_DISPLAY);
+    m_Events.emplace_back(EventType::LOAIDNG_DISPLAY, Get_ID());
 
 
-    m_pGameInstance->Subscribe(EventType::LOADING_END, [this](void* pData)
+    m_pGameInstance->Subscribe(EventType::LOADING_END, Get_ID(), [this](void* pData)
         {
             this->Loading_End();   // 멤버 함수 호출
         });
 
     // Event 목록 관리.
-    m_Events.push_back(EventType::LOADING_END);
+    m_Events.emplace_back(EventType::LOADING_END, Get_ID());
 #pragma endregion
 
     return S_OK;
@@ -253,8 +251,8 @@ void CLoading_BackGround::Destroy()
 {
     __super::Destroy();
 
-    for (auto& val : m_Events)
-        m_pGameInstance->UnSubscribe(val);
+    for (auto& Event : m_Events)
+        m_pGameInstance->UnSubscribe(Event.first, Event.second);
 }
 
 
