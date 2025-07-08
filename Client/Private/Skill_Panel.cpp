@@ -56,6 +56,8 @@ void CSkill_Panel::Priority_Update(_float fTimeDelta)
 void CSkill_Panel::Update(_float fTimeDelta)
 {
     __super::Update(fTimeDelta);
+
+   
 }
 
 void CSkill_Panel::Late_Update(_float fTimeDelta)

@@ -26,6 +26,14 @@ public:
 	_float Rand_Normal();
 	_float Rand(_float fMin, _float fMax);
 
+
+	// 마우스 2D 충돌 관련 헬퍼 함수 모아두기.
+public:
+	// 마우스 가져오기.
+	POINT Get_Mouse_Cursor(HWND hWnd);
+	// 마우스 충돌 확인하기.
+	_bool Mouse_InRect2D(HWND hWnd, _float2 vPosition, _float fSizeX, _float fSizeY);
+
 #pragma endregion
 
 #pragma region LEVEL_MANAGER

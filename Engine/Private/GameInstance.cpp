@@ -142,6 +142,30 @@ _float CGameInstance::Rand(_float fMin, _float fMax)
 	return fMin + Rand_Normal() * (fMax - fMin);	
 }
 
+// 현재 창의 마우스 좌표로 가져와야함.
+POINT CGameInstance::Get_Mouse_Cursor(HWND hWnd)
+{
+	POINT pt{};
+
+	// pt에 현재 마우스 포스 가져오기.
+	GetCursorPos(&pt);
+	ScreenToClient(hWnd, &pt);
+
+	return pt;
+}
+
+// 윈도우 좌표 기준의 (2D 좌표를 제공해야합니다. )
+_bool CGameInstance::Mouse_InRect2D(HWND hWnd, _float2 vPosition, _float fSizeX, _float fSizeY)
+{
+	POINT pt = Get_Mouse_Cursor(hWnd);
+	RECT rcWindow = { (LONG)(vPosition.x - fSizeX)
+		, (LONG)(vPosition.y - fSizeY), 
+		  (LONG)(vPosition.x + fSizeX), 
+		  (LONG)(vPosition.y + fSizeY) };
+
+	return PtInRect(&rcWindow, pt);
+}
+
 #pragma endregion
 
 #pragma region LEVEL_MANAGER
