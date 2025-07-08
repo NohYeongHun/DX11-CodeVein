@@ -34,16 +34,17 @@ HRESULT CBackGround::Initialize_Clone(void* pArg)
 
 void CBackGround::Priority_Update(_float fTimeDelta)
 {
-    int a = 10;
+    __super::Priority_Update(fTimeDelta);
 }
 
 void CBackGround::Update(_float fTimeDelta)
 {
-    int a = 10;
+    __super::Update(fTimeDelta);
 }
 
 void CBackGround::Late_Update(_float fTimeDelta)
 {
+    __super::Late_Update(fTimeDelta);
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::UI, this)))
         return;
 }

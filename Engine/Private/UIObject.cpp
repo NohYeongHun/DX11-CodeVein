@@ -178,12 +178,26 @@ HRESULT CUIObject::Begin()
 	return S_OK;
 }
 
+HRESULT CUIObject::Begin_Blend()
+{
+	/* Alpha Blend On, DepthStencil Off*/
+	m_pGameInstance->Apply_BlendeState();
+	m_pGameInstance->Apply_DepthStencilOff();
+	return S_OK;
+}
+
 HRESULT CUIObject::End()
 {
 	/* Defautl Setting 설정 */
 	m_pGameInstance->Apply_DefaultStates();
 
 	return S_OK;
+}
+
+HRESULT CUIObject::Blend_End()
+{
+	/* Defautl Setting 설정 */
+	return m_pGameInstance->Apply_DefaultStates();
 }
 
 void CUIObject::Destroy()

@@ -51,6 +51,7 @@ HRESULT CTexture::Initialize_Clone(void* pArg)
     return S_OK;
 }
 
+// Bind_Shader_Resource할 때 Texture Idx 변경 가능.
 HRESULT CTexture::Bind_Shader_Resource(CShader* pShader, const _char* pConstantName, _uint iTextureIndex)
 {
     if (iTextureIndex >= m_iNumTextures)
