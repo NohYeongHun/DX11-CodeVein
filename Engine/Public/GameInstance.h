@@ -26,6 +26,14 @@ public:
 	_float Rand_Normal();
 	_float Rand(_float fMin, _float fMax);
 
+
+	// 마우스 2D 충돌 관련 헬퍼 함수 모아두기.
+public:
+	// 마우스 가져오기.
+	POINT Get_Mouse_Cursor(HWND hWnd);
+	// 마우스 충돌 확인하기.
+	_bool Mouse_InRect2D(HWND hWnd, _float2 vPosition, _float fSizeX, _float fSizeY);
+
 #pragma endregion
 
 #pragma region LEVEL_MANAGER
@@ -83,13 +91,24 @@ public:
 #pragma endregion
 
 #pragma region EVENT_MANAGER
-	void Subscribe(EventType id, _uint iID, FCallback&& fn);
+	void Subscribe(EventType id, uint32_t iID, FCallback&& fn);
 
 	template<typename T>
 	void Publish(EventType id, T* msg);
 
-	void UnSubscribe(EventType id, _uint iID);
+	void UnSubscribe(EventType id, uint32_t iID);
 #pragma endregion
+
+#pragma region PIPE_LINE
+	_matrix Get_Transform_Matrix(D3DTS eTransformState) const;
+	const _float4x4* Get_Transform_Float4x4(D3DTS eTransformState) const;
+	_matrix Get_Transform_Matrix_Inverse(D3DTS eTransformState) const;
+	const _float4x4* Get_Transform_Float4x4_Inverse(D3DTS eTransformState) const;
+	const _float4* Get_CamPosition() const;
+	void Set_Transform(D3DTS eTransformState, _fmatrix Matrix);
+	void Set_Transform(D3DTS eTransformState, const _float4x4& Matrix);
+#pragma endregion
+
 
 
 //
@@ -110,6 +129,7 @@ private:
 	class CCollider_Manager*	m_pCollider_Manager = { nullptr };
 	class CTexture_Manager*		m_pTexture_Manager = { nullptr };
 	class CEvent_Manager*		m_pEvent_Manager = { nullptr };
+	class CPipeLine* m_pPipleLine = { nullptr };
 	_float m_fTimeDelta = {};
 
 

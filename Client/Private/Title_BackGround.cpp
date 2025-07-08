@@ -1,12 +1,11 @@
-﻿#include "Title_BackGround.h"
-
+﻿
 CTitle_BackGround::CTitle_BackGround(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-    : CUIObject{ pDevice, pContext }
+    : CUIObject { pDevice, pContext }
 {
 }
 
 CTitle_BackGround::CTitle_BackGround(const CTitle_BackGround& Prototype)
-    : CUIObject(Prototype)
+    : CUIObject(Prototype )
 {
 }
 
@@ -17,58 +16,92 @@ HRESULT CTitle_BackGround::Initialize_Prototype()
 
 HRESULT CTitle_BackGround::Initialize_Clone(void* pArg)
 {
-    UIOBJECT_DESC               Desc{};
-    Desc.fX = g_iWinSizeX >> 1;
-    Desc.fY = g_iWinSizeY >> 1;
-    Desc.fSizeX = g_iWinSizeX;
-    Desc.fSizeY = g_iWinSizeY;
-
-    if (FAILED(__super::Initialize_Clone(&Desc)))
+    if (nullptr == pArg)
         return E_FAIL;
+
+    TITLE_BAKCGROUND_DESC* pDesc = static_cast<TITLE_BAKCGROUND_DESC*>(pArg);
+
+    if (FAILED(__super::Initialize_Clone(pDesc)))
+        return E_FAIL;
+
+    m_iTextureCount = pDesc->iTextureCount;
+    m_iPassIdx = pDesc->iPassIdx;
 
     if (FAILED(Ready_Components()))
         return E_FAIL;
+
+    // 매번 업데이트 엔진할 때마다 가져옴.
+    m_fTexture_ChangeTime = m_pGameInstance->Get_TimeDelta() * 60.f;
+    m_iTextureIdx = pDesc->iTexture;
+    m_fAlpha = pDesc->fAlpha;
+
+    m_iRandID = rand();
 
     return S_OK;
 }
 
 void CTitle_BackGround::Priority_Update(_float fTimeDelta)
 {
-    int a = 10;
+    __super::Priority_Update(fTimeDelta);
 }
 
 void CTitle_BackGround::Update(_float fTimeDelta)
 {
-    int a = 10;
+    __super::Update(fTimeDelta);
+
+    if (m_fTime >= m_fTexture_ChangeTime)
+    {
+        //m_iTextureIdx = (m_iTextureIdx + 1) % m_iTextureCount;
+        m_fTime = 0.f;
+    }
+    else
+        m_fTime += fTimeDelta;
+
 }
 
 void CTitle_BackGround::Late_Update(_float fTimeDelta)
 {
+    __super::Late_Update(fTimeDelta);
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::UI, this)))
         return;
 }
 
 HRESULT CTitle_BackGround::Render()
 {
+    ImGui::Begin("HI");
+    ImGui::SliderFloat(to_string(m_iTextureIdx).c_str(), &m_fAlpha, 0.f, 1.f);
+    ImGui::End();
 
     __super::Begin();
 
-    if (FAILED(m_pTransformCom->Bind_Shader_Resource(m_pShaderCom, "g_WorldMatrix")))
+    
+
+    if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &m_RenderMatrix)))
         return E_FAIL;
 
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix)))
         return E_FAIL;
+
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
         return E_FAIL;
 
-    if (FAILED(m_pTextureCom->Bind_Shader_Resource(m_pShaderCom, "g_Texture", 0)))
+    if (FAILED(m_pShaderCom->Bind_Float("g_fTime", m_fTime)))
         return E_FAIL;
 
-    m_pShaderCom->Begin(0);
+    if (FAILED(m_pShaderCom->Bind_Float("g_fAlpha", m_fAlpha)))
+        return E_FAIL;
+
+    if (FAILED(m_pTextureCom->Bind_Shader_Resource(m_pShaderCom, "g_Texture", m_iTextureIdx)))
+        return E_FAIL;
+
+    
+    m_pShaderCom->Begin(m_iPassIdx);
 
     m_pVIBufferCom->Bind_Resources();
 
     m_pVIBufferCom->Render();
+
+    __super::End();
 
     return S_OK;
 }
@@ -83,7 +116,7 @@ HRESULT CTitle_BackGround::Ready_Components()
         TEXT("Com_VIBuffer"), reinterpret_cast<CComponent**>(&m_pVIBufferCom), nullptr)))
         return E_FAIL;
 
-    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::LOGO), TEXT("Prototype_Component_Texture_Title"),
+    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::LOGO), TEXT("Prototype_Component_Texture_Title_BackGround"),
         TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom), nullptr)))
         return E_FAIL;
 
@@ -96,7 +129,7 @@ CTitle_BackGround* CTitle_BackGround::Create(ID3D11Device* pDevice, ID3D11Device
 
     if (FAILED(pInstance->Initialize_Prototype()))
     {
-        MSG_BOX(TEXT("Failed to Created : CLoading_BackGround"));
+        MSG_BOX(TEXT("Failed to Created : CTitle_BackGround"));
         Safe_Release(pInstance);
     }
 
@@ -109,7 +142,7 @@ CGameObject* CTitle_BackGround::Clone(void* pArg)
 
     if (FAILED(pInstance->Initialize_Clone(pArg)))
     {
-        MSG_BOX(TEXT("Failed to Created : CLoading_BackGround"));
+        MSG_BOX(TEXT("Failed to Created : CTitle_BackGround"));
         Safe_Release(pInstance);
     }
 
@@ -121,6 +154,7 @@ void CTitle_BackGround::Free()
     __super::Free();
 
     Safe_Release(m_pVIBufferCom);
+
     Safe_Release(m_pShaderCom);
     Safe_Release(m_pTextureCom);
 }

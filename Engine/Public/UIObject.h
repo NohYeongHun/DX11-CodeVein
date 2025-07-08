@@ -33,6 +33,7 @@ public:
 #pragma region COMPOSITE Pattern 용도
 public:
 	_fmatrix Get_RenderMatrix();
+	_bool Mouse_InRect2D(HWND hWnd);
 	//_fmatrix Get_LocalMatrix();
 public:
 	// UI 자식 객체 추가.
@@ -40,7 +41,6 @@ public:
 	void RemoveChild(CUIObject* pChild);
 	void Set_Parent(CUIObject* pParent);
 #pragma endregion
-
 
 
 
@@ -58,7 +58,10 @@ protected:
 	void Update_Transform();
 
 	HRESULT Begin();
+	HRESULT Begin_Blend();
+
 	HRESULT End();
+	HRESULT Blend_End();
 
 
 public:

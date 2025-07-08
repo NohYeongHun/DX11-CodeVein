@@ -10,6 +10,24 @@
 NS_BEGIN(Client)
 class CTitle final : public CUIObject
 {
+public:
+	enum class Text : _ubyte
+	{
+		TEXT = 0,
+		ENUM_LINE = 1,
+		END
+	};
+
+	enum class BackGround : _ubyte
+	{
+		BACKGROUND_BLACK = 0,
+		BACKGROUND_WHITE = 1,
+		BACKGROUND_WHITE_MODIFY_LIGHT = 2,
+		BACKGROUND_WHITE_BASE_LIGHT = 3,
+		BACKGROUND_WHITE_SHADE = 4,
+		BACKGROUND_END
+	};
+
 private:
 	CTitle(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CTitle(const CTitle& Prototype);
@@ -24,8 +42,8 @@ public:
 	virtual HRESULT Render();
 
 private:
-	CUIObject* m_pTitleText = { nullptr };
-	CUIObject* m_pTitleLine = { nullptr };
+	vector<CTitleText*> m_TitleTexts = {};
+	vector<CTitle_BackGround*> m_TitleBackGruonds = {};
 
 	CShader*		m_pShaderCom = { nullptr };
 	CVIBuffer_Rect*	m_pVIBufferCom = { nullptr };
@@ -35,6 +53,15 @@ private:
 private:
 	HRESULT Ready_Components();
 	HRESULT Ready_Childs();
+	
+	HRESULT Ready_Title_BackGround_Black();
+	HRESULT Ready_Title_BackGround();
+	HRESULT Ready_Title_BackGround_Light();
+	HRESULT Ready_Title_BackGround_Modify_Light();
+	HRESULT Ready_Title_BackGround_Shade();
+	HRESULT Ready_Title_Text();
+	
+	
 
 public:
 	static CTitle* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

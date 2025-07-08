@@ -65,7 +65,7 @@ HRESULT CLoading_BackGround::Initialize_Clone(void* pArg)
 
 void CLoading_BackGround::Priority_Update(_float fTimeDelta)
 {
-    if (m_IsLoadingFadeOut && m_fFade >= 5.f)
+    if (m_IsLoadingFadeOut && m_fFade >= 1.f)
     {
         // Loading이 끝나는 시점에 
         m_pGameInstance->Publish<CLevel_Loading>(EventType::OPEN_LEVEL, nullptr);
@@ -96,7 +96,7 @@ void CLoading_BackGround::Late_Update(_float fTimeDelta)
 
     __super::Late_Update(fTimeDelta);
 
-    if (m_fFade < 5.f)
+    if (m_fFade < 1.f)
     {
         if (m_IsLoadingFadeOut)
             m_fFade += fTimeDelta;
@@ -126,7 +126,7 @@ HRESULT CLoading_BackGround::Render()
 
     if (m_IsLoadingFadeOut)
     {
-        _float fFade = Clamp(m_fFade / 5.f, 0.f, 1.f);
+        _float fFade = Clamp(m_fFade / 1.f, 0.f, 1.f);
         if (FAILED(m_pShaderCom->Bind_Float("g_fFade", fFade)))
             return E_FAIL;
 

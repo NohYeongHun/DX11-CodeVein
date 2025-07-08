@@ -47,14 +47,18 @@ void CMainApp::Update(_float fTimeDelta)
 
 HRESULT CMainApp::Render()
 {
-	_float4		vClearColor = _float4(0.f, 0.f, 1.f, 1.f);
+	//_float4		vClearColor = _float4(0.7f, 0.7f, 0.7f, 0.1f);
+	_float4		vClearColor = _float4(0.0f, 0.0f, 1.f, 1.f);
 
+
+	
 	m_pGameInstance->Render_Begin(&vClearColor);
+	m_pImGui_Manager->Render_Begin();
 
 	m_pGameInstance->Draw();
 
-	m_pImGui_Manager->Render();
-
+	//m_pImGui_Manager->Render();
+	m_pImGui_Manager->Render_End();
 	m_pGameInstance->Render_End();
 
 	return S_OK;
@@ -65,14 +69,12 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 {
 	m_pImGui_Manager = CImgui_Manager::Get_Instance(m_pDevice, m_pContext);
 
-	D3D11_INPUT_ELEMENT_DESC Elements[] =
-	{
-		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-	};
-
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxPosTex"),
-		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxPosTex.hlsl"), Elements, 2))))
+		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxPosTex.hlsl"), VTXPOSTEX::Elements, VTXPOSTEX::iNumElements))))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxNorTex"),
+		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxNorTex.hlsl"), VTXNORTEX::Elements, VTXNORTEX::iNumElements))))
 		return E_FAIL;
 
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_VIBuffer_Rect"),

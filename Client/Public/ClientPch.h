@@ -46,6 +46,8 @@
 #include "Loading_Panel.h"
 #include "Loading_Slot.h"
 
+#include "Terrain.h"
+#include "Camera_Free.h"
 
 #pragma endregion
 

@@ -10,9 +10,6 @@
     <Filter Include="02. GameObject\UI">
       <UniqueIdentifier>{6977d529-b211-4a58-b875-96b4d144dec0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02. GameObject\UI\Title">
-      <UniqueIdentifier>{8ede5bb7-14bc-4890-8cf9-17349b2c72b3}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02. GameObject\UI\Player">
       <UniqueIdentifier>{fff5a693-5c43-482c-9d13-ee31bfe8bb55}</UniqueIdentifier>
     </Filter>
@@ -51,6 +48,21 @@
     </Filter>
     <Filter Include="02. GameObject\UI\Loading">
       <UniqueIdentifier>{8c701e3d-252e-4e7a-9364-b8c965c04254}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Terrain">
+      <UniqueIdentifier>{3727b5a4-f518-4921-b16e-f758ebb9cff7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Camera">
+      <UniqueIdentifier>{601ff180-9629-4481-97b2-72783f83fc04}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Camera\Free">
+      <UniqueIdentifier>{8c9b2f97-75b7-4b9e-82cc-5067f623a6f2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\UI\Logo">
+      <UniqueIdentifier>{6bfc1964-b349-4bf9-b3b4-46e7ebebb9c5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\UI\Logo\Title">
+      <UniqueIdentifier>{8ede5bb7-14bc-4890-8cf9-17349b2c72b3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -130,13 +142,10 @@
       <Filter>02. GameObject\UI</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Title.h">
-      <Filter>02. GameObject\UI\Title</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\Title_BackGround.h">
-      <Filter>02. GameObject\UI\Title</Filter>
+      <Filter>02. GameObject\UI\Logo\Title</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\TitleText.h">
-      <Filter>02. GameObject\UI\Title</Filter>
+      <Filter>02. GameObject\UI\Logo\Title</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\HUD.h">
       <Filter>02. GameObject\UI\Player</Filter>
@@ -164,6 +173,15 @@
     </ClInclude>
     <ClInclude Include="..\Public\Loading_Slot.h">
       <Filter>02. GameObject\UI\Loading</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Terrain.h">
+      <Filter>02. GameObject\Terrain</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Camera_Free.h">
+      <Filter>02. GameObject\Camera\Free</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Title_BackGround.h">
+      <Filter>02. GameObject\UI\Logo\Title</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -238,13 +256,10 @@
       <Filter>02. GameObject\UI</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Title.cpp">
-      <Filter>02. GameObject\UI\Title</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Title_BackGround.cpp">
-      <Filter>02. GameObject\UI\Title</Filter>
+      <Filter>02. GameObject\UI\Logo\Title</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\TitleText.cpp">
-      <Filter>02. GameObject\UI\Title</Filter>
+      <Filter>02. GameObject\UI\Logo\Title</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\HUD.cpp">
       <Filter>02. GameObject\UI\Player</Filter>
@@ -273,9 +288,21 @@
     <ClCompile Include="..\Private\Loading_Slot.cpp">
       <Filter>02. GameObject\UI\Loading</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Terrain.cpp">
+      <Filter>02. GameObject\Terrain</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Camera_Free.cpp">
+      <Filter>02. GameObject\Camera\Free</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Title_BackGround.cpp">
+      <Filter>02. GameObject\UI\Logo\Title</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPosTex.hlsl">
+      <Filter>98. Default</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxNorTex.hlsl">
       <Filter>98. Default</Filter>
     </FxCompile>
   </ItemGroup>

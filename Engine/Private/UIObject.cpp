@@ -57,15 +57,15 @@ HRESULT CUIObject::Initialize_Clone(void* pArg)
 
 void CUIObject::Priority_Update(_float fTimeDelta)
 {
+	// 부모 Transform 갱신 이후에 자식 객체 Update()
+	Update_Transform();
+
 	for (auto& pChild : m_Children)
 		pChild->Priority_Update(fTimeDelta);
 }
 
 void CUIObject::Update(_float fTimeDelta)
 {
-	// 부모 Transform 갱신 이후에 자식 객체 Update()
-	Update_Transform();
-
 	for (auto* child : m_Children)
 		child->Update(fTimeDelta);
 }
@@ -89,6 +89,21 @@ _fmatrix CUIObject::Get_RenderMatrix()
 {
 	return XMLoadFloat4x4(&m_RenderMatrix);
 }
+
+// Priority_Update로 Transform 업데이트 이후에 실행.
+_bool CUIObject::Mouse_InRect2D(HWND hWnd)
+{
+	_float4 vPos{};
+	// 위치 이동은 끝난 상황임.
+	_fmatrix matrix = Get_RenderMatrix();
+	XMStoreFloat4(&vPos, matrix.r[3]);
+
+	// 윈도우 좌표 변환.
+	// 부모 객체의 월드 좌표값으로 변환된 위치 + 내 이동 위치.
+	_float2 vWindowPos = { vPos.x + m_iWinSizeX * 0.5f, vPos.y * -1.f + m_iWinSizeY * 0.5f };
+	return m_pGameInstance->Mouse_InRect2D(hWnd, vWindowPos, m_fSizeX, m_fSizeY);
+}
+
 
 void CUIObject::AddChild(CUIObject* pChild)
 {
@@ -120,7 +135,7 @@ void CUIObject::Update_Transform()
 	// 항상 항등으로 초기화합니다.
 	XMStoreFloat4x4(&m_RenderMatrix, XMMatrixIdentity());
 
-	_matrix matWorld{};
+	_matrix matWorld{}, matScale{};
 	// 크기 곱해주기.
 
 	// 위치 설정.
@@ -132,16 +147,20 @@ void CUIObject::Update_Transform()
 		m_pTransformCom->Set_State(STATE::POSITION, XMVectorSet(m_fX - m_iWinSizeX * 0.5f, -m_fY + m_iWinSizeY * 0.5f, 0.f, 1.f));
 
 	/* 로컬 행렬 생성. */
-	matWorld = XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrix());
+	matWorld = m_pTransformCom->Get_WorldMatrix();
 
 	if (m_pParent)
 		XMStoreFloat4x4(&m_RenderMatrix, matWorld * m_pParent->Get_RenderMatrix());
 	else
 		// 크기가 곱해지지 않은 행렬 반환.
 		XMStoreFloat4x4(&m_RenderMatrix, matWorld);
+
+
+	//matScale = XMMatrixScaling(m_fSizeX, m_fSizeY, 1.f);
+	//XMStoreFloat4x4(&m_RenderMatrix, matScale * XMLoadFloat4x4(&m_RenderMatrix));
 }
 
-/* 크기는 따로 곱해줘야 한다. */
+/* 크기는 마지막 렌더링 시점에 곱해주어야합니다. */
 HRESULT CUIObject::Begin()
 {
 	_matrix matScale{}, matWorld{};
@@ -159,12 +178,26 @@ HRESULT CUIObject::Begin()
 	return S_OK;
 }
 
+HRESULT CUIObject::Begin_Blend()
+{
+	/* Alpha Blend On, DepthStencil Off*/
+	m_pGameInstance->Apply_BlendeState();
+	m_pGameInstance->Apply_DepthStencilOff();
+	return S_OK;
+}
+
 HRESULT CUIObject::End()
 {
 	/* Defautl Setting 설정 */
 	m_pGameInstance->Apply_DefaultStates();
 
 	return S_OK;
+}
+
+HRESULT CUIObject::Blend_End()
+{
+	/* Defautl Setting 설정 */
+	return m_pGameInstance->Apply_DefaultStates();
 }
 
 void CUIObject::Destroy()

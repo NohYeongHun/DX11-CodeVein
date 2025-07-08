@@ -64,6 +64,8 @@ HRESULT CTitleText::Render()
 {
     __super::Begin();
 
+    /*__super::Begin_Blend();*/
+
     if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &m_RenderMatrix)))
         return E_FAIL;
 
@@ -71,13 +73,6 @@ HRESULT CTitleText::Render()
         return E_FAIL;
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
         return E_FAIL;
-
-    if (FAILED(m_pShaderCom->Bind_Int("g_iTextureIndex", m_iTextureIndex)))
-        return E_FAIL;
-
-    /*if (FAILED(m_pShaderCom->Bind_Float("g_fTime", m_fChangeTime)))
-        return E_FAIL;*/
-
 
     if (FAILED(m_pTextureCom->Bind_Shader_Resource(m_pShaderCom, "g_Texture", m_iTextureIndex)))
         return E_FAIL;
@@ -88,8 +83,9 @@ HRESULT CTitleText::Render()
 
     m_pVIBufferCom->Render();
 
-    
     __super::End();
+
+    /*__super::Blend_End();*/
 
     return S_OK;
 }

@@ -75,6 +75,15 @@ void CSkill_Slot::Update(_float fTimeDelta)
             m_IsCoolTime = false;
         }
     }
+
+    if (Mouse_InRect2D(g_hWnd))
+    {
+        if (GetAsyncKeyState(MOUSE_R))
+            MSG_BOX(TEXT("Slot Check"));
+    }
+   
+
+    
 }
 
 void CSkill_Slot::Late_Update(_float fTimeDelta)

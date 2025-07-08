@@ -34,9 +34,6 @@ HRESULT CTitle::Initialize_Clone(void* pArg)
     if (FAILED(Ready_Childs()))
         return E_FAIL;
 
-    
-    //m_pGameInstance->Get_TimeDelta(TEXT("Timer_60"));
-   
 
     return S_OK;
 }
@@ -54,66 +51,208 @@ void CTitle::Update(_float fTimeDelta)
 void CTitle::Late_Update(_float fTimeDelta)
 {
     __super::Late_Update(fTimeDelta);
-
-    /*if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::UI, this)))
-        return;*/
 }
 
+// Title 객체는 렌더링 안함.
 HRESULT CTitle::Render()
 {
-    //__super::Begin();
-
-    /*
-    * 해당 위치의 월드 행렬에서 부모기준 위치 변경이 완료되어 있어야한다.
-    * 밑의 Bind_Shader_Resources는 현재 Transform의 World 행렬을 곱해준다.
-    * Transform의 월드 행렬에는 Parent의 월드행렬이 모두 곱해져 있어야 한다.
-    */
-
-    //if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &m_RenderMatrix)))
-    //    return E_FAIL;
-    //
-    //if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix)))
-    //    return E_FAIL;
-    //if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
-    //    return E_FAIL;
-    //
-    //if (FAILED(m_pTextureCom->Bind_Shader_Resource(m_pShaderCom, "g_Texture", 0)))
-    //    return E_FAIL;
-    //
-    //m_pShaderCom->Begin(0);    
-    //
-    //m_pVIBufferCom->Bind_Resources();
-    //
-    //m_pVIBufferCom->Render();
-
     return S_OK;
 }
 
 HRESULT CTitle::Ready_Components()
 {
-    //if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxPosTex"),
-    //    TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom), nullptr)))
-    //    return E_FAIL;
-    //
-    //if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_VIBuffer_Rect"),
-    //    TEXT("Com_VIBuffer"), reinterpret_cast<CComponent**>(&m_pVIBufferCom), nullptr)))
-    //    return E_FAIL;
-    //
-    //if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::LOGO), TEXT("Prototype_Component_Texture_Title"),
-    //    TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom), nullptr)))
-    //    return E_FAIL;
-
     return S_OK;
 }
 
 HRESULT CTitle::Ready_Childs()
 {
+    m_TitleBackGruonds.resize(ENUM_CLASS(BackGround::BACKGROUND_END));
+
+    if (FAILED(Ready_Title_BackGround_Black()))
+        return E_FAIL;
+
+    
+    if (FAILED(Ready_Title_BackGround()))
+        return E_FAIL;
+
+    if (FAILED(Ready_Title_BackGround_Light()))
+        return E_FAIL;
+
+
+    if (FAILED(Ready_Title_BackGround_Modify_Light()))
+        return E_FAIL;
+
+    if (FAILED(Ready_Title_BackGround_Shade()))
+        return E_FAIL;
+    
+    
+
+    if (FAILED(Ready_Title_Text()))
+        return E_FAIL;
+
+    return S_OK;
+}
+
+
+HRESULT CTitle::Ready_Title_BackGround_Black()
+{
+    CTitle_BackGround::TITLE_BAKCGROUND_DESC BackGroundDesc{};
+    CUIObject* pUIObject = nullptr;
+
+    BackGroundDesc.fX = 0;
+    BackGroundDesc.fY = 0;
+    BackGroundDesc.fSizeX = g_iWinSizeX;
+    BackGroundDesc.fSizeY = g_iWinSizeY;
+
+    BackGroundDesc.iTextureCount = 2;
+    BackGroundDesc.iTexture = 0;
+    BackGroundDesc.iPassIdx = 0;
+    BackGroundDesc.fAlpha = 0.5f;
+
+    pUIObject = nullptr;
+    pUIObject = dynamic_cast<CUIObject*>(
+        m_pGameInstance->Clone_Prototype(
+            PROTOTYPE::GAMEOBJECT
+            , ENUM_CLASS(LEVEL::LOGO)
+            , TEXT("Prototype_GameObject_Title_BackGround"), &BackGroundDesc));
+
+    if (nullptr == pUIObject)
+        return E_FAIL;
+
+    AddChild(pUIObject);
+    m_TitleBackGruonds[ENUM_CLASS(BackGround::BACKGROUND_BLACK)] = static_cast<CTitle_BackGround*>(pUIObject);
+
+    return S_OK;
+}
+
+HRESULT CTitle::Ready_Title_BackGround()
+{
+    CTitle_BackGround::TITLE_BAKCGROUND_DESC BackGroundDesc{};
+    CUIObject* pUIObject = nullptr;
+    BackGroundDesc.fX = 0;
+    BackGroundDesc.fY = 0;
+    BackGroundDesc.fSizeX = g_iWinSizeX;
+    BackGroundDesc.fSizeY = g_iWinSizeY;
+
+    BackGroundDesc.iTextureCount = 2;
+    BackGroundDesc.iTexture = 1;
+    BackGroundDesc.iPassIdx = 4;
+    BackGroundDesc.fAlpha = 0.21f;
+
+    pUIObject = dynamic_cast<CUIObject*>(
+        m_pGameInstance->Clone_Prototype(
+            PROTOTYPE::GAMEOBJECT
+            , ENUM_CLASS(LEVEL::LOGO)
+            , TEXT("Prototype_GameObject_Title_BackGround"), &BackGroundDesc));
+
+    if (nullptr == pUIObject)
+        return E_FAIL;
+
+    AddChild(pUIObject);
+    m_TitleBackGruonds[ENUM_CLASS(BackGround::BACKGROUND_WHITE)] = static_cast<CTitle_BackGround*>(pUIObject);
+
+
+    return S_OK;
+}
+
+HRESULT CTitle::Ready_Title_BackGround_Modify_Light()
+{
+    CTitle_BackGround::TITLE_BAKCGROUND_DESC BackGroundDesc{};
+    CUIObject* pUIObject = nullptr;
+    BackGroundDesc.fX = 0;
+    BackGroundDesc.fY = 0;
+    BackGroundDesc.fSizeX = g_iWinSizeX;
+    BackGroundDesc.fSizeY = g_iWinSizeY;
+
+    BackGroundDesc.iTextureCount = 2;
+    BackGroundDesc.iTexture = 2;
+    BackGroundDesc.iPassIdx = 4;
+    BackGroundDesc.fAlpha = 0.23f;
+
+    pUIObject = dynamic_cast<CUIObject*>(
+        m_pGameInstance->Clone_Prototype(
+            PROTOTYPE::GAMEOBJECT
+            , ENUM_CLASS(LEVEL::LOGO)
+            , TEXT("Prototype_GameObject_Title_BackGround"), &BackGroundDesc));
+
+    if (nullptr == pUIObject)
+        return E_FAIL;
+
+    AddChild(pUIObject);
+    m_TitleBackGruonds[ENUM_CLASS(BackGround::BACKGROUND_WHITE_MODIFY_LIGHT)] = static_cast<CTitle_BackGround*>(pUIObject);
+    return S_OK;
+}
+
+HRESULT CTitle::Ready_Title_BackGround_Light()
+{
+    CTitle_BackGround::TITLE_BAKCGROUND_DESC BackGroundDesc{};
+    CUIObject* pUIObject = nullptr;
+
+    BackGroundDesc.fX = 0;
+    BackGroundDesc.fY = 0;
+    BackGroundDesc.fSizeX = g_iWinSizeX;
+    BackGroundDesc.fSizeY = g_iWinSizeY;
+
+    BackGroundDesc.iTextureCount = 2;
+    BackGroundDesc.iTexture = 3;
+    BackGroundDesc.iPassIdx = 4;
+    BackGroundDesc.fAlpha = 0.66f;
+
+    pUIObject = dynamic_cast<CUIObject*>(
+        m_pGameInstance->Clone_Prototype(
+            PROTOTYPE::GAMEOBJECT
+            , ENUM_CLASS(LEVEL::LOGO)
+            , TEXT("Prototype_GameObject_Title_BackGround"), &BackGroundDesc));
+
+    if (nullptr == pUIObject)
+        return E_FAIL;
+
+    AddChild(pUIObject);
+    m_TitleBackGruonds[ENUM_CLASS(BackGround::BACKGROUND_WHITE_BASE_LIGHT)] = static_cast<CTitle_BackGround*>(pUIObject);
+
+    return S_OK;
+}
+
+HRESULT CTitle::Ready_Title_BackGround_Shade()
+{
+    CTitle_BackGround::TITLE_BAKCGROUND_DESC BackGroundDesc{};
+    CUIObject* pUIObject = nullptr;
+    BackGroundDesc.fX = 0;
+    BackGroundDesc.fY = 0;
+    BackGroundDesc.fSizeX = g_iWinSizeX;
+    BackGroundDesc.fSizeY = g_iWinSizeY;
+
+    BackGroundDesc.iTextureCount = 2;
+    BackGroundDesc.iTexture = 4;
+    BackGroundDesc.iPassIdx = 4;
+    BackGroundDesc.fAlpha = 0.89f;
+
+
+    pUIObject = dynamic_cast<CUIObject*>(
+        m_pGameInstance->Clone_Prototype(
+            PROTOTYPE::GAMEOBJECT
+            , ENUM_CLASS(LEVEL::LOGO)
+            , TEXT("Prototype_GameObject_Title_BackGround"), &BackGroundDesc));
+
+    if (nullptr == pUIObject)
+        return E_FAIL;
+
+    AddChild(pUIObject);
+    m_TitleBackGruonds[ENUM_CLASS(BackGround::BACKGROUND_WHITE_SHADE)] = static_cast<CTitle_BackGround*>(pUIObject);
+
+    return S_OK;
+}
+
+HRESULT CTitle::Ready_Title_Text()
+{
+    m_TitleTexts.resize(2);
+
     CTitleText::TITLETEXT_DESC TitleTextDesc{};
     TitleTextDesc.fX = 0;
     TitleTextDesc.fY = 0;
     TitleTextDesc.fSizeX = 1280;
     TitleTextDesc.fSizeY = 280;
-    
+
 
     CUIObject* pUIObject = nullptr;
     TitleTextDesc.iTextureIndex = 0;
@@ -122,13 +261,13 @@ HRESULT CTitle::Ready_Childs()
         m_pGameInstance->Clone_Prototype(
             PROTOTYPE::GAMEOBJECT
             , ENUM_CLASS(LEVEL::LOGO)
-            , TEXT("Prototype_GameObject_TitleText"), &TitleTextDesc));
+            , TEXT("Prototype_GameObject_Title_Text"), &TitleTextDesc));
 
     if (nullptr == pUIObject)
         return E_FAIL;
 
     AddChild(pUIObject);
-    m_pTitleText = pUIObject;
+    m_TitleTexts[ENUM_CLASS(Text::TEXT)] = static_cast<CTitleText*>(pUIObject);
 
 
     pUIObject = nullptr;
@@ -138,17 +277,17 @@ HRESULT CTitle::Ready_Childs()
         m_pGameInstance->Clone_Prototype(
             PROTOTYPE::GAMEOBJECT
             , ENUM_CLASS(LEVEL::LOGO)
-            , TEXT("Prototype_GameObject_TitleText"), &TitleTextDesc));
+            , TEXT("Prototype_GameObject_Title_Text"), &TitleTextDesc));
 
     if (nullptr == pUIObject)
         return E_FAIL;
 
     AddChild(pUIObject);
-    m_pTitleLine = pUIObject;
-    
+    m_TitleTexts[ENUM_CLASS(Text::ENUM_LINE)] = static_cast<CTitleText*>(pUIObject);
 
     return S_OK;
 }
+
 
 CTitle* CTitle::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
@@ -156,7 +295,7 @@ CTitle* CTitle::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 
     if (FAILED(pInstance->Initialize_Prototype()))
     {
-        MSG_BOX(TEXT("Failed to Created : CBackGround"));
+        MSG_BOX(TEXT("Failed to Created : CTitle"));
         Safe_Release(pInstance);
     }
 
@@ -179,8 +318,11 @@ CGameObject* CTitle::Clone(void* pArg)
 void CTitle::Free()
 {
     __super::Free();
-    Safe_Release(m_pVIBufferCom);
+    m_TitleTexts.clear();
 
+    Safe_Release(m_pVIBufferCom);
     Safe_Release(m_pShaderCom);
     Safe_Release(m_pTextureCom);
+
+
 }

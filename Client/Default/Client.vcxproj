@@ -155,6 +155,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\public\BackGround.h" />
+    <ClInclude Include="..\Public\Camera_Free.h" />
     <ClInclude Include="..\Public\ClientPch.h" />
     <ClInclude Include="..\Public\Client_Defines.h" />
     <ClInclude Include="..\Public\HPBar.h" />
@@ -179,13 +180,14 @@
     <ClInclude Include="..\Public\Loading_BackGround.h" />
     <ClInclude Include="..\Public\Loading_Panel.h" />
     <ClInclude Include="..\Public\Loading_Slot.h" />
+    <ClInclude Include="..\Public\Title_BackGround.h" />
     <ClInclude Include="..\Public\MainApp.h" />
     <ClInclude Include="..\Public\Skill_Icon.h" />
     <ClInclude Include="..\Public\Skill_Panel.h" />
     <ClInclude Include="..\Public\Skill_Slot.h" />
     <ClInclude Include="..\Public\StatusPanel.h" />
+    <ClInclude Include="..\Public\Terrain.h" />
     <ClInclude Include="..\Public\Title.h" />
-    <ClInclude Include="..\Public\Title_BackGround.h" />
     <ClInclude Include="..\Public\TitleText.h" />
     <ClInclude Include="Client.h" />
     <ClInclude Include="framework.h" />
@@ -194,6 +196,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\BackGround.cpp" />
+    <ClCompile Include="..\Private\Camera_Free.cpp" />
     <ClCompile Include="..\Private\ClientPch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
@@ -217,13 +220,14 @@
     <ClCompile Include="..\Private\Loading_BackGround.cpp" />
     <ClCompile Include="..\Private\Loading_Panel.cpp" />
     <ClCompile Include="..\Private\Loading_Slot.cpp" />
+    <ClCompile Include="..\Private\Title_BackGround.cpp" />
     <ClCompile Include="..\Private\MainApp.cpp" />
     <ClCompile Include="..\Private\Skill_Icon.cpp" />
     <ClCompile Include="..\Private\Skill_Panel.cpp" />
     <ClCompile Include="..\Private\Skill_Slot.cpp" />
     <ClCompile Include="..\Private\StatusPanel.cpp" />
+    <ClCompile Include="..\Private\Terrain.cpp" />
     <ClCompile Include="..\Private\Title.cpp" />
-    <ClCompile Include="..\Private\Title_BackGround.cpp" />
     <ClCompile Include="..\Private\TitleText.cpp" />
     <ClCompile Include="Client.cpp" />
   </ItemGroup>
@@ -235,6 +239,7 @@
     <Image Include="small.ico" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxNorTex.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPosTex.hlsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
