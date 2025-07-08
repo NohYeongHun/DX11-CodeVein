@@ -132,7 +132,7 @@ void CUIObject::Update_Transform()
 		m_pTransformCom->Set_State(STATE::POSITION, XMVectorSet(m_fX - m_iWinSizeX * 0.5f, -m_fY + m_iWinSizeY * 0.5f, 0.f, 1.f));
 
 	/* 로컬 행렬 생성. */
-	matWorld = XMLoadFloat4x4(m_pTransformCom->Get_WorldMatrix());
+	matWorld = m_pTransformCom->Get_WorldMatrix();
 
 	if (m_pParent)
 		XMStoreFloat4x4(&m_RenderMatrix, matWorld * m_pParent->Get_RenderMatrix());

@@ -59,6 +59,11 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11De
 	if (nullptr == m_pEvent_Manager)
 		return E_FAIL;
 
+	// PipeLine
+	m_pPipleLine = CPipeLine::Create();
+	if (nullptr == m_pPipleLine)
+		return E_FAIL;
+
 	return S_OK;
 }
 
@@ -68,6 +73,11 @@ void CGameInstance::Update_Engine(_float fTimeDelta)
 
 	/* 내 게임내에서 반복적인 갱신이 필요한 객체들이 있다라면 갱신을 여기에서 모아서 수행하낟. */
 	m_pObject_Manager->Priority_Update(fTimeDelta);
+
+	/* 카메라에 대한 이동 조정은 Object Manager의 Priority Update 단계에서 끝나고 
+	* 해당 단계를 이용해서 각 객체들에 적용할 행렬들을 생성해둡니다.
+	*/
+	m_pPipleLine->Update();
 
 	/*m_pPicking->Update();*/
 
@@ -281,16 +291,45 @@ void CGameInstance::Change_Texture_ToGameObject(class CGameObject* pGameObject, 
 {
 	m_pTexture_Manager->Change_Texture_ToGameObject(pGameObject, strComponentTag, ppOut, iLevelIndex, strTextureTag);
 }
+#pragma endregion
 
+#pragma region EVENT_MANAGER
 void CGameInstance::Subscribe(EventType id, uint32_t iID, FCallback&& fn)
 {
 	m_pEvent_Manager->Subscribe(id, iID, std::move(fn));
 }
 
-
 void CGameInstance::UnSubscribe(EventType id, uint32_t iID)
 {
 	m_pEvent_Manager->UnSubscribe(id, iID);
+}
+_matrix CGameInstance::Get_Transform_Matrix(D3DTS eTransformState) const
+{
+	return m_pPipleLine->Get_Transform_Matrix(eTransformState);
+}
+const _float4x4* CGameInstance::Get_Transform_Float4x4(D3DTS eTransformState) const
+{
+	return m_pPipleLine->Get_Transform_Float4x4(eTransformState);
+}
+_matrix CGameInstance::Get_Transform_Matrix_Inverse(D3DTS eTransformState) const
+{
+	return m_pPipleLine->Get_Transform_Matrix_Inverse(eTransformState);
+}
+const _float4x4* CGameInstance::Get_Transform_Float4x4_Inverse(D3DTS eTransformState) const
+{
+	return m_pPipleLine->Get_Transform_Float4x4_Inverse(eTransformState);
+}
+const _float4* CGameInstance::Get_CamPosition() const
+{
+	return m_pPipleLine->Get_CamPosition();
+}
+void CGameInstance::Set_Transform(D3DTS eTransformState, _fmatrix Matrix)
+{
+	m_pPipleLine->Set_Transform(eTransformState, Matrix);
+}
+void CGameInstance::Set_Transform(D3DTS eTransformState, const _float4x4& Matrix)
+{
+	m_pPipleLine->Set_Transform(eTransformState, Matrix);
 }
 #pragma endregion
 
@@ -324,7 +363,8 @@ void CGameInstance::Release_Engine()
 	Safe_Release(m_pLevel_Manager);
 	Safe_Release(m_pFont_Manager);
 	Safe_Release(m_pEvent_Manager);
-	
+	Safe_Release(m_pPipleLine);
+
 	Safe_Release(m_pGraphic_Device);
 	
 	

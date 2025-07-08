@@ -7,6 +7,7 @@ namespace Engine
 	enum class PROTOTYPE { GAMEOBJECT, COMPONENT };
 	enum class RENDERGROUP { PRIORITY, NONBLEND, BLEND, UI, STATIC_UI, END };
 	enum class WINMODE { FULL, WIN, END };
+	enum class D3DTS { VIEW, PROJ, END };
 	
 	enum class MOUSEKEYSTATE { LB, RB, MB, END	};
 	enum class MOUSEMOVESTATE {	X, Y, Z, END	};
@@ -27,6 +28,7 @@ namespace Engine
 	{
 		KEY_START = 0,
 
+		// 1, 2, 3, 4, 5, 6 ,7, 8, 9...
 		Alpha0 = 0x30, Alpha1 = 0x31, Alpha2 = 0x32, Alpha3 = 0x33, Alpha4 = 0x34, Alpha5 = 0x35, Alpha6 = 0x36, Alpha7 = 0x37, Alpha8 = 0x38, Alpha9 = 0x39,
 
 		Q = 'Q', W = 'W', E = 'E', R = 'R', T = 'T', Y = 'Y', U = 'U', I = 'I', O = 'O', P = 'P',

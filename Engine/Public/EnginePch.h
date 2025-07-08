@@ -28,12 +28,15 @@
 
 
 #pragma region GAMEOBJECT
+
 #include "IdGen.h"
 #include "GameObject.h"
 #include "Transform.h"
 #include "Layer.h"
 #include "Object_Manager.h"
 #include "UIObject.h"
+#include "Camera.h"
+
 #pragma endregion
 
 #include "Prototype_Manager.h"
@@ -41,8 +44,7 @@
 #include "Font_Manager.h"
 
 
-
-
+#include "PipeLine.h"
 
 
 
