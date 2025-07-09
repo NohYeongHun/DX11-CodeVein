@@ -31,6 +31,8 @@ HRESULT CCamera_Free::Initialize_Clone(void* pArg)
 // 카메라에 대한 이동 전환은 Priority_Update에서 완료 후 Pipe Line에 행렬이 전달됨.
 void CCamera_Free::Priority_Update(_float fTimeDelta)
 {
+	__super::Priority_Update(fTimeDelta);
+
 	if (GetKeyState('W') & 0x8000)
 	{
 		m_pTransformCom->Go_Straight(fTimeDelta);
@@ -49,28 +51,37 @@ void CCamera_Free::Priority_Update(_float fTimeDelta)
 		m_pTransformCom->Go_Right(fTimeDelta);
 	}
 
-	
+
+	_long		MouseMove = {};
+	if (MouseMove = m_pGameInstance->Get_DIMouseMove(MOUSEMOVESTATE::X))
+	{
+		m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta * MouseMove * m_fMouseSensor);
+	}
+
+	if (MouseMove = m_pGameInstance->Get_DIMouseMove(MOUSEMOVESTATE::Y))
+	{
+		m_pTransformCom->Turn(XMVectorSet(1.f, 0.f, 0.f, 0.f), fTimeDelta * MouseMove * m_fMouseSensor);
+	}
+
 
 	__super::Update_PipeLines();
 }
 
 void CCamera_Free::Update(_float fTimeDelta)
 {
+	__super::Update(fTimeDelta);
 }
 
 void CCamera_Free::Late_Update(_float fTimeDelta)
 {
+	// 여기서 마우스 이전 프레임 위치 저장.
+	
+	__super::Late_Update(fTimeDelta);
 }
 
 HRESULT CCamera_Free::Render()
 {
 	return S_OK;
-}
-
-// Priority Update
-void CCamera_Free::Update_PipeLines()
-{
-	
 }
 
 CCamera_Free* CCamera_Free::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

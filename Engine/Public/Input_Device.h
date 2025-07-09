@@ -5,30 +5,33 @@
 
 NS_BEGIN(Engine)
 
-class  CInput_Device : public CBase
+class  CInput_Device final : public CBase
 {
 private:
 	CInput_Device(void);
 	virtual ~CInput_Device(void) = default;
 	
+
+#pragma region ENGINE에 제공
 public:
-	_byte	Get_DIKeyState(_ubyte byKeyID)		
-	{ 
-		return m_byKeyState[byKeyID]; 
+	_byte	Get_DIKeyState(_ubyte byKeyID)
+	{
+		return m_byKeyState[byKeyID];
 	}
 
 	_byte	Get_DIMouseState(MOUSEKEYSTATE eMouse)
-	{ 	
-		return m_tMouseState.rgbButtons[static_cast<_uint>(eMouse)]; 	
+	{
+		return m_tMouseState.rgbButtons[static_cast<_uint>(eMouse)];
 	}
 
 	// 현재 마우스의 특정 축 좌표를 반환
 	_long	Get_DIMouseMove(MOUSEMOVESTATE eMouseState)
-	{	
-
-
+	{
 		return *((reinterpret_cast<_int*>(&m_tMouseState)) + static_cast<_uint>(eMouseState));
 	}
+#pragma endregion
+
+
 
 	
 public:

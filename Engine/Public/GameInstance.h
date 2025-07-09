@@ -109,6 +109,12 @@ public:
 	void Set_Transform(D3DTS eTransformState, const _float4x4& Matrix);
 #pragma endregion
 
+#pragma region INPUT_DEVICE
+	public:
+		_byte	Get_DIKeyState(_ubyte byKeyID);
+		_byte	Get_DIMouseState(MOUSEKEYSTATE eMouse);
+		_long	Get_DIMouseMove(MOUSEMOVESTATE eMouseState);
+#pragma endregion
 
 
 //
@@ -129,7 +135,8 @@ private:
 	class CCollider_Manager*	m_pCollider_Manager = { nullptr };
 	class CTexture_Manager*		m_pTexture_Manager = { nullptr };
 	class CEvent_Manager*		m_pEvent_Manager = { nullptr };
-	class CPipeLine* m_pPipleLine = { nullptr };
+	class CPipeLine*			m_pPipleLine = { nullptr };
+	class CInput_Device*		m_pInput_Device = { nullptr };
 	_float m_fTimeDelta = {};
 
 

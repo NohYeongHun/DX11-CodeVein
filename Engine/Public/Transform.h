@@ -53,6 +53,14 @@ public:
 public:
 	HRESULT Bind_Shader_Resource(class CShader* pShader, const _char* pConstantName);
 
+
+
+
+#pragma region 헬퍼 기능 - 외부 툴 연계
+public:
+	void Editor();
+#pragma endregion
+
 public:
 	void Scale(_float3 vScale);
 	void Scaling(_float3 vScale);
@@ -60,16 +68,34 @@ public:
 	void Go_Left(_float fTimeDelta);
 	void Go_Right(_float fTimeDelta);
 	void Go_Backward(_float fTimeDelta);
+
 	void Rotation(_fvector vAxis, _float fRadian);
 	void Turn(_fvector vAxis, _float fTimeDelta);
 	void LookAt(_fvector vAt);
+	void Set_Rotation(_float3 vAngle);
+
+
 	void Chase(_fvector vTargetPos, _float fTimeDelta, _float fLimit = 0.f);
 
+public:
+	void Update_Transform();
+	void Set_Parent(CTransform* pTarget);
+
 private:
-	_float4x4				m_WorldMatrix = {};
-	_float					m_fSpeedPerSec = {};
-	_float					m_fRotationPerSec = {};
-	_float3					m_vAngles = {};
+	CTransform*		m_pParent = { nullptr };
+	_float4x4		m_WorldMatrix = {};
+	_float			m_fSpeedPerSec = {};
+	_float			m_fRotationPerSec = {};
+
+	_float3	m_vAngle = {};
+
+	_float m_fPitch = {}; // X축 기준으로의 회전.
+	_float m_fYaw = {};   // Y축 기준으로의 회전이다.
+	_float m_fRoll = {};  // Z축 기죽으로의 회전.
+	
+
+	// 외부 변수
+
 
 public:
 	static CTransform* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

@@ -13,7 +13,6 @@ HRESULT CMainApp::Initialize_Clone()
 #ifdef _DEBUG
 	AllocConsole();
 #endif // DEBUG
-
 	
 	ENGINE_DESC		EngineDesc{};
 

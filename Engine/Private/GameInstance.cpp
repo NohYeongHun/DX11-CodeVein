@@ -64,6 +64,12 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11De
 	if (nullptr == m_pPipleLine)
 		return E_FAIL;
 
+	// Input Device
+	m_pInput_Device = CInput_Device::Create(EngineDesc.hInst, EngineDesc.hWnd);
+	if (nullptr == m_pInput_Device)
+		return E_FAIL;
+
+
 	return S_OK;
 }
 
@@ -84,7 +90,11 @@ void CGameInstance::Update_Engine(_float fTimeDelta)
 	m_pObject_Manager->Update(fTimeDelta);
 	m_pObject_Manager->Late_Update(fTimeDelta);
 
+	m_pInput_Device->Update();
+
 	m_pLevel_Manager->Update(fTimeDelta);
+
+	
 }
 
 HRESULT CGameInstance::Clear_Resources(_uint iClearLevelID)
@@ -355,6 +365,22 @@ void CGameInstance::Set_Transform(D3DTS eTransformState, const _float4x4& Matrix
 {
 	m_pPipleLine->Set_Transform(eTransformState, Matrix);
 }
+
+#pragma endregion
+
+#pragma region INPUT_DEVICE
+_byte CGameInstance::Get_DIKeyState(_ubyte byKeyID)
+{
+	return m_pInput_Device->Get_DIKeyState(byKeyID);
+}
+_byte CGameInstance::Get_DIMouseState(MOUSEKEYSTATE eMouse)
+{
+	return m_pInput_Device->Get_DIMouseState(eMouse);
+}
+_long CGameInstance::Get_DIMouseMove(MOUSEMOVESTATE eMouseState)
+{
+	return m_pInput_Device->Get_DIMouseMove(eMouseState);
+}
 #pragma endregion
 
 
@@ -389,6 +415,7 @@ void CGameInstance::Release_Engine()
 	Safe_Release(m_pEvent_Manager);
 	Safe_Release(m_pPipleLine);
 
+	Safe_Release(m_pInput_Device);
 	Safe_Release(m_pGraphic_Device);
 	
 	

@@ -23,7 +23,7 @@ public:
 	virtual HRESULT Render();
 
 public:
-	void Update_PipeLines();
+
 
 private:
 	_float m_fMouseSensor = {};

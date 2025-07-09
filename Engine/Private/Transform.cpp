@@ -32,7 +32,12 @@ HRESULT CTransform::Bind_Shader_Resource(CShader* pShader, const _char* pConstan
 	return pShader->Bind_Matrix(pConstantName, &m_WorldMatrix);
 }
 
-/* 크기 1기준으로 들어온 vScale 값을 곱해줍니다. 
+void CTransform::Editor()
+{
+
+}
+
+/* 크기 1기준으로 들어온 vScale 값을 곱해줍니다.
 * => 누적이 아닙니다. 
 */
 void CTransform::Scale(_float3 vScale)
@@ -107,7 +112,6 @@ void CTransform::Rotation(_fvector vAxis, _float fRadian)
 	Set_State(STATE::UP, XMVector4Transform(vUp, RotationMatrix));
 	Set_State(STATE::LOOK, XMVector4Transform(vLook, RotationMatrix));
 	
-	// XMVector3TransformNormal();
 
 
 }
@@ -139,6 +143,33 @@ void CTransform::LookAt(_fvector vAt)
 	Set_State(STATE::LOOK, XMVector3Normalize(vLook) * vScaled.z);
 }
 
+void CTransform::Set_Rotation(_float3 vAngle)
+{
+}
+
+//void CTransform::Set_Rotation(_float3 vAngle)
+//{
+//	// Get current RotationMatrix from the WorldMatrix by decomposition.
+//	_vector vScale, vRotationQuat, vTranslation;
+//	XMMatrixDecompose(&vScale, &vRotationQuat, &vTranslation, Get_WorldMatrix());
+//	_matrix RotationMatrix = XMMatrixRotationQuaternion(vRotationQuat);
+//
+//	// Multiply the WorldMatrix by the Inverse of current RotationMatrix (to get a WorldMatrix without any Rotation)
+//	_matrix InverseRotationMatrix = XMMatrixInverse(nullptr, RotationMatrix);
+//	_matrix WorldMatrixWithoutRotation = XMMatrixMultiply(Get_WorldMatrix(), InverseRotationMatrix);
+//
+//	// Make a NewRotationMatrix with new angle values
+//	_matrix NewRotationMatrix = XMMatrixRotationRollPitchYaw(XMConvertToRadians(vAngle.x), XMConvertToRadians(vAngle.y), XMConvertToRadians(vAngle.z));
+//	m_fPitch = vAngle.x;
+//	m_fYaw = vAngle.y;
+//	m_fRoll = vAngle.z;
+//
+//	// Set NewRotationMatrix to WorldMatrixWithoutRotation
+//	Set_State(STATE::RIGHT, XMVector3TransformNormal(WorldMatrixWithoutRotation.r[0], NewRotationMatrix));
+//	Set_State(STATE::UP, XMVector3TransformNormal(WorldMatrixWithoutRotation.r[1], NewRotationMatrix));
+//	Set_State(STATE::LOOK, XMVector3TransformNormal(WorldMatrixWithoutRotation.r[2], NewRotationMatrix));
+//}
+
 void CTransform::Chase(_fvector vTargetPos, _float fTimeDelta, _float fLimit)
 {
 	_vector		vPosition = Get_State(STATE::POSITION);
@@ -150,6 +181,23 @@ void CTransform::Chase(_fvector vTargetPos, _float fTimeDelta, _float fLimit)
 		vPosition += XMVector3Normalize(vMoveDir) * m_fSpeedPerSec * fTimeDelta;
 
 	Set_State(STATE::POSITION, vPosition);
+}
+
+// 회전축에 따른 축 뒤틀림 문제를 해결하기 위함.
+void CTransform::Update_Transform()
+{
+	// 매 프레임 마다 크 자 이 공 부 를 통해 회전축 업데이트
+	if (m_pParent != nullptr)
+		m_pParent->Update_Transform();
+}
+
+void CTransform::Set_Parent(CTransform* pTarget)
+{
+	if (pTarget == m_pParent)
+		return;
+
+	Update_Transform();
+
 }
 
 CTransform* CTransform::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
