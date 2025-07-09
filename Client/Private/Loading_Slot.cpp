@@ -84,8 +84,8 @@ HRESULT CLoading_Slot::Render()
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
         return E_FAIL;
 
-    if (FAILED(m_pShaderCom->Bind_Int("g_iTextureIndex", m_iTextureIndex)))
-        return E_FAIL;
+    /*if (FAILED(m_pShaderCom->Bind_Int("g_iTextureIndex", m_iTextureIndex)))
+        return E_FAIL;*/
 
 
     //_float fFillRatio = 1.f;

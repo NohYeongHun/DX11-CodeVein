@@ -55,10 +55,10 @@ private:
 	HRESULT Ready_Childs();
 	
 	HRESULT Ready_Title_BackGround_Black();
-	HRESULT Ready_Title_BackGround();
+	HRESULT Ready_Title_BackGround_White();
 	HRESULT Ready_Title_BackGround_Light();
 	HRESULT Ready_Title_BackGround_Modify_Light();
-	HRESULT Ready_Title_BackGround_Shade();
+	HRESULT Ready_Title_BackGround_White_Shade();
 	HRESULT Ready_Title_Text();
 	
 	

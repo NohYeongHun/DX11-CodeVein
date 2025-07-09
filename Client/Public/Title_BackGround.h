@@ -14,6 +14,7 @@ public:
 		_uint iTexture = {};
 		_uint iPassIdx = { 0 };
 		_float fAlpha = { 0.5f };
+		_wstring strObjTag = {};
 	}TITLE_BAKCGROUND_DESC;
 private:
 	CTitle_BackGround(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

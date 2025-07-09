@@ -34,7 +34,9 @@ HRESULT CTitle_BackGround::Initialize_Clone(void* pArg)
     m_fTexture_ChangeTime = m_pGameInstance->Get_TimeDelta() * 60.f;
     m_iTextureIdx = pDesc->iTexture;
     m_fAlpha = pDesc->fAlpha;
+    m_strObjTag = pDesc->strObjTag;
 
+    
     m_iRandID = rand();
 
     return S_OK;
@@ -68,13 +70,15 @@ void CTitle_BackGround::Late_Update(_float fTimeDelta)
 
 HRESULT CTitle_BackGround::Render()
 {
+    wstring_convert<codecvt_utf8<wchar_t>> converter;
+    string str = converter.to_bytes(m_strObjTag);
+
     ImGui::Begin("HI");
-    ImGui::SliderFloat(to_string(m_iTextureIdx).c_str(), &m_fAlpha, 0.f, 1.f);
+    
+    ImGui::SliderFloat(str.c_str(), &m_fAlpha, 0.f, 1.f);
     ImGui::End();
 
     __super::Begin();
-
-    
 
     if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &m_RenderMatrix)))
         return E_FAIL;

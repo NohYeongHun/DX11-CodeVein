@@ -16,7 +16,7 @@ namespace Engine
 
 	// 콜라이더 타입 별로 배열에 담을 것.
 	enum class COLLIDERLAYER : uint32_t {
-		NONE = 0
+		  NONE = 0
 		, PLAYER = 1 << 1
 		, ENEMY = 1 << 2
 		, STATIC = 1 << 3

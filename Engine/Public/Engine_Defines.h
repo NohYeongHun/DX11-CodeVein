@@ -4,7 +4,11 @@
 
 #include <d3d11.h>
 #include <DirectXMath.h>
+#include <DirectXCollision.h>
+
 #include <d3dcompiler.h>
+
+
 
 /* DX의 Device Input 사용.*/
 #define DIRECTINPUT_VERSION 0x0800
@@ -16,7 +20,12 @@
 #include <DirectXTK/DDSTextureLoader.h>
 #include <DirectXTK/WICTextureLoader.h>
 
+#include "DirectXTK/PrimitiveBatch.h"
+#include "DirectXTK/VertexTypes.h"
+#include "DirectXTK/Effects.h"
+
 using namespace DirectX;
+
 
 #include <memory>
 #include <vector>
@@ -26,7 +35,10 @@ using namespace DirectX;
 #include <functional>
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 #include <ctime>
+#include <codecvt>
+#include <locale> 
 using namespace std;
 
 

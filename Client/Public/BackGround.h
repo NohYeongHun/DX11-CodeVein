@@ -2,11 +2,6 @@
 
 #include "UIObject.h"
 
-NS_BEGIN(Engine)
-class CShader;
-class CTexture;
-class CVIBuffer_Rect;
-NS_END
 
 NS_BEGIN(Client)
 

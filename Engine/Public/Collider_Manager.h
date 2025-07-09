@@ -14,13 +14,10 @@ public:
 
 #pragma region ENGINE에 제공
 public:
-	HRESULT Add_Collider_To_Layer(COLLIDERLAYER eColliderLayer, CCollider* pCollider);
-	HRESULT Remove_Collider_To_Layer(COLLIDERLAYER eColliderLayer, CCollider* pCollider);
+	HRESULT Add_Collider_To_Manager(CCollider* pCollider);
 
 public:
-	void Priority_Update(); // list에서 소멸.
-	void Update();			// N
-	void Late_Update();
+	void Update();
 #pragma endregion
 
 
@@ -28,15 +25,9 @@ public:
 private:
 	class CGameInstance* m_pGameInstance = { nullptr };
 	_uint m_iNumLevels = { };
-	// 1 Phase 최적화용 list에 담아두기.
-	list<pair<CCollider*, CCollider*>> m_BroadList = {};
 
-	typedef list<CCollider::COLLIDER_INFO> COLLIDERTYPES;
-
-	unordered_map<COLLIDERLAYER, COLLIDERTYPES> m_Colliders = {};
-	//map<, COLLIDERTYPES> m_Colliders = { nullptr };
-
-
+	// 최적화는 각 객체들이 업데이트나 Render에서 조건에 따라 Collider를 안넣으면 되려나?
+	list<CCollider*> m_ColliderList = {};
 
 
 public:

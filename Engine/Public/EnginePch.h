@@ -16,7 +16,14 @@
 #include "Renderer.h"
 #pragma region COMPONENT
 #include "Component.h"
+
 #include "Collider.h"
+#include "Bounding.h"
+#include "Bounding_AABB.h"
+#include "Bounding_OBB.h"
+#include "Bounding_Sphere.h"
+
+
 #include "Collider_Manager.h"
 #include "Shader.h"
 #include "VIBuffer.h"

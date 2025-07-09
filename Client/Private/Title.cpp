@@ -68,21 +68,24 @@ HRESULT CTitle::Ready_Childs()
 {
     m_TitleBackGruonds.resize(ENUM_CLASS(BackGround::BACKGROUND_END));
 
+    // 0
     if (FAILED(Ready_Title_BackGround_Black()))
         return E_FAIL;
 
-    
-    if (FAILED(Ready_Title_BackGround()))
+    // 1
+    if (FAILED(Ready_Title_BackGround_White()))
         return E_FAIL;
 
+    // 2.
     if (FAILED(Ready_Title_BackGround_Light()))
         return E_FAIL;
-
-
+    
+    // 3
     if (FAILED(Ready_Title_BackGround_Modify_Light()))
         return E_FAIL;
 
-    if (FAILED(Ready_Title_BackGround_Shade()))
+    // 4
+    if (FAILED(Ready_Title_BackGround_White_Shade()))
         return E_FAIL;
     
     
@@ -108,6 +111,7 @@ HRESULT CTitle::Ready_Title_BackGround_Black()
     BackGroundDesc.iTexture = 0;
     BackGroundDesc.iPassIdx = 0;
     BackGroundDesc.fAlpha = 0.5f;
+    BackGroundDesc.strObjTag = TEXT("BackGround Black");
 
     pUIObject = nullptr;
     pUIObject = dynamic_cast<CUIObject*>(
@@ -125,7 +129,7 @@ HRESULT CTitle::Ready_Title_BackGround_Black()
     return S_OK;
 }
 
-HRESULT CTitle::Ready_Title_BackGround()
+HRESULT CTitle::Ready_Title_BackGround_White()
 {
     CTitle_BackGround::TITLE_BAKCGROUND_DESC BackGroundDesc{};
     CUIObject* pUIObject = nullptr;
@@ -138,6 +142,8 @@ HRESULT CTitle::Ready_Title_BackGround()
     BackGroundDesc.iTexture = 1;
     BackGroundDesc.iPassIdx = 4;
     BackGroundDesc.fAlpha = 0.21f;
+    BackGroundDesc.strObjTag = TEXT("BackGround White");
+    
 
     pUIObject = dynamic_cast<CUIObject*>(
         m_pGameInstance->Clone_Prototype(
@@ -168,6 +174,7 @@ HRESULT CTitle::Ready_Title_BackGround_Modify_Light()
     BackGroundDesc.iTexture = 2;
     BackGroundDesc.iPassIdx = 4;
     BackGroundDesc.fAlpha = 0.23f;
+    BackGroundDesc.strObjTag = TEXT("BackGround Modify_Light");
 
     pUIObject = dynamic_cast<CUIObject*>(
         m_pGameInstance->Clone_Prototype(
@@ -197,6 +204,7 @@ HRESULT CTitle::Ready_Title_BackGround_Light()
     BackGroundDesc.iTexture = 3;
     BackGroundDesc.iPassIdx = 4;
     BackGroundDesc.fAlpha = 0.66f;
+    BackGroundDesc.strObjTag = TEXT("BackGround Light");
 
     pUIObject = dynamic_cast<CUIObject*>(
         m_pGameInstance->Clone_Prototype(
@@ -213,7 +221,7 @@ HRESULT CTitle::Ready_Title_BackGround_Light()
     return S_OK;
 }
 
-HRESULT CTitle::Ready_Title_BackGround_Shade()
+HRESULT CTitle::Ready_Title_BackGround_White_Shade()
 {
     CTitle_BackGround::TITLE_BAKCGROUND_DESC BackGroundDesc{};
     CUIObject* pUIObject = nullptr;
@@ -226,6 +234,7 @@ HRESULT CTitle::Ready_Title_BackGround_Shade()
     BackGroundDesc.iTexture = 4;
     BackGroundDesc.iPassIdx = 4;
     BackGroundDesc.fAlpha = 0.89f;
+    BackGroundDesc.strObjTag = TEXT("BackGround White Shade");
 
 
     pUIObject = dynamic_cast<CUIObject*>(

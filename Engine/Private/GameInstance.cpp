@@ -298,18 +298,16 @@ HRESULT CGameInstance::Render_Font(const _wstring& strFontTag, const _tchar* pTe
 
 	return m_pFont_Manager->Render_Font(strFontTag, pText, vPosition, vColor, fRotation, vOrigin, fScale);
 }
+
 #pragma endregion
 
- #pragma region COLLIDER_MANAGER
-
-HRESULT CGameInstance::Add_Collider_To_Layer(COLLIDERLAYER eColliderLayer, CCollider* pCollider)
+#pragma region COLLIDER_MANAGER
+HRESULT CGameInstance::Add_Collider_To_Manager(CCollider* pCollider)
 {
-	return m_pCollider_Manager->Add_Collider_To_Layer(eColliderLayer, pCollider);
-}
+	if (nullptr == m_pCollider_Manager)
+		return E_FAIL;
 
-HRESULT CGameInstance::Remove_Collider_To_Layer(COLLIDERLAYER eColliderLayer, CCollider* pCollider)
-{
-	return m_pCollider_Manager->Remove_Collider_To_Layer(eColliderLayer, pCollider);
+	return m_pCollider_Manager->Add_Collider_To_Manager(pCollider);
 }
 
 #pragma endregion

@@ -15,6 +15,7 @@ CUIObject::CUIObject(const CUIObject& Prototype)
 HRESULT CUIObject::Initialize_Prototype()
 {
 	XMStoreFloat4x4(&m_RenderMatrix, XMMatrixIdentity());
+	m_strObjTag = TEXT("UI");
 	return S_OK;
 }
 

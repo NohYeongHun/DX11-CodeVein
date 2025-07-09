@@ -16,6 +16,7 @@ CGameObject::CGameObject(const CGameObject& Prototype)
 	: m_pDevice{ Prototype.m_pDevice }
 	, m_pContext{ Prototype.m_pContext }
 	, m_pGameInstance{ CGameInstance::GetInstance() }
+	, m_strObjTag { Prototype.m_strObjTag }
 {
 	Safe_AddRef(m_pGameInstance);
 	Safe_AddRef(m_pDevice);
@@ -69,6 +70,21 @@ HRESULT CGameObject::Render()
 	return S_OK;
 }
 
+void CGameObject::On_Collision_Enter(CGameObject* pOther)
+{
+
+}
+
+void CGameObject::On_Collision_Stay(CGameObject* pOther)
+{
+
+}
+
+void CGameObject::On_Collision_Exit(CGameObject* pOther)
+{
+
+}
+
 HRESULT CGameObject::Add_Component(_uint iPrototypeLevelIndex, const _wstring& strPrototypeTag, const _wstring& strComponentTag, CComponent** ppOut, void* pArg)
 {
 	if (nullptr != Get_Component(strComponentTag))
@@ -107,6 +123,13 @@ HRESULT CGameObject::Change_Component(const _wstring& strComponentTag, CComponen
 
 	return S_OK;
 }
+
+const _wstring& CGameObject::Get_ObjectTag()
+{
+	return m_strObjTag;
+}
+
+
 
 void CGameObject::Destroy()
 {

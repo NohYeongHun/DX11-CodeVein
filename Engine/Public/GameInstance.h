@@ -80,8 +80,7 @@ public:
 
 #pragma region COLLIDER_MANAGER
 public:
-	HRESULT Add_Collider_To_Layer(COLLIDERLAYER eColliderLayer, class CCollider* pCollider);
-	HRESULT Remove_Collider_To_Layer(COLLIDERLAYER eColliderLayer, class CCollider* pCollider);
+	HRESULT Add_Collider_To_Manager(class CCollider* pCollider);
 #pragma endregion
 
 #pragma region TEXTURE_MANAGER

@@ -21,7 +21,7 @@ namespace Engine
 	{
 		if (nullptr != Pointer)
 		{
-			delete [] Pointer;
+			delete[] Pointer;
 			Pointer = nullptr;
 		}
 	}
