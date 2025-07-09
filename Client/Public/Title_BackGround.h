@@ -14,6 +14,7 @@ public:
 		_uint iTexture = {};
 		_uint iPassIdx = { 0 };
 		_float fAlpha = { 0.5f };
+		_float fChangeTime = { 0.f };
 		_wstring strObjTag = {};
 	}TITLE_BAKCGROUND_DESC;
 private:
@@ -36,12 +37,10 @@ private:
 	_uint					m_iTextureCount = {};
 	_uint					m_iTextureIdx = {};
 	_uint					m_iPassIdx = {};
-	
-	_uint m_iRandID = { };
 
 	_float					m_fAlpha = {};
-	_float					m_fTexture_ChangeTime = {};
 	_float					m_fTime = {};
+	_float					m_fChangeTime = {};
 
 
 private:

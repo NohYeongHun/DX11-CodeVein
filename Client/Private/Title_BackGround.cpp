@@ -31,14 +31,14 @@ HRESULT CTitle_BackGround::Initialize_Clone(void* pArg)
         return E_FAIL;
 
     // 매번 업데이트 엔진할 때마다 가져옴.
-    m_fTexture_ChangeTime = m_pGameInstance->Get_TimeDelta() * 60.f;
     m_iTextureIdx = pDesc->iTexture;
     m_fAlpha = pDesc->fAlpha;
     m_strObjTag = pDesc->strObjTag;
+    
+    m_fChangeTime = pDesc->fChangeTime;
+    
 
     
-    m_iRandID = rand();
-
     return S_OK;
 }
 
@@ -57,6 +57,18 @@ void CTitle_BackGround::Late_Update(_float fTimeDelta)
     __super::Late_Update(fTimeDelta);
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::UI, this)))
         return;
+
+    if (m_fTime < m_fChangeTime)
+    {
+        m_fTime += fTimeDelta;
+        m_fAlpha += fTimeDelta * 0.1f;
+        if (m_fAlpha >= 1.f)
+            m_fAlpha = 0.2f;
+    }
+    else
+        m_fTime = 0.f;
+        
+
 }
 
 HRESULT CTitle_BackGround::Render()
