@@ -12,6 +12,9 @@
 *.sln.docstates
 *.lib
 *.dll
+*.psa
+*.pskx
+*.mat
 EngineSDK/
 
 # User-specific files (MonoDevelop/Xamarin Studio)
