@@ -11,16 +11,6 @@ CLoading_Panel::CLoading_Panel(const CLoading_Panel& Prototype)
 {
 }
 
-//void CLoading_Panel::Change_Skill(_uint iSkillSlot, const _wstring& strTextureTag, _uint iTextureIndex)
-//{
-//    m_SkillSlots[iSkillSlot]->Change_Skill(strTextureTag, iTextureIndex);
-//}
-//
-//void CLoading_Panel::Execute_Skill(_uint iSkillSlot)
-//{
-//    m_SkillSlots[iSkillSlot]->Execute_Skill();
-//}
-
 HRESULT CLoading_Panel::Initialize_Prototype()
 {
     m_iLoading_Slot = 9;

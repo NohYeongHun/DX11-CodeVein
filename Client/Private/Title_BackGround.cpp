@@ -50,15 +50,6 @@ void CTitle_BackGround::Priority_Update(_float fTimeDelta)
 void CTitle_BackGround::Update(_float fTimeDelta)
 {
     __super::Update(fTimeDelta);
-
-    if (m_fTime >= m_fTexture_ChangeTime)
-    {
-        //m_iTextureIdx = (m_iTextureIdx + 1) % m_iTextureCount;
-        m_fTime = 0.f;
-    }
-    else
-        m_fTime += fTimeDelta;
-
 }
 
 void CTitle_BackGround::Late_Update(_float fTimeDelta)
@@ -73,8 +64,7 @@ HRESULT CTitle_BackGround::Render()
     wstring_convert<codecvt_utf8<wchar_t>> converter;
     string str = converter.to_bytes(m_strObjTag);
 
-    ImGui::Begin("HI");
-    
+    ImGui::Begin("Title BackGround");
     ImGui::SliderFloat(str.c_str(), &m_fAlpha, 0.f, 1.f);
     ImGui::End();
 
@@ -87,9 +77,6 @@ HRESULT CTitle_BackGround::Render()
         return E_FAIL;
 
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
-        return E_FAIL;
-
-    if (FAILED(m_pShaderCom->Bind_Float("g_fTime", m_fTime)))
         return E_FAIL;
 
     if (FAILED(m_pShaderCom->Bind_Float("g_fAlpha", m_fAlpha)))

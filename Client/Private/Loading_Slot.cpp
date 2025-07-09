@@ -10,22 +10,6 @@ CLoading_Slot::CLoading_Slot(const CLoading_Slot& Prototype)
 {
 }
 
-//void CLoading_Slot::Change_Skill(const _wstring& strTextureTag, _uint iTextureIndex)
-//{
-//    m_pSkill->Change_Skill(strTextureTag, iTextureIndex);
-//}
-//
-//void CLoading_Slot::Execute_Skill()
-//{
-//    if (nullptr == m_pSkill && m_IsCoolTime)
-//        return;
-//
-//    // 스킬 실행.
-//    m_IsCoolTime = true;
-//    m_fTime = 0.f;
-//
-//    // 실제 스킬 실행 로직은?
-//}
 
 HRESULT CLoading_Slot::Initialize_Prototype()
 {
@@ -83,22 +67,6 @@ HRESULT CLoading_Slot::Render()
         return E_FAIL;
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
         return E_FAIL;
-
-    /*if (FAILED(m_pShaderCom->Bind_Int("g_iTextureIndex", m_iTextureIndex)))
-        return E_FAIL;*/
-
-
-    //_float fFillRatio = 1.f;
-    //if (m_IsCoolTime)                        // 쿨타임이면 0~1로 노말라이즈
-    //{
-    //    if (m_fCoolTime > 0.f)
-    //        fFillRatio = Clamp(m_fTime / m_fCoolTime, 0.f, 1.f);
-    //    else
-    //        fFillRatio = 1.f;                // 방어 코드: 쿨타임 값이 0이면 그냥 다 찬 걸로
-    //}
-
-    //if (FAILED(m_pShaderCom->Bind_Float("g_fFillRatio", fFillRatio)))
-    //    return E_FAIL;
 
     if (FAILED(m_pTextureCom->Bind_Shader_Resource(m_pShaderCom, "g_Texture", m_iTextureIndex)))
         return E_FAIL;

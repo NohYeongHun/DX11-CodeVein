@@ -19,8 +19,6 @@ public:
 	{
 		m_iCurrentPass = iPass;
 	}
-	/*void Change_Skill(const _wstring& strTextureTag, _uint iTextureIndex);
-	void Execute_Skill();*/
 
 public:
 	virtual HRESULT Initialize_Prototype();
