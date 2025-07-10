@@ -17,7 +17,10 @@
 *.psk
 *.json
 *.mat
+#Client/Bin/Resources
 EngineSDK/
+
+!*.hlsl
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
@@ -239,7 +242,7 @@ _pkginfo.txt
 !?*.[Cc]ache/
 
 # Others
-ClientBin/
+#ClientBin/
 ~$*
 *~
 *.dbmdl
