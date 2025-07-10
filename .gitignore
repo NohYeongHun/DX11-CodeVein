@@ -18,7 +18,15 @@
 *.json
 *.mat
 #Client/Bin/Resources
+
+Client/Bin/**
+Tool/Bin/
+Engine/Bin/
 EngineSDK/
+
+!Client/Bin/
+!Client/Bin/ShaderFiles/
+!Client/Bin/ShaderFiles/**
 
 !*.hlsl
 
@@ -39,11 +47,15 @@ x86/
 [Aa][Rr][Mm]/
 [Aa][Rr][Mm]64/
 bld/
-[Bb]in/
+# 1) Bin 안 전부(재귀) 무시
+#[Bb]in/
 [Oo]bj/
 [Oo]ut/
 [Ll]og/
 [Ll]ogs/
+
+
+   
 
 # Visual Studio 2015/2017 cache/options directory
 .vs/
