@@ -10,6 +10,25 @@ CHPBar::CHPBar(const CHPBar& Prototype)
 {
 }
 
+/*
+* 주의점 : 플레이어의 무적 시간 만큼 제공해야합니다. (피격 시간) 
+* 피격 시간 이내에 한번 더 맞았을 경우 효과가 제대로 안나올 수도 있음.
+*/
+void CHPBar::Increase_Hp(_uint iHp, _float fTime)
+{
+    m_fLeftRatio = static_cast<_float>(m_iHp) / static_cast<_float>(m_iMaxHp);
+    m_iHp = min(m_iHp + iHp, m_iMaxHp);
+    m_fRightRatio = static_cast<_float>(m_iHp) / static_cast<_float>(m_iMaxHp);
+    m_bIncrease = true;
+}
+
+void CHPBar::Decrease_Hp(_uint iHp, _float fTime)
+{
+    m_fRightRatio = static_cast<_float>(m_iHp) / static_cast<_float>(m_iMaxHp);
+    m_iHp = max(m_iHp - iHp, 0);
+    m_fLeftRatio = static_cast<_float>(m_iHp) / static_cast<_float>(m_iMaxHp);
+    m_bDecrease = true;
+}
 
 HRESULT CHPBar::Initialize_Prototype()
 {
@@ -33,7 +52,40 @@ HRESULT CHPBar::Initialize_Clone(void* pArg)
 
 void CHPBar::Priority_Update(_float fTimeDelta)
 {
+    
+    
+    if (m_bDecrease)
+    {
+        if (m_fRightRatio <= m_fLeftRatio)
+        {
+            m_fRightRatio = 0;
+            m_fLeftRatio = 0;
+            m_bDecrease = false;
+        }
+        else
+            m_fRightRatio -= fTimeDelta * 0.05f;
+    }
+    if (m_bIncrease)
+    {
+        if (m_fRightRatio <= m_fLeftRatio)
+        {
+            m_fRightRatio = 0;
+            m_fLeftRatio = 0;
+            m_bIncrease = false;
+        }
+        else
+            m_fLeftRatio += fTimeDelta * 0.05f;
+    }
+
+    
+
     __super::Priority_Update(fTimeDelta);
+    if (m_pGameInstance->Get_KeyUp(DIK_5))
+        Decrease_Hp(50, 1.f);
+    if (m_pGameInstance->Get_KeyUp(DIK_6))
+        Increase_Hp(50, 1.f);
+
+
 }
 
 
@@ -48,6 +100,9 @@ void CHPBar::Late_Update(_float fTimeDelta)
 
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::STATIC_UI, this)))
         return;
+
+
+    
 }
 
 HRESULT CHPBar::Render()
@@ -62,18 +117,33 @@ HRESULT CHPBar::Render()
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
         return E_FAIL;
 
-    /*if (FAILED(m_pShaderCom->Bind_Int("g_iTextureIndex", m_iTextureIndex)))
-        return E_FAIL;*/
+
+    
+    _float fFillRatio = 1.f - (static_cast<_float>(m_iHp) / static_cast<_float>(m_iMaxHp));
+    if (FAILED(m_pShaderCom->Bind_Float("g_fFillRatio", fFillRatio)))
+        return E_FAIL;
+
+    if (FAILED(m_pShaderCom->Bind_Float("g_fLeftRatio", m_fLeftRatio)))
+        return E_FAIL;
+
+    if (FAILED(m_pShaderCom->Bind_Float("g_fRightRatio", m_fRightRatio)))
+        return E_FAIL;
+
+    if (FAILED(m_pShaderCom->Bind_Bool("g_bIncrease", m_bIncrease)))
+        return E_FAIL;
+
 
     if (FAILED(m_pTextureCom->Bind_Shader_Resource(m_pShaderCom, "g_Texture", m_iTextureIndex)))
         return E_FAIL;
 
-    m_pShaderCom->Begin(0);
+
+    m_pShaderCom->Begin(5);
 
     m_pVIBufferCom->Bind_Resources();
 
     m_pVIBufferCom->Render();
 
+    // 폰트 출력.
     Render_HP();
 
     __super::End();
@@ -83,7 +153,7 @@ HRESULT CHPBar::Render()
 
 void CHPBar::Render_HP()
 {
-    _float fScreenX = m_RenderMatrix._41 + (g_iWinSizeX >> 1) + 100.f;
+    _float fScreenX = m_RenderMatrix._41 + (g_iWinSizeX >> 1) + 80.f;
     _float fScreenY = (g_iWinSizeY >> 1) - m_RenderMatrix._42 - 15.f;
 
     _float2 vPosition = { fScreenX , fScreenY };
@@ -93,7 +163,7 @@ void CHPBar::Render_HP()
     swprintf_s(szBuffer, L"%d / %d", m_iHp, m_iMaxHp);
 
     m_pGameInstance->Render_Font(TEXT("HUD_TEXT"), szBuffer
-        , vPosition, XMVectorSet(1.f, 1.f, 1.f, 1.f));
+        , vPosition, XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f, {}, 1.5f);
 }
 
 HRESULT CHPBar::Ready_Components()

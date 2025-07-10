@@ -22,6 +22,7 @@ public:
 	HRESULT Bind_SRV(const _char* pConstantName, ID3D11ShaderResourceView* pSRV);
 	HRESULT Bind_Int(const _char* pConstantName, _uint iValue);
 	HRESULT Bind_Float(const _char* pConstantName, _float fValue);
+	HRESULT Bind_Bool(const _char* pConstantName, _bool bValue);
 	
 private:
 	ID3DX11Effect*				m_pEffect = { nullptr };

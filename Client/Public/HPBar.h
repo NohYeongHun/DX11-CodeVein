@@ -15,6 +15,10 @@ private:
 	virtual ~CHPBar() = default;
 
 public:
+	void Increase_Hp(_uint iHp, _float fTime);
+	void Decrease_Hp(_uint iHp, _float fTime);
+
+public:
 	virtual HRESULT Initialize_Prototype();
 	virtual HRESULT Initialize_Clone(void* pArg);
 	virtual void Priority_Update(_float fTimeDelta);
@@ -29,10 +33,18 @@ private:
 	CShader* m_pShaderCom = { nullptr };
 	CVIBuffer_Rect* m_pVIBufferCom = { nullptr };
 	CTexture* m_pTextureCom = { nullptr };
-
 	_uint  m_iTextureIndex = {};
+
+#pragma region Shader용 HP Increase, Decrease 효과
+	_float m_fRightRatio = {};
+	_float m_fLeftRatio = {};
+
 	_uint  m_iHp = {};
 	_uint  m_iMaxHp = {};
+
+	_bool  m_bIncrease = { false };
+	_bool  m_bDecrease = { false };
+#pragma endregion
 
 
 private:
