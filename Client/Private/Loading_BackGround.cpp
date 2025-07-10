@@ -96,11 +96,12 @@ void CLoading_BackGround::Late_Update(_float fTimeDelta)
 
     __super::Late_Update(fTimeDelta);
 
-    if (m_fFade < 1.f)
+    if (m_IsLoadingFadeOut)
     {
-        if (m_IsLoadingFadeOut)
+        if (m_fFade < 1.f)
             m_fFade += fTimeDelta;
     }
+        
 }
 
 HRESULT CLoading_BackGround::Render()

@@ -1,4 +1,4 @@
-#include "Level_Manager.h"
+ï»¿#include "Level_Manager.h"
 #include "GameInstance.h"
 
 #include "Level.h"
@@ -9,9 +9,10 @@ CLevel_Manager::CLevel_Manager()
 	Safe_AddRef(m_pGameInstance);
 }
 
+/* ìì› íŒŒê´´ ì‹œ. */
 HRESULT CLevel_Manager::Open_Level(_uint iLevelID, CLevel* pNewLevel)
 {
-	/* ±âÁ¸·¹º§¿ë ÀÚ¿øÀ» ÆÄ±«ÇÑ´Ù. */
+	/* ê¸°ì¡´ë ˆë²¨ìš© ìì›ì„ íŒŒê´´í•œë‹¤. */
 	if (FAILED(Clear_Resources()))
 		return E_FAIL;
 

@@ -34,13 +34,30 @@ HRESULT CTitle::Initialize_Clone(void* pArg)
     if (FAILED(Ready_Childs()))
         return E_FAIL;
 
+    if (FAILED(Ready_Events()))
+        return E_FAIL;
+
 
     return S_OK;
 }
 
 void CTitle::Priority_Update(_float fTimeDelta)
 {
+    // 자식 객체들에게 모두 FadeOut 효과 부여 => Rendering Pass 변경.
+    if (m_IsLogoFadeOut && m_fFadeTime >= 1.f)
+    {
+        m_pGameInstance->Publish<CLevel_Logo>(EventType::OPEN_GAMEPAY, nullptr);
+
+        // Logo 에서 Loading에 호출해야함. => 이 이벤트가 아님.
+        //m_pGameInstance->Publish<CLevel_Loading>(EventType::OPEN_LEVEL, nullptr);
+        m_IsLogoFadeOut = false;
+
+        return;
+    }
+
     __super::Priority_Update(fTimeDelta);
+
+    
 }
 
 void CTitle::Update(_float fTimeDelta)
@@ -51,12 +68,29 @@ void CTitle::Update(_float fTimeDelta)
 void CTitle::Late_Update(_float fTimeDelta)
 {
     __super::Late_Update(fTimeDelta);
+
+    if (m_fFadeTime < 1.f)
+    {
+        if (m_IsLogoFadeOut)
+            m_fFadeTime += fTimeDelta;
+    }
 }
 
 // Title 객체는 렌더링 안함.
 HRESULT CTitle::Render()
 {
     return S_OK;
+}
+
+void CTitle::Logo_End()
+{
+    m_IsLogoFadeOut = true;
+    m_fFadeTime = { 0.f };
+
+    // 자식 객체들에게 모두 FadeOut 효과 렌더링 패스 부여하고. 시간 부여.
+    for (auto& pBackGround : m_TitleBackGruonds)
+        pBackGround->Start_FadeOut();
+
 }
 
 HRESULT CTitle::Ready_Components()
@@ -92,6 +126,22 @@ HRESULT CTitle::Ready_Childs()
 
     if (FAILED(Ready_Title_Text()))
         return E_FAIL;
+
+    return S_OK;
+}
+
+HRESULT CTitle::Ready_Events()
+{
+#pragma region FADE_OUT
+    m_pGameInstance->Subscribe(EventType::LOGO_END, Get_ID(), [this](void* pData)
+        {
+            this->Logo_End();   // 멤버 함수 호출
+        });
+
+    // Event 목록 관리.
+    m_Events.emplace_back(EventType::LOGO_END, Get_ID());
+
+#pragma endregion
 
     return S_OK;
 }
@@ -325,10 +375,19 @@ CGameObject* CTitle::Clone(void* pArg)
     return pInstance;
 }
 
+void CTitle::Destroy()
+{
+    __super::Destroy();
+
+    for (auto& Event : m_Events)
+        m_pGameInstance->UnSubscribe(Event.first, Event.second);
+}
+
 void CTitle::Free()
 {
     __super::Free();
     m_TitleTexts.clear();
+    
 
     Safe_Release(m_pVIBufferCom);
     Safe_Release(m_pShaderCom);

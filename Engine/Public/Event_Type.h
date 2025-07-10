@@ -7,7 +7,9 @@ enum class EventType : _uint
 	SKILL_EXECUTE = 3,
 	LOAIDNG_DISPLAY = 4,
 	LOADING_END = 5,
-	OPEN_LEVEL = 6,
+	LOGO_END = 6,
+	OPEN_LEVEL = 7,
+	OPEN_GAMEPAY = 8,
 	EVENT_END
 };
 

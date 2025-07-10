@@ -77,6 +77,12 @@ void CGameInstance::Update_Engine(_float fTimeDelta)
 {
 	m_fTimeDelta = fTimeDelta;
 
+	// Task Queue에 들어가있으면 해당 작업을 우선 처리한다.
+	if(FAILED(Task()))
+		return;
+
+	m_pInput_Device->Update();
+
 	/* 내 게임내에서 반복적인 갱신이 필요한 객체들이 있다라면 갱신을 여기에서 모아서 수행하낟. */
 	m_pObject_Manager->Priority_Update(fTimeDelta);
 
@@ -90,10 +96,9 @@ void CGameInstance::Update_Engine(_float fTimeDelta)
 	m_pObject_Manager->Update(fTimeDelta);
 	m_pObject_Manager->Late_Update(fTimeDelta);
 
-	m_pInput_Device->Update();
+	
 
 	m_pLevel_Manager->Update(fTimeDelta);
-
 	
 }
 
@@ -103,6 +108,26 @@ HRESULT CGameInstance::Clear_Resources(_uint iClearLevelID)
 	m_pPrototype_Manager->Clear(iClearLevelID);
 
 	m_pObject_Manager->Clear(iClearLevelID);
+
+	return S_OK;
+}
+
+
+HRESULT CGameInstance::Task()
+{
+	while (!m_Tasks.empty())
+	{
+		INSTANCE_TASK task = m_Tasks.front();
+		HRESULT hr = task.fn();
+
+		if (FAILED(hr))
+		{
+			MSG_BOX(TEXT("Game Instance Task Queue Failed"));
+			return E_FAIL;
+		}
+			
+		m_Tasks.pop();
+	}
 
 	return S_OK;
 }
@@ -185,7 +210,16 @@ HRESULT CGameInstance::Open_Level(_uint iLevelID, CLevel* pNewLevel)
 	if (nullptr == m_pLevel_Manager)
 		return E_FAIL;
 
-	return m_pLevel_Manager->Open_Level(iLevelID, pNewLevel);
+	CLevel_Manager::CHANGE_LEVEL_DESC Desc{};
+	Desc.iLevelID = iLevelID;
+	Desc.pNewLevel = pNewLevel;
+	
+	// Task 넣어주기.
+	m_Tasks.emplace(INSTANCE_TASK{ [desc = Desc, this]() {
+			return m_pLevel_Manager->Open_Level(desc.iLevelID, desc.pNewLevel);
+		}});
+
+	return S_OK;
 }
 
 /* 현재 레벨 확인. */

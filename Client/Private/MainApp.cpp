@@ -157,7 +157,7 @@ HRESULT CMainApp::Ready_Prototype_Fonts()
 	if (FAILED(m_pGameInstance
 		->Load_Font(
 			TEXT("HUD_TEXT")
-			, TEXT("../../Resources/Font/CodeVein.spritefont"))))
+			, TEXT("../Bin/Resources/Font/Bazzi.spritefont"))))
 		return E_FAIL;
 
 	return S_OK;

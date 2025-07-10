@@ -52,12 +52,14 @@ HRESULT CInput_Device::Initialize(HINSTANCE hInst, HWND hWnd)
 */
 void CInput_Device::Update(void)
 {
+	memcpy(m_byPrevKeyState, m_byKeyState, sizeof(m_byPrevKeyState));
+	memcpy(&m_tPrevMouseState, &m_tMouseState, sizeof(m_tPrevMouseState));
+
 	// Device State를 m_byKeyState에 받아온다.
 	m_pKeyBoard->GetDeviceState(256, m_byKeyState);
 	m_pMouse->GetDeviceState(sizeof(m_tMouseState), &m_tMouseState);
 
-	memcpy(m_byPrevKeyState, m_byKeyState, sizeof(m_byPrevKeyState));
-	memcpy(&m_tPrevMouseState, &m_tMouseState, sizeof(m_tPrevMouseState));
+	
 }
 
 CInput_Device* CInput_Device::Create(HINSTANCE hInstance, HWND hWnd)
