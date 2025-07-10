@@ -97,12 +97,6 @@
     <Filter Include="00. System">
       <UniqueIdentifier>{8c8976a5-931c-4b39-b355-0f3f4035e214}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. System\00.Timers">
-      <UniqueIdentifier>{0a7f5a32-2364-4f71-b0b5-7b6386429329}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. System\00.Timers\Manager">
-      <UniqueIdentifier>{c819f794-6f2b-404f-85ca-411546f7389c}</UniqueIdentifier>
-    </Filter>
     <Filter Include="00. System\01.Device">
       <UniqueIdentifier>{1f28d277-d6a4-4e00-bb6e-0c2a374abe79}</UniqueIdentifier>
     </Filter>
@@ -115,13 +109,19 @@
     <Filter Include="01. Utility\08. Renderer">
       <UniqueIdentifier>{146b4657-e65a-4c97-b906-c1c3ba9c69ec}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. System\00. Timers">
+      <UniqueIdentifier>{0a7f5a32-2364-4f71-b0b5-7b6386429329}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. System\00. Timers\Manager">
+      <UniqueIdentifier>{c819f794-6f2b-404f-85ca-411546f7389c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Timer.cpp">
-      <Filter>00. System\00.Timers</Filter>
+      <Filter>00. System\00. Timers</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Timer_Manager.cpp">
-      <Filter>00. System\00.Timers\Manager</Filter>
+      <Filter>00. System\00. Timers\Manager</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\GameInstance.cpp">
       <Filter>01. Utility\00. GameInstance</Filter>
@@ -243,10 +243,10 @@
       <Filter>99 .Defines</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Timer.h">
-      <Filter>00. System\00.Timers</Filter>
+      <Filter>00. System\00. Timers</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Timer_Manager.h">
-      <Filter>00. System\00.Timers\Manager</Filter>
+      <Filter>00. System\00. Timers\Manager</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\GameInstance.h">
       <Filter>01. Utility\00. GameInstance</Filter>
