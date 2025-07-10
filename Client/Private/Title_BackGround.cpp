@@ -31,14 +31,14 @@ HRESULT CTitle_BackGround::Initialize_Clone(void* pArg)
         return E_FAIL;
 
     // 매번 업데이트 엔진할 때마다 가져옴.
-    m_fTexture_ChangeTime = m_pGameInstance->Get_TimeDelta() * 60.f;
     m_iTextureIdx = pDesc->iTexture;
     m_fAlpha = pDesc->fAlpha;
     m_strObjTag = pDesc->strObjTag;
+    
+    m_fChangeTime = pDesc->fChangeTime;
+    
 
     
-    m_iRandID = rand();
-
     return S_OK;
 }
 
@@ -50,15 +50,6 @@ void CTitle_BackGround::Priority_Update(_float fTimeDelta)
 void CTitle_BackGround::Update(_float fTimeDelta)
 {
     __super::Update(fTimeDelta);
-
-    if (m_fTime >= m_fTexture_ChangeTime)
-    {
-        //m_iTextureIdx = (m_iTextureIdx + 1) % m_iTextureCount;
-        m_fTime = 0.f;
-    }
-    else
-        m_fTime += fTimeDelta;
-
 }
 
 void CTitle_BackGround::Late_Update(_float fTimeDelta)
@@ -66,6 +57,18 @@ void CTitle_BackGround::Late_Update(_float fTimeDelta)
     __super::Late_Update(fTimeDelta);
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::UI, this)))
         return;
+
+    if (m_fTime < m_fChangeTime)
+    {
+        m_fTime += fTimeDelta;
+        m_fAlpha += fTimeDelta * 0.1f;
+        if (m_fAlpha >= 1.f)
+            m_fAlpha = 0.2f;
+    }
+    else
+        m_fTime = 0.f;
+        
+
 }
 
 HRESULT CTitle_BackGround::Render()
@@ -73,8 +76,7 @@ HRESULT CTitle_BackGround::Render()
     wstring_convert<codecvt_utf8<wchar_t>> converter;
     string str = converter.to_bytes(m_strObjTag);
 
-    ImGui::Begin("HI");
-    
+    ImGui::Begin("Title BackGround");
     ImGui::SliderFloat(str.c_str(), &m_fAlpha, 0.f, 1.f);
     ImGui::End();
 
@@ -87,9 +89,6 @@ HRESULT CTitle_BackGround::Render()
         return E_FAIL;
 
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
-        return E_FAIL;
-
-    if (FAILED(m_pShaderCom->Bind_Float("g_fTime", m_fTime)))
         return E_FAIL;
 
     if (FAILED(m_pShaderCom->Bind_Float("g_fAlpha", m_fAlpha)))

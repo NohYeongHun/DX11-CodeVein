@@ -174,6 +174,7 @@ HRESULT CTitle::Ready_Title_BackGround_Modify_Light()
     BackGroundDesc.iTexture = 2;
     BackGroundDesc.iPassIdx = 4;
     BackGroundDesc.fAlpha = 0.23f;
+    BackGroundDesc.fChangeTime = 1.f;
     BackGroundDesc.strObjTag = TEXT("BackGround Modify_Light");
 
     pUIObject = dynamic_cast<CUIObject*>(
