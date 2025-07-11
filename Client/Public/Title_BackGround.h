@@ -55,6 +55,7 @@ private:
 
 private:
 	HRESULT Ready_Components();
+	HRESULT Ready_Render_Resource();
 
 public:
 	static CTitle_BackGround* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

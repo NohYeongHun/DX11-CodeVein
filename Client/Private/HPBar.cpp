@@ -138,7 +138,7 @@ void CHPBar::Render_HP()
     swprintf_s(szBuffer, L"%d / %d", m_iHp, m_iMaxHp);
 
     m_pGameInstance->Render_Font(TEXT("HUD_TEXT"), szBuffer
-        , vPosition, XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f, {}, 1.5f);
+        , vPosition, XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f, {}, 1.f);
 }
 
 HRESULT CHPBar::Ready_Components()

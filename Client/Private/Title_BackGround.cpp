@@ -73,23 +73,7 @@ HRESULT CTitle_BackGround::Render()
 
     __super::Begin();
 
-    if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &m_RenderMatrix)))
-        return E_FAIL;
-
-    if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix)))
-        return E_FAIL;
-
-    if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
-        return E_FAIL;
-
-    if (FAILED(m_pShaderCom->Bind_Float("g_fAlpha", m_fAlpha)))
-        return E_FAIL;
-
-    if (FAILED(m_pTextureCom->Bind_Shader_Resource(m_pShaderCom, "g_Texture", m_iTextureIdx)))
-        return E_FAIL;
-
-    _float fFade = Clamp(m_fFadeTime / 1.f, 0.f, 1.f);
-    if (FAILED(m_pShaderCom->Bind_Float("g_fFade", fFade)))
+    if (FAILED(Ready_Render_Resource()))
         return E_FAIL;
 
 
@@ -146,6 +130,30 @@ HRESULT CTitle_BackGround::Ready_Components()
 
     if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::LOGO), TEXT("Prototype_Component_Texture_Title_BackGround"),
         TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom), nullptr)))
+        return E_FAIL;
+
+    return S_OK;
+}
+
+HRESULT CTitle_BackGround::Ready_Render_Resource()
+{
+    if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &m_RenderMatrix)))
+        return E_FAIL;
+
+    if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix)))
+        return E_FAIL;
+
+    if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
+        return E_FAIL;
+
+    if (FAILED(m_pShaderCom->Bind_Float("g_fAlpha", m_fAlpha)))
+        return E_FAIL;
+
+    if (FAILED(m_pTextureCom->Bind_Shader_Resource(m_pShaderCom, "g_Texture", m_iTextureIdx)))
+        return E_FAIL;
+
+    _float fFade = Clamp(m_fFadeTime / 1.f, 0.f, 1.f);
+    if (FAILED(m_pShaderCom->Bind_Float("g_fFade", fFade)))
         return E_FAIL;
 
     return S_OK;
