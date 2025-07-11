@@ -1,4 +1,5 @@
-﻿
+﻿#include "Terrain.h"
+
 CTerrain::CTerrain(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CGameObject { pDevice, pContext }
 {
@@ -43,44 +44,7 @@ void CTerrain::Late_Update(_float fTimeDelta)
 
 HRESULT CTerrain::Render()
 {
-
-    if (FAILED(m_pTransformCom->Bind_Shader_Resource(m_pShaderCom, "g_WorldMatrix")))
-        return E_FAIL;
-
-    //_float4x4 ViewMatrix{}, ProjMatrix{};
-
-    //// 임시 카메라 생성.
-    //XMStoreFloat4x4(&ViewMatrix, XMMatrixLookAtLH(
-    //    XMVectorSet(0.f, 200.f, -150.f, 1.f)
-    //    , XMVectorSet(0.f, 0.f, 0.f, 1.f)
-    //    , XMVectorSet(0.f, 1.f, 0.f, 0.f)
-    //));
-    //
-    //XMStoreFloat4x4(&ProjMatrix, XMMatrixPerspectiveFovLH(
-    //    XMConvertToRadians(60.f)
-    //    , g_iWinSizeX / static_cast<_float>(g_iWinSizeY)
-    //    , 0.1f
-    //    , 1000.f
-    //));
-
-
-    if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance->Get_Transform_Float4x4(D3DTS::VIEW))))
-        return E_FAIL;
-
-    if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_Transform_Float4x4(D3DTS::PROJ))))
-        return E_FAIL;
-
-    //if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &ViewMatrix)))
-    //    return E_FAIL;
-
-    //if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &ProjMatrix)))
-    //    return E_FAIL;
-
-    if (FAILED(m_pTextureCom->Bind_Shader_Resource(m_pShaderCom, "g_Texture", 0)))
-        return E_FAIL;
-
-
-    if (FAILED(m_pTextureCom->Bind_Shader_Resource(m_pShaderCom, "g_Texture", 0)))
+    if (FAILED(Ready_Render_Resources()))
         return E_FAIL;
 
     m_pShaderCom->Begin(0);    
@@ -105,6 +69,51 @@ HRESULT CTerrain::Ready_Components()
     if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Texture_Terrain"),
         TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom), nullptr)))
         return E_FAIL;
+
+
+
+    return S_OK;
+}
+
+HRESULT CTerrain::Ready_Render_Resources()
+{
+    if (FAILED(m_pTransformCom->Bind_Shader_Resource(m_pShaderCom, "g_WorldMatrix")))
+        return E_FAIL;
+
+    if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance->Get_Transform_Float4x4(D3DTS::VIEW))))
+        return E_FAIL;
+
+    if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_Transform_Float4x4(D3DTS::PROJ))))
+        return E_FAIL;
+
+    if (FAILED(m_pTextureCom->Bind_Shader_Resource(m_pShaderCom, "g_Texture", 0)))
+        return E_FAIL;
+
+    const LIGHT_DESC* pLightDesc = m_pGameInstance->Get_LightDesc(0);
+    if (nullptr == pLightDesc)
+        return E_FAIL;
+
+    if(FAILED(m_pShaderCom->Bind_RawValue("g_vLightDir", &pLightDesc->vDirection, sizeof(_float4))))
+        return E_FAIL;
+
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDiffuse", &pLightDesc->vDiffuse, sizeof(_float4))))
+        return E_FAIL;
+
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightAmbient", &pLightDesc->vAmbient, sizeof(_float4))))
+        return E_FAIL;
+
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightSpecular", &pLightDesc->vSpecular, sizeof(_float4))))
+        return E_FAIL;
+
+    _float4 vCamPos = *m_pGameInstance->Get_CamPosition();
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
+        return E_FAIL;
+
+    cout << "Pos : " << vCamPos.x << " , " << vCamPos.y << " , " << vCamPos.z << endl;
+
+
+
+
 
     return S_OK;
 }
