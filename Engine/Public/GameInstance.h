@@ -11,6 +11,12 @@ private:
 	CGameInstance();
 	virtual ~CGameInstance() = default;
 
+public:
+	typedef struct tagInstanceTask
+	{
+		function<HRESULT()> fn;
+	}INSTANCE_TASK;
+
 #pragma region ENGINE
 public:
 	_float Get_TimeDelta() { return m_fTimeDelta; }
@@ -18,6 +24,11 @@ public:
 	HRESULT Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11Device** ppDevice, ID3D11DeviceContext** ppContext);
 	void Update_Engine(_float fTimeDelta);
 	HRESULT Clear_Resources(_uint iClearLevelID);
+
+	
+private:
+	HRESULT Task();
+
 public:
 	void Render_Begin(const _float4* pClearColor);
 	HRESULT Draw();
@@ -113,14 +124,27 @@ public:
 		_byte	Get_DIKeyState(_ubyte byKeyID);
 		_byte	Get_DIMouseState(MOUSEKEYSTATE eMouse);
 		_long	Get_DIMouseMove(MOUSEMOVESTATE eMouseState);
+
+		_bool Get_KeyDown(_ubyte byKeyID);
+		_bool Get_KeyUp(_ubyte byKeyID);
+		_bool Get_MouseKeyDown(MOUSEKEYSTATE eMouse);
+		_bool Get_MouseKeyUp(MOUSEKEYSTATE eMouse);
 #pragma endregion
 
+#pragma region LIGHT_MANAGER
+	public:
+		const LIGHT_DESC* Get_LightDesc(_uint iIndex) const;
+		HRESULT Add_Light(const LIGHT_DESC& LightDesc);
+#pragma endregion
+
+		
 
 //
 //#pragma region PICKING 
 //	void Transform_Picking_ToLocalSpace(class CTransform* pTransformCom);
 //	_bool isPicked_InLocalSpace(const _float3& vPointA, const _float3& vPointB, const _float3& vPointC, _float3* pOut);
 //#pragma endregion
+
 
 private:
 	class CGraphic_Device*		m_pGraphic_Device = { nullptr };
@@ -136,7 +160,10 @@ private:
 	class CEvent_Manager*		m_pEvent_Manager = { nullptr };
 	class CPipeLine*			m_pPipleLine = { nullptr };
 	class CInput_Device*		m_pInput_Device = { nullptr };
+	class CLight_Manager*		m_pLight_Manager = { nullptr };
 	_float m_fTimeDelta = {};
+	
+	queue<INSTANCE_TASK> m_Tasks = {}; // Task
 
 
 public:

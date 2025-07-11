@@ -17,6 +17,9 @@ public:
 		_float fChangeTime = { 0.f };
 		_wstring strObjTag = {};
 	}TITLE_BAKCGROUND_DESC;
+
+
+
 private:
 	CTitle_BackGround(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CTitle_BackGround(const CTitle_BackGround& Prototype);
@@ -30,6 +33,10 @@ public:
 	virtual void Late_Update(_float fTimeDelta);
 	virtual HRESULT Render();
 
+public:
+	void Start_FadeOut();
+	void Time_Calc(_float fTimeDelta);
+
 private:
 	CShader*				m_pShaderCom = { nullptr };
 	CVIBuffer_Rect*			m_pVIBufferCom = { nullptr };
@@ -41,6 +48,9 @@ private:
 	_float					m_fAlpha = {};
 	_float					m_fTime = {};
 	_float					m_fChangeTime = {};
+
+	_float					m_fFadeTime = {};
+	_bool					m_IsFadeOut = { false };
 
 
 private:

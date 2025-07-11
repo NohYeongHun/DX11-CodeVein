@@ -14,6 +14,13 @@ NS_BEGIN(Engine)
 
 class CLevel_Manager final : public CBase
 {
+public:
+	typedef struct tagChangeLevelDesc 
+	{
+		_uint iLevelID = {};
+		class CLevel* pNewLevel = {};
+	}CHANGE_LEVEL_DESC;
+
 private:
 	CLevel_Manager();
 	virtual ~CLevel_Manager() = default;

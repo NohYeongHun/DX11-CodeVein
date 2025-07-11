@@ -41,18 +41,29 @@ public:
 	virtual void Late_Update(_float fTimeDelta);
 	virtual HRESULT Render();
 
+	virtual void Destroy();
+
+public:
+	void Logo_End();
+
 private:
 	vector<CTitleText*> m_TitleTexts = {};
 	vector<CTitle_BackGround*> m_TitleBackGruonds = {};
+
+	vector<pair<EventType, uint32_t>> m_Events = {};
 
 	CShader*		m_pShaderCom = { nullptr };
 	CVIBuffer_Rect*	m_pVIBufferCom = { nullptr };
 	CTexture*		m_pTextureCom = { nullptr };
 	_float			m_fChangeTime = {};
 
+	_bool m_IsLogoFadeOut = { false };
+	_float m_fFadeTime = { 0.f };
+
 private:
 	HRESULT Ready_Components();
 	HRESULT Ready_Childs();
+	HRESULT Ready_Events();
 	
 	HRESULT Ready_Title_BackGround_Black();
 	HRESULT Ready_Title_BackGround_White();

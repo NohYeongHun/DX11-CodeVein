@@ -49,6 +49,7 @@ private:
 
 private:
 	HRESULT Ready_Components(SKILLSLOT_DESC* pDesc);
+	HRESULT Ready_Render_Resources();
 
 public:
 	static CSkill_Slot* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

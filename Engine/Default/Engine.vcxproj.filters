@@ -97,12 +97,6 @@
     <Filter Include="00. System">
       <UniqueIdentifier>{8c8976a5-931c-4b39-b355-0f3f4035e214}</UniqueIdentifier>
     </Filter>
-    <Filter Include="00. System\00.Timers">
-      <UniqueIdentifier>{0a7f5a32-2364-4f71-b0b5-7b6386429329}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="00. System\00.Timers\Manager">
-      <UniqueIdentifier>{c819f794-6f2b-404f-85ca-411546f7389c}</UniqueIdentifier>
-    </Filter>
     <Filter Include="00. System\01.Device">
       <UniqueIdentifier>{1f28d277-d6a4-4e00-bb6e-0c2a374abe79}</UniqueIdentifier>
     </Filter>
@@ -115,13 +109,25 @@
     <Filter Include="01. Utility\08. Renderer">
       <UniqueIdentifier>{146b4657-e65a-4c97-b906-c1c3ba9c69ec}</UniqueIdentifier>
     </Filter>
+    <Filter Include="00. System\00. Timers">
+      <UniqueIdentifier>{0a7f5a32-2364-4f71-b0b5-7b6386429329}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="00. System\00. Timers\Manager">
+      <UniqueIdentifier>{c819f794-6f2b-404f-85ca-411546f7389c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\09. Light">
+      <UniqueIdentifier>{9053c498-038b-4826-b94c-d2f7344fc61b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\09. Light\Manager">
+      <UniqueIdentifier>{4525e4b6-a6b4-4098-8703-bffcfb0f3a08}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Timer.cpp">
-      <Filter>00. System\00.Timers</Filter>
+      <Filter>00. System\00. Timers</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Timer_Manager.cpp">
-      <Filter>00. System\00.Timers\Manager</Filter>
+      <Filter>00. System\00. Timers\Manager</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\GameInstance.cpp">
       <Filter>01. Utility\00. GameInstance</Filter>
@@ -222,6 +228,12 @@
     <ClCompile Include="..\Private\Bounding_Sphere.cpp">
       <Filter>01. Utility\03. Component\Collider\Bounding\SPHERE</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Light_Manager.cpp">
+      <Filter>01. Utility\09. Light\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Light.cpp">
+      <Filter>01. Utility\09. Light</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Engine_Defines.h">
@@ -243,10 +255,10 @@
       <Filter>99 .Defines</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Timer.h">
-      <Filter>00. System\00.Timers</Filter>
+      <Filter>00. System\00. Timers</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Timer_Manager.h">
-      <Filter>00. System\00.Timers\Manager</Filter>
+      <Filter>00. System\00. Timers\Manager</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\GameInstance.h">
       <Filter>01. Utility\00. GameInstance</Filter>
@@ -349,6 +361,12 @@
     </ClInclude>
     <ClInclude Include="..\Public\Bounding_Sphere.h">
       <Filter>01. Utility\03. Component\Collider\Bounding\SPHERE</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Light_Manager.h">
+      <Filter>01. Utility\09. Light\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Light.h">
+      <Filter>01. Utility\09. Light</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -43,6 +43,7 @@ private:
 
 private:
 	HRESULT Ready_Components(SKILLICON_DESC* pDesc);
+	HRESULT Ready_Render_Resources();
 
 public:
 	static CSkill_Icon* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

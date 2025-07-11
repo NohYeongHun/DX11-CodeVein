@@ -32,7 +32,10 @@ HRESULT CFont::Render(const _tchar* pText, const _float2& vPosition, _fvector vC
             m_pBatch,
             pText,
             vPosition,
-            vColor
+            vColor, 
+            fRotation, 
+            vOrigin,
+            fScale
         );
 
     // Draw Call 끝.

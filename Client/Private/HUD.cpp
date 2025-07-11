@@ -80,25 +80,25 @@ void CHUD::Update(_float fTimeDelta)
     Desc.iSkillPanelIdx = SKILL_PANEL1;
     Desc.pText = TEXT("Action_SkillIcon");
     
-    if (GetAsyncKeyState('1') & 0x8000)
+    if (m_pGameInstance->Get_KeyUp(DIK_1))
     {
         Desc.iSlotIdx = 0;
         Desc.iTextureIdx = 0;
         m_pGameInstance->Publish(EventType::SKILL_CHANGE, & Desc);
     }
-    if (GetAsyncKeyState('2') & 0x8000)
+    if (m_pGameInstance->Get_KeyUp(DIK_2))
     {
         Desc.iSlotIdx = 1;
         Desc.iTextureIdx = 1;
         m_pGameInstance->Publish(EventType::SKILL_CHANGE, &Desc);
     }
-    if (GetAsyncKeyState('3') & 0x8000)
+    if (m_pGameInstance->Get_KeyUp(DIK_3))
     {
         Desc.iSlotIdx = 2;
         Desc.iTextureIdx = 2;
         m_pGameInstance->Publish(EventType::SKILL_CHANGE, &Desc);
     }
-    if (GetAsyncKeyState('4') & 0x8000)
+    if (m_pGameInstance->Get_KeyUp(DIK_4))
     {
         Desc.iSlotIdx = 3;
         Desc.iTextureIdx = 3;
@@ -106,7 +106,7 @@ void CHUD::Update(_float fTimeDelta)
     }
 
     // 마우스 왼쪽 클릭 시 쿨타임 돌게하기.
-    if (GetAsyncKeyState(VK_LBUTTON) & 0x8000)
+    if (m_pGameInstance->Get_MouseKeyUp(MOUSEKEYSTATE::LB))
     {
         SKILLEXECUTE_DESC Desc{};
         Desc.iSkillPanelIdx = SKILL_PANEL1;
@@ -115,7 +115,32 @@ void CHUD::Update(_float fTimeDelta)
         m_pGameInstance->Publish(EventType::SKILL_EXECUTE, &Desc);
     }
 
+    if (m_pGameInstance->Get_KeyUp(DIK_5))
+    {
+        HPCHANGE_DESC HpDesc{};
+        HpDesc.bIncrease = false;
+        HpDesc.iHp = 50;
+        HpDesc.fTime = 1.f;
+        m_pGameInstance->Publish(EventType::HP_CHANGE, &HpDesc);
+    }
 
+    if (m_pGameInstance->Get_KeyUp(DIK_6))
+    {
+        HPCHANGE_DESC HpDesc{};
+        HpDesc.bIncrease = true;
+        HpDesc.iHp = 50;
+        HpDesc.fTime = 1.f;
+        m_pGameInstance->Publish(EventType::HP_CHANGE, &HpDesc);
+    }
+
+    if (m_pGameInstance->Get_KeyUp(DIK_7))
+    {
+        STEMINA_CHANGE_DESC SteminaDesc{};
+        SteminaDesc.bIncrease = false;
+        SteminaDesc.iStemina = 40;
+        SteminaDesc.fTime = 1.f;
+        m_pGameInstance->Publish(EventType::STEMINA_CHANGE, &SteminaDesc);
+    }
 
     __super::Update(fTimeDelta);
 }
@@ -224,7 +249,7 @@ HRESULT CHUD::Ready_StatusPanel()
         return E_FAIL;
 
     AddChild(pUIObject);
-    m_StatusPanels[STATUS_PANEL1] = static_cast<CStatusPanel*>(pUIObject);
+    m_StatusPanels[STATUS_PANEL_BAR] = static_cast<CStatusPanel*>(pUIObject);
     
     return S_OK;
 }
@@ -311,6 +336,8 @@ void CHUD::Destroy()
 
     for (auto& val : m_Events)
         m_pGameInstance->UnSubscribe(val, Get_ID());
+
+    m_Events.clear();
 }
 
 void CHUD::Free()

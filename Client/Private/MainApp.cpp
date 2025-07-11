@@ -100,8 +100,8 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 
 HRESULT CMainApp::Ready_Prototype_HUD()
 {
-#pragma region HUD 객체
 
+#pragma region Skill Panel
 	// Skill Slot UI Texture
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
 		, TEXT("Prototype_Component_Texture_SkillSlot")
@@ -130,21 +130,35 @@ HRESULT CMainApp::Ready_Prototype_HUD()
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_SkillPanel"),
 		CSkill_Panel::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
-
+#pragma endregion
+	
+#pragma region Status Panel
 	// Status 
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
 		, TEXT("Prototype_Component_Texture_HPBar")
 		, CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/User/HPBar/HPBar%d.png"), 2))))
 		return E_FAIL;
 
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
+		, TEXT("Prototype_Component_Texture_SteminaBar")
+		, CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/User/HPBar/Stemina%d.png"), 1))))
+		return E_FAIL;
+
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_HPBar"),
 		CHPBar::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_SteminaBar"),
+		CSteminaBar::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_StatusPanel"),
 		CStatusPanel::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
+#pragma endregion
+
+	
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_HUD"),
 		CHUD::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
@@ -157,7 +171,7 @@ HRESULT CMainApp::Ready_Prototype_Fonts()
 	if (FAILED(m_pGameInstance
 		->Load_Font(
 			TEXT("HUD_TEXT")
-			, TEXT("../../Resources/Font/CodeVein.spritefont"))))
+			, TEXT("../Bin/Resources/Font/Bazzi.spritefont"))))
 		return E_FAIL;
 
 	return S_OK;

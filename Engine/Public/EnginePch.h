@@ -14,6 +14,7 @@
 #include "Level_Manager.h"
 
 #include "Renderer.h"
+
 #pragma region COMPONENT
 #include "Component.h"
 
@@ -51,8 +52,9 @@
 #include "Font.h"
 #include "Font_Manager.h"
 
-
 #include "PipeLine.h"
+#include "Light.h"
+#include "Light_Manager.h"
 
 
 
