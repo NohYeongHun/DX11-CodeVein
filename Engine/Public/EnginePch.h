@@ -52,8 +52,9 @@
 #include "Font.h"
 #include "Font_Manager.h"
 
-
 #include "PipeLine.h"
+#include "Light.h"
+#include "Light_Manager.h"
 
 
 

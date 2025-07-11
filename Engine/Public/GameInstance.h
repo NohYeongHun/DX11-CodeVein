@@ -131,6 +131,13 @@ public:
 		_bool Get_MouseKeyUp(MOUSEKEYSTATE eMouse);
 #pragma endregion
 
+#pragma region LIGHT_MANAGER
+	public:
+		const LIGHT_DESC* Get_LightDesc(_uint iIndex) const;
+		HRESULT Add_Light(const LIGHT_DESC& LightDesc);
+#pragma endregion
+
+		
 
 //
 //#pragma region PICKING 
@@ -153,9 +160,10 @@ private:
 	class CEvent_Manager*		m_pEvent_Manager = { nullptr };
 	class CPipeLine*			m_pPipleLine = { nullptr };
 	class CInput_Device*		m_pInput_Device = { nullptr };
+	class CLight_Manager*		m_pLight_Manager = { nullptr };
 	_float m_fTimeDelta = {};
 	
-	queue<INSTANCE_TASK> m_Tasks = {};
+	queue<INSTANCE_TASK> m_Tasks = {}; // Task
 
 
 public:

@@ -4,11 +4,15 @@ texture2D g_Texture;
 vector g_vLightDir = vector(1.f, -1.f, 1.f, 0.f);
 vector g_vLightDiffuse = vector(1.f, 1.f, 1.f, 1.f);
 vector g_vLightAmbient = vector(0.4f, 0.4f, 0.4f, 1.f);
+vector g_vLightSpecular = vector(1.f, 1.f, 1.f, 1.f);
+
+vector g_vCamPosition;
 
 /* 재질 
 */
 texture2D g_DiffuseTexture;
 vector g_vMtrlAmbient = 1.f;
+vector g_vMtrlSpecular = 1.f;
 
 sampler DefaultSampler = sampler_state
 {
@@ -83,98 +87,18 @@ PS_OUT PS_MAIN(PS_IN In)
     
     vector vMtrlDiffuse = g_Texture.Sample(DefaultSampler, In.vTexcoord * 50.f);
     
-    
     float fShade = max(dot((normalize(g_vLightDir) * -1.f), normalize(In.vNormal)), 0.f); // 명암 계산.
-    Out.vColor = (g_vLightDiffuse * vMtrlDiffuse) * saturate(fShade + (g_vLightAmbient * g_vMtrlAmbient));
+    
+    vector vReflect = reflect(normalize(g_vLightDir), normalize(In.vNormal));
+    vector vLook = g_vCamPosition - In.vWorldPos;
+    
+    float fSpecular = pow(max(dot(normalize(vLook), normalize(vReflect)), 0.f), 50.0f);
+    
+    Out.vColor = (g_vLightDiffuse * vMtrlDiffuse) * saturate(fShade + (g_vLightAmbient * g_vMtrlAmbient)) +
+                    (g_vLightSpecular * g_vMtrlSpecular) * fSpecular;
     
     return Out;
 }
-
-
-//int g_iTextureIndex;
-
-
-// Texture Index에 따라서 다른 픽셀 쉐이더를 제공하기.
-//PS_OUT PS_MAIN2(PS_IN In)
-//{
-//    PS_OUT Out = (PS_OUT) 0;
-    
-//    float2 uv = In.vTexcoord;
-    
-//    float4 baseColor = g_Texture.Sample(DefaultSampler, uv); // 원본 텍스처 색
-//    float4 fillerColor = float4(1, 1, 1, 1); // 다이아몬드 안에 채워질 색
-    
-//    // 다이아몬드 중심
-//    float2 center = float2(0.5f, 0.5f);
-//    float2 delta = abs(uv - center);
-//    bool bIsInDiamond = (delta.x + delta.y) < 0.5f;
-    
-//    if (bIsInDiamond)
-//    {
-//        Out.vColor = lerp(baseColor, fillerColor, 0.8f); // 부드럽게 섞기
-//    }
-//    else
-//    {
-//        Out.vColor = baseColor;
-//    }
-    
-//    return Out;
-//}
-
-
-//float g_
-//;
-//PS_OUT PS_MAIN3(PS_IN In)
-//{
-//    PS_OUT Out = (PS_OUT) 0;
-
-//    float2 uv = In.vTexcoord;
-//    float4 fillerColor = float4(0, 0, 0, 1); // 다이아몬드 안에 채워질 색
-//    float4 baseColor = g_Texture.Sample(DefaultSampler, uv); // 원본 텍스처 색
-
-    
-//    // 다이아몬드 중심
-//    float2 center = float2(0.5f, 0.5f);
-//    float2 delta = abs(uv - center);
-//    bool bIsInDiamond = (delta.x + delta.y) < 0.51f;
-
-//    // 아래서 위로 채우기
-//    bool bIsFillRegion = uv.y > (1.0 - g_fFillRatio);
-
-//    if (bIsInDiamond && bIsFillRegion)
-//    {
-//        // 다이아몬드 내부이면서, 채워질 영역이면
-//        Out.vColor = lerp(baseColor, fillerColor, 0.8f); // 부드럽게 섞기
-//    }
-//    else
-//    {
-//        // 그 외는 원본 텍스처 유지
-//        Out.vColor = baseColor;
-//    }
-
-//    return Out;
-//}
-
-//float g_fFade;
-
-//// Fade Out Shader
-//PS_OUT PS_MAIN4(PS_IN In)
-//{
-//    PS_OUT Out = (PS_OUT) 0;
-
-//    float2 uv = In.vTexcoord;
-//    float4 baseColor = g_Texture.Sample(DefaultSampler, uv);
-//    float4 fillerColor = float4(0, 0, 0, 1);
-    
-//    baseColor.rgb = lerp(baseColor.rgb, float3(0.0, 0.0, 0.0), saturate(g_fFade));
-    
-//    // 핵심 한 줄: 원본→검정으로 선형 보간
-//    Out.vColor = baseColor;
-    
-
-//    return Out;
-//}
-
 
 technique11 DefaultTechnique
 {
@@ -186,27 +110,6 @@ technique11 DefaultTechnique
         VertexShader = compile vs_5_0 VS_MAIN();
         PixelShader = compile ps_5_0 PS_MAIN();
     }
-
-    //pass LoadingSlotPass
-    //{
-    //    VertexShader = compile vs_5_0 VS_MAIN();
-    //    PixelShader = compile ps_5_0 PS_MAIN2();
-    //}
-
-    //pass SkillSlotPass
-    //{
-    //    VertexShader = compile vs_5_0 VS_MAIN();
-    //    PixelShader = compile ps_5_0 PS_MAIN3();
-    //}
-
-    //pass FadeOutPass
-    //{
-    //    VertexShader = compile vs_5_0 VS_MAIN();
-    //    PixelShader = compile ps_5_0 PS_MAIN4();
-    //}
-    
-
-
 
     ///* 모델의 상황에 따라 다른 쉐이딩 기법 세트(블렌딩 + 디스토션  )를 먹여주기위해서 */
     //pass DefaultPass1

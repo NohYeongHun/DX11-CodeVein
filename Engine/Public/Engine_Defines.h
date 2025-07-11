@@ -40,12 +40,15 @@ using namespace DirectX;
 #include <codecvt>
 #include <locale> 
 #include <queue>
-using namespace std;
-
 
 #include <thread>
 #include <io.h>
 #include <iostream>
+
+using namespace std;
+
+
+
 
 #include "Engine_Enum.h"
 #include "Engine_Macro.h"
