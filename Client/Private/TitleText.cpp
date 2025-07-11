@@ -116,14 +116,15 @@ HRESULT CTitleText::Ready_Render_Resource()
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
         return E_FAIL;
 
-    if (FAILED(m_pShaderCom->Bind_Float("g_fAlpha", m_fAlpha)))
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fAlpha", static_cast<void*>(&m_fAlpha), sizeof(_float))))
         return E_FAIL;
 
     if (FAILED(m_pTextureCom->Bind_Shader_Resource(m_pShaderCom, "g_Texture", m_iTextureIndex)))
         return E_FAIL;
 
     _float fFade = Clamp(m_fFadeTime / 1.f, 0.f, 1.f);
-    if (FAILED(m_pShaderCom->Bind_Float("g_fFade", fFade)))
+
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fFade", static_cast<void*>(&fFade), sizeof(_float))))
         return E_FAIL;
 
     return S_OK;
