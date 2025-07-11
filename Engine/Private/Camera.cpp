@@ -32,7 +32,6 @@ HRESULT CCamera::Initialize_Clone(void* pArg)
     // 2. Transform Component에 카메라의 바라보는 방향 (vAt) 설정.
     m_pTransformCom->LookAt(XMLoadFloat4(&pDesc->vAt));
 
-
     // 3. ViewPort 정보 가져와서 설정.
     _uint iNumViewPorts{ 1 };
     D3D11_VIEWPORT ViewportDesc{};
