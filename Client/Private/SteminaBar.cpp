@@ -1,11 +1,11 @@
-﻿#include "HPBar.h"
+﻿#include "SteminaBar.h"
 
-CHPBar::CHPBar(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CSteminaBar::CSteminaBar(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CUIObject(pDevice, pContext)
 {
 }
 
-CHPBar::CHPBar(const CHPBar& Prototype)
+CSteminaBar::CSteminaBar(const CSteminaBar& Prototype)
     : CUIObject(Prototype)
 {
 }
@@ -14,35 +14,36 @@ CHPBar::CHPBar(const CHPBar& Prototype)
 * 주의점 : 플레이어의 무적 시간 만큼 제공해야합니다. (피격 시간) 
 * 피격 시간 이내에 한번 더 맞았을 경우 효과가 제대로 안나올 수도 있음.
 */
-void CHPBar::Increase_Hp(_uint iHp, _float fTime)
+void CSteminaBar::Increase_Stemina(_uint iStemina, _float fTime)
 {
-    m_fLeftRatio = static_cast<_float>(m_iHp) / static_cast<_float>(m_iMaxHp);
-    m_iHp = min(m_iHp + iHp, m_iMaxHp);
-    m_fRightRatio = static_cast<_float>(m_iHp) / static_cast<_float>(m_iMaxHp);
+    m_fLeftRatio = static_cast<_float>(m_iStemina) / static_cast<_float>(m_iMaxStemina);
+    m_iStemina = min(m_iStemina + iStemina, m_iMaxStemina);
+    m_fRightRatio = static_cast<_float>(m_iStemina) / static_cast<_float>(m_iMaxStemina);
     m_bIncrease = true;
 }
 
-void CHPBar::Decrease_Hp(_uint iHp, _float fTime)
+void CSteminaBar::Decrease_Stemina(_uint iStemina, _float fTime)
 {
-    m_fRightRatio = static_cast<_float>(m_iHp) / static_cast<_float>(m_iMaxHp);
-    m_iHp = max(m_iHp - iHp, 0);
-    m_fLeftRatio = static_cast<_float>(m_iHp) / static_cast<_float>(m_iMaxHp);
+    m_fRightRatio = static_cast<_float>(m_iStemina) / static_cast<_float>(m_iMaxStemina);
+    m_iStemina = max(m_iStemina - iStemina, 0);
+    m_fLeftRatio = static_cast<_float>(m_iStemina) / static_cast<_float>(m_iMaxStemina);
+
     m_bDecrease = true;
 }
 
-HRESULT CHPBar::Initialize_Prototype()
+HRESULT CSteminaBar::Initialize_Prototype()
 {
     return S_OK;
 }
 
-HRESULT CHPBar::Initialize_Clone(void* pArg)
+HRESULT CSteminaBar::Initialize_Clone(void* pArg)
 {
     if (FAILED(__super::Initialize_Clone(pArg)))
         return E_FAIL;
 
     m_iTextureIndex = 0;
-    m_iMaxHp = 500;
-    m_iHp    = m_iMaxHp;
+    m_iMaxStemina = 200;
+    m_iStemina = m_iMaxStemina;
 
     if (FAILED(Ready_Components()))
         return E_FAIL;
@@ -53,9 +54,8 @@ HRESULT CHPBar::Initialize_Clone(void* pArg)
     return S_OK;
 }
 
-void CHPBar::Priority_Update(_float fTimeDelta)
+void CSteminaBar::Priority_Update(_float fTimeDelta)
 {
-    
     
     if (m_bDecrease)
     {
@@ -64,11 +64,12 @@ void CHPBar::Priority_Update(_float fTimeDelta)
             m_fRightRatio = 0;
             m_fLeftRatio = 0;
             m_bDecrease = false;
+            Increase_Stemina(m_iMaxStemina - m_iStemina, 1.f);
         }
         else
             m_fRightRatio -= fTimeDelta * 0.2f;
     }
-    if (m_bIncrease)
+    else if (m_bIncrease)
     {
         if (m_fRightRatio <= m_fLeftRatio)
         {
@@ -77,34 +78,28 @@ void CHPBar::Priority_Update(_float fTimeDelta)
             m_bIncrease = false;
         }
         else
-            m_fLeftRatio += fTimeDelta * 0.2f;
+           m_fLeftRatio += fTimeDelta * 0.2f;
     }
 
-    
 
     __super::Priority_Update(fTimeDelta);
-
-
 }
 
 
-void CHPBar::Update(_float fTimeDelta)
+void CSteminaBar::Update(_float fTimeDelta)
 {
     __super::Update(fTimeDelta);
 }
 
-void CHPBar::Late_Update(_float fTimeDelta)
+void CSteminaBar::Late_Update(_float fTimeDelta)
 {
     __super::Late_Update(fTimeDelta);
 
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::STATIC_UI, this)))
         return;
-
-
-    
 }
 
-HRESULT CHPBar::Render()
+HRESULT CSteminaBar::Render()
 {
     __super::Begin();
 
@@ -118,30 +113,13 @@ HRESULT CHPBar::Render()
 
     m_pVIBufferCom->Render();
 
-    // 폰트 출력.
-    Render_HP();
-
     __super::End();
 
     return S_OK;
 }
 
-void CHPBar::Render_HP()
-{
-    _float fScreenX = m_RenderMatrix._41 + (g_iWinSizeX >> 1) + 80.f;
-    _float fScreenY = (g_iWinSizeY >> 1) - m_RenderMatrix._42 - 15.f;
 
-    _float2 vPosition = { fScreenX , fScreenY };
-    // Window 좌표계 기준 출력. (0, 0이 좌측 상단)
-
-    wchar_t szBuffer[64] = {};
-    swprintf_s(szBuffer, L"%d / %d", m_iHp, m_iMaxHp);
-
-    m_pGameInstance->Render_Font(TEXT("HUD_TEXT"), szBuffer
-        , vPosition, XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f, {}, 1.5f);
-}
-
-HRESULT CHPBar::Ready_Components()
+HRESULT CSteminaBar::Ready_Components()
 {
     if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxPosTex"),
         TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom), nullptr)))
@@ -151,14 +129,14 @@ HRESULT CHPBar::Ready_Components()
         TEXT("Com_VIBuffer"), reinterpret_cast<CComponent**>(&m_pVIBufferCom), nullptr)))
         return E_FAIL;
 
-    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_HPBar"),
+    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_SteminaBar"),
         TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom), nullptr)))
         return E_FAIL;
 
     return S_OK;
 }
 
-HRESULT CHPBar::Ready_Render_Resources()
+HRESULT CSteminaBar::Ready_Render_Resources()
 {
     if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &m_RenderMatrix)))
         return E_FAIL;
@@ -169,7 +147,7 @@ HRESULT CHPBar::Ready_Render_Resources()
         return E_FAIL;
 
 
-    _float fFillRatio = 1.f - (static_cast<_float>(m_iHp) / static_cast<_float>(m_iMaxHp));
+    _float fFillRatio = 1.f - (static_cast<_float>(m_iStemina) / static_cast<_float>(m_iMaxStemina));
     if (FAILED(m_pShaderCom->Bind_RawValue("g_fFillRatio", static_cast<void*>(&fFillRatio), sizeof(fFillRatio))))
         return E_FAIL;
 
@@ -188,61 +166,61 @@ HRESULT CHPBar::Ready_Render_Resources()
     return S_OK;
 }
 
-HRESULT CHPBar::Ready_Events()
+HRESULT CSteminaBar::Ready_Events()
 {
-#pragma region HP_CHANGE
-    m_pGameInstance->Subscribe(EventType::HP_CHANGE, Get_ID(), [this](void* pData)
+#pragma region STEMINA CHANGE
+    m_pGameInstance->Subscribe(EventType::STEMINA_CHANGE, Get_ID(), [this](void* pData)
         {
-            HPCHANGE_DESC* desc = static_cast<HPCHANGE_DESC*>(pData);
-            if (desc->bIncrease)
-                this->Increase_Hp(desc->iHp, desc->fTime);
+            STEMINA_CHANGE_DESC* desc = static_cast<STEMINA_CHANGE_DESC*>(pData);
+            if(desc->bIncrease)
+                this->Increase_Stemina(desc->iStemina, desc->fTime);
             else
-                this->Decrease_Hp(desc->iHp, desc->fTime);
+                this->Decrease_Stemina(desc->iStemina, desc->fTime);
         });
 
     // Event 목록 관리.
-    m_Events.push_back(EventType::HP_CHANGE);
-
+    m_Events.push_back(EventType::STEMINA_CHANGE);
 #pragma endregion
     return S_OK;
 }
 
-CHPBar* CHPBar::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CSteminaBar* CSteminaBar::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-    CHPBar* pInstance = new CHPBar(pDevice, pContext);
+    CSteminaBar* pInstance = new CSteminaBar(pDevice, pContext);
     if (FAILED(pInstance->Initialize_Prototype()))
     {
-        MSG_BOX(TEXT("Create Failed : CHPBar"));
+        MSG_BOX(TEXT("Create Failed : CSteminaBar"));
         Safe_Release(pInstance);
     }
 
     return pInstance;
 }
 
-CGameObject* CHPBar::Clone(void* pArg)
+CGameObject* CSteminaBar::Clone(void* pArg)
 {
-    CHPBar* pInstance = new CHPBar(*this);
+    CSteminaBar* pInstance = new CSteminaBar(*this);
     if (FAILED(pInstance->Initialize_Clone(pArg)))
     {
-        MSG_BOX(TEXT("Clone Failed : CHPBar"));
+        MSG_BOX(TEXT("Clone Failed : CSteminaBar"));
         Safe_Release(pInstance);
     }
 
     return pInstance;
 }
 
-void CHPBar::Destroy()
+void CSteminaBar::Destroy()
 {
     __super::Destroy();
 
     for (auto& val : m_Events)
         m_pGameInstance->UnSubscribe(val, Get_ID());
+
+    m_Events.clear();
 }
 
-void CHPBar::Free()
+void CSteminaBar::Free()
 {
     __super::Free();
-
     Safe_Release(m_pVIBufferCom);
     Safe_Release(m_pShaderCom);
     

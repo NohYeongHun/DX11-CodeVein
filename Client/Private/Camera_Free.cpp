@@ -53,19 +53,15 @@ void CCamera_Free::Priority_Update(_float fTimeDelta)
 	}
 
 
-	_long		MouseMove = {};
-	//if (m_pGameInstance->Get_DIMouseState(MOUSEKEYSTATE::LB))
 	if (m_pGameInstance->Get_MouseKeyDown(MOUSEKEYSTATE::LB))
 	{
+		_long		MouseMove = {};
 		if (MouseMove = m_pGameInstance->Get_DIMouseMove(MOUSEMOVESTATE::X))
 			m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta * MouseMove * m_fMouseSensor);
 
 		if (MouseMove = m_pGameInstance->Get_DIMouseMove(MOUSEMOVESTATE::Y))
 			m_pTransformCom->Turn(m_pTransformCom->Get_State(STATE::RIGHT), fTimeDelta * MouseMove * m_fMouseSensor);
 	}
-	
-
-	
 
 
 	__super::Update_PipeLines();

@@ -10,6 +10,8 @@ enum class EventType : _uint
 	LOGO_END = 6,
 	OPEN_LEVEL = 7,
 	OPEN_GAMEPAY = 8,
+	HP_CHANGE = 9,
+	STEMINA_CHANGE = 10,
 	EVENT_END
 };
 
@@ -35,6 +37,21 @@ typedef struct tagSkillExecuteDesc
 	_float fSkillCoolTime = {};
 }SKILLEXECUTE_DESC;
 
+
+typedef struct tagHPChangeDesc
+{
+	_uint iHp;
+	_float fTime;
+	_bool bIncrease;
+}HPCHANGE_DESC;
+
+
+typedef struct tagSteminaChangeDesc
+{
+	_uint iStemina;
+	_float fTime;
+	_bool bIncrease;
+}STEMINA_CHANGE_DESC;
 #pragma endregion
 
 #pragma region LOADING
@@ -43,6 +60,8 @@ typedef struct tagLoadingEventDesc
 	_bool isVisibility;
 }LOADINGEVENT_DESC;
 #pragma endregion
+
+
 
 
 

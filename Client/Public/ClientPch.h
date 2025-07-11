@@ -41,6 +41,7 @@
 #include "Skill_Panel.h"
 
 #include "HPBar.h"
+#include "SteminaBar.h"
 #include "StatusPanel.h"
 #include "Loading_BackGround.h"
 #include "Loading_Panel.h"

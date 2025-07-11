@@ -98,29 +98,7 @@ HRESULT CSkill_Slot::Render()
 {
     __super::Begin();
 
-    if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &m_RenderMatrix)))
-        return E_FAIL;
-
-    if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix)))
-        return E_FAIL;
-
-    if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
-        return E_FAIL;
-
-
-    _float fFillRatio = 1.f;
-    if (m_IsCoolTime)                        // 쿨타임이면 0~1로 노말라이즈
-    {
-        if (m_fCoolTime > 0.f)
-            fFillRatio = Clamp(m_fTime / m_fCoolTime, 0.f, 1.f);
-        else
-            fFillRatio = 1.f;                // 방어 코드: 쿨타임 값이 0이면 그냥 다 찬 걸로
-    }
-
-    if (FAILED(m_pShaderCom->Bind_Float("g_fFillRatio", fFillRatio)))
-        return E_FAIL;
-
-    if (FAILED(m_pTextureCom->Bind_Shader_Resource(m_pShaderCom, "g_Texture", m_iTextureIndex)))
+    if (FAILED(Ready_Render_Resources()))
         return E_FAIL;
 
     m_pShaderCom->Begin(2);
@@ -173,6 +151,36 @@ HRESULT CSkill_Slot::Ready_Components(SKILLSLOT_DESC* pDesc)
 
     if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_SkillSlot"),
         TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom), nullptr)))
+        return E_FAIL;
+
+    return S_OK;
+}
+
+HRESULT CSkill_Slot::Ready_Render_Resources()
+{
+    if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &m_RenderMatrix)))
+        return E_FAIL;
+
+    if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix)))
+        return E_FAIL;
+
+    if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
+        return E_FAIL;
+
+
+    _float fFillRatio = 1.f;
+    if (m_IsCoolTime)                        // 쿨타임이면 0~1로 노말라이즈
+    {
+        if (m_fCoolTime > 0.f)
+            fFillRatio = Clamp(m_fTime / m_fCoolTime, 0.f, 1.f);
+        else
+            fFillRatio = 1.f;                // 방어 코드: 쿨타임 값이 0이면 그냥 다 찬 걸로
+    }
+
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fFillRatio", static_cast<void*>(&fFillRatio), sizeof(fFillRatio))))
+        return E_FAIL;
+
+    if (FAILED(m_pTextureCom->Bind_Shader_Resource(m_pShaderCom, "g_Texture", m_iTextureIndex)))
         return E_FAIL;
 
     return S_OK;

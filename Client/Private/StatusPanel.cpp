@@ -7,18 +7,31 @@ CStatusPanel::CStatusPanel(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 
 CStatusPanel::CStatusPanel(const CStatusPanel& Prototype)
     : CUIObject(Prototype)
-    , m_iSkillSlot { Prototype.m_iSkillSlot }
 {
 }
 
-void CStatusPanel::Change_Skill(_uint iSkillSlot, const _wstring& strTextureTag, _uint iTextureIndex)
+void CStatusPanel::Increase_Hp(_uint iHp, _float fTime)
 {
-    m_SkillSlots[iSkillSlot]->Change_Skill(strTextureTag, iTextureIndex);
+    m_pHpBar->Increase_Hp(iHp, fTime);
+}
+
+void CStatusPanel::Decrease_Hp(_uint iHp, _float fTime)
+{
+    m_pHpBar->Decrease_Hp(iHp, fTime);
+}
+
+void CStatusPanel::Increase_Stemina(_uint iStemina, _float fTime)
+{
+    m_pSteminaBar->Increase_Stemina(iStemina, fTime);
+}
+
+void CStatusPanel::Decrease_Stemina(_uint iStemina, _float fTime)
+{
+    m_pSteminaBar->Decrease_Stemina(iStemina, fTime);
 }
 
 HRESULT CStatusPanel::Initialize_Prototype()
 {
-    m_iSkillSlot = 4;
     return S_OK;
 }
 
@@ -32,7 +45,6 @@ HRESULT CStatusPanel::Initialize_Clone(void* pArg)
 
     if (FAILED(Ready_Components()))
         return E_FAIL;
-
 
     if (FAILED(Ready_Childs()))
         return E_FAIL;
@@ -89,7 +101,27 @@ HRESULT CStatusPanel::Ready_Childs()
         return E_FAIL;
 
     AddChild(pUIObject);
-    
+    m_pHpBar = static_cast<CHPBar*>(pUIObject);
+
+    // 정중앙 위치
+    Desc.fX = 0;
+    Desc.fY = -50.f;
+    Desc.fSizeX = 400.f;
+    Desc.fSizeY = 20.f;
+
+    pUIObject = nullptr;
+
+    pUIObject = dynamic_cast<CUIObject*>(
+        m_pGameInstance->Clone_Prototype(
+            PROTOTYPE::GAMEOBJECT
+            , ENUM_CLASS(LEVEL::STATIC)
+            , TEXT("Prototype_GameObject_SteminaBar"), &Desc));
+
+    if (nullptr == pUIObject)
+        return E_FAIL;
+
+    AddChild(pUIObject);
+    m_pSteminaBar = static_cast<CSteminaBar*>(pUIObject);
 
     return S_OK;
 }

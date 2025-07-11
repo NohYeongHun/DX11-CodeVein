@@ -14,7 +14,7 @@ public:
 
 	enum STATUSPANEL : _uint
 	{
-		STATUS_PANEL1 = 0,
+		STATUS_PANEL_BAR = 0,
 		STATUS_PANEL_END = 1
 	};
 

@@ -5,18 +5,18 @@ NS_BEGIN(Client)
 /*
 * HP Bar 객체.
 */
-class CHPBar final : public CUIObject
+class CSteminaBar final : public CUIObject
 {
 public:
 
 private:
-	CHPBar(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	CHPBar(const CHPBar& Prototype);
-	virtual ~CHPBar() = default;
+	CSteminaBar(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	CSteminaBar(const CSteminaBar& Prototype);
+	virtual ~CSteminaBar() = default;
 
 public:
-	void Increase_Hp(_uint iHp, _float fTime);
-	void Decrease_Hp(_uint iHp, _float fTime);
+	void Increase_Stemina(_uint iStemina, _float fTime);
+	void Decrease_Stemina(_uint iStemina, _float fTime);
 
 public:
 	virtual HRESULT Initialize_Prototype();
@@ -27,8 +27,6 @@ public:
 	virtual HRESULT Render();
 
 public:
-	void Render_HP();
-
 
 private:
 	CShader* m_pShaderCom = { nullptr };
@@ -36,12 +34,14 @@ private:
 	CTexture* m_pTextureCom = { nullptr };
 	_uint  m_iTextureIndex = {};
 
-#pragma region Shader용 HP Increase, Decrease 효과
+#pragma region Shader용 Stemina Increase, Decrease 효과
 	_float m_fRightRatio = {};
 	_float m_fLeftRatio = {};
 
-	_uint  m_iHp = {};
-	_uint  m_iMaxHp = {};
+	_float m_fIncreaseTime = {};
+
+	_uint  m_iStemina = {};
+	_uint  m_iMaxStemina = {};
 
 	_bool  m_bIncrease = { false };
 	_bool  m_bDecrease = { false };
@@ -55,7 +55,7 @@ private:
 	HRESULT Ready_Events();
 
 public:
-	static CHPBar* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CSteminaBar* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;
 	virtual void Destroy() override;
 	virtual void Free() override;

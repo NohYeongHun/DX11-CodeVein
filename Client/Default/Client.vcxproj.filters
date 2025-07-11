@@ -183,6 +183,9 @@
     <ClInclude Include="..\Public\Title_BackGround.h">
       <Filter>02. GameObject\UI\Logo\Title</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\SteminaBar.h">
+      <Filter>02. GameObject\UI\Player\Status</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -296,6 +299,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Title_BackGround.cpp">
       <Filter>02. GameObject\UI\Logo\Title</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\SteminaBar.cpp">
+      <Filter>02. GameObject\UI\Player\Status</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

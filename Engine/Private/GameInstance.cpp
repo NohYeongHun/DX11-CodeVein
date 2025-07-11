@@ -69,6 +69,10 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11De
 	if (nullptr == m_pInput_Device)
 		return E_FAIL;
 
+	// Light Manager
+	m_pLight_Manager = CLight_Manager::Create();
+	if (nullptr == m_pLight_Manager)
+		return E_FAIL;
 
 	return S_OK;
 }
@@ -429,7 +433,20 @@ _bool CGameInstance::Get_MouseKeyUp(MOUSEKEYSTATE eMouse)
 {
 	return m_pInput_Device->Get_MouseKeyUp(eMouse);
 }
+
 #pragma endregion
+
+#pragma region LIGHT_MANAGER
+const LIGHT_DESC* CGameInstance::Get_LightDesc(_uint iIndex) const
+{
+	return m_pLight_Manager->Get_LightDesc(iIndex);
+}
+HRESULT CGameInstance::Add_Light(const LIGHT_DESC& LightDesc)
+{
+	return m_pLight_Manager->Add_Light(LightDesc);
+}
+#pragma endregion
+
 
 
 //
@@ -462,6 +479,7 @@ void CGameInstance::Release_Engine()
 	Safe_Release(m_pFont_Manager);
 	Safe_Release(m_pEvent_Manager);
 	Safe_Release(m_pPipleLine);
+	Safe_Release(m_pLight_Manager);
 
 	Safe_Release(m_pInput_Device);
 	Safe_Release(m_pGraphic_Device);

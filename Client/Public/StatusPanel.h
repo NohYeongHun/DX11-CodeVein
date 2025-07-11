@@ -14,7 +14,15 @@ private:
 	virtual ~CStatusPanel() = default;
 
 public:
-	void Change_Skill(_uint iSkillSlot, const _wstring& strTextureTag, _uint iTextureIndex);
+#pragma region HUD에 제공할 함수.
+	void Increase_Hp(_uint iHp, _float fTime);
+	void Decrease_Hp(_uint iHp, _float fTime);
+
+	void Increase_Stemina(_uint iStemina, _float fTime);
+	void Decrease_Stemina(_uint iStemina, _float fTime);
+#pragma endregion
+
+	
 
 public:
 	virtual HRESULT Initialize_Prototype();
@@ -27,8 +35,8 @@ public:
 public:
 
 private:
-	_uint m_iSkillSlot = {};
-	vector<class CSkill_Slot*> m_SkillSlots = {};
+	class CHPBar* m_pHpBar = { nullptr };
+	class CSteminaBar* m_pSteminaBar = { nullptr };
 
 private:
 	HRESULT Ready_Components();
