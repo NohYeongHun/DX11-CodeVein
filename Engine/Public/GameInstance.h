@@ -121,11 +121,11 @@ public:
 
 #pragma region INPUT_DEVICE
 	public:
-		_byte	Get_DIKeyState(_ubyte byKeyID);
-		_byte	Get_DIMouseState(MOUSEKEYSTATE eMouse);
-		_long	Get_DIMouseMove(MOUSEMOVESTATE eMouseState);
+		_byte Get_DIKeyState(_ubyte byKeyID);
+		_byte Get_DIMouseState(MOUSEKEYSTATE eMouse);
+		_long Get_DIMouseMove(MOUSEMOVESTATE eMouseState);
 
-		_bool Get_KeyDown(_ubyte byKeyID);
+		_bool Get_KeyPress(_ubyte byKeyID);
 		_bool Get_KeyUp(_ubyte byKeyID);
 		_bool Get_MouseKeyDown(MOUSEKEYSTATE eMouse);
 		_bool Get_MouseKeyUp(MOUSEKEYSTATE eMouse);

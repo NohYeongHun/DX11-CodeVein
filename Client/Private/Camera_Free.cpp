@@ -31,23 +31,25 @@ HRESULT CCamera_Free::Initialize_Clone(void* pArg)
 // 카메라에 대한 이동 전환은 Priority_Update에서 완료 후 Pipe Line에 행렬이 전달됨.
 void CCamera_Free::Priority_Update(_float fTimeDelta)
 {
+	return;
+
 	__super::Priority_Update(fTimeDelta);
 
-	if (m_pGameInstance->Get_KeyDown(DIK_W))
+	if (m_pGameInstance->Get_KeyPress(DIK_W))
 	{
 		m_pTransformCom->Go_Straight(fTimeDelta);
 	}
 
-	if (m_pGameInstance->Get_KeyDown(DIK_S))
+	if (m_pGameInstance->Get_KeyPress(DIK_S))
 	{
 		m_pTransformCom->Go_Backward(fTimeDelta);
 	}
 
-	if (m_pGameInstance->Get_KeyDown(DIK_A))
+	if (m_pGameInstance->Get_KeyPress(DIK_A))
 	{
 		m_pTransformCom->Go_Left(fTimeDelta);
 	}
-	if (m_pGameInstance->Get_KeyDown(DIK_D))
+	if (m_pGameInstance->Get_KeyPress(DIK_D))
 	{
 		m_pTransformCom->Go_Right(fTimeDelta);
 	}

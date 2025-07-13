@@ -16,17 +16,40 @@ CHPBar::CHPBar(const CHPBar& Prototype)
 */
 void CHPBar::Increase_Hp(_uint iHp, _float fTime)
 {
-    m_fLeftRatio = static_cast<_float>(m_iHp) / static_cast<_float>(m_iMaxHp);
-    m_iHp = min(m_iHp + iHp, m_iMaxHp);
-    m_fRightRatio = static_cast<_float>(m_iHp) / static_cast<_float>(m_iMaxHp);
+    if (m_bDecrease)
+    {
+        m_fLeftRatio = m_fRightRatio;
+        m_iHp = m_iHp < iHp ? 0 : m_iHp + iHp;
+        m_fRightRatio = static_cast<_float>(m_iHp) / static_cast<_float>(m_iMaxHp);
+        m_bDecrease = false;
+    }
+    else
+    {
+        m_fLeftRatio = static_cast<_float>(m_iHp) / static_cast<_float>(m_iMaxHp);
+        m_iHp = min(m_iHp + iHp, m_iMaxHp);
+        m_fRightRatio = static_cast<_float>(m_iHp) / static_cast<_float>(m_iMaxHp);
+    }
+    
     m_bIncrease = true;
 }
 
 void CHPBar::Decrease_Hp(_uint iHp, _float fTime)
 {
-    m_fRightRatio = static_cast<_float>(m_iHp) / static_cast<_float>(m_iMaxHp);
-    m_iHp = max(m_iHp - iHp, 0);
-    m_fLeftRatio = static_cast<_float>(m_iHp) / static_cast<_float>(m_iMaxHp);
+    if (m_bIncrease)
+    {
+        m_fRightRatio = m_fLeftRatio;
+        m_iHp = m_iHp < iHp ? 0 : m_iHp - iHp;
+        m_fLeftRatio = static_cast<_float>(m_iHp) / static_cast<_float>(m_iMaxHp);
+        m_bIncrease = false;
+    }
+    else
+    {
+        m_fRightRatio = static_cast<_float>(m_iHp) / static_cast<_float>(m_iMaxHp);
+        m_iHp = max(m_iHp - iHp, 0);
+        m_fLeftRatio = static_cast<_float>(m_iHp) / static_cast<_float>(m_iMaxHp);
+    }
+
+    
     m_bDecrease = true;
 }
 

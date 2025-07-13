@@ -173,6 +173,12 @@
     <ClInclude Include="..\Public\imstb_rectpack.h" />
     <ClInclude Include="..\Public\imstb_textedit.h" />
     <ClInclude Include="..\Public\imstb_truetype.h" />
+    <ClInclude Include="..\Public\Inventory.h" />
+    <ClInclude Include="..\Public\InventoryItem_Icon.h" />
+    <ClInclude Include="..\Public\InventoryItem_Slot.h" />
+    <ClInclude Include="..\Public\InventorySkill_Icon.h" />
+    <ClInclude Include="..\Public\InventorySkill_Slot.h" />
+    <ClInclude Include="..\Public\Inventory_Panel.h" />
     <ClInclude Include="..\Public\Level_GamePlay.h" />
     <ClInclude Include="..\Public\Level_Loading.h" />
     <ClInclude Include="..\Public\Level_Logo.h" />
@@ -217,6 +223,12 @@
     <ClCompile Include="..\Private\Imgui_Manager.cpp" />
     <ClCompile Include="..\Private\imgui_tables.cpp" />
     <ClCompile Include="..\Private\imgui_widgets.cpp" />
+    <ClCompile Include="..\Private\Inventory.cpp" />
+    <ClCompile Include="..\Private\InventoryItem_Icon.cpp" />
+    <ClCompile Include="..\Private\InventoryItem_Slot.cpp" />
+    <ClCompile Include="..\Private\InventorySkill_Icon.cpp" />
+    <ClCompile Include="..\Private\InventorySkill_Slot.cpp" />
+    <ClCompile Include="..\Private\Inventory_Panel.cpp" />
     <ClCompile Include="..\Private\Level_GamePlay.cpp" />
     <ClCompile Include="..\Private\Level_Loading.cpp" />
     <ClCompile Include="..\Private\Level_Logo.cpp" />

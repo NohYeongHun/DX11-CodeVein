@@ -23,30 +23,44 @@
 #pragma endregion
 
 
-
-
 #pragma region COMPONENT
 
 #pragma endregion
 
 
 #pragma region GAMEOBJECT
+
 #include "BackGround.h"
+/* =========================================== Title Object ===================================== */
 #include "Title_BackGround.h"
 #include "TitleText.h"
 #include "Title.h"
+
+/* =========================================== HUD ===================================== */
 #include "HUD.h"
 #include "Skill_Icon.h"
 #include "Skill_Slot.h"
 #include "Skill_Panel.h"
-
 #include "HPBar.h"
 #include "SteminaBar.h"
 #include "StatusPanel.h"
+
+/* ======================================= Inventory =================================== */
+#include "Inventory.h"
+#include "Inventory_Panel.h"
+#include "InventorySkill_Icon.h"
+#include "InventorySkill_Slot.h"
+#include "InventoryItem_Icon.h"
+#include "InventoryItem_Slot.h"
+
+
+
+/* ======================================= Loading Object =================================== */
 #include "Loading_BackGround.h"
 #include "Loading_Panel.h"
 #include "Loading_Slot.h"
 
+/* ======================================= Terrain Object =================================== */
 #include "Terrain.h"
 #include "Camera_Free.h"
 

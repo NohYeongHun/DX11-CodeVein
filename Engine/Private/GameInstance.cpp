@@ -113,6 +113,7 @@ HRESULT CGameInstance::Clear_Resources(_uint iClearLevelID)
 	m_pPrototype_Manager->Clear(iClearLevelID);
 
 	m_pObject_Manager->Clear(iClearLevelID);
+	
 
 	return S_OK;
 }
@@ -418,9 +419,9 @@ _long CGameInstance::Get_DIMouseMove(MOUSEMOVESTATE eMouseState)
 {
 	return m_pInput_Device->Get_DIMouseMove(eMouseState);
 }
-_bool CGameInstance::Get_KeyDown(_ubyte byKeyID)
+_bool CGameInstance::Get_KeyPress(_ubyte byKeyID)
 {
-	return m_pInput_Device->Get_KeyDown(byKeyID);
+	return m_pInput_Device->Get_KeyPress(byKeyID);
 }
 _bool CGameInstance::Get_KeyUp(_ubyte byKeyID)
 {

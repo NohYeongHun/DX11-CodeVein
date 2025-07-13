@@ -3,7 +3,7 @@ enum class EventType : _uint
 {
 	NONE = 0,
 	HUD_DISPLAY = 1,
-	SKILL_CHANGE = 2,
+	HUD_SKILL_CHANGE = 2,
 	SKILL_EXECUTE = 3,
 	LOAIDNG_DISPLAY = 4,
 	LOADING_END = 5,
@@ -12,6 +12,8 @@ enum class EventType : _uint
 	OPEN_GAMEPAY = 8,
 	HP_CHANGE = 9,
 	STEMINA_CHANGE = 10,
+	INVENTORY_DISPLAY = 11,
+	INVENTORY_SKILL_CHANGE = 12,
 	EVENT_END
 };
 
@@ -21,13 +23,18 @@ typedef struct tagHUDEventDesc
 	_bool isVisibility;
 }HUDEVENT_DESC;
 
-typedef struct tagSkillChangeDesc
+typedef struct tagInventoryDisplayDesc
+{
+	_bool isVisibility;
+}INVENTORY_DISPLAY_DESC;
+
+typedef struct tagHUDSkillChangeDesc
 {
 	_uint iSkillPanelIdx = {};
 	_uint iSlotIdx = {};
 	const _tchar* pText = {};
 	_uint iTextureIdx = {};
-}SKILLCHANGE_DESC;
+}HUD_SKILLCHANGE_DESC;
 
 
 typedef struct tagSkillExecuteDesc
@@ -61,6 +68,16 @@ typedef struct tagLoadingEventDesc
 }LOADINGEVENT_DESC;
 #pragma endregion
 
+
+#pragma region INVENTORY
+typedef struct tagInventorySkillChangeDesc
+{
+	_uint iSkillPanelIdx = {};
+	_uint iSlotIdx = {};
+	const _tchar* pText = {};
+	_uint iTextureIdx = {};
+}INVENTORY_SKILLCHANGE_DESC;
+#pragma endregion
 
 
 

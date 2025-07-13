@@ -64,6 +64,15 @@
     <Filter Include="02. GameObject\UI\Logo\Title">
       <UniqueIdentifier>{8ede5bb7-14bc-4890-8cf9-17349b2c72b3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. GameObject\UI\Player\Inventory">
+      <UniqueIdentifier>{fd30e691-f5fe-43fe-a881-e456047c23fb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\UI\Player\Inventory\Skill">
+      <UniqueIdentifier>{0697f553-cf17-4fa5-89c7-f59b91a225dc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\UI\Player\Inventory\Item">
+      <UniqueIdentifier>{1555930f-c90d-4faa-8db4-9b55b29ddc92}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -186,6 +195,24 @@
     <ClInclude Include="..\Public\SteminaBar.h">
       <Filter>02. GameObject\UI\Player\Status</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Inventory.h">
+      <Filter>02. GameObject\UI\Player\Inventory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Inventory_Panel.h">
+      <Filter>02. GameObject\UI\Player\Inventory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\InventorySkill_Icon.h">
+      <Filter>02. GameObject\UI\Player\Inventory\Skill</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\InventorySkill_Slot.h">
+      <Filter>02. GameObject\UI\Player\Inventory\Skill</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\InventoryItem_Icon.h">
+      <Filter>02. GameObject\UI\Player\Inventory\Item</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\InventoryItem_Slot.h">
+      <Filter>02. GameObject\UI\Player\Inventory\Item</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -302,6 +329,24 @@
     </ClCompile>
     <ClCompile Include="..\Private\SteminaBar.cpp">
       <Filter>02. GameObject\UI\Player\Status</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Inventory.cpp">
+      <Filter>02. GameObject\UI\Player\Inventory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Inventory_Panel.cpp">
+      <Filter>02. GameObject\UI\Player\Inventory</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\InventorySkill_Icon.cpp">
+      <Filter>02. GameObject\UI\Player\Inventory\Skill</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\InventorySkill_Slot.cpp">
+      <Filter>02. GameObject\UI\Player\Inventory\Skill</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\InventoryItem_Icon.cpp">
+      <Filter>02. GameObject\UI\Player\Inventory\Item</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\InventoryItem_Slot.cpp">
+      <Filter>02. GameObject\UI\Player\Inventory\Item</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

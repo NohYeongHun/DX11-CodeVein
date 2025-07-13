@@ -32,22 +32,15 @@ public:
 
 
 	// 이전 프레임에 키가 눌려있고 현재 프레임에도 누를 경우.
-	_bool Get_KeyDown(_ubyte byKeyID)
-	{
-		_bool IsCurrent = m_byKeyState[byKeyID] & 0x80;
-		_bool IsPrev = m_byPrevKeyState[byKeyID] & 0x80;
+	_bool Get_KeyPress(_ubyte byKeyID);
 
-		return IsCurrent && IsPrev;
-	}
+	// 이전 프레임에 키가 안눌려있고 현재 프레임에 누를 경우.
+	_bool Get_KeyDown(_ubyte byKeyID);
+
 
 	// 이전 프레임에 키가 눌려져 있지 않고 현재 프레임에만 누른 경우
-	_bool Get_KeyUp(_ubyte byKeyID)
-	{
-		_uint IsCurrent = m_byKeyState[byKeyID] & 0x80;
-		_uint IsPrev = m_byPrevKeyState[byKeyID] & 0x80;
+	_bool Get_KeyUp(_ubyte byKeyID);
 
-		return !IsCurrent && IsPrev;
-	}
 
 	_bool Get_MouseKeyDown(MOUSEKEYSTATE eMouse)
 	{
