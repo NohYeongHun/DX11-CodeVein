@@ -71,6 +71,7 @@ void CUIObject::Update(_float fTimeDelta)
 		child->Update(fTimeDelta);
 }
 
+// 자식이 나중에 출력되야 하므로 나먼저 Renderer에 넣어준다.
 void CUIObject::Late_Update(_float fTimeDelta)
 {
 	for (auto& pChild : m_Children)
@@ -165,6 +166,7 @@ void CUIObject::Update_Transform()
 HRESULT CUIObject::Begin()
 {
 	_matrix matScale{}, matWorld{};
+
 	matScale = XMMatrixScaling(m_fSizeX, m_fSizeY, 1.f);
 	matWorld = matScale * XMLoadFloat4x4(&m_RenderMatrix);
 

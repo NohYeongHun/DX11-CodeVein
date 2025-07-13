@@ -134,7 +134,7 @@ HRESULT CLoading_Panel::Ready_Childs(LOADING_PANEL_DESC* pDesc)
         pUIObject = dynamic_cast<CUIObject*>(
             m_pGameInstance->Clone_Prototype(
                 PROTOTYPE::GAMEOBJECT
-                , ENUM_CLASS(LEVEL::STATIC)
+                , ENUM_CLASS(LEVEL::LOADING)
                 , TEXT("Prototype_GameObject_Loading_Slot"), &Desc));
 
         if (nullptr == pUIObject)

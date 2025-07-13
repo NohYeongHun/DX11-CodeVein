@@ -32,8 +32,6 @@ HRESULT CTitleText::Initialize_Clone(void* pArg)
     if (FAILED(Ready_Components()))
         return E_FAIL;
 
-    //m_fChangeTime = m_pGameInstance->Get_TimeDelta(TEXT("Timer_60"));
-
     return S_OK;
 }
 
@@ -51,33 +49,20 @@ void CTitleText::Late_Update(_float fTimeDelta)
 {
     __super::Late_Update(fTimeDelta);
 
-    if (m_fChangeTime <= 5.f)
-        m_fChangeTime += fTimeDelta;
-    else
-        m_fChangeTime = 0.f;
-
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::UI, this)))
         return;
+
+    Time_Calc(fTimeDelta);
 }
 
 HRESULT CTitleText::Render()
 {
     __super::Begin();
 
-    /*__super::Begin_Blend();*/
-
-    if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &m_RenderMatrix)))
+    if (FAILED(Ready_Render_Resource()))
         return E_FAIL;
 
-    if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix)))
-        return E_FAIL;
-    if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
-        return E_FAIL;
-
-    if (FAILED(m_pTextureCom->Bind_Shader_Resource(m_pShaderCom, "g_Texture", m_iTextureIndex)))
-        return E_FAIL;
-
-    m_pShaderCom->Begin(0);
+    m_pShaderCom->Begin(m_iPassIdx);
 
     m_pVIBufferCom->Bind_Resources();
 
@@ -85,9 +70,23 @@ HRESULT CTitleText::Render()
 
     __super::End();
 
-    /*__super::Blend_End();*/
-
     return S_OK;
+}
+
+void CTitleText::Start_FadeOut()
+{
+    m_IsFadeOut = true;
+    m_fFadeTime = 0.f;
+    m_iPassIdx = 3; // FadeOut
+}
+
+void CTitleText::Time_Calc(_float fTimeDelta)
+{
+    if (m_IsFadeOut)
+    {
+        if (m_fFadeTime < 1.f)
+            m_fFadeTime += fTimeDelta;
+    }
 }
 
 HRESULT CTitleText::Ready_Components()
@@ -102,6 +101,30 @@ HRESULT CTitleText::Ready_Components()
 
     if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::LOGO), TEXT("Prototype_Component_Texture_Title_Text"),
         TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom), nullptr)))
+        return E_FAIL;
+
+    return S_OK;
+}
+
+HRESULT CTitleText::Ready_Render_Resource()
+{
+    if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &m_RenderMatrix)))
+        return E_FAIL;
+
+    if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix)))
+        return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
+        return E_FAIL;
+
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fAlpha", static_cast<void*>(&m_fAlpha), sizeof(_float))))
+        return E_FAIL;
+
+    if (FAILED(m_pTextureCom->Bind_Shader_Resource(m_pShaderCom, "g_Texture", m_iTextureIndex)))
+        return E_FAIL;
+
+    _float fFade = Clamp(m_fFadeTime / 1.f, 0.f, 1.f);
+
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fFade", static_cast<void*>(&fFade), sizeof(_float))))
         return E_FAIL;
 
     return S_OK;

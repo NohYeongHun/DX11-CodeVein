@@ -2,7 +2,7 @@
 
 CHUD::CHUD(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CUIObject(pDevice, pContext)
-    , m_IsVisibility(true)
+    , m_IsVisibility(false)
 {
 }
 
@@ -60,6 +60,9 @@ HRESULT CHUD::Initialize_Clone(void* pArg)
     if (FAILED(Ready_Events()))
         return E_FAIL;
 
+    if (FAILED(Ready_Skills()))
+        return E_FAIL;
+
 
     return S_OK;
 }
@@ -76,40 +79,40 @@ void CHUD::Update(_float fTimeDelta)
     if (!m_IsVisibility)
         return;
 
-    SKILLCHANGE_DESC Desc{};
-    Desc.iSkillPanelIdx = SKILL_PANEL1;
+    HUD_SKILLCHANGE_DESC Desc{};
+    Desc.iSkillPanelIdx = SKILL_PANEL_TOP;
     Desc.pText = TEXT("Action_SkillIcon");
     
     if (m_pGameInstance->Get_KeyUp(DIK_1))
     {
         Desc.iSlotIdx = 0;
         Desc.iTextureIdx = 0;
-        m_pGameInstance->Publish(EventType::SKILL_CHANGE, & Desc);
+        m_pGameInstance->Publish(EventType::HUD_SKILL_CHANGE, & Desc);
     }
     if (m_pGameInstance->Get_KeyUp(DIK_2))
     {
         Desc.iSlotIdx = 1;
         Desc.iTextureIdx = 1;
-        m_pGameInstance->Publish(EventType::SKILL_CHANGE, &Desc);
+        m_pGameInstance->Publish(EventType::HUD_SKILL_CHANGE, &Desc);
     }
     if (m_pGameInstance->Get_KeyUp(DIK_3))
     {
         Desc.iSlotIdx = 2;
         Desc.iTextureIdx = 2;
-        m_pGameInstance->Publish(EventType::SKILL_CHANGE, &Desc);
+        m_pGameInstance->Publish(EventType::HUD_SKILL_CHANGE, &Desc);
     }
     if (m_pGameInstance->Get_KeyUp(DIK_4))
     {
         Desc.iSlotIdx = 3;
         Desc.iTextureIdx = 3;
-        m_pGameInstance->Publish(EventType::SKILL_CHANGE, &Desc);
+        m_pGameInstance->Publish(EventType::HUD_SKILL_CHANGE, &Desc);
     }
 
     // 마우스 왼쪽 클릭 시 쿨타임 돌게하기.
     if (m_pGameInstance->Get_MouseKeyUp(MOUSEKEYSTATE::LB))
     {
         SKILLEXECUTE_DESC Desc{};
-        Desc.iSkillPanelIdx = SKILL_PANEL1;
+        Desc.iSkillPanelIdx = SKILL_PANEL_TOP;
         Desc.iSlotIdx = 1;
         Desc.fSkillCoolTime = 3.f;
         m_pGameInstance->Publish(EventType::SKILL_EXECUTE, &Desc);
@@ -199,7 +202,7 @@ HRESULT CHUD::Ready_SkillPanel()
         return E_FAIL;
 
     AddChild(pUIObject);
-    m_SkillPanels[SKILL_PANEL1] = static_cast<CSkill_Panel*>(pUIObject);
+    m_SkillPanels[SKILL_PANEL_TOP] = static_cast<CSkill_Panel*>(pUIObject);
 
     // Skill Panel2 추가
     pUIObject = nullptr;
@@ -220,7 +223,7 @@ HRESULT CHUD::Ready_SkillPanel()
         return E_FAIL;
 
     AddChild(pUIObject);
-    m_SkillPanels[SKILL_PANEL2] = static_cast<CSkill_Panel*>(pUIObject);
+    m_SkillPanels[SKILL_PANEL_BOTTOM] = static_cast<CSkill_Panel*>(pUIObject);
 
     return S_OK;
 }
@@ -271,9 +274,9 @@ HRESULT CHUD::Ready_Events()
 
 #pragma region SKILL_CHANGE
    
-    m_pGameInstance->Subscribe(EventType::SKILL_CHANGE, Get_ID(), [this](void* pData)
+    m_pGameInstance->Subscribe(EventType::HUD_SKILL_CHANGE, Get_ID(), [this](void* pData)
         {
-            SKILLCHANGE_DESC* desc = static_cast<SKILLCHANGE_DESC*>(pData);
+            HUD_SKILLCHANGE_DESC* desc = static_cast<HUD_SKILLCHANGE_DESC*>(pData);
             this->Change_Skill(
                 desc->iSkillPanelIdx,
                 desc->iSlotIdx
@@ -282,7 +285,7 @@ HRESULT CHUD::Ready_Events()
         });
 
     // Event 목록 관리.
-    m_Events.push_back(EventType::SKILL_CHANGE);
+    m_Events.push_back(EventType::HUD_SKILL_CHANGE);
 
 #pragma endregion
 
@@ -301,6 +304,27 @@ HRESULT CHUD::Ready_Events()
 #pragma endregion
 
 
+
+    return S_OK;
+}
+
+HRESULT CHUD::Ready_Skills()
+{
+    HUD_SKILLCHANGE_DESC Desc{};
+    Desc.iSkillPanelIdx = SKILL_PANEL_TOP;
+    Desc.pText = TEXT("Action_SkillIcon");
+
+    // 우측 위
+    //Desc.iSlotIdx = 0;
+    //Desc.iTextureIdx = 0;
+    //m_pGameInstance->Publish(EventType::HUD_SKILL_CHANGE, &Desc);
+
+    //// 좌측 
+    //Desc.iSlotIdx = 1;
+    //Desc.iTextureIdx = 1;
+    //m_pGameInstance->Publish(EventType::HUD_SKILL_CHANGE, &Desc);
+
+  
 
     return S_OK;
 }

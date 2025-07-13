@@ -7,8 +7,8 @@ class CHUD final : public CUIObject
 public:
 	enum SKILLPANEL : _uint
 	{
-		SKILL_PANEL1 = 0,
-		SKILL_PANEL2 = 1,
+		SKILL_PANEL_TOP = 0,
+		SKILL_PANEL_BOTTOM = 1,
 		SKILL_PANEL_END = 2
 	};
 
@@ -19,8 +19,8 @@ public:
 	};
 
 private:
-	CHUD(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	CHUD(const CHUD& Prototype);
+	explicit CHUD(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	explicit CHUD(const CHUD& Prototype);
 	virtual ~CHUD() = default;
 
 public:
@@ -46,6 +46,7 @@ private:
 	HRESULT Ready_SkillPanel();
 	HRESULT Ready_StatusPanel();
 	HRESULT Ready_Events();
+	HRESULT Ready_Skills(); // 기본 스킬 설정.
 
 
 private:

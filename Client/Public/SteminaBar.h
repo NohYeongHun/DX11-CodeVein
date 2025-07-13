@@ -34,7 +34,9 @@ private:
 	CTexture* m_pTextureCom = { nullptr };
 	_uint  m_iTextureIndex = {};
 
+	_uint  m_iAddStemina = {};
 #pragma region Shader용 Stemina Increase, Decrease 효과
+
 	_float m_fRightRatio = {};
 	_float m_fLeftRatio = {};
 
@@ -53,6 +55,8 @@ private:
 	HRESULT Ready_Components();
 	HRESULT Ready_Render_Resources();
 	HRESULT Ready_Events();
+
+	void Ratio_Calc(_float fTimeDelta);
 
 public:
 	static CSteminaBar* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

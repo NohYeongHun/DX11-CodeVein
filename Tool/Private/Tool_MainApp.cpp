@@ -97,6 +97,13 @@ HRESULT CTool_MainApp::Ready_Fonts()
 			, TEXT("../../Resources/Font/CodeVein.spritefont"))))
 		return E_FAIL;
 
+
+	/*if (FAILED(m_pGameInstance
+		->Load_Font(
+			TEXT("HUD_TEXT")
+			, TEXT("../../Resources/Font/NEXONLv1Gothic.spritefont"))))
+		return E_FAIL;*/
+
 	return S_OK;
 }
 

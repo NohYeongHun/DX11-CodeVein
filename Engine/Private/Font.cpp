@@ -16,8 +16,6 @@ HRESULT CFont::Initialize_Clone(const _tchar* pFontFilePath)
     m_pFont = new SpriteFont(m_pDevice, pFontFilePath);
     m_pBatch = new SpriteBatch(m_pContext);
 
-    
-
     return S_OK;
 }
 

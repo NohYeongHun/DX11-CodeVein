@@ -42,7 +42,9 @@ HRESULT CLevel_GamePlay::Initialize_Clone()
 
 void CLevel_GamePlay::Update(_float fTimeDelta)
 {
-	
+	if (m_pGameInstance->Get_KeyUp(DIK_I))
+		m_pGameInstance->Publish<CInventory>(EventType::INVENTORY_DISPLAY, nullptr);
+
 }
 
 HRESULT CLevel_GamePlay::Render()

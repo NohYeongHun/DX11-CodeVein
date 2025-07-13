@@ -23,16 +23,32 @@ public:
 	virtual void Late_Update(_float fTimeDelta);
 	virtual HRESULT Render();
 
+
+#pragma region FadeOut
+public:
+	void Start_FadeOut();
+	void Time_Calc(_float fTimeDelta);
+#pragma endregion
+
+
+
+
 private:
 	CShader* m_pShaderCom = { nullptr };
 	CVIBuffer_Rect* m_pVIBufferCom = { nullptr };
 	CTexture* m_pTextureCom = { nullptr };
-	_float m_fChangeTime = {};
 	_uint m_iTextureIndex = {};
-	
+
+	_uint m_iPassIdx = {};
+	_float m_fAlpha = {};
+	_float m_fTime = {};
+
+	_float m_fFadeTime = {};
+	_bool m_IsFadeOut = { false };
 
 private:
 	HRESULT Ready_Components();
+	HRESULT Ready_Render_Resource();
 
 public:
 	static CTitleText* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

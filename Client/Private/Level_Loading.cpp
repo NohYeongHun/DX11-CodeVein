@@ -10,7 +10,7 @@ HRESULT CLevel_Loading::Initialize_Clone(LEVEL eNextLevelID)
 {
 	m_eNextLevelID = eNextLevelID;	 
 
-	if (FAILED(Ready_LoadingScene()))
+	if (FAILED(Ready_LoadingScene(TEXT("Loading_BackGround"))))
 		return E_FAIL;
 
 	/* 현재 레벨을 구성해주기 위한 객체들을 생성한다. */
@@ -33,11 +33,14 @@ HRESULT CLevel_Loading::Initialize_Clone(LEVEL eNextLevelID)
 */
 void CLevel_Loading::Update(_float fTimeDelta)
 {
-	if (true == m_pLoader->isFinished() && 
-		GetKeyState(VK_SPACE) & 0x8000)
+	/*if (true == m_pLoader->isFinished() && 
+		GetKeyState(VK_SPACE) & 0x8000)*/
+
+	if (!m_IsFinished == m_pLoader->isFinished())
 	{
 		// Fade Out 시작. => 나중에는 로더가 끝나는 시점? isFinshed 받으면?
 		m_pGameInstance->Publish<CLoading_BackGround>(EventType::LOADING_END, nullptr);
+		m_IsFinished = true;
 	}
 }
 
@@ -72,17 +75,46 @@ HRESULT CLevel_Loading::Ready_LoadingBackGround(const _wstring& strLayerTag)
 	return S_OK;
 }
 
-HRESULT CLevel_Loading::Ready_LoadingScene()
+HRESULT CLevel_Loading::Ready_LoadingScene(const _wstring& strLayerTag)
 {
-	LOADINGEVENT_DESC Desc{};
-	Desc.isVisibility = true;
-	m_pGameInstance->Publish<LOADINGEVENT_DESC>(EventType::LOAIDNG_DISPLAY, & Desc);
 
+	// 1. Texture
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LOADING)
+		, TEXT("Prototype_Component_Texture_Loading_BackGround")
+		, CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Loading/Loading_BackGround%d.png"), 1))))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LOADING)
+		, TEXT("Prototype_Component_Texture_Loading_Slot")
+		, CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Loading/Loading_Slot%d.png"), 1))))
+		return E_FAIL;
+
+
+
+	// 2. 객체
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LOADING), TEXT("Prototype_GameObject_Loading_BackGround"),
+		CLoading_BackGround::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LOADING), TEXT("Prototype_GameObject_Loading_Panel"),
+		CLoading_Panel::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LOADING), TEXT("Prototype_GameObject_Loading_Slot"),
+		CLoading_Slot::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	// 3. Clone
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::LOADING), strLayerTag,
+		ENUM_CLASS(LEVEL::LOADING), TEXT("Prototype_GameObject_Loading_BackGround"))))
+		return E_FAIL;
+	
 	return S_OK;
 }
 
 HRESULT CLevel_Loading::Ready_GameObjects()
 {
+
 	return S_OK;
 }
 
@@ -126,12 +158,6 @@ CLevel_Loading* CLevel_Loading::Create(ID3D11Device* pDevice, ID3D11DeviceContex
 void CLevel_Loading::Free()
 {
 	__super::Free();
-
-
-	// 2. Loading Display를 종료한다. => Level Loading이 끝나면.
-	LOADINGEVENT_DESC Desc{};
-	Desc.isVisibility = false;
-	m_pGameInstance->Publish<LOADINGEVENT_DESC>(EventType::LOAIDNG_DISPLAY,  & Desc);
 	
 	// 3. 지울 때 제거
 	for (auto& Event : m_Events)

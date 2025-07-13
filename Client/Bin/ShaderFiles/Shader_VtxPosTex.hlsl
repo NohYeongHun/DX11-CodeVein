@@ -185,7 +185,7 @@ PS_OUT PS_MAIN6(PS_IN In)
     bool bIsFill; 
     
     if (g_bIncrease)
-        bIsFill = uv.x > g_fLeftRatio;
+        bIsFill = uv.x > g_fLeftRatio; // uv.x가 g_fLeftRatio보다 크다면?
     else
         bIsFill = uv.x > (1.0 - g_fFillRatio); // 이거 때문임. => 미리 증가해버려서 안보임.
        
@@ -197,10 +197,9 @@ PS_OUT PS_MAIN6(PS_IN In)
         if (bIsFillGray)
         {
             Out.vColor = lerp(baseColor, fillerColor, 0.8f); // 부드럽게 섞기  
-            
         }
         else
-            Out.vColor = fillerBlack;
+            Out.vColor = fillerBlack; // 검정 설정.
     }
     else
     {

@@ -27,7 +27,6 @@ void CLevel_Logo::Update(_float fTimeDelta)
 		m_IsLogoEnd = true;
 		m_pGameInstance->Publish<CTitle>(EventType::LOGO_END, nullptr);
 		return;
-		
 	}
 
 	return;
@@ -44,8 +43,6 @@ void CLevel_Logo::Open_Level()
 {
 	if (FAILED(m_pGameInstance->Open_Level(static_cast<_uint>(LEVEL::LOADING), CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL::GAMEPLAY))))
 		return;
-
-
 }
 
 HRESULT CLevel_Logo::Ready_Layer_Title(const _wstring& strLayerTag)

@@ -6,6 +6,30 @@ CInput_Device::CInput_Device(void)
 	ZeroMemory(m_byKeyState, sizeof(m_byKeyState));
 }
 
+_bool CInput_Device::Get_KeyPress(_ubyte byKeyID)
+{
+	_bool IsCurrent = m_byKeyState[byKeyID] & 0x80;
+	_bool IsPrev = m_byPrevKeyState[byKeyID] & 0x80;
+
+	return IsCurrent && IsPrev;
+}
+
+_bool CInput_Device::Get_KeyDown(_ubyte byKeyID)
+{
+	_bool IsCurrent = m_byKeyState[byKeyID] & 0x80;
+	_bool IsPrev = m_byPrevKeyState[byKeyID] & 0x80;
+
+	return IsCurrent && !IsPrev;
+}
+
+_bool CInput_Device::Get_KeyUp(_ubyte byKeyID)
+{
+	_bool IsCurrent = m_byKeyState[byKeyID] & 0x80;
+	_bool IsPrev = m_byPrevKeyState[byKeyID] & 0x80;
+
+	return !IsCurrent && IsPrev;
+}
+
 HRESULT CInput_Device::Initialize(HINSTANCE hInst, HWND hWnd)
 {
 

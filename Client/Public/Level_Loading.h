@@ -30,10 +30,12 @@ private:
 	class CLoader*		m_pLoader = { nullptr };
 	vector<pair<EventType, uint32_t>> m_Events = {};
 
+	_bool m_IsFinished = { false };
+
 
 private:
 	HRESULT Ready_LoadingBackGround(const _wstring& strLayerTag);
-	HRESULT Ready_LoadingScene();
+	HRESULT Ready_LoadingScene(const _wstring& strLayerTag);
 	HRESULT Ready_GameObjects();
 	HRESULT Ready_LoadingThread();
 	HRESULT Ready_Events();

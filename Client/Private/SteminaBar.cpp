@@ -14,21 +14,32 @@ CSteminaBar::CSteminaBar(const CSteminaBar& Prototype)
 * 주의점 : 플레이어의 무적 시간 만큼 제공해야합니다. (피격 시간) 
 * 피격 시간 이내에 한번 더 맞았을 경우 효과가 제대로 안나올 수도 있음.
 */
+
+// 한번에 늘리면 안되고 시간에 따라 늘리게?
 void CSteminaBar::Increase_Stemina(_uint iStemina, _float fTime)
 {
-    m_fLeftRatio = static_cast<_float>(m_iStemina) / static_cast<_float>(m_iMaxStemina);
-    m_iStemina = min(m_iStemina + iStemina, m_iMaxStemina);
-    m_fRightRatio = static_cast<_float>(m_iStemina) / static_cast<_float>(m_iMaxStemina);
     m_bIncrease = true;
 }
 
 void CSteminaBar::Decrease_Stemina(_uint iStemina, _float fTime)
 {
-    m_fRightRatio = static_cast<_float>(m_iStemina) / static_cast<_float>(m_iMaxStemina);
-    m_iStemina = max(m_iStemina - iStemina, 0);
-    m_fLeftRatio = static_cast<_float>(m_iStemina) / static_cast<_float>(m_iMaxStemina);
-
+    // 증가 중인데 감소한다면.
+    if (m_bIncrease)
+    {
+        m_fRightRatio = m_fLeftRatio;
+        m_iStemina = m_iStemina < iStemina ? 0 : m_iStemina - iStemina;
+        m_fLeftRatio = static_cast<_float>(m_iStemina) / static_cast<_float>(m_iMaxStemina);
+        m_bIncrease = false;
+    }
+    else
+    {
+        m_fRightRatio = static_cast<_float>(m_iStemina) / static_cast<_float>(m_iMaxStemina);
+        m_iStemina = m_iStemina < iStemina ? 0 : m_iStemina - iStemina;
+        m_fLeftRatio = static_cast<_float>(m_iStemina) / static_cast<_float>(m_iMaxStemina);
+    }
+    
     m_bDecrease = true;
+
 }
 
 HRESULT CSteminaBar::Initialize_Prototype()
@@ -56,32 +67,7 @@ HRESULT CSteminaBar::Initialize_Clone(void* pArg)
 
 void CSteminaBar::Priority_Update(_float fTimeDelta)
 {
-    
-    if (m_bDecrease)
-    {
-        if (m_fRightRatio <= m_fLeftRatio)
-        {
-            m_fRightRatio = 0;
-            m_fLeftRatio = 0;
-            m_bDecrease = false;
-            Increase_Stemina(m_iMaxStemina - m_iStemina, 1.f);
-        }
-        else
-            m_fRightRatio -= fTimeDelta * 0.2f;
-    }
-    else if (m_bIncrease)
-    {
-        if (m_fRightRatio <= m_fLeftRatio)
-        {
-            m_fRightRatio = 0;
-            m_fLeftRatio = 0;
-            m_bIncrease = false;
-        }
-        else
-           m_fLeftRatio += fTimeDelta * 0.2f;
-    }
-
-
+    Ratio_Calc(fTimeDelta);
     __super::Priority_Update(fTimeDelta);
 }
 
@@ -146,7 +132,6 @@ HRESULT CSteminaBar::Ready_Render_Resources()
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
         return E_FAIL;
 
-
     _float fFillRatio = 1.f - (static_cast<_float>(m_iStemina) / static_cast<_float>(m_iMaxStemina));
     if (FAILED(m_pShaderCom->Bind_RawValue("g_fFillRatio", static_cast<void*>(&fFillRatio), sizeof(fFillRatio))))
         return E_FAIL;
@@ -182,6 +167,31 @@ HRESULT CSteminaBar::Ready_Events()
     m_Events.push_back(EventType::STEMINA_CHANGE);
 #pragma endregion
     return S_OK;
+}
+
+void CSteminaBar::Ratio_Calc(_float fTimeDelta)
+{
+    if (m_bDecrease)
+    {
+        if (m_fRightRatio <= m_fLeftRatio)
+        {
+            m_bDecrease = false;
+            m_bIncrease = true;
+        }
+        else
+            m_fRightRatio -= fTimeDelta * 0.5f;
+    }
+    else if (m_bIncrease)
+    {
+        m_fLeftRatio = static_cast<_float>(m_iStemina) / static_cast<_float>(m_iMaxStemina);
+        if (m_iStemina < m_iMaxStemina)
+        {
+            m_iStemina++;
+            m_fRightRatio = static_cast<_float>(m_iStemina) / static_cast<_float>(m_iMaxStemina);
+        }
+        else
+            m_bIncrease = false;
+    }
 }
 
 CSteminaBar* CSteminaBar::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
