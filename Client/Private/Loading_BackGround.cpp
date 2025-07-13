@@ -57,39 +57,37 @@ HRESULT CLoading_BackGround::Initialize_Clone(void* pArg)
     if (FAILED(Ready_Events()))
         return E_FAIL;
 
-    
-    
-
     return S_OK;
 }
 
 void CLoading_BackGround::Priority_Update(_float fTimeDelta)
 {
+    /*if (!m_IsVisibility)
+        return;*/
+
     if (m_IsLoadingFadeOut && m_fFade >= 1.f)
     {
+        // 요청한 프레임 까지는 그려져야 한다.
         // Loading이 끝나는 시점에 
         m_pGameInstance->Publish<CLevel_Loading>(EventType::OPEN_LEVEL, nullptr);
         m_IsLoadingFadeOut = false;
         m_fFade = 0.f;
     }
 
-    if (!m_IsVisibility)
-        return;
-
     __super::Priority_Update(fTimeDelta);
 }
 
 void CLoading_BackGround::Update(_float fTimeDelta)
 {
-    if (!m_IsVisibility)
-        return;
+    /*if (!m_IsVisibility)
+        return;*/
     __super::Update(fTimeDelta);
 }
 
 void CLoading_BackGround::Late_Update(_float fTimeDelta)
 {
-    if (!m_IsVisibility)
-        return;
+    /*if (!m_IsVisibility)
+        return;*/
 
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::STATIC_UI, this)))
         return;
@@ -106,23 +104,10 @@ void CLoading_BackGround::Late_Update(_float fTimeDelta)
 
 HRESULT CLoading_BackGround::Render()
 {
-    if (!m_IsVisibility)
-        return S_OK;
 
     __super::Begin();
 
-    if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &m_RenderMatrix)))
-        return E_FAIL;
-
-    if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix)))
-        return E_FAIL;
-    if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
-        return E_FAIL;
-
-    /*if (FAILED(m_pShaderCom->Bind_Int("g_iTextureIndex", m_iTextureIndex)))
-        return E_FAIL;*/
-
-    if (FAILED(m_pTextureCom->Bind_Shader_Resource(m_pShaderCom, "g_Texture", m_iTextureIndex)))
+    if (FAILED(Ready_Render_Resources()))
         return E_FAIL;
 
     if (m_IsLoadingFadeOut)
@@ -156,7 +141,7 @@ HRESULT CLoading_BackGround::Ready_Components()
         TEXT("Com_VIBuffer"), reinterpret_cast<CComponent**>(&m_pVIBufferCom), nullptr)))
         return E_FAIL;
 
-    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Loading_BackGround"),
+    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::LOADING), TEXT("Prototype_Component_Texture_Loading_BackGround"),
         TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom), nullptr)))
         return E_FAIL;
 
@@ -165,19 +150,19 @@ HRESULT CLoading_BackGround::Ready_Components()
 
 HRESULT CLoading_BackGround::Ready_Events()
 {
-#pragma region Loading Display
+
 
     // Event 등록
-    m_pGameInstance->Subscribe(EventType::LOAIDNG_DISPLAY, Get_ID(), [this](void* pData)
-        {
-            LOADINGEVENT_DESC* desc = static_cast<LOADINGEVENT_DESC*>(pData);
-            this->Set_Visibility(desc->isVisibility);   // 멤버 함수 호출
-        });
+    //m_pGameInstance->Subscribe(EventType::LOAIDNG_DISPLAY, Get_ID(), [this](void* pData)
+    //    {
+    //        LOADINGEVENT_DESC* desc = static_cast<LOADINGEVENT_DESC*>(pData);
+    //        this->Set_Visibility(desc->isVisibility);   // 멤버 함수 호출
+    //    });
 
-    // Event 목록 관리.
-    m_Events.emplace_back(EventType::LOAIDNG_DISPLAY, Get_ID());
+    //// Event 목록 관리.
+    //m_Events.emplace_back(EventType::LOAIDNG_DISPLAY, Get_ID());
 
-
+#pragma region Loading End
     m_pGameInstance->Subscribe(EventType::LOADING_END, Get_ID(), [this](void* pData)
         {
             this->Loading_End();   // 멤버 함수 호출
@@ -210,7 +195,7 @@ HRESULT CLoading_BackGround::Ready_Childs()
     pUIObject = dynamic_cast<CUIObject*>(
         m_pGameInstance->Clone_Prototype(
             PROTOTYPE::GAMEOBJECT
-            , ENUM_CLASS(LEVEL::STATIC)
+            , ENUM_CLASS(LEVEL::LOADING)
             , TEXT("Prototype_GameObject_Loading_Panel"), &Desc));
 
     if (nullptr == pUIObject)
@@ -218,6 +203,25 @@ HRESULT CLoading_BackGround::Ready_Childs()
 
     AddChild(pUIObject);
     m_LoadingPanels[0] = static_cast<CLoading_Panel*>(pUIObject);
+
+    return S_OK;
+}
+
+HRESULT CLoading_BackGround::Ready_Render_Resources()
+{
+    if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &m_RenderMatrix)))
+        return E_FAIL;
+
+    if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix)))
+        return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
+        return E_FAIL;
+
+    /*if (FAILED(m_pShaderCom->Bind_Int("g_iTextureIndex", m_iTextureIndex)))
+        return E_FAIL;*/
+
+    if (FAILED(m_pTextureCom->Bind_Shader_Resource(m_pShaderCom, "g_Texture", m_iTextureIndex)))
+        return E_FAIL;
 
     return S_OK;
 }

@@ -16,7 +16,6 @@ private:
 public:
 	const _bool Get_Visibility();
 	void Set_Visibility(_bool IsVIsibility);
-
 	void Loading_End();
 
 
@@ -47,6 +46,7 @@ private:
 	HRESULT Ready_Components();
 	HRESULT Ready_Events();
 	HRESULT Ready_Childs();
+	HRESULT Ready_Render_Resources();
 
 public:
 	static CLoading_BackGround* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

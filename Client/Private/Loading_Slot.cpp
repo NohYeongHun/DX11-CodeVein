@@ -31,6 +31,7 @@ HRESULT CLoading_Slot::Initialize_Clone(void* pArg)
     if (FAILED(Ready_Components()))
         return E_FAIL;
 
+    // Loader가 얘들을 생성도 하기전에 그려진다.
 
     return S_OK;
 }
@@ -52,10 +53,12 @@ void CLoading_Slot::Late_Update(_float fTimeDelta)
         return;
 
     __super::Late_Update(fTimeDelta);
-
     
 }
 
+// 한 프레임 한번 바인딩된 Texture가 쭉 이어졌다. 
+// ViewPort 문제?
+/* View Project 문제가 아님.*/
 HRESULT CLoading_Slot::Render()
 {
     __super::Begin();
@@ -93,7 +96,7 @@ HRESULT CLoading_Slot::Ready_Components()
         TEXT("Com_VIBuffer"), reinterpret_cast<CComponent**>(&m_pVIBufferCom), nullptr)))
         return E_FAIL;
 
-    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Loading_Slot"),
+    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::LOADING), TEXT("Prototype_Component_Texture_Loading_Slot"),
         TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom), nullptr)))
         return E_FAIL;
 

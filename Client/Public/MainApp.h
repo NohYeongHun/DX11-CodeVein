@@ -30,16 +30,19 @@ private:
 private:
 #pragma region PROTOTYPE
 	HRESULT Ready_Prototype_ForStatic();
+	HRESULT Ready_Prototype_ForSkillTexture();
 	HRESULT Ready_Prototype_HUD();
+	HRESULT Ready_Prototype_Inventory();
 	HRESULT Ready_Prototype_Fonts();
-	HRESULT Ready_Prototype_Loading();
 #pragma endregion
 
 
 #pragma region STATIC OBJECT
 	HRESULT Ready_Clone_ForStatic();
+	HRESULT Ready_Clone_Texture();
 	HRESULT Ready_Clone_HUD(const _wstring& strLayerTag);
-	HRESULT Ready_Clone_Loading(const _wstring& strLayerTag);
+	HRESULT Ready_Clone_Inventory(const _wstring& strLayerTag);
+	
 #pragma endregion
 
 	
