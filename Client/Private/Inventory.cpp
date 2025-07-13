@@ -155,6 +155,9 @@ HRESULT CInventory::Ready_Childs()
     if (FAILED(Ready_ItemPanel()))
         return E_FAIL;
 
+    if (FAILED(Ready_StatusPanel()))
+        return E_FAIL;
+
     return S_OK;
 }
 
@@ -239,8 +242,8 @@ HRESULT CInventory::Ready_ItemPanel()
 
 #pragma region LEFT_PANEL
     CInventory_Panel::INVENTORY_PANEL_DESC Desc{};
-    Desc.fX = -250.f;
-    Desc.fY = -200.f;
+    Desc.fX = -160.f;
+    Desc.fY = 200.f;
     Desc.fSizeX = 0;
     Desc.fSizeY = 0;
     Desc.ePanelType = CInventory_Panel::PANELTYPE::ITEM_PANEL;
@@ -264,6 +267,39 @@ HRESULT CInventory::Ready_ItemPanel()
     m_InventoryItem_Panels[ITEM_PANEL::ITEM_PANEL_TOP] = static_cast<CInventory_Panel*>(pUIObject);
 #pragma endregion
 
+    return S_OK;
+}
+
+HRESULT CInventory::Ready_StatusPanel()
+{
+    m_InventoryStatus_Panels.resize(STATUS_PANEL::STATUS_PANEL_END);
+
+    // Panel 객체는 위치만 존재하고 Skill Slot을 소유하는 객체임.
+
+    CInventory_Panel::INVENTORY_PANEL_DESC Desc{};
+    Desc.fX = -240.f;
+    Desc.fY = 300.f;
+    Desc.fSizeX = 0;
+    Desc.fSizeY = 0;
+    Desc.ePanelType = CInventory_Panel::PANELTYPE::STATUS_PANEL;
+    Desc.fSlot_SizeX = 80;
+    Desc.fSlot_SizeY = 80;
+    Desc.iInventorySlot = 10;
+
+
+    CUIObject* pUIObject = nullptr;
+    // Skill Panel Left 추가 
+    pUIObject = dynamic_cast<CUIObject*>(
+        m_pGameInstance->Clone_Prototype(
+            PROTOTYPE::GAMEOBJECT
+            , ENUM_CLASS(LEVEL::STATIC)
+            , TEXT("Prototype_GameObject_Inventory_Panel"), &Desc));
+
+    if (nullptr == pUIObject)
+        return E_FAIL;
+
+    AddChild(pUIObject);
+    m_InventoryStatus_Panels[STATUS_PANEL::STATUS_PANEL_TOP] = static_cast<CInventory_Panel*>(pUIObject);
     return S_OK;
 }
 
@@ -303,16 +339,16 @@ HRESULT CInventory::Ready_Events()
 
 HRESULT CInventory::Ready_Skills()
 {
-    /*INVENTORY_SKILLCHANGE_DESC Desc{};
+    INVENTORY_SKILLCHANGE_DESC Desc{};
     Desc.pText = TEXT("Action_SkillIcon");
     Desc.iSkillPanelIdx = SKILL_PANEL_LEFT;
     Desc.iSlotIdx = 0;
     Desc.iTextureIdx = 0;
-    m_pGameInstance->Publish(EventType::INVENTORY_SKILL_CHANGE, &Desc);*/
+    m_pGameInstance->Publish(EventType::INVENTORY_SKILL_CHANGE, &Desc);
 
-    /*Desc.iSlotIdx = 2;
+    Desc.iSlotIdx = 2;
     Desc.iTextureIdx = 1;
-    m_pGameInstance->Publish(EventType::INVENTORY_SKILL_CHANGE, &Desc);*/
+    m_pGameInstance->Publish(EventType::INVENTORY_SKILL_CHANGE, &Desc);
 
     return S_OK;
 }

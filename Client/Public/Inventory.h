@@ -19,6 +19,12 @@ public:
 		ITEM_PANEL_END
 	};
 
+	enum STATUS_PANEL : _uint
+	{
+		STATUS_PANEL_TOP = 0,
+		STATUS_PANEL_END
+	};
+
 private:
 	explicit CInventory(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	explicit CInventory(const CInventory& Prototype);
@@ -46,6 +52,7 @@ private:
 	HRESULT Ready_Childs();
 	HRESULT Ready_SkillPanel();
 	HRESULT Ready_ItemPanel();
+	HRESULT Ready_StatusPanel();
 	HRESULT Ready_Events();
 
 	HRESULT Ready_Skills(); // 이벤트 호출로. 기본 스킬 채워넣기. 
@@ -60,8 +67,9 @@ private:
 
 	_uint m_iTextureIndex = {};
 
-;	vector<class CInventory_Panel*> m_InventorySkill_Panels = {};
-;	vector<class CInventory_Panel*> m_InventoryItem_Panels = {};
+	vector<class CInventory_Panel*> m_InventorySkill_Panels = {};
+	vector<class CInventory_Panel*> m_InventoryItem_Panels = {};
+	vector<class CInventory_Panel*> m_InventoryStatus_Panels = {};
 
 	vector<EventType> m_Events = {};
 	_bool m_IsVisibility = { };

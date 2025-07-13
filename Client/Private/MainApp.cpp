@@ -81,7 +81,7 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 		return E_FAIL;
 
 
-	if (FAILED(Ready_Prototype_ForSkillTexture()))
+	if (FAILED(Ready_Prototype_ForUsageTexture()))
 		return E_FAIL;
 
 	if (FAILED(Ready_Prototype_HUD()))
@@ -102,11 +102,18 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 	return S_OK;
 }
 
-HRESULT CMainApp::Ready_Prototype_ForSkillTexture()
+HRESULT CMainApp::Ready_Prototype_ForUsageTexture()
 {
+	/* Action Skill */
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
 		, TEXT("Prototype_Component_Texture_Action_SkillIcon")
 		, CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/User/SkillIcon/Action/Action%d.png"), 12))))
+		return E_FAIL;
+
+	/* Status Icon */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
+		, TEXT("Prototype_Component_Texture_StatusIcon")
+		, CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/User/Inventory/Category/Category%d.png"), 10))))
 		return E_FAIL;
 
 	return S_OK;
@@ -209,6 +216,10 @@ HRESULT CMainApp::Ready_Prototype_Inventory()
 
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_InventoryItem_Icon"),
 		CInventoryItem_Icon::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_InventoryStatus_Icon"),
+		CInventoryStatus_Icon::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
 #pragma endregion

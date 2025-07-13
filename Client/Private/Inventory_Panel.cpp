@@ -66,7 +66,7 @@ HRESULT CInventory_Panel::Render()
     /*wstring_convert<codecvt_utf8<wchar_t>> converter;
     string str = converter.to_bytes(m_strObjTag);*/
 
-    if (m_ePanelType == ITEM_PANEL)
+    if (m_ePanelType == STATUS_PANEL)
     {
         if (ImGui::IsWindowAppearing())              // 또는 static bool once=true;
         {
@@ -107,6 +107,9 @@ HRESULT CInventory_Panel::Ready_Childs(INVENTORY_PANEL_DESC* pDesc)
     case PANELTYPE::ITEM_PANEL:
         hr = Ready_Item_Childs(pDesc);
         break;
+    case PANELTYPE::STATUS_PANEL:
+        hr = Ready_Status_Childs(pDesc);
+        break;
     }
 
     if (FAILED(hr))
@@ -130,11 +133,8 @@ HRESULT CInventory_Panel::Ready_Skill_Childs(INVENTORY_PANEL_DESC* pDesc)
     Desc.fSizeY = fSizeY;
 
     const _float posX[4] = { -fSizeX * 0.5f - 1.f, fSizeX * 0.5f + 1.f, -fSizeX * 0.5f - 1.f, fSizeX * 0.5f + 1.f };
-    const _float posY[4] = { fSizeY * 0.5f - 1.f, fSizeY * 0.5f - 1.f , -fSizeY * 0.5f + 1.f, -fSizeY * 0.5f + 1.f };
+    const _float posY[4] = { fSizeY * 0.5f + 2.f, fSizeY * 0.5f + 2.f , -fSizeY * 0.5f - 2.f, -fSizeY * 0.5f - 2.f };
 
-
-    /*const _float posX[4] = { -fSizeX * 0.5f - 1.f, fSizeX * 0.5f + 1.f, -fSizeX * 0.5f - 1.f, fSizeX * 0.5f + 1.f };
-    const _float posY[4] = { -fSizeY * 0.5f - 1.f, -fSizeY * 0.5f - 1.f , fSizeY * 0.5f + 1.f, fSizeY * 0.5f + 1.f };*/
 
     CUIObject* pUIObject = nullptr;
 
@@ -172,7 +172,7 @@ HRESULT CInventory_Panel::Ready_Item_Childs(INVENTORY_PANEL_DESC* pDesc)
     Desc.fSizeX = fSizeX;
     Desc.fSizeY = fSizeY;
 
-    const _float posX[3] = { -fSizeX * 0.5f - 1.f, 0.f, fSizeX * 0.5f };
+    const _float posX[3] = { -fSizeX - 5.f, 0.f, fSizeX + 5.f};
     const _float posY[3] = { 0.f, 0.f, 0.f};
 
     CUIObject* pUIObject = nullptr;
@@ -193,6 +193,45 @@ HRESULT CInventory_Panel::Ready_Item_Childs(INVENTORY_PANEL_DESC* pDesc)
 
         AddChild(pUIObject);
         m_ItemSlots.push_back(static_cast<CInventoryItem_Slot*>(pUIObject));
+    }
+
+    return S_OK;
+}
+
+HRESULT CInventory_Panel::Ready_Status_Childs(INVENTORY_PANEL_DESC* pDesc)
+{
+    m_iInventory_Slot = pDesc->iInventorySlot;
+    _float fSizeX = pDesc->fSlot_SizeX;
+    _float fSizeY = pDesc->fSlot_SizeY;
+
+    CInventoryStatus_Icon::STATUS_ICON_DESC Desc{};
+    Desc.fX = 0;
+    Desc.fY = 0;
+    Desc.fSizeX = fSizeX;
+    Desc.fSizeY = fSizeY;
+
+    _float fPosX = -200.f;
+    _float fPosY = 0.f;
+
+    CUIObject* pUIObject = nullptr;
+
+    for (_uint i = 0; i < m_iInventory_Slot; ++i)
+    {
+        Desc.fX = fPosX + i * fSizeX ;
+        Desc.fY = fPosY;
+        Desc.iTextureIndex = i;
+
+        pUIObject = dynamic_cast<CUIObject*>(
+            m_pGameInstance->Clone_Prototype(
+                PROTOTYPE::GAMEOBJECT
+                , ENUM_CLASS(LEVEL::STATIC)
+                , TEXT("Prototype_GameObject_InventoryStatus_Icon"), &Desc));
+
+        if (nullptr == pUIObject)
+            return E_FAIL;
+
+        AddChild(pUIObject);
+        m_StatusIcons.push_back(static_cast<CInventoryStatus_Icon*>(pUIObject));
     }
 
     return S_OK;

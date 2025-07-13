@@ -178,6 +178,7 @@
     <ClInclude Include="..\Public\InventoryItem_Slot.h" />
     <ClInclude Include="..\Public\InventorySkill_Icon.h" />
     <ClInclude Include="..\Public\InventorySkill_Slot.h" />
+    <ClInclude Include="..\Public\InventoryStatus_Icon.h" />
     <ClInclude Include="..\Public\Inventory_Panel.h" />
     <ClInclude Include="..\Public\Level_GamePlay.h" />
     <ClInclude Include="..\Public\Level_Loading.h" />
@@ -228,6 +229,7 @@
     <ClCompile Include="..\Private\InventoryItem_Slot.cpp" />
     <ClCompile Include="..\Private\InventorySkill_Icon.cpp" />
     <ClCompile Include="..\Private\InventorySkill_Slot.cpp" />
+    <ClCompile Include="..\Private\InventoryStatus_Icon.cpp" />
     <ClCompile Include="..\Private\Inventory_Panel.cpp" />
     <ClCompile Include="..\Private\Level_GamePlay.cpp" />
     <ClCompile Include="..\Private\Level_Loading.cpp" />

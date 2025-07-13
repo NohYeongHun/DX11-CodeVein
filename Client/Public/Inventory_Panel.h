@@ -14,6 +14,7 @@ public:
 	{
 		SKILL_PANEL = 0,
 		ITEM_PANEL = 1,
+		STATUS_PANEL = 2,
 		PANEL_END
 	};
 
@@ -46,16 +47,17 @@ public:
 
 private:
 	PANELTYPE m_ePanelType = {};
-
 	_uint m_iInventory_Slot = {};
 	vector<class CInventorySkill_Slot*> m_SkillSlots = {};
 	vector<class CInventoryItem_Slot*> m_ItemSlots = {};
+	vector<class CInventoryStatus_Icon*> m_StatusIcons = {};
 
 private:
 	HRESULT Ready_Components();
 	HRESULT Ready_Childs(INVENTORY_PANEL_DESC* pDesc);
 	HRESULT Ready_Skill_Childs(INVENTORY_PANEL_DESC* pDesc);
 	HRESULT Ready_Item_Childs(INVENTORY_PANEL_DESC* pDesc);
+	HRESULT Ready_Status_Childs(INVENTORY_PANEL_DESC* pDesc);
 
 public:
 	static CInventory_Panel* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

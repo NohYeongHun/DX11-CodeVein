@@ -52,6 +52,8 @@
 #include "InventorySkill_Slot.h"
 #include "InventoryItem_Icon.h"
 #include "InventoryItem_Slot.h"
+#include "InventoryStatus_Icon.h"
+
 
 
 
