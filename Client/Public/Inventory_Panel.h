@@ -15,6 +15,7 @@ public:
 		SKILL_PANEL = 0,
 		ITEM_PANEL = 1,
 		STATUS_PANEL = 2,
+		STATUS_INFO_PANEL = 3,
 		PANEL_END
 	};
 
@@ -46,11 +47,13 @@ public:
 
 
 private:
-	PANELTYPE m_ePanelType = {};
-	_uint m_iInventory_Slot = {};
 	vector<class CInventorySkill_Slot*> m_SkillSlots = {};
 	vector<class CInventoryItem_Slot*> m_ItemSlots = {};
 	vector<class CInventoryStatus_Icon*> m_StatusIcons = {};
+	PANELTYPE m_ePanelType = {};
+	_uint m_iInventory_Slot = {};
+	
+
 
 private:
 	HRESULT Ready_Components();

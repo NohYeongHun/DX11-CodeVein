@@ -22,6 +22,7 @@ public:
 	enum STATUS_PANEL : _uint
 	{
 		STATUS_PANEL_TOP = 0,
+		STATUS_PANEL_INFO = 1,
 		STATUS_PANEL_END
 	};
 

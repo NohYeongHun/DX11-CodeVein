@@ -1,16 +1,15 @@
-﻿#include "InventoryItem_Icon.h"
-
-CInventoryStatus_Icon::CInventoryStatus_Icon(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿
+CInventoryStatus_Info::CInventoryStatus_Info(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CUIObject(pDevice, pContext)
 {
 }
 
-CInventoryStatus_Icon::CInventoryStatus_Icon(const CInventoryStatus_Icon& Prototype)
+CInventoryStatus_Info::CInventoryStatus_Info(const CInventoryStatus_Info& Prototype)
     : CUIObject(Prototype)
 {
 }
 
-void CInventoryStatus_Icon::Change_Item(const _wstring& strTextureTag, _uint iTextureIndex)
+void CInventoryStatus_Info::Change_Info(const _wstring& strTextureTag, _uint iTextureIndex)
 {
     m_iTextureIndex = iTextureIndex;
 
@@ -20,12 +19,12 @@ void CInventoryStatus_Icon::Change_Item(const _wstring& strTextureTag, _uint iTe
         , strTextureTag);
 }
 
-HRESULT CInventoryStatus_Icon::Initialize_Prototype()
+HRESULT CInventoryStatus_Info::Initialize_Prototype()
 {
     return S_OK;
 }
 
-HRESULT CInventoryStatus_Icon::Initialize_Clone(void* pArg)
+HRESULT CInventoryStatus_Info::Initialize_Clone(void* pArg)
 {
     m_iTextureIndex = 0;
 
@@ -38,7 +37,7 @@ HRESULT CInventoryStatus_Icon::Initialize_Clone(void* pArg)
 
     m_iTextureIndex = pDesc->iTextureIndex;
 
-    m_pTransformCom->Scale(_float3(0.8f, 0.8f, 1.f));
+    //m_pTransformCom->Scale(_float3(0.8f, 0.8f, 1.f));
 
     /* Change Skill로 기본 Skill들 채워넣기*/
 
@@ -46,16 +45,15 @@ HRESULT CInventoryStatus_Icon::Initialize_Clone(void* pArg)
     return S_OK;
 }
 
-void CInventoryStatus_Icon::Priority_Update(_float fTimeDelta)
+void CInventoryStatus_Info::Priority_Update(_float fTimeDelta)
 {
     __super::Priority_Update(fTimeDelta);
 }
 
 
-void CInventoryStatus_Icon::Update(_float fTimeDelta)
+void CInventoryStatus_Info::Update(_float fTimeDelta)
 {
     __super::Update(fTimeDelta);
-
 
     if (Mouse_InRect2D(g_hWnd))
     {
@@ -64,7 +62,7 @@ void CInventoryStatus_Icon::Update(_float fTimeDelta)
     }
 }
 
-void CInventoryStatus_Icon::Late_Update(_float fTimeDelta)
+void CInventoryStatus_Info::Late_Update(_float fTimeDelta)
 {
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::STATIC_UI, this)))
         return;
@@ -72,7 +70,7 @@ void CInventoryStatus_Icon::Late_Update(_float fTimeDelta)
     __super::Late_Update(fTimeDelta);
 }
 
-HRESULT CInventoryStatus_Icon::Render()
+HRESULT CInventoryStatus_Info::Render()
 {
     // Texture가 없을 수도 있음.
     if (m_pTextureCom == nullptr)
@@ -94,7 +92,7 @@ HRESULT CInventoryStatus_Icon::Render()
     return S_OK;
 }
 
-HRESULT CInventoryStatus_Icon::Ready_Components(STATUS_ICON_DESC* pDesc)
+HRESULT CInventoryStatus_Info::Ready_Components(STATUS_ICON_DESC* pDesc)
 {
     if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxPosTex"),
         TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom), nullptr)))
@@ -113,7 +111,7 @@ HRESULT CInventoryStatus_Icon::Ready_Components(STATUS_ICON_DESC* pDesc)
     return S_OK;
 }
 
-HRESULT CInventoryStatus_Icon::Ready_Render_Resources()
+HRESULT CInventoryStatus_Info::Ready_Render_Resources()
 {
 
     if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &m_RenderMatrix)))
@@ -132,9 +130,9 @@ HRESULT CInventoryStatus_Icon::Ready_Render_Resources()
     return S_OK;
 }
 
-CInventoryStatus_Icon* CInventoryStatus_Icon::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CInventoryStatus_Info* CInventoryStatus_Info::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-    CInventoryStatus_Icon* pInstance = new CInventoryStatus_Icon(pDevice, pContext);
+    CInventoryStatus_Info* pInstance = new CInventoryStatus_Info(pDevice, pContext);
     if (FAILED(pInstance->Initialize_Prototype()))
     {
         MSG_BOX(TEXT("Create Failed : CInventoryStatus_Info"));
@@ -144,9 +142,9 @@ CInventoryStatus_Icon* CInventoryStatus_Icon::Create(ID3D11Device* pDevice, ID3D
     return pInstance;
 }
 
-CGameObject* CInventoryStatus_Icon::Clone(void* pArg)
+CGameObject* CInventoryStatus_Info::Clone(void* pArg)
 {
-    CInventoryStatus_Icon* pInstance = new CInventoryStatus_Icon(*this);
+    CInventoryStatus_Info* pInstance = new CInventoryStatus_Info(*this);
     if (FAILED(pInstance->Initialize_Clone(pArg)))
     {
         MSG_BOX(TEXT("Clone Failed : CInventoryStatus_Info"));
@@ -156,12 +154,12 @@ CGameObject* CInventoryStatus_Icon::Clone(void* pArg)
     return pInstance;
 }
 
-void CInventoryStatus_Icon::Destroy()
+void CInventoryStatus_Info::Destroy()
 {
     __super::Destroy();
 }
 
-void CInventoryStatus_Icon::Free()
+void CInventoryStatus_Info::Free()
 {
     __super::Free();
     Safe_Release(m_pVIBufferCom);
