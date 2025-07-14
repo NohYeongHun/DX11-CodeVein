@@ -32,6 +32,8 @@
 #include "VIBuffer_Terrain.h"
 #include "Texture.h"
 #include "Texture_Manager.h"
+#include "Mesh.h"
+#include "Model.h"
 #pragma endregion
 
 

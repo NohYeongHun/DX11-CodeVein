@@ -31,6 +31,7 @@ private:
 #pragma region PROTOTYPE
 	HRESULT Ready_Prototype_ForStatic();
 	HRESULT Ready_Prototype_ForUsageTexture();
+	HRESULT Ready_Prototype_ForModel();
 	HRESULT Ready_Prototype_HUD();
 	HRESULT Ready_Prototype_Inventory();
 	HRESULT Ready_Prototype_Fonts();

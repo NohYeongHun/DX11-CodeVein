@@ -67,6 +67,9 @@
 #include "Terrain.h"
 #include "Camera_Free.h"
 
+/* ======================================== Actor Object ===================================== */
+#include "Player.h"
+
 #pragma endregion
 
 

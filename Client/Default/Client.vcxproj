@@ -191,6 +191,7 @@
     <ClInclude Include="..\Public\Loading_BackGround.h" />
     <ClInclude Include="..\Public\Loading_Panel.h" />
     <ClInclude Include="..\Public\Loading_Slot.h" />
+    <ClInclude Include="..\Public\Player.h" />
     <ClInclude Include="..\Public\SteminaBar.h" />
     <ClInclude Include="..\Public\Title_BackGround.h" />
     <ClInclude Include="..\Public\MainApp.h" />
@@ -243,6 +244,7 @@
     <ClCompile Include="..\Private\Loading_BackGround.cpp" />
     <ClCompile Include="..\Private\Loading_Panel.cpp" />
     <ClCompile Include="..\Private\Loading_Slot.cpp" />
+    <ClCompile Include="..\Private\Player.cpp" />
     <ClCompile Include="..\Private\SteminaBar.cpp" />
     <ClCompile Include="..\Private\Title_BackGround.cpp" />
     <ClCompile Include="..\Private\MainApp.cpp" />
@@ -263,6 +265,7 @@
     <Image Include="small.ico" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxMesh.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxNorTex.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPosTex.hlsl" />
   </ItemGroup>

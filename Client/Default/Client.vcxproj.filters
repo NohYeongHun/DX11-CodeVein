@@ -76,6 +76,9 @@
     <Filter Include="02. GameObject\UI\Player\Inventory\Status">
       <UniqueIdentifier>{4fc10ff9-cca4-4b8a-b7e9-7ceb6d6bf8a8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. GameObject\Player">
+      <UniqueIdentifier>{0cf99a3b-b0e9-4fc2-a130-7a176463771d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -222,6 +225,9 @@
     <ClInclude Include="..\Public\InventoryStatus_Info.h">
       <Filter>02. GameObject\UI\Player\Inventory\Status</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Player.h">
+      <Filter>02. GameObject\Player</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -251,9 +257,6 @@
     </ClCompile>
     <ClCompile Include="..\Private\Level_Logo.cpp">
       <Filter>01. Levels\00. Logo</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Loader.cpp">
-      <Filter>01. Levels\99. Loading\Loader</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\ClientPch.cpp">
       <Filter>99. Defines</Filter>
@@ -363,12 +366,21 @@
     <ClCompile Include="..\Private\InventoryStatus_Info.cpp">
       <Filter>02. GameObject\UI\Player\Inventory\Status</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Player.cpp">
+      <Filter>02. GameObject\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Loader.cpp">
+      <Filter>01. Levels\99. Loading\Loader</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPosTex.hlsl">
       <Filter>98. Default</Filter>
     </FxCompile>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxNorTex.hlsl">
+      <Filter>98. Default</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxMesh.hlsl">
       <Filter>98. Default</Filter>
     </FxCompile>
   </ItemGroup>

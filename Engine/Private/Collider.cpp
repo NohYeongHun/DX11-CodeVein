@@ -87,10 +87,14 @@ _bool CCollider::Intersect(const CCollider* pTargetCollider)
     return _bool();
 }
 
+#ifdef _DEBUG
 HRESULT CCollider::Render()
 {
     return S_OK;
 }
+#endif // _DEBUG
+
+
 
 
 CCollider* CCollider::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, TYPE eColliderType)

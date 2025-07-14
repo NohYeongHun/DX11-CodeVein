@@ -14,6 +14,12 @@ HRESULT CLoader_GamePlay::Loading_Resource(ID3D11Device* pDevice, ID3D11DeviceCo
 		return E_FAIL;
 	}
 
+	if (FAILED(Add_Prototype_Player(pDevice, pContext, pGameInstance)))
+	{
+		MSG_BOX(TEXT("Create Failed Loading : GamePlay Player "));
+		return E_FAIL;
+	}
+
 	return S_OK;
 }
 
@@ -24,6 +30,19 @@ HRESULT CLoader_GamePlay::Add_Prototype_Component(ID3D11Device* pDevice, ID3D11D
 
 HRESULT CLoader_GamePlay::Add_Prototype_GameObject(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
 {
+	return S_OK;
+}
+
+
+// 1.
+HRESULT CLoader_GamePlay::Add_Prototype_Player(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
+{
+	// Player Prototype 생성.
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level)
+		, TEXT("Prototype_GameObject_Player")
+		, CPlayer::Create(pDevice, pContext))))
+		return E_FAIL;
+
 	return S_OK;
 }
 
