@@ -76,11 +76,11 @@ void CSkill_Slot::Update(_float fTimeDelta)
         }
     }
 
-    if (Mouse_InRect2D(g_hWnd))
+    /*if (Mouse_InRect2D(g_hWnd))
     {
         if (GetAsyncKeyState(MOUSE_R))
             MSG_BOX(TEXT("Slot Check"));
-    }
+    }*/
    
 
     

@@ -60,9 +60,6 @@ HRESULT CHUD::Initialize_Clone(void* pArg)
     if (FAILED(Ready_Events()))
         return E_FAIL;
 
-    if (FAILED(Ready_Skills()))
-        return E_FAIL;
-
 
     return S_OK;
 }
@@ -79,7 +76,7 @@ void CHUD::Update(_float fTimeDelta)
     if (!m_IsVisibility)
         return;
 
-    HUD_SKILLCHANGE_DESC Desc{};
+    /*HUD_SKILLCHANGE_DESC Desc{};
     Desc.iSkillPanelIdx = SKILL_PANEL_TOP;
     Desc.pText = TEXT("Action_SkillIcon");
     
@@ -106,7 +103,7 @@ void CHUD::Update(_float fTimeDelta)
         Desc.iSlotIdx = 3;
         Desc.iTextureIdx = 3;
         m_pGameInstance->Publish(EventType::HUD_SKILL_CHANGE, &Desc);
-    }
+    }*/
 
     // 마우스 왼쪽 클릭 시 쿨타임 돌게하기.
     if (m_pGameInstance->Get_MouseKeyUp(MOUSEKEYSTATE::LB))
@@ -308,26 +305,6 @@ HRESULT CHUD::Ready_Events()
     return S_OK;
 }
 
-HRESULT CHUD::Ready_Skills()
-{
-    HUD_SKILLCHANGE_DESC Desc{};
-    Desc.iSkillPanelIdx = SKILL_PANEL_TOP;
-    Desc.pText = TEXT("Action_SkillIcon");
-
-    // 우측 위
-    //Desc.iSlotIdx = 0;
-    //Desc.iTextureIdx = 0;
-    //m_pGameInstance->Publish(EventType::HUD_SKILL_CHANGE, &Desc);
-
-    //// 좌측 
-    //Desc.iSlotIdx = 1;
-    //Desc.iTextureIdx = 1;
-    //m_pGameInstance->Publish(EventType::HUD_SKILL_CHANGE, &Desc);
-
-  
-
-    return S_OK;
-}
 
 CHUD* CHUD::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {

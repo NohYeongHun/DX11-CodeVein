@@ -7,9 +7,9 @@ class CInventory final : public CUIObject
 public:
 	enum SKILL_PANEL : _uint
 	{
-		SKILL_PANEL_LEFT = 0, // 왼쪽
-		SKILL_PANEL_RIGHT_TOP = 1, // 오른쪽 위
-		SKILL_PANEL_RIGHT_BOTTOM = 2, // 오른쪽 아래.
+		SKILL_PANEL_RIGHT_TOP = 0, // 오른쪽 위
+		SKILL_PANEL_RIGHT_BOTTOM = 1, // 오른쪽 아래.
+		SKILL_PANEL_LEFT = 2, // 왼쪽
 		SKILL_PANEL_END
 	};
 

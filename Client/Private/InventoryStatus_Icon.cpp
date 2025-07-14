@@ -57,11 +57,11 @@ void CInventoryStatus_Icon::Update(_float fTimeDelta)
     __super::Update(fTimeDelta);
 
 
-    if (Mouse_InRect2D(g_hWnd))
+   /* if (Mouse_InRect2D(g_hWnd))
     {
         if (m_pGameInstance->Get_MouseKeyUp(MOUSEKEYSTATE::LB))
             MSG_BOX(TEXT("Status Check"));
-    }
+    }*/
 }
 
 void CInventoryStatus_Icon::Late_Update(_float fTimeDelta)

@@ -46,7 +46,6 @@ private:
 	HRESULT Ready_SkillPanel();
 	HRESULT Ready_StatusPanel();
 	HRESULT Ready_Events();
-	HRESULT Ready_Skills(); // 기본 스킬 설정.
 
 
 private:

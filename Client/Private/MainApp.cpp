@@ -46,17 +46,17 @@ void CMainApp::Update(_float fTimeDelta)
 
 HRESULT CMainApp::Render()
 {
-	//_float4		vClearColor = _float4(0.7f, 0.7f, 0.7f, 0.1f);
 	_float4		vClearColor = _float4(0.0f, 0.0f, 1.f, 1.f);
-
-
 	
 	m_pGameInstance->Render_Begin(&vClearColor);
 	m_pImGui_Manager->Render_Begin();
 
 	m_pGameInstance->Draw();
 
-	//m_pImGui_Manager->Render();
+	ImGui::Begin("Information");
+	ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
+	ImGui::End();
+
 	m_pImGui_Manager->Render_End();
 	m_pGameInstance->Render_End();
 
@@ -81,16 +81,17 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxMesh.hlsl"), VTXMESH::Elements, VTXMESH::iNumElements))))
 		return E_FAIL;
 
+
+	/* ==================================================== Other ====================================================*/
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_VIBuffer_Rect"),
 		CVIBuffer_Rect::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
-
 	if (FAILED(Ready_Prototype_ForUsageTexture()))
 		return E_FAIL;
 	
-	if (FAILED(Ready_Prototype_ForModel()))
-		return E_FAIL;
+	/*if (FAILED(Ready_Prototype_ForModel()))
+		return E_FAIL;*/
 
 	if (FAILED(Ready_Prototype_HUD()))
 		return E_FAIL;
@@ -105,7 +106,6 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 	
 	
 #pragma endregion
-
 
 	return S_OK;
 }
@@ -132,7 +132,7 @@ HRESULT CMainApp::Ready_Prototype_ForModel()
 {
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
 		, TEXT("Prototype_Component_Model_Player")
-		, CModel::Create(m_pDevice, m_pContext, "../Bin/Resources/Models/Player/PlayerTest.fbx"))))
+		, CModel::Create(m_pDevice, m_pContext, "../Bin/Resources/Models/Player/Player.fbx"))))
 		return E_FAIL;
 
 	return S_OK;
@@ -209,6 +209,13 @@ HRESULT CMainApp::Ready_Prototype_Inventory()
 		, TEXT("Prototype_Component_Texture_InventorySlot")
 		, CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/User/Inventory/Slot%d.png"), 1))))
 		return E_FAIL;
+
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
+		, TEXT("Prototype_Component_Texture_Inventory_StatusInfo")
+		, CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/User/Inventory/Info/StatusInfo%d.png"), 1))))
+		return E_FAIL;
+
 #pragma endregion
 
 #pragma region OBJECT
@@ -239,6 +246,10 @@ HRESULT CMainApp::Ready_Prototype_Inventory()
 
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_InventoryStatus_Icon"),
 		CInventoryStatus_Icon::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_InventoryStatus_Info"),
+		CInventoryStatus_Info::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
 #pragma endregion

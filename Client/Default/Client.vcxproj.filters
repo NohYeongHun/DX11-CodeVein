@@ -13,9 +13,6 @@
     <Filter Include="02. GameObject\UI\Player">
       <UniqueIdentifier>{fff5a693-5c43-482c-9d13-ee31bfe8bb55}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02. GameObject\UI\Player\Skill">
-      <UniqueIdentifier>{0703403d-7f2d-49a6-9104-9f1f4860732e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="01. Levels">
       <UniqueIdentifier>{ccf6878b-78ca-4842-ae64-0a877924ff47}</UniqueIdentifier>
     </Filter>
@@ -42,9 +39,6 @@
     </Filter>
     <Filter Include="99. Defines">
       <UniqueIdentifier>{7aa2cf62-6ed3-40ac-8805-9ee09729bdbb}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="02. GameObject\UI\Player\Status">
-      <UniqueIdentifier>{fef56ff8-d94e-4d31-92e7-1d66e7c6f7b7}</UniqueIdentifier>
     </Filter>
     <Filter Include="02. GameObject\UI\Loading">
       <UniqueIdentifier>{8c701e3d-252e-4e7a-9364-b8c965c04254}</UniqueIdentifier>
@@ -78,6 +72,15 @@
     </Filter>
     <Filter Include="02. GameObject\Player">
       <UniqueIdentifier>{0cf99a3b-b0e9-4fc2-a130-7a176463771d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\UI\Player\HUD">
+      <UniqueIdentifier>{c86b759b-4280-4b29-9579-338f677e2e7e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\UI\Player\HUD\Status">
+      <UniqueIdentifier>{fef56ff8-d94e-4d31-92e7-1d66e7c6f7b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\UI\Player\HUD\Skill">
+      <UniqueIdentifier>{0703403d-7f2d-49a6-9104-9f1f4860732e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -162,23 +165,20 @@
     <ClInclude Include="..\Public\TitleText.h">
       <Filter>02. GameObject\UI\Logo\Title</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\HUD.h">
-      <Filter>02. GameObject\UI\Player</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\Skill_Panel.h">
-      <Filter>02. GameObject\UI\Player\Skill</Filter>
+      <Filter>02. GameObject\UI\Player\HUD\Skill</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Skill_Slot.h">
-      <Filter>02. GameObject\UI\Player\Skill</Filter>
+      <Filter>02. GameObject\UI\Player\HUD\Skill</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Skill_Icon.h">
-      <Filter>02. GameObject\UI\Player\Skill</Filter>
+      <Filter>02. GameObject\UI\Player\HUD\Skill</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\StatusPanel.h">
-      <Filter>02. GameObject\UI\Player\Status</Filter>
+      <Filter>02. GameObject\UI\Player\HUD\Status</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\HPBar.h">
-      <Filter>02. GameObject\UI\Player\Status</Filter>
+      <Filter>02. GameObject\UI\Player\HUD\Status</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Loading_BackGround.h">
       <Filter>02. GameObject\UI\Loading</Filter>
@@ -199,7 +199,7 @@
       <Filter>02. GameObject\UI\Logo\Title</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\SteminaBar.h">
-      <Filter>02. GameObject\UI\Player\Status</Filter>
+      <Filter>02. GameObject\UI\Player\HUD\Status</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Inventory.h">
       <Filter>02. GameObject\UI\Player\Inventory</Filter>
@@ -227,6 +227,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\Player.h">
       <Filter>02. GameObject\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\HUD.h">
+      <Filter>02. GameObject\UI\Player\HUD</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -303,23 +306,20 @@
     <ClCompile Include="..\Private\TitleText.cpp">
       <Filter>02. GameObject\UI\Logo\Title</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\HUD.cpp">
-      <Filter>02. GameObject\UI\Player</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\Skill_Icon.cpp">
-      <Filter>02. GameObject\UI\Player\Skill</Filter>
+      <Filter>02. GameObject\UI\Player\HUD\Skill</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Skill_Panel.cpp">
-      <Filter>02. GameObject\UI\Player\Skill</Filter>
+      <Filter>02. GameObject\UI\Player\HUD\Skill</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Skill_Slot.cpp">
-      <Filter>02. GameObject\UI\Player\Skill</Filter>
+      <Filter>02. GameObject\UI\Player\HUD\Skill</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\StatusPanel.cpp">
-      <Filter>02. GameObject\UI\Player\Status</Filter>
+      <Filter>02. GameObject\UI\Player\HUD\Status</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\HPBar.cpp">
-      <Filter>02. GameObject\UI\Player\Status</Filter>
+      <Filter>02. GameObject\UI\Player\HUD\Status</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Loading_BackGround.cpp">
       <Filter>02. GameObject\UI\Loading</Filter>
@@ -340,7 +340,7 @@
       <Filter>02. GameObject\UI\Logo\Title</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\SteminaBar.cpp">
-      <Filter>02. GameObject\UI\Player\Status</Filter>
+      <Filter>02. GameObject\UI\Player\HUD\Status</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Inventory.cpp">
       <Filter>02. GameObject\UI\Player\Inventory</Filter>
@@ -371,6 +371,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Loader.cpp">
       <Filter>01. Levels\99. Loading\Loader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\HUD.cpp">
+      <Filter>02. GameObject\UI\Player\HUD</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

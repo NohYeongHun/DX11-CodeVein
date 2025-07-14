@@ -14,8 +14,8 @@ HRESULT CLevel_GamePlay::Initialize_Clone()
 	//if (FAILED(Ready_HUD()))
 	//	return E_FAIL;
 	
-	if (FAILED(Ready_Layer_Player(TEXT("Layer_Player"))))
-		return E_FAIL;
+	/*if (FAILED(Ready_Layer_Player(TEXT("Layer_Player"))))
+		return E_FAIL;*/
 	
 	if (FAILED(Ready_Layer_Terrain(TEXT("Layer_Terrain"))))
 		return E_FAIL;

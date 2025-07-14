@@ -50,6 +50,7 @@ private:
 	vector<class CInventorySkill_Slot*> m_SkillSlots = {};
 	vector<class CInventoryItem_Slot*> m_ItemSlots = {};
 	vector<class CInventoryStatus_Icon*> m_StatusIcons = {};
+	vector<class CInventoryStatus_Info*> m_StatusInfos = {};
 	PANELTYPE m_ePanelType = {};
 	_uint m_iInventory_Slot = {};
 	

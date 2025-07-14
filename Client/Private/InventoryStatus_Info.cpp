@@ -1,4 +1,5 @@
-﻿
+﻿#include "InventoryStatus_Info.h"
+
 CInventoryStatus_Info::CInventoryStatus_Info(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CUIObject(pDevice, pContext)
 {
@@ -31,15 +32,9 @@ HRESULT CInventoryStatus_Info::Initialize_Clone(void* pArg)
     if (FAILED(__super::Initialize_Clone(pArg)))
         return E_FAIL;
 
-    STATUS_ICON_DESC* pDesc = static_cast<STATUS_ICON_DESC*>(pArg);
-    if (FAILED(Ready_Components(pDesc)))
+    STATUS_INFO_DESC* pDesc = static_cast<STATUS_INFO_DESC*>(pArg);
+    if (FAILED(Ready_Components()))
         return E_FAIL;
-
-    m_iTextureIndex = pDesc->iTextureIndex;
-
-    //m_pTransformCom->Scale(_float3(0.8f, 0.8f, 1.f));
-
-    /* Change Skill로 기본 Skill들 채워넣기*/
 
 
     return S_OK;
@@ -55,11 +50,6 @@ void CInventoryStatus_Info::Update(_float fTimeDelta)
 {
     __super::Update(fTimeDelta);
 
-    if (Mouse_InRect2D(g_hWnd))
-    {
-        if (m_pGameInstance->Get_MouseKeyUp(MOUSEKEYSTATE::LB))
-            MSG_BOX(TEXT("Status Check"));
-    }
 }
 
 void CInventoryStatus_Info::Late_Update(_float fTimeDelta)
@@ -76,6 +66,15 @@ HRESULT CInventoryStatus_Info::Render()
     if (m_pTextureCom == nullptr)
         return S_OK;
 
+
+    if (ImGui::IsWindowAppearing())              // 또는 static bool once=true;
+    {
+        ImGui::SetNextWindowPos({ 100, 100 }, ImGuiCond_Appearing);
+        ImGui::SetNextWindowSize({ 460, 240 }, ImGuiCond_Appearing); // ← 원하는 픽셀
+    }
+
+   
+
     __super::Begin();
     
     if (FAILED(Ready_Render_Resources()))
@@ -87,12 +86,31 @@ HRESULT CInventoryStatus_Info::Render()
 
     m_pVIBufferCom->Render();
 
+
+    Render_Info();
     __super::End();
 
     return S_OK;
 }
 
-HRESULT CInventoryStatus_Info::Ready_Components(STATUS_ICON_DESC* pDesc)
+void CInventoryStatus_Info::Render_Info()
+{
+    _float fScreenX = m_RenderMatrix._41 + (g_iWinSizeX >> 1) -430.f;
+    _float fScreenY = (g_iWinSizeY >> 1) - m_RenderMatrix._42 - 20.f;
+
+
+    _float2 vPosition = { fScreenX , fScreenY };
+
+    m_statusString = L"STATUS";
+
+    wchar_t szBuffer[64] = {};
+    swprintf_s(szBuffer, m_statusString.c_str());
+
+    m_pGameInstance->Render_Font(TEXT("HUD_TEXT"), szBuffer
+        , vPosition, XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f, {}, 1.f);
+}
+
+HRESULT CInventoryStatus_Info::Ready_Components()
 {
     if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxPosTex"),
         TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom), nullptr)))
@@ -102,11 +120,9 @@ HRESULT CInventoryStatus_Info::Ready_Components(STATUS_ICON_DESC* pDesc)
         TEXT("Com_VIBuffer"), reinterpret_cast<CComponent**>(&m_pVIBufferCom), nullptr)))
         return E_FAIL;
 
-    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_StatusIcon"),
+    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Inventory_StatusInfo"),
         TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom), nullptr)))
         return E_FAIL;
-
-    // Texture Component는 Change Skill 이벤트로 넣는다.
 
     return S_OK;
 }

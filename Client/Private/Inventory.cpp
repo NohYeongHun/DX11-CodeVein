@@ -40,6 +40,16 @@ void CInventory::Set_Visibility()
 void CInventory::Change_Skill(_uint iSkillPanel, _uint iSkillSlot, const _wstring& strTextureTag, _uint iTextureIndex)
 {
     m_InventorySkill_Panels[iSkillPanel]->Change_Skill(iSkillSlot, strTextureTag, iTextureIndex);
+
+
+    // 동시에 HUD에도 동기화를 해주어야합니다.
+    HUD_SKILLCHANGE_DESC Desc{};
+    Desc.iSkillPanelIdx = iSkillPanel;
+    Desc.pText = TEXT("Action_SkillIcon");
+    Desc.iSlotIdx = iSkillSlot;
+    Desc.iTextureIdx = iTextureIndex;
+
+    m_pGameInstance->Publish<HUD_SKILLCHANGE_DESC>(EventType::HUD_SKILL_CHANGE, &Desc);
 }
 
 
@@ -53,12 +63,11 @@ HRESULT CInventory::Initialize_Prototype()
 
 HRESULT CInventory::Initialize_Clone(void* pArg)
 {
-    // Inventory 는 크기가 없이 위치만.
-    UIOBJECT_DESC  
-        Desc{};
+
+    UIOBJECT_DESC  Desc{};
     // 정 중앙 위치
     Desc.fX = (g_iWinSizeX >> 1) - 300.f;
-    Desc.fY = (g_iWinSizeY >> 1) - 100.f;
+    Desc.fY = (g_iWinSizeY >> 1) - 50.f;
     Desc.fSizeX = 600;
     Desc.fSizeY = 300;
 
@@ -93,6 +102,61 @@ void CInventory::Update(_float fTimeDelta)
 {
     if (!m_IsVisibility)
         return;
+
+    INVENTORY_SKILLCHANGE_DESC Desc{};
+    Desc.iSkillPanelIdx = SKILL_PANEL::SKILL_PANEL_RIGHT_TOP;
+    Desc.pText = TEXT("Action_SkillIcon");
+
+    if (m_pGameInstance->Get_KeyUp(DIK_1))
+    {
+        Desc.iSlotIdx = 0;
+        Desc.iTextureIdx = 0;
+        m_pGameInstance->Publish(EventType::INVENTORY_SKILL_CHANGE, &Desc);
+    }
+    if (m_pGameInstance->Get_KeyUp(DIK_2))
+    {
+        Desc.iSlotIdx = 1;
+        Desc.iTextureIdx = 1;
+        m_pGameInstance->Publish(EventType::INVENTORY_SKILL_CHANGE, &Desc);
+    }
+    if (m_pGameInstance->Get_KeyUp(DIK_3))
+    {
+        Desc.iSlotIdx = 2;
+        Desc.iTextureIdx = 2;
+        m_pGameInstance->Publish(EventType::INVENTORY_SKILL_CHANGE, &Desc);
+    }
+    if (m_pGameInstance->Get_KeyUp(DIK_4))
+    {
+        Desc.iSlotIdx = 3;
+        Desc.iTextureIdx = 3;
+        m_pGameInstance->Publish(EventType::INVENTORY_SKILL_CHANGE, &Desc);
+    }
+
+    Desc.iSkillPanelIdx = SKILL_PANEL::SKILL_PANEL_RIGHT_BOTTOM;
+    if(m_pGameInstance->Get_KeyUp(DIK_5))
+    {
+        Desc.iSlotIdx = 0;
+        Desc.iTextureIdx = 4;
+        m_pGameInstance->Publish(EventType::INVENTORY_SKILL_CHANGE, &Desc);
+    }
+    if (m_pGameInstance->Get_KeyUp(DIK_6))
+    {
+        Desc.iSlotIdx = 1;
+        Desc.iTextureIdx = 5;
+        m_pGameInstance->Publish(EventType::INVENTORY_SKILL_CHANGE, &Desc);
+    }
+    if (m_pGameInstance->Get_KeyUp(DIK_7))
+    {
+        Desc.iSlotIdx = 2;
+        Desc.iTextureIdx = 6;
+        m_pGameInstance->Publish(EventType::INVENTORY_SKILL_CHANGE, &Desc);
+    }
+    if (m_pGameInstance->Get_KeyUp(DIK_8))
+    {
+        Desc.iSlotIdx = 3;
+        Desc.iTextureIdx = 7;
+        m_pGameInstance->Publish(EventType::INVENTORY_SKILL_CHANGE, &Desc);
+    }
 
     __super::Update(fTimeDelta);
 }
@@ -339,7 +403,7 @@ HRESULT CInventory::Ready_Events()
 
 HRESULT CInventory::Ready_Skills()
 {
-    INVENTORY_SKILLCHANGE_DESC Desc{};
+    /*INVENTORY_SKILLCHANGE_DESC Desc{};
     Desc.pText = TEXT("Action_SkillIcon");
     Desc.iSkillPanelIdx = SKILL_PANEL_LEFT;
     Desc.iSlotIdx = 0;
@@ -348,7 +412,7 @@ HRESULT CInventory::Ready_Skills()
 
     Desc.iSlotIdx = 2;
     Desc.iTextureIdx = 1;
-    m_pGameInstance->Publish(EventType::INVENTORY_SKILL_CHANGE, &Desc);
+    m_pGameInstance->Publish(EventType::INVENTORY_SKILL_CHANGE, &Desc);*/
 
     return S_OK;
 }

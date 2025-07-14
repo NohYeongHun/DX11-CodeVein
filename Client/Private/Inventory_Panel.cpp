@@ -66,26 +66,21 @@ HRESULT CInventory_Panel::Render()
     /*wstring_convert<codecvt_utf8<wchar_t>> converter;
     string str = converter.to_bytes(m_strObjTag);*/
 
-    if (m_ePanelType == STATUS_PANEL)
-    {
-        if (ImGui::IsWindowAppearing())              // 또는 static bool once=true;
-        {
-            ImGui::SetNextWindowPos({ 100, 100 }, ImGuiCond_Appearing);
-            ImGui::SetNextWindowSize({ 460, 240 }, ImGuiCond_Appearing); // ← 원하는 픽셀
-        }
+    //if (m_ePanelType == STATUS_PANEL)
+    //{
+    //    if (ImGui::IsWindowAppearing())              // 또는 static bool once=true;
+    //    {
+    //        ImGui::SetNextWindowPos({ 100, 100 }, ImGuiCond_Appearing);
+    //        ImGui::SetNextWindowSize({ 460, 240 }, ImGuiCond_Appearing); // ← 원하는 픽셀
+    //    }
 
-        string str = "Inventory Panel[" + to_string(Get_ID()) + ']';
-        ImGui::Begin(str.c_str());
-        ImGui::InputFloat("FX", &m_fX);
-        ImGui::InputFloat("FY", &m_fY);
-        ImGui::End();
-    }
+    //    string str = "Inventory Panel[" + to_string(Get_ID()) + ']';
+    //    ImGui::Begin(str.c_str());
+    //    ImGui::InputFloat("FX", &m_fX);
+    //    ImGui::InputFloat("FY", &m_fY);
+    //    ImGui::End();
+    //}
 
-    
-
-    __super::Begin();
-
-    __super::End();
 
     return S_OK;
 }
@@ -200,6 +195,7 @@ HRESULT CInventory_Panel::Ready_Item_Childs(INVENTORY_PANEL_DESC* pDesc)
 
 HRESULT CInventory_Panel::Ready_Status_Childs(INVENTORY_PANEL_DESC* pDesc)
 {
+    
     m_iInventory_Slot = pDesc->iInventorySlot;
     _float fSizeX = pDesc->fSlot_SizeX;
     _float fSizeY = pDesc->fSlot_SizeY;
@@ -233,6 +229,26 @@ HRESULT CInventory_Panel::Ready_Status_Childs(INVENTORY_PANEL_DESC* pDesc)
         AddChild(pUIObject);
         m_StatusIcons.push_back(static_cast<CInventoryStatus_Icon*>(pUIObject));
     }
+
+    /* Status 설명창 */
+    UIOBJECT_DESC InfoDesc{};
+
+    InfoDesc.fX = 160.f;
+    InfoDesc.fY = 100.f;
+    InfoDesc.fSizeX = 900.f;
+    InfoDesc.fSizeY = 80.f;
+
+    pUIObject = dynamic_cast<CUIObject*>(
+        m_pGameInstance->Clone_Prototype(
+            PROTOTYPE::GAMEOBJECT
+            , ENUM_CLASS(LEVEL::STATIC)
+            , TEXT("Prototype_GameObject_InventoryStatus_Info"), &InfoDesc));
+
+    if (nullptr == pUIObject)
+        return E_FAIL;
+
+    AddChild(pUIObject);
+    m_StatusInfos.push_back(static_cast<CInventoryStatus_Info*>(pUIObject));
 
     return S_OK;
 }
@@ -269,4 +285,8 @@ void CInventory_Panel::Destroy()
 void CInventory_Panel::Free()
 {
     __super::Free();
+    m_SkillSlots.clear();
+    m_ItemSlots.clear();
+    m_StatusIcons.clear();
+    m_StatusInfos.clear();
 }

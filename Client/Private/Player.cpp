@@ -28,7 +28,8 @@ HRESULT CPlayer::Initialize_Clone(void* pArg)
     if (FAILED(Ready_Components(pDesc)))
         return E_FAIL;
 
-    m_pTransformCom->Rotation(XMVectorSet(1.f, 0.f, 0.f, 0.f), XMConvertToRadians(90.f));
+    // Player 정면 바라보게 하기?
+    //m_pTransformCom->Rotation(XMVectorSet(1.f, 0.f, 0.f, 0.f), XMConvertToRadians(270.f));
 
     return S_OK;
 }
@@ -94,7 +95,7 @@ HRESULT CPlayer::Render()
         
 
     _uint iNumMeshes = m_pModelCom->Get_NumMeshes();
-    for (size_t i = 0; i < iNumMeshes; i++)
+    for (_uint i = 0; i < iNumMeshes; i++)
     {
         if (FAILED(m_pShaderCom->Begin(0)))
             return E_FAIL;

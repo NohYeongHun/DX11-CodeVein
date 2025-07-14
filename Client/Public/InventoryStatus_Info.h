@@ -5,10 +5,10 @@ NS_BEGIN(Client)
 class CInventoryStatus_Info final : public CUIObject
 {
 public:
-	typedef struct tagStatusIconDesc : CUIObject::UIOBJECT_DESC
+	typedef struct tagStatusInfoDesc : CUIObject::UIOBJECT_DESC
 	{
-		_uint iTextureIndex = {};
-	}STATUS_ICON_DESC;
+
+	}STATUS_INFO_DESC;
 
 private:
 	explicit CInventoryStatus_Info(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -34,9 +34,14 @@ private:
 
 	_uint m_iTextureIndex = {};
 
+	_wstring m_statusString = {};
+
 
 private:
-	HRESULT Ready_Components(STATUS_ICON_DESC* pDesc);
+	void Render_Info();
+
+private:
+	HRESULT Ready_Components();
 	HRESULT Ready_Render_Resources();
 
 public:
