@@ -219,6 +219,9 @@
     <ClInclude Include="..\Public\InventoryStatus_Icon.h">
       <Filter>02. GameObject\UI\Player\Inventory\Status</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\InventoryStatus_Info.h">
+      <Filter>02. GameObject\UI\Player\Inventory\Status</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -355,6 +358,9 @@
       <Filter>02. GameObject\UI\Player\Inventory\Item</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\InventoryStatus_Icon.cpp">
+      <Filter>02. GameObject\UI\Player\Inventory\Status</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\InventoryStatus_Info.cpp">
       <Filter>02. GameObject\UI\Player\Inventory\Status</Filter>
     </ClCompile>
   </ItemGroup>

@@ -53,6 +53,7 @@
 #include "InventoryItem_Icon.h"
 #include "InventoryItem_Slot.h"
 #include "InventoryStatus_Icon.h"
+#include "InventoryStatus_Info.h"
 
 
 
