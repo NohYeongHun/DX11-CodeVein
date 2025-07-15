@@ -12,6 +12,8 @@ CMesh::CMesh(const CMesh& Prototype)
 
 HRESULT CMesh::Initialize_Prototype(const aiMesh* pAIMesh, _fmatrix PreTransformMatrix)
 {
+	// Material Index 설정.
+	m_iMaterialIndex = pAIMesh->mMaterialIndex;
 	m_iNumVertices = pAIMesh->mNumVertices;
 	m_iVertexStride = sizeof(VTXMESH);
 	m_iNumIndices = pAIMesh->mNumFaces * 3;

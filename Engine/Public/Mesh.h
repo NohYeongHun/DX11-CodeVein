@@ -12,6 +12,10 @@ private:
 	virtual ~CMesh() = default;
 
 public:
+	const _uint Get_MaterialIndex() { return m_iMaterialIndex; }
+
+
+public:
 	virtual HRESULT Initialize_Prototype(const aiMesh* pMesh, _fmatrix PreTransformMatrix);
 	virtual HRESULT Initialize_Clone(void* pArg) override;
 
@@ -21,6 +25,7 @@ public:
 	HRESULT Render();
 
 private:
+	_uint m_iMaterialIndex = { };
 
 
 public:

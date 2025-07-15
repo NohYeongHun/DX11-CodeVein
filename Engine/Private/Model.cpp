@@ -51,9 +51,16 @@ HRESULT CModel::Initialize_Clone(void* pArg)
     return S_OK;
 }
 
-HRESULT CModel::Bind_Shader_Resource(CShader* pShader, const _char* pConstantName, _uint iMaterialIndex, _uint iTextureType, _uint iTextureIndex)
+HRESULT CModel::Bind_Shader_Resource(CShader* pShader, const _char* pConstantName, _uint iMeshIndex, aiTextureType eTextureType, _uint iTextureIndex)
 {
-	return m_Materials[iMaterialIndex]->Bind_Shader_Resource(pShader, pConstantName, iTextureType, iTextureIndex);
+	// 1. Model에서 Material Index를 가져오고
+	// 이거를 m_Materials MaterialIndex
+	_uint iMaterialIndex = m_Meshes[iMeshIndex]->Get_MaterialIndex();
+
+	if (iMaterialIndex >= m_Meshes.size()) 
+		return E_FAIL;
+
+	return m_Materials[iMaterialIndex]->Bind_Shader_Resource(pShader, pConstantName, eTextureType, iTextureIndex);
 }
 
 HRESULT CModel::Render(_uint iNumMesh)
@@ -73,10 +80,10 @@ HRESULT CModel::Ready_Meshes(_fmatrix PreTransformMatrix)
 
 	for (_uint i = 0; i < m_iNumMeshes; i++)
 	{
-		string szPath = m_pAIScene->mMeshes[i]->mName.data;
-		_wstring MeshName(szPath.begin(), szPath.end());
-		MeshName += L" : " + to_wstring(i);
-		MSG_BOX(MeshName.c_str());
+		//string szPath = m_pAIScene->mMeshes[i]->mName.data;
+		//_wstring MeshName(szPath.begin(), szPath.end());
+		//MeshName += L" : " + to_wstring(i);
+		//MSG_BOX(MeshName.c_str());
 
 		CMesh* pMesh = CMesh::Create(m_pDevice, m_pContext, m_pAIScene->mMeshes[i], PreTransformMatrix);
 		if (nullptr == pMesh)

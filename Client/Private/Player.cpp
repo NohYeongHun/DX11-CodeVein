@@ -97,9 +97,8 @@ HRESULT CPlayer::Render()
     _uint iNumMeshes = m_pModelCom->Get_NumMeshes();
     for (_uint i = 0; i < iNumMeshes; i++)
     {
-        m_pModelCom->Bind_Shader_Resource(m_pShaderCom, "g_DiffuseTexture", i, 1, 0);
+        m_pModelCom->Bind_Shader_Resource(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE, 0);
         
-           
 
         if (FAILED(m_pShaderCom->Begin(0)))
             return E_FAIL;

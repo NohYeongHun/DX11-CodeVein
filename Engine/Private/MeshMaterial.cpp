@@ -14,6 +14,12 @@ HRESULT CMeshMaterial::Initialize(const _char* pModelFilePath, const aiMaterial*
 	// 폴더 경로 지정. szDrive, szDir
 	_char szDir[MAX_PATH] = {};
 
+	/* 1. Dir 가져오기. */
+	/* C:\Users\dkznd\Desktop\DX11\DX11Code\Mine\MyFramework\Framework\Client\Bin\Resources\Models\Player.fbx */
+	/* Drvie : C:\ */
+	/* Dir : Users\dkznd\Desktop\DX11\DX11Code\Mine\MyFramework\Framework\Client\Bin\Resources\Models\ */
+	/* Filename : Player */
+	/* Ext .fbx */
 	_splitpath_s(pModelFilePath, nullptr, 0, szDir, MAX_PATH, nullptr, 0, nullptr, 0);
 
 	string strDirPath = string(szDir);
@@ -56,8 +62,8 @@ HRESULT CMeshMaterial::Initialize(const _char* pModelFilePath, const aiMaterial*
 			}
 				
 
-			texPath = L"Material Name (" + to_wstring(iNum) + L") " + texPath;
-			MSG_BOX(texPath.c_str());
+			//texPath = L"Material Name (" + to_wstring(iNum) + L") " + texPath;
+			//MSG_BOX(texPath.c_str());
 
 			m_SRVs[i].push_back(pSRV);
 
@@ -70,12 +76,12 @@ HRESULT CMeshMaterial::Initialize(const _char* pModelFilePath, const aiMaterial*
 	return S_OK;
 }
 
-HRESULT CMeshMaterial::Bind_Shader_Resource(CShader* pShader, const _char* pConstantName, _uint iTextureType, _uint iTextureIndex)
+HRESULT CMeshMaterial::Bind_Shader_Resource(CShader* pShader, const _char* pConstantName, aiTextureType eTextureType, _uint iTextureIndex)
 {
-	if (iTextureIndex >= m_SRVs[iTextureType].size())
+	if (iTextureIndex >= m_SRVs[eTextureType].size())
 		return E_FAIL;
 
-	return pShader->Bind_SRV(pConstantName, m_SRVs[iTextureType][iTextureIndex]);
+	return pShader->Bind_SRV(pConstantName, m_SRVs[eTextureType][iTextureIndex]);
 }
 
 CMeshMaterial* CMeshMaterial::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _char* pModelFilePath, const aiMaterial* pAIMaterial)

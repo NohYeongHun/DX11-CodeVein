@@ -22,7 +22,7 @@ public:
 
 
 public:
-	HRESULT Bind_Shader_Resource(CShader* pShader, const _char* pConstantName, _uint iMaterialIndex, _uint iTextureType, _uint iTextureIndex);
+	HRESULT Bind_Shader_Resource(CShader* pShader, const _char* pConstantName, _uint iMeshIndex, aiTextureType eTextureType, _uint iTextureIndex);
 	HRESULT Render(_uint iNumMesh);
 
 private:
