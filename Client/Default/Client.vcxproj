@@ -192,6 +192,10 @@
     <ClInclude Include="..\Public\Loading_Panel.h" />
     <ClInclude Include="..\Public\Loading_Slot.h" />
     <ClInclude Include="..\Public\Player.h" />
+    <ClInclude Include="..\Public\SkillUI.h" />
+    <ClInclude Include="..\Public\SkillUI_Icon.h" />
+    <ClInclude Include="..\Public\SkillUI_Panel.h" />
+    <ClInclude Include="..\Public\SkillUI_Slot.h" />
     <ClInclude Include="..\Public\SteminaBar.h" />
     <ClInclude Include="..\Public\Title_BackGround.h" />
     <ClInclude Include="..\Public\MainApp.h" />
@@ -245,6 +249,10 @@
     <ClCompile Include="..\Private\Loading_Panel.cpp" />
     <ClCompile Include="..\Private\Loading_Slot.cpp" />
     <ClCompile Include="..\Private\Player.cpp" />
+    <ClCompile Include="..\Private\SkillUI.cpp" />
+    <ClCompile Include="..\Private\SkillUI_Icon.cpp" />
+    <ClCompile Include="..\Private\SkillUI_Panel.cpp" />
+    <ClCompile Include="..\Private\SkillUI_Slot.cpp" />
     <ClCompile Include="..\Private\SteminaBar.cpp" />
     <ClCompile Include="..\Private\Title_BackGround.cpp" />
     <ClCompile Include="..\Private\MainApp.cpp" />

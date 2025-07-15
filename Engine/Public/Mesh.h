@@ -12,7 +12,7 @@ private:
 	virtual ~CMesh() = default;
 
 public:
-	virtual HRESULT Initialize_Prototype(const aiMesh* pMesh);
+	virtual HRESULT Initialize_Prototype(const aiMesh* pMesh, _fmatrix PreTransformMatrix);
 	virtual HRESULT Initialize_Clone(void* pArg) override;
 
 public:
@@ -24,7 +24,7 @@ private:
 
 
 public:
-	static CMesh* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const aiMesh* pMesh);
+	static CMesh* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const aiMesh* pMesh, _fmatrix PreTransformMatrix );
 	virtual CComponent* Clone(void* pArg) override;
 	virtual void Free() override;
 };

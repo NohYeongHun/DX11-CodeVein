@@ -22,6 +22,12 @@ HRESULT CTexture::Initialize_Prototype(const _tchar* pTextureFilePath, _uint iNu
     
     _wsplitpath_s(pTextureFilePath, nullptr, 0, nullptr, 0, nullptr, 0, szExt, MAX_PATH);
 
+    /* D:\Burger\153\Framework\Engine\PrivateBurger\153\Framework\Engine\Private\Texture%d.png*/
+    //_wsplitpath_s(pTextureFilePath, nullptr, 0, nullptr, 0, nullptr, 0, szExt, MAX_PATH);
+    /*_tchar szFullPath[MAX_PATH] = {};
+        string strPath = strTexturePath.data;
+        HRESULT hr = CreateWICTextureFromFile(m_pDevice, szFullPath, nullptr, &pSRV);*/
+
     for (_uint i = 0; i < iNumTextures; i++)
     {
         _tchar szFullPath[MAX_PATH] = {};

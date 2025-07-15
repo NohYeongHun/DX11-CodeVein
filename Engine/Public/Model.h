@@ -16,12 +16,13 @@ public:
 	}
 
 public:
-	virtual HRESULT Initialize_Prototype(const _char* pModelFilePath);
+	virtual HRESULT Initialize_Prototype(MODELTYPE eModelType, _fmatrix PreTransformMatrix, const _char* pModelFilePath);
 	virtual HRESULT Initialize_Clone(void* pArg);
 
 
 
 public:
+	HRESULT Bind_Shader_Resource(CShader* pShader, const _char* pConstantName, _uint iMaterialIndex, _uint iTextureType, _uint iTextureIndex);
 	HRESULT Render(_uint iNumMesh);
 
 private:
@@ -29,14 +30,25 @@ private:
 	Assimp::Importer m_Importer = {};
 
 private:
+	MODELTYPE m_ModelType = {};
+	_float4x4 m_PreTransformMatrix = {};
+
 	_uint m_iNumMeshes = {};
-	vector<class CMesh*> m_Meshes = {};
+	vector<class CMesh*> m_Meshes;
+
+
+	_uint m_iNumMaterials = {};
+	vector<class CMeshMaterial*> m_Materials;
+
+
 
 private:
-	HRESULT Ready_Meshes();
+	HRESULT Ready_Meshes(_fmatrix PreTransformMatrix);
+	HRESULT Ready_Materials(const _char* pModelFilePath);
+
 
 public:
-	static CModel* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _char* pModelFilePath);
+	static CModel* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, MODELTYPE eModelType, _fmatrix PreTransformMatrix, const _char* pModelFilePath);
 	virtual CComponent* Clone(void* pArg) override;
 	virtual void Free() override;
 };

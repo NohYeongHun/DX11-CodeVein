@@ -127,6 +127,9 @@
     <Filter Include="01. Utility\03. Component\Model\Mesh">
       <UniqueIdentifier>{d2dd22a0-bd0b-422a-9f20-69067df7a144}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01. Utility\03. Component\Model\Material">
+      <UniqueIdentifier>{709e7145-bdaa-4a94-afd7-021b926be0ec}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Timer.cpp">
@@ -245,6 +248,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Mesh.cpp">
       <Filter>01. Utility\03. Component\Model\Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\MeshMaterial.cpp">
+      <Filter>01. Utility\03. Component\Model\Material</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -385,6 +391,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\Mesh.h">
       <Filter>01. Utility\03. Component\Model\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\MeshMaterial.h">
+      <Filter>01. Utility\03. Component\Model\Material</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

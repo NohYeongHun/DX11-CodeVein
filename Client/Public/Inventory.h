@@ -13,6 +13,13 @@ public:
 		SKILL_PANEL_END
 	};
 
+	enum SKILLINFO_PANEL : _uint
+	{
+		SKILLINFO_PANEL = 0,
+		SKILLINFO_END
+	};
+
+
 	enum ITEM_PANEL : _uint
 	{
 		ITEM_PANEL_TOP = 0,
@@ -52,6 +59,8 @@ private:
 	HRESULT Ready_Components();
 	HRESULT Ready_Childs();
 	HRESULT Ready_SkillPanel();
+
+
 	HRESULT Ready_ItemPanel();
 	HRESULT Ready_StatusPanel();
 	HRESULT Ready_Events();
@@ -70,7 +79,7 @@ private:
 
 	vector<class CInventory_Panel*> m_InventorySkill_Panels = {};
 	vector<class CInventory_Panel*> m_InventoryItem_Panels = {};
-	vector<class CInventory_Panel*> m_InventoryStatus_Panels = {};
+	vector<class CInventory_Panel*> m_InventoryStatus_Panels = {}; 
 
 	vector<EventType> m_Events = {};
 	_bool m_IsVisibility = { };

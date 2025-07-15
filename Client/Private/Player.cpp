@@ -90,13 +90,17 @@ HRESULT CPlayer::Render()
     ImGui::InputFloat("Z : ", &vPosition.z);
     ImGui::End();
 
+
     if (FAILED(Ready_Render_Resources()))
         return E_FAIL;
-        
 
     _uint iNumMeshes = m_pModelCom->Get_NumMeshes();
     for (_uint i = 0; i < iNumMeshes; i++)
     {
+        m_pModelCom->Bind_Shader_Resource(m_pShaderCom, "g_DiffuseTexture", i, 1, 0);
+        
+           
+
         if (FAILED(m_pShaderCom->Begin(0)))
             return E_FAIL;
 

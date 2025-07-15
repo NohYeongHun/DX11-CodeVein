@@ -1,13 +1,32 @@
+
 matrix g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
+
+vector g_vLightDir = vector(1.f, -1.f, 1.f, 0.f);
+vector g_vLightDiffuse = vector(1.f, 1.f, 1.f, 1.f);
+vector g_vLightAmbient = vector(0.4f, 0.4f, 0.4f, 1.f);
+vector g_vLightSpecular = vector(1.f, 1.f, 1.f, 1.f);
+
+vector g_vCamPosition;
+
+/*재질*/
 texture2D g_DiffuseTexture;
-texture2D g_NormalTexture;
+vector g_vMtrlAmbient = 1.f;
+vector g_vMtrlSpecular = 1.f;
+
+
+sampler DefaultSampler = sampler_state
+{
+    filter = min_mag_mip_linear;
+    AddressU = wrap;
+    AddressV = wrap;
+};
 
 struct VS_IN
 {
     float3 vPosition : POSITION;
     float3 vNormal : NORMAL;
     float3 vTangent : TANGENT;
-    float3 vBiNormal : BINORMAL;
+    float3 vBinormal : BINORMAL;
     float2 vTexcoord : TEXCOORD0;
 };
 
@@ -15,8 +34,6 @@ struct VS_OUT
 {
     float4 vPosition : SV_POSITION;
     float4 vNormal : NORMAL;
-    float4 vTangent : TANGENT;
-    float4 vBinormal : BINORMAL;
     float2 vTexcoord : TEXCOORD0;
     float4 vWorldPos : TEXCOORD1;
 };
@@ -36,11 +53,8 @@ VS_OUT VS_MAIN(VS_IN In)
     matWVP = mul(matWV, g_ProjMatrix);
     
     Out.vPosition = mul(float4(In.vPosition, 1.f), matWVP);
-    Out.vNormal = mul(float4(In.vNormal, 0.f), g_WorldMatrix); // 정점의 노말 벡터를 World 행렬을 곱해준다.
-    Out.vTangent = mul(float4(In.vTangent, 0.f), g_WorldMatrix);
-    Out.vBinormal = mul(float4(In.vBiNormal, 0.f), g_WorldMatrix);
+    Out.vNormal = mul(float4(In.vNormal, 0.f), g_WorldMatrix);
     Out.vTexcoord = In.vTexcoord;
-    
     Out.vWorldPos = mul(float4(In.vPosition, 1.f), g_WorldMatrix);
     
     return Out;
@@ -54,40 +68,66 @@ struct PS_IN
 {
     float4 vPosition : SV_POSITION;
     float4 vNormal : NORMAL;
-    float4 vTangent : TANGENT;
-    float4 vBinormal : BINORMAL;
     float2 vTexcoord : TEXCOORD0;
     float4 vWorldPos : TEXCOORD1;
+
 };
 
 struct PS_OUT
 {
     float4 vColor : SV_TARGET0;
+    
 };
 
 /* 만든 픽셀 각각에 대해서 픽셀 쉐이더를 수행한다. */
 /* 픽셀의 색을 결정한다. */
 
 
-
 PS_OUT PS_MAIN(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
-    Out.vColor = float4(0.f, 0.f, 0.f, 1.f);
     
+    //vector vMtrlDiffuse = 1.f; /*g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord * 50.f)*/
+    vector vMtrlDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
     
-   
+    float fShade = max(dot(normalize(g_vLightDir) * -1.f, normalize(In.vNormal)), 0.f);
+    
+    /*슬라이딩 이야기했다*/
+    vector vReflect = reflect(normalize(g_vLightDir), normalize(In.vNormal));
+    vector vLook = In.vWorldPos - g_vCamPosition;
+    
+    float fSpecular = pow(max(dot(normalize(vLook) * -1.f, normalize(vReflect)), 0.f), 50.0f);
+    
+    Out.vColor = (g_vLightDiffuse * vMtrlDiffuse) * saturate(fShade + (g_vLightAmbient * g_vMtrlAmbient)) +
+                    (g_vLightSpecular * g_vMtrlSpecular) * fSpecular;
+    
     return Out;
 }
 
 technique11 DefaultTechnique
 {
-    pass Default
+    /* 특정 패스를 이용해서 점정을 그려냈다. */
+    /* 하나의 모델을 그려냈다. */ 
+    /* 모델의 상황에 따라 다른 쉐이딩 기법 세트(명암 + 림라이트 + 스펙큘러 + 노멀맵 + ssao )를 먹여주기위해서 */
+    pass DefaultPass
     {
-
         VertexShader = compile vs_5_0 VS_MAIN();
-        GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_MAIN();
     }
+
+    ///* 모델의 상황에 따라 다른 쉐이딩 기법 세트(블렌딩 + 디스토션  )를 먹여주기위해서 */
+    //pass DefaultPass1
+    //{
+    //    VertexShader = compile vs_5_0 VS_MAIN1();
+
+    //}
+
+    ///* 정점의 정보에 따라 쉐이더 파일을 작성한다. */
+    ///* 정점의 정보가 같지만 완전히 다른 취급을 하느 ㄴ객체나 모델을 그리는 방식 -> 렌더링방식에 차이가 생길 수 있다. */ 
+    //pass DefaultPass1
+    //{
+    //    VertexShader = compile vs_5_0 VS_MAIN1();
+
+    //}
 
 }

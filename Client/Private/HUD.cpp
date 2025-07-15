@@ -106,7 +106,7 @@ void CHUD::Update(_float fTimeDelta)
     }*/
 
     // 마우스 왼쪽 클릭 시 쿨타임 돌게하기.
-    if (m_pGameInstance->Get_MouseKeyUp(MOUSEKEYSTATE::LB))
+    /*if (m_pGameInstance->Get_MouseKeyUp(MOUSEKEYSTATE::LB))
     {
         SKILLEXECUTE_DESC Desc{};
         Desc.iSkillPanelIdx = SKILL_PANEL_TOP;
@@ -140,7 +140,7 @@ void CHUD::Update(_float fTimeDelta)
         SteminaDesc.iStemina = 40;
         SteminaDesc.fTime = 1.f;
         m_pGameInstance->Publish(EventType::STEMINA_CHANGE, &SteminaDesc);
-    }
+    }*/
 
     __super::Update(fTimeDelta);
 }

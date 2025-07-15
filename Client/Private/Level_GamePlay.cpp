@@ -11,11 +11,11 @@ CLevel_GamePlay::CLevel_GamePlay(ID3D11Device* pDevice, ID3D11DeviceContext* pCo
 
 HRESULT CLevel_GamePlay::Initialize_Clone()
 {
-	//if (FAILED(Ready_HUD()))
-	//	return E_FAIL;
+	if (FAILED(Ready_HUD()))
+		return E_FAIL;
 	
-	/*if (FAILED(Ready_Layer_Player(TEXT("Layer_Player"))))
-		return E_FAIL;*/
+	if (FAILED(Ready_Layer_Player(TEXT("Layer_Player"))))
+		return E_FAIL;
 	
 	if (FAILED(Ready_Layer_Terrain(TEXT("Layer_Terrain"))))
 		return E_FAIL;
@@ -46,6 +46,8 @@ void CLevel_GamePlay::Update(_float fTimeDelta)
 {
 	if (m_pGameInstance->Get_KeyUp(DIK_I))
 		m_pGameInstance->Publish<CInventory>(EventType::INVENTORY_DISPLAY, nullptr);
+
+	
 
 }
 

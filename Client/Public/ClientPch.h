@@ -56,6 +56,11 @@
 #include "InventoryStatus_Info.h"
 
 
+/* ======================================= SKillUI =================================== */
+#include "SkillUI.h"
+#include "SkillUI_Panel.h"
+#include "SkillUI_Slot.h"
+#include "SkillUI_Icon.h"
 
 
 /* ======================================= Loading Object =================================== */

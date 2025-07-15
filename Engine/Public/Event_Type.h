@@ -14,6 +14,7 @@ enum class EventType : _uint
 	STEMINA_CHANGE = 10,
 	INVENTORY_DISPLAY = 11,
 	INVENTORY_SKILL_CHANGE = 12,
+	SKILLINFO_DISPLAY = 13,
 	EVENT_END
 };
 
@@ -79,6 +80,12 @@ typedef struct tagInventorySkillChangeDesc
 }INVENTORY_SKILLCHANGE_DESC;
 #pragma endregion
 
+#pragma region SKILLINFO
+typedef struct tagSkillInfoDisplayDesc
+{
+	_bool Isvisibility;
+}SKILLINFO_DISPLAY_DESC;
+#pragma endregion
 
 
 

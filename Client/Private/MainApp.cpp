@@ -90,8 +90,9 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 	if (FAILED(Ready_Prototype_ForUsageTexture()))
 		return E_FAIL;
 	
-	/*if (FAILED(Ready_Prototype_ForModel()))
-		return E_FAIL;*/
+	/* Model Load */
+	if (FAILED(Ready_Prototype_ForModel()))
+		return E_FAIL;
 
 	if (FAILED(Ready_Prototype_HUD()))
 		return E_FAIL;
@@ -130,9 +131,15 @@ HRESULT CMainApp::Ready_Prototype_ForUsageTexture()
 // 2. Model Prototype Static에 생성.
 HRESULT CMainApp::Ready_Prototype_ForModel()
 {
+
+	_matrix		PreTransformMatrix = XMMatrixIdentity();
+
+	/* Prototype_Component_Model */
+	PreTransformMatrix = XMMatrixScaling(1.f, 1.f, 1.f) * XMMatrixRotationX(XMConvertToRadians(90.0f)) * XMMatrixRotationY(XMConvertToRadians(180.0f));
+
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
 		, TEXT("Prototype_Component_Model_Player")
-		, CModel::Create(m_pDevice, m_pContext, "../Bin/Resources/Models/Player/Player.fbx"))))
+		, CModel::Create(m_pDevice, m_pContext, MODELTYPE::NONANIM ,PreTransformMatrix,  "../Bin/Resources/Models/Player/Player.fbx"))))
 		return E_FAIL;
 
 	return S_OK;
@@ -258,6 +265,41 @@ HRESULT CMainApp::Ready_Prototype_Inventory()
 	
 
 
+	return S_OK;
+}
+
+HRESULT CMainApp::Ready_Prototype_SkillUI()
+{
+#pragma region TEXTURE
+	/* MIDDLE Inventory Texture */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
+		, TEXT("Prototype_Component_Texture_SkillUI_Panel")
+		, CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/User/SkillUI/Panel%d.png"), 1))))
+		return E_FAIL;
+#pragma endregion
+
+#pragma region OBJECT
+	// 1. UI Panel 출력부터.
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_SkillUI"),
+		CSkillUI::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_SkillUI_Panel"),
+		CSkillUI_Panel::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_SkillUI_Slot"),
+		CSkillUI_Slot::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_SkillUI_Icon"),
+		CSkillUI_Icon::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+#pragma endregion
+
+
+	
 	return S_OK;
 }
 

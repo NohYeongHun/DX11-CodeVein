@@ -102,6 +102,14 @@ void CInventory::Update(_float fTimeDelta)
 {
     if (!m_IsVisibility)
         return;
+    
+    if (m_pGameInstance->Get_KeyUp(DIK_S))
+    {
+        SKILLINFO_DISPLAY_DESC Desc{};
+        Desc.Isvisibility = true;
+        m_pGameInstance->Publish(EventType::SKILLINFO_DISPLAY, &Desc);
+    }
+
 
     INVENTORY_SKILLCHANGE_DESC Desc{};
     Desc.iSkillPanelIdx = SKILL_PANEL::SKILL_PANEL_RIGHT_TOP;
@@ -297,6 +305,7 @@ HRESULT CInventory::Ready_SkillPanel()
     return S_OK;
 }
 
+
 HRESULT CInventory::Ready_ItemPanel()
 {
 
@@ -473,12 +482,10 @@ void CInventory::Free()
     __super::Free();
 
     m_InventoryItem_Panels.clear();
-
-
     m_InventorySkill_Panels.clear();
+    m_InventoryStatus_Panels.clear();
 
     Safe_Release(m_pVIBufferCom);
     Safe_Release(m_pShaderCom);
-
     Safe_Release(m_pTextureCom);
 }
