@@ -199,10 +199,10 @@ POINT CGameInstance::Get_Mouse_Cursor(HWND hWnd)
 _bool CGameInstance::Mouse_InRect2D(HWND hWnd, _float2 vPosition, _float fSizeX, _float fSizeY)
 {
 	POINT pt = Get_Mouse_Cursor(hWnd);
-	RECT rcWindow = { (LONG)(vPosition.x - fSizeX)
-		, (LONG)(vPosition.y - fSizeY), 
-		  (LONG)(vPosition.x + fSizeX), 
-		  (LONG)(vPosition.y + fSizeY) };
+	RECT rcWindow = { (LONG)(vPosition.x - fSizeX * 0.5f)
+		, (LONG)(vPosition.y - fSizeY * 0.5f), 
+		  (LONG)(vPosition.x + fSizeX * 0.5f), 
+		  (LONG)(vPosition.y + fSizeY * 0.5f) };
 
 	return PtInRect(&rcWindow, pt);
 }
@@ -427,9 +427,9 @@ _bool CGameInstance::Get_KeyUp(_ubyte byKeyID)
 {
 	return m_pInput_Device->Get_KeyUp(byKeyID);
 }
-_bool CGameInstance::Get_MouseKeyDown(MOUSEKEYSTATE eMouse)
+_bool CGameInstance::Get_MouseKeyPress(MOUSEKEYSTATE eMouse)
 {
-	return m_pInput_Device->Get_MouseKeyDown(eMouse);
+	return m_pInput_Device->Get_MouseKeyPress(eMouse);
 }
 _bool CGameInstance::Get_MouseKeyUp(MOUSEKEYSTATE eMouse)
 {

@@ -16,6 +16,9 @@ private:
 	virtual ~CInventoryStatus_Info() = default;
 
 public:
+	void Set_Visibility();
+
+public:
 	// Status Info 체크.
 	void Change_Info(const _wstring& strTextureTag , _uint iTextureIndex);
 
@@ -35,7 +38,7 @@ private:
 	_uint m_iTextureIndex = {};
 
 	_wstring m_statusString = {};
-
+	_bool m_IsVisibility = {};
 
 private:
 	void Render_Info();

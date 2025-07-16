@@ -10,6 +10,11 @@ CInventoryStatus_Info::CInventoryStatus_Info(const CInventoryStatus_Info& Protot
 {
 }
 
+void CInventoryStatus_Info::Set_Visibility()
+{
+    m_IsVisibility = !m_IsVisibility;
+}
+
 void CInventoryStatus_Info::Change_Info(const _wstring& strTextureTag, _uint iTextureIndex)
 {
     m_iTextureIndex = iTextureIndex;
@@ -42,18 +47,28 @@ HRESULT CInventoryStatus_Info::Initialize_Clone(void* pArg)
 
 void CInventoryStatus_Info::Priority_Update(_float fTimeDelta)
 {
+    if (!m_IsVisibility)
+        return;
+
+
     __super::Priority_Update(fTimeDelta);
 }
 
 
 void CInventoryStatus_Info::Update(_float fTimeDelta)
 {
+    if (!m_IsVisibility)
+        return;
+
     __super::Update(fTimeDelta);
 
 }
 
 void CInventoryStatus_Info::Late_Update(_float fTimeDelta)
 {
+    if (!m_IsVisibility)
+        return;
+
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::STATIC_UI, this)))
         return;
 

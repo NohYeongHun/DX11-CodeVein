@@ -44,6 +44,7 @@ private:
 	HRESULT Ready_Clone_Texture();
 	HRESULT Ready_Clone_HUD(const _wstring& strLayerTag);
 	HRESULT Ready_Clone_Inventory(const _wstring& strLayerTag);
+	HRESULT Ready_Clone_SkillUI(const _wstring& strLayerTag);
 	
 #pragma endregion
 

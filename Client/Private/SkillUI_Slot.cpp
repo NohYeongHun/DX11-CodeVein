@@ -1,4 +1,5 @@
-﻿CSkillUI_Slot::CSkillUI_Slot(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿#include "SkillUI_Slot.h"
+CSkillUI_Slot::CSkillUI_Slot(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CUIObject(pDevice, pContext)
 {
 }
@@ -8,9 +9,37 @@ CSkillUI_Slot::CSkillUI_Slot(const CSkillUI_Slot& Prototype)
 {
 }
 
+void CSkillUI_Slot::Set_Visibility()
+{
+    m_IsVisibility = !m_IsVisibility;
+    if (nullptr != m_pSkill)
+        m_pSkill->Set_Visibility();
+}
+
+
+void CSkillUI_Slot::Update_SelectedInfo(_uint iPanelType, _uint iPanelIndex, _uint iSlotIndex)
+{
+    m_iSelect_PanelType = iPanelType;
+    m_iSelect_PanelIndex = iPanelIndex;
+    m_iSelect_SlotIndex = iSlotIndex;
+}
+
 void CSkillUI_Slot::Change_Skill(const _wstring& strTextureTag, _uint iTextureIndex)
 {
+    m_strTextureTag = strTextureTag;
+    m_iIcon_TextureIndex = iTextureIndex;
     m_pSkill->Change_Skill(strTextureTag, iTextureIndex);
+    
+}
+
+void CSkillUI_Slot::Change_Inventory_Skill()
+{
+    INVENTORY_SKILLCHANGE_DESC Desc{};
+    Desc.pText = m_strTextureTag.c_str();
+    Desc.iSkillPanelIdx = m_iSelect_PanelIndex;
+    Desc.iSlotIdx = m_iSelect_SlotIndex;
+    Desc.iTextureIdx = m_iIcon_TextureIndex;
+    m_pGameInstance->Publish(EventType::INVENTORY_SKILL_CHANGE, &Desc);
 }
 
 HRESULT CSkillUI_Slot::Initialize_Prototype()
@@ -23,7 +52,10 @@ HRESULT CSkillUI_Slot::Initialize_Clone(void* pArg)
     if (FAILED(__super::Initialize_Clone(pArg)))
         return E_FAIL;
 
+    
     SKILLSLOT_DESC* pDesc = static_cast<SKILLSLOT_DESC*>(pArg);
+    m_iSlotIndex = pDesc->iSlotIndex;
+
     if (FAILED(Ready_Components(pDesc)))
         return E_FAIL;
 
@@ -35,17 +67,34 @@ HRESULT CSkillUI_Slot::Initialize_Clone(void* pArg)
 
 void CSkillUI_Slot::Priority_Update(_float fTimeDelta)
 {
+    if (!m_IsVisibility)
+        return;
+
     __super::Priority_Update(fTimeDelta);
 }
 
 
 void CSkillUI_Slot::Update(_float fTimeDelta)
 {
+    if (!m_IsVisibility)
+        return;
+
+    if (m_pGameInstance->Get_MouseKeyUp(MOUSEKEYSTATE::LB))
+    {
+        if (Mouse_InRect2D(g_hWnd))
+        {
+            Change_Inventory_Skill();
+        }
+    }
+
     __super::Update(fTimeDelta);   
 }
 
 void CSkillUI_Slot::Late_Update(_float fTimeDelta)
 {
+    if (!m_IsVisibility)
+        return;
+
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::STATIC_UI, this)))
         return;
 
@@ -74,12 +123,14 @@ HRESULT CSkillUI_Slot::Render()
 
 HRESULT CSkillUI_Slot::Ready_Childs()
 {
-    CInventorySkill_Icon::SKILLICON_DESC Desc{};
+
+    CSkillUI_Icon::SKILLICON_DESC Desc{};
     // 정중앙 위치
     Desc.fX = 0;
     Desc.fY = 0; 
     Desc.fSizeX = m_fSizeX;
     Desc.fSizeY = m_fSizeY;
+    Desc.iTextureIndex = m_iIcon_TextureIndex;
     
     CUIObject* pUIObject = nullptr;
     
@@ -87,13 +138,13 @@ HRESULT CSkillUI_Slot::Ready_Childs()
         m_pGameInstance->Clone_Prototype(
             PROTOTYPE::GAMEOBJECT
             , ENUM_CLASS(LEVEL::STATIC)
-            , TEXT("Prototype_GameObject_InventorySkill_Icon"), &Desc));
+            , TEXT("Prototype_GameObject_SkillUI_Icon"), &Desc));
 
     if (nullptr == pUIObject)
         return E_FAIL;
 
     AddChild(pUIObject);
-    m_pSkill = static_cast<CInventorySkill_Icon*>(pUIObject);
+    m_pSkill = static_cast<CSkillUI_Icon*>(pUIObject);
 
     return S_OK;
 }
@@ -127,7 +178,7 @@ HRESULT CSkillUI_Slot::Ready_Render_Resources()
         return E_FAIL;
 
 
-    if (FAILED(m_pTextureCom->Bind_Shader_Resource(m_pShaderCom, "g_Texture", m_iTextureIndex)))
+    if (FAILED(m_pTextureCom->Bind_Shader_Resource(m_pShaderCom, "g_Texture", 0)))
         return E_FAIL;
 
     return S_OK;

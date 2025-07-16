@@ -20,6 +20,9 @@ private:
 	virtual ~CSkillUI_Icon() = default;
 
 public:
+	void Set_Visibility();
+
+public:
 	void Change_Skill(const _wstring& strTextureTag , _uint iTextureIndex);
 
 public:
@@ -35,7 +38,9 @@ private:
 	CVIBuffer_Rect* m_pVIBufferCom = { nullptr };
 	CTexture* m_pTextureCom = { nullptr };
 
+	_wstring m_strTextureTag = {};
 	_uint m_iTextureIndex = {};
+	_bool m_IsVisibility = {};
 
 	/* 스킬 정보? */
 	

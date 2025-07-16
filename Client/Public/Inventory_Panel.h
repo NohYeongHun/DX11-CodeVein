@@ -26,8 +26,10 @@ public:
 		_float fSlot_SizeY{};
 		PANELTYPE ePanelType = {};
 		_uint iInventorySlot = {};
+		_uint iPanelIdx = {};
 
 	}INVENTORY_PANEL_DESC;
+
 
 private:
 	explicit CInventory_Panel(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -36,6 +38,9 @@ private:
 
 public:
 	void Change_Skill(_uint iSkillSlot, const _wstring& strTextureTag, _uint iTextureIndex);
+
+public:
+	void Set_Visibility();
 
 public:
 	virtual HRESULT Initialize_Prototype();
@@ -52,8 +57,11 @@ private:
 	vector<class CInventoryStatus_Icon*> m_StatusIcons = {};
 	vector<class CInventoryStatus_Info*> m_StatusInfos = {};
 	PANELTYPE m_ePanelType = {};
+	_uint m_iPanelIdx = {};
 	_uint m_iInventory_Slot = {};
 	
+
+	_bool m_IsVisibility = { };
 
 
 private:

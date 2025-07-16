@@ -42,21 +42,11 @@ public:
 	_bool Get_KeyUp(_ubyte byKeyID);
 
 
-	_bool Get_MouseKeyDown(MOUSEKEYSTATE eMouse)
-	{
-		_bool IsCurrent = m_tMouseState.rgbButtons[static_cast<_uint>(eMouse)] & 0x80;
-		_bool IsPrev = m_tPrevMouseState.rgbButtons[static_cast<_uint>(eMouse)] & 0x80;
+	_bool Get_MouseKeyPress(MOUSEKEYSTATE eMouse);
 
-		return IsCurrent && IsPrev;
-	}
+	_bool Get_MouseKeyUp(MOUSEKEYSTATE eMouse);
 
-	_bool Get_MouseKeyUp(MOUSEKEYSTATE eMouse)
-	{
-		_bool IsCurrent = m_tMouseState.rgbButtons[static_cast<_uint>(eMouse)] & 0x80;
-		_bool IsPrev = m_tPrevMouseState.rgbButtons[static_cast<_uint>(eMouse)] & 0x80;
-
-		return IsCurrent && !IsPrev;
-	}
+	_bool Get_MouseKeyDown(MOUSEKEYSTATE eMouse);
 #pragma endregion
 
 

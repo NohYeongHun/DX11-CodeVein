@@ -82,11 +82,11 @@
     <Filter Include="02. GameObject\UI\Player\HUD\Skill">
       <UniqueIdentifier>{0703403d-7f2d-49a6-9104-9f1f4860732e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02. GameObject\UI\Player\SkillUI">
-      <UniqueIdentifier>{75480950-da75-44b5-9ea0-f7f6a5113f8d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="96. ShaderFiles">
       <UniqueIdentifier>{9f38318c-82ba-407a-adfa-9d14dcc051aa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\UI\Player\SkillUI">
+      <UniqueIdentifier>{75480950-da75-44b5-9ea0-f7f6a5113f8d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

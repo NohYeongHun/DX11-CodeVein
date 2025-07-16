@@ -210,6 +210,16 @@ PS_OUT PS_MAIN6(PS_IN In)
     return Out;
 }
 
+PS_OUT PS_MAIN7(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+    
+    Out.vColor = float4(0.f, 0.f, 0.f, 1.f);
+    //Out.vColor.rgb = In.vTexcoord.y;
+    
+    return Out;
+}
+
 
 technique11 DefaultTechnique
 {
@@ -250,6 +260,12 @@ technique11 DefaultTechnique
     {
         VertexShader = compile vs_5_0 VS_MAIN();
         PixelShader = compile ps_5_0 PS_MAIN6();
+    }
+
+    pass BlackColorPass
+    {
+        VertexShader = compile vs_5_0 VS_MAIN();
+        PixelShader = compile ps_5_0 PS_MAIN7();
     }
     
 

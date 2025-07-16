@@ -157,9 +157,6 @@ void CUIObject::Update_Transform()
 		// 크기가 곱해지지 않은 행렬 반환.
 		XMStoreFloat4x4(&m_RenderMatrix, matWorld);
 
-
-	//matScale = XMMatrixScaling(m_fSizeX, m_fSizeY, 1.f);
-	//XMStoreFloat4x4(&m_RenderMatrix, matScale * XMLoadFloat4x4(&m_RenderMatrix));
 }
 
 /* 크기는 마지막 렌더링 시점에 곱해주어야합니다. */

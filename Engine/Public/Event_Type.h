@@ -15,6 +15,7 @@ enum class EventType : _uint
 	INVENTORY_DISPLAY = 11,
 	INVENTORY_SKILL_CHANGE = 12,
 	SKILLINFO_DISPLAY = 13,
+	SKILLINFO_SKILL_CHANGE = 14,
 	EVENT_END
 };
 
@@ -84,7 +85,18 @@ typedef struct tagInventorySkillChangeDesc
 typedef struct tagSkillInfoDisplayDesc
 {
 	_bool Isvisibility;
+	_uint iPanelType;  // 패널 타입 (0: 스킬, 1: 아이템, 2: 상태, 3: 상태 정보)
+	_uint iPanelIndex; // 스킬을 교체할 패널
+	_uint iSlotIndex;  // 스킬을 교체할 슬롯
 }SKILLINFO_DISPLAY_DESC;
+
+typedef struct tagSkillInfoSkillChangeDesc
+{
+	_uint iSkillPanelIdx = {};
+	_uint iSlotIdx = {};
+	const _tchar* pText = {};
+	_uint iTextureIdx = {};
+}SKILLINFO_SKILL_CHANGE_DESC;
 #pragma endregion
 
 

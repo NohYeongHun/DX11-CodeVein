@@ -11,12 +11,18 @@ public:
 	typedef struct tagSkillSlotDesc : CUIObject::UIOBJECT_DESC
 	{
 		_uint iTextureIndex = {};
+		_uint iPanelType = {};
+		_uint iPanelIndex = {};
+		_uint iSlotIndex = {};
 	}SKILLSLOT_DESC;
 
 private:
 	CInventorySkill_Slot(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CInventorySkill_Slot(const CInventorySkill_Slot& Prototype);
 	virtual ~CInventorySkill_Slot() = default;
+
+public:
+	void Set_Visibility();
 
 public:
 	void Change_Skill(const _wstring& strTextureTag, _uint iTextureIndex);
@@ -39,8 +45,12 @@ private:
 	CVIBuffer_Rect* m_pVIBufferCom = { nullptr };
 	CTexture* m_pTextureCom = { nullptr };
 
+	_uint m_iPanelType = {};
 	_uint m_iTextureIndex = {};
+	_uint m_iPanelIndex = {};
+	_uint m_iSlotIndex = {};
 
+	_bool m_IsVisibility = {};
 
 private:
 	HRESULT Ready_Components(SKILLSLOT_DESC* pDesc);

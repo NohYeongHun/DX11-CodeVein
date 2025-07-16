@@ -10,6 +10,13 @@ CInventorySkill_Slot::CInventorySkill_Slot(const CInventorySkill_Slot& Prototype
 {
 }
 
+void CInventorySkill_Slot::Set_Visibility()
+{
+    m_IsVisibility = !m_IsVisibility;
+    if (nullptr != m_pSkill)
+        m_pSkill->Set_Visibility();
+}
+
 void CInventorySkill_Slot::Change_Skill(const _wstring& strTextureTag, _uint iTextureIndex)
 {
     m_pSkill->Change_Skill(strTextureTag, iTextureIndex);
@@ -26,6 +33,10 @@ HRESULT CInventorySkill_Slot::Initialize_Clone(void* pArg)
         return E_FAIL;
 
     SKILLSLOT_DESC* pDesc = static_cast<SKILLSLOT_DESC*>(pArg);
+    m_iSlotIndex = pDesc->iSlotIndex;
+    m_iPanelIndex = pDesc->iPanelIndex;
+    m_iPanelType = pDesc->iPanelType;
+
     if (FAILED(Ready_Components(pDesc)))
         return E_FAIL;
 
@@ -37,17 +48,40 @@ HRESULT CInventorySkill_Slot::Initialize_Clone(void* pArg)
 
 void CInventorySkill_Slot::Priority_Update(_float fTimeDelta)
 {
+    if (!m_IsVisibility)
+        return;
+
     __super::Priority_Update(fTimeDelta);
 }
 
 
 void CInventorySkill_Slot::Update(_float fTimeDelta)
 {
+    if (!m_IsVisibility)
+        return;
+
     __super::Update(fTimeDelta);   
+
+    // UI 전용 확인.
+    if (m_pGameInstance->Get_MouseKeyUp(MOUSEKEYSTATE::LB))
+    {
+        if (Mouse_InRect2D(g_hWnd))
+        {
+            SKILLINFO_DISPLAY_DESC Desc{};
+            Desc.Isvisibility = true;
+            Desc.iPanelType = CInventory_Panel::PANELTYPE::SKILL_PANEL;
+            Desc.iPanelIndex = m_iPanelIndex;
+            Desc.iSlotIndex = m_iSlotIndex;
+            m_pGameInstance->Publish(EventType::SKILLINFO_DISPLAY, &Desc);
+        }
+    }
 }
 
 void CInventorySkill_Slot::Late_Update(_float fTimeDelta)
 {
+    if (!m_IsVisibility)
+        return;
+
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::STATIC_UI, this)))
         return;
 

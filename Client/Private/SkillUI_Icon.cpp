@@ -1,4 +1,5 @@
-﻿CSkillUI_Icon::CSkillUI_Icon(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿#include "SkillUI_Icon.h"
+CSkillUI_Icon::CSkillUI_Icon(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CUIObject(pDevice, pContext)
 {
 }
@@ -8,15 +9,22 @@ CSkillUI_Icon::CSkillUI_Icon(const CSkillUI_Icon& Prototype)
 {
 }
 
+void CSkillUI_Icon::Set_Visibility()
+{
+    m_IsVisibility = !m_IsVisibility;
+}
+
 void CSkillUI_Icon::Change_Skill(const _wstring& strTextureTag, _uint iTextureIndex)
 {
     m_iTextureIndex = iTextureIndex;
+    m_strTextureTag = strTextureTag;
 
     // 무슨 이름으로 넣을래?
     m_pGameInstance->Change_Texture_ToGameObject(this, TEXT("Com_Texture")
         , reinterpret_cast<CComponent**>(&m_pTextureCom), ENUM_CLASS(LEVEL::STATIC)
         , strTextureTag);
 }
+
 
 HRESULT CSkillUI_Icon::Initialize_Prototype()
 {
@@ -44,17 +52,26 @@ HRESULT CSkillUI_Icon::Initialize_Clone(void* pArg)
 
 void CSkillUI_Icon::Priority_Update(_float fTimeDelta)
 {
+    if (!m_IsVisibility)
+        return;
+
     __super::Priority_Update(fTimeDelta);
 }
 
 
 void CSkillUI_Icon::Update(_float fTimeDelta)
 {
+    if (!m_IsVisibility)
+        return;
+
     __super::Update(fTimeDelta);
 }
 
 void CSkillUI_Icon::Late_Update(_float fTimeDelta)
 {
+    if (!m_IsVisibility)
+        return;
+
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::STATIC_UI, this)))
         return;
 

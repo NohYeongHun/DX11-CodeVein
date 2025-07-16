@@ -18,6 +18,9 @@ private:
 	virtual ~CInventoryStatus_Icon() = default;
 
 public:
+	void Set_Visibility() { m_IsVisibility = !m_IsVisibility; }
+
+public:
 	void Change_Item(const _wstring& strTextureTag , _uint iTextureIndex);
 
 public:
@@ -34,7 +37,7 @@ private:
 	CTexture* m_pTextureCom = { nullptr };
 
 	_uint m_iTextureIndex = {};
-
+	_bool m_IsVisibility = {};
 	/* 스킬 정보? */
 	
 

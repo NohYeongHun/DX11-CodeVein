@@ -59,6 +59,13 @@ HRESULT CMainApp::Render()
 	ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
 	ImGui::End();
 
+	POINT mousePos;
+	GetCursorPos(&mousePos);
+	ScreenToClient(g_hWnd, &mousePos);
+
+	_wstring strMousePos = L" X : " + to_wstring(mousePos.x) + L" Y : " + to_wstring(mousePos.y);
+	SetWindowText(g_hWnd, strMousePos.c_str());
+
 	m_pImGui_Manager->Render_End();
 	m_pGameInstance->Render_End();
 
@@ -93,13 +100,16 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 		return E_FAIL;
 	
 	/* Model Load */
-	if (FAILED(Ready_Prototype_ForModel()))
-		return E_FAIL;
+	//if (FAILED(Ready_Prototype_ForModel()))
+	//	return E_FAIL;
 
 	if (FAILED(Ready_Prototype_HUD()))
 		return E_FAIL;
 
 	if (FAILED(Ready_Prototype_Inventory()))
+		return E_FAIL;
+	
+	if (FAILED(Ready_Prototype_SkillUI()))
 		return E_FAIL;
 
 
@@ -264,9 +274,6 @@ HRESULT CMainApp::Ready_Prototype_Inventory()
 #pragma endregion
 
 
-	
-
-
 	return S_OK;
 }
 
@@ -330,6 +337,9 @@ HRESULT CMainApp::Ready_Clone_ForStatic()
 	// 생성은 하되 비활성화 해두어야 합니다.
 	if (FAILED(Ready_Clone_Inventory(TEXT("Layer_Inventory"))))
 		return E_FAIL;
+	
+	if (FAILED(Ready_Clone_SkillUI(TEXT("Layer_SkillUI"))))
+		return E_FAIL;
 
 
 	
@@ -364,6 +374,15 @@ HRESULT CMainApp::Ready_Clone_Inventory(const _wstring& strLayerTag)
 {
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::STATIC), strLayerTag,
 		ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Inventory"))))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CMainApp::Ready_Clone_SkillUI(const _wstring& strLayerTag)
+{
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::STATIC), strLayerTag,
+		ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_SkillUI"))))
 		return E_FAIL;
 
 	return S_OK;

@@ -16,6 +16,23 @@ void CInventory_Panel::Change_Skill(_uint iSkillSlot, const _wstring& strTexture
         m_SkillSlots[iSkillSlot]->Change_Skill(strTextureTag, iTextureIndex);
 }
 
+void CInventory_Panel::Set_Visibility()
+{
+    m_IsVisibility = !m_IsVisibility;
+
+	for (auto& val : m_SkillSlots)
+		val->Set_Visibility();
+    
+    for (auto& val : m_ItemSlots)
+		val->Set_Visibility();
+    
+    for (auto& val : m_StatusIcons)
+		val->Set_Visibility();
+    
+    for (auto& val : m_StatusInfos)
+		val->Set_Visibility();
+}
+
 HRESULT CInventory_Panel::Initialize_Prototype()
 {
 
@@ -27,11 +44,12 @@ HRESULT CInventory_Panel::Initialize_Clone(void* pArg)
     if (nullptr == pArg)
         return E_FAIL;
 
-    m_iInventory_Slot = 4; 
+     m_iInventory_Slot = 4; 
 
      INVENTORY_PANEL_DESC* pDesc = static_cast<INVENTORY_PANEL_DESC*>(pArg);
 
      m_ePanelType = pDesc->ePanelType;
+     m_iPanelIdx = pDesc->iPanelIdx;
     if (FAILED(__super::Initialize_Clone(pDesc)))
         return E_FAIL;
 
@@ -46,16 +64,25 @@ HRESULT CInventory_Panel::Initialize_Clone(void* pArg)
 
 void CInventory_Panel::Priority_Update(_float fTimeDelta)
 {
+    if (!m_IsVisibility)
+        return;
+
     __super::Priority_Update(fTimeDelta);
 }
 
 void CInventory_Panel::Update(_float fTimeDelta)
 {
+    if (!m_IsVisibility)
+        return;
+
     __super::Update(fTimeDelta);
 }
 
 void CInventory_Panel::Late_Update(_float fTimeDelta)
 {
+    if (!m_IsVisibility)
+        return;
+
     __super::Late_Update(fTimeDelta);
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::STATIC_UI, this)))
         return;
@@ -63,25 +90,7 @@ void CInventory_Panel::Late_Update(_float fTimeDelta)
 
 HRESULT CInventory_Panel::Render()
 {
-    /*wstring_convert<codecvt_utf8<wchar_t>> converter;
-    string str = converter.to_bytes(m_strObjTag);*/
-
-    //if (m_ePanelType == STATUS_PANEL)
-    //{
-    //    if (ImGui::IsWindowAppearing())              // 또는 static bool once=true;
-    //    {
-    //        ImGui::SetNextWindowPos({ 100, 100 }, ImGuiCond_Appearing);
-    //        ImGui::SetNextWindowSize({ 460, 240 }, ImGuiCond_Appearing); // ← 원하는 픽셀
-    //    }
-
-    //    string str = "Inventory Panel[" + to_string(Get_ID()) + ']';
-    //    ImGui::Begin(str.c_str());
-    //    ImGui::InputFloat("FX", &m_fX);
-    //    ImGui::InputFloat("FY", &m_fY);
-    //    ImGui::End();
-    //}
-
-
+  
     return S_OK;
 }
 
@@ -127,7 +136,7 @@ HRESULT CInventory_Panel::Ready_Skill_Childs(INVENTORY_PANEL_DESC* pDesc)
     Desc.fSizeX = fSizeX;
     Desc.fSizeY = fSizeY;
 
-    const _float posX[4] = { -fSizeX * 0.5f - 1.f, fSizeX * 0.5f + 1.f, -fSizeX * 0.5f - 1.f, fSizeX * 0.5f + 1.f };
+    const _float posX[4] = { -fSizeX * 0.5f - 2.f, fSizeX * 0.5f + 2.f, -fSizeX * 0.5f - 2.f, fSizeX * 0.5f + 2.f };
     const _float posY[4] = { fSizeY * 0.5f + 2.f, fSizeY * 0.5f + 2.f , -fSizeY * 0.5f - 2.f, -fSizeY * 0.5f - 2.f };
 
 
@@ -137,6 +146,10 @@ HRESULT CInventory_Panel::Ready_Skill_Childs(INVENTORY_PANEL_DESC* pDesc)
     {
         Desc.fX = posX[i];
         Desc.fY = posY[i];
+        
+        Desc.iPanelIndex = m_iPanelIdx;
+        Desc.iSlotIndex = i;
+        Desc.iPanelType = m_ePanelType;
 
         pUIObject = dynamic_cast<CUIObject*>(
             m_pGameInstance->Clone_Prototype(

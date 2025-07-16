@@ -33,6 +33,8 @@ private:
 	virtual ~CSkillUI_Panel() = default;
 
 public:
+	void Set_Visibility();
+	void Update_SelectedInfo(_uint iPanelType, _uint iPanelIndex, _uint iSlotIndex);
 	void Change_Skill(_uint iSkillSlot, const _wstring& strTextureTag, _uint iTextureIndex);
 
 public:
@@ -45,18 +47,29 @@ public:
 
 
 private:
-	vector<class CSkill*> m_SkillSlots = {};
+	class CShader* m_pShaderCom = { nullptr };
+	class CVIBuffer_Rect* m_pVIBufferCom = { nullptr };
+	class CTexture* m_pTextureCom = { nullptr };
+
+	vector<class CSkillUI_Slot*> m_SkillSlots = {};
 	
 	PANELTYPE m_ePanelType = {};
 	_uint m_iInventory_Slot = {};
-	
 
+	_bool m_IsVisibility = {}; // 가시성 변경.
+
+	// 스킬 패널에 오기전에 선택한 인벤토리 스킬 슬롯 정보.
+	_uint m_iSelect_PanelType = {};
+	_uint m_iSelect_PanelIndex = {};
+	_uint m_iSelect_SlotIndex = {};
 
 private:
 	HRESULT Ready_Components();
 	HRESULT Ready_Childs(SKILLUI_PANEL_DESC* pDesc);
 	HRESULT Ready_Skill_Childs(SKILLUI_PANEL_DESC* pDesc);
 	HRESULT Ready_Item_Childs(SKILLUI_PANEL_DESC* pDesc);
+	HRESULT Ready_Render_Resources();
+
 
 public:
 	static CSkillUI_Panel* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

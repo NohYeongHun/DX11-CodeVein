@@ -19,6 +19,9 @@ private:
 	virtual ~CInventoryItem_Slot() = default;
 
 public:
+	void Set_Visibility() { m_IsVisibility = !m_IsVisibility; }
+
+public:
 	void Change_Item(const _wstring& strTextureTag, _uint iTextureIndex);
 	
 
@@ -40,7 +43,7 @@ private:
 	CTexture* m_pTextureCom = { nullptr };
 
 	_uint m_iTextureIndex = {};
-
+	_bool m_IsVisibility = {};
 
 private:
 	HRESULT Ready_Components(SKILLSLOT_DESC* pDesc);

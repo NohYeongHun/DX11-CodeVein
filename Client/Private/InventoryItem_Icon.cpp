@@ -46,17 +46,26 @@ HRESULT CInventoryItem_Icon::Initialize_Clone(void* pArg)
 
 void CInventoryItem_Icon::Priority_Update(_float fTimeDelta)
 {
+    if (!m_IsVisibility)
+        return;
+
     __super::Priority_Update(fTimeDelta);
 }
 
 
 void CInventoryItem_Icon::Update(_float fTimeDelta)
 {
+    if (!m_IsVisibility)
+        return;
+
     __super::Update(fTimeDelta);
 }
 
 void CInventoryItem_Icon::Late_Update(_float fTimeDelta)
 {
+    if (!m_IsVisibility)
+        return;
+
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::STATIC_UI, this)))
         return;
 

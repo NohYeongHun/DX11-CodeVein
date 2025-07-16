@@ -38,17 +38,26 @@ HRESULT CInventoryItem_Slot::Initialize_Clone(void* pArg)
 
 void CInventoryItem_Slot::Priority_Update(_float fTimeDelta)
 {
+    if (!m_IsVisibility)
+        return;
+
     __super::Priority_Update(fTimeDelta);
 }
 
 
 void CInventoryItem_Slot::Update(_float fTimeDelta)
 {
+    if (!m_IsVisibility)
+        return;
+
     __super::Update(fTimeDelta);   
 }
 
 void CInventoryItem_Slot::Late_Update(_float fTimeDelta)
 {
+    if (!m_IsVisibility)
+        return;
+
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::STATIC_UI, this)))
         return;
 

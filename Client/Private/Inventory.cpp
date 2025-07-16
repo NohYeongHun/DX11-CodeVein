@@ -22,6 +22,15 @@ void CInventory::Set_Visibility()
 {
     m_IsVisibility = !m_IsVisibility;
 
+	for (auto & val : m_InventorySkill_Panels)
+		val->Set_Visibility();
+
+    for (auto& val : m_InventoryItem_Panels)
+        val->Set_Visibility();
+
+    for (auto& val : m_InventoryStatus_Panels)
+        val->Set_Visibility();
+
     HUDEVENT_DESC Desc{};
     
     if (!m_IsVisibility)
@@ -115,12 +124,12 @@ void CInventory::Update(_float fTimeDelta)
     Desc.iSkillPanelIdx = SKILL_PANEL::SKILL_PANEL_RIGHT_TOP;
     Desc.pText = TEXT("Action_SkillIcon");
 
-    if (m_pGameInstance->Get_KeyUp(DIK_1))
-    {
-        Desc.iSlotIdx = 0;
-        Desc.iTextureIdx = 0;
-        m_pGameInstance->Publish(EventType::INVENTORY_SKILL_CHANGE, &Desc);
-    }
+    //if (m_pGameInstance->Get_KeyUp(DIK_1))
+    //{
+    //    Desc.iSlotIdx = 0;
+    //    Desc.iTextureIdx = 0;
+    //    m_pGameInstance->Publish(EventType::INVENTORY_SKILL_CHANGE, &Desc);
+    //}
     if (m_pGameInstance->Get_KeyUp(DIK_2))
     {
         Desc.iSlotIdx = 1;
@@ -249,6 +258,7 @@ HRESULT CInventory::Ready_SkillPanel()
     Desc.fSlot_SizeX = 80;
     Desc.fSlot_SizeY = 80;
     Desc.iInventorySlot = 4;
+    Desc.iPanelIdx = SKILL_PANEL::SKILL_PANEL_LEFT;
 
 
     CUIObject* pUIObject = nullptr;
@@ -269,6 +279,7 @@ HRESULT CInventory::Ready_SkillPanel()
 #pragma region RIGHTTOP_PANEL
     Desc.fX = 300.f;
     Desc.fY = 50.f;
+    Desc.iPanelIdx = SKILL_PANEL::SKILL_PANEL_RIGHT_TOP;
     pUIObject = nullptr;
     // Skill Panel1 추가 
     pUIObject = dynamic_cast<CUIObject*>(
@@ -287,6 +298,7 @@ HRESULT CInventory::Ready_SkillPanel()
 #pragma region RIGHTBOTTOM_PANEL
     Desc.fX = 300.f;
     Desc.fY = -150.f;
+    Desc.iPanelIdx = SKILL_PANEL::SKILL_PANEL_RIGHT_BOTTOM;
     pUIObject = nullptr;
     // Skill Panel1 추가 
     pUIObject = dynamic_cast<CUIObject*>(

@@ -22,34 +22,25 @@ void CSkillUI::Set_Visibility()
 {
     m_IsVisibility = !m_IsVisibility;
 
-    HUDEVENT_DESC Desc{};
-    
-    if (!m_IsVisibility)
+	for (auto& val : m_SkillUI_Panels)
+		val->Set_Visibility(); // 모든 패널의 가시성을 변경합니다.
+
+
+    if (m_IsVisibility) // 켜진 상태라면?
     {
-        Desc.isVisibility = true;
-        m_pGameInstance->Publish<HUDEVENT_DESC>(EventType::HUD_DISPLAY, &Desc);
+        for (auto& val : m_SkillUI_Panels)
+            val->Update_SelectedInfo(m_iSelect_PanelType, m_iSelect_PanelIndex, m_iSelect_SlotIndex);
     }
-    else
-    {
-        Desc.isVisibility = false;
-        m_pGameInstance->Publish<HUDEVENT_DESC>(EventType::HUD_DISPLAY, &Desc);
-    }
-        
+
+
+
+    m_pGameInstance->Publish<CInventory>(EventType::INVENTORY_DISPLAY, nullptr);
 }
+
 
 void CSkillUI::Change_Skill(_uint iSkillPanel, _uint iSkillSlot, const _wstring& strTextureTag, _uint iTextureIndex)
 {
-    //m_InventorySkill_Panels[iSkillPanel]->Change_Skill(iSkillSlot, strTextureTag, iTextureIndex);
-
-
-    // 동시에 HUD에도 동기화를 해주어야합니다.
-    HUD_SKILLCHANGE_DESC Desc{};
-    Desc.iSkillPanelIdx = iSkillPanel;
-    Desc.pText = TEXT("Action_SkillIcon");
-    Desc.iSlotIdx = iSkillSlot;
-    Desc.iTextureIdx = iTextureIndex;
-
-    m_pGameInstance->Publish<HUD_SKILLCHANGE_DESC>(EventType::HUD_SKILL_CHANGE, &Desc);
+    m_SkillUI_Panels[iSkillPanel]->Change_Skill(iSkillSlot, strTextureTag, iTextureIndex);
 }
 
 
@@ -100,6 +91,9 @@ void CSkillUI::Update(_float fTimeDelta)
     if (!m_IsVisibility)
         return;
 
+    if (m_pGameInstance->Get_KeyUp(DIK_ESCAPE))
+        Set_Visibility();
+
     __super::Update(fTimeDelta);
 }
 
@@ -126,8 +120,8 @@ HRESULT CSkillUI::Ready_Childs()
     CSkillUI_Panel::SKILLUI_PANEL_DESC Desc{};
     Desc.fX = -390.f;
     Desc.fY = 0.f;
-    Desc.fSizeX = 0;
-    Desc.fSizeY = 0;
+    Desc.fSizeX = 600;
+    Desc.fSizeY = 800;
     Desc.ePanelType = CSkillUI_Panel::PANELTYPE::SKILL_UI;
     Desc.fSlot_SizeX = 80;
     Desc.fSlot_SizeY = 80;
@@ -152,9 +146,9 @@ HRESULT CSkillUI::Ready_Childs()
 
 #pragma region RIGHT_PANEL( SKILL INFO)
     Desc.fX = 390.f;
-    Desc.fY = 0.f;
-    Desc.fSizeX = 0;
-    Desc.fSizeY = 0;
+    Desc.fY = -100.f;
+    Desc.fSizeX = 600;
+    Desc.fSizeY = 600;
     Desc.ePanelType = CSkillUI_Panel::PANELTYPE::SKILL_INFO;
     Desc.fSlot_SizeX = 80;
     Desc.fSlot_SizeY = 80;
@@ -184,32 +178,36 @@ HRESULT CSkillUI::Ready_Childs()
 
 HRESULT CSkillUI::Ready_Events()
 {
-#pragma region INVENTORY DISPLAY
-    //// Event 등록
-    //m_pGameInstance->Subscribe(EventType::INVENTORY_DISPLAY, Get_ID(), [this](void* pData)
-    //    {
-    //        this->Set_Visibility();   // 멤버 함수 호출
-    //    });
+#pragma region SKILL UI DISPLAY
+    // Event 등록
+    m_pGameInstance->Subscribe(EventType::SKILLINFO_DISPLAY, Get_ID(), [this](void* pData)
+        {
+            SKILLINFO_DISPLAY_DESC* pDesc = static_cast<SKILLINFO_DISPLAY_DESC*>(pData);
+            m_iSelect_PanelIndex = pDesc->iPanelIndex;
+            m_iSelect_PanelType = pDesc->iPanelType;
+            m_iSelect_SlotIndex = pDesc->iSlotIndex;
+            this->Set_Visibility();   // 멤버 함수 호출
+        });
 
-    //// Event 목록 관리.
-    //m_Events.push_back(EventType::INVENTORY_DISPLAY);
+    // Event 목록 관리.
+    m_Events.push_back(EventType::SKILLINFO_DISPLAY);
 
 #pragma endregion
 
 #pragma region SKILL_CHANGE
 
-    //m_pGameInstance->Subscribe(EventType::INVENTORY_SKILL_CHANGE, Get_ID(), [this](void* pData)
-    //    {
-    //        INVENTORY_SKILLCHANGE_DESC* desc = static_cast<INVENTORY_SKILLCHANGE_DESC*>(pData);
-    //        this->Change_Skill(
-    //            desc->iSkillPanelIdx,
-    //            desc->iSlotIdx
-    //            , desc->pText
-    //            , desc->iTextureIdx);  // 멤버 함수 호출
-    //    });
+    m_pGameInstance->Subscribe(EventType::SKILLINFO_SKILL_CHANGE, Get_ID(), [this](void* pData)
+        {
+            SKILLINFO_SKILL_CHANGE_DESC* desc = static_cast<SKILLINFO_SKILL_CHANGE_DESC*>(pData);
+            this->Change_Skill(
+                desc->iSkillPanelIdx,
+                desc->iSlotIdx
+                , desc->pText
+                , desc->iTextureIdx);  // 멤버 함수 호출
+        });
 
-    //// Event 목록 관리.
-    //m_Events.push_back(EventType::INVENTORY_SKILL_CHANGE);
+    // Event 목록 관리.
+    m_Events.push_back(EventType::INVENTORY_SKILL_CHANGE);
 
 #pragma endregion
 
@@ -218,16 +216,15 @@ HRESULT CSkillUI::Ready_Events()
 
 HRESULT CSkillUI::Ready_Skills()
 {
-    /*INVENTORY_SKILLCHANGE_DESC Desc{};
+    SKILLINFO_SKILL_CHANGE_DESC Desc{};
     Desc.pText = TEXT("Action_SkillIcon");
-    Desc.iSkillPanelIdx = SKILL_PANEL_LEFT;
-    Desc.iSlotIdx = 0;
-    Desc.iTextureIdx = 0;
-    m_pGameInstance->Publish(EventType::INVENTORY_SKILL_CHANGE, &Desc);
-
-    Desc.iSlotIdx = 2;
-    Desc.iTextureIdx = 1;
-    m_pGameInstance->Publish(EventType::INVENTORY_SKILL_CHANGE, &Desc);*/
+    Desc.iSkillPanelIdx = PANEL::SKILLUI_PANEL;
+    for (_uint i = 0; i < 8; i++)
+    {
+        Desc.iSlotIdx = i;
+        Desc.iTextureIdx = i;
+        m_pGameInstance->Publish(EventType::SKILLINFO_SKILL_CHANGE, &Desc);
+    }
 
     return S_OK;
 }

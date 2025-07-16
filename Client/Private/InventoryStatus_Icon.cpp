@@ -48,24 +48,26 @@ HRESULT CInventoryStatus_Icon::Initialize_Clone(void* pArg)
 
 void CInventoryStatus_Icon::Priority_Update(_float fTimeDelta)
 {
+    if (!m_IsVisibility)
+        return;
+
     __super::Priority_Update(fTimeDelta);
 }
 
 
 void CInventoryStatus_Icon::Update(_float fTimeDelta)
 {
+    if (!m_IsVisibility)
+        return;
+
     __super::Update(fTimeDelta);
-
-
-   /* if (Mouse_InRect2D(g_hWnd))
-    {
-        if (m_pGameInstance->Get_MouseKeyUp(MOUSEKEYSTATE::LB))
-            MSG_BOX(TEXT("Status Check"));
-    }*/
 }
 
 void CInventoryStatus_Icon::Late_Update(_float fTimeDelta)
 {
+    if (!m_IsVisibility)
+        return;
+
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::STATIC_UI, this)))
         return;
 

@@ -53,7 +53,7 @@ void CCamera_Free::Priority_Update(_float fTimeDelta)
 	}
 
 
-	if (m_pGameInstance->Get_MouseKeyDown(MOUSEKEYSTATE::LB))
+	if (m_pGameInstance->Get_MouseKeyPress(MOUSEKEYSTATE::LB))
 	{
 		_long		MouseMove = {};
 		if (MouseMove = m_pGameInstance->Get_DIMouseMove(MOUSEMOVESTATE::X))

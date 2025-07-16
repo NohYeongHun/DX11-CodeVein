@@ -10,10 +10,30 @@ CSkillUI_Panel::CSkillUI_Panel(const CSkillUI_Panel& Prototype)
 {
 }
 
+void CSkillUI_Panel::Set_Visibility()
+{
+    m_IsVisibility = !m_IsVisibility;
+
+    for (auto& val : m_SkillSlots)
+        val->Set_Visibility();
+}
+
+void CSkillUI_Panel::Update_SelectedInfo(_uint iPanelType, _uint iPanelIndex, _uint iSlotIndex)
+{
+    m_iSelect_PanelType = iPanelType;
+    m_iSelect_PanelIndex = iPanelIndex;
+    m_iSelect_SlotIndex = iSlotIndex;
+
+    for (auto& val : m_SkillSlots)
+        val->Update_SelectedInfo(m_iSelect_PanelType, m_iSelect_PanelIndex, m_iSelect_SlotIndex);
+    
+}
+
+
 void CSkillUI_Panel::Change_Skill(_uint iSkillSlot, const _wstring& strTextureTag, _uint iTextureIndex)
 {
-    //if (m_ePanelType == PANELTYPE::SKILL_UI)
-    //    //m_SkillSlots[iSkillSlot]->Change_Skill(strTextureTag, iTextureIndex);
+    if (m_ePanelType == PANELTYPE::SKILL_UI)
+        m_SkillSlots[iSkillSlot]->Change_Skill(strTextureTag, iTextureIndex);
 }
 
 HRESULT CSkillUI_Panel::Initialize_Prototype()
@@ -26,8 +46,6 @@ HRESULT CSkillUI_Panel::Initialize_Clone(void* pArg)
 {
     if (nullptr == pArg)
         return E_FAIL;
-
-    m_iInventory_Slot = 4; 
 
     SKILLUI_PANEL_DESC* pDesc = static_cast<SKILLUI_PANEL_DESC*>(pArg);
 
@@ -46,47 +64,70 @@ HRESULT CSkillUI_Panel::Initialize_Clone(void* pArg)
 
 void CSkillUI_Panel::Priority_Update(_float fTimeDelta)
 {
+    if (!m_IsVisibility)
+        return;
+
     __super::Priority_Update(fTimeDelta);
 }
 
 void CSkillUI_Panel::Update(_float fTimeDelta)
 {
+    if (!m_IsVisibility)
+        return;
+
     __super::Update(fTimeDelta);
 }
 
 void CSkillUI_Panel::Late_Update(_float fTimeDelta)
 {
-    __super::Late_Update(fTimeDelta);
+    if (!m_IsVisibility)
+        return;
+
+
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::STATIC_UI, this)))
         return;
+
+    __super::Late_Update(fTimeDelta);
 }
 
 HRESULT CSkillUI_Panel::Render()
 {
-    /*wstring_convert<codecvt_utf8<wchar_t>> converter;
-    string str = converter.to_bytes(m_strObjTag);*/
+    // Texture가 없을 수도 있음.
+    if (m_pTextureCom == nullptr)
+        return S_OK;
 
-    //if (m_ePanelType == STATUS_PANEL)
-    //{
-    //    if (ImGui::IsWindowAppearing())              // 또는 static bool once=true;
-    //    {
-    //        ImGui::SetNextWindowPos({ 100, 100 }, ImGuiCond_Appearing);
-    //        ImGui::SetNextWindowSize({ 460, 240 }, ImGuiCond_Appearing); // ← 원하는 픽셀
-    //    }
+    __super::Begin();
 
-    //    string str = "Inventory Panel[" + to_string(Get_ID()) + ']';
-    //    ImGui::Begin(str.c_str());
-    //    ImGui::InputFloat("FX", &m_fX);
-    //    ImGui::InputFloat("FY", &m_fY);
-    //    ImGui::End();
-    //}
+    if (FAILED(Ready_Render_Resources()))
+        return E_FAIL;
 
+
+    m_pShaderCom->Begin(6);
+
+    m_pVIBufferCom->Bind_Resources();
+
+    m_pVIBufferCom->Render();
+
+    __super::End();
 
     return S_OK;
 }
 
 HRESULT CSkillUI_Panel::Ready_Components()
 {
+    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxPosTex"),
+        TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom), nullptr)))
+        return E_FAIL;
+
+    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_VIBuffer_Rect"),
+        TEXT("Com_VIBuffer"), reinterpret_cast<CComponent**>(&m_pVIBufferCom), nullptr)))
+        return E_FAIL;
+
+    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_SkillUI_Panel"),
+        TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom), nullptr)))
+        return E_FAIL;
+
+
     return S_OK;
 }
 
@@ -114,46 +155,62 @@ HRESULT CSkillUI_Panel::Ready_Childs(SKILLUI_PANEL_DESC* pDesc)
 
 HRESULT CSkillUI_Panel::Ready_Skill_Childs(SKILLUI_PANEL_DESC* pDesc)
 {
-   /* m_iInventory_Slot = pDesc->iSkillSlot;
-
     _float fSizeX = pDesc->fSlot_SizeX;
     _float fSizeY = pDesc->fSlot_SizeY;
+    
+    m_iInventory_Slot = pDesc->iSkillSlot;
 
-    CInventorySkill_Slot::SKILLSLOT_DESC Desc{};
-    Desc.fX = 0;
+    CSkillUI_Slot::SKILLSLOT_DESC Desc{};
+    Desc.fX = -200.f;
     Desc.fY = 0;
     Desc.fSizeX = fSizeX;
     Desc.fSizeY = fSizeY;
 
-    const _float posX[4] = { -fSizeX * 0.5f - 1.f, fSizeX * 0.5f + 1.f, -fSizeX * 0.5f - 1.f, fSizeX * 0.5f + 1.f };
-    const _float posY[4] = { fSizeY * 0.5f + 2.f, fSizeY * 0.5f + 2.f , -fSizeY * 0.5f - 2.f, -fSizeY * 0.5f - 2.f };
 
 
     CUIObject* pUIObject = nullptr;
 
-    for (_uint i = 0; i < m_iInventory_Slot; ++i)
+    for (_uint i = 0; i < 8; ++i)
     {
-        Desc.fX = posX[i];
-        Desc.fY = posY[i];
-
+        Desc.fX = -200.f + fSizeX * (i % 4) + 10.f * (i % 4);
+        Desc.fY = 300.f - 200.f * (i / 4);
+        Desc.iTextureIndex = i;
+        Desc.iSlotIndex = i;
         pUIObject = dynamic_cast<CUIObject*>(
             m_pGameInstance->Clone_Prototype(
                 PROTOTYPE::GAMEOBJECT
                 , ENUM_CLASS(LEVEL::STATIC)
-                , TEXT("Prototype_GameObject_InventorySkill_Slot"), &Desc));
+                , TEXT("Prototype_GameObject_SkillUI_Slot"), &Desc));
 
         if (nullptr == pUIObject)
             return E_FAIL;
 
         AddChild(pUIObject);
-        m_SkillSlots.push_back(static_cast<CInventorySkill_Slot*>(pUIObject));
-    }*/
+        m_SkillSlots.push_back(static_cast<CSkillUI_Slot*>(pUIObject));
+    }
 
     return S_OK;
 }
 
 HRESULT CSkillUI_Panel::Ready_Item_Childs(SKILLUI_PANEL_DESC* pDesc)
 {
+    return S_OK;
+}
+
+HRESULT CSkillUI_Panel::Ready_Render_Resources()
+{
+    if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &m_RenderMatrix)))
+        return E_FAIL;
+
+    if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix)))
+        return E_FAIL;
+
+    if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
+        return E_FAIL;
+
+    if (FAILED(m_pTextureCom->Bind_Shader_Resource(m_pShaderCom, "g_Texture", 0)))
+        return E_FAIL;
+
     return S_OK;
 }
 
@@ -192,5 +249,9 @@ void CSkillUI_Panel::Free()
 {
     __super::Free();
     m_SkillSlots.clear();
+
+    Safe_Release(m_pShaderCom);
+    Safe_Release(m_pVIBufferCom);
+    Safe_Release(m_pTextureCom);
 
 }

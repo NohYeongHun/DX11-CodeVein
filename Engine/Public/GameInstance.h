@@ -127,7 +127,7 @@ public:
 
 		_bool Get_KeyPress(_ubyte byKeyID);
 		_bool Get_KeyUp(_ubyte byKeyID);
-		_bool Get_MouseKeyDown(MOUSEKEYSTATE eMouse);
+		_bool Get_MouseKeyPress(MOUSEKEYSTATE eMouse);
 		_bool Get_MouseKeyUp(MOUSEKEYSTATE eMouse);
 #pragma endregion
 

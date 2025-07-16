@@ -7,10 +7,12 @@ NS_BEGIN(Client)
 */
 class CSkillUI_Slot final : public CUIObject
 {
+
 public:
 	typedef struct tagSkillSlotDesc : CUIObject::UIOBJECT_DESC
 	{
 		_uint iTextureIndex = {};
+		_uint iSlotIndex = {};
 	}SKILLSLOT_DESC;
 
 private:
@@ -19,8 +21,13 @@ private:
 	virtual ~CSkillUI_Slot() = default;
 
 public:
+	void Set_Visibility();
+	void Update_SelectedInfo(_uint iPanelType, _uint iPanelIndex, _uint iSlotIndex);
+public:
 	void Change_Skill(const _wstring& strTextureTag, _uint iTextureIndex);
-	
+
+	void Change_Inventory_Skill();
+
 
 public:
 	virtual HRESULT Initialize_Prototype();
@@ -34,13 +41,20 @@ public:
 	HRESULT Ready_Childs();
 
 private:
-	class CInventorySkill_Icon* m_pSkill = { nullptr };
+	class CSkillUI_Icon* m_pSkill = { nullptr };
 	CShader* m_pShaderCom = { nullptr };
 	CVIBuffer_Rect* m_pVIBufferCom = { nullptr };
 	CTexture* m_pTextureCom = { nullptr };
 
-	_uint m_iTextureIndex = {};
+	_uint m_iIcon_TextureIndex = {};
+	_uint m_iSlotIndex = {};
+	_bool m_IsVisibility = {};
+	_wstring m_strTextureTag = {};
 
+	// 스킬 패널에 오기전에 선택한 스킬 슬롯 정보.
+	_uint m_iSelect_PanelType = {};
+	_uint m_iSelect_PanelIndex = {};
+	_uint m_iSelect_SlotIndex = {};
 
 private:
 	HRESULT Ready_Components(SKILLSLOT_DESC* pDesc);

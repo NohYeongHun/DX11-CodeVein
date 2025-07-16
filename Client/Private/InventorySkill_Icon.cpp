@@ -1,4 +1,5 @@
-﻿CInventorySkill_Icon::CInventorySkill_Icon(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿#include "InventorySkill_Icon.h"
+CInventorySkill_Icon::CInventorySkill_Icon(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CUIObject(pDevice, pContext)
 {
 }
@@ -6,6 +7,11 @@
 CInventorySkill_Icon::CInventorySkill_Icon(const CInventorySkill_Icon& Prototype)
     : CUIObject(Prototype)
 {
+}
+
+void CInventorySkill_Icon::Set_Visibility()
+{
+	m_IsVisibility = !m_IsVisibility;
 }
 
 void CInventorySkill_Icon::Change_Skill(const _wstring& strTextureTag, _uint iTextureIndex)
@@ -44,17 +50,28 @@ HRESULT CInventorySkill_Icon::Initialize_Clone(void* pArg)
 
 void CInventorySkill_Icon::Priority_Update(_float fTimeDelta)
 {
+    if (!m_IsVisibility)
+        return;
+
     __super::Priority_Update(fTimeDelta);
 }
 
 
 void CInventorySkill_Icon::Update(_float fTimeDelta)
 {
+    if (!m_IsVisibility)
+        return;
+
     __super::Update(fTimeDelta);
+
+   
 }
 
 void CInventorySkill_Icon::Late_Update(_float fTimeDelta)
 {
+    if (!m_IsVisibility)
+        return;
+
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::STATIC_UI, this)))
         return;
 

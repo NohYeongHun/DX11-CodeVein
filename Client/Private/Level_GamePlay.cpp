@@ -14,8 +14,8 @@ HRESULT CLevel_GamePlay::Initialize_Clone()
 	if (FAILED(Ready_HUD()))
 		return E_FAIL;
 	
-	if (FAILED(Ready_Layer_Player(TEXT("Layer_Player"))))
-		return E_FAIL;
+	//if (FAILED(Ready_Layer_Player(TEXT("Layer_Player"))))
+	//	return E_FAIL;
 	
 	if (FAILED(Ready_Layer_Terrain(TEXT("Layer_Terrain"))))
 		return E_FAIL;
@@ -53,7 +53,7 @@ void CLevel_GamePlay::Update(_float fTimeDelta)
 
 HRESULT CLevel_GamePlay::Render()
 {
-	SetWindowText(g_hWnd, TEXT("게임플레이레벨입니다."));
+	//SetWindowText(g_hWnd, TEXT("게임플레이레벨입니다."));
 
 	return S_OK;
 }
