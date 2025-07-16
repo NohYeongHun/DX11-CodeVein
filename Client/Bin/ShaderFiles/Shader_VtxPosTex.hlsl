@@ -214,7 +214,7 @@ PS_OUT PS_MAIN7(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
     
-    Out.vColor = float4(0.f, 0.f, 0.f, 1.f);
+    Out.vColor = float4(0.f, 0.f, 0.f, 0.9f);
     //Out.vColor.rgb = In.vTexcoord.y;
     
     return Out;

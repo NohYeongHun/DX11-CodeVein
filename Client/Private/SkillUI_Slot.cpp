@@ -82,9 +82,7 @@ void CSkillUI_Slot::Update(_float fTimeDelta)
     if (m_pGameInstance->Get_MouseKeyUp(MOUSEKEYSTATE::LB))
     {
         if (Mouse_InRect2D(g_hWnd))
-        {
             Change_Inventory_Skill();
-        }
     }
 
     __super::Update(fTimeDelta);   

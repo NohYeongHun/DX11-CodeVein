@@ -70,6 +70,7 @@ private:
 	HRESULT Ready_Item_Childs(SKILLUI_PANEL_DESC* pDesc);
 	HRESULT Ready_Render_Resources();
 
+	void Render_Explain();
 
 public:
 	static CSkillUI_Panel* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

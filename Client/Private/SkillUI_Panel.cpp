@@ -100,13 +100,16 @@ HRESULT CSkillUI_Panel::Render()
 
     if (FAILED(Ready_Render_Resources()))
         return E_FAIL;
-
+    
 
     m_pShaderCom->Begin(6);
 
     m_pVIBufferCom->Bind_Resources();
 
     m_pVIBufferCom->Render();
+
+    if (m_ePanelType == PANELTYPE::SKILL_UI)
+        Render_Explain();
 
     __super::End();
 
@@ -173,7 +176,7 @@ HRESULT CSkillUI_Panel::Ready_Skill_Childs(SKILLUI_PANEL_DESC* pDesc)
     for (_uint i = 0; i < 8; ++i)
     {
         Desc.fX = -200.f + fSizeX * (i % 4) + 10.f * (i % 4);
-        Desc.fY = 300.f - 200.f * (i / 4);
+        Desc.fY = 250.f - 150.f * (i / 4);
         Desc.iTextureIndex = i;
         Desc.iSlotIndex = i;
         pUIObject = dynamic_cast<CUIObject*>(
@@ -212,6 +215,23 @@ HRESULT CSkillUI_Panel::Ready_Render_Resources()
         return E_FAIL;
 
     return S_OK;
+}
+
+void CSkillUI_Panel::Render_Explain()
+{
+    _float fScreenX = m_RenderMatrix._41 + (g_iWinSizeX >> 1) -240.f;
+    _float fScreenY = (g_iWinSizeY >> 1) - m_RenderMatrix._42 -340.f;
+
+    _float2 vPosition = { fScreenX , fScreenY };
+    // Window 좌표계 기준 출력. (0, 0이 좌측 상단)
+
+
+    m_pGameInstance->Render_Font(TEXT("HUD_TEXT"), TEXT("Skill Panel 1")
+        , vPosition, XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f, {}, 1.f);
+
+    vPosition.y += 150.f;
+    m_pGameInstance->Render_Font(TEXT("HUD_TEXT"), TEXT("Skill Panel 2")
+        , vPosition, XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f, {}, 1.f);
 }
 
 
