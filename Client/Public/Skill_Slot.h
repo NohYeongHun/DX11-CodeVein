@@ -20,7 +20,7 @@ private:
 	virtual ~CSkill_Slot() = default;
 
 public:
-	void Change_Skill(const _wstring& strTextureTag, _uint iTextureIndex);
+	void Change_Skill(class CSkillUI_Icon* pSkillIcon, _uint iTextureIndex);
 	void Execute_Skill(_float fSkillCoolTime);
 
 public:

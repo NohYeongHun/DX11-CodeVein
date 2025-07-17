@@ -14,14 +14,22 @@ void CInventorySkill_Icon::Set_Visibility()
 	m_IsVisibility = !m_IsVisibility;
 }
 
-void CInventorySkill_Icon::Change_Skill(const _wstring& strTextureTag, _uint iTextureIndex)
+void CInventorySkill_Icon::Change_Skill(CSkillUI_Icon* pSkillIcon, _uint iTextureIndex)
 {
-    m_iTextureIndex = iTextureIndex;
+    m_iTextureIndex = iTextureIndex;    
 
-    // 무슨 이름으로 넣을래?
-    m_pGameInstance->Change_Texture_ToGameObject(this, TEXT("Com_Texture")
+
+    Safe_Release(m_pTextureCom);
+    m_pTextureCom = static_cast<CTexture*>(pSkillIcon->Get_Component(L"Com_Texture"));
+    if (nullptr == m_pTextureCom)
+        return;
+
+    Safe_AddRef(m_pTextureCom);
+
+    //// 무슨 이름으로 넣을래?
+    /*m_pGameInstance->Change_Texture_ToGameObject(this, TEXT("Com_Texture")
         , reinterpret_cast<CComponent**>(&m_pTextureCom), ENUM_CLASS(LEVEL::STATIC)
-        , strTextureTag);
+        , strTextureTag);*/
 }
 
 HRESULT CInventorySkill_Icon::Initialize_Prototype()

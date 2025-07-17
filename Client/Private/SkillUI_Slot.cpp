@@ -13,7 +13,10 @@ void CSkillUI_Slot::Set_Visibility()
 {
     m_IsVisibility = !m_IsVisibility;
     if (nullptr != m_pSkill)
+    {
         m_pSkill->Set_Visibility();
+    }
+        
 }
 
 
@@ -22,6 +25,9 @@ void CSkillUI_Slot::Update_SelectedInfo(_uint iPanelType, _uint iPanelIndex, _ui
     m_iSelect_PanelType = iPanelType;
     m_iSelect_PanelIndex = iPanelIndex;
     m_iSelect_SlotIndex = iSlotIndex;
+
+    if (nullptr != m_pSkill)
+        m_pSkill->Update_SelectedInfo(m_iSelect_PanelType, m_iSelect_PanelIndex, m_iSelect_SlotIndex);
 }
 
 void CSkillUI_Slot::Change_Skill(const _wstring& strTextureTag, _uint iTextureIndex)
@@ -32,15 +38,6 @@ void CSkillUI_Slot::Change_Skill(const _wstring& strTextureTag, _uint iTextureIn
     
 }
 
-void CSkillUI_Slot::Change_Inventory_Skill()
-{
-    INVENTORY_SKILLCHANGE_DESC Desc{};
-    Desc.pText = m_strTextureTag.c_str();
-    Desc.iSkillPanelIdx = m_iSelect_PanelIndex;
-    Desc.iSlotIdx = m_iSelect_SlotIndex;
-    Desc.iTextureIdx = m_iIcon_TextureIndex;
-    m_pGameInstance->Publish(EventType::INVENTORY_SKILL_CHANGE, &Desc);
-}
 
 HRESULT CSkillUI_Slot::Initialize_Prototype()
 {
@@ -80,12 +77,6 @@ void CSkillUI_Slot::Update(_float fTimeDelta)
 {
     if (!m_IsVisibility)
         return;
-
-    if (m_pGameInstance->Get_MouseKeyUp(MOUSEKEYSTATE::LB))
-    {
-        if (Mouse_InRect2D(g_hWnd))
-            Change_Inventory_Skill();
-    }
 
     __super::Update(fTimeDelta);   
 }

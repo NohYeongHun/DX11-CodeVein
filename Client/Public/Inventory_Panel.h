@@ -37,7 +37,7 @@ private:
 	virtual ~CInventory_Panel() = default;
 
 public:
-	void Change_Skill(_uint iSkillSlot, const _wstring& strTextureTag, _uint iTextureIndex);
+	void Change_Skill(_uint iSkillSlot, class CSkillUI_Icon* pSkillIcon, _uint iTextureIndex);
 
 public:
 	void Set_Visibility();

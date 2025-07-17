@@ -351,7 +351,8 @@ HRESULT CMainApp::Ready_Clone_ForStatic()
 	// 생성은 하되 비활성화 해두어야 합니다.
 	if (FAILED(Ready_Clone_Inventory(TEXT("Layer_Inventory"))))
 		return E_FAIL;
-	//
+
+	// 
 	if (FAILED(Ready_Clone_SkillUI(TEXT("Layer_SkillUI"))))
 		return E_FAIL;
 
@@ -365,10 +366,10 @@ HRESULT CMainApp::Ready_Clone_ForStatic()
 HRESULT CMainApp::Ready_Clone_Texture()
 {
 #pragma region SKILL ICON
-	if (FAILED(m_pGameInstance->Add_Texture(ENUM_CLASS(LEVEL::STATIC),
+	/*if (FAILED(m_pGameInstance->Add_Texture(ENUM_CLASS(LEVEL::STATIC),
 		TEXT("Prototype_Component_Texture_Action_SkillIcon"),
 		TEXT("Action_SkillIcon"))))
-		return E_FAIL;
+		return E_FAIL;*/
 #pragma endregion
 
 	return S_OK;

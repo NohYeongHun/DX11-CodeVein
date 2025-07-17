@@ -10,9 +10,9 @@ CSkill_Slot::CSkill_Slot(const CSkill_Slot& Prototype)
 {
 }
 
-void CSkill_Slot::Change_Skill(const _wstring& strTextureTag, _uint iTextureIndex)
+void CSkill_Slot::Change_Skill(CSkillUI_Icon* pSkillIcon, _uint iTextureIndex)
 {
-    m_pSkill->Change_Skill(strTextureTag, iTextureIndex);
+    m_pSkill->Change_Skill(pSkillIcon, iTextureIndex);
 }
 
 void CSkill_Slot::Execute_Skill(_float fSkillCoolTime)

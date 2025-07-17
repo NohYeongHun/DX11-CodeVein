@@ -71,8 +71,8 @@ HRESULT CSkillUI::Initialize_Clone(void* pArg)
     if (FAILED(Ready_Events()))
         return E_FAIL;
 
-    if (FAILED(Ready_Skills()))
-        return E_FAIL;
+    //if (FAILED(Ready_Skills()))
+    //    return E_FAIL;
 
 
 
@@ -126,7 +126,7 @@ HRESULT CSkillUI::Ready_Childs()
     Desc.fSlot_SizeX = 80;
     Desc.fSlot_SizeY = 80;
     Desc.iSkillSlot = 8;
-	Desc.pText = L"Action_SkillIcon";
+	Desc.pText = L"Prototype_Component_Texture_Action_SkillIcon";
 
 
     CUIObject* pUIObject = nullptr;

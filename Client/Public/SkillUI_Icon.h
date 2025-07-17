@@ -22,8 +22,10 @@ private:
 
 public:
 	void Set_Visibility();
+	void Update_SelectedInfo(_uint iPanelType, _uint iPanelIndex, _uint iSlotIndex);
 
 public:
+	void Change_Inventory_Skill();
 	void Change_Skill(const _wstring& strTextureTag , _uint iTextureIndex);
 
 public:
@@ -43,8 +45,10 @@ private:
 	_uint m_iTextureIndex = {};
 	_bool m_IsVisibility = {};
 
-	/* 스킬 정보? */
-	
+	// 스킬 패널에 오기전에 선택한 인벤토리 스킬 슬롯 정보.
+	_uint m_iSelect_PanelType = {};
+	_uint m_iSelect_PanelIndex = {};
+	_uint m_iSelect_SlotIndex = {};
 
 
 private:

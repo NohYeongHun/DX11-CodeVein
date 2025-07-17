@@ -14,10 +14,29 @@ void CSkillUI_Icon::Set_Visibility()
     m_IsVisibility = !m_IsVisibility;
 }
 
+void CSkillUI_Icon::Update_SelectedInfo(_uint iPanelType, _uint iPanelIndex, _uint iSlotIndex)
+{
+    m_iSelect_PanelType = iPanelType;
+    m_iSelect_PanelIndex = iPanelIndex;
+    m_iSelect_SlotIndex = iSlotIndex;
+}
+
+void CSkillUI_Icon::Change_Inventory_Skill()
+{
+    INVENTORY_SKILLCHANGE_DESC Desc{};
+    Desc.iSkillPanelIdx = m_iSelect_PanelIndex;
+    Desc.iSlotIdx = m_iSelect_SlotIndex;
+    Desc.iTextureIdx = m_iTextureIndex;
+    Desc.pSkillIcon = this;
+
+    m_pGameInstance->Publish(EventType::INVENTORY_SKILL_CHANGE, &Desc);
+}
+
 void CSkillUI_Icon::Change_Skill(const _wstring& strTextureTag, _uint iTextureIndex)
 {
     m_iTextureIndex = iTextureIndex;
     m_strTextureTag = strTextureTag;
+
 
     // 무슨 이름으로 넣을래?
     m_pGameInstance->Change_Texture_ToGameObject(this, TEXT("Com_Texture")
@@ -33,13 +52,12 @@ HRESULT CSkillUI_Icon::Initialize_Prototype()
 
 HRESULT CSkillUI_Icon::Initialize_Clone(void* pArg)
 {
-    m_iTextureIndex = 0;
-
     if (FAILED(__super::Initialize_Clone(pArg)))
         return E_FAIL;
 
     SKILLICON_DESC* pDesc = static_cast<SKILLICON_DESC*>(pArg);
     m_strTextureTag = pDesc->pText;
+    m_iTextureIndex = pDesc->iTextureIndex;
     
     if (FAILED(Ready_Components(pDesc)))
         return E_FAIL;
@@ -67,6 +85,12 @@ void CSkillUI_Icon::Update(_float fTimeDelta)
         return;
 
     __super::Update(fTimeDelta);
+
+    if (m_pGameInstance->Get_MouseKeyUp(MOUSEKEYSTATE::LB))
+    {
+        if (Mouse_InRect2D(g_hWnd))
+            Change_Inventory_Skill();
+    }
 }
 
 void CSkillUI_Icon::Late_Update(_float fTimeDelta)
@@ -110,6 +134,10 @@ HRESULT CSkillUI_Icon::Ready_Components(SKILLICON_DESC* pDesc)
 
     if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_VIBuffer_Rect"),
         TEXT("Com_VIBuffer"), reinterpret_cast<CComponent**>(&m_pVIBufferCom), nullptr)))
+        return E_FAIL;
+
+    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Action_SkillIcon"),
+        TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom), nullptr)))
         return E_FAIL;
 
     // Texture Component는 Change Skill 이벤트로 넣는다.

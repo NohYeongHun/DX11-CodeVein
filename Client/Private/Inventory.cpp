@@ -46,16 +46,16 @@ void CInventory::Set_Visibility()
         
 }
 
-void CInventory::Change_Skill(_uint iSkillPanel, _uint iSkillSlot, const _wstring& strTextureTag, _uint iTextureIndex)
+void CInventory::Change_Skill(_uint iSkillPanel, _uint iSkillSlot, CSkillUI_Icon* pSkillIcon, _uint iTextureIndex)
 {
-    m_InventorySkill_Panels[iSkillPanel]->Change_Skill(iSkillSlot, strTextureTag, iTextureIndex);
+    m_InventorySkill_Panels[iSkillPanel]->Change_Skill(iSkillSlot, pSkillIcon, iTextureIndex);
 
 
-    // 동시에 HUD에도 동기화를 해주어야합니다.
+    //// 동시에 HUD에도 동기화를 해주어야합니다.
     HUD_SKILLCHANGE_DESC Desc{};
     Desc.iSkillPanelIdx = iSkillPanel;
-    Desc.pText = TEXT("Action_SkillIcon");
     Desc.iSlotIdx = iSkillSlot;
+    Desc.pSkillIcon = pSkillIcon;
     Desc.iTextureIdx = iTextureIndex;
 
     m_pGameInstance->Publish<HUD_SKILLCHANGE_DESC>(EventType::HUD_SKILL_CHANGE, &Desc);
@@ -117,62 +117,6 @@ void CInventory::Update(_float fTimeDelta)
         SKILLINFO_DISPLAY_DESC Desc{};
         Desc.Isvisibility = true;
         m_pGameInstance->Publish(EventType::SKILLINFO_DISPLAY, &Desc);
-    }
-
-
-    INVENTORY_SKILLCHANGE_DESC Desc{};
-    Desc.iSkillPanelIdx = SKILL_PANEL::SKILL_PANEL_RIGHT_TOP;
-    Desc.pText = TEXT("Action_SkillIcon");
-
-    //if (m_pGameInstance->Get_KeyUp(DIK_1))
-    //{
-    //    Desc.iSlotIdx = 0;
-    //    Desc.iTextureIdx = 0;
-    //    m_pGameInstance->Publish(EventType::INVENTORY_SKILL_CHANGE, &Desc);
-    //}
-    if (m_pGameInstance->Get_KeyUp(DIK_2))
-    {
-        Desc.iSlotIdx = 1;
-        Desc.iTextureIdx = 1;
-        m_pGameInstance->Publish(EventType::INVENTORY_SKILL_CHANGE, &Desc);
-    }
-    if (m_pGameInstance->Get_KeyUp(DIK_3))
-    {
-        Desc.iSlotIdx = 2;
-        Desc.iTextureIdx = 2;
-        m_pGameInstance->Publish(EventType::INVENTORY_SKILL_CHANGE, &Desc);
-    }
-    if (m_pGameInstance->Get_KeyUp(DIK_4))
-    {
-        Desc.iSlotIdx = 3;
-        Desc.iTextureIdx = 3;
-        m_pGameInstance->Publish(EventType::INVENTORY_SKILL_CHANGE, &Desc);
-    }
-
-    Desc.iSkillPanelIdx = SKILL_PANEL::SKILL_PANEL_RIGHT_BOTTOM;
-    if(m_pGameInstance->Get_KeyUp(DIK_5))
-    {
-        Desc.iSlotIdx = 0;
-        Desc.iTextureIdx = 4;
-        m_pGameInstance->Publish(EventType::INVENTORY_SKILL_CHANGE, &Desc);
-    }
-    if (m_pGameInstance->Get_KeyUp(DIK_6))
-    {
-        Desc.iSlotIdx = 1;
-        Desc.iTextureIdx = 5;
-        m_pGameInstance->Publish(EventType::INVENTORY_SKILL_CHANGE, &Desc);
-    }
-    if (m_pGameInstance->Get_KeyUp(DIK_7))
-    {
-        Desc.iSlotIdx = 2;
-        Desc.iTextureIdx = 6;
-        m_pGameInstance->Publish(EventType::INVENTORY_SKILL_CHANGE, &Desc);
-    }
-    if (m_pGameInstance->Get_KeyUp(DIK_8))
-    {
-        Desc.iSlotIdx = 3;
-        Desc.iTextureIdx = 7;
-        m_pGameInstance->Publish(EventType::INVENTORY_SKILL_CHANGE, &Desc);
     }
 
     __super::Update(fTimeDelta);
@@ -407,10 +351,11 @@ HRESULT CInventory::Ready_Events()
     m_pGameInstance->Subscribe(EventType::INVENTORY_SKILL_CHANGE, Get_ID(), [this](void* pData)
         {
             INVENTORY_SKILLCHANGE_DESC* desc = static_cast<INVENTORY_SKILLCHANGE_DESC*>(pData);
+            CSkillUI_Icon* pSkillIcon = static_cast<CSkillUI_Icon*>(desc->pSkillIcon);
             this->Change_Skill(
                 desc->iSkillPanelIdx,
                 desc->iSlotIdx
-                , desc->pText
+                , pSkillIcon
                 , desc->iTextureIdx);  // 멤버 함수 호출
         });
 

@@ -24,10 +24,9 @@ private:
 public:
 	void Set_Visibility();
 	void Update_SelectedInfo(_uint iPanelType, _uint iPanelIndex, _uint iSlotIndex);
+
 public:
 	void Change_Skill(const _wstring& strTextureTag, _uint iTextureIndex);
-
-	void Change_Inventory_Skill();
 
 
 public:

@@ -22,9 +22,9 @@ void CHUD::Set_Visibility(_bool IsVIsibility)
     m_IsVisibility = IsVIsibility;
 }
 
-void CHUD::Change_Skill(_uint iSkillPanel, _uint iSkillSlot, const _wstring& strTextureTag, _uint iTextureIndex)
+void CHUD::Change_Skill(_uint iSkillPanel, _uint iSkillSlot, CSkillUI_Icon* pSkillIcon, _uint iTextureIndex)
 {
-    m_SkillPanels[iSkillPanel]->Change_Skill(iSkillSlot, strTextureTag, iTextureIndex);
+    m_SkillPanels[iSkillPanel]->Change_Skill(iSkillSlot, pSkillIcon, iTextureIndex);
 }
 
 void CHUD::Execute_Skill(_uint iSkillPanel, _uint iSkillSlot, _float fSkillCoolTime)
@@ -274,10 +274,11 @@ HRESULT CHUD::Ready_Events()
     m_pGameInstance->Subscribe(EventType::HUD_SKILL_CHANGE, Get_ID(), [this](void* pData)
         {
             HUD_SKILLCHANGE_DESC* desc = static_cast<HUD_SKILLCHANGE_DESC*>(pData);
+            CSkillUI_Icon* pSkillIcon = static_cast<CSkillUI_Icon*>(desc->pSkillIcon);
             this->Change_Skill(
                 desc->iSkillPanelIdx,
                 desc->iSlotIdx
-            ,desc->pText
+            , pSkillIcon
             , desc->iTextureIdx);  // 멤버 함수 호출
         });
 

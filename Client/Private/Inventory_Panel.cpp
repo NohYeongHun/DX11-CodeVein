@@ -10,10 +10,10 @@ CInventory_Panel::CInventory_Panel(const CInventory_Panel& Prototype)
 {
 }
 
-void CInventory_Panel::Change_Skill(_uint iSkillSlot, const _wstring& strTextureTag, _uint iTextureIndex)
+void CInventory_Panel::Change_Skill(_uint iSkillSlot, CSkillUI_Icon* pSkillIcon, _uint iTextureIndex)
 {
     if (m_ePanelType == SKILL_PANEL)
-        m_SkillSlots[iSkillSlot]->Change_Skill(strTextureTag, iTextureIndex);
+        m_SkillSlots[iSkillSlot]->Change_Skill(pSkillIcon, iTextureIndex);
 }
 
 void CInventory_Panel::Set_Visibility()

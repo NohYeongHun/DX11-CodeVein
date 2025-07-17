@@ -44,7 +44,7 @@ public:
 
 public:
 	// 몇 번째 스킬 패널의 몇번 슬롯에 Skill을 변경할 것인지? => 나중에 이벤트 버스로 호출.
-	void Change_Skill(_uint iSkillPanel, _uint iSkillSlot, const _wstring& strTextureTag, _uint iTextureIndex);
+	void Change_Skill(_uint iSkillPanel, _uint iSkillSlot, class CSkillUI_Icon* pSkillIcon,  _uint iTextureIndex);
 
 public:
 	virtual HRESULT Initialize_Prototype();

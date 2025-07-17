@@ -34,8 +34,8 @@ typedef struct tagHUDSkillChangeDesc
 {
 	_uint iSkillPanelIdx = {};
 	_uint iSlotIdx = {};
-	const _tchar* pText = {};
 	_uint iTextureIdx = {};
+	void* pSkillIcon = { nullptr };
 }HUD_SKILLCHANGE_DESC;
 
 
@@ -76,8 +76,8 @@ typedef struct tagInventorySkillChangeDesc
 {
 	_uint iSkillPanelIdx = {};
 	_uint iSlotIdx = {};
-	const _tchar* pText = {};
 	_uint iTextureIdx = {};
+	void* pSkillIcon = { nullptr };
 }INVENTORY_SKILLCHANGE_DESC;
 #pragma endregion
 

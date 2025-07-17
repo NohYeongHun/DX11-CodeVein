@@ -17,9 +17,9 @@ void CInventorySkill_Slot::Set_Visibility()
         m_pSkill->Set_Visibility();
 }
 
-void CInventorySkill_Slot::Change_Skill(const _wstring& strTextureTag, _uint iTextureIndex)
+void CInventorySkill_Slot::Change_Skill(CSkillUI_Icon* pSkillIcon, _uint iTextureIndex)
 {
-    m_pSkill->Change_Skill(strTextureTag, iTextureIndex);
+    m_pSkill->Change_Skill(pSkillIcon, iTextureIndex);
 }
 
 HRESULT CInventorySkill_Slot::Initialize_Prototype()
