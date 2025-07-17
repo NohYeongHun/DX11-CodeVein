@@ -14,7 +14,10 @@ HRESULT CLevel_GamePlay::Initialize_Clone()
 	if (FAILED(Ready_HUD()))
 		return E_FAIL;
 	
-	//if (FAILED(Ready_Layer_Player(TEXT("Layer_Player"))))
+	if (FAILED(Ready_Layer_Player(TEXT("Layer_Player"))))
+		return E_FAIL;
+
+	//if (FAILED(Ready_Layer_Map(TEXT("Layer_Map"))))
 	//	return E_FAIL;
 	
 	if (FAILED(Ready_Layer_Terrain(TEXT("Layer_Terrain"))))
@@ -32,8 +35,8 @@ HRESULT CLevel_GamePlay::Initialize_Clone()
 
 	
 
-	if (FAILED(Ready_Layer_Monster(TEXT("Layer_Monster"))))
-		return E_FAIL;
+	//if (FAILED(Ready_Layer_Monster(TEXT("Layer_Monster"))))
+	//	return E_FAIL;
 
 	if (FAILED(Ready_Layer_Effect(TEXT("Layer_Effect"))))
 		return E_FAIL;
@@ -128,6 +131,16 @@ HRESULT CLevel_GamePlay::Ready_Layer_Player(const _wstring& strLayerTag)
 
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel), strLayerTag,
 		ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_Player"))))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CLevel_GamePlay::Ready_Layer_Map(const _wstring& strLayerTag)
+{
+
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel), strLayerTag,
+		ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_Map"))))
 		return E_FAIL;
 
 	return S_OK;

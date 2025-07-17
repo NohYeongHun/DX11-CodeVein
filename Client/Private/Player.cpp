@@ -130,17 +130,11 @@ HRESULT CPlayer::Ready_Components(PLAYER_DESC* pDesc)
         TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom), nullptr)))
         return E_FAIL;
 
-    /*if (FAILED(__super::Add_Component(ENUM_CLASS(LEVEL::STATIC)
+    if (FAILED(__super::Add_Component(ENUM_CLASS(LEVEL::STATIC)
         , TEXT("Prototype_Component_Model_Player")
         ,TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom), nullptr)))
-        return E_FAIL;*/
-
-    if (FAILED(__super::Add_Component(ENUM_CLASS(LEVEL::GAMEPLAY)
-        , TEXT("Prototype_Component_Model_Map")
-        , TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom), nullptr)))
         return E_FAIL;
 
-    
 
     return S_OK;
 }

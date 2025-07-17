@@ -109,12 +109,6 @@ HRESULT CTerrain::Ready_Render_Resources()
     if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
         return E_FAIL;
 
-    cout << "Pos : " << vCamPos.x << " , " << vCamPos.y << " , " << vCamPos.z << endl;
-
-
-
-
-
     return S_OK;
 }
 

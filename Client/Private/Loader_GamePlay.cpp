@@ -8,6 +8,13 @@ HRESULT CLoader_GamePlay::Loading_Resource(ID3D11Device* pDevice, ID3D11DeviceCo
 		return E_FAIL;
 	}
 
+	//if (FAILED(Add_Prototype_Map(pDevice, pContext, pGameInstance)))
+	//{
+	//	MSG_BOX(TEXT("Create Failed Loading : GamePlay Map "));
+	//	return E_FAIL;
+	//}
+
+
 	if (FAILED(Add_Prototype_Camera_Free(pDevice, pContext, pGameInstance)))
 	{
 		MSG_BOX(TEXT("Create Failed Loading : GamePlay Camera_Free "));
@@ -41,6 +48,25 @@ HRESULT CLoader_GamePlay::Add_Prototype_Player(ID3D11Device* pDevice, ID3D11Devi
 	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level)
 		, TEXT("Prototype_GameObject_Player")
 		, CPlayer::Create(pDevice, pContext))))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+// 1.
+HRESULT CLoader_GamePlay::Add_Prototype_Map(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
+{
+	_matrix		PreTransformMatrix = XMMatrixIdentity();
+
+	// Map Prototype 생성.
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level)
+		, TEXT("Prototype_Component_Model_Map")
+		, CModel::Create(pDevice, pContext, MODELTYPE::NONANIM, PreTransformMatrix, "../Bin/Resources/Models/Map/BossMap.glb"))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level)
+		, TEXT("Prototype_GameObject_Map")
+		, CMap::Create(pDevice, pContext))))
 		return E_FAIL;
 
 	return S_OK;

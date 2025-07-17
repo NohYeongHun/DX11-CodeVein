@@ -104,8 +104,8 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 		return E_FAIL;
 	
 	/* Model Load */
-	//if (FAILED(Ready_Prototype_ForModel()))
-	//	return E_FAIL;
+	if (FAILED(Ready_Prototype_ForModel()))
+		return E_FAIL;
 
 	if (FAILED(Ready_Prototype_HUD()))
 		return E_FAIL;
@@ -151,7 +151,7 @@ HRESULT CMainApp::Ready_Prototype_ForModel()
 	_matrix		PreTransformMatrix = XMMatrixIdentity();
 
 	/* Prototype_Component_Model */
-	PreTransformMatrix = XMMatrixScaling(1.f, 1.f, 1.f) * XMMatrixRotationX(XMConvertToRadians(90.0f)) * XMMatrixRotationY(XMConvertToRadians(180.0f));
+	PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
 
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
 		, TEXT("Prototype_Component_Model_Player")
@@ -402,8 +402,6 @@ HRESULT CMainApp::Ready_Clone_SkillUI(const _wstring& strLayerTag)
 
 	return S_OK;
 }
-
-
 
 
 

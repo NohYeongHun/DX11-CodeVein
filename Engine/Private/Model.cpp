@@ -38,8 +38,6 @@ HRESULT CModel::Initialize_Prototype(MODELTYPE eModelType, _fmatrix PreTransform
 	XMStoreFloat4x4(&m_PreTransformMatrix, PreTransformMatrix);
 	
 
-	
-
 	if (FAILED(Ready_Meshes(PreTransformMatrix)))
 		return E_FAIL;
 
