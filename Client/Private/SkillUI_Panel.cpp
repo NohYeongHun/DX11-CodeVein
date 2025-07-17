@@ -50,6 +50,8 @@ HRESULT CSkillUI_Panel::Initialize_Clone(void* pArg)
     SKILLUI_PANEL_DESC* pDesc = static_cast<SKILLUI_PANEL_DESC*>(pArg);
 
      m_ePanelType = pDesc->ePanelType;
+     m_strTextureTag = pDesc->pText;
+     
     if (FAILED(__super::Initialize_Clone(pDesc)))
         return E_FAIL;
 
@@ -168,6 +170,7 @@ HRESULT CSkillUI_Panel::Ready_Skill_Childs(SKILLUI_PANEL_DESC* pDesc)
     Desc.fY = 0;
     Desc.fSizeX = fSizeX;
     Desc.fSizeY = fSizeY;
+    Desc.pText = m_strTextureTag.c_str();
 
 
 

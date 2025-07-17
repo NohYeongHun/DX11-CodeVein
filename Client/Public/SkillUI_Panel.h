@@ -24,6 +24,7 @@ public:
 		_float fSlot_SizeY{};
 		PANELTYPE ePanelType = {};
 		_uint iSkillSlot = {};
+		const _tchar* pText = {};
 
 	}SKILLUI_PANEL_DESC;
 
@@ -53,6 +54,7 @@ private:
 
 	vector<class CSkillUI_Slot*> m_SkillSlots = {};
 	
+	_wstring m_strTextureTag = {};
 	PANELTYPE m_ePanelType = {};
 	_uint m_iInventory_Slot = {};
 

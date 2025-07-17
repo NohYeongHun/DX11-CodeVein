@@ -126,6 +126,7 @@ HRESULT CSkillUI::Ready_Childs()
     Desc.fSlot_SizeX = 80;
     Desc.fSlot_SizeY = 80;
     Desc.iSkillSlot = 8;
+	Desc.pText = L"Action_SkillIcon";
 
 
     CUIObject* pUIObject = nullptr;

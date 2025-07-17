@@ -11,6 +11,7 @@ class CSkillUI_Icon final : public CUIObject
 public:
 	typedef struct tagSkillIconDesc : CUIObject::UIOBJECT_DESC
 	{
+		const _tchar* pText = {};
 		_uint iTextureIndex = {};
 	}SKILLICON_DESC;
 

@@ -54,7 +54,9 @@ HRESULT CSkillUI_Slot::Initialize_Clone(void* pArg)
 
     
     SKILLSLOT_DESC* pDesc = static_cast<SKILLSLOT_DESC*>(pArg);
+    m_iIcon_TextureIndex = pDesc->iTextureIndex;
     m_iSlotIndex = pDesc->iSlotIndex;
+    m_strTextureTag = pDesc->pText;
 
     if (FAILED(Ready_Components(pDesc)))
         return E_FAIL;
@@ -129,6 +131,7 @@ HRESULT CSkillUI_Slot::Ready_Childs()
     Desc.fSizeX = m_fSizeX;
     Desc.fSizeY = m_fSizeY;
     Desc.iTextureIndex = m_iIcon_TextureIndex;
+    Desc.pText = m_strTextureTag.c_str();
     
     CUIObject* pUIObject = nullptr;
     

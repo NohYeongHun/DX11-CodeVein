@@ -39,6 +39,8 @@ HRESULT CSkillUI_Icon::Initialize_Clone(void* pArg)
         return E_FAIL;
 
     SKILLICON_DESC* pDesc = static_cast<SKILLICON_DESC*>(pArg);
+    m_strTextureTag = pDesc->pText;
+    
     if (FAILED(Ready_Components(pDesc)))
         return E_FAIL;
 

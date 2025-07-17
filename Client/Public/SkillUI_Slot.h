@@ -11,6 +11,7 @@ class CSkillUI_Slot final : public CUIObject
 public:
 	typedef struct tagSkillSlotDesc : CUIObject::UIOBJECT_DESC
 	{
+		const _tchar* pText = {};
 		_uint iTextureIndex = {};
 		_uint iSlotIndex = {};
 	}SKILLSLOT_DESC;
