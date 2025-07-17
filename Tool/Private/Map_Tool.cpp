@@ -1,4 +1,4 @@
-#include "Map_Tool.h"
+ï»¿#include "Map_Tool.h"
 
 
 CMap_Tool::CMap_Tool(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -12,16 +12,18 @@ CMap_Tool::CMap_Tool(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 }
 
 
-HRESULT CMap_Tool::Initialize_Clone()
+HRESULT CMap_Tool::Initialize()
 {
-    if(FAILED(Ready_Imgui()))
+    if (FAILED(Ready_Imgui()))
         return E_FAIL;
+
+	
 
 
     return S_OK;
 }
 
-/* ¸ñÀûÀ» ¾î¶»°Ô ÇÒ°Å³Ä?.. */
+/* ëª©ì ì„ ì–´ë–»ê²Œ í• ê±°ëƒ?.. */
 void CMap_Tool::ImGui_Render()
 {
 	struct LevelButton {
@@ -61,7 +63,7 @@ void CMap_Tool::ImGui_MenuBar_Render()
 {
 	if (ImGui::BeginMenuBar())
 	{
-		// ÆÄÀÏ ¸Þ´º. => Æ¯Á¤ Å¸ÀÔÀÇ ÆÄÀÏÀ» ºÒ·¯¿À°Å³ª È®ÀÎÇÒ ¼ö ÀÖ½À´Ï´Ù.
+		// íŒŒì¼ ë©”ë‰´. => íŠ¹ì • íƒ€ìž…ì˜ íŒŒì¼ì„ ë¶ˆëŸ¬ì˜¤ê±°ë‚˜ í™•ì¸í•  ìˆ˜ ìžˆìŠµë‹ˆë‹¤.
 		if (ImGui::BeginMenu("File"))
 		{
 			if (ImGui::MenuItem("open"))
@@ -70,7 +72,7 @@ void CMap_Tool::ImGui_MenuBar_Render()
 				config.path = "../SaveFile/";
 				config.flags = ImGuiFileDialogFlags_ReadOnlyFileNameField;
 
-				// ÆÄÀÏ ´ÙÀÌ¾ó·Î±× ¿­±â
+				// íŒŒì¼ ë‹¤ì´ì–¼ë¡œê·¸ ì—´ê¸°
 				// ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose File", config);
 				ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose File", ".bin", config);
 			}
@@ -88,7 +90,7 @@ void CMap_Tool::ImGui_MenuBar_Render()
 		ImGui::EndMenuBar();
 	}
 
-	// ÀÐ±â¿ë ·ÎÁ÷
+	// ì½ê¸°ìš© ë¡œì§
 	if (ImGuiFileDialog::Instance()->Display("ChooseFileDlgKey")) {
 		if (ImGuiFileDialog::Instance()->IsOk()) {
 			std::string load_path = ImGuiFileDialog::Instance()->GetFilePathName();
@@ -114,7 +116,7 @@ HRESULT CMap_Tool::Ready_Imgui()
 CMap_Tool* CMap_Tool::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
     CMap_Tool* pInstance = new CMap_Tool(pDevice, pContext);
-    if (FAILED(pInstance->Initialize_Clone()))
+    if (FAILED(pInstance->Initialize()))
     {
         MSG_BOX(TEXT("Create Failed : CMap_Tool"));
         Safe_Release(pInstance);

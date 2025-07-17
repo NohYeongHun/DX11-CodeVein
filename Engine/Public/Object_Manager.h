@@ -15,7 +15,12 @@ private:
 	virtual ~CObject_Manager() = default;
 
 public:
+#pragma region ENGINE제공
 	class CComponent* Get_Component(_uint iLayerLevelIndex, const _wstring& strLayerTag, const _wstring& strComponentTag, _uint iIndex = 0);
+	class CLayer* Get_Layer(_uint iLayerIndex, const _wstring& strLayerTag);
+#pragma endregion
+
+	
 
 public:
 	HRESULT Initialize(_uint iNumLevels);

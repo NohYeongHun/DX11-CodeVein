@@ -266,6 +266,14 @@ CComponent* CGameInstance::Find_Component(_uint iLayerLevelIndex, const _wstring
 	return m_pObject_Manager->Get_Component(iLayerLevelIndex, strLayerTag, strComponentTag, iIndex);
 }
 
+CLayer* CGameInstance::Get_Layer(_uint iLayerIndex, const _wstring& strLayerTag)
+{
+	if (nullptr == m_pObject_Manager)
+		return nullptr; 
+
+	return m_pObject_Manager->Get_Layer(iLayerIndex, strLayerTag);
+}
+
 HRESULT CGameInstance::Add_GameObject_ToLayer(_uint iLayerLevelIndex, const _wstring& strLayerTag, _uint iPrototypeLevelIndex, const _wstring& strPrototypeTag, void* pArg)
 {
 	if (nullptr == m_pObject_Manager)

@@ -1,11 +1,11 @@
-﻿#include "Model.h"
+﻿#include "Tool_Model.h"
 
-CModel::CModel(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CTool_Model::CTool_Model(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CComponent { pDevice, pContext }
 {
 }
 
-CModel::CModel(const CModel& Prototype)
+CTool_Model::CTool_Model(const CTool_Model& Prototype)
     : CComponent ( Prototype )
 	, m_pAIScene { Prototype.m_pAIScene }
 	, m_Meshes { Prototype.m_Meshes }
@@ -22,7 +22,7 @@ CModel::CModel(const CModel& Prototype)
 		Safe_AddRef(material);
 }
 
-HRESULT CModel::Initialize_Prototype(MODELTYPE eModelType, _fmatrix PreTransformMatrix, const _char* pModelFilePath)
+HRESULT CTool_Model::Initialize_Prototype(MODELTYPE eModelType, _fmatrix PreTransformMatrix, const _char* pModelFilePath)
 {
 	_uint iFlag = { aiProcess_ConvertToLeftHanded | aiProcessPreset_TargetRealtime_Fast };
 
@@ -47,13 +47,13 @@ HRESULT CModel::Initialize_Prototype(MODELTYPE eModelType, _fmatrix PreTransform
     return S_OK;
 }
 
-HRESULT CModel::Initialize_Clone(void* pArg)
+HRESULT CTool_Model::Initialize_Clone(void* pArg)
 {
 
     return S_OK;
 }
 
-HRESULT CModel::Bind_Shader_Resource(CShader* pShader, const _char* pConstantName, _uint iMeshIndex, aiTextureType eTextureType, _uint iTextureIndex)
+HRESULT CTool_Model::Bind_Shader_Resource(CShader* pShader, const _char* pConstantName, _uint iMeshIndex, aiTextureType eTextureType, _uint iTextureIndex)
 {
 	// 1. Model에서 Material Index를 가져오고
 	// 이거를 m_Materials MaterialIndex
@@ -65,7 +65,7 @@ HRESULT CModel::Bind_Shader_Resource(CShader* pShader, const _char* pConstantNam
 	return m_Materials[iMaterialIndex]->Bind_Shader_Resource(pShader, pConstantName, eTextureType, iTextureIndex);
 }
 
-HRESULT CModel::Render(_uint iNumMesh)
+HRESULT CTool_Model::Render(_uint iNumMesh)
 {
 	if (FAILED(m_Meshes[iNumMesh]->Bind_Resources()))
 		return E_FAIL;
@@ -76,7 +76,7 @@ HRESULT CModel::Render(_uint iNumMesh)
 	return S_OK;
 }
 
-HRESULT CModel::Ready_Meshes(_fmatrix PreTransformMatrix)
+HRESULT CTool_Model::Ready_Meshes(_fmatrix PreTransformMatrix)
 {
 	m_iNumMeshes = m_pAIScene->mNumMeshes;
 
@@ -87,7 +87,7 @@ HRESULT CModel::Ready_Meshes(_fmatrix PreTransformMatrix)
 		//MeshName += L" : " + to_wstring(i);
 		//MSG_BOX(MeshName.c_str());
 
-		CMesh* pMesh = CMesh::Create(m_pDevice, m_pContext, m_pAIScene->mMeshes[i], PreTransformMatrix);
+		CTool_Mesh* pMesh = CTool_Mesh::Create(m_pDevice, m_pContext, m_pAIScene->mMeshes[i], PreTransformMatrix);
 		if (nullptr == pMesh)
 			return E_FAIL;
 
@@ -97,13 +97,13 @@ HRESULT CModel::Ready_Meshes(_fmatrix PreTransformMatrix)
 	return S_OK;
 }
 
-HRESULT CModel::Ready_Materials(const _char* pModelFilePath)
+HRESULT CTool_Model::Ready_Materials(const _char* pModelFilePath)
 {
 	m_iNumMaterials = m_pAIScene->mNumMaterials;
 
 	for (_uint i = 0; i < m_iNumMaterials; i++)
 	{
-		CMeshMaterial* pMaterial = CMeshMaterial::Create(m_pDevice, m_pContext, pModelFilePath, m_pAIScene->mMaterials[i], m_pAIScene);
+		CTool_MeshMaterial* pMaterial = CTool_MeshMaterial::Create(m_pDevice, m_pContext, pModelFilePath, m_pAIScene->mMaterials[i], m_pAIScene);
 		if (nullptr == pMaterial)
 			return E_FAIL;
 
@@ -112,34 +112,34 @@ HRESULT CModel::Ready_Materials(const _char* pModelFilePath)
 	return S_OK;
 }
 
-CModel* CModel::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, MODELTYPE eModelType, _fmatrix PreTransformMatrix, const _char* pModelFilePath)
+CTool_Model* CTool_Model::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, MODELTYPE eModelType, _fmatrix PreTransformMatrix, const _char* pModelFilePath)
 {
 
-	CModel* pInstance = new CModel(pDevice, pContext);
+	CTool_Model* pInstance = new CTool_Model(pDevice, pContext);
 
 	if (FAILED(pInstance->Initialize_Prototype(eModelType, PreTransformMatrix, pModelFilePath)))
 	{
-		MSG_BOX(TEXT("Failed to Created : CModel"));
+		MSG_BOX(TEXT("Failed to Created : CTool_Model"));
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-CComponent* CModel::Clone(void* pArg)
+CComponent* CTool_Model::Clone(void* pArg)
 {
-	CModel* pInstance = new CModel(*this);
+	CTool_Model* pInstance = new CTool_Model(*this);
 
 	if (FAILED(pInstance->Initialize_Clone(pArg)))
 	{
-		MSG_BOX(TEXT("Failed to Cloned : CModel"));
+		MSG_BOX(TEXT("Failed to Cloned : CTool_Model"));
 		Safe_Release(pInstance);
 	}
 
 	return pInstance;
 }
 
-void CModel::Free()
+void CTool_Model::Free()
 {
 	__super::Free();
 	for (auto& pMesh : m_Meshes)

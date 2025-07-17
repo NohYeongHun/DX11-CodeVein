@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Base.h"
 
 NS_BEGIN(Tool)
@@ -9,7 +9,7 @@ private:
 	virtual ~CMap_Tool() = default;
 
 public:
-	HRESULT Initialize_Clone();
+	HRESULT Initialize();
 	
 public:
 	void ImGui_Render();
@@ -24,6 +24,7 @@ private:
 
 private:
 	HRESULT Ready_Imgui();
+	
 
 private:
 	void ImGui_MenuBar_Render();

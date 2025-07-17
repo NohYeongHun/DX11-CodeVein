@@ -30,8 +30,8 @@ HRESULT CTool_MainApp::Initialize_Clone()
 	if (FAILED(Ready_Console()))
 		return E_FAIL;
 
-	/*if (FAILED(Start_Level(LEVEL::LOGO)))
-		return E_FAIL;*/
+	if (FAILED(Start_Level(LEVEL::LOGO)))
+		return E_FAIL;
 
 	return S_OK;
 }
@@ -46,43 +46,54 @@ HRESULT CTool_MainApp::Render()
 	
 	_float4		vClearColor = _float4(0.f, 0.f, 1.f, 1.f);
 
-
-
 	m_pGameInstance->Render_Begin(&vClearColor);
 	
 	// Render Begin Render End 사이에 넣어야함.
-#ifdef _DEBUG
 	m_pImGui_Manager->Render_Begin();
-#endif // _DEBUG
-
 	
 	//m_pImGui_Manager->Render();
-	m_pMapTool->ImGui_Render();
+	//m_pMapTool->ImGui_Render();
 
 	m_pGameInstance->Draw();
 
-#ifdef _DEBUG
+	m_pImGui_Manager->Render_Hierarchy();
+
 	m_pImGui_Manager->Render_End();
-#endif // _DEBUG
 
 	m_pGameInstance->Render_End();
 	return S_OK;
 }
 
 
+
 HRESULT CTool_MainApp::Ready_Prototype_ForStatic()
 {
 	m_pImGui_Manager = CImgui_Manager::Get_Instance(m_pDevice, m_pContext);
 
-	m_pMapTool = CMap_Tool::Create(m_pDevice, m_pContext);
+	//m_pMapTool = CMap_Tool::Create(m_pDevice, m_pContext);
 
-	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LEVEL_STATIC), TEXT("Prototype_Component_VIBuffer_Rect"),
-	//	CVIBuffer_Rect::Create(m_pDevice, m_pContext))))
-	//	return E_FAIL;
+	/* ==================================================== Shader ====================================================*/
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxPosTex"),
+		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxPosTex.hlsl"), VTXPOSTEX::Elements, VTXPOSTEX::iNumElements))))
+		return E_FAIL;
 
-	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LEVEL_STATIC), TEXT("Prototype_Component_Transform"),
-	//	CTransform::Create(m_pDevice, m_pContext))))
-	//	return E_FAIL;
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxNorTex"),
+		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxNorTex.hlsl"), VTXNORTEX::Elements, VTXNORTEX::iNumElements))))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxMesh"),
+		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxMesh.hlsl"), VTXMESH::Elements, VTXMESH::iNumElements))))
+		return E_FAIL;
+
+	/* ==================================================== Other ====================================================*/
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_VIBuffer_Rect"),
+		CVIBuffer_Rect::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Transform"),
+		CTransform::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
 
 	return S_OK;
 }
@@ -120,6 +131,14 @@ HRESULT CTool_MainApp::Ready_Console()
 	std::ios::sync_with_stdio(); // iostream 동기화
 
 	std::cout << "Console created!" << std::endl;
+	return S_OK;
+}
+
+HRESULT CTool_MainApp::Start_Level(LEVEL eStartLevelID)
+{
+	if (FAILED(m_pGameInstance->Open_Level(static_cast<_uint>(LEVEL::LOADING), CLevel_Loading::Create(m_pDevice, m_pContext, eStartLevelID))))
+		return E_FAIL;
+
 	return S_OK;
 }
 

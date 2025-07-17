@@ -1,4 +1,4 @@
-#include "Imgui_Manager.h"
+ï»¿#include "Imgui_Manager.h"
 
 // SingleTon
 CImgui_Manager* CImgui_Manager::m_pInstance = nullptr;
@@ -47,7 +47,7 @@ void CImgui_Manager::Render()
 
     // Button
     if (ImGui::Button("Test Me")) {
-        // ¹öÆ°ÀÌ Å¬¸¯µÇ¾úÀ» ¶§ ½ÇÇàµÉ ÄÚµå
+        // ë²„íŠ¼ì´ í´ë¦­ë˜ì—ˆì„ ë•Œ ì‹¤í–‰ë  ì½”ë“œ
         MessageBoxA(nullptr, "Button clicked!", "Info", MB_OK);
     }
     // text
@@ -71,7 +71,7 @@ void CImgui_Manager::Render_End()
 
 HRESULT CImgui_Manager::Initialize_Clone(HWND hWnd, ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-    // 1. ÄÁÅØ½ºÆ® »ý¼º.
+    // 1. ì»¨í…ìŠ¤íŠ¸ ìƒì„±.
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
 
@@ -91,6 +91,61 @@ HRESULT CImgui_Manager::Initialize_Clone(HWND hWnd, ID3D11Device* pDevice, ID3D1
 
     return S_OK;
 }
+
+#pragma region HIERARCHYì— ë“±ë¡í•œë‹¤.
+
+// ì¶œë ¥ì€ ë ˆë²¨ì—ì„œ.
+void CImgui_Manager::Render_Hierarchy()
+{
+	ImGui::SetNextWindowSize(ImVec2(300, 400), ImGuiCond_Always);
+	ImGui::Begin("Hierarchy", nullptr, ImGuiWindowFlags_MenuBar);
+
+	/*if (ImGui::BeginMenuBar())
+	{
+		if (ImGui::BeginMenu("File"))
+		{
+			ImGui::MenuItem("open");
+			ImGui::MenuItem("save");
+			ImGui::EndMenu();
+		}
+		ImGui::EndMenuBar();
+	}*/
+
+    _uint id = 0;
+	for (auto& pair : m_HierarchyObjects)
+	{
+       
+		if (ImGui::TreeNode(pair.first.c_str()))
+		{
+			ImGui::TreePop();
+		}
+	}
+
+	ImGui::End();
+}
+
+void CImgui_Manager::Register_Hierarchy_Objects(CGameObject* pGameObject)
+{
+    static int id = 0;
+    _wstring wstrValue = pGameObject->Get_ObjectTag();
+    string strValue = { wstrValue.begin(), wstrValue.end() };
+    strValue += to_string(id++);
+
+    m_HierarchyObjects.emplace_back(make_pair(strValue, pGameObject ));
+}
+
+void CImgui_Manager::Register_Hierarchy_Layer(CLayer* pLayer)
+{
+
+    for (auto& pGameObject : pLayer->Get_GameObjects())
+    {
+        if (nullptr != pGameObject)
+            Register_Hierarchy_Objects(pGameObject);
+    }
+}
+
+#pragma endregion
+
 
 CImgui_Manager* CImgui_Manager::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {

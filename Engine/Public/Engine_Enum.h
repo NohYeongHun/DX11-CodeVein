@@ -6,7 +6,7 @@ namespace Engine
 	enum class MODELTYPE { ANIM, NONANIM };
 	enum class STATE { RIGHT, UP, LOOK, POSITION };
 	enum class PROTOTYPE { GAMEOBJECT, COMPONENT };
-	enum class RENDERGROUP { PRIORITY, NONBLEND, BLEND, UI, STATIC_UI, END };
+	enum class RENDERGROUP { PRIORITY, NONBLEND, BLEND, UI, STATIC_UI, CAMERA, END };
 	enum class WINMODE { FULL, WIN, END };
 	enum class D3DTS { VIEW, PROJ, END };
 	

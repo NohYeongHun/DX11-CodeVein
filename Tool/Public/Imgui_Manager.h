@@ -1,9 +1,11 @@
-#pragma once
+﻿#pragma once
 #include "Base.h"
 
 NS_BEGIN(Tool)
 class CImgui_Manager final : public CBase
 {
+
+
 private:
 	CImgui_Manager(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 public:
@@ -21,6 +23,17 @@ private:
 	class CGameInstance* m_pGameInstance = { nullptr };
 	ID3D11Device* m_pDevice = { nullptr };
 	ID3D11DeviceContext* m_pDeviceContext = { nullptr };
+
+
+#pragma region HIERARCHY
+public:
+	void Render_Hierarchy();
+	void Register_Hierarchy_Objects(class CGameObject* pGameObject);
+	void Register_Hierarchy_Layer(class CLayer* pLayer);
+#pragma endregion
+
+private:
+	list<pair<string, class CGameObject*>> m_HierarchyObjects = {};
 
 
 public:

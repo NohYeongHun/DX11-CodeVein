@@ -21,6 +21,11 @@ CComponent* CObject_Manager::Get_Component(_uint iLayerLevelIndex, const _wstrin
 	return pLayer->Get_Component(strComponentTag, iIndex);
 }
 
+CLayer* CObject_Manager::Get_Layer(_uint iLayerIndex, const _wstring& strLayerTag)
+{
+	return Find_Layer(iLayerIndex, strLayerTag);
+}
+
 HRESULT CObject_Manager::Initialize(_uint iNumLevels)
 {
 	m_pLayers = new map<const _wstring, CLayer*>[iNumLevels];

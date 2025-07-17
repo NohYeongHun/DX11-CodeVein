@@ -14,6 +14,9 @@ public:
 	void Update(_float fTimeDelta);
 	HRESULT Render();
 
+public:
+	HRESULT ImGui_Register_Objects();
+
 private:
 	CGameInstance* m_pGameInstance = { nullptr };
 	ID3D11Device* m_pDevice = { nullptr };
@@ -28,7 +31,9 @@ private:
 	HRESULT Ready_Fonts(); // Font_Manager에 Font를 추가한다.
 	HRESULT Ready_Console();
 
-	//HRESULT Start_Level(LEVEL eStartLevelID);
+	HRESULT Start_Level(LEVEL eStartLevelID);
+
+
 
 public:
 	static CTool_MainApp* Create();

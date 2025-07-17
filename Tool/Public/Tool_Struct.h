@@ -25,4 +25,10 @@ typedef struct tagPlayerStructInfo
 	_uint iScore;
 }PLAYER_DATA_INFO;
 
+typedef struct tagHierarchyObjectDesc
+{
+	class CGameObject* pGameObject = { nullptr };
+	const char* szName = {}; // 이름.
+}HIERARCHY_OBJECT_DSEC;
+
 NS_END
