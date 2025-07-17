@@ -10,9 +10,21 @@ CMainApp::CMainApp()
 
 HRESULT CMainApp::Initialize_Clone()
 {
-#ifdef _DEBUG
+//#ifdef _DEBUG
+//	AllocConsole();
+//#endif // DEBUG
+
 	AllocConsole();
-#endif // DEBUG
+
+	// 표준 출력, 에러, 입력 핸들을 콘솔에 연결
+	FILE* fp;
+
+	freopen_s(&fp, "CONOUT$", "w", stdout); // std::cout
+	freopen_s(&fp, "CONOUT$", "w", stderr); // std::cerr
+	freopen_s(&fp, "CONIN$", "r", stdin);   // std::cin
+
+	// 콘솔 버퍼 동기화
+	std::ios::sync_with_stdio(true);
 	
 	ENGINE_DESC		EngineDesc{};
 
@@ -28,7 +40,6 @@ HRESULT CMainApp::Initialize_Clone()
 
 	if (FAILED(Ready_Prototype_ForStatic()))
 		return E_FAIL;
-
 
 	if (FAILED(Ready_Clone_ForStatic()))
 		return E_FAIL;
@@ -58,13 +69,6 @@ HRESULT CMainApp::Render()
 	ImGui::Begin("Information");
 	ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
 	ImGui::End();
-
-	POINT mousePos;
-	GetCursorPos(&mousePos);
-	ScreenToClient(g_hWnd, &mousePos);
-
-	_wstring strMousePos = L" X : " + to_wstring(mousePos.x) + L" Y : " + to_wstring(mousePos.y);
-	SetWindowText(g_hWnd, strMousePos.c_str());
 
 	m_pImGui_Manager->Render_End();
 	m_pGameInstance->Render_End();
@@ -153,6 +157,8 @@ HRESULT CMainApp::Ready_Prototype_ForModel()
 		, TEXT("Prototype_Component_Model_Player")
 		, CModel::Create(m_pDevice, m_pContext, MODELTYPE::NONANIM ,PreTransformMatrix,  "../Bin/Resources/Models/Player/Player.fbx"))))
 		return E_FAIL;
+
+	
 
 	return S_OK;
 }
@@ -341,11 +347,11 @@ HRESULT CMainApp::Ready_Clone_ForStatic()
 	// 생성은 하되 비활성화 해두어야 합니다.
 	if (FAILED(Ready_Clone_HUD(TEXT("Layer_HUD"))))
 		return E_FAIL;
-
+	//
 	// 생성은 하되 비활성화 해두어야 합니다.
 	if (FAILED(Ready_Clone_Inventory(TEXT("Layer_Inventory"))))
 		return E_FAIL;
-	
+	//
 	if (FAILED(Ready_Clone_SkillUI(TEXT("Layer_SkillUI"))))
 		return E_FAIL;
 
@@ -425,9 +431,10 @@ void CMainApp::Free()
 {
 	__super::Free();
 
-#ifdef _DEBUG
+//#ifdef _DEBUG
+//	FreeConsole();
+//#endif // DEBUG
 	FreeConsole();
-#endif // DEBUG
 
 	Safe_Release(m_pImGui_Manager);
 

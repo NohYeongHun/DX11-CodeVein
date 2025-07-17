@@ -31,6 +31,7 @@
 #pragma region GAMEOBJECT
 
 #include "BackGround.h"
+#include "Camera_Free.h"
 /* =========================================== Title Object ===================================== */
 #include "Title_BackGround.h"
 #include "TitleText.h"
@@ -70,7 +71,7 @@
 
 /* ======================================= Terrain Object =================================== */
 #include "Terrain.h"
-#include "Camera_Free.h"
+#include "Map.h"
 
 /* ======================================== Actor Object ===================================== */
 #include "Player.h"

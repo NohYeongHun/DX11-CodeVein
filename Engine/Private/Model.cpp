@@ -26,15 +26,19 @@ HRESULT CModel::Initialize_Prototype(MODELTYPE eModelType, _fmatrix PreTransform
 {
 	_uint iFlag = { aiProcess_ConvertToLeftHanded | aiProcessPreset_TargetRealtime_Fast };
 
+	m_ModelType = eModelType;
+
+	if (MODELTYPE::NONANIM == eModelType)
+		iFlag |= aiProcess_PreTransformVertices; // Animation 사용하지 않는 경우.
+
 	m_pAIScene = m_Importer.ReadFile(pModelFilePath, iFlag);
 	if (nullptr == m_pAIScene)
 		return E_FAIL;
 
-
 	XMStoreFloat4x4(&m_PreTransformMatrix, PreTransformMatrix);
+	
 
-	if (MODELTYPE::NONANIM == m_ModelType)
-		iFlag |= aiProcess_PreTransformVertices; // Animation 사용하지 않는 경우.
+	
 
 	if (FAILED(Ready_Meshes(PreTransformMatrix)))
 		return E_FAIL;
@@ -101,7 +105,7 @@ HRESULT CModel::Ready_Materials(const _char* pModelFilePath)
 
 	for (_uint i = 0; i < m_iNumMaterials; i++)
 	{
-		CMeshMaterial* pMaterial = CMeshMaterial::Create(m_pDevice, m_pContext, pModelFilePath, m_pAIScene->mMaterials[i]);
+		CMeshMaterial* pMaterial = CMeshMaterial::Create(m_pDevice, m_pContext, pModelFilePath, m_pAIScene->mMaterials[i], m_pAIScene);
 		if (nullptr == pMaterial)
 			return E_FAIL;
 

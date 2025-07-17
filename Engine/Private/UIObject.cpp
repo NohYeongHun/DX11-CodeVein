@@ -209,7 +209,11 @@ void CUIObject::Free()
 {
 	__super::Free();
 	for (auto& pChild : m_Children)
-		Safe_Release(pChild);
+	{
+		if (nullptr != pChild)
+			Safe_Release(pChild);
+	}
+		
 
 	m_Children.clear();
 	m_pParent = nullptr;

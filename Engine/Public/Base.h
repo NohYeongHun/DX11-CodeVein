@@ -24,6 +24,7 @@ public:
 
 
 	const uint32_t Get_ID() { return m_iID; }
+	const unsigned int Get_RefCount() const { return m_iRefCnt; }
 
 private:
 	unsigned int m_iRefCnt = {};

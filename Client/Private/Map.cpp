@@ -1,16 +1,16 @@
-﻿#include "Player.h"
+﻿#include "Map.h"
 
-CPlayer::CPlayer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CMap::CMap(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CGameObject(pDevice, pContext)
 {
 }
 
-CPlayer::CPlayer(const CPlayer& Prototype)
+CMap::CMap(const CMap& Prototype)
     : CGameObject(Prototype)
 {
 }
 
-HRESULT CPlayer::Initialize_Prototype()
+HRESULT CMap::Initialize_Prototype()
 {
     if (FAILED(__super::Initialize_Prototype()))
         return E_FAIL;
@@ -18,7 +18,7 @@ HRESULT CPlayer::Initialize_Prototype()
     return S_OK;
 }
 
-HRESULT CPlayer::Initialize_Clone(void* pArg)
+HRESULT CMap::Initialize_Clone(void* pArg)
 {
     PLAYER_DESC* pDesc = static_cast<PLAYER_DESC*>(pArg);
     
@@ -34,37 +34,17 @@ HRESULT CPlayer::Initialize_Clone(void* pArg)
     return S_OK;
 }
 
-void CPlayer::Priority_Update(_float fTimeDelta)
+void CMap::Priority_Update(_float fTimeDelta)
 {
     __super::Priority_Update(fTimeDelta);
 }
 
-void CPlayer::Update(_float fTimeDelta)
+void CMap::Update(_float fTimeDelta)
 {
     __super::Update(fTimeDelta);
-
-    if (m_pGameInstance->Get_KeyPress(DIK_W))
-    {
-        m_pTransformCom->Go_Straight(fTimeDelta);
-    }
-
-    if (m_pGameInstance->Get_KeyPress(DIK_S))
-    {
-        m_pTransformCom->Go_Backward(fTimeDelta);
-    }
-
-    if (m_pGameInstance->Get_KeyPress(DIK_A))
-    {
-        m_pTransformCom->Go_Left(fTimeDelta);
-    }
-
-    if (m_pGameInstance->Get_KeyPress(DIK_D))
-    {
-        m_pTransformCom->Go_Right(fTimeDelta);
-    }
 }
 
-void CPlayer::Late_Update(_float fTimeDelta)
+void CMap::Late_Update(_float fTimeDelta)
 {
     __super::Late_Update(fTimeDelta);
 
@@ -72,25 +52,8 @@ void CPlayer::Late_Update(_float fTimeDelta)
         return;
 }
 
-HRESULT CPlayer::Render()
+HRESULT CMap::Render()
 {
-    if (ImGui::IsWindowAppearing())              // 또는 static bool once=true;
-    {
-        ImGui::SetNextWindowPos({ 100, 100 }, ImGuiCond_Appearing);
-        ImGui::SetNextWindowSize({ 460, 240 }, ImGuiCond_Appearing); // ← 원하는 픽셀
-    }
-
-    string str = "Player Transform [" + to_string(Get_ID()) + ']';
-    ImGui::Begin(str.c_str());
-    _float4 vPosition = {};
-    XMStoreFloat4(&vPosition, m_pTransformCom->Get_State(STATE::POSITION));
-
-    ImGui::InputFloat("X : ", &vPosition.x);
-    ImGui::InputFloat("Y : ", &vPosition.y);
-    ImGui::InputFloat("Z : ", &vPosition.z);
-    ImGui::End();
-
-
     if (FAILED(Ready_Render_Resources()))
         return E_FAIL;
 
@@ -98,7 +61,6 @@ HRESULT CPlayer::Render()
     for (_uint i = 0; i < iNumMeshes; i++)
     {
         m_pModelCom->Bind_Shader_Resource(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE, 0);
-        
 
         if (FAILED(m_pShaderCom->Begin(0)))
             return E_FAIL;
@@ -111,19 +73,19 @@ HRESULT CPlayer::Render()
     return S_OK;
 }
 
-void CPlayer::On_Collision_Enter(CGameObject* pOther)
+void CMap::On_Collision_Enter(CGameObject* pOther)
 {
 }
 
-void CPlayer::On_Collision_Stay(CGameObject* pOther)
+void CMap::On_Collision_Stay(CGameObject* pOther)
 {
 }
 
-void CPlayer::On_Collision_Exit(CGameObject* pOther)
+void CMap::On_Collision_Exit(CGameObject* pOther)
 {
 }
 
-HRESULT CPlayer::Ready_Components(PLAYER_DESC* pDesc)
+HRESULT CMap::Ready_Components(PLAYER_DESC* pDesc)
 {
 
     if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxMesh"),
@@ -145,7 +107,7 @@ HRESULT CPlayer::Ready_Components(PLAYER_DESC* pDesc)
     return S_OK;
 }
 
-HRESULT CPlayer::Ready_Render_Resources()
+HRESULT CMap::Ready_Render_Resources()
 {
     if (FAILED(m_pTransformCom->Bind_Shader_Resource(m_pShaderCom, "g_WorldMatrix")))
         return E_FAIL;
@@ -160,22 +122,22 @@ HRESULT CPlayer::Ready_Render_Resources()
     return S_OK;
 }
 
-CPlayer* CPlayer::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CMap* CMap::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-    CPlayer* pInstance = new CPlayer(pDevice, pContext);
+    CMap* pInstance = new CMap(pDevice, pContext);
 
     if (FAILED(pInstance->Initialize_Prototype()))
     {
-        MSG_BOX(TEXT("Failed to Created : CPlayer"));
+        MSG_BOX(TEXT("Failed to Created : CMap"));
         Safe_Release(pInstance);
     }
 
     return pInstance;
 }
 
-CGameObject* CPlayer::Clone(void* pArg)
+CGameObject* CMap::Clone(void* pArg)
 {
-    CPlayer* pInstance = new CPlayer(*this);
+    CMap* pInstance = new CMap(*this);
 
     if (FAILED(pInstance->Initialize_Clone(pArg)))
     {
@@ -186,12 +148,12 @@ CGameObject* CPlayer::Clone(void* pArg)
     return pInstance;
 }
 
-void CPlayer::Destroy()
+void CMap::Destroy()
 {
     __super::Destroy();
 }
 
-void CPlayer::Free()
+void CMap::Free()
 {
     __super::Free();
     Safe_Release(m_pModelCom);

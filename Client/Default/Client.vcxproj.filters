@@ -88,6 +88,9 @@
     <Filter Include="02. GameObject\UI\Player\SkillUI">
       <UniqueIdentifier>{75480950-da75-44b5-9ea0-f7f6a5113f8d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. GameObject\Map">
+      <UniqueIdentifier>{ab12065f-d5da-4899-b59f-399fd5a47036}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -249,6 +252,9 @@
     <ClInclude Include="..\Public\SkillUI_Slot.h">
       <Filter>02. GameObject\UI\Player\SkillUI</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Map.h">
+      <Filter>02. GameObject\Map</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -404,6 +410,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\SkillUI_Slot.cpp">
       <Filter>02. GameObject\UI\Player\SkillUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Map.cpp">
+      <Filter>02. GameObject\Map</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
