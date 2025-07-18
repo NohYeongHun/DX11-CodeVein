@@ -66,23 +66,36 @@ HRESULT CMeshMaterial::Initialize_FBX(const _char* pModelFilePath, const aiMater
 			}
 
 
-			_char szFileName[MAX_PATH] = {};
-			_char szExt[MAX_PATH] = {};
+			_char			szFullPath[MAX_PATH] = {};
+			_char			szDrive[MAX_PATH] = {};
+			_char			szDir[MAX_PATH] = {};
+			_char			szFileName[MAX_PATH] = {};
+			_char			szExt[MAX_PATH] = {};
+
+			_splitpath_s(pModelFilePath, szDrive, MAX_PATH, szDir, MAX_PATH, nullptr, 0, nullptr, 0);
 			_splitpath_s(strTexturePath.data, nullptr, 0, nullptr, 0, szFileName, MAX_PATH, szExt, MAX_PATH);
 
-			string fileName = { szFileName };
-			string fileExt = { szExt };
-			string filePath = strDirPath + fileName + fileExt;
+			strcpy_s(szFullPath, szDrive);
+			strcat_s(szFullPath, szDir);
+			strcat_s(szFullPath, szFileName);
+			strcat_s(szFullPath, szExt);
 
-			_wstring texPath = _wstring(filePath.begin(), filePath.end());
+			_tchar			szTextureFilePath[MAX_PATH] = {};
+			MultiByteToWideChar(CP_ACP, 0, szFullPath, strlen(szFullPath), szTextureFilePath, MAX_PATH);
 
-			// Texture 만들기 까지는 성공.
-			HRESULT hr = CreateWICTextureFromFile(m_pDevice, texPath.c_str(), nullptr, &pSRV);
+
+			HRESULT		hr = {};
+
+			if (false == strcmp(".tga", szExt))
+				hr = E_FAIL;
+
+			if (false == strcmp(".dds", szExt))
+				hr = CreateDDSTextureFromFile(m_pDevice, szTextureFilePath, nullptr, &pSRV);
+			else
+				hr = CreateWICTextureFromFile(m_pDevice, szTextureFilePath, nullptr, &pSRV);
 
 			if (FAILED(hr))
-			{
 				return E_FAIL;
-			}
 
 
 			//texPath = L"Material Name (" + to_wstring(iNum) + L") " + texPath;

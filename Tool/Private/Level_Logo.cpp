@@ -75,24 +75,24 @@ HRESULT CLevel_Logo::Ready_Layer_Map(const _wstring& strLayerTag)
 // Map_Part 레이어에 순번으로 존재.
 HRESULT CLevel_Logo::Ready_Layer_Map_Parts(const _wstring& strLayerTag)
 {
-	//// 1. BluePillar
-	//CMap_Part::MAP_PART_DESC Desc{};
-	//Desc.pModelTag = TEXT("MapPart_BluePillar");
-	//if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel)
-	//	, strLayerTag, ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_Map_Part"), &Desc)))
-	//{
-	//	MSG_BOX(TEXT("Failed to Add GameObject to Layer Map_Part"));
-	//	return E_FAIL;
-	//}
+	// 1. BluePillar
+	CMap_Part::MAP_PART_DESC Desc{};
+	Desc.pModelTag = TEXT("MapPart_BluePillar");
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel)
+		, strLayerTag, ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_Map_Part"), &Desc)))
+	{
+		MSG_BOX(TEXT("Failed to Add GameObject to Layer Map_Part"));
+		return E_FAIL;
+	}
 
-	//// 2. Pillar
-	//Desc.pModelTag = TEXT("MapPart_Pillar");
-	//if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel)
-	//	, strLayerTag, ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_Map_Part"), &Desc)))
-	//{
-	//	MSG_BOX(TEXT("Failed to Add GameObject to Layer Map_Part"));
-	//	return E_FAIL;
-	//}
+	// 2. Pillar
+	Desc.pModelTag = TEXT("MapPart_Pillar");
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel)
+		, strLayerTag, ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_Map_Part"), &Desc)))
+	{
+		MSG_BOX(TEXT("Failed to Add GameObject to Layer Map_Part"));
+		return E_FAIL;
+	}
 
 
 	return S_OK;

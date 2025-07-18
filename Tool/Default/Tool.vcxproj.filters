@@ -22,15 +22,6 @@
     <Filter Include="01. Level">
       <UniqueIdentifier>{eb04441d-918f-487f-bc82-e51605875c90}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01. Level\Loading">
-      <UniqueIdentifier>{40979bdc-d301-41d5-9dd6-fa1f7729bae4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="01. Level\Loading\Loader">
-      <UniqueIdentifier>{9df901fd-4234-4b17-b3b9-2b9fb28c73e6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="01. Level\Logo">
-      <UniqueIdentifier>{85f63420-076a-4247-85c4-521f6297ba4b}</UniqueIdentifier>
-    </Filter>
     <Filter Include="01. Level\01. Tool">
       <UniqueIdentifier>{e74a81c5-0205-49b3-ac94-5f9794d8e86d}</UniqueIdentifier>
     </Filter>
@@ -63,6 +54,15 @@
     </Filter>
     <Filter Include="03. Component\Model\Bone">
       <UniqueIdentifier>{c771afe9-3831-4d34-8bb7-7af8e5678a9d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Level\00. Loading">
+      <UniqueIdentifier>{40979bdc-d301-41d5-9dd6-fa1f7729bae4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Level\00. Loading\Loader">
+      <UniqueIdentifier>{9df901fd-4234-4b17-b3b9-2b9fb28c73e6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Level\02. Logo">
+      <UniqueIdentifier>{85f63420-076a-4247-85c4-521f6297ba4b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -130,13 +130,13 @@
       <Filter>97. Imgui\Dependency</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Level_Loading.h">
-      <Filter>01. Level\Loading</Filter>
+      <Filter>01. Level\00. Loading</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Level_Logo.h">
-      <Filter>01. Level\Logo</Filter>
+      <Filter>01. Level\02. Logo</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Loader.h">
-      <Filter>01. Level\Loading\Loader</Filter>
+      <Filter>01. Level\00. Loading\Loader</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Tool_Mesh.h">
       <Filter>03. Component\Model\Mesh</Filter>
@@ -209,13 +209,13 @@
       <Filter>97. Imgui\Dependency</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Level_Loading.cpp">
-      <Filter>01. Level\Loading</Filter>
+      <Filter>01. Level\00. Loading</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Level_Logo.cpp">
-      <Filter>01. Level\Logo</Filter>
+      <Filter>01. Level\02. Logo</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Loader.cpp">
-      <Filter>01. Level\Loading\Loader</Filter>
+      <Filter>01. Level\00. Loading\Loader</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Tool_Mesh.cpp">
       <Filter>03. Component\Model\Mesh</Filter>

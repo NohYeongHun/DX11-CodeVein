@@ -126,8 +126,11 @@ void CImgui_Manager::Render_Hierarchy()
 void CImgui_Manager::Register_Hierarchy_Objects(CGameObject* pGameObject)
 {
     static int id = 0;
-    _wstring wstrValue = pGameObject->Get_ObjectTag();
-    string strValue = { wstrValue.begin(), wstrValue.end() };
+    const _tchar* wstrValue = pGameObject->Get_ObjectTag().c_str();
+
+    _char szFullPath[MAX_PATH] = {};
+    WideCharToMultiByte(CP_ACP, 0, wstrValue, -1, szFullPath, MAX_PATH, nullptr, nullptr);
+    string strValue = szFullPath;
     strValue += to_string(id++);
 
     m_HierarchyObjects.emplace_back(make_pair(strValue, pGameObject ));

@@ -78,6 +78,8 @@ HRESULT CMap_Part::Render()
             return E_FAIL;
     }
     
+    
+
     string strName = "Map_Part : " + to_string(Get_ID());
     _float4 vPos = {};
     XMStoreFloat4(&vPos, m_pTransformCom->Get_State(STATE::POSITION));
