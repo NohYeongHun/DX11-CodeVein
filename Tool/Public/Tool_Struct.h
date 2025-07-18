@@ -31,4 +31,5 @@ typedef struct tagHierarchyObjectDesc
 	const char* szName = {}; // 이름.
 }HIERARCHY_OBJECT_DSEC;
 
+
 NS_END

@@ -114,7 +114,6 @@ void CImgui_Manager::Render_Hierarchy()
     _uint id = 0;
 	for (auto& pair : m_HierarchyObjects)
 	{
-       
 		if (ImGui::TreeNode(pair.first.c_str()))
 		{
 			ImGui::TreePop();

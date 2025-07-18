@@ -77,7 +77,7 @@ HRESULT CLevel_Logo::Ready_Layer_Map_Parts(const _wstring& strLayerTag)
 {
 	// 1. BluePillar
 	CMap_Part::MAP_PART_DESC Desc{};
-	Desc.pModelTag = TEXT("BluePillar");
+	Desc.pModelTag = TEXT("MapPart_BluePillar");
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel)
 		, strLayerTag, ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_Map_Part"), &Desc)))
 	{
@@ -86,7 +86,7 @@ HRESULT CLevel_Logo::Ready_Layer_Map_Parts(const _wstring& strLayerTag)
 	}
 
 	// 2. Pillar
-	Desc.pModelTag = TEXT("Pillar");
+	Desc.pModelTag = TEXT("MapPart_Pillar");
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel)
 		, strLayerTag, ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_Map_Part"), &Desc)))
 	{

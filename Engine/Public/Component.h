@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "Base.h"
 
@@ -21,7 +21,7 @@ protected:
 	class CGameInstance*			m_pGameInstance = { nullptr };
 
 	_bool						m_isCloned = { false };
-
+	
 
 public:
 	virtual CComponent* Clone(void* pArg) = 0;

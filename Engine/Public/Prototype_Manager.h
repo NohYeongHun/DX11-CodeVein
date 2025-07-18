@@ -20,6 +20,11 @@ private:
 	virtual ~CPrototype_Manager() = default;
 
 public:
+	// Prototype에 있는 전체 Name들을 가져옵니다.
+	void Get_PrototypeName_List(list<_wstring>& outList, _uint iLevelIndex, const _tchar* pPrefix);
+	
+
+public:
 	HRESULT Initialize(_uint iNumLevels);
 	HRESULT Add_Prototype(_uint iPrototypeLevelIndex, const _wstring& strPrototypeTag, class CBase* pPrototype);
 	class CBase* Clone_Prototype(PROTOTYPE ePrototype, _uint iPrototypeLevelIndex, const _wstring& strPrototypeTag, void* pArg);

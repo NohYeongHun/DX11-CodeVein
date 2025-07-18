@@ -25,6 +25,7 @@ public:
 
 public:
 	const _wstring& Get_ObjectTag();
+	
 
 public:
 	virtual HRESULT Initialize_Prototype();

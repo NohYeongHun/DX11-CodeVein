@@ -89,14 +89,16 @@ HRESULT CLoader::Loading_For_Logo_Level()
 #pragma region MAP PART
 // Map Prototype 생성.
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LOGO)
-		, TEXT("BluePillar")
+		, TEXT("MapPart_BluePillar")
 		, CTool_Model::Create(m_pDevice, m_pContext, MODELTYPE::NONANIM, PreTransformMatrix, "../Bin/Resources/Models/Map/BossMap/BluePillar.glb"))))
 		return E_FAIL;
 
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LOGO)
-		, TEXT("Pillar")
+		, TEXT("MapPart_Pillar")
 		, CTool_Model::Create(m_pDevice, m_pContext, MODELTYPE::NONANIM, PreTransformMatrix, "../Bin/Resources/Models/Map/BossMap/Pillar.glb"))))
 		return E_FAIL;
+
+	
 
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LOGO)
 		, TEXT("Prototype_GameObject_Map_Part")

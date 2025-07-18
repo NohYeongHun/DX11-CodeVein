@@ -5,6 +5,21 @@ CPrototype_Manager::CPrototype_Manager()
 	
 }
 
+void CPrototype_Manager::Get_PrototypeName_List(list<_wstring>& outList, _uint iLevelIndex, const _tchar* pPrefix)
+{
+	if (nullptr == m_pPrototypes || iLevelIndex >= m_iNumLevels)
+		return;
+
+	_wstring prefix = pPrefix;
+
+	for (auto& Pair : m_pPrototypes[iLevelIndex])
+	{
+		if (Pair.first.compare(0, prefix.length(), prefix) == 0)
+			outList.push_back(Pair.first);
+	}
+
+}
+
 HRESULT CPrototype_Manager::Initialize(_uint iNumLevels)
 {
 	m_pPrototypes = new PROTOTYPES[iNumLevels];
