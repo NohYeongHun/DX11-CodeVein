@@ -35,6 +35,7 @@
 
 #include "MeshMaterial.h"
 #include "Mesh.h"
+#include "Bone.h"
 #include "Model.h"
 
 #pragma endregion

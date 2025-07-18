@@ -33,18 +33,27 @@ private:
 	MODELTYPE m_ModelType = {};
 	_float4x4 m_PreTransformMatrix = {};
 
+private:
+	/* Meshes */
 	_uint m_iNumMeshes = {};
 	vector<class CMesh*> m_Meshes;
 
-
+private:
+	/* Materials */
 	_uint m_iNumMaterials = {};
 	vector<class CMeshMaterial*> m_Materials;
+
+private:
+	/* Bones */
+	_uint m_iNumBones = {};
+	vector<class CBone*> m_Bones;
 
 
 
 private:
 	HRESULT Ready_Meshes(_fmatrix PreTransformMatrix);
 	HRESULT Ready_Materials(const _char* pModelFilePath);
+	HRESULT Ready_Bones(const aiNode* pAiNode, _int iParentBoneIndex);
 
 
 public:

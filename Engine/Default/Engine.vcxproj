@@ -158,6 +158,7 @@ call copy.bat</Command>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Base.cpp" />
+    <ClCompile Include="..\Private\Bone.cpp" />
     <ClCompile Include="..\Private\Bounding_OBB.cpp" />
     <ClCompile Include="..\Private\Bounding.cpp" />
     <ClCompile Include="..\Private\Bounding_AABB.cpp" />
@@ -203,6 +204,7 @@ call copy.bat</Command>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\Base.h" />
+    <ClInclude Include="..\Public\Bone.h" />
     <ClInclude Include="..\Public\Bounding.h" />
     <ClInclude Include="..\Public\Bounding_AABB.h" />
     <ClInclude Include="..\Public\Bounding_OBB.h" />

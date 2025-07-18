@@ -14,12 +14,16 @@ CModel::CModel(const CModel& Prototype)
 	, m_iNumMeshes { Prototype.m_iNumMeshes }
 	, m_iNumMaterials { Prototype.m_iNumMaterials }
 	, m_PreTransformMatrix { Prototype.m_PreTransformMatrix }
+	, m_Bones{ Prototype.m_Bones }
 {
 	for (auto& mesh : m_Meshes)
 		Safe_AddRef(mesh);
 
 	for (auto& material : m_Materials)
 		Safe_AddRef(material);
+
+	for (auto& bone : m_Bones)
+		Safe_AddRef(bone);
 }
 
 HRESULT CModel::Initialize_Prototype(MODELTYPE eModelType, _fmatrix PreTransformMatrix, const _char* pModelFilePath)
@@ -42,6 +46,9 @@ HRESULT CModel::Initialize_Prototype(MODELTYPE eModelType, _fmatrix PreTransform
 		return E_FAIL;
 
 	if (FAILED(Ready_Materials(pModelFilePath)))
+		return E_FAIL;
+
+	if (FAILED(Ready_Bones(m_pAIScene->mRootNode, -1)))
 		return E_FAIL;
 
     return S_OK;
@@ -87,7 +94,7 @@ HRESULT CModel::Ready_Meshes(_fmatrix PreTransformMatrix)
 		//MeshName += L" : " + to_wstring(i);
 		//MSG_BOX(MeshName.c_str());
 
-		CMesh* pMesh = CMesh::Create(m_pDevice, m_pContext, m_pAIScene->mMeshes[i], PreTransformMatrix);
+		CMesh* pMesh = CMesh::Create(m_pDevice, m_pContext, m_ModelType, m_pAIScene->mMeshes[i], PreTransformMatrix);
 		if (nullptr == pMesh)
 			return E_FAIL;
 
@@ -109,6 +116,25 @@ HRESULT CModel::Ready_Materials(const _char* pModelFilePath)
 
 		m_Materials.push_back(pMaterial);
 	}
+	return S_OK;
+}
+
+HRESULT CModel::Ready_Bones(const aiNode* pAiNode, _int iParentBoneIndex)
+{
+	CBone* pBone = CBone::Create(pAiNode, iParentBoneIndex);
+	if (nullptr == pBone)
+		return E_FAIL;
+
+	m_Bones.push_back(pBone);
+
+	_int iOwnBoneIndex = m_Bones.size() - 1; // 자식 객체에 부여할 부모 인덱스는 자신의 인덱스.
+
+	for (_uint i = 0; i < pAiNode->mNumChildren; i++)
+	{
+		if (FAILED(Ready_Bones(pAiNode->mChildren[i], iOwnBoneIndex)))
+			return E_FAIL;
+	}
+
 	return S_OK;
 }
 
@@ -151,7 +177,13 @@ void CModel::Free()
 		Safe_Release(pMaterial);
 
 	m_Materials.clear();
+
+	for (auto& pBone : m_Bones)
+		Safe_Release(pBone);
+
+	m_Bones.clear();
 	
 	//Safe_Delete(m_pAIScene);
+	m_Importer.FreeScene();
 
 }
