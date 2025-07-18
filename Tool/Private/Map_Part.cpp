@@ -10,6 +10,7 @@ CMap_Part::CMap_Part(const CMap_Part& Prototype)
 {
 }
 
+
 HRESULT CMap_Part::Initialize_Prototype()
 {
     if (FAILED(__super::Initialize_Prototype()))
@@ -51,6 +52,18 @@ void CMap_Part::Priority_Update(_float fTimeDelta)
 void CMap_Part::Update(_float fTimeDelta)
 {
     __super::Update(fTimeDelta);
+    _float fDist = {};
+
+    if (m_pGameInstance->Get_MouseKeyUp(MOUSEKEYSTATE::LB) &&
+        m_pModelCom->Is_Ray_Hit(m_pGameInstance->Get_RayOrigin()
+        , m_pGameInstance->Get_RayDir(), &fDist))
+    {
+        MSG_BOX(TEXT("Map Part Ray Hit!"));
+        TOOL_SELECT_OBJECT_DESC Desc{};
+        Desc.pSelectedObject = this;
+        m_pGameInstance->Publish(EventType::SELECTED_MODEL, &Desc);
+    }
+    
 }
 
 void CMap_Part::Late_Update(_float fTimeDelta)

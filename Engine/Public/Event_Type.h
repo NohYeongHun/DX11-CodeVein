@@ -1,6 +1,7 @@
 ﻿NS_BEGIN(Engine)
 enum class EventType : _uint
 {
+	/* Client */
 	NONE = 0,
 	HUD_DISPLAY = 1,
 	HUD_SKILL_CHANGE = 2,
@@ -16,6 +17,8 @@ enum class EventType : _uint
 	INVENTORY_SKILL_CHANGE = 12,
 	SKILLINFO_DISPLAY = 13,
 	SKILLINFO_SKILL_CHANGE = 14,
+	/* Map Tool */
+	SELECTED_MODEL = 15,
 	EVENT_END
 };
 
@@ -100,5 +103,11 @@ typedef struct tagSkillInfoSkillChangeDesc
 #pragma endregion
 
 
+/* Map Tool*/
+
+typedef struct tagMapToolSelectedEventDesc
+{
+	class CGameObject* pSelectedObject = { nullptr }; // 선택한 객체 포인터 전달해주기.
+}TOOL_SELECT_OBJECT_DESC;
 
 NS_END

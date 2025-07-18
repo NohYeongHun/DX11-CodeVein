@@ -13,7 +13,7 @@ private:
 
 public:
 	const _uint Get_MaterialIndex() { return m_iMaterialIndex; }
-
+	const _bool Is_Ray_Hit(const _float3& rayOrigin, const _float3& rayDir, _float* pOutDist);
 
 public:
 	virtual HRESULT Initialize_Prototype(MODELTYPE eModelType, const aiMesh* pMesh, _fmatrix PreTransformMatrix);
@@ -29,6 +29,9 @@ public:
 	HRESULT Render();
 
 private:
+	vector<_float3> m_vecPositions;
+	vector<_uint>   m_vecIndices;
+
 	_uint m_iMaterialIndex = { };
 	_uint m_iNumBones = {};
 

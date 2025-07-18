@@ -15,9 +15,9 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11De
 	if (nullptr == m_pGraphic_Device)
 		return E_FAIL;
 
-	//m_pPicking = CPicking::Create(*ppOut, EngineDesc.hWnd);
-	//if (nullptr == m_pPicking)
-	//	return E_FAIL;
+	m_pPicking = CPicking::Create(*ppDevice, *ppContext, EngineDesc.hWnd);
+	if (nullptr == m_pPicking)
+		return E_FAIL;
 
 
 	m_pLevel_Manager = CLevel_Manager::Create();
@@ -94,6 +94,11 @@ void CGameInstance::Update_Engine(_float fTimeDelta)
 	* 해당 단계를 이용해서 각 객체들에 적용할 행렬들을 생성해둡니다.
 	*/
 	m_pPipleLine->Update();
+
+	/*
+	* 피킹 Update 진행. => 갱신된 PipeLine 정보 이용.
+	*/
+	m_pPicking->Update();
 
 	/*m_pPicking->Update();*/
 
@@ -455,6 +460,14 @@ HRESULT CGameInstance::Add_Light(const LIGHT_DESC& LightDesc)
 {
 	return m_pLight_Manager->Add_Light(LightDesc);
 }
+const _float3& CGameInstance::Get_RayOrigin()
+{
+	return m_pPicking->Get_RayOrigin();
+}
+const _float3& CGameInstance::Get_RayDir()
+{
+	return m_pPicking->Get_RayDir();
+}
 #pragma endregion
 
 
@@ -490,6 +503,7 @@ void CGameInstance::Release_Engine()
 	Safe_Release(m_pEvent_Manager);
 	Safe_Release(m_pPipleLine);
 	Safe_Release(m_pLight_Manager);
+	Safe_Release(m_pPicking);
 
 	Safe_Release(m_pInput_Device);
 	Safe_Release(m_pGraphic_Device);

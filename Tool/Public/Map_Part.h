@@ -15,6 +15,9 @@ private:
 	CMap_Part(const CMap_Part& Prototype);
 	virtual ~CMap_Part() = default;
 	
+/* 충돌된 Map Part는 Imgui에서 조작할 수 있는 Transform 주소를 반환합니다. */
+public:
+
 public:
 	virtual HRESULT Initialize_Prototype();
 	virtual HRESULT Initialize_Clone(void* pArg);
@@ -32,7 +35,7 @@ public:
 
 
 private:
-	class CModel* m_pModelCom = { nullptr };
+	class CTool_Model* m_pModelCom = { nullptr };
 	class CShader* m_pShaderCom = { nullptr };
 	const _tchar* m_pModelTag = { nullptr };
 	_wstring m_PartName = {  };

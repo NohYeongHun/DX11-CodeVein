@@ -10,7 +10,7 @@ private:
 	virtual ~CTool_MainApp() = default;
 
 public:
-	HRESULT Initialize_Clone();
+	HRESULT Initialize();
 	void Update(_float fTimeDelta);
 	HRESULT Render();
 

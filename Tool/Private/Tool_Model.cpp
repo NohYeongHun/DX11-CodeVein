@@ -26,6 +26,20 @@ CTool_Model::CTool_Model(const CTool_Model& Prototype)
 		Safe_AddRef(bone);
 }
 
+const _bool CTool_Model::Is_Ray_Hit(const _float3& rayOrigin, const _float3& rayDir, _float* pOutDist)
+{
+	_bool IsHit = false;
+
+	for (_uint i = 0; i < m_iNumMeshes; i++)
+	{
+		IsHit = m_Meshes[i]->Is_Ray_Hit(rayOrigin, rayDir, pOutDist);
+		if (IsHit)
+			return true;
+	}
+
+	return false;
+}
+
 HRESULT CTool_Model::Initialize_Prototype(MODELTYPE eModelType, _fmatrix PreTransformMatrix, const _char* pModelFilePath)
 {
 	

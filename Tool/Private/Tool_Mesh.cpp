@@ -10,6 +10,37 @@ CTool_Mesh::CTool_Mesh(const CTool_Mesh& Prototype)
 {
 }
 
+const _bool CTool_Mesh::Is_Ray_Hit(const _float3& rayOrigin, const _float3& rayDir, _float* pOutDist)
+{
+	_bool bHit = false;
+	_float fClosestDist = 1000.f;
+
+	_fvector vRayOrigin = XMLoadFloat3(&rayOrigin);
+	_fvector vRayDir = XMLoadFloat3(&rayDir);
+
+	for (_uint i = 0; i < m_vecIndices.size(); i+= 3)
+	{
+		_fvector v0 = XMLoadFloat3(&m_vecPositions[m_vecIndices[i]]);
+		_gvector v1 = XMLoadFloat3(&m_vecPositions[m_vecIndices[i + 1]]);
+		_hvector v2 = XMLoadFloat3(&m_vecPositions[m_vecIndices[i + 2]]);
+
+		_float fDist = 0.f;
+		if (TriangleTests::Intersects(vRayOrigin, vRayDir, v0, v1, v2, fDist))
+		{
+			if (fDist < fClosestDist)
+			{
+				fClosestDist = fDist;
+				bHit = true;
+			}
+		}
+	}
+
+	if (bHit && pOutDist)
+		*pOutDist = fClosestDist;
+
+	return bHit;
+}
+
 HRESULT CTool_Mesh::Initialize_Prototype(MODELTYPE eModelType, const aiMesh* pAIMesh, _fmatrix PreTransformMatrix)
 {
 	// Material Index 설정.
@@ -22,9 +53,11 @@ HRESULT CTool_Mesh::Initialize_Prototype(MODELTYPE eModelType, const aiMesh* pAI
 	m_eIndexFormat = DXGI_FORMAT_R32_UINT;
 	m_ePrimitiveType = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 
-	HRESULT hr = eModelType == MODELTYPE::NONANIM
+	HRESULT hr = (eModelType == MODELTYPE::NONANIM || eModelType == MODELTYPE::STATIC )
 		? Initialize_Vertex_For_NonAnim(pAIMesh, PreTransformMatrix)
 		: Initialize_Vertex_For_Anim(pAIMesh);
+
+
 
 
 	D3D11_BUFFER_DESC		IBDesc{};
@@ -45,6 +78,11 @@ HRESULT CTool_Mesh::Initialize_Prototype(MODELTYPE eModelType, const aiMesh* pAI
 		pIndices[iNumIndices++] = AIFace.mIndices[0];
 		pIndices[iNumIndices++] = AIFace.mIndices[1];
 		pIndices[iNumIndices++] = AIFace.mIndices[2];
+
+		/* 충돌 확인용 벡터 인덱스 생성. */
+		m_vecIndices.push_back(AIFace.mIndices[0]);
+		m_vecIndices.push_back(AIFace.mIndices[1]);
+		m_vecIndices.push_back(AIFace.mIndices[2]);
 	}
 
 	D3D11_SUBRESOURCE_DATA	IBInitialData{};
@@ -85,6 +123,9 @@ HRESULT CTool_Mesh::Initialize_Vertex_For_NonAnim(const aiMesh* pAIMesh, _fmatri
 		memcpy(&pVertices[i].vTangent, &pAIMesh->mTangents[i], sizeof(_float3));
 		memcpy(&pVertices[i].vBinormal, &pAIMesh->mBitangents[i], sizeof(_float3));
 		memcpy(&pVertices[i].vTexcoord, &pAIMesh->mTextureCoords[0][i], sizeof(_float2));
+
+		/* 충돌 확인용 Vertex Position 설정. */
+		m_vecPositions.push_back(pVertices[i].vPosition);
 	}
 
 	D3D11_SUBRESOURCE_DATA	VBInitialData{};

@@ -61,6 +61,7 @@
 #include "PipeLine.h"
 #include "Light.h"
 #include "Light_Manager.h"
+#include "Picking.h"
 
 
 

@@ -9,7 +9,7 @@ CLevel_Logo::CLevel_Logo(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 
 HRESULT CLevel_Logo::Initialize_Clone()
 {
-	m_pImGui_Manager = CImgui_Manager::Get_Instance(m_pDevice, m_pContext);
+	//m_pImGui_Manager = CImgui_Manager::Get_Instance(m_pDevice, m_pContext);
 
 	/* 현재 레벨을 구성해주기 위한 객체들을 생성한다. */
 	if (FAILED(Ready_Layer_Title(TEXT("Layer_Title"))))
@@ -25,13 +25,18 @@ HRESULT CLevel_Logo::Initialize_Clone()
 	if (FAILED(Ready_Layer_Camera(TEXT("Layer_Camera"))))
 		return E_FAIL;
 
+	if (FAILED(Ready_Map_Tool()))
+		return E_FAIL;
+
 	if (FAILED(Ready_Events()))
 		return E_FAIL;
 	
+
+	
+
 	/* 등록 후 등록한 개체들 순회하면서 Hierarchy에 등록? */
-	_uint iCurrentLevelID = ENUM_CLASS(m_eCurLevel);
-	CLayer* pLayer = m_pGameInstance->Get_Layer(iCurrentLevelID, TEXT("Layer_Map_Part"));
-	m_pImGui_Manager->Register_Hierarchy_Layer(pLayer);
+	
+	//m_pImGui_Manager->Register_Hierarchy_Layer(pLayer);
 	
 	return S_OK;
 }
@@ -46,6 +51,8 @@ void CLevel_Logo::Update(_float fTimeDelta)
 HRESULT CLevel_Logo::Render()
 {
 	SetWindowText(g_hWnd, TEXT("로고레벨입니다."));
+
+	m_pMapTool->Render();
 
 	return S_OK;
 }
@@ -75,8 +82,10 @@ HRESULT CLevel_Logo::Ready_Layer_Map(const _wstring& strLayerTag)
 // Map_Part 레이어에 순번으로 존재.
 HRESULT CLevel_Logo::Ready_Layer_Map_Parts(const _wstring& strLayerTag)
 {
+	
+	CMap_Part::MAP_PART_DESC Desc{}; // Desc에 전달한 Model Tag를 이용해서 적합한 Model Component를 임포트합니다..
+
 	// 1. BluePillar
-	CMap_Part::MAP_PART_DESC Desc{};
 	Desc.pModelTag = TEXT("MapPart_BluePillar");
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel)
 		, strLayerTag, ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_Map_Part"), &Desc)))
@@ -85,14 +94,14 @@ HRESULT CLevel_Logo::Ready_Layer_Map_Parts(const _wstring& strLayerTag)
 		return E_FAIL;
 	}
 
-	// 2. Pillar
-	Desc.pModelTag = TEXT("MapPart_Pillar");
+	//// 2. Pillar
+	/*Desc.pModelTag = TEXT("MapPart_Pillar");
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel)
 		, strLayerTag, ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_Map_Part"), &Desc)))
 	{
 		MSG_BOX(TEXT("Failed to Add GameObject to Layer Map_Part"));
 		return E_FAIL;
-	}
+	}*/
 
 
 	return S_OK;
@@ -129,6 +138,21 @@ HRESULT CLevel_Logo::Ready_Events()
 	return S_OK;
 }
 
+HRESULT CLevel_Logo::Ready_Map_Tool()
+{
+	_uint iCurrentLevelID = ENUM_CLASS(m_eCurLevel);
+	CLayer* pLayer = m_pGameInstance->Get_Layer(iCurrentLevelID, TEXT("Layer_Map_Part"));
+
+	m_pMapTool = CMap_Tool::Create(m_pDevice, m_pContext);
+	if (nullptr == m_pMapTool)
+		return E_FAIL;
+
+	// Map Part 객체들 Layer
+	m_pMapTool->Register_Hierarchy_Layer(pLayer);
+	
+	return S_OK;
+}
+
 
 CLevel_Logo* CLevel_Logo::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
@@ -150,5 +174,7 @@ void CLevel_Logo::Free()
 
 	for (auto& Event : m_Events)
 		m_pGameInstance->UnSubscribe(Event.first, Event.second);
+
+	Safe_Release(m_pMapTool); // Map Tool은 별개 객체.
 
 }

@@ -21,18 +21,24 @@ public:
 
 private:
 	vector<pair<EventType, uint32_t>> m_Events = {};
-	CImgui_Manager* m_pImGui_Manager = { nullptr };
+	
+	CMap_Tool* m_pMapTool = { nullptr };
 
 	_bool m_IsLogoEnd = { false };
 	LEVEL m_eCurLevel = LEVEL::LOGO;
+
+	
 
 private:
 	HRESULT Ready_Layer_Title(const _wstring& strLayerTag);
 	HRESULT Ready_Layer_Map(const _wstring& strLayerTag);
 	HRESULT Ready_Layer_Map_Parts(const _wstring& strLayerTag);
 	HRESULT Ready_Layer_Camera(const _wstring& strLayerTag);
+	
 	HRESULT Ready_Events();
 
+private:
+	HRESULT Ready_Map_Tool();
 
 
 public:

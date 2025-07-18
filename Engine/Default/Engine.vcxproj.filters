@@ -133,6 +133,9 @@
     <Filter Include="01. Utility\03. Component\Model\Bone">
       <UniqueIdentifier>{fa73c927-e98e-4bc8-be67-4c7a9716fbc5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01. Utility\10. Picking">
+      <UniqueIdentifier>{4ea7e238-aeaa-472b-bb6b-2c94047e5f1b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Timer.cpp">
@@ -257,6 +260,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Bone.cpp">
       <Filter>01. Utility\03. Component\Model\Bone</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Picking.cpp">
+      <Filter>01. Utility\10. Picking</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -403,6 +409,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\Bone.h">
       <Filter>01. Utility\03. Component\Model\Bone</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Picking.h">
+      <Filter>01. Utility\10. Picking</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

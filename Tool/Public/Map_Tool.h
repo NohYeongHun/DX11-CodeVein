@@ -10,9 +10,33 @@ private:
 
 public:
 	HRESULT Initialize();
-	
+	HRESULT Ready_Events();
+
 public:
-	void ImGui_Render();
+	void Change_SelectObject(class CGameObject* pSelectedObject);
+
+	void Render();
+
+public:
+	void Render_Hierarchy();
+	void Register_Hierarchy_Objects(class CGameObject* pGameObject);
+	void Register_Hierarchy_Layer(class CLayer* pLayer);
+	
+
+public:
+
+
+public:
+#pragma region Map Tool의 기능들
+	void Transform_Render(const string& name, class CTransform* pTransform);
+	void Spawn_Object(const _wstring& prototypeTag, const _float3& position);
+#pragma endregion
+
+	
+	//void Transform_Render(const string& name, _float3& Transform);
+
+//public:
+//	void ImGui_Render();
 	
 
 
@@ -23,11 +47,20 @@ private:
 	CImgui_Manager* m_pImgui_Manager = { nullptr };
 
 private:
+	_float m_Interval = 1.f;
+	class CGameObject* m_pSelectedObject = { nullptr };
+	vector<EventType> m_Events = {};
+
+private:
+	list<pair<string, class CGameObject*>> m_HierarchyObjects = {};
+
+private:
 	HRESULT Ready_Imgui();
 	
 
-private:
-	void ImGui_MenuBar_Render();
+
+//private:
+//	void ImGui_MenuBar_Render();
 
 
 public:

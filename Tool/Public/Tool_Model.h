@@ -16,6 +16,9 @@ public:
 	}
 
 public:
+	const _bool Is_Ray_Hit(const _float3& rayOrigin, const _float3& rayDir, _float* pOutDist);
+
+public:
 	virtual HRESULT Initialize_Prototype(MODELTYPE eModelType, _fmatrix PreTransformMatrix, const _char* pModelFilePath);
 	virtual HRESULT Initialize_Clone(void* pArg);
 

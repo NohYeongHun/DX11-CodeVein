@@ -7,7 +7,7 @@ CTool_MainApp::CTool_MainApp()
 	Safe_AddRef(m_pGameInstance);
 }
 
-HRESULT CTool_MainApp::Initialize_Clone()
+HRESULT CTool_MainApp::Initialize()
 {
 	ENGINE_DESC		EngineDesc{};
 
@@ -20,6 +20,7 @@ HRESULT CTool_MainApp::Initialize_Clone()
 
 	if (FAILED(m_pGameInstance->Initialize_Engine(EngineDesc, &m_pDevice, &m_pContext)))
 		return E_FAIL;
+	
 
 	if (FAILED(Ready_Prototype_ForStatic()))
 		return E_FAIL;
@@ -56,7 +57,7 @@ HRESULT CTool_MainApp::Render()
 
 	m_pGameInstance->Draw();
 
-	m_pImGui_Manager->Render_Hierarchy();
+	//m_pImGui_Manager->Render_Hierarchy();
 
 	m_pImGui_Manager->Render_End();
 
@@ -151,7 +152,7 @@ CTool_MainApp* CTool_MainApp::Create()
 {
 	CTool_MainApp* pInstance = new CTool_MainApp();
 
-	if (FAILED(pInstance->Initialize_Clone()))
+	if (FAILED(pInstance->Initialize()))
 	{
 		MSG_BOX(TEXT("Failed to Created : CTool_MainApp"));
 		Safe_Release(pInstance);

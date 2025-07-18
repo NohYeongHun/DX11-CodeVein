@@ -68,6 +68,8 @@ HRESULT CLoader::Loading_For_Logo_Level()
 
 	lstrcpy(m_szLoadingText, TEXT("로고 레벨을 로딩중입니다."));
 
+
+
 #pragma region MAP
 	// 1. Model 로딩.
 	_matrix		PreTransformMatrix = XMMatrixIdentity();
@@ -90,13 +92,13 @@ HRESULT CLoader::Loading_For_Logo_Level()
 // Map Prototype 생성.
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LOGO)
 		, TEXT("MapPart_BluePillar")
-		, CTool_Model::Create(m_pDevice, m_pContext, MODELTYPE::NONANIM, PreTransformMatrix, "../Bin/Resources/Models/Map/BossMap/GLB/BluePillar.glb"))))
+		, CTool_Model::Create(m_pDevice, m_pContext, MODELTYPE::STATIC, PreTransformMatrix, "../Bin/Resources/Models/Map/BossMap/GLB/BluePillar.glb"))))
 		return E_FAIL;
 
-	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LOGO)
+	/*if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LOGO)
 		, TEXT("MapPart_Pillar")
-		, CTool_Model::Create(m_pDevice, m_pContext, MODELTYPE::NONANIM, PreTransformMatrix, "../Bin/Resources/Models/Map/BossMap/GLB/Pillar.glb"))))
-		return E_FAIL;
+		, CTool_Model::Create(m_pDevice, m_pContext, MODELTYPE::STATIC, PreTransformMatrix, "../Bin/Resources/Models/Map/BossMap/GLB/Pillar.glb"))))
+		return E_FAIL;*/
 
 	
 

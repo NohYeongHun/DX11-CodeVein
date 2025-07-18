@@ -138,6 +138,12 @@ public:
 		HRESULT Add_Light(const LIGHT_DESC& LightDesc);
 #pragma endregion
 
+#pragma region PICKING
+	public:
+		const _float3& Get_RayOrigin();
+		const _float3& Get_RayDir();
+#pragma endregion
+
 		
 
 //
@@ -162,6 +168,7 @@ private:
 	class CPipeLine*			m_pPipleLine = { nullptr };
 	class CInput_Device*		m_pInput_Device = { nullptr };
 	class CLight_Manager*		m_pLight_Manager = { nullptr };
+	
 	_float m_fTimeDelta = {};
 	
 	queue<INSTANCE_TASK> m_Tasks = {}; // Task

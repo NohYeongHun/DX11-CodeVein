@@ -3,9 +3,10 @@
 #pragma warning(disable : 4251)
 
 #include <d3d11.h>
-#include <DirectXMath.h>
+//#include <DirectXMath.h>
 #include <d3dcompiler.h>
 #include <DirectXCollision.h>
+
 
 
 
