@@ -16,8 +16,12 @@ public:
 
 
 public:
-	virtual HRESULT Initialize_Prototype(const aiMesh* pMesh, _fmatrix PreTransformMatrix);
+	virtual HRESULT Initialize_Prototype(MODELTYPE eModelType, const aiMesh* pMesh, _fmatrix PreTransformMatrix);
 	virtual HRESULT Initialize_Clone(void* pArg) override;
+
+public:
+	HRESULT Initialize_Vertex_For_NonAnim(const aiMesh* pAIMesh, _fmatrix PreTransformMatrix);
+	HRESULT Initialize_Vertex_For_Anim(const aiMesh* pAIMesh);
 
 public:
 	/* 준비된 자원을 이용하여 어떠한 기능(렌더링)을 수행하기위하여 자원을 장치에 바인딩한다. */
@@ -26,10 +30,11 @@ public:
 
 private:
 	_uint m_iMaterialIndex = { };
+	_uint m_iNumBones = {};
 
 
 public:
-	static CTool_Mesh* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const aiMesh* pMesh, _fmatrix PreTransformMatrix );
+	static CTool_Mesh* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, MODELTYPE eModelType, const aiMesh* pMesh, _fmatrix PreTransformMatrix );
 	virtual CComponent* Clone(void* pArg) override;
 	virtual void Free() override;
 };

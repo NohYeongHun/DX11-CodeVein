@@ -54,6 +54,9 @@ bld/
 [Ll]og/
 [Ll]ogs/
 
+# Resources 폴더 무시.
+Resources/
+
 
    
 

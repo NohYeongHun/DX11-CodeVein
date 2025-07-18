@@ -177,6 +177,7 @@
     <ClInclude Include="..\Public\Loader.h" />
     <ClInclude Include="..\Public\Map.h" />
     <ClInclude Include="..\Public\Map_Part.h" />
+    <ClInclude Include="..\Public\Tool_Bone.h" />
     <ClInclude Include="..\Public\Tool_Mesh.h" />
     <ClInclude Include="..\Public\Tool_MeshMaterial.h" />
     <ClInclude Include="..\Public\Tool_Model.h" />
@@ -206,6 +207,7 @@
     <ClCompile Include="..\Private\Loader.cpp" />
     <ClCompile Include="..\Private\Map.cpp" />
     <ClCompile Include="..\Private\Map_Part.cpp" />
+    <ClCompile Include="..\Private\Tool_Bone.cpp" />
     <ClCompile Include="..\Private\Tool_Mesh.cpp" />
     <ClCompile Include="..\Private\Tool_MeshMaterial.cpp" />
     <ClCompile Include="..\Private\Tool_Model.cpp" />
@@ -228,6 +230,7 @@
     <None Include="..\Bin\ShaderFiles\Engine_Shader_Defines.hlsli" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxAnimMesh.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxMesh.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxNorTex.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPosTex.hlsl" />

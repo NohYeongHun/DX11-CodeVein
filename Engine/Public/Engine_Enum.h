@@ -3,7 +3,11 @@
 
 namespace Engine
 {
-	enum class MODELTYPE { ANIM, NONANIM, STATIC };
+	enum class MODELTYPE : _ubyte { 
+		ANIM = 0
+		, NONANIM = 1
+		, STATIC  = 2
+	};
 	enum class STATE { RIGHT, UP, LOOK, POSITION };
 	enum class PROTOTYPE { GAMEOBJECT, COMPONENT };
 	enum class RENDERGROUP { PRIORITY, NONBLEND, BLEND, UI, STATIC_UI, CAMERA, END };

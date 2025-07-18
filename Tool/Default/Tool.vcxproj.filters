@@ -61,6 +61,9 @@
     <Filter Include="96. ShaderFiles">
       <UniqueIdentifier>{3ce9bf54-df44-4a4d-adf6-f537fc34fe8f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="03. Component\Model\Bone">
+      <UniqueIdentifier>{c771afe9-3831-4d34-8bb7-7af8e5678a9d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -153,6 +156,7 @@
     <ClInclude Include="..\Public\Map_Part.h">
       <Filter>02. GameObject\Map\Parts</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Tool_Bone.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="small.ico">
@@ -229,6 +233,7 @@
     <ClCompile Include="..\Private\Map_Part.cpp">
       <Filter>02. GameObject\Map\Parts</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Tool_Bone.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Tool.rc">
@@ -248,6 +253,9 @@
       <Filter>96. ShaderFiles</Filter>
     </FxCompile>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPosTex.hlsl">
+      <Filter>96. ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxAnimMesh.hlsl">
       <Filter>96. ShaderFiles</Filter>
     </FxCompile>
   </ItemGroup>

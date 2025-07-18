@@ -25,6 +25,7 @@
 #pragma region Model
 #include "Tool_Mesh.h"
 #include "Tool_MeshMaterial.h"
+#include "Tool_Bone.h"
 #include "Tool_Model.h"
 #pragma endregion
 

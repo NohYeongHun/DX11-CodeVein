@@ -140,7 +140,6 @@ HRESULT CModel::Ready_Bones(const aiNode* pAiNode, _int iParentBoneIndex)
 
 CModel* CModel::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, MODELTYPE eModelType, _fmatrix PreTransformMatrix, const _char* pModelFilePath)
 {
-
 	CModel* pInstance = new CModel(pDevice, pContext);
 
 	if (FAILED(pInstance->Initialize_Prototype(eModelType, PreTransformMatrix, pModelFilePath)))

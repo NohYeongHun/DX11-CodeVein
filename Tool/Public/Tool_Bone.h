@@ -1,16 +1,16 @@
 ﻿#pragma once
 #include "Base.h"
 
-NS_BEGIN(Engine)
-class CBone final : public CBase
+NS_BEGIN(Tool)
+class CTool_Bone final : public CBase
 {
 private:
-	explicit CBone();
-	virtual ~CBone() = default;
+	explicit CTool_Bone();
+	virtual ~CTool_Bone() = default;
 
 
 public:
-	void Update_CombinedTransformMatrix(const vector<CBone*>& Bones); // 읽기 전용으로 벡터를 가져와서 부모 본의 변환 행렬과 결합된 본의 변환 행렬을 업데이트합니다.
+	void Update_CombinedTransformMatrix(const vector<CTool_Bone*>& Bones); // 읽기 전용으로 벡터를 가져와서 부모 본의 변환 행렬과 결합된 본의 변환 행렬을 업데이트합니다.
 
 public:
 	HRESULT Initialize(const aiNode* pAINode, _int iParentBoneIndex);
@@ -24,7 +24,7 @@ private:
 	_float4x4 m_CombinedTransformationMatrix = {}; // 부모 본의 변환 행렬과 결합된 본의 변환 행렬.
 
 public:
-	static CBone* Create(const aiNode* pAINode, _int iParentBoneIndex);
+	static CTool_Bone* Create(const aiNode* pAINode, _int iParentBoneIndex);
 	virtual void Free();
 
 };
