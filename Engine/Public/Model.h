@@ -18,12 +18,12 @@ public:
 public:
 	virtual HRESULT Initialize_Prototype(MODELTYPE eModelType, _fmatrix PreTransformMatrix, const _char* pModelFilePath);
 	virtual HRESULT Initialize_Clone(void* pArg);
-
+	HRESULT Render(_uint iNumMesh);
 
 
 public:
-	HRESULT Bind_Shader_Resource(CShader* pShader, const _char* pConstantName, _uint iMeshIndex, aiTextureType eTextureType, _uint iTextureIndex);
-	HRESULT Render(_uint iNumMesh);
+	HRESULT Bind_Materials(CShader* pShader, const _char* pConstantName, _uint iMeshIndex, aiTextureType eTextureType, _uint iTextureIndex);
+	void Play_Animation(_float fTimeDelta);
 
 private:
 	const aiScene* m_pAIScene = { nullptr };

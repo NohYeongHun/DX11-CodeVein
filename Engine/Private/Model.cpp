@@ -60,16 +60,29 @@ HRESULT CModel::Initialize_Clone(void* pArg)
     return S_OK;
 }
 
-HRESULT CModel::Bind_Shader_Resource(CShader* pShader, const _char* pConstantName, _uint iMeshIndex, aiTextureType eTextureType, _uint iTextureIndex)
+HRESULT CModel::Bind_Materials(CShader* pShader, const _char* pConstantName, _uint iMeshIndex, aiTextureType eTextureType, _uint iTextureIndex)
 {
-	// 1. Model에서 Material Index를 가져오고
-	// 이거를 m_Materials MaterialIndex
-	_uint iMaterialIndex = m_Meshes[iMeshIndex]->Get_MaterialIndex();
-
-	if (iMaterialIndex >= m_Meshes.size()) 
+	if (iMeshIndex >= m_iNumMeshes)
 		return E_FAIL;
 
-	return m_Materials[iMaterialIndex]->Bind_Shader_Resource(pShader, pConstantName, eTextureType, iTextureIndex);
+	_uint       iMaterialIndex = m_Meshes[iMeshIndex]->Get_MaterialIndex();
+
+	if (m_iNumMaterials <= iMaterialIndex)
+		return E_FAIL;
+
+	return m_Materials[iMaterialIndex]->Bind_Resources(pShader, pConstantName, eTextureType, iTextureIndex);
+}
+
+void CModel::Play_Animation(_float fTimeDelta)
+{
+	/* 현재 시간에 맞는 뼈의 상태대로 특정 뼈들의 TransformationMatrix를 갱신해준다. */
+
+
+   /* 바꿔야할 뼈들의 Transforemation행렬이 갱신되었다면, 정점들에게 직접 전달되야할 CombindTransformationMatrix를 만들어준다. */
+	for (auto& pBone : m_Bones)
+	{
+		pBone->Update_CombinedTransformationMatrix(m_Bones);
+	}
 }
 
 HRESULT CModel::Render(_uint iNumMesh)

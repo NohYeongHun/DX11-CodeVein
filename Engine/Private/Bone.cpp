@@ -4,7 +4,7 @@ CBone::CBone()
 {
 }
 
-void CBone::Update_CombinedTransformMatrix(const vector<CBone*>& Bones)
+void CBone::Update_CombinedTransformationMatrix(const vector<CBone*>& Bones)
 {
 	// 부모 본의 인덱스가 -1이면, 즉 루트 본이면
 	if (m_iParentBoneIndex == - 1)

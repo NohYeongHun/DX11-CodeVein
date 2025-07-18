@@ -156,7 +156,9 @@
     <ClInclude Include="..\Public\Map_Part.h">
       <Filter>02. GameObject\Map\Parts</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Tool_Bone.h" />
+    <ClInclude Include="..\Public\Tool_Bone.h">
+      <Filter>03. Component\Model\Bone</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="small.ico">
@@ -233,7 +235,9 @@
     <ClCompile Include="..\Private\Map_Part.cpp">
       <Filter>02. GameObject\Map\Parts</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Tool_Bone.cpp" />
+    <ClCompile Include="..\Private\Tool_Bone.cpp">
+      <Filter>03. Component\Model\Bone</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Tool.rc">

@@ -35,7 +35,7 @@ HRESULT CTool_MeshMaterial::Initialize(const _char* pModelFilePath, const aiMate
 	return S_OK;
 }
 
-HRESULT CTool_MeshMaterial::Bind_Shader_Resource(CShader* pShader, const _char* pConstantName, aiTextureType eTextureType, _uint iTextureIndex)
+HRESULT CTool_MeshMaterial::Bind_Resources(CShader* pShader, const _char* pConstantName, aiTextureType eTextureType, _uint iTextureIndex)
 {
 	if (iTextureIndex >= m_SRVs[eTextureType].size())
 		return E_FAIL;

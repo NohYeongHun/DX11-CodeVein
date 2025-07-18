@@ -58,16 +58,17 @@ HRESULT CTool_Model::Initialize_Clone(void* pArg)
     return S_OK;
 }
 
-HRESULT CTool_Model::Bind_Shader_Resource(CShader* pShader, const _char* pConstantName, _uint iMeshIndex, aiTextureType eTextureType, _uint iTextureIndex)
+HRESULT CTool_Model::Bind_Materials(CShader* pShader, const _char* pConstantName, _uint iMeshIndex, aiTextureType eTextureType, _uint iTextureIndex)
 {
-	// 1. Model에서 Material Index를 가져오고
-	// 이거를 m_Materials MaterialIndex
-	_uint iMaterialIndex = m_Meshes[iMeshIndex]->Get_MaterialIndex();
-
-	if (iMaterialIndex >= m_Meshes.size()) 
+	if (iMeshIndex >= m_iNumMeshes)
 		return E_FAIL;
 
-	return m_Materials[iMaterialIndex]->Bind_Shader_Resource(pShader, pConstantName, eTextureType, iTextureIndex);
+	_uint       iMaterialIndex = m_Meshes[iMeshIndex]->Get_MaterialIndex();
+
+	if (m_iNumMaterials <= iMaterialIndex)
+		return E_FAIL;
+
+	return m_Materials[iMaterialIndex]->Bind_Resources(pShader, pConstantName, eTextureType, iTextureIndex);
 }
 
 HRESULT CTool_Model::Render(_uint iNumMesh)

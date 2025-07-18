@@ -35,7 +35,7 @@ HRESULT CMeshMaterial::Initialize(const _char* pModelFilePath, const aiMaterial*
 	return S_OK;
 }
 
-HRESULT CMeshMaterial::Bind_Shader_Resource(CShader* pShader, const _char* pConstantName, aiTextureType eTextureType, _uint iTextureIndex)
+HRESULT CMeshMaterial::Bind_Resources(CShader* pShader, const _char* pConstantName, aiTextureType eTextureType, _uint iTextureIndex)
 {
 	if (iTextureIndex >= m_SRVs[eTextureType].size())
 		return E_FAIL;

@@ -10,7 +10,7 @@ private:
 
 
 public:
-	void Update_CombinedTransformMatrix(const vector<CBone*>& Bones); // 읽기 전용으로 벡터를 가져와서 부모 본의 변환 행렬과 결합된 본의 변환 행렬을 업데이트합니다.
+	void Update_CombinedTransformationMatrix(const vector<CBone*>& Bones); // 읽기 전용으로 벡터를 가져와서 부모 본의 변환 행렬과 결합된 본의 변환 행렬을 업데이트합니다.
 
 public:
 	HRESULT Initialize(const aiNode* pAINode, _int iParentBoneIndex);

@@ -12,7 +12,7 @@ private:
 
 public:
 	HRESULT Initialize(const _char* pModelFilePath, const aiMaterial* pAIMaterial, const aiScene* pAIscene);
-	HRESULT Bind_Shader_Resource(CShader* pShader, const _char* pConstantName, aiTextureType iTextureType, _uint iTextureIndex);
+	HRESULT Bind_Resources(CShader* pShader, const _char* pConstantName, aiTextureType iTextureType, _uint iTextureIndex);
 	HRESULT Initialize_FBX(const _char* pModelFilePath, const aiMaterial* pAIMaterial, string strDirPath);
 	HRESULT Initialize_GLB(const _char* pModelFilePath, const aiMaterial* pAIMaterial, const aiScene* pAiScene, string strDirPath);
 
