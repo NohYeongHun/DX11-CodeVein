@@ -2,20 +2,13 @@
 #include "PrototypeName.h"
 
 NS_BEGIN(Tool)
-/* 사용할 Prototype Name들을 배열에 미리 저장 */
-const _tchar* Model_PrototypeNames[MAX_PATH] =
-{
-	TEXT("MapPart_Circle_Floor"),
-	TEXT("MapPart_Side_Floor"),
-	TEXT("MapPart_Floor")
-};
 
-/* 사용할 Prototype Name 모델 Path 저장. */
-const _char* Model_PrototypePath[MAX_PATH] =
+/* 사용할 Prototype Name들을 배열에 미리 저장 */
+const MODEL_DESC Model_Prototypes[] =
 {
-	"../Bin/Resources/Models/Map/BossMap/CircleFloor.fbx",
-	"../Bin/Resources/Models/Map/BossMap/SideFloor.fbx",
-	"../Bin/Resources/Models/Map/BossMap/Floor.fbx"
+	{ TEXT("MapPart_Circle_Floor"), "../Bin/Resources/Models/Map/BossMap/CircleFloor.fbx", "textures/CircleFloor/" },
+	{ TEXT("MapPart_Side_Floor"),   "../Bin/Resources/Models/Map/BossMap/SideFloor.fbx",   "textures/Floor/" },
+	{ TEXT("MapPart_Floor"),        "../Bin/Resources/Models/Map/BossMap/Floor.fbx",        "textures/Floor/" }
 };
 
 extern unsigned int Model_PrototypeSize = 3;

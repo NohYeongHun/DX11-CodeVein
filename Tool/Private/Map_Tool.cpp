@@ -253,7 +253,7 @@ void CMap_Tool::Register_Prototype_Hierarchy(_uint iPrototypeLevelIndex, const _
 
 
     for (_uint i = 0; i < Model_PrototypeSize; ++i)
-        outList.push_back(Model_PrototypeNames[i]);
+        outList.push_back(Model_Prototypes[i].prototypeName);
     
 
     for (auto& modelName : outList)

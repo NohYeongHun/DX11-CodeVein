@@ -114,34 +114,14 @@ HRESULT CLoader::Loading_For_Logo_Level()
 // Map Prototype 생성.
 	PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f);
 
-	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LOGO)
-		, TEXT("MapPart_Circle_Floor")
-		, CTool_Model::Create(m_pDevice, m_pContext, MODELTYPE::NONANIM, PreTransformMatrix, "../Bin/Resources/Models/Map/BossMap/CircleFloor.fbx", "textures/CircleFloor/"))))
-		return E_FAIL;
-
-	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LOGO)
-		, TEXT("MapPart_Side_Floor")
-		, CTool_Model::Create(m_pDevice, m_pContext, MODELTYPE::NONANIM, PreTransformMatrix, "../Bin/Resources/Models/Map/BossMap/SideFloor.fbx", "textures/Floor/"))))
-		return E_FAIL;
-
-	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LOGO)
-		, TEXT("MapPart_Floor")
-		, CTool_Model::Create(m_pDevice, m_pContext, MODELTYPE::NONANIM, PreTransformMatrix, "../Bin/Resources/Models/Map/BossMap/Floor.fbx", "textures/Floor/"))))
-		return E_FAIL;
-
-	
-
-	/*if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LOGO)
-		, TEXT("MapPart_BluePillar")
-		, CTool_Model::Create(m_pDevice, m_pContext, MODELTYPE::STATIC, PreTransformMatrix, "../Bin/Resources/Models/Map/BossMap/GLB/BluePillar.glb", ""))))
-		return E_FAIL;*/
-
-	/*if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LOGO)
-		, TEXT("MapPart_Pillar")
-		, CTool_Model::Create(m_pDevice, m_pContext, MODELTYPE::STATIC, PreTransformMatrix, "../Bin/Resources/Models/Map/BossMap/GLB/Pillar.glb"))))
-		return E_FAIL;*/
-
-	
+	for (_uint i = 0; i < Model_PrototypeSize; ++i)
+	{
+		if (FAILED(m_pGameInstance->Add_Prototype(
+			ENUM_CLASS(LEVEL::LOGO)
+			, Model_Prototypes[i].prototypeName
+			,CTool_Model::Create(m_pDevice, m_pContext, MODELTYPE::NONANIM, PreTransformMatrix, Model_Prototypes[i].modelPath, Model_Prototypes[i].texturePath))))
+			return E_FAIL;
+	}
 
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LOGO)
 		, TEXT("Prototype_GameObject_Map_Part")
