@@ -46,7 +46,7 @@ HRESULT CLevel_Logo::Initialize_Clone()
 
 void CLevel_Logo::Update(_float fTimeDelta)
 {
-
+	m_pMapTool->Update(fTimeDelta);
 
 	return;
 }
@@ -198,7 +198,7 @@ HRESULT CLevel_Logo::Ready_Map_Tool()
 	// Map Part Prototype 객체들을 Hierarchy에 등록합니다.
 	m_pMapTool->Register_Prototype_Hierarchy(ENUM_CLASS(m_eCurLevel)
 		, TEXT("Prototype_GameObject_Map_Part"), TEXT("MapPart"));
-
+	
 	// Map Part 객체들 Layer
 	//m_pMapTool->Register_Layer_Hierarchy(pLayer);
 	

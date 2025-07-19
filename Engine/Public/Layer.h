@@ -13,6 +13,9 @@ private:
 public:
 	class CComponent* Get_Component(const _wstring& strComponentTag, _uint iIndex);
 	list<class CGameObject*>& Get_GameObjects() { return m_GameObjects; }
+	RAYHIT_DESC Get_PickingLocalObject(_float* pOutDist);
+
+
 
 public:
 	HRESULT Add_GameObject(class CGameObject* pGameObject) {

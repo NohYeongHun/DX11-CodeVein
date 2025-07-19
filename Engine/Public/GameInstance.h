@@ -26,6 +26,7 @@ public:
 	HRESULT Clear_Resources(_uint iClearLevelID);
 
 	
+	
 private:
 	HRESULT Task();
 
@@ -65,6 +66,7 @@ public:
 	class CComponent* Find_Component(_uint iLayerLevelIndex, const _wstring& strLayerTag, const _wstring& strComponentTag, _uint iIndex = 0);
 	class CLayer* Get_Layer(_uint iLayerIndex, const _wstring& strLayerTag);
 	HRESULT Add_GameObject_ToLayer(_uint iLayerLevelIndex, const _wstring& strLayerTag, _uint iPrototypeLevelIndex, const _wstring& strPrototypeTag, void* pArg = nullptr);
+	RAYHIT_DESC Get_PickingLocalObject(_uint iLayerLevelIndex, const _wstring strLayerTag, _float* pOutDist);
 #pragma endregion
 
 #pragma region RENDERER
@@ -140,9 +142,12 @@ public:
 #pragma endregion
 
 #pragma region PICKING
-	public:
+public:
 		const _float3& Get_RayOrigin();
 		const _float3& Get_RayDir();
+		const _float3& Get_Local_RayOrigin();
+		const _float3& Get_Local_RayDir();
+		void Transform_To_LocalSpace(_matrix WorldInverseMatrix);
 #pragma endregion
 
 		

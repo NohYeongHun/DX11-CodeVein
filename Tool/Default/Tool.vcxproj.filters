@@ -22,9 +22,6 @@
     <Filter Include="01. Level">
       <UniqueIdentifier>{eb04441d-918f-487f-bc82-e51605875c90}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01. Level\01. Tool">
-      <UniqueIdentifier>{e74a81c5-0205-49b3-ac94-5f9794d8e86d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="03. Component">
       <UniqueIdentifier>{8a0010b4-d413-402f-bcb9-04b385338c73}</UniqueIdentifier>
     </Filter>
@@ -66,6 +63,9 @@
     </Filter>
     <Filter Include="02. GameObject\Player">
       <UniqueIdentifier>{600840f0-0c69-4c89-9d06-5ea8533d2fc7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Level\02. Logo\00. Tool">
+      <UniqueIdentifier>{e74a81c5-0205-49b3-ac94-5f9794d8e86d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -124,7 +124,7 @@
       <Filter>00. MainApp</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Map_Tool.h">
-      <Filter>01. Level\01. Tool</Filter>
+      <Filter>01. Level\02. Logo\00. Tool</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\ImGuiFileDialog.h">
       <Filter>97. Imgui\Dependency</Filter>
@@ -209,7 +209,7 @@
       <Filter>00. MainApp</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Map_Tool.cpp">
-      <Filter>01. Level\01. Tool</Filter>
+      <Filter>01. Level\02. Logo\00. Tool</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\ImGuiFileDialog.cpp">
       <Filter>97. Imgui\Dependency</Filter>

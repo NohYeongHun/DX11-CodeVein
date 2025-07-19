@@ -82,10 +82,10 @@ void CCamera_Free::Late_Update(_float fTimeDelta)
 
 HRESULT CCamera_Free::Render()
 {
-	_float4 vPos = {};
+	/*_float4 vPos = {};
 	XMStoreFloat4(&vPos, m_pTransformCom->Get_State(STATE::POSITION));
 	Transform_Print_Imgui("Camera", reinterpret_cast<_float*>(&vPos));
-	m_pTransformCom->Set_State(STATE::POSITION, XMLoadFloat4(&vPos));
+	m_pTransformCom->Set_State(STATE::POSITION, XMLoadFloat4(&vPos));*/
 
 	return S_OK;
 }

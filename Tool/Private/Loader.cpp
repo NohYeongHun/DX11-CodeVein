@@ -90,10 +90,10 @@ HRESULT CLoader::Loading_For_Logo_Level()
 	PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
 
 	// Player Prototype 생성.
-	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LOGO)
+	/*if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LOGO)
 		, TEXT("Prototype_GameObject_Player")
 		, CPlayer::Create(m_pDevice, m_pContext))))
-		return E_FAIL;
+		return E_FAIL;*/
 
 	//_matrix		PreTransformMatrix = XMMatrixIdentity();
 
@@ -115,8 +115,8 @@ HRESULT CLoader::Loading_For_Logo_Level()
 	PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f);
 
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LOGO)
-		, TEXT("MapPart_Floor")
-		, CTool_Model::Create(m_pDevice, m_pContext, MODELTYPE::NONANIM, PreTransformMatrix, "../Bin/Resources/Models/Map/BossMap/Floor.fbx", "textures/Floor/"))))
+		, TEXT("MapPart_Circle_Floor")
+		, CTool_Model::Create(m_pDevice, m_pContext, MODELTYPE::NONANIM, PreTransformMatrix, "../Bin/Resources/Models/Map/BossMap/CircleFloor.fbx", "textures/CircleFloor/"))))
 		return E_FAIL;
 
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LOGO)
@@ -125,9 +125,11 @@ HRESULT CLoader::Loading_For_Logo_Level()
 		return E_FAIL;
 
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LOGO)
-		, TEXT("MapPart_Circle_Floor")
-		, CTool_Model::Create(m_pDevice, m_pContext, MODELTYPE::NONANIM, PreTransformMatrix, "../Bin/Resources/Models/Map/BossMap/CircleFloor.fbx", "textures/CircleFloor/"))))
+		, TEXT("MapPart_Floor")
+		, CTool_Model::Create(m_pDevice, m_pContext, MODELTYPE::NONANIM, PreTransformMatrix, "../Bin/Resources/Models/Map/BossMap/Floor.fbx", "textures/Floor/"))))
 		return E_FAIL;
+
+	
 
 	/*if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LOGO)
 		, TEXT("MapPart_BluePillar")

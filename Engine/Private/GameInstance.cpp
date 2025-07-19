@@ -295,6 +295,21 @@ HRESULT CGameInstance::Add_GameObject_ToLayer(_uint iLayerLevelIndex, const _wst
 	return m_pObject_Manager->Add_GameObject_ToLayer(iLayerLevelIndex, strLayerTag, iPrototypeLevelIndex, strPrototypeTag, pArg);
 }
 
+/* Layer 객체들이 Picking 되었는지 확인하기. */
+RAYHIT_DESC CGameInstance::Get_PickingLocalObject(_uint iLayerLevelIndex, const _wstring strLayerTag, _float* pOutDist)
+{
+	return m_pObject_Manager->Get_PickingLocalObject(iLayerLevelIndex, strLayerTag, pOutDist);
+}
+
+///* Layer 객체들이 Picking 되었는지 확인하기. */
+//CGameObject* CGameInstance::Get_PickingObject(_uint iLayerLevelIndex, const _wstring strLayerTag, const _float3& vRayOrigin, const _float3& vRayDir, _float* pOutDist)
+//{
+//	if (nullptr == m_pObject_Manager)
+//		return nullptr;
+//
+//	return m_pObject_Manager->Get_PickingObject(iLayerLevelIndex, strLayerTag, vRayOrigin, vRayDir, pOutDist);
+//}
+
 #pragma endregion
 
 #pragma region RENDERER
@@ -475,6 +490,18 @@ const _float3& CGameInstance::Get_RayOrigin()
 const _float3& CGameInstance::Get_RayDir()
 {
 	return m_pPicking->Get_RayDir();
+}
+const _float3& CGameInstance::Get_Local_RayOrigin()
+{
+	return m_pPicking->Get_Local_RayOrigin();
+}
+const _float3& CGameInstance::Get_Local_RayDir()
+{
+	return m_pPicking->Get_Local_RayDir();
+}
+void CGameInstance::Transform_To_LocalSpace(_matrix WorldInverseMatrix)
+{
+	m_pPicking->Transform_To_LocalSpace(WorldInverseMatrix);
 }
 #pragma endregion
 

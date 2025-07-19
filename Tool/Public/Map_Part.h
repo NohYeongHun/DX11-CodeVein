@@ -27,6 +27,9 @@ public:
 	virtual void On_Collision_Enter(CGameObject* pOther);
 	virtual void On_Collision_Stay(CGameObject* pOther);
 	virtual void On_Collision_Exit(CGameObject* pOther);
+
+	/* Ray에 맞았는지 확인. */
+	virtual const _bool Is_Ray_LocalHit(_float* pOutDist) override;
 #pragma endregion
 
 

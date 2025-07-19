@@ -67,14 +67,16 @@ HRESULT CTool_MeshMaterial::Initialize_FBX(const _char* pModelFilePath, const ai
 			{
 				break;
 			}
-
-
 			_char			szFullPath[MAX_PATH] = {};
 			_char			szDrive[MAX_PATH] = {};
 			_char			szDir[MAX_PATH] = {};
 			_char			szFileName[MAX_PATH] = {};
 			_char			szExt[MAX_PATH] = {};
 
+			string data = strTexturePath.data;
+			_bool isData = data != ".";
+
+			
 			_splitpath_s(pModelFilePath, szDrive, MAX_PATH, szDir, MAX_PATH, nullptr, 0, nullptr, 0);
 			_splitpath_s(strTexturePath.data, nullptr, 0, nullptr, 0, szFileName, MAX_PATH, szExt, MAX_PATH);
 

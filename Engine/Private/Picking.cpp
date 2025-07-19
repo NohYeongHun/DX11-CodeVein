@@ -57,6 +57,12 @@ void CPicking::Update()
  
 }
 
+void CPicking::Transform_To_LocalSpace(_matrix WorldInverseMatrix)
+{
+    XMStoreFloat3(&m_Local_Ray_Origin, XMVector3TransformCoord(XMLoadFloat3(&m_Ray_Origin), WorldInverseMatrix));
+    XMStoreFloat3(&m_Local_Ray_Dir, XMVector3TransformNormal(XMLoadFloat3(&m_Ray_Dir), WorldInverseMatrix));
+}
+
 CPicking* CPicking::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, HWND hWnd)
 {
     CPicking* pInstance = new CPicking(pDevice, pContext);

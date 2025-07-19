@@ -18,6 +18,9 @@ public:
 #pragma region ENGINE제공
 	class CComponent* Get_Component(_uint iLayerLevelIndex, const _wstring& strLayerTag, const _wstring& strComponentTag, _uint iIndex = 0);
 	class CLayer* Get_Layer(_uint iLayerIndex, const _wstring& strLayerTag);
+
+	/* 특정 Layer Picking 결과 반환.*/
+	RAYHIT_DESC Get_PickingLocalObject(_uint iLayerLevelIndex, const _wstring strLayerTag, _float* pOutDist);
 #pragma endregion
 
 	

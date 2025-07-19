@@ -26,6 +26,26 @@ CLayer* CObject_Manager::Get_Layer(_uint iLayerIndex, const _wstring& strLayerTa
 	return Find_Layer(iLayerIndex, strLayerTag);
 }
 
+/* Layer 객체들이 Picking이 되었는지 확인하기. */
+//CGameObject* CObject_Manager::Get_PickingObject(_uint iLayerLevelIndex, const _wstring strLayerTag, const _float3& vRayOrigin, const _float3& vRayDir, _float* pOutDist)
+//{
+//
+//	CLayer* pLayer = Find_Layer(iLayerLevelIndex, strLayerTag);
+//	if (nullptr == pLayer)
+//		return nullptr;
+//
+//	return pLayer->Get_PickingObject(vRayOrigin, vRayDir, pOutDist);
+//}
+
+RAYHIT_DESC CObject_Manager::Get_PickingLocalObject(_uint iLayerLevelIndex, const _wstring strLayerTag, _float* pOutDist)
+{
+	CLayer* pLayer = Find_Layer(iLayerLevelIndex, strLayerTag);
+	if (nullptr == pLayer)
+		return {};
+
+	return pLayer->Get_PickingLocalObject(pOutDist);
+}
+
 HRESULT CObject_Manager::Initialize(_uint iNumLevels)
 {
 	m_pLayers = new map<const _wstring, CLayer*>[iNumLevels];

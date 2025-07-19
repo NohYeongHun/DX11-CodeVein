@@ -29,6 +29,14 @@ namespace Engine
 
 	}LIGHT_DESC;
 
+	typedef struct tagRayCastHit
+	{
+		_float3 vHitPoint;
+		_float3 vHitNormal;
+		_float  fDistance;
+		class CGameObject* pHitObject = nullptr;
+	}RAYHIT_DESC;
+
 	typedef struct tagVertexPositionTexcoord
 	{
 		XMFLOAT3		vPosition;

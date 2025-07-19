@@ -36,12 +36,6 @@ HRESULT CMap_Part::Initialize_Clone(void* pArg)
         return E_FAIL;
 
     //m_pTransformCom->Scaling({ 1.f, 1.f, 1.f });
-
-    // Player 정면 바라보게 하기?
-    //m_pTransformCom->Rotation(XMVectorSet(1.f, 0.f, 0.f, 0.f), XMConvertToRadians(270.f));
-
-    
-
     return S_OK;
 }
 
@@ -55,7 +49,7 @@ void CMap_Part::Update(_float fTimeDelta)
     __super::Update(fTimeDelta);
     _float fDist = {};
 
-    if (m_pGameInstance->Get_MouseKeyUp(MOUSEKEYSTATE::LB) &&
+   /* if (m_pGameInstance->Get_MouseKeyUp(MOUSEKEYSTATE::LB) &&
         m_pModelCom->Is_Ray_Hit(m_pGameInstance->Get_RayOrigin()
         , m_pGameInstance->Get_RayDir(), &fDist))
     {
@@ -63,7 +57,7 @@ void CMap_Part::Update(_float fTimeDelta)
         TOOL_SELECT_OBJECT_DESC Desc{};
         Desc.pSelectedObject = this;
         m_pGameInstance->Publish(EventType::SELECTED_MODEL, &Desc);
-    }
+    }*/
     
 }
 
@@ -84,6 +78,7 @@ HRESULT CMap_Part::Render()
     for (_uint i = 0; i < iNumMeshes; i++)
     {
         m_pModelCom->Bind_Materials(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE, 0);
+        
 
         if (FAILED(m_pShaderCom->Begin(0)))
             return E_FAIL;
@@ -94,11 +89,11 @@ HRESULT CMap_Part::Render()
     
     
 
-    string strName = "Map_Part : " + to_string(Get_ID());
+    /*string strName = "Map_Part : " + to_string(Get_ID());
     _float4 vPos = {};
     XMStoreFloat4(&vPos, m_pTransformCom->Get_State(STATE::POSITION));
     Transform_Print_Imgui(strName.c_str(), reinterpret_cast<_float*>(&vPos));
-    m_pTransformCom->Set_State(STATE::POSITION, XMLoadFloat4(&vPos));
+    m_pTransformCom->Set_State(STATE::POSITION, XMLoadFloat4(&vPos));*/
 
     return S_OK;
 }
@@ -113,6 +108,18 @@ void CMap_Part::On_Collision_Stay(CGameObject* pOther)
 
 void CMap_Part::On_Collision_Exit(CGameObject* pOther)
 {
+}
+
+const _bool CMap_Part::Is_Ray_LocalHit(_float* pOutDist)
+{
+    // Ray를 Local로 변환.
+    m_pGameInstance->Transform_To_LocalSpace(m_pTransformCom->Get_WorldMatrix_Inverse());
+
+    if (m_pModelCom->Is_Ray_Hit(m_pGameInstance->Get_Local_RayOrigin()
+        , m_pGameInstance->Get_Local_RayDir(), pOutDist))
+        return true;
+
+    return false;
 }
 
 HRESULT CMap_Part::Ready_Components(MODEL_CREATE_DESC* pDesc)

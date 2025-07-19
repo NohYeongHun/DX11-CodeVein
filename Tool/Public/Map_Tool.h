@@ -5,13 +5,12 @@ NS_BEGIN(Tool)
 class CMap_Tool final : public CBase
 {
 public:
-	enum RENDERTYPE 
+	enum TOOLMODE 
 	{
 		// 1. 프로토타입 하이어라키를 선택했을 때 메시를 원하는 위치에 배치하도록.
 		// 메시에 클릭 했을 때 해당 메시 옆에 배치되도록.
-		
-		MODEL_CREATE = 0, 
-		MODEL_EDIT = 1,
+		CREATE = 0, 
+		EDIT = 1,
 		RENDER_END
 	};
 
@@ -26,76 +25,90 @@ public:
 
 public:
 	void Change_SelectObject(class CGameObject* pSelectedObject);
-
+	void Update(_float fTimeDelta);
 	void Render();
+	void Render_Debug_Window();
+	void Handle_SelectedObject();
 
+#pragma region Create Mode
 public:
-#pragma region Prototype Manager Hierarchy (생성 가능한 객체) 
+	void Render_Model_Create();
 	void Render_Prototype_Hierarchy();
-	void Render_Prototype_Inspector();
-	//void Register_Prototype_HierarchyObjects(class CGameObject* pGameObject);
+	void Render_Prototype_Inspector(ImVec2 vPos);
 	void Register_Prototype_Hierarchy(_uint iPrototypeLevelIndex, const _wstring& strObjectTag, const _wstring& strModelPrefix);
+	void Handle_CreateMode_SelectedObject();
 #pragma endregion
 
-	
-
-#pragma region Object Manager Hierarchy (생성된 객체)
+#pragma region Edit Mode
 public:
+	void Render_Model_Edit();
 	void Render_Layer_Hierarchy();
-
 	void Register_Layer_HierarchyObjects(class CGameObject* pGameObject);
 	void Register_Layer_Hierarchy(class CLayer* pLayer);
+	void Handle_EditMode_SelectedObject();
 #pragma endregion
 
-	
-	
 
-public:
-	RENDERTYPE m_eRenderType = { RENDER_END };
-
-public:
 #pragma region Map Tool의 기능들
+public:
+	void Update_Picking(_uint iLayerLevelIndex, const _wstring& strLevelLayerTag);
 	void Transform_Render(const string& name, class CTransform* pTransform);
 	//void Spawn_Object(const _wstring& prototypeTag, const _float3& position);
 #pragma endregion
 
-	
-	//void Transform_Render(const string& name, _float3& Transform);
-
-//public:
-//	void ImGui_Render();
-	
 
 
+#pragma region CREATE 시 사용 변수
 private:
-	class CGameInstance* m_pGameInstance = { nullptr };
-	ID3D11Device* m_pDevice = { nullptr };
-	ID3D11DeviceContext* m_pDeviceContext = { nullptr };
-	CImgui_Manager* m_pImgui_Manager = { nullptr };
-
-
-
-private:
-	LEVEL m_eCurLevel = {};
-	_float m_Interval = 1.f;
-	class CGameObject* m_pSelectedObject = { nullptr };
-	vector<EventType> m_Events = {};
-
-private:
-	list<pair<string, class CGameObject*>> m_Layer_Objects = {};
-	list<pair<string, string>> m_PrototypeNames = {};
-
 
 	/* 현재 선택된 SelectedObjTag */
-private:
 	string m_Selected_PrototypeObjTag = {};
 	string m_Selected_PrototypeModelTag = {};
 	_wstring m_wSelected_PrototypeObjTag = {};
 	_wstring m_wSelected_PrototypeModelTag = {};
 
+	list<pair<string, string>> m_PrototypeNames = {};
+
+	/* Prototype Hierarchy Pos 저장 */
+	ImVec2 m_PrototypeinspectorPos = {};
+	_bool m_IsPicking_Create = {};
+#pragma endregion
+
+#pragma region EDIT 시 사용 변수.
+
+private:
+	list<pair<string, class CGameObject*>> m_Layer_Objects = {};
+#pragma endregion
+
+#pragma region 공통
+private:
+	RAYHIT_DESC m_RayHitDesc = {};
+	_bool m_IsPossible_Picking = { false };
+	
+	class CGameObject* m_pSelectedObject = { nullptr }; // 선택된 객체.
+	TOOLMODE m_eToolMode = { TOOLMODE::CREATE }; // 상태 저장.
+
+	LEVEL m_eCurLevel = {};
+	_float m_Interval = 1.f;
+	_float3 m_vInterval = {};
+	
+	vector<EventType> m_Events = {};
+
+private:
+	class CGameInstance* m_pGameInstance = { nullptr };
+	class CCamera_Free* m_pCamera = { nullptr };
+	class CTransform* m_pCameraTransformCom = { nullptr };
+
+	ID3D11Device* m_pDevice = { nullptr };
+	ID3D11DeviceContext* m_pDeviceContext = { nullptr };
+	CImgui_Manager* m_pImgui_Manager = { nullptr };
+#pragma endregion
+
+
 private:
 	HRESULT Ready_Imgui();
 	
+
 
 
 //private:

@@ -12,11 +12,25 @@ CMap_Tool::CMap_Tool(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 }
 
 
+/* 맵툴이 카메라 소유시키기 .*/
 HRESULT CMap_Tool::Initialize(LEVEL eLevel)
 {
-    m_eRenderType = RENDERTYPE::MODEL_CREATE;
     m_eCurLevel = eLevel;
 
+    /* 카메라 초기화 */
+    list<CGameObject*> cameraList = m_pGameInstance->Get_Layer(ENUM_CLASS(m_eCurLevel), TEXT("Layer_Camera"))
+        ->Get_GameObjects();
+
+    auto iter = cameraList.begin();
+
+    if (iter == cameraList.end())
+        return E_FAIL;
+
+    m_pCamera = static_cast<CCamera_Free*>(*iter);
+    Safe_AddRef(m_pCamera);
+
+    m_pCameraTransformCom = static_cast<CTransform*>(m_pCamera->Get_Component(L"Com_Transform"));
+    
     if (FAILED(Ready_Imgui()))
         return E_FAIL;
 
@@ -28,13 +42,7 @@ HRESULT CMap_Tool::Initialize(LEVEL eLevel)
 
 HRESULT CMap_Tool::Ready_Events()
 {
-    m_pGameInstance->Subscribe(EventType::SELECTED_MODEL, Get_ID(), [this](void* pData)
-        {
-            TOOL_SELECT_OBJECT_DESC* pDesc = static_cast<TOOL_SELECT_OBJECT_DESC*>(pData);
-            Change_SelectObject(pDesc->pSelectedObject);
-        });
 
-    m_Events.push_back(EventType::SELECTED_MODEL);
 
     return S_OK;
 }
@@ -44,11 +52,33 @@ void CMap_Tool::Change_SelectObject(CGameObject* pSelectedObject)
     m_pSelectedObject = pSelectedObject;
 }
 
+void CMap_Tool::Update(_float fTimeDelta)
+{
+    if (m_pGameInstance->Get_KeyUp(DIK_C))
+        m_eToolMode = TOOLMODE::CREATE;
+    if (m_pGameInstance->Get_KeyUp(DIK_E))
+        m_eToolMode = TOOLMODE::EDIT;
+
+
+    if (m_IsPossible_Picking && m_pGameInstance->Get_MouseKeyUp(MOUSEKEYSTATE::RB))
+        Update_Picking(ENUM_CLASS(m_eCurLevel), TEXT("Layer_Map_Parts"));
+
+    Handle_SelectedObject();
+}
+
 void CMap_Tool::Render()
 {
-    Render_Prototype_Hierarchy();
-    Render_Layer_Hierarchy();
-    if (nullptr != m_pSelectedObject)
+    if (m_eToolMode == TOOLMODE::CREATE)
+        Render_Model_Create();
+    else
+        Render_Model_Edit();
+
+
+    // 디버그 정보는 항상 렌더링
+    Render_Debug_Window();
+
+    //Render_Layer_Hierarchy();
+    /*if (nullptr != m_pSelectedObject)
     {
         _char szFullPath[MAX_PATH] = {};
         WideCharToMultiByte(CP_ACP, 0, m_pSelectedObject->Get_ObjectTag().c_str(), -1, szFullPath, MAX_PATH, nullptr, nullptr);
@@ -57,89 +87,156 @@ void CMap_Tool::Render()
         CTransform* pTransform = static_cast<CTransform*>(m_pSelectedObject->Get_Component(L"Com_Transform"));
         
         Transform_Render(strValue, pTransform);
-    }
+    }*/
 }
 
 
-#pragma region Prototype Manager Hierarchy (생성 가능한 객체) 
+
+
+
+/* Edit 모드에서 선택된 개체 정보가 있다면?*/
+void CMap_Tool::Render_Debug_Window()
+{
+    ImGuiIO& io = ImGui::GetIO();
+
+    // 윈도우 하단에서 150 → 200~250 정도 위로
+    ImVec2 windowPos = ImVec2(10.f, io.DisplaySize.y - 250.f);
+    ImVec2 windowSize = ImVec2(300.f, 200.f);
+
+    // Cond_Once: 최초 한 번만 위치 적용 → 이후 드래그 가능
+    ImGui::SetNextWindowPos(windowPos, ImGuiCond_Once);
+    ImGui::SetNextWindowSize(windowSize, ImGuiCond_Once);
+
+    // NoCollapse만 유지, 이동 가능하게
+    ImGui::Begin("Debug", nullptr, ImGuiWindowFlags_NoCollapse);
+
+    
+    _float3 camPos = {};
+    XMStoreFloat3(&camPos,m_pCameraTransformCom->Get_State(STATE::POSITION));
+    ImGui::Text("Camera Pos: (%.2f, %.2f, %.2f)", camPos.x, camPos.y, camPos.z);
+
+    const char* modeStr = (m_eToolMode == TOOLMODE::CREATE) ? "CREATE" : "EDIT";
+    ImGui::Text("Tool Mode: %s", modeStr);
+
+    // 체크박스 추가 - 피킹 가능 여부
+    ImGui::Checkbox("Enable Picking", &m_IsPossible_Picking);
+
+    ImGui::End();
+}
+
+void CMap_Tool::Handle_SelectedObject()
+{
+    if (nullptr == m_pSelectedObject)
+        return;
+
+    if (m_eToolMode == TOOLMODE::CREATE)
+        Handle_CreateMode_SelectedObject();
+    else if (m_eToolMode == TOOLMODE::EDIT)
+        Handle_EditMode_SelectedObject();
+}   
+
+
+
+
+#pragma region CREATE_MODE
+
+
+void CMap_Tool::Render_Model_Create()
+{
+    Render_Prototype_Hierarchy();
+}
+
+
 void CMap_Tool::Render_Prototype_Hierarchy()
 {
-    /*ImGui::SetNextWindowSize(ImVec2(300, 400), ImGuiCond_Always);
-    ImGui::Begin("Prototype_Hierarchy", nullptr, ImGuiWindowFlags_MenuBar);*/
+    ImGui::SetNextWindowPos(ImVec2(g_iWinSizeX - 310.f, 10.f), ImGuiCond_Always);
+    ImGui::SetNextWindowSize(ImVec2(300, 400), ImGuiCond_Once);
+    ImGui::Begin("Prototype_Hierarchy", nullptr, ImGuiWindowFlags_NoCollapse);
 
     static int iSelectedIndex = -1;
     _uint id = 0;
 
     _wstring objTag = {};
     _wstring modelTag = {};
+    ImVec2 hierarchyPos = ImGui::GetWindowPos();
+    ImVec2 hierarchySize = ImGui::GetWindowSize();
+    
 
     for (auto& pair : m_PrototypeNames)
     {
         if (ImGui::Selectable(pair.second.c_str(), id == iSelectedIndex))
         {
+            m_PrototypeinspectorPos = ImVec2(hierarchyPos.x - 310.f, hierarchyPos.y); // 왼쪽 붙이기
+
             iSelectedIndex = id;
             m_wSelected_PrototypeObjTag = _wstring(pair.first.begin(), pair.first.end());
             m_wSelected_PrototypeModelTag = _wstring(pair.second.begin(), pair.second.end());
 
             m_Selected_PrototypeModelTag = pair.second;
             m_Selected_PrototypeObjTag = pair.first;
-
-            /*m_Selected_PrototypeModelTag = pair.second;
-            WideCharToMultiByte(CP_ACP, 0, modelTag.c_str(), -1, m_Selected_PrototypeModelTag, MAX_PATH, nullptr, nullptr);*/
         }
         
     }
-    ++id;
 
     if (iSelectedIndex >= 0 && iSelectedIndex < m_PrototypeNames.size())
-    {
-        Render_Prototype_Inspector();
-        
-    }
-
-
-}
-
-void CMap_Tool::Render_Prototype_Inspector()
-{
-    ImGui::Begin("Prototype_Inspector");
-
-    ImGui::Text(m_Selected_PrototypeModelTag.c_str());
-
-    static float fPosition[3] = { 0.f, 0.f, 0.f};
-    ImGui::InputFloat3("Position", fPosition);
-
-    static float fRotation[3] = { 0.f, 0.f, 0.f };
-    ImGui::InputFloat3("Rotation", fRotation);
-
-    static float fScale[3] = { 1.f, 1.f, 1.f };
-    ImGui::InputFloat3("Scale", fScale);
-
-    /* 인스턴스 생성. */
-    if (ImGui::Button("Create Instance"))
-    {
-        MODEL_CREATE_DESC Desc{};
-        Desc.pModelTag = m_wSelected_PrototypeModelTag.c_str();
-		Desc.vPosition = _float4(fPosition[0], fPosition[1], fPosition[2], 1.f);
-		Desc.vRotate = _float3(fRotation[0], fRotation[1], fRotation[2]);
-		Desc.vScale = _float3(fScale[0], fScale[1], fScale[2]);
-
-
-        if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel)
-            , TEXT("Layer_Map_Parts")
-            , ENUM_CLASS(m_eCurLevel)
-            , m_wSelected_PrototypeObjTag, &Desc)))
-        {
-            MSG_BOX(TEXT("Add GameoBject_To_Layer Failed"));
-            return;
-        }
-		
-    }
+        Render_Prototype_Inspector(m_PrototypeinspectorPos);
 
     ImGui::End();
 }
 
-// 음.. 솔직히 Model Component 이름만 알면 되지 않나?
+void CMap_Tool::Render_Prototype_Inspector(ImVec2 vPos)
+{
+
+    ImGui::SetNextWindowPos(vPos, ImGuiCond_Always);
+    ImGui::SetNextWindowSize(ImVec2(300, 250), ImGuiCond_Once);
+    ImGui::Begin("Prototype_Transform");
+
+    ImGui::Text(m_Selected_PrototypeModelTag.c_str());
+
+
+    if (!m_IsPicking_Create)
+    {
+        static float fPosition[3] = { 0.f, 0.f, 0.f };
+        ImGui::InputFloat3("Position", fPosition);
+
+        static float fRotation[3] = { 0.f, 0.f, 0.f };
+        ImGui::InputFloat3("Rotation", fRotation);
+
+        static float fScale[3] = { 1.f, 1.f, 1.f };
+        ImGui::InputFloat3("Scale", fScale);
+
+        if (ImGui::Button("Create Instance"))
+        {
+            MODEL_CREATE_DESC Desc{};
+            Desc.pModelTag = m_wSelected_PrototypeModelTag.c_str();
+            Desc.vPosition = _float4(fPosition[0], fPosition[1], fPosition[2], 1.f);
+            Desc.vRotate = _float3(fRotation[0], fRotation[1], fRotation[2]);
+            Desc.vScale = _float3(fScale[0], fScale[1], fScale[2]);
+
+
+            if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel)
+                , TEXT("Layer_Map_Parts")
+                , ENUM_CLASS(m_eCurLevel)
+                , m_wSelected_PrototypeObjTag, &Desc)))
+            {
+                MSG_BOX(TEXT("Add GameObject_To_Layer Failed"));
+                return;
+            }
+        }
+    }
+    else if (m_IsPicking_Create)
+    {
+        static float fInterval[3] = { 0.f, 0.f, 0.f };
+        ImGui::InputFloat3("Interval", fInterval);
+        m_vInterval = _float3(fInterval[0], fInterval[1], fInterval[2]);
+    }
+
+    /* 인스턴스 생성. */
+    ImGui::Checkbox("Picking Create", &m_IsPicking_Create);
+
+    ImGui::End();
+}
+
 
 /* 프로토타입 인덱스, 객체 이름, 모델 컴포넌트 이름.*/
 void CMap_Tool::Register_Prototype_Hierarchy(_uint iPrototypeLevelIndex, const _wstring& strObjectTag, const _wstring& strModelPrefix)
@@ -160,9 +257,43 @@ void CMap_Tool::Register_Prototype_Hierarchy(_uint iPrototypeLevelIndex, const _
     }
 
 }
+void CMap_Tool::Handle_CreateMode_SelectedObject()
+{
+    /* Create Mode에서 Selecetd Object의 역할*/
+
+    /* 생성할 위치. 월드 좌표 반영이 안됨. */
+    _float3 vPos = {};
+    XMStoreFloat3(&vPos, XMLoadFloat3(&m_RayHitDesc.vHitPoint));
 
 
-#pragma region LAYER
+    MODEL_CREATE_DESC Desc{};
+    Desc.pModelTag = m_wSelected_PrototypeModelTag.c_str();
+    Desc.vPosition = _float4(vPos.x + m_vInterval.x, vPos.y + m_vInterval.y, vPos.z + m_vInterval.z, 1.f);
+    Desc.vRotate = _float3(0.f, 0.f, 0.f);
+    Desc.vScale = _float3(1.f, 1.f, 1.f);
+
+    if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel)
+        , TEXT("Layer_Map_Parts")
+        , ENUM_CLASS(m_eCurLevel)
+        , m_wSelected_PrototypeObjTag, &Desc)))
+    {
+        MSG_BOX(TEXT("Create GameObject_To_Layer Failed"));
+        return;
+    }
+
+    // 이미 생성했으면? => 계속 생성 방지. 
+    m_pSelectedObject = nullptr; // 계속 생성 방지.
+}
+#pragma endregion
+
+
+#pragma region EDIT MODE
+
+void CMap_Tool::Render_Model_Edit()
+{
+    Render_Layer_Hierarchy();
+}
+
 void CMap_Tool::Render_Layer_Hierarchy()
 {
     ImGui::SetNextWindowSize(ImVec2(300, 400), ImGuiCond_Always);
@@ -207,9 +338,23 @@ void CMap_Tool::Register_Layer_Hierarchy(CLayer* pLayer)
             Register_Layer_HierarchyObjects(pGameObject);
     }
 }
+void CMap_Tool::Handle_EditMode_SelectedObject()
+{
+
+}
 #pragma endregion
 
 
+/* Selected Object를 설정해줍니다. */
+void CMap_Tool::Update_Picking(_uint iLayerLevelIndex, const _wstring& strLevelLayerTag)
+{
+    _float fOutDist = {};
+    m_RayHitDesc = m_pGameInstance->Get_PickingLocalObject(iLayerLevelIndex, strLevelLayerTag,
+        &fOutDist);
+
+    m_pSelectedObject = m_RayHitDesc.pHitObject;
+    
+}
 
 void CMap_Tool::Transform_Render(const string& name, CTransform* pTransform)
 {
@@ -290,6 +435,7 @@ void CMap_Tool::Free()
     m_Layer_Objects.clear();
     m_PrototypeNames.clear();
 
+    Safe_Release(m_pCamera);
     Safe_Release(m_pGameInstance);
     Safe_Release(m_pDeviceContext);
     Safe_Release(m_pDevice);

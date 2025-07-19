@@ -100,10 +100,10 @@ HRESULT CTool_MainApp::Ready_Prototype_ForStatic()
 	/* Prototype_Component_Model */
 	PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
 
-	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
-		, TEXT("Prototype_Component_Model_Player")
-		, CTool_Model::Create(m_pDevice, m_pContext, MODELTYPE::NONANIM, PreTransformMatrix, "../Bin/Resources/Models/Player/Player.fbx", ""))))
-		return E_FAIL;
+	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
+	//	, TEXT("Prototype_Component_Model_Player")
+	//	, CTool_Model::Create(m_pDevice, m_pContext, MODELTYPE::NONANIM, PreTransformMatrix, "../Bin/Resources/Models/Player/Player.fbx", ""))))
+	//	return E_FAIL;
 
 	return S_OK;
 }
