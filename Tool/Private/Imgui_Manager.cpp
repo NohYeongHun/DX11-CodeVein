@@ -112,7 +112,7 @@ void CImgui_Manager::Render_Hierarchy()
 	}*/
 
     _uint id = 0;
-	for (auto& pair : m_HierarchyObjects)
+	for (auto& pair : m_Layer_Objects)
 	{
 		if (ImGui::TreeNode(pair.first.c_str()))
 		{
@@ -133,7 +133,7 @@ void CImgui_Manager::Register_Hierarchy_Objects(CGameObject* pGameObject)
     string strValue = szFullPath;
     strValue += to_string(id++);
 
-    m_HierarchyObjects.emplace_back(make_pair(strValue, pGameObject ));
+    m_Layer_Objects.emplace_back(make_pair(strValue, pGameObject ));
 }
 
 void CImgui_Manager::Register_Hierarchy_Layer(CLayer* pLayer)

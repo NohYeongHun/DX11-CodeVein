@@ -19,7 +19,7 @@ public:
 	const _bool Is_Ray_Hit(const _float3& rayOrigin, const _float3& rayDir, _float* pOutDist);
 
 public:
-	virtual HRESULT Initialize_Prototype(MODELTYPE eModelType, _fmatrix PreTransformMatrix, const _char* pModelFilePath);
+	virtual HRESULT Initialize_Prototype(MODELTYPE eModelType, _fmatrix PreTransformMatrix, const _char* pModelFilePath, const _char* pTextureFolderPath);
 	virtual HRESULT Initialize_Clone(void* pArg);
 
 
@@ -54,12 +54,12 @@ private:
 
 private:
 	HRESULT Ready_Meshes(_fmatrix PreTransformMatrix);
-	HRESULT Ready_Materials(const _char* pModelFilePath);
+	HRESULT Ready_Materials(const _char* pModelFilePath, const _char* pTextureFolderPath);
 	HRESULT Ready_Bones(const aiNode* pAiNode, _int iParentBoneIndex);
 
 
 public:
-	static CTool_Model* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, MODELTYPE eModelType, _fmatrix PreTransformMatrix, const _char* pModelFilePath);
+	static CTool_Model* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, MODELTYPE eModelType, _fmatrix PreTransformMatrix, const _char* pModelFilePath, const _char* pTextureFolderPath);
 	virtual CComponent* Clone(void* pArg) override;
 	virtual void Free() override;
 };

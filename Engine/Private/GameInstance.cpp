@@ -246,6 +246,14 @@ _uint CGameInstance::Get_CurrentLevelID()
 
 #pragma region PROTOTYPE_MANAGER
 
+void CGameInstance::Get_PrototypeName_List(list<_wstring>& outList, _uint iLevelIndex, const _tchar* pPrefix)
+{
+	if (nullptr == m_pPrototype_Manager)
+		return;
+
+	m_pPrototype_Manager->Get_PrototypeName_List(outList, iLevelIndex, pPrefix);
+}
+
 HRESULT CGameInstance::Add_Prototype(_uint iPrototypeLevelIndex, const _wstring& strPrototypeTag, CBase* pPrototype)
 {
 	if (nullptr == m_pPrototype_Manager)

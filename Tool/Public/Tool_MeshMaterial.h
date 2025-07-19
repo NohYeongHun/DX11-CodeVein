@@ -11,7 +11,7 @@ private:
 
 
 public:
-	HRESULT Initialize(const _char* pModelFilePath, const aiMaterial* pAIMaterial, const aiScene* pAIscene);
+	HRESULT Initialize(const _char* pModelFilePath, const _char* pTextureFloderPath, const aiMaterial* pAIMaterial, const aiScene* pAIscene);
 	HRESULT Bind_Resources(CShader* pShader, const _char* pConstantName, aiTextureType iTextureType, _uint iTextureIndex);
 	HRESULT Initialize_FBX(const _char* pModelFilePath, const aiMaterial* pAIMaterial, string strDirPath);
 	HRESULT Initialize_GLB(const _char* pModelFilePath, const aiMaterial* pAIMaterial, const aiScene* pAiScene, string strDirPath);
@@ -23,7 +23,7 @@ private:
 	vector<ID3D11ShaderResourceView*> m_SRVs[AI_TEXTURE_TYPE_MAX];
 
 public:
-	static CTool_MeshMaterial* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _char* pModelFilePath, const aiMaterial* pAIMaterial, const aiScene* pAiScene);
+	static CTool_MeshMaterial* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _char* pModelFilePath, const _char* pTextureFloderPath, const aiMaterial* pAIMaterial, const aiScene* pAiScene);
 	virtual void Free();
 };
 NS_END

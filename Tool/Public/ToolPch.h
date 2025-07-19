@@ -34,6 +34,7 @@
 #include "Map_Part.h"
 #include "Map.h"
 #include "Camera_Free.h"
+#include "Player.h"
 #pragma endregion
 
 static void Transform_Print_Imgui(const char* szName, _float* vPos)

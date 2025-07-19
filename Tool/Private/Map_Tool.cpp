@@ -12,8 +12,11 @@ CMap_Tool::CMap_Tool(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 }
 
 
-HRESULT CMap_Tool::Initialize()
+HRESULT CMap_Tool::Initialize(LEVEL eLevel)
 {
+    m_eRenderType = RENDERTYPE::MODEL_CREATE;
+    m_eCurLevel = eLevel;
+
     if (FAILED(Ready_Imgui()))
         return E_FAIL;
 
@@ -43,7 +46,8 @@ void CMap_Tool::Change_SelectObject(CGameObject* pSelectedObject)
 
 void CMap_Tool::Render()
 {
-    Render_Hierarchy();
+    Render_Prototype_Hierarchy();
+    Render_Layer_Hierarchy();
     if (nullptr != m_pSelectedObject)
     {
         _char szFullPath[MAX_PATH] = {};
@@ -56,13 +60,116 @@ void CMap_Tool::Render()
     }
 }
 
-void CMap_Tool::Render_Hierarchy()
+
+#pragma region Prototype Manager Hierarchy (생성 가능한 객체) 
+void CMap_Tool::Render_Prototype_Hierarchy()
+{
+    /*ImGui::SetNextWindowSize(ImVec2(300, 400), ImGuiCond_Always);
+    ImGui::Begin("Prototype_Hierarchy", nullptr, ImGuiWindowFlags_MenuBar);*/
+
+    static int iSelectedIndex = -1;
+    _uint id = 0;
+
+    _wstring objTag = {};
+    _wstring modelTag = {};
+
+    for (auto& pair : m_PrototypeNames)
+    {
+        if (ImGui::Selectable(pair.second.c_str(), id == iSelectedIndex))
+        {
+            iSelectedIndex = id;
+            m_wSelected_PrototypeObjTag = _wstring(pair.first.begin(), pair.first.end());
+            m_wSelected_PrototypeModelTag = _wstring(pair.second.begin(), pair.second.end());
+
+            m_Selected_PrototypeModelTag = pair.second;
+            m_Selected_PrototypeObjTag = pair.first;
+
+            /*m_Selected_PrototypeModelTag = pair.second;
+            WideCharToMultiByte(CP_ACP, 0, modelTag.c_str(), -1, m_Selected_PrototypeModelTag, MAX_PATH, nullptr, nullptr);*/
+        }
+        
+    }
+    ++id;
+
+    if (iSelectedIndex >= 0 && iSelectedIndex < m_PrototypeNames.size())
+    {
+        Render_Prototype_Inspector();
+        
+    }
+
+
+}
+
+void CMap_Tool::Render_Prototype_Inspector()
+{
+    ImGui::Begin("Prototype_Inspector");
+
+    ImGui::Text(m_Selected_PrototypeModelTag.c_str());
+
+    static float fPosition[3] = { 0.f, 0.f, 0.f};
+    ImGui::InputFloat3("Position", fPosition);
+
+    static float fRotation[3] = { 0.f, 0.f, 0.f };
+    ImGui::InputFloat3("Rotation", fRotation);
+
+    static float fScale[3] = { 1.f, 1.f, 1.f };
+    ImGui::InputFloat3("Scale", fScale);
+
+    /* 인스턴스 생성. */
+    if (ImGui::Button("Create Instance"))
+    {
+        MODEL_CREATE_DESC Desc{};
+        Desc.pModelTag = m_wSelected_PrototypeModelTag.c_str();
+		Desc.vPosition = _float4(fPosition[0], fPosition[1], fPosition[2], 1.f);
+		Desc.vRotate = _float3(fRotation[0], fRotation[1], fRotation[2]);
+		Desc.vScale = _float3(fScale[0], fScale[1], fScale[2]);
+
+
+        if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel)
+            , TEXT("Layer_Map_Parts")
+            , ENUM_CLASS(m_eCurLevel)
+            , m_wSelected_PrototypeObjTag, &Desc)))
+        {
+            MSG_BOX(TEXT("Add GameoBject_To_Layer Failed"));
+            return;
+        }
+		
+    }
+
+    ImGui::End();
+}
+
+// 음.. 솔직히 Model Component 이름만 알면 되지 않나?
+
+/* 프로토타입 인덱스, 객체 이름, 모델 컴포넌트 이름.*/
+void CMap_Tool::Register_Prototype_Hierarchy(_uint iPrototypeLevelIndex, const _wstring& strObjectTag, const _wstring& strModelPrefix)
+{
+    /* 실제 Clone 작업은.*/
+    list<_wstring> outList = {};
+    m_pGameInstance->Get_PrototypeName_List(outList, ENUM_CLASS(m_eCurLevel), TEXT("MapPart_"));
+
+    _char szFullPath[MAX_PATH] = {};
+    WideCharToMultiByte(CP_ACP, 0, strObjectTag.c_str(), -1, szFullPath, MAX_PATH, nullptr, nullptr);
+    string strObject = szFullPath;
+
+    for (auto& modelName : outList)
+    {
+        _char szModelName[MAX_PATH] = {};
+        WideCharToMultiByte(CP_ACP, 0, modelName.c_str(), -1, szModelName, MAX_PATH, nullptr, nullptr);
+        m_PrototypeNames.emplace_back(strObject, szModelName);
+    }
+
+}
+
+
+#pragma region LAYER
+void CMap_Tool::Render_Layer_Hierarchy()
 {
     ImGui::SetNextWindowSize(ImVec2(300, 400), ImGuiCond_Always);
     ImGui::Begin("Hierarchy", nullptr, ImGuiWindowFlags_MenuBar);
 
     _uint id = 0;
-    for (auto& pair : m_HierarchyObjects)
+    for (auto& pair : m_Layer_Objects)
     {
         if (ImGui::TreeNode(pair.first.c_str()))
         {
@@ -73,7 +180,7 @@ void CMap_Tool::Render_Hierarchy()
     ImGui::End();
 }
 
-void CMap_Tool::Register_Hierarchy_Objects(CGameObject* pGameObject)
+void CMap_Tool::Register_Layer_HierarchyObjects(CGameObject* pGameObject)
 {
     static int id = 0;
     const _tchar* wstrValue = pGameObject->Get_ObjectTag().c_str();
@@ -83,17 +190,26 @@ void CMap_Tool::Register_Hierarchy_Objects(CGameObject* pGameObject)
     string strValue = szFullPath;
     strValue += to_string(id++);
 
-    m_HierarchyObjects.emplace_back(make_pair(strValue, pGameObject));
+    m_Layer_Objects.emplace_back(make_pair(strValue, pGameObject));
 }
 
-void CMap_Tool::Register_Hierarchy_Layer(CLayer* pLayer)
+void CMap_Tool::Register_Layer_Hierarchy(CLayer* pLayer)
 {
+    if (nullptr == pLayer)
+        return;
+
+    if (pLayer->Get_GameObjects().size() == 0)
+        return;
+
     for (auto& pGameObject : pLayer->Get_GameObjects())
     {
         if (nullptr != pGameObject)
-            Register_Hierarchy_Objects(pGameObject);
+            Register_Layer_HierarchyObjects(pGameObject);
     }
 }
+#pragma endregion
+
+
 
 void CMap_Tool::Transform_Render(const string& name, CTransform* pTransform)
 {
@@ -133,126 +249,11 @@ void CMap_Tool::Transform_Render(const string& name, CTransform* pTransform)
     ImGui::PopItemWidth();
     ImGui::PopID();
 }
+#pragma endregion
 
-//void CMap_Tool::Transform_Render(const string& name, _float3& transform)
-//{
-//    ImGui::Text("%s", name.c_str());
-//    ImGui::PushID(name.c_str());  // ID 충돌 방지용
-//
-//    ImGui::PushItemWidth(80.0f);
-//    static const char* axisLabels[3] = { "X", "Y", "Z" };
-//    
-//    for (int i = 0; i < 3; ++i)
-//    {
-//        ImGui::PushID(i);
-//
-//        const char* axis = (i == 0) ? "X" : (i == 1) ? "Y" : "Z";
-//
-//        ImGui::Text("%s", axis);
-//        ImGui::SameLine();
-//
-//        _float* pValue = nullptr;
-//        switch (i)
-//        {
-//        case 0: pValue = &transform.x; break;
-//        case 1: pValue = &transform.y; break;
-//        case 2: pValue = &transform.z; break;
-//        }
-//
-//        ImGui::InputFloat("##Value", pValue, 0.0f, 0.0f, "%.3f");
-//        ImGui::SameLine();
-//
-//        if (ImGui::Button("<"))
-//            *pValue -= m_Interval;
-//        ImGui::SameLine();
-//
-//        if (ImGui::Button(">"))
-//            *pValue += m_Interval;
-//
-//        ImGui::PopID();
-//    }
-//
-//    ImGui::PopItemWidth();
-//    ImGui::PopID(); // label
-//}
 
-///* 목적을 어떻게 할거냐?.. */
-//void CMap_Tool::ImGui_Render()
-//{
-//	struct LevelButton {
-//		const char* label;
-//		_wstring vibuffer_type;
-//	};
-//
-//	const LevelButton tab[] = {
-//	{ "Texture", TEXT("Layer_Tile")},
-//	{ "Map Cube", TEXT("Layer_Cube")},
-//	{ "Collider Cube", TEXT("Layer_Collider")},
-//	{"QusetionBlock", TEXT("Layer_QuestionBlock") },
-//	{"NormalBlock", TEXT("Layer_NormalBlock") },
-//	{"Broken block", TEXT("Layer_BrokenBlock") }
-//	};
-//
-//	ImGui::Begin("Map_Tool", nullptr, ImGuiWindowFlags_MenuBar);
-//
-//	if (ImGui::BeginTabBar("tab"))
-//	{
-//		for (auto& el : tab)
-//		{
-//			if (ImGui::BeginTabItem(el.label))
-//			{
-//				ImGui_MenuBar_Render();
-//
-//				ImGui::EndTabItem();
-//			}
-//		}
-//		ImGui::EndTabBar();
-//	}
-//
-//	ImGui::End();
-//}
-//
-//void CMap_Tool::ImGui_MenuBar_Render()
-//{
-//	if (ImGui::BeginMenuBar())
-//	{
-//		// 파일 메뉴. => 특정 타입의 파일을 불러오거나 확인할 수 있습니다.
-//		if (ImGui::BeginMenu("File"))
-//		{
-//			if (ImGui::MenuItem("open"))
-//			{
-//				IGFD::FileDialogConfig config;
-//				config.path = "../SaveFile/";
-//				config.flags = ImGuiFileDialogFlags_ReadOnlyFileNameField;
-//
-//				// 파일 다이얼로그 열기
-//				// ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose File", config);
-//				ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose File", ".bin", config);
-//			}
-//			if (ImGui::MenuItem("save"))
-//			{
-//				IGFD::FileDialogConfig config;
-//				config.path = "../SaveFile/";
-//				config.flags = ImGuiFileDialogFlags_ConfirmOverwrite;
-//
-//				ImGuiFileDialog::Instance()->OpenDialog("SaveFileDlgKey", "Choose File", ".bin", config);
-//
-//			}
-//			ImGui::EndMenu();
-//		}
-//		ImGui::EndMenuBar();
-//	}
-//
-//	// 읽기용 로직
-//	if (ImGuiFileDialog::Instance()->Display("ChooseFileDlgKey")) {
-//		if (ImGuiFileDialog::Instance()->IsOk()) {
-//			std::string load_path = ImGuiFileDialog::Instance()->GetFilePathName();
-//			// ImGui::Text("Selected file: %s", filePath.c_str());
-//			//m_pTile_Loader->Load_Tile(load_path, LEVEL::LEVEL_MAPEDIT);
-//		}
-//		ImGuiFileDialog::Instance()->Close();
-//	}
-//}
+
+
 
 HRESULT CMap_Tool::Ready_Imgui()
 {
@@ -266,10 +267,10 @@ HRESULT CMap_Tool::Ready_Imgui()
     return S_OK;
 }
 
-CMap_Tool* CMap_Tool::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CMap_Tool* CMap_Tool::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, LEVEL eLevel)
 {
     CMap_Tool* pInstance = new CMap_Tool(pDevice, pContext);
-    if (FAILED(pInstance->Initialize()))
+    if (FAILED(pInstance->Initialize(eLevel)))
     {
         MSG_BOX(TEXT("Create Failed : CMap_Tool"));
         Safe_Release(pInstance);
@@ -285,6 +286,9 @@ void CMap_Tool::Free()
         m_pGameInstance->UnSubscribe(val, Get_ID());
 
     m_Events.clear();
+
+    m_Layer_Objects.clear();
+    m_PrototypeNames.clear();
 
     Safe_Release(m_pGameInstance);
     Safe_Release(m_pDeviceContext);

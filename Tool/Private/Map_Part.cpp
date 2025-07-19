@@ -21,12 +21,10 @@ HRESULT CMap_Part::Initialize_Prototype()
 
 HRESULT CMap_Part::Initialize_Clone(void* pArg)
 {
-    MAP_PART_DESC* pDesc = static_cast<MAP_PART_DESC*>(pArg);
+    MODEL_CREATE_DESC* pDesc = static_cast<MODEL_CREATE_DESC*>(pArg);
     
     m_pModelTag = pDesc->pModelTag;
-    m_PartName = m_pModelTag;
-    
-    m_strObjTag = m_PartName;
+    m_strObjTag = m_pModelTag;
 
     if (FAILED(__super::Initialize_Clone(pDesc)))
         return E_FAIL;
@@ -34,7 +32,10 @@ HRESULT CMap_Part::Initialize_Clone(void* pArg)
     if (FAILED(Ready_Components(pDesc)))
         return E_FAIL;
 
-    m_pTransformCom->Scaling({ 1.f, 1.f, 1.f });
+    if (FAILED(Ready_Transform(pDesc)))
+        return E_FAIL;
+
+    //m_pTransformCom->Scaling({ 1.f, 1.f, 1.f });
 
     // Player 정면 바라보게 하기?
     //m_pTransformCom->Rotation(XMVectorSet(1.f, 0.f, 0.f, 0.f), XMConvertToRadians(270.f));
@@ -114,18 +115,33 @@ void CMap_Part::On_Collision_Exit(CGameObject* pOther)
 {
 }
 
-HRESULT CMap_Part::Ready_Components(MAP_PART_DESC* pDesc)
+HRESULT CMap_Part::Ready_Components(MODEL_CREATE_DESC* pDesc)
 {
     if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxMesh"),
         TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom), nullptr)))
         return E_FAIL;
     
     if (FAILED(__super::Add_Component(ENUM_CLASS(LEVEL::LOGO)
-        , m_pModelTag
+        , pDesc->pModelTag
         , TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom), nullptr)))
         return E_FAIL;
 
     
+
+    return S_OK;
+}
+
+HRESULT CMap_Part::Ready_Transform(MODEL_CREATE_DESC* pDesc)
+{
+    m_pTransformCom->Set_State(STATE::POSITION, XMLoadFloat4(&pDesc->vPosition));
+    m_pTransformCom->Scale(pDesc->vScale);
+
+    if (pDesc->vRotate.x > 0.f) 
+		m_pTransformCom->Rotation(XMVectorSet(1.f, 0.f, 0.f, 0.f), XMConvertToRadians(pDesc->vRotate.x));
+    else if (pDesc->vRotate.y > 0.f)
+        m_pTransformCom->Rotation(XMVectorSet(0.f, 1.f, 0.f, 0.f), XMConvertToRadians(pDesc->vRotate.y));
+	else if (pDesc->vRotate.z > 0.f)
+		m_pTransformCom->Rotation(XMVectorSet(0.f, 0.f, 1.f, 0.f), XMConvertToRadians(pDesc->vRotate.z));
 
     return S_OK;
 }

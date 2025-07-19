@@ -33,7 +33,7 @@ public:
 #pragma endregion
 
 private:
-	list<pair<string, class CGameObject*>> m_HierarchyObjects = {};
+	list<pair<string, class CGameObject*>> m_Layer_Objects = {};
 
 
 public:

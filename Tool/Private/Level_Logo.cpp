@@ -18,6 +18,9 @@ HRESULT CLevel_Logo::Initialize_Clone()
 	//if (FAILED(Ready_Layer_Map(TEXT("Layer_Map"))))
 	//	return E_FAIL;
 
+	//if (FAILED(Ready_Layer_Player(TEXT("Layer_Player"))))
+	//	return E_FAIL;
+
 	if (FAILED(Ready_Layer_Map_Parts(TEXT("Layer_Map_Part"))))
 		return E_FAIL;
 
@@ -25,10 +28,10 @@ HRESULT CLevel_Logo::Initialize_Clone()
 	if (FAILED(Ready_Layer_Camera(TEXT("Layer_Camera"))))
 		return E_FAIL;
 
-	if (FAILED(Ready_Map_Tool()))
+	if (FAILED(Ready_Events()))
 		return E_FAIL;
 
-	if (FAILED(Ready_Events()))
+	if (FAILED(Ready_Map_Tool()))
 		return E_FAIL;
 	
 
@@ -79,20 +82,65 @@ HRESULT CLevel_Logo::Ready_Layer_Map(const _wstring& strLayerTag)
 	return S_OK;
 }
 
+HRESULT CLevel_Logo::Ready_Layer_Player(const _wstring& strLayerTag)
+{
+	CPlayer::PLAYER_DESC Desc{};
+	Desc.fSpeedPerSec = 10.f;
+	Desc.fRotationPerSec = XMConvertToRadians(90.0f);
+
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel), strLayerTag,
+		ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_Player"))))
+		return E_FAIL;
+
+	return S_OK;
+}
+
 // Map_Part 레이어에 순번으로 존재.
 HRESULT CLevel_Logo::Ready_Layer_Map_Parts(const _wstring& strLayerTag)
 {
 	
-	CMap_Part::MAP_PART_DESC Desc{}; // Desc에 전달한 Model Tag를 이용해서 적합한 Model Component를 임포트합니다..
-
-	// 1. BluePillar
-	Desc.pModelTag = TEXT("MapPart_BluePillar");
+	MODEL_CREATE_DESC Desc{}; // Desc에 전달한 Model Tag를 이용해서 적합한 Model Component를 임포트합니다..
+	// 1. Floor
+	/*Desc.pModelTag = TEXT("MapPart_Floor");
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel)
 		, strLayerTag, ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_Map_Part"), &Desc)))
 	{
 		MSG_BOX(TEXT("Failed to Add GameObject to Layer Map_Part"));
 		return E_FAIL;
 	}
+
+	Desc.pModelTag = TEXT("MapPart_Side_Floor");
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel)
+		, strLayerTag, ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_Map_Part"), &Desc)))
+	{
+		MSG_BOX(TEXT("Failed to Add GameObject to Layer Map_Part"));
+		return E_FAIL;
+	}
+
+	Desc.pModelTag = TEXT("MapPart_Circle_Floor");
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel)
+		, strLayerTag, ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_Map_Part"), &Desc)))
+	{
+		MSG_BOX(TEXT("Failed to Add GameObject to Layer Map_Part"));
+		return E_FAIL;
+	}*/
+
+	// 1. BluePillar
+	/*Desc.pModelTag = TEXT("MapPart_BluePillar");
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel)
+		, strLayerTag, ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_Map_Part"), &Desc)))
+	{
+		MSG_BOX(TEXT("Failed to Add GameObject to Layer Map_Part"));
+		return E_FAIL;
+	}*/
+
+	/*Desc.pModelTag = TEXT("MapPart_CircleFloor");
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel)
+		, strLayerTag, ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_Map_Part"), &Desc)))
+	{
+		MSG_BOX(TEXT("Failed to Add GameObject to Layer MapPart_CircleFloor"));
+		return E_FAIL;
+	}*/
 
 	//// 2. Pillar
 	/*Desc.pModelTag = TEXT("MapPart_Pillar");
@@ -143,12 +191,16 @@ HRESULT CLevel_Logo::Ready_Map_Tool()
 	_uint iCurrentLevelID = ENUM_CLASS(m_eCurLevel);
 	CLayer* pLayer = m_pGameInstance->Get_Layer(iCurrentLevelID, TEXT("Layer_Map_Part"));
 
-	m_pMapTool = CMap_Tool::Create(m_pDevice, m_pContext);
+	m_pMapTool = CMap_Tool::Create(m_pDevice, m_pContext, m_eCurLevel);
 	if (nullptr == m_pMapTool)
 		return E_FAIL;
+	
+	// Map Part Prototype 객체들을 Hierarchy에 등록합니다.
+	m_pMapTool->Register_Prototype_Hierarchy(ENUM_CLASS(m_eCurLevel)
+		, TEXT("Prototype_GameObject_Map_Part"), TEXT("MapPart"));
 
 	// Map Part 객체들 Layer
-	m_pMapTool->Register_Hierarchy_Layer(pLayer);
+	//m_pMapTool->Register_Layer_Hierarchy(pLayer);
 	
 	return S_OK;
 }

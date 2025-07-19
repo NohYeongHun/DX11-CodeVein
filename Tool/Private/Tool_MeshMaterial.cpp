@@ -8,7 +8,7 @@ CTool_MeshMaterial::CTool_MeshMaterial(ID3D11Device* pDevice, ID3D11DeviceContex
 	Safe_AddRef(m_pContext);
 }
 
-HRESULT CTool_MeshMaterial::Initialize(const _char* pModelFilePath, const aiMaterial* pAIMaterial, const aiScene* pAiscene)
+HRESULT CTool_MeshMaterial::Initialize(const _char* pModelFilePath, const _char* pTextureFloderPath, const aiMaterial* pAIMaterial, const aiScene* pAiscene)
 {
 	
 	// 폴더 경로 지정. szDrive, szDir
@@ -23,8 +23,11 @@ HRESULT CTool_MeshMaterial::Initialize(const _char* pModelFilePath, const aiMate
 	/* Ext .fbx */
 	_splitpath_s(pModelFilePath, nullptr, 0, szDir, MAX_PATH, nullptr, 0, szExt, MAX_PATH);
 
-	string strDirPath = string(szDir);
+	
 	string strExt = string(szExt);
+
+	/* textures/CircleFloor/ */
+	string strDirPath = string(pTextureFloderPath);
 
 	if (strExt == ".fbx")
 		Initialize_FBX(pModelFilePath, pAIMaterial, strDirPath);
@@ -77,6 +80,7 @@ HRESULT CTool_MeshMaterial::Initialize_FBX(const _char* pModelFilePath, const ai
 
 			strcpy_s(szFullPath, szDrive);
 			strcat_s(szFullPath, szDir);
+			strcat_s(szFullPath, strDirPath.c_str()); // Add texture folder path
 			strcat_s(szFullPath, szFileName);
 			strcat_s(szFullPath, szExt);
 
@@ -155,11 +159,11 @@ HRESULT CTool_MeshMaterial::Initialize_GLB(const _char* pModelFilePath, const ai
 	return S_OK;
 }
 
-CTool_MeshMaterial* CTool_MeshMaterial::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _char* pModelFilePath, const aiMaterial* pAIMaterial, const aiScene* pAiScene)
+CTool_MeshMaterial* CTool_MeshMaterial::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _char* pModelFilePath, const _char* pTextureFloderPath, const aiMaterial* pAIMaterial, const aiScene* pAiScene)
 {
 	CTool_MeshMaterial* pInstance = new CTool_MeshMaterial(pDevice, pContext);
 
-	if (FAILED(pInstance->Initialize(pModelFilePath, pAIMaterial, pAiScene)))
+	if (FAILED(pInstance->Initialize(pModelFilePath, pTextureFloderPath, pAIMaterial, pAiScene)))
 	{
 		MSG_BOX(TEXT("Create Failed : CTool_MeshMaterial"));
 		Safe_Release(pInstance);

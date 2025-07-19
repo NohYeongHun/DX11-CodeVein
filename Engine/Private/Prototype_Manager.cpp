@@ -14,8 +14,10 @@ void CPrototype_Manager::Get_PrototypeName_List(list<_wstring>& outList, _uint i
 
 	for (auto& Pair : m_pPrototypes[iLevelIndex])
 	{
-		if (Pair.first.compare(0, prefix.length(), prefix) == 0)
+		_wstring strPrototypeTag = Pair.first;
+		if (strPrototypeTag.compare(0, prefix.length(), prefix) == 0)
 			outList.push_back(Pair.first);
+			
 	}
 
 }

@@ -58,8 +58,6 @@ HRESULT CTool_Mesh::Initialize_Prototype(MODELTYPE eModelType, const aiMesh* pAI
 		: Initialize_Vertex_For_Anim(pAIMesh);
 
 
-
-
 	D3D11_BUFFER_DESC		IBDesc{};
 	IBDesc.ByteWidth = m_iNumIndices * m_iIndexStride;
 	IBDesc.Usage = D3D11_USAGE_DEFAULT;

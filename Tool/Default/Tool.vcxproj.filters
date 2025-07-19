@@ -64,6 +64,9 @@
     <Filter Include="01. Level\02. Logo">
       <UniqueIdentifier>{85f63420-076a-4247-85c4-521f6297ba4b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. GameObject\Player">
+      <UniqueIdentifier>{600840f0-0c69-4c89-9d06-5ea8533d2fc7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -159,6 +162,9 @@
     <ClInclude Include="..\Public\Tool_Bone.h">
       <Filter>03. Component\Model\Bone</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Player.h">
+      <Filter>02. GameObject\Player</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="small.ico">
@@ -237,6 +243,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Tool_Bone.cpp">
       <Filter>03. Component\Model\Bone</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Player.cpp">
+      <Filter>02. GameObject\Player</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

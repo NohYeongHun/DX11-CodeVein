@@ -40,7 +40,7 @@ const _bool CTool_Model::Is_Ray_Hit(const _float3& rayOrigin, const _float3& ray
 	return false;
 }
 
-HRESULT CTool_Model::Initialize_Prototype(MODELTYPE eModelType, _fmatrix PreTransformMatrix, const _char* pModelFilePath)
+HRESULT CTool_Model::Initialize_Prototype(MODELTYPE eModelType, _fmatrix PreTransformMatrix, const _char* pModelFilePath, const _char* pTextureFolderPath)
 {
 	
 	_uint iFlag = { aiProcess_ConvertToLeftHanded | aiProcessPreset_TargetRealtime_Fast };
@@ -60,7 +60,7 @@ HRESULT CTool_Model::Initialize_Prototype(MODELTYPE eModelType, _fmatrix PreTran
 	if (FAILED(Ready_Meshes(PreTransformMatrix)))
 		return E_FAIL;
 
-	if (FAILED(Ready_Materials(pModelFilePath)))
+	if (FAILED(Ready_Materials(pModelFilePath, pTextureFolderPath)))
 		return E_FAIL;
 
     return S_OK;
@@ -117,13 +117,13 @@ HRESULT CTool_Model::Ready_Meshes(_fmatrix PreTransformMatrix)
 	return S_OK;
 }
 
-HRESULT CTool_Model::Ready_Materials(const _char* pModelFilePath)
+HRESULT CTool_Model::Ready_Materials(const _char* pModelFilePath, const _char* pTextureFolderPath)
 {
 	m_iNumMaterials = m_pAIScene->mNumMaterials;
 
 	for (_uint i = 0; i < m_iNumMaterials; i++)
 	{
-		CTool_MeshMaterial* pMaterial = CTool_MeshMaterial::Create(m_pDevice, m_pContext, pModelFilePath, m_pAIScene->mMaterials[i], m_pAIScene);
+		CTool_MeshMaterial* pMaterial = CTool_MeshMaterial::Create(m_pDevice, m_pContext, pModelFilePath, pTextureFolderPath, m_pAIScene->mMaterials[i], m_pAIScene);
 		if (nullptr == pMaterial)
 			return E_FAIL;
 
@@ -151,12 +151,12 @@ HRESULT CTool_Model::Ready_Bones(const aiNode* pAiNode, _int iParentBoneIndex)
 	return S_OK;
 }
 
-CTool_Model* CTool_Model::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, MODELTYPE eModelType, _fmatrix PreTransformMatrix, const _char* pModelFilePath)
+CTool_Model* CTool_Model::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, MODELTYPE eModelType, _fmatrix PreTransformMatrix, const _char* pModelFilePath, const _char* pTextureFolderPath)
 {
 
 	CTool_Model* pInstance = new CTool_Model(pDevice, pContext);
 
-	if (FAILED(pInstance->Initialize_Prototype(eModelType, PreTransformMatrix, pModelFilePath)))
+	if (FAILED(pInstance->Initialize_Prototype(eModelType, PreTransformMatrix, pModelFilePath, pTextureFolderPath)))
 	{
 		MSG_BOX(TEXT("Failed to Created : CTool_Model"));
 		Safe_Release(pInstance);
