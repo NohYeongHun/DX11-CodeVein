@@ -5,6 +5,25 @@ CPrototype_Manager::CPrototype_Manager()
 	
 }
 
+/* PrototyeName 들을 List에 Add한다. */
+void CPrototype_Manager::Add_Prototype_To_List(list<_wstring>& outList, _uint iLevelIndex, list<_wstring>& nameList)
+{
+	if (nullptr == m_pPrototypes || iLevelIndex >= m_iNumLevels)
+		return;
+
+	for (auto& name : nameList)
+	{
+		for (auto& Pair : m_pPrototypes[iLevelIndex])
+		{
+			_wstring strPrototypeTag = Pair.first;
+
+			if (strPrototypeTag == name)
+				outList.push_back(Pair.first);
+		}
+	}
+	
+}
+
 void CPrototype_Manager::Get_PrototypeName_List(list<_wstring>& outList, _uint iLevelIndex, const _tchar* pPrefix)
 {
 	if (nullptr == m_pPrototypes || iLevelIndex >= m_iNumLevels)

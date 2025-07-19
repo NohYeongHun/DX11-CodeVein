@@ -37,6 +37,8 @@ HRESULT CMap_Tool::Initialize(LEVEL eLevel)
     if (FAILED(Ready_Events()))
         return E_FAIL;
 
+
+
     return S_OK;
 }
 
@@ -193,7 +195,6 @@ void CMap_Tool::Render_Prototype_Inspector(ImVec2 vPos)
 
     ImGui::Text(m_Selected_PrototypeModelTag.c_str());
 
-
     if (!m_IsPicking_Create)
     {
         static float fPosition[3] = { 0.f, 0.f, 0.f };
@@ -243,11 +244,17 @@ void CMap_Tool::Register_Prototype_Hierarchy(_uint iPrototypeLevelIndex, const _
 {
     /* 실제 Clone 작업은.*/
     list<_wstring> outList = {};
-    m_pGameInstance->Get_PrototypeName_List(outList, ENUM_CLASS(m_eCurLevel), TEXT("MapPart_"));
+    //m_pGameInstance->Get_PrototypeName_List(outList, ENUM_CLASS(m_eCurLevel), TEXT("MapPart_"));
+    
 
     _char szFullPath[MAX_PATH] = {};
     WideCharToMultiByte(CP_ACP, 0, strObjectTag.c_str(), -1, szFullPath, MAX_PATH, nullptr, nullptr);
     string strObject = szFullPath;
+
+
+    for (_uint i = 0; i < Model_PrototypeSize; ++i)
+        outList.push_back(Model_PrototypeNames[i]);
+    
 
     for (auto& modelName : outList)
     {

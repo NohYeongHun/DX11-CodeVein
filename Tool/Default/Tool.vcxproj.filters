@@ -165,6 +165,9 @@
     <ClInclude Include="..\Public\Player.h">
       <Filter>02. GameObject\Player</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\PrototypeName.h">
+      <Filter>98. Define</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="small.ico">
@@ -246,6 +249,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Player.cpp">
       <Filter>02. GameObject\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\PrototypeName.cpp">
+      <Filter>98. Define</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

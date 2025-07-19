@@ -178,6 +178,7 @@
     <ClInclude Include="..\Public\Map.h" />
     <ClInclude Include="..\Public\Map_Part.h" />
     <ClInclude Include="..\Public\Player.h" />
+    <ClInclude Include="..\Public\PrototypeName.h" />
     <ClInclude Include="..\Public\Tool_Bone.h" />
     <ClInclude Include="..\Public\Tool_Mesh.h" />
     <ClInclude Include="..\Public\Tool_MeshMaterial.h" />
@@ -209,6 +210,7 @@
     <ClCompile Include="..\Private\Map.cpp" />
     <ClCompile Include="..\Private\Map_Part.cpp" />
     <ClCompile Include="..\Private\Player.cpp" />
+    <ClCompile Include="..\Private\PrototypeName.cpp" />
     <ClCompile Include="..\Private\Tool_Bone.cpp" />
     <ClCompile Include="..\Private\Tool_Mesh.cpp" />
     <ClCompile Include="..\Private\Tool_MeshMaterial.cpp" />

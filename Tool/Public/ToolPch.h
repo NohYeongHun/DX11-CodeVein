@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "EnginePch.h"
 #include "Tool_Defines.h"
+#include "PrototypeName.h"
 
 #pragma region IMGUI
 #define IMGUI_DEFINE_MATH_OPERATORS
