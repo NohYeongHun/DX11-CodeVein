@@ -76,6 +76,8 @@ HRESULT CTool_MeshMaterial::Initialize_FBX(const _char* pModelFilePath, const ai
 			_splitpath_s(pModelFilePath, szDrive, MAX_PATH, szDir, MAX_PATH, nullptr, 0, nullptr, 0);
 			_splitpath_s(strTexturePath.data, nullptr, 0, nullptr, 0, szFileName, MAX_PATH, szExt, MAX_PATH);
 
+			string ext = ".dds";
+			
 			strcpy_s(szFullPath, szDrive);
 			strcat_s(szFullPath, szDir);
 			strcat_s(szFullPath, strDirPath.c_str()); // Add texture folder path
@@ -92,7 +94,7 @@ HRESULT CTool_MeshMaterial::Initialize_FBX(const _char* pModelFilePath, const ai
 				hr = E_FAIL;
 
 			if (false == strcmp(".dds", szExt))
-				hr = CreateDDSTextureFromFile(m_pDevice, szTextureFilePath, nullptr, &pSRV);
+ 				hr = CreateDDSTextureFromFile(m_pDevice, szTextureFilePath, nullptr, &pSRV);
 			else
 				hr = CreateWICTextureFromFile(m_pDevice, szTextureFilePath, nullptr, &pSRV);
 

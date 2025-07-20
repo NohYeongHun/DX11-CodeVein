@@ -93,8 +93,7 @@ private:
 	LEVEL m_eCurLevel = {};
 	_float m_Interval = 1.f;
 	_float3 m_vInterval = {};
-	
-	vector<EventType> m_Events = {};
+
 
 private:
 	class CGameInstance* m_pGameInstance = { nullptr };

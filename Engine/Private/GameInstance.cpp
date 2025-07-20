@@ -515,24 +515,10 @@ void CGameInstance::Transform_To_LocalSpace(_matrix WorldInverseMatrix)
 
 
 
-//
-//void CGameInstance::Transform_Picking_ToLocalSpace(CTransform* pTransformCom)
-//{
-//	m_pPicking->Transform_ToLocalSpace(pTransformCom);
-//}
-//
-//_bool CGameInstance::isPicked_InLocalSpace(const _float3& vPointA, const _float3& vPointB, const _float3& vPointC, _float3* pOut)
-//{
-//	return m_pPicking->isPicked_InLocalSpace(vPointA, vPointB, vPointC, pOut);
-//}
-
-
-
 void CGameInstance::Release_Engine()
 {
 	Release();
 
-	//Safe_Release(m_pPicking);
 	
 	Safe_Release(m_pTimer_Manager);
 	Safe_Release(m_pRenderer);

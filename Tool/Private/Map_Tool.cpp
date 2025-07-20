@@ -37,20 +37,10 @@ HRESULT CMap_Tool::Initialize(LEVEL eLevel)
     if (FAILED(Ready_Imgui()))
         return E_FAIL;
 
-    if (FAILED(Ready_Events()))
-        return E_FAIL;
-
-
 
     return S_OK;
 }
 
-HRESULT CMap_Tool::Ready_Events()
-{
-
-
-    return S_OK;
-}
 
 void CMap_Tool::Change_SelectObject(CGameObject* pSelectedObject)
 {
@@ -130,9 +120,7 @@ void CMap_Tool::Render_MenuBar()
     if (ImGuiFileDialog::Instance()->Display("ChooseFileDlgKey")) {
         if (ImGuiFileDialog::Instance()->IsOk()) {
             std::string load_path = ImGuiFileDialog::Instance()->GetFilePathName();
-            // ImGui::Text("Selected file: %s", filePath.c_str());
             m_pSaveFile_Loader->Load_File(load_path, m_eCurLevel);
-            //m_pTile_Loader->Load_Tile(load_path, LEVEL::LEVEL_MAPEDIT); 저장 로직.
         }
         ImGuiFileDialog::Instance()->Close();
     }
@@ -144,11 +132,6 @@ void CMap_Tool::Render_MenuBar()
         {
             std::string save_path = ImGuiFileDialog::Instance()->GetFilePathName();
             m_pSaveFile_Loader->Save_File(save_path);
-
-            // ImGui::Text("Saving to: %s", savePath.c_str());
-            //m_pTile_Loader->Save_Tile(save_path);
-            // TODO: 파일 저장 처리
-            // 예: std::ofstream ofs(savePath); ofs << "data";
         }
         ImGuiFileDialog::Instance()->Close();
     }
@@ -183,6 +166,7 @@ void CMap_Tool::Render_Debug_Window()
 
     const char* modeStr = (m_eToolMode == TOOLMODE::CREATE) ? "CREATE" : "EDIT";
     ImGui::Text("Tool Mode: %s", modeStr);
+    ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
 
     // 체크박스 추가 - 피킹 가능 여부
     ImGui::Checkbox("Enable Picking", &m_IsPossible_Picking);
@@ -516,10 +500,6 @@ CMap_Tool* CMap_Tool::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContex
 void CMap_Tool::Free()
 {
     __super::Free();
-    for (auto& val : m_Events)
-        m_pGameInstance->UnSubscribe(val, Get_ID());
-
-    m_Events.clear();
 
     m_Layer_Objects.clear();
     m_PrototypeNames.clear();

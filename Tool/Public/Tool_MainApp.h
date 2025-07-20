@@ -22,7 +22,7 @@ private:
 	ID3D11Device* m_pDevice = { nullptr };
 	ID3D11DeviceContext* m_pContext = { nullptr };
 
-	CImgui_Manager* m_pImGui_Manager = { nullptr };
+	class CImgui_Manager* m_pImGui_Manager = { nullptr };
 	
 	class CMap_Tool* m_pMapTool = { nullptr };
 

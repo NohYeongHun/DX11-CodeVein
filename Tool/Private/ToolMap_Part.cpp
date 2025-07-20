@@ -13,7 +13,7 @@ CToolMap_Part::CToolMap_Part(const CToolMap_Part& Prototype)
 
 const MAP_PART_INFO& CToolMap_Part::Save_ModelInfo(_fmatrix PreTransformMatrix)
 {
-    return m_pModelCom->Save_ModelInfo(PreTransformMatrix, m_pModelTag);
+    return m_pModelCom->Save_ModelInfo(PreTransformMatrix, m_strModelTag);
 }
 
 HRESULT CToolMap_Part::Initialize_Prototype()
@@ -52,8 +52,8 @@ HRESULT CToolMap_Part::Initialize_Clone(void* pArg)
 
 HRESULT CToolMap_Part::Initialize_Craete(MODEL_CREATE_DESC* pDesc)
 {
-    m_pModelTag = pDesc->pModelTag;
-    m_strObjTag = m_pModelTag;
+    m_strModelTag = pDesc->pModelTag;
+    m_strObjTag = m_strModelTag.c_str();
 
 
     if (FAILED(__super::Initialize_Clone(pDesc)))
@@ -72,8 +72,8 @@ HRESULT CToolMap_Part::Initialize_Craete(MODEL_CREATE_DESC* pDesc)
 
 HRESULT CToolMap_Part::Initialize_Load(MAP_PART_INFO* pDesc)
 {
-    m_pModelTag = pDesc->strModelTag.c_str();
-    m_strObjTag = m_pModelTag;
+    m_strModelTag = pDesc->strModelTag;
+    m_strObjTag = m_strModelTag.c_str();
 
     if (FAILED(__super::Initialize_Clone(pDesc)))
         return E_FAIL;

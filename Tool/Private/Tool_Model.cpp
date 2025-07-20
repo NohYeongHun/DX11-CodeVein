@@ -40,13 +40,13 @@ const MAP_PART_INFO& CTool_Model::Save_ModelInfo(_fmatrix PreTransformMatrix, _w
 	if (FAILED(Save_Meshes(PreTransformMatrix)))
 	{
 		MSG_BOX(TEXT("Mesh Save Failed"));
-		return {};
+		return m_ModelInfo;
 	}
 
 	if (FAILED(Save_Marterials()))
 	{
 		MSG_BOX(TEXT("Material Save Failed"));
-		return {};
+		return m_ModelInfo;
 	}
 
 	return m_ModelInfo;

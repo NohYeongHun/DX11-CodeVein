@@ -56,7 +56,7 @@ public:
 private:
 	class CTool_Model* m_pModelCom = { nullptr };
 	class CShader* m_pShaderCom = { nullptr };
-	const _tchar* m_pModelTag = { nullptr };
+	_wstring m_strModelTag = {};
 	_wstring m_PartName = {  };
 	int m_iPartID = {};
 
