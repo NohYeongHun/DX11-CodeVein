@@ -100,7 +100,7 @@ void CMap_Tool::Render_MenuBar()
                 config.flags = ImGuiFileDialogFlags_ReadOnlyFileNameField;
 
                 // 파일 다이얼로그 열기
-                ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose File", ".bin", config);
+                ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose File", ".dat", config);
             }
             if (ImGui::MenuItem("save"))
             {
@@ -108,7 +108,7 @@ void CMap_Tool::Render_MenuBar()
                 config.path = "../Bin/Resources/SaveFile/";
                 config.flags = ImGuiFileDialogFlags_ConfirmOverwrite;
 
-                ImGuiFileDialog::Instance()->OpenDialog("SaveFileDlgKey", "Choose File", ".bin", config);
+                ImGuiFileDialog::Instance()->OpenDialog("SaveFileDlgKey", "Choose File", ".dat", config);
 
             }
             ImGui::EndMenu();
