@@ -48,7 +48,6 @@ HRESULT CTool_MeshMaterial::Bind_Resources(CShader* pShader, const _char* pConst
 
 HRESULT CTool_MeshMaterial::Initialize_FBX(const _char* pModelFilePath, const aiMaterial* pAIMaterial, string strDirPath)
 {
-	static _uint iNum = 0;
 
 	for (_uint i = 1; i < AI_TEXTURE_TYPE_MAX; i++)
 	{
@@ -72,9 +71,6 @@ HRESULT CTool_MeshMaterial::Initialize_FBX(const _char* pModelFilePath, const ai
 			_char			szDir[MAX_PATH] = {};
 			_char			szFileName[MAX_PATH] = {};
 			_char			szExt[MAX_PATH] = {};
-
-			string data = strTexturePath.data;
-			_bool isData = data != ".";
 
 			
 			_splitpath_s(pModelFilePath, szDrive, MAX_PATH, szDir, MAX_PATH, nullptr, 0, nullptr, 0);
@@ -111,7 +107,6 @@ HRESULT CTool_MeshMaterial::Initialize_FBX(const _char* pModelFilePath, const ai
 		}
 	}
 
-	iNum++;
 
 	return S_OK;
 }

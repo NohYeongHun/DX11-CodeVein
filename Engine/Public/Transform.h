@@ -78,16 +78,15 @@ public:
 	void Chase(_fvector vTargetPos, _float fTimeDelta, _float fLimit = 0.f);
 
 public:
-	void Update_Transform();
-	void Set_Parent(CTransform* pTarget);
+	/*void Update_Transform();
+	void Set_Parent(CTransform* pTarget);*/
 
 private:
-	CTransform*		m_pParent = { nullptr };
+	//CTransform*		m_pParent = { nullptr };
 	_float4x4		m_WorldMatrix = {};
 	_float			m_fSpeedPerSec = {};
 	_float			m_fRotationPerSec = {};
-
-	_float3	m_vAngle = {};
+	_float3			m_vAngles = {};
 
 	_float m_fPitch = {}; // X축 기준으로의 회전.
 	_float m_fYaw = {};   // Y축 기준으로의 회전이다.

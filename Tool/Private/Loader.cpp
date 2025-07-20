@@ -125,7 +125,7 @@ HRESULT CLoader::Loading_For_Logo_Level()
 
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LOGO)
 		, TEXT("Prototype_GameObject_Map_Part")
-		, CMap_Part::Create(m_pDevice, m_pContext))))
+		, CToolMap_Part::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 #pragma endregion
 

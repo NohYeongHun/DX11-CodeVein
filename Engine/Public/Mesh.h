@@ -30,6 +30,8 @@ public:
 	HRESULT Render();
 
 private:
+	vector<_float3> m_vecPositions;
+	vector<_uint>   m_vecIndices;
 	_uint m_iMaterialIndex = { };
 	_uint m_iNumBones = {};
 

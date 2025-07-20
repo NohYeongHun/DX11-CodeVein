@@ -183,22 +183,22 @@ void CTransform::Chase(_fvector vTargetPos, _float fTimeDelta, _float fLimit)
 	Set_State(STATE::POSITION, vPosition);
 }
 
-// 회전축에 따른 축 뒤틀림 문제를 해결하기 위함.
-void CTransform::Update_Transform()
-{
-	// 매 프레임 마다 크 자 이 공 부 를 통해 회전축 업데이트
-	if (m_pParent != nullptr)
-		m_pParent->Update_Transform();
-}
-
-void CTransform::Set_Parent(CTransform* pTarget)
-{
-	if (pTarget == m_pParent)
-		return;
-
-	Update_Transform();
-
-}
+//// 회전축에 따른 축 뒤틀림 문제를 해결하기 위함.
+//void CTransform::Update_Transform()
+//{
+//	// 매 프레임 마다 크 자 이 공 부 를 통해 회전축 업데이트
+//	if (m_pParent != nullptr)
+//		m_pParent->Update_Transform();
+//}
+//
+//void CTransform::Set_Parent(CTransform* pTarget)
+//{
+//	if (pTarget == m_pParent)
+//		return;
+//
+//	Update_Transform();
+//
+//}
 
 CTransform* CTransform::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {

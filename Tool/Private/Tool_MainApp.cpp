@@ -21,6 +21,7 @@ HRESULT CTool_MainApp::Initialize()
 	if (FAILED(m_pGameInstance->Initialize_Engine(EngineDesc, &m_pDevice, &m_pContext)))
 		return E_FAIL;
 	
+	m_pImGui_Manager = CImgui_Manager::Get_Instance(m_pDevice, m_pContext);
 
 	if (FAILED(Ready_Prototype_ForStatic()))
 		return E_FAIL;
@@ -64,7 +65,7 @@ HRESULT CTool_MainApp::Render()
 
 HRESULT CTool_MainApp::Ready_Prototype_ForStatic()
 {
-	m_pImGui_Manager = CImgui_Manager::Get_Instance(m_pDevice, m_pContext);
+	
 
 	//m_pMapTool = CMap_Tool::Create(m_pDevice, m_pContext);
 

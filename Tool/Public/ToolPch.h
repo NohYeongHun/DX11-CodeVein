@@ -1,7 +1,14 @@
 ﻿#pragma once
 #include "EnginePch.h"
 #include "Tool_Defines.h"
+
+#pragma region TOOL 관련
+#include "SaveFile_Define.h"
+#include "SaveFile_Loader.h"
 #include "PrototypeName.h"
+#pragma endregion
+
+
 
 #pragma region IMGUI
 #define IMGUI_DEFINE_MATH_OPERATORS
@@ -32,15 +39,18 @@
 
 
 #pragma region GAMEOBJECT
-#include "Map_Part.h"
+#include "ToolMap_Part.h" // 저장 용
+#include "Map_Part.h"	  // Load 용
 #include "Map.h"
 #include "Camera_Free.h"
 #include "Player.h"
 #pragma endregion
 
-static void Transform_Print_Imgui(const char* szName, _float* vPos)
-{
-	ImGui::Begin(szName);
-	ImGui::InputFloat3("pos", vPos);
-	ImGui::End();
-}
+
+
+//static void Transform_Print_Imgui(const char* szName, _float* vPos)
+//{
+//	ImGui::Begin(szName);
+//	ImGui::InputFloat3("pos", vPos);
+//	ImGui::End();
+//}

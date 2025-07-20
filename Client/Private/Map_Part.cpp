@@ -1,4 +1,6 @@
-﻿
+﻿#include "Map.h"
+#include "Map_Part.h"
+
 CMap_Part::CMap_Part(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CGameObject(pDevice, pContext)
 {

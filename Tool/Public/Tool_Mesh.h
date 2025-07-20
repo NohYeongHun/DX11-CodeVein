@@ -11,6 +11,14 @@ private:
 	CTool_Mesh(const CTool_Mesh& Prototype);
 	virtual ~CTool_Mesh() = default;
 
+
+#pragma region Tool 에서 추출할 Mesh 정보들
+public:
+	
+#pragma endregion
+
+
+
 public:
 	const _uint Get_MaterialIndex() { return m_iMaterialIndex; }
 	const _bool Is_Ray_Hit(const _float3& rayOrigin, const _float3& rayDir, _float* pOutDist);
@@ -34,6 +42,9 @@ private:
 
 	_uint m_iMaterialIndex = { };
 	_uint m_iNumBones = {};
+
+	/* 이 메시에 영향을 주는 뼈들의 인덱스(전체뼈기준) 집합. */
+	vector<_int>	m_BoneIndices;
 
 
 public:

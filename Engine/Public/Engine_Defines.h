@@ -49,6 +49,7 @@ using namespace DirectX;
 #include <thread>
 #include <io.h>
 #include <iostream>
+#include <fstream>
 
 using namespace std;
 

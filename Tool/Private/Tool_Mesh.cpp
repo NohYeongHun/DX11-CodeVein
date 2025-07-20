@@ -132,6 +132,9 @@ HRESULT CTool_Mesh::Initialize_Vertex_For_NonAnim(const aiMesh* pAIMesh, _fmatri
 	if (FAILED(m_pDevice->CreateBuffer(&VBDesc, &VBInitialData, &m_pVB)))
 		return E_FAIL;
 
+	/* MeshInfo Header에 생성과 동시에 저장가능한 정보들을 채워줍니다. */
+	
+
 	Safe_Delete_Array(pVertices);
 
 	return S_OK;

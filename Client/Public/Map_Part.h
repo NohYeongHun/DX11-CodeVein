@@ -1,8 +1,6 @@
 ﻿#pragma once
 #include "GameObject.h"
 
-/* Map Tool 상에서 배치하고 생성하고 수정하는 Class */
-/* Client용 Class가 하나 더 필요함. */
 NS_BEGIN(Tool)
 class CMap_Part final : public CGameObject
 {

@@ -1,21 +1,22 @@
-﻿
-CMap_Part::CMap_Part(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿#include "ToolMap_Part.h"
+
+CToolMap_Part::CToolMap_Part(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CGameObject(pDevice, pContext)
 {
 }
 
-CMap_Part::CMap_Part(const CMap_Part& Prototype)
+CToolMap_Part::CToolMap_Part(const CToolMap_Part& Prototype)
     : CGameObject(Prototype)
 {
 }
 
 
-const MODEL_INFO& CMap_Part::Save_ModelInfo(_fmatrix PreTransformMatrix)
+const MODEL_INFO& CToolMap_Part::Save_ModelInfo(_fmatrix PreTransformMatrix)
 {
     return m_pModelCom->Save_ModelInfo(PreTransformMatrix, m_pModelTag);
 }
 
-HRESULT CMap_Part::Initialize_Prototype()
+HRESULT CToolMap_Part::Initialize_Prototype()
 {
     if (FAILED(__super::Initialize_Prototype()))
         return E_FAIL;
@@ -24,41 +25,79 @@ HRESULT CMap_Part::Initialize_Prototype()
 }
 
 /* Create Desc와 저장 Desc를 동일하게..*/
-HRESULT CMap_Part::Initialize_Clone(void* pArg)
+HRESULT CToolMap_Part::Initialize_Clone(void* pArg)
 {
-    MODEL_CREATE_DESC* pDesc = static_cast<MODEL_CREATE_DESC*>(pArg);
-    m_pModelTag = pDesc->pModelTag;
-    m_strObjTag = m_pModelTag;
+    MAP_PART_DESC* pDesc = static_cast<MAP_PART_DESC*>(pArg);
 
-    if (FAILED(__super::Initialize_Clone(pDesc)))
+    if (FAILED(Ready_Components()))
         return E_FAIL;
 
-    if (FAILED(Ready_Components(pDesc)))
-        return E_FAIL;
-
-    if (FAILED(Ready_Transform(pDesc)))
-        return E_FAIL;
+    if (pDesc->eArgType == ARG_TYPE::CREATE)
+    {
+        MODEL_CREATE_DESC* pCreateDesc = static_cast<MODEL_CREATE_DESC*>(pDesc->pData);
+        if(FAILED(Initialize_Craete(pCreateDesc)))
+            return E_FAIL;
+    }
+    else if (pDesc->eArgType == ARG_TYPE::MODEL_LOAD)
+    {
+        MODEL_INFO* pInfoDesc = static_cast<MODEL_INFO*>(pDesc->pData);
+        if (FAILED(Initialize_Load(pInfoDesc)))
+            return E_FAIL;
+    }
+    
 
     //m_pTransformCom->Scaling({ 1.f, 1.f, 1.f });
     return S_OK;
 }
 
-/* Load 용*/
-HRESULT CMap_Part::Initialize_Load(void* pArg)
+HRESULT CToolMap_Part::Initialize_Craete(MODEL_CREATE_DESC* pDesc)
 {
-    MODEL_INFO* pDesc = static_cast<MODEL_INFO*>(pArg);
+    m_pModelTag = pDesc->pModelTag;
+    m_strObjTag = m_pModelTag;
+
+
+    if (FAILED(__super::Initialize_Clone(pDesc)))
+        return E_FAIL;
+
+    if (FAILED(__super::Add_Component(ENUM_CLASS(LEVEL::LOGO)
+        , pDesc->pModelTag
+        , TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom), nullptr)))
+        return E_FAIL;
+
+    if (FAILED(Ready_Transform(pDesc)))
+        return E_FAIL;
+
+    return S_OK;
+}
+
+HRESULT CToolMap_Part::Initialize_Load(MODEL_INFO* pDesc)
+{
+    m_pModelTag = pDesc->strModelTag.c_str();
+    m_strObjTag = m_pModelTag;
+
+    if (FAILED(__super::Initialize_Clone(pDesc)))
+        return E_FAIL;
+
+    if (FAILED(__super::Add_Component(ENUM_CLASS(LEVEL::LOGO)
+        , pDesc->strModelTag.c_str()
+        , TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom), nullptr)))
+        return E_FAIL;
+
+    /* 추후 Transform 정보도 저장해서 추가.*/
+
 
     return S_OK;
 }
 
 
 
-void CMap_Part::Priority_Update(_float fTimeDelta)
+
+void CToolMap_Part::Priority_Update(_float fTimeDelta)
 {
     __super::Priority_Update(fTimeDelta);
 }
 
-void CMap_Part::Update(_float fTimeDelta)
+void CToolMap_Part::Update(_float fTimeDelta)
 {
     __super::Update(fTimeDelta);
     _float fDist = {};
@@ -75,7 +114,7 @@ void CMap_Part::Update(_float fTimeDelta)
     
 }
 
-void CMap_Part::Late_Update(_float fTimeDelta)
+void CToolMap_Part::Late_Update(_float fTimeDelta)
 {
     __super::Late_Update(fTimeDelta);
 
@@ -83,7 +122,7 @@ void CMap_Part::Late_Update(_float fTimeDelta)
         return;
 }
 
-HRESULT CMap_Part::Render()
+HRESULT CToolMap_Part::Render()
 {
     if (FAILED(Ready_Render_Resources()))
         return E_FAIL;
@@ -112,19 +151,19 @@ HRESULT CMap_Part::Render()
     return S_OK;
 }
 
-void CMap_Part::On_Collision_Enter(CGameObject* pOther)
+void CToolMap_Part::On_Collision_Enter(CGameObject* pOther)
 {
 }
 
-void CMap_Part::On_Collision_Stay(CGameObject* pOther)
+void CToolMap_Part::On_Collision_Stay(CGameObject* pOther)
 {
 }
 
-void CMap_Part::On_Collision_Exit(CGameObject* pOther)
+void CToolMap_Part::On_Collision_Exit(CGameObject* pOther)
 {
 }
 
-const _bool CMap_Part::Is_Ray_LocalHit(_float* pOutDist)
+const _bool CToolMap_Part::Is_Ray_LocalHit(_float* pOutDist)
 {
     // Ray를 Local로 변환.
     m_pGameInstance->Transform_To_LocalSpace(m_pTransformCom->Get_WorldMatrix_Inverse());
@@ -136,23 +175,17 @@ const _bool CMap_Part::Is_Ray_LocalHit(_float* pOutDist)
     return false;
 }
 
-HRESULT CMap_Part::Ready_Components(MODEL_CREATE_DESC* pDesc)
+HRESULT CToolMap_Part::Ready_Components()
 {
     if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxMesh"),
         TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom), nullptr)))
         return E_FAIL;
-    
-    if (FAILED(__super::Add_Component(ENUM_CLASS(LEVEL::LOGO)
-        , pDesc->pModelTag
-        , TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom), nullptr)))
-        return E_FAIL;
-
-    
 
     return S_OK;
 }
 
-HRESULT CMap_Part::Ready_Transform(MODEL_CREATE_DESC* pDesc)
+
+HRESULT CToolMap_Part::Ready_Transform(MODEL_CREATE_DESC* pDesc)
 {
     m_pTransformCom->Set_State(STATE::POSITION, XMLoadFloat4(&pDesc->vPosition));
     m_pTransformCom->Scale(pDesc->vScale);
@@ -167,7 +200,7 @@ HRESULT CMap_Part::Ready_Transform(MODEL_CREATE_DESC* pDesc)
     return S_OK;
 }
 
-HRESULT CMap_Part::Ready_Render_Resources()
+HRESULT CToolMap_Part::Ready_Render_Resources()
 {
     if (FAILED(m_pTransformCom->Bind_Shader_Resource(m_pShaderCom, "g_WorldMatrix")))
         return E_FAIL;
@@ -182,22 +215,22 @@ HRESULT CMap_Part::Ready_Render_Resources()
     return S_OK;
 }
 
-CMap_Part* CMap_Part::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CToolMap_Part* CToolMap_Part::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-    CMap_Part* pInstance = new CMap_Part(pDevice, pContext);
+    CToolMap_Part* pInstance = new CToolMap_Part(pDevice, pContext);
 
     if (FAILED(pInstance->Initialize_Prototype()))
     {
-        MSG_BOX(TEXT("Failed to Created : CMap_Part"));
+        MSG_BOX(TEXT("Failed to Created : CToolMap_Part"));
         Safe_Release(pInstance);
     }
 
     return pInstance;
 }
 
-CGameObject* CMap_Part::Clone(void* pArg)
+CGameObject* CToolMap_Part::Clone(void* pArg)
 {
-    CMap_Part* pInstance = new CMap_Part(*this);
+    CToolMap_Part* pInstance = new CToolMap_Part(*this);
 
     if (FAILED(pInstance->Initialize_Clone(pArg)))
     {
@@ -208,12 +241,12 @@ CGameObject* CMap_Part::Clone(void* pArg)
     return pInstance;
 }
 
-void CMap_Part::Destroy()
+void CToolMap_Part::Destroy()
 {
     __super::Destroy();
 }
 
-void CMap_Part::Free()
+void CToolMap_Part::Free()
 {
     __super::Free();
     Safe_Release(m_pModelCom);

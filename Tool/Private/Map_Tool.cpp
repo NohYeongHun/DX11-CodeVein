@@ -29,6 +29,9 @@ HRESULT CMap_Tool::Initialize(LEVEL eLevel)
     m_pCamera = static_cast<CCamera_Free*>(*iter);
     Safe_AddRef(m_pCamera);
 
+    /* SaveFile Loader 초기화 */
+    m_pSaveFile_Loader = CSaveFile_Loader::Create();
+
     m_pCameraTransformCom = static_cast<CTransform*>(m_pCamera->Get_Component(L"Com_Transform"));
     
     if (FAILED(Ready_Imgui()))
@@ -58,6 +61,7 @@ void CMap_Tool::Update(_float fTimeDelta)
 {
     if (m_pGameInstance->Get_KeyUp(DIK_C))
         m_eToolMode = TOOLMODE::CREATE;
+
     if (m_pGameInstance->Get_KeyUp(DIK_E))
         m_eToolMode = TOOLMODE::EDIT;
 
@@ -68,6 +72,11 @@ void CMap_Tool::Update(_float fTimeDelta)
     Handle_SelectedObject();
 }
 
+struct LevelButton {
+    const char* label;
+    const _wstring vibuffer_type;
+};
+
 void CMap_Tool::Render()
 {
     if (m_eToolMode == TOOLMODE::CREATE)
@@ -75,28 +84,83 @@ void CMap_Tool::Render()
     else
         Render_Model_Edit();
 
+    // MenuBar 렌더링.
+    Render_MenuBar();
 
     // 디버그 정보는 항상 렌더링
     Render_Debug_Window();
 
-    //Render_Layer_Hierarchy();
-    /*if (nullptr != m_pSelectedObject)
-    {
-        _char szFullPath[MAX_PATH] = {};
-        WideCharToMultiByte(CP_ACP, 0, m_pSelectedObject->Get_ObjectTag().c_str(), -1, szFullPath, MAX_PATH, nullptr, nullptr);
-        string strValue = szFullPath;
+}
 
-        CTransform* pTransform = static_cast<CTransform*>(m_pSelectedObject->Get_Component(L"Com_Transform"));
-        
-        Transform_Render(strValue, pTransform);
-    }*/
+void CMap_Tool::Render_MenuBar()
+{
+    if (!m_IsPossible_SaveLoad)
+        return;
+
+    ImGui::Begin("Test Window", nullptr, ImGuiWindowFlags_MenuBar);
+
+    if (ImGui::BeginMenuBar())
+    {
+        if (ImGui::BeginMenu("File"))
+        {
+            if (ImGui::MenuItem("open"))
+            {
+                IGFD::FileDialogConfig config;
+                config.path = "../Bin/Resources/SaveFile/";
+                config.flags = ImGuiFileDialogFlags_ReadOnlyFileNameField;
+
+                // 파일 다이얼로그 열기
+                ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose File", ".bin", config);
+            }
+            if (ImGui::MenuItem("save"))
+            {
+                IGFD::FileDialogConfig config;
+                config.path = "../Bin/Resources/SaveFile/";
+                config.flags = ImGuiFileDialogFlags_ConfirmOverwrite;
+
+                ImGuiFileDialog::Instance()->OpenDialog("SaveFileDlgKey", "Choose File", ".bin", config);
+
+            }
+            ImGui::EndMenu();
+        }
+        ImGui::EndMenuBar();
+    }
+
+    // 읽기용 로직
+    if (ImGuiFileDialog::Instance()->Display("ChooseFileDlgKey")) {
+        if (ImGuiFileDialog::Instance()->IsOk()) {
+            std::string load_path = ImGuiFileDialog::Instance()->GetFilePathName();
+            // ImGui::Text("Selected file: %s", filePath.c_str());
+            m_pSaveFile_Loader->Load_File(load_path, m_eCurLevel);
+            //m_pTile_Loader->Load_Tile(load_path, LEVEL::LEVEL_MAPEDIT); 저장 로직.
+        }
+        ImGuiFileDialog::Instance()->Close();
+    }
+
+    // 저장용 로직
+    if (ImGuiFileDialog::Instance()->Display("SaveFileDlgKey"))
+    {
+        if (ImGuiFileDialog::Instance()->IsOk())
+        {
+            std::string save_path = ImGuiFileDialog::Instance()->GetFilePathName();
+            m_pSaveFile_Loader->Save_File(save_path);
+
+            // ImGui::Text("Saving to: %s", savePath.c_str());
+            //m_pTile_Loader->Save_Tile(save_path);
+            // TODO: 파일 저장 처리
+            // 예: std::ofstream ofs(savePath); ofs << "data";
+        }
+        ImGuiFileDialog::Instance()->Close();
+    }
+
+    ImGui::End();
 }
 
 
 
 
 
-/* Edit 모드에서 선택된 개체 정보가 있다면?*/
+/* Debug 모드에서 현재 상태값에 대한 지정을 수행합니다. */
 void CMap_Tool::Render_Debug_Window()
 {
     ImGuiIO& io = ImGui::GetIO();
@@ -122,6 +186,8 @@ void CMap_Tool::Render_Debug_Window()
 
     // 체크박스 추가 - 피킹 가능 여부
     ImGui::Checkbox("Enable Picking", &m_IsPossible_Picking);
+    // 체크박스 추가 - 파일 Load Save 여부
+    ImGui::Checkbox("Enable SaveLoad", &m_IsPossible_SaveLoad);
 
     ImGui::End();
 }
@@ -145,6 +211,9 @@ void CMap_Tool::Handle_SelectedObject()
 
 void CMap_Tool::Render_Model_Create()
 {
+    if (m_IsPossible_SaveLoad)
+        return;
+
     Render_Prototype_Hierarchy();
 }
 
@@ -208,12 +277,17 @@ void CMap_Tool::Render_Prototype_Inspector(ImVec2 vPos)
 
         if (ImGui::Button("Create Instance"))
         {
-            MODEL_CREATE_DESC Desc{};
-            Desc.pModelTag = m_wSelected_PrototypeModelTag.c_str();
-            Desc.vPosition = _float4(fPosition[0], fPosition[1], fPosition[2], 1.f);
-            Desc.vRotate = _float3(fRotation[0], fRotation[1], fRotation[2]);
-            Desc.vScale = _float3(fScale[0], fScale[1], fScale[2]);
+            CToolMap_Part::MAP_PART_DESC Desc{};
+            Desc.eArgType = CToolMap_Part::ARG_TYPE::CREATE;
 
+            MODEL_CREATE_DESC CreateDesc{};
+            CreateDesc.pModelTag = m_wSelected_PrototypeModelTag.c_str();
+            CreateDesc.vPosition = _float4(fPosition[0], fPosition[1], fPosition[2], 1.f);
+            CreateDesc.vRotate = _float3(fRotation[0], fRotation[1], fRotation[2]);
+            CreateDesc.vScale = _float3(fScale[0], fScale[1], fScale[2]);
+
+            /* 구조체 데이터 넣기. */
+            Desc.pData = reinterpret_cast<void*>(&CreateDesc);
 
             if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel)
                 , TEXT("Layer_Map_Parts")
@@ -272,12 +346,17 @@ void CMap_Tool::Handle_CreateMode_SelectedObject()
     _float3 vPos = {};
     XMStoreFloat3(&vPos, XMLoadFloat3(&m_RayHitDesc.vHitPoint));
 
+    CToolMap_Part::MAP_PART_DESC Desc{};
+    Desc.eArgType = CToolMap_Part::ARG_TYPE::CREATE;
 
-    MODEL_CREATE_DESC Desc{};
-    Desc.pModelTag = m_wSelected_PrototypeModelTag.c_str();
-    Desc.vPosition = _float4(vPos.x + m_vInterval.x, vPos.y + m_vInterval.y, vPos.z + m_vInterval.z, 1.f);
-    Desc.vRotate = _float3(0.f, 0.f, 0.f);
-    Desc.vScale = _float3(1.f, 1.f, 1.f);
+    MODEL_CREATE_DESC CreateDesc{};
+    CreateDesc.pModelTag = m_wSelected_PrototypeModelTag.c_str();
+    CreateDesc.vPosition = _float4(vPos.x + m_vInterval.x, vPos.y + m_vInterval.y, vPos.z + m_vInterval.z, 1.f);
+    CreateDesc.vRotate = _float3(0.f, 0.f, 0.f);
+    CreateDesc.vScale = _float3(1.f, 1.f, 1.f);
+
+    /* 구조체 데이터 넣기. */
+    Desc.pData = reinterpret_cast<void*>(&CreateDesc);
 
     if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel)
         , TEXT("Layer_Map_Parts")
@@ -298,6 +377,9 @@ void CMap_Tool::Handle_CreateMode_SelectedObject()
 
 void CMap_Tool::Render_Model_Edit()
 {
+    if (m_IsPossible_SaveLoad)
+        return;
+
     Render_Layer_Hierarchy();
 }
 
@@ -442,6 +524,7 @@ void CMap_Tool::Free()
     m_Layer_Objects.clear();
     m_PrototypeNames.clear();
 
+    Safe_Release(m_pSaveFile_Loader);
     Safe_Release(m_pCamera);
     Safe_Release(m_pGameInstance);
     Safe_Release(m_pDeviceContext);

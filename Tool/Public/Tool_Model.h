@@ -15,18 +15,29 @@ public:
 		return m_iNumMeshes;
 	}
 
+	
+#pragma region 저장용 함수.
+public:
+	const MODEL_INFO& Save_ModelInfo(_fmatrix PreTransformMatrix, _wstring pModelTag);
+
+private:
+	HRESULT Save_Meshes(_fmatrix PreTransformMatrix);
+	HRESULT Save_Marterials();
+#pragma endregion
+
 public:
 	const _bool Is_Ray_Hit(const _float3& rayOrigin, const _float3& rayDir, _float* pOutDist);
+
 
 public:
 	virtual HRESULT Initialize_Prototype(MODELTYPE eModelType, _fmatrix PreTransformMatrix, const _char* pModelFilePath, const _char* pTextureFolderPath);
 	virtual HRESULT Initialize_Clone(void* pArg);
-
-
-
+	
 public:
 	HRESULT Bind_Materials(CShader* pShader, const _char* pConstantName, _uint iMeshIndex, aiTextureType eTextureType, _uint iTextureIndex);
 	HRESULT Render(_uint iNumMesh);
+
+
 
 private:
 	const aiScene* m_pAIScene = { nullptr };
@@ -51,11 +62,18 @@ private:
 	_uint m_iNumBones = {};
 	vector<class CTool_Bone*> m_Bones;
 
+private:
+	MODEL_INFO m_ModelInfo = {};
+	string m_ModelDir = {};
+
 
 private:
 	HRESULT Ready_Meshes(_fmatrix PreTransformMatrix);
 	HRESULT Ready_Materials(const _char* pModelFilePath, const _char* pTextureFolderPath);
 	HRESULT Ready_Bones(const aiNode* pAiNode, _int iParentBoneIndex);
+
+
+
 
 
 public:

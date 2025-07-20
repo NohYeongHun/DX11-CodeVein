@@ -255,6 +255,12 @@
     <ClInclude Include="..\Public\Map.h">
       <Filter>02. GameObject\Map</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Map_Part.h">
+      <Filter>02. GameObject\Map</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\SaveFile_Define.h">
+      <Filter>99. Defines</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -412,6 +418,9 @@
       <Filter>02. GameObject\UI\Player\SkillUI</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Map.cpp">
+      <Filter>02. GameObject\Map</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Map_Part.cpp">
       <Filter>02. GameObject\Map</Filter>
     </ClCompile>
   </ItemGroup>

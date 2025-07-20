@@ -27,6 +27,7 @@ public:
 	void Change_SelectObject(class CGameObject* pSelectedObject);
 	void Update(_float fTimeDelta);
 	void Render();
+	void Render_MenuBar();
 	void Render_Debug_Window();
 	void Handle_SelectedObject();
 
@@ -84,6 +85,7 @@ private:
 private:
 	RAYHIT_DESC m_RayHitDesc = {};
 	_bool m_IsPossible_Picking = { false };
+	_bool m_IsPossible_SaveLoad = { false };
 	
 	class CGameObject* m_pSelectedObject = { nullptr }; // 선택된 객체.
 	TOOLMODE m_eToolMode = { TOOLMODE::CREATE }; // 상태 저장.
@@ -98,6 +100,7 @@ private:
 	class CGameInstance* m_pGameInstance = { nullptr };
 	class CCamera_Free* m_pCamera = { nullptr };
 	class CTransform* m_pCameraTransformCom = { nullptr };
+	class CSaveFile_Loader* m_pSaveFile_Loader = { nullptr };
 
 	ID3D11Device* m_pDevice = { nullptr };
 	ID3D11DeviceContext* m_pDeviceContext = { nullptr };
