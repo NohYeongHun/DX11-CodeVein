@@ -12,12 +12,20 @@ typedef struct MeshInfoHeader {
 
 // 한 머테리얼이 들고 있는 정보.
 typedef struct MarterialHeader {
-    uint32_t materialVectorSize;
+    uint32_t materialPathVectorSize;
     vector<_wstring> materialPathVector;
 }MATERIAL_INFO;
 
+
+//_float3 vRotation{};    // Euler deg or rad — 툴에서 쓰는 형식
+typedef struct TransformHeader {
+    _float4 vPosition{};    // (x,y,z)
+    _float3 vScale{ 1.f,1.f,1.f };
+}TRANSFORM_INFO;
+
+
 // 모델이 들고 있는 정보.
-typedef struct ModelInfoHeader
+typedef struct MapPartHeader
 {
     _wstring strModelTag;
     uint32_t meshVectorSize;
@@ -25,7 +33,9 @@ typedef struct ModelInfoHeader
     
     uint32_t materialVectorSize;
     vector<MATERIAL_INFO> materialVector;
-}MODEL_INFO;
+
+    TRANSFORM_INFO transformInfo;
+}MAP_PART_INFO;
 
 // 여러 모델들을 들고 있는 바이너리 파일.
 

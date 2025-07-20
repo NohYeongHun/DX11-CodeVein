@@ -27,7 +27,7 @@ CTool_Model::CTool_Model(const CTool_Model& Prototype)
 		Safe_AddRef(bone);
 }
 
-const MODEL_INFO& CTool_Model::Save_ModelInfo(_fmatrix PreTransformMatrix, _wstring strModelTag)
+const MAP_PART_INFO& CTool_Model::Save_ModelInfo(_fmatrix PreTransformMatrix, _wstring strModelTag)
 {
 	m_ModelInfo.strModelTag = strModelTag;
 	m_ModelInfo.meshVectorSize = m_pAIScene->mNumMeshes;
@@ -58,7 +58,7 @@ HRESULT CTool_Model::Save_Meshes(_fmatrix PreTransformMatrix)
 	{
 		/* 1. Mesh 정보 넣어주기. */
 		aiMesh* pAIMesh = m_pAIScene->mMeshes[i];
-		MeshInfoHeader& dst = m_ModelInfo.meshVector[i];
+		MESH_INFO& dst = m_ModelInfo.meshVector[i];
 
 		// (1) 기본 메타
 		dst.iMarterialIndex = pAIMesh->mMaterialIndex;
@@ -106,11 +106,16 @@ HRESULT CTool_Model::Save_Marterials()
 
 	for (_uint i = 0; i < m_iNumMaterials; i++)
 	{
+		// Material 정보를 저장할 구조체.
+		MATERIAL_INFO& dst = m_ModelInfo.materialVector[i];
+		dst.materialPathVectorSize = AI_TEXTURE_TYPE_MAX;
+		
 		// AIScene에서 만든 Material
 		const aiMaterial* pAIMaterial = m_pAIScene->mMaterials[i];
 
 		// Material 정보를 담을 벡터.
 		vector<_wstring>& pathVector = m_ModelInfo.materialVector[i].materialPathVector;
+		
 		pathVector.resize(AI_TEXTURE_TYPE_MAX);
 
 		for (_uint j = 1; j < AI_TEXTURE_TYPE_MAX; j++)

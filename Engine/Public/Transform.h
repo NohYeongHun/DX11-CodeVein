@@ -45,6 +45,10 @@ public:
 		return XMMatrixInverse(nullptr, XMLoadFloat4x4(&m_WorldMatrix));
 	}
 
+	_float3 Get_Eular_Degree() {
+		return { m_fPitch, m_fRoll, m_fYaw }; // 어떤 축으로 어떻게 회전했는지가 나옵니다.
+	}
+
 
 public:
 	virtual HRESULT Initialize_Prototype();

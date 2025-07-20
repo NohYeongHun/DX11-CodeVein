@@ -10,7 +10,7 @@ CMap_Part::CMap_Part(const CMap_Part& Prototype)
 }
 
 
-const MODEL_INFO& CMap_Part::Save_ModelInfo(_fmatrix PreTransformMatrix)
+const MAP_PART_INFO& CMap_Part::Save_ModelInfo(_fmatrix PreTransformMatrix)
 {
     return m_pModelCom->Save_ModelInfo(PreTransformMatrix, m_pModelTag);
 }
@@ -46,7 +46,7 @@ HRESULT CMap_Part::Initialize_Clone(void* pArg)
 /* Load 용*/
 HRESULT CMap_Part::Initialize_Load(void* pArg)
 {
-    MODEL_INFO* pDesc = static_cast<MODEL_INFO*>(pArg);
+    MAP_PART_INFO* pDesc = static_cast<MAP_PART_INFO*>(pArg);
 
     return S_OK;
 }

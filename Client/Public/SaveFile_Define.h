@@ -25,7 +25,7 @@ typedef struct ModelInfoHeader
     
     uint32_t materialVectorSize;
     vector<MATERIAL_INFO> materialVector;
-}MODEL_INFO;
+}MAP_PART_INFO;
 
 // 여러 모델들을 들고 있는 바이너리 파일.
 

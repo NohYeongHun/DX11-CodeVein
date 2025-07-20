@@ -15,7 +15,7 @@ private:
 	
 /* 충돌된 Map Part는 Imgui에서 조작할 수 있는 Transform 주소를 반환합니다. */
 public:
-	const MODEL_INFO& Save_ModelInfo(_fmatrix PreTransformMatrix);
+	const MAP_PART_INFO& Save_ModelInfo(_fmatrix PreTransformMatrix);
 
 public:
 	virtual HRESULT Initialize_Prototype();

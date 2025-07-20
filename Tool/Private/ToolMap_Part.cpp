@@ -11,7 +11,7 @@ CToolMap_Part::CToolMap_Part(const CToolMap_Part& Prototype)
 }
 
 
-const MODEL_INFO& CToolMap_Part::Save_ModelInfo(_fmatrix PreTransformMatrix)
+const MAP_PART_INFO& CToolMap_Part::Save_ModelInfo(_fmatrix PreTransformMatrix)
 {
     return m_pModelCom->Save_ModelInfo(PreTransformMatrix, m_pModelTag);
 }
@@ -40,7 +40,7 @@ HRESULT CToolMap_Part::Initialize_Clone(void* pArg)
     }
     else if (pDesc->eArgType == ARG_TYPE::MODEL_LOAD)
     {
-        MODEL_INFO* pInfoDesc = static_cast<MODEL_INFO*>(pDesc->pData);
+        MAP_PART_INFO* pInfoDesc = static_cast<MAP_PART_INFO*>(pDesc->pData);
         if (FAILED(Initialize_Load(pInfoDesc)))
             return E_FAIL;
     }
@@ -70,7 +70,7 @@ HRESULT CToolMap_Part::Initialize_Craete(MODEL_CREATE_DESC* pDesc)
     return S_OK;
 }
 
-HRESULT CToolMap_Part::Initialize_Load(MODEL_INFO* pDesc)
+HRESULT CToolMap_Part::Initialize_Load(MAP_PART_INFO* pDesc)
 {
     m_pModelTag = pDesc->strModelTag.c_str();
     m_strObjTag = m_pModelTag;
@@ -83,8 +83,9 @@ HRESULT CToolMap_Part::Initialize_Load(MODEL_INFO* pDesc)
         , TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom), nullptr)))
         return E_FAIL;
 
-    /* 추후 Transform 정보도 저장해서 추가.*/
-
+    /* Transform 정보도 저장해서 추가.*/
+    if (FAILED(Ready_Transform(pDesc)))
+        return E_FAIL;
 
     return S_OK;
 }
@@ -196,6 +197,24 @@ HRESULT CToolMap_Part::Ready_Transform(MODEL_CREATE_DESC* pDesc)
         m_pTransformCom->Rotation(XMVectorSet(0.f, 1.f, 0.f, 0.f), XMConvertToRadians(pDesc->vRotate.y));
 	else if (pDesc->vRotate.z > 0.f)
 		m_pTransformCom->Rotation(XMVectorSet(0.f, 0.f, 1.f, 0.f), XMConvertToRadians(pDesc->vRotate.z));
+
+    return S_OK;
+}
+
+HRESULT CToolMap_Part::Ready_Transform(MAP_PART_INFO* pDesc)
+{
+    m_pTransformCom->Set_State(STATE::POSITION, XMLoadFloat4(&(pDesc->transformInfo.vPosition)));
+    m_pTransformCom->Scale(pDesc->transformInfo.vScale);
+
+   /* m_pTransformCom->Set_State(STATE::POSITION, XMLoadFloat4(&pDesc->vPosition));
+    m_pTransformCom->Scale(pDesc->vScale);
+
+    if (pDesc->vRotate.x > 0.f)
+        m_pTransformCom->Rotation(XMVectorSet(1.f, 0.f, 0.f, 0.f), XMConvertToRadians(pDesc->vRotate.x));
+    else if (pDesc->vRotate.y > 0.f)
+        m_pTransformCom->Rotation(XMVectorSet(0.f, 1.f, 0.f, 0.f), XMConvertToRadians(pDesc->vRotate.y));
+    else if (pDesc->vRotate.z > 0.f)
+        m_pTransformCom->Rotation(XMVectorSet(0.f, 0.f, 1.f, 0.f), XMConvertToRadians(pDesc->vRotate.z));*/
 
     return S_OK;
 }

@@ -25,7 +25,7 @@ private:
 
 
 private: 
-	bool Read_ModelInfo(std::ifstream& ifs, MODEL_INFO& outModel);
+	bool Read_ModelInfo(std::ifstream& ifs, MAP_PART_INFO& outModel);
 
 	void WriteWString(std::ofstream & ofs, const std::wstring & ws)
 	{

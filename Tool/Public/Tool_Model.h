@@ -18,7 +18,7 @@ public:
 	
 #pragma region 저장용 함수.
 public:
-	const MODEL_INFO& Save_ModelInfo(_fmatrix PreTransformMatrix, _wstring pModelTag);
+	const MAP_PART_INFO& Save_ModelInfo(_fmatrix PreTransformMatrix, _wstring pModelTag);
 
 private:
 	HRESULT Save_Meshes(_fmatrix PreTransformMatrix);
@@ -63,7 +63,7 @@ private:
 	vector<class CTool_Bone*> m_Bones;
 
 private:
-	MODEL_INFO m_ModelInfo = {};
+	MAP_PART_INFO m_ModelInfo = {};
 	string m_ModelDir = {};
 
 

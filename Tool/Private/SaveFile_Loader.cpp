@@ -45,46 +45,61 @@ void CSaveFile_Loader::Save_File(string filePath)
 		size_t count = objList.size();
 		ofs.write(reinterpret_cast<const char*>(&count), sizeof(size_t));
 
-		// 4. 리스트 순회
+		// 4. 리스트 순회 Map Part 순회.
 		for (const auto& pGameObject : objList)
 		{
 			CToolMap_Part* pMapPart = dynamic_cast<CToolMap_Part*>(pGameObject);
 			_matrix PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f);
-			MODEL_INFO Model_Info = pMapPart->Save_ModelInfo(PreTransformMatrix);
+			MAP_PART_INFO Model_Info = pMapPart->Save_ModelInfo(PreTransformMatrix);
 
 			/* ----------- WString ModelTag ------------ */
 			WriteWString(ofs, Model_Info.strModelTag);   // ★ 모델 태그 먼저 기록
 
 			/* ---------- Mesh ---------- */
 			// 1. meshVector size
-			ofs.write((char*)&Model_Info.meshVectorSize, sizeof(uint32_t));
+			ofs.write(reinterpret_cast<const char*>(& Model_Info.meshVectorSize), sizeof(uint32_t));
 
 			// - vector 순회.
 			for (const MESH_INFO& mesh : Model_Info.meshVector)
 			{
-				ofs.write((char*)&mesh.iMarterialIndex, sizeof(uint32_t));
-				ofs.write((char*)&mesh.iVertexCount, sizeof(uint32_t));
-				ofs.write((char*)&mesh.iIndicesCount, sizeof(uint32_t));
+				ofs.write(reinterpret_cast<const char*>(&mesh.iMarterialIndex), sizeof(uint32_t));
+				ofs.write(reinterpret_cast<const char*>(&mesh.iVertexCount), sizeof(uint32_t));
+				ofs.write(reinterpret_cast<const char*>(& mesh.iIndicesCount), sizeof(uint32_t));
 
-				ofs.write((char*)mesh.vertices.data(),
+				ofs.write(reinterpret_cast<const char*>(mesh.vertices.data()),
 					mesh.iVertexCount * sizeof(VTXMESH));
-				ofs.write((char*)mesh.indices.data(),
+				ofs.write(reinterpret_cast<const char*>(mesh.indices.data()),
 					mesh.iIndicesCount * sizeof(uint32_t));
 			}
 			
 			/* ---------- Material ---------- */
-			ofs.write((char*)&Model_Info.materialVectorSize, sizeof(uint32_t));
+			ofs.write(reinterpret_cast<const char*>(&Model_Info.materialVectorSize), sizeof(uint32_t));
 
 			for (const MATERIAL_INFO& mat : Model_Info.materialVector)
 			{
-				ofs.write((char*)&mat.materialVectorSize, sizeof(uint32_t));
+				ofs.write(reinterpret_cast<const char*>(& mat.materialPathVectorSize), sizeof(uint32_t));
 
+				// wstring 저장시 len, ws.data()로 저장합니다. 
+				// 0번 인덱스에는 아무것도 없으므로 1번 인덱스부터..
 				for (const std::wstring& texPath : mat.materialPathVector)
 					WriteWString(ofs, texPath);   // 길이+바이트 순으로
 			}
+
+
+			/* ---------- Transform ---------- */
+			_float4 vPosition{};    // (x,y,z)
+			_float3 vScale{ 1.f,1.f,1.f };
+
+			CTransform* pTransform = static_cast<CTransform*>(pMapPart->Get_Component(L"Com_Transform"));
+			XMStoreFloat4(&vPosition, pTransform->Get_State(STATE::POSITION));
+			vScale = pTransform->Get_Scaled();
+
+			Model_Info.transformInfo.vPosition = vPosition;
+			Model_Info.transformInfo.vScale = vScale;
+			
+			ofs.write(reinterpret_cast<const char*>(&Model_Info.transformInfo), sizeof(TRANSFORM_INFO));
 		}
 	}
-
 	ofs.close();
 }
 
@@ -106,7 +121,6 @@ void CSaveFile_Loader::Load_File(string filePath, LEVEL eLevel)
 	};
 
 	_matrix PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f);
-
 	
 
 	for (int i = 0; i < 1; ++i)
@@ -119,7 +133,7 @@ void CSaveFile_Loader::Load_File(string filePath, LEVEL eLevel)
 			CToolMap_Part::MAP_PART_DESC Desc{};
 			Desc.eArgType = CToolMap_Part::ARG_TYPE::MODEL_LOAD;
 			
-			MODEL_INFO modelInfo{};
+			MAP_PART_INFO modelInfo{};
 			if (!Read_ModelInfo(ifs, modelInfo))
 				return;
 
@@ -142,7 +156,7 @@ void CSaveFile_Loader::Load_File(string filePath, LEVEL eLevel)
 
 }
 
-bool CSaveFile_Loader::Read_ModelInfo(std::ifstream& ifs, MODEL_INFO& outModel)
+bool CSaveFile_Loader::Read_ModelInfo(std::ifstream& ifs, MAP_PART_INFO& outModel)
 {
 	
 	/* ---------- ModelTag ---------- */
@@ -158,6 +172,7 @@ bool CSaveFile_Loader::Read_ModelInfo(std::ifstream& ifs, MODEL_INFO& outModel)
 	uint32_t meshVectorSize = {};
 	ifs.read(reinterpret_cast<char*>(&meshVectorSize), sizeof(uint32_t));
 
+	outModel.meshVectorSize = meshVectorSize;
 	// 2. vector 순회해서 채워넣기.
 	outModel.meshVector.resize(meshVectorSize); // 크기 지정.
 
@@ -200,21 +215,25 @@ bool CSaveFile_Loader::Read_ModelInfo(std::ifstream& ifs, MODEL_INFO& outModel)
 	for (uint32_t k = 0; k < outModel.materialVectorSize; ++k)
 	{
 		MATERIAL_INFO& mat = outModel.materialVector[k];
-		if (!ReadBytes(ifs, &mat.materialVectorSize, sizeof(uint32_t)))
+		if (!ReadBytes(ifs, &mat.materialPathVectorSize, sizeof(uint32_t)))
 			return false;
 
 		mat.materialPathVector.clear();
-		mat.materialPathVector.reserve(mat.materialVectorSize);
+		mat.materialPathVector.resize(mat.materialPathVectorSize);
 
-		for (uint32_t t = 0; t < mat.materialVectorSize; ++t)
+		for (uint32_t t = 0; t < mat.materialPathVectorSize; ++t)
 		{
 			std::wstring texPath = ReadWString(ifs);
 			if (!ifs)
 				return false;
 
-			mat.materialPathVector.push_back(texPath);
+			mat.materialPathVector[t] = texPath;
 		}
 	}
+
+	/* Transform 저장하기. */
+	if (!ReadBytes(ifs, &outModel.transformInfo, sizeof(TRANSFORM_INFO)))
+		return false;
 
 	return true;
 

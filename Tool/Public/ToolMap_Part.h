@@ -27,7 +27,7 @@ private:
 	
 /* 충돌된 Map Part는 Imgui에서 조작할 수 있는 Transform 주소를 반환합니다. */
 public:
-	const MODEL_INFO& Save_ModelInfo(_fmatrix PreTransformMatrix);
+	const MAP_PART_INFO& Save_ModelInfo(_fmatrix PreTransformMatrix);
 
 public:
 	virtual HRESULT Initialize_Prototype();
@@ -35,7 +35,7 @@ public:
 
 	virtual HRESULT Initialize_Craete(MODEL_CREATE_DESC* pDesc);
 
-	virtual HRESULT Initialize_Load(MODEL_INFO* pDesc);
+	virtual HRESULT Initialize_Load(MAP_PART_INFO* pDesc);
 
 	virtual void Priority_Update(_float fTimeDelta);
 	virtual void Update(_float fTimeDelta);
@@ -64,6 +64,7 @@ private:
 private:
 	HRESULT Ready_Components();
 	HRESULT Ready_Transform(MODEL_CREATE_DESC* pDesc);
+	HRESULT Ready_Transform(MAP_PART_INFO* pDesc);
 	HRESULT Ready_Render_Resources();
 
 public:
