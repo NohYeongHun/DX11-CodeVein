@@ -4,23 +4,6 @@ CTool_Bone::CTool_Bone()
 {
 }
 
-void CTool_Bone::Update_CombinedTransformMatrix(const vector<CTool_Bone*>& Bones)
-{
-	// 부모 본의 인덱스가 -1이면, 즉 루트 본이면
-	if (m_iParentBoneIndex == -1)
-	{
-		// 결합된 변환 행렬은 현재 본의 변환 행렬과 동일합니다.
-		m_CombinedTransformationMatrix = m_TransformationMatrix;
-		return;
-	}
-
-	// 부모 본의 결합된 변환 행렬을 가져와서 현재 본의 변환 행렬과 곱합니다.
-	const CTool_Bone* pParentBone = Bones[m_iParentBoneIndex];
-	XMStoreFloat4x4(&m_CombinedTransformationMatrix,
-		XMLoadFloat4x4(&pParentBone->m_CombinedTransformationMatrix) *
-		XMLoadFloat4x4(&m_TransformationMatrix));
-}
-
 HRESULT CTool_Bone::Initialize(const aiNode* pAINode, _int iParentBoneIndex)
 {
     if (nullptr == pAINode)
@@ -44,6 +27,29 @@ HRESULT CTool_Bone::Initialize(const aiNode* pAINode, _int iParentBoneIndex)
     m_iParentBoneIndex = iParentBoneIndex;
 
     return S_OK;
+}
+
+void CTool_Bone::Update_CombinedTransformationMatrix(const _float4x4& PreTransformMatrix, const vector<CTool_Bone*>& Bones)
+{
+    // 부모 본의 인덱스가 -1이면, 즉 루트 본이면
+    if (m_iParentBoneIndex == -1)
+    {
+        // 결합된 변환 행렬은 현재 본의 변환 행렬과 동일합니다.
+        XMStoreFloat4x4(&m_CombinedTransformationMatrix, XMLoadFloat4x4(&PreTransformMatrix) * XMLoadFloat4x4(&m_TransformationMatrix));
+        return;
+    }
+
+    // 부모 본의 결합된 변환 행렬을 가져와서 현재 본의 변환 행렬과 곱합니다.
+    XMStoreFloat4x4(&m_CombinedTransformationMatrix,
+        XMLoadFloat4x4(&m_TransformationMatrix) * XMLoadFloat4x4(&Bones[m_iParentBoneIndex]->m_CombinedTransformationMatrix));
+}
+
+/* Bone 정보 저장. */
+void CTool_Bone::Save_Bones(BONE_INFO& BoneInfo)
+{
+    BoneInfo.iParentBoneIndex = m_iParentBoneIndex;
+    BoneInfo.TransformMatrix = m_TransformationMatrix;
+    BoneInfo.strName = m_szName;
 }
 
 CTool_Bone* CTool_Bone::Create(const aiNode* pAINode, _int iParentBoneIndex)

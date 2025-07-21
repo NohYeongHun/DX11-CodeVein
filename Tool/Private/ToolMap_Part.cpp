@@ -11,9 +11,18 @@ CToolMap_Part::CToolMap_Part(const CToolMap_Part& Prototype)
 }
 
 
-const MAP_PART_INFO& CToolMap_Part::Save_ModelInfo(_fmatrix PreTransformMatrix)
+const MAP_PART_INFO& CToolMap_Part::Save_NonAminModel(_fmatrix PreTransformMatrix)
 {
-    return m_pModelCom->Save_ModelInfo(PreTransformMatrix, m_strModelTag);
+    MODEL_INFO modelInfo = m_pModelCom->Save_NonAminModel(PreTransformMatrix, m_strModelTag);
+    
+
+    return {
+        modelInfo.strModelTag,
+        modelInfo.meshVectorSize,
+        modelInfo.meshVector,
+        modelInfo.materialVectorSize,
+        modelInfo.materialVector
+    };
 }
 
 HRESULT CToolMap_Part::Initialize_Prototype()

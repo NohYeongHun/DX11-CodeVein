@@ -246,22 +246,6 @@ _uint CGameInstance::Get_CurrentLevelID()
 
 #pragma region PROTOTYPE_MANAGER
 
-//void CGameInstance::Add_Prototype_To_List(list<_wstring>& outList, _uint iLevelIndex)
-//{
-//	if (nullptr == m_pPrototype_Manager)
-//		return;
-//
-//	m_pPrototype_Manager->Get_PrototypeName_List(outList, iLevelIndex);
-//}
-
-//void CGameInstance::Get_PrototypeName_List(list<_wstring>& outList, _uint iLevelIndex, const _tchar* pPrefix)
-//{
-//	if (nullptr == m_pPrototype_Manager)
-//		return;
-//
-//	m_pPrototype_Manager->Get_PrototypeName_List(outList, iLevelIndex, pPrefix);
-//}
-
 HRESULT CGameInstance::Add_Prototype(_uint iPrototypeLevelIndex, const _wstring& strPrototypeTag, CBase* pPrototype)
 {
 	if (nullptr == m_pPrototype_Manager)
@@ -276,6 +260,14 @@ CBase* CGameInstance::Clone_Prototype(PROTOTYPE ePrototype, _uint iPrototypeLeve
 		return nullptr;
 
 	return m_pPrototype_Manager->Clone_Prototype(ePrototype, iPrototypeLevelIndex, strPrototypeTag, pArg);	
+}
+
+CBase* CGameInstance::Get_Prototype(PROTOTYPE ePrototype, _uint iPrototpyeLevelIndex, const _wstring& strPrototypeTag)
+{
+	if (nullptr == m_pPrototype_Manager)
+		return nullptr;
+
+	return m_pPrototype_Manager->Get_Prototype(ePrototype, iPrototpyeLevelIndex, strPrototypeTag);
 }
 
 #pragma endregion

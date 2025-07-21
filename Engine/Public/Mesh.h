@@ -12,11 +12,11 @@ private:
 	virtual ~CMesh() = default;
 
 public:
-	const _uint Get_MaterialIndex() { return m_iMaterialIndex; }
-
-public:
 	virtual HRESULT Initialize_Prototype(MODELTYPE eModelType, const aiMesh* pAIMesh, const vector<class CBone*>& Bones, _fmatrix PreTransformMatrix);
 	virtual HRESULT Initialize_Clone(void* pArg) override;
+
+public:
+	const _uint Get_MaterialIndex() { return m_iMaterialIndex; }
 
 public:
 	HRESULT Bind_BoneMatrices(class CShader* pShader, const _char* pConstantName, const vector<class CBone*>& Bones);

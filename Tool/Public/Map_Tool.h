@@ -14,6 +14,13 @@ public:
 		RENDER_END
 	};
 
+	enum SAVEMODE
+	{
+		MAP_OBJECT = 0,
+		MODEL_COMPONENT = 1,
+		SAVE_END
+	};
+
 
 private:
 	explicit CMap_Tool(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -26,7 +33,7 @@ public:
 	void Change_SelectObject(class CGameObject* pSelectedObject);
 	void Update(_float fTimeDelta);
 	void Render();
-	void Render_MenuBar();
+	void Render_SaveLoad();
 	void Render_Debug_Window();
 	void Handle_SelectedObject();
 
@@ -55,6 +62,7 @@ public:
 public:
 	void Update_Picking(_uint iLayerLevelIndex, const _wstring& strLevelLayerTag);
 	void Transform_Render(const string& name, class CTransform* pTransform);
+		
 	//void Spawn_Object(const _wstring& prototypeTag, const _float3& position);
 #pragma endregion
 
@@ -99,7 +107,7 @@ private:
 	_float m_Interval = 1.f;
 	_float3 m_vInterval = {};
 
-
+	SAVEMODE m_eSaveMode = {};
 private:
 	class CGameInstance* m_pGameInstance = { nullptr };
 	class CCamera_Free* m_pCamera = { nullptr };

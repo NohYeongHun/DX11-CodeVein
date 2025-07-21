@@ -136,6 +136,18 @@
     <Filter Include="01. Utility\10. Picking">
       <UniqueIdentifier>{4ea7e238-aeaa-472b-bb6b-2c94047e5f1b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01. Utility\03. Component\LoadModel">
+      <UniqueIdentifier>{7c3fd026-7f66-442d-9bf3-3b6e4fb55dfc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\03. Component\LoadModel\Bone">
+      <UniqueIdentifier>{c6e01d73-66c9-4981-95ba-4a025f1366b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\03. Component\LoadModel\Material">
+      <UniqueIdentifier>{d700de62-5fa1-4da9-8517-fa36afe7e7be}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\03. Component\LoadModel\Mesh">
+      <UniqueIdentifier>{5a79b8f7-2ba7-43ff-8e1a-af77debd529e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Timer.cpp">
@@ -263,6 +275,18 @@
     </ClCompile>
     <ClCompile Include="..\Private\Picking.cpp">
       <Filter>01. Utility\10. Picking</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Load_Model.cpp">
+      <Filter>01. Utility\03. Component\LoadModel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Load_Bone.cpp">
+      <Filter>01. Utility\03. Component\LoadModel\Bone</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Load_Mesh.cpp">
+      <Filter>01. Utility\03. Component\LoadModel\Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Load_MeshMaterial.cpp">
+      <Filter>01. Utility\03. Component\LoadModel\Material</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -412,6 +436,24 @@
     </ClInclude>
     <ClInclude Include="..\Public\Picking.h">
       <Filter>01. Utility\10. Picking</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Load_Bone.h">
+      <Filter>01. Utility\03. Component\LoadModel\Bone</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Load_Model.h">
+      <Filter>01. Utility\03. Component\LoadModel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Load_Mesh.h">
+      <Filter>01. Utility\03. Component\LoadModel\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Load_MeshMaterial.h">
+      <Filter>01. Utility\03. Component\LoadModel\Material</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\LoadFile_Define.h">
+      <Filter>99 .Defines</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\SaveFile_Define.h">
+      <Filter>99 .Defines</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

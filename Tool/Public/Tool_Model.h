@@ -9,33 +9,53 @@ private:
 	explicit CTool_Model(const CTool_Model& Prototype);
 	virtual ~CTool_Model() = default;
 
+public:
+	virtual HRESULT Initialize_Prototype(MODELTYPE eModelType, _fmatrix PreTransformMatrix, const _char* pModelFilePath, const _char* pTextureFolderPath);
+	virtual HRESULT Initialize_Clone(void* pArg);
+	HRESULT Render(_uint iNumMesh);
 
 public:
 	_uint Get_NumMeshes() const {
 		return m_iNumMeshes;
 	}
 
+	MODELTYPE Get_ModelType() const {
+		return m_ModelType;
+	}
+
 	
 #pragma region 저장용 함수.
 public:
-	const MAP_PART_INFO& Save_ModelInfo(_fmatrix PreTransformMatrix, _wstring pModelTag);
+	const MODEL_INFO& Save_NonAminModel(_fmatrix PreTransformMatrix, _wstring pModelTag);
+	
+private:
+	HRESULT Save_NonAnimMeshes(_fmatrix PreTransformMatrix);
+	HRESULT Save_NonAnimMarterials();
+
+
+/* 애니메이션 */
+public:
+	void Save_AnimModel(ANIMMODEL_INFO& AnimModelInfo, _fmatrix PreTransformMatrix);
+
 
 private:
-	HRESULT Save_Meshes(_fmatrix PreTransformMatrix);
-	HRESULT Save_Marterials();
+	HRESULT Save_AnimMeshes(ANIMMODEL_INFO& AnimModelInfo, _fmatrix PreTransformMatrix);
+	HRESULT Save_AnimMaterials(ANIMMODEL_INFO& AnimModelInfo);
+	HRESULT Save_Bones(ANIMMODEL_INFO& AnimModelInfo);
+
 #pragma endregion
 
 public:
 	const _bool Is_Ray_Hit(const _float3& rayOrigin, const _float3& rayDir, _float* pOutDist);
 
 
-public:
-	virtual HRESULT Initialize_Prototype(MODELTYPE eModelType, _fmatrix PreTransformMatrix, const _char* pModelFilePath, const _char* pTextureFolderPath);
-	virtual HRESULT Initialize_Clone(void* pArg);
-	
+
+
 public:
 	HRESULT Bind_Materials(CShader* pShader, const _char* pConstantName, _uint iMeshIndex, aiTextureType eTextureType, _uint iTextureIndex);
-	HRESULT Render(_uint iNumMesh);
+	HRESULT Bind_BoneMatrices(class CShader* pShader, const _char* pConstantName, _uint iMeshIndex);
+	
+	void Play_Animation(_float fTimeDelta);
 
 
 
@@ -63,7 +83,8 @@ private:
 	vector<class CTool_Bone*> m_Bones;
 
 private:
-	MAP_PART_INFO m_ModelInfo = {};
+	MODEL_INFO m_NonAnimModelInfo = {};
+
 	string m_ModelDir = {};
 
 
@@ -73,10 +94,8 @@ private:
 	HRESULT Ready_Bones(const aiNode* pAiNode, _int iParentBoneIndex);
 
 
-
-
-
 public:
+	
 	static CTool_Model* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, MODELTYPE eModelType, _fmatrix PreTransformMatrix, const _char* pModelFilePath, const _char* pTextureFolderPath);
 	virtual CComponent* Clone(void* pArg) override;
 	virtual void Free() override;

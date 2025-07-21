@@ -8,11 +8,11 @@ HRESULT CLoader_GamePlay::Loading_Resource(ID3D11Device* pDevice, ID3D11DeviceCo
 		return E_FAIL;
 	}
 
-	//if (FAILED(Add_Prototype_Map(pDevice, pContext, pGameInstance)))
-	//{
-	//	MSG_BOX(TEXT("Create Failed Loading : GamePlay Map "));
-	//	return E_FAIL;
-	//}
+	/*if (FAILED(Add_Prototype_Map(pDevice, pContext, pGameInstance)))
+	{
+		MSG_BOX(TEXT("Create Failed Loading : GamePlay Map "));
+		return E_FAIL;
+	}*/
 
 
 	if (FAILED(Add_Prototype_Camera_Free(pDevice, pContext, pGameInstance)))

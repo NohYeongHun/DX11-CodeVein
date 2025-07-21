@@ -32,6 +32,7 @@ public:
 	void Get_PrototypeName_List(list<_wstring>& outList, _uint iLevelIndex, const _tchar* pPrefix);
 	HRESULT Add_Prototype(_uint iPrototypeLevelIndex, const _wstring& strPrototypeTag, class CBase* pPrototype);
 	class CBase* Clone_Prototype(PROTOTYPE ePrototype, _uint iPrototypeLevelIndex, const _wstring& strPrototypeTag, void* pArg);
+	class CBase* Get_Prototype(PROTOTYPE ePrototype, _uint iPrototypeLevelIndex, const _wstring& strPrototypeTag);
 	void Clear(_uint iLevelIndex);
 #pragma endregion
 

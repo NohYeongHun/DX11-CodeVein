@@ -116,6 +116,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>EnginePch.h</PrecompiledHeaderFile>
       <ForcedIncludeFiles>EnginePch.h</ForcedIncludeFiles>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -141,6 +142,7 @@ call copy.bat</Command>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>EnginePch.h</PrecompiledHeaderFile>
       <ForcedIncludeFiles>EnginePch.h</ForcedIncludeFiles>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -197,6 +199,10 @@ call copy.bat</Command>
     <ClCompile Include="..\Private\Texture_Manager.cpp" />
     <ClCompile Include="..\Private\Timer.cpp" />
     <ClCompile Include="..\Private\Timer_Manager.cpp" />
+    <ClCompile Include="..\Private\Load_Bone.cpp" />
+    <ClCompile Include="..\Private\Load_Mesh.cpp" />
+    <ClCompile Include="..\Private\Load_MeshMaterial.cpp" />
+    <ClCompile Include="..\Private\Load_Model.cpp" />
     <ClCompile Include="..\private\Transform.cpp" />
     <ClCompile Include="..\private\UIObject.cpp" />
     <ClCompile Include="..\private\VIBuffer.cpp" />
@@ -235,6 +241,7 @@ call copy.bat</Command>
     <ClInclude Include="..\Public\Level_Manager.h" />
     <ClInclude Include="..\Public\Light.h" />
     <ClInclude Include="..\Public\Light_Manager.h" />
+    <ClInclude Include="..\Public\LoadFile_Define.h" />
     <ClInclude Include="..\Public\Mesh.h" />
     <ClInclude Include="..\Public\MeshMaterial.h" />
     <ClInclude Include="..\Public\Model.h" />
@@ -243,11 +250,16 @@ call copy.bat</Command>
     <ClInclude Include="..\Public\PipeLine.h" />
     <ClInclude Include="..\Public\Prototype_Manager.h" />
     <ClInclude Include="..\Public\Renderer.h" />
+    <ClInclude Include="..\Public\SaveFile_Define.h" />
     <ClInclude Include="..\public\Shader.h" />
     <ClInclude Include="..\Public\Texture.h" />
     <ClInclude Include="..\Public\Texture_Manager.h" />
     <ClInclude Include="..\Public\Timer.h" />
     <ClInclude Include="..\Public\Timer_Manager.h" />
+    <ClInclude Include="..\Public\Load_Bone.h" />
+    <ClInclude Include="..\Public\Load_Mesh.h" />
+    <ClInclude Include="..\Public\Load_MeshMaterial.h" />
+    <ClInclude Include="..\Public\Load_Model.h" />
     <ClInclude Include="..\public\Transform.h" />
     <ClInclude Include="..\public\UIObject.h" />
     <ClInclude Include="..\public\VIBuffer.h" />

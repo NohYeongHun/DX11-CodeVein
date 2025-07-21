@@ -103,17 +103,14 @@ HRESULT CPlayer::Render()
         m_pModelCom->Bind_Materials(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE, 0);
         
         if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
-        {
-            MSG_BOX(TEXT("Bind_Bone Failed Player"));
-            return E_FAIL;
-        }
+            CRASH()
             
 
         if (FAILED(m_pShaderCom->Begin(0)))
-            return E_FAIL;
+            CRASH()
 
         if (FAILED(m_pModelCom->Render(i)))
-            return E_FAIL;
+            CRASH()
     }
     
 

@@ -28,6 +28,7 @@
 using namespace DirectX;
 
 
+
 #include <memory>
 #include <vector>
 #include <list>
@@ -62,6 +63,88 @@ namespace Engine
 #include "Engine_Macro.h"
 #include "Engine_Struct.h"
 #include "Engine_Function.h"
+
+#include "SaveFile_Define.h"
+//#include "LoadFile_Define.h"
+
+
+#define CRASH(cause)                  \
+{                                 \
+uint32_t* crash = nullptr;            \
+__analysis_assume(crash != nullptr);   \
+*crash = 0xDEADBEEF;               \
+}
+
+#define ASSERT_CRASH(expr)         \
+{                           \
+if (!(expr))               \
+{                        \
+CRASH("ASSERT_CRASH");      \
+__analysis_assume(expr);   \
+}                        \
+}
+
+
+#pragma region 헬퍼 함수.
+
+static void WriteWString(std::ofstream& ofs, const std::wstring& ws)
+{
+    uint32_t len = static_cast<uint32_t>(ws.size());
+    ofs.write(reinterpret_cast<const char*>(&len), sizeof(uint32_t));
+    if (len > 0)
+        ofs.write(reinterpret_cast<const char*>(ws.data()), len * sizeof(wchar_t));
+}
+
+static void WriteString(std::ofstream& ofs, const std::string& st)
+{
+    uint32_t len = static_cast<uint32_t>(st.size());
+    ofs.write(reinterpret_cast<const char*>(&len), sizeof(uint32_t));
+    if (len > 0)
+        ofs.write(st.c_str(), len * sizeof(char));
+}
+
+static inline bool ReadBytes(std::ifstream& ifs, void* dst, size_t bytes)
+{
+    ifs.read(reinterpret_cast<char*>(dst), bytes);
+    return !!ifs;
+}
+
+static inline wstring ReadWString(std::ifstream& ifs)
+{
+    uint32_t len = 0;
+    if (!ReadBytes(ifs, &len, sizeof(uint32_t)))
+        return {};
+
+    std::wstring out;
+    if (len > 0)
+    {
+        out.resize(len);
+        if (!ReadBytes(ifs, &out[0], sizeof(wchar_t) * len))
+            out.clear();
+    }
+    return out;
+}
+
+static inline string ReadString(std::ifstream& ifs)
+{
+    uint32_t len = 0;
+    if (!ReadBytes(ifs, &len, sizeof(uint32_t)))
+        return {};
+
+    std::string out;
+    if (len > 0)
+    {
+        out.resize(len);
+        if (!ReadBytes(ifs, out.data(), sizeof(char) * len))
+        {
+            out.clear();
+        }
+    }
+
+    return out;
+}
+
+#pragma endregion
 
 
 #ifdef _DEBUG

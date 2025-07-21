@@ -67,6 +67,9 @@
     <Filter Include="01. Level\01. Logo\00. Tool">
       <UniqueIdentifier>{e74a81c5-0205-49b3-ac94-5f9794d8e86d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="03. Component\LoadModel">
+      <UniqueIdentifier>{6e423eeb-cb0c-4be5-9ae0-78587c11b464}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -168,14 +171,14 @@
     <ClInclude Include="..\Public\PrototypeName.h">
       <Filter>98. Define</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\SaveFile_Loader.h">
-      <Filter>98. Define</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\SaveFile_Define.h">
       <Filter>98. Define</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Map_Part.h">
       <Filter>02. GameObject\Map\Parts</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\SaveFile_Loader.h">
+      <Filter>01. Level\01. Logo\00. Tool</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -262,11 +265,11 @@
     <ClCompile Include="..\Private\PrototypeName.cpp">
       <Filter>98. Define</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\SaveFile_Loader.cpp">
-      <Filter>98. Define</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\Map_Part.cpp">
       <Filter>02. GameObject\Map\Parts</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\SaveFile_Loader.cpp">
+      <Filter>01. Level\01. Logo\00. Tool</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

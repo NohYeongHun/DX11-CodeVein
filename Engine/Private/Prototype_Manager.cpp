@@ -50,9 +50,10 @@ HRESULT CPrototype_Manager::Initialize(_uint iNumLevels)
 	return S_OK;
 }
 
+#pragma region ENGINE에 제공
 HRESULT CPrototype_Manager::Add_Prototype(_uint iPrototpyeLevelIndex, const _wstring& strPrototypeTag, CBase* pPrototype)
 {
-	if (nullptr == m_pPrototypes || 
+	if (nullptr == m_pPrototypes ||
 		m_iNumLevels <= iPrototpyeLevelIndex ||
 		nullptr != Find_Prototype(iPrototpyeLevelIndex, strPrototypeTag))
 		return E_FAIL;
@@ -81,6 +82,16 @@ CBase* CPrototype_Manager::Clone_Prototype(PROTOTYPE ePrototype, _uint iPrototyp
 
 	return pGameObject;
 }
+
+CBase* CPrototype_Manager::Get_Prototype(PROTOTYPE ePrototype, _uint iPrototypeLevelIndex, const _wstring& strPrototypeTag)
+{
+	return Find_Prototype(iPrototypeLevelIndex, strPrototypeTag);
+}
+
+#pragma endregion
+
+
+
 
 void CPrototype_Manager::Clear(_uint iLevelIndex)
 {

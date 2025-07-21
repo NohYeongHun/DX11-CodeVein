@@ -165,6 +165,11 @@ HRESULT CMainApp::Ready_Prototype_ForModel()
 		, CModel::Create(m_pDevice, m_pContext, MODELTYPE::ANIM ,PreTransformMatrix,  "../Bin/Resources/Models/Player/Player.fbx"))))
 		return E_FAIL;
 
+	/*if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
+		, TEXT("Prototype_Component_Model_Player")
+		, CModel::Create(m_pDevice, m_pContext, MODELTYPE::ANIM, PreTransformMatrix, "../Bin/Resources/Models/Player/Chest/Treasure_Chest.fbx"))))
+		return E_FAIL;*/
+
 	
 
 	return S_OK;

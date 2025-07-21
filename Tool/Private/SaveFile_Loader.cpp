@@ -12,7 +12,7 @@ HRESULT CSaveFile_Loader::Initialize()
 }
 
 // Transform 정보도 추가해야됨 나중에.
-void CSaveFile_Loader::Save_File(string filePath)
+void CSaveFile_Loader::Save_MapFile(string filePath)
 {
 	// 1. 파일 경로 열기.
 	std::ofstream ofs(filePath, std::ios::binary);
@@ -50,7 +50,7 @@ void CSaveFile_Loader::Save_File(string filePath)
 		{
 			CToolMap_Part* pMapPart = dynamic_cast<CToolMap_Part*>(pGameObject);
 			_matrix PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f);
-			MAP_PART_INFO Model_Info = pMapPart->Save_ModelInfo(PreTransformMatrix);
+			MAP_PART_INFO Model_Info = pMapPart->Save_NonAminModel(PreTransformMatrix); // Model 정보 채워넣기.
 
 			/* ----------- WString ModelTag ------------ */
 			WriteWString(ofs, Model_Info.strModelTag);   // ★ 모델 태그 먼저 기록
@@ -103,7 +103,7 @@ void CSaveFile_Loader::Save_File(string filePath)
 	ofs.close();
 }
 
-void CSaveFile_Loader::Load_File(string filePath, LEVEL eLevel)
+void CSaveFile_Loader::Load_MapFile(string filePath, LEVEL eLevel)
 {
 	std::ifstream ifs(filePath, std::ios::binary);
 	if (!ifs.is_open())
@@ -134,7 +134,7 @@ void CSaveFile_Loader::Load_File(string filePath, LEVEL eLevel)
 			Desc.eArgType = CToolMap_Part::ARG_TYPE::MODEL_LOAD;
 			
 			MAP_PART_INFO modelInfo{};
-			if (!Read_ModelInfo(ifs, modelInfo))
+			if (!Read_MapInfo(ifs, modelInfo))
 				return;
 
 			Desc.pData = reinterpret_cast<void*>(&modelInfo);
@@ -156,7 +156,166 @@ void CSaveFile_Loader::Load_File(string filePath, LEVEL eLevel)
 
 }
 
-bool CSaveFile_Loader::Read_ModelInfo(std::ifstream& ifs, MAP_PART_INFO& outModel)
+/* 모델을 로드 해서 프로토타입에 추가합니다. */
+void CSaveFile_Loader::Save_ModelFile(string filePath, const _wstring& strPrototypeTag)
+{
+	// 1. 파일 경로 열기.
+	std::ofstream ofs(filePath, std::ios::binary);
+
+	if (!ofs.is_open())
+		return;
+
+	struct PrototypeInfo {
+		const wchar_t* PrototypeName;
+		const std::type_info& typeInfo;
+	};
+
+	
+	PrototypeInfo ePrototypeInfo = {
+		strPrototypeTag.c_str(), typeid(CTool_Model)};
+
+	// 2. 현재 프로토타입 모델 가져오기.
+	CTool_Model* pModel = dynamic_cast<CTool_Model*>(m_pGameInstance->Get_Prototype(PROTOTYPE::COMPONENT
+		, ENUM_CLASS(m_eCurLevel), strPrototypeTag));
+
+	if (nullptr == pModel)
+	{
+		MSG_BOX(TEXT("Failed Get Prototype Save Model File"));
+		return;
+	}
+
+
+	switch (pModel->Get_ModelType())
+	{
+	case MODELTYPE::ANIM:
+		Save_AnimModel(ofs, pModel, strPrototypeTag);
+		break;
+
+	case MODELTYPE::NONANIM:
+		Save_NonAnimModel(ofs, pModel, strPrototypeTag);
+		break;
+	}
+	
+	
+
+	ofs.close();
+}
+
+void CSaveFile_Loader::Save_AnimModel(std::ofstream& ofs, CTool_Model* pModel, const _wstring& strModelTag)
+{
+	if (nullptr == pModel)
+		CRASH();
+
+	ANIMMODEL_INFO animModelInfo = {};
+	// Model Tag는 선택된 Prototype Tag로 저장됩니다.
+	animModelInfo.strModelTag = strModelTag; 
+
+	_matrix		PreTransformMatrix = XMMatrixIdentity();
+	
+	// 1. ANIMMODEL_INFO를 채웁니다.
+	pModel->Save_AnimModel(animModelInfo, PreTransformMatrix);
+
+	// 2. 채워진 값을 이용해서 .dat 파일을 씁니다.
+	/* ----------- WString ModelTag ------------ */
+	WriteWString(ofs, animModelInfo.strModelTag);   // ★ 모델 태그 먼저 기록
+
+	/* ---------- Mesh ---------- */
+	// 1. meshVector size
+	ofs.write(reinterpret_cast<const char*>(&animModelInfo.meshVectorSize), sizeof(uint32_t));
+
+
+	// - vector 순회.
+	for (const ANIMMESH_INFO& mesh : animModelInfo.meshVector)
+	{
+		ofs.write(reinterpret_cast<const char*>(&mesh.iMarterialIndex), sizeof(uint32_t));
+		ofs.write(reinterpret_cast<const char*>(&mesh.iVertexCount), sizeof(uint32_t));
+		ofs.write(reinterpret_cast<const char*>(&mesh.iIndicesCount), sizeof(uint32_t));
+		ofs.write(reinterpret_cast<const char*>(&mesh.iBoneCount), sizeof(uint32_t));
+		
+		WriteString(ofs, mesh.strName);
+
+		// vertex 저장
+		ofs.write(reinterpret_cast<const char*>(mesh.vertices.data()),
+			mesh.iVertexCount * sizeof(VTXANIMMESH));
+
+		// index 저장
+		ofs.write(reinterpret_cast<const char*>(mesh.indices.data()),
+			mesh.iIndicesCount * sizeof(uint32_t));
+
+		// bone 저장
+		ofs.write(reinterpret_cast<const char*>(&mesh.BoneIndexVectorSize), sizeof(uint32_t));
+		ofs.write(reinterpret_cast<const char*>(mesh.Boneindices.data()),
+			mesh.BoneIndexVectorSize * sizeof(_int));
+
+		// Offset Matrix
+		ofs.write(reinterpret_cast<const char*>(&mesh.OffSetVectorSize), sizeof(uint32_t));
+		ofs.write(reinterpret_cast<const char*>(mesh.OffsetMatrices.data()),
+			mesh.OffSetVectorSize * sizeof(_float4x4));
+	}
+
+	/* ---------- Material ---------- */
+	ofs.write(reinterpret_cast<const char*>(&animModelInfo.materialVectorSize), sizeof(uint32_t));
+	for (const MATERIAL_INFO& material : animModelInfo.materialVector)
+	{
+		ofs.write(reinterpret_cast<const char*>(&material.materialPathVectorSize), sizeof(uint32_t));
+
+		for (const std::wstring& texPath : material.materialPathVector)
+			WriteWString(ofs, texPath);   // 길이+바이트 순으로
+	}
+
+	/* ---------- Bone ---------- */
+	ofs.write(reinterpret_cast<const char*>(&animModelInfo.boneVectorSize), sizeof(uint32_t));
+	for (const BONE_INFO& bone : animModelInfo.boneVector)
+	{
+		ofs.write(reinterpret_cast<const char*>(&bone.iParentBoneIndex), sizeof(_int));
+		WriteString(ofs, bone.strName);
+		ofs.write(reinterpret_cast<const char*>(&bone.TransformMatrix), sizeof(_float4x4));
+	}
+
+}
+
+// 기존거 Prototype Load 되는지부터 확인
+void CSaveFile_Loader::Save_NonAnimModel(std::ofstream& ofs, CTool_Model* pModel, const _wstring& strModelTag)
+{
+	_matrix PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f);
+	MODEL_INFO nonAnimModelInfo = {};
+
+	nonAnimModelInfo = pModel->Save_NonAminModel(PreTransformMatrix, strModelTag);
+}
+
+void CSaveFile_Loader::Load_ModelFile(string filePath, LEVEL eLevel)
+{
+	std::ifstream ifs(filePath, std::ios::binary);
+	if (!ifs.is_open())
+		return;
+
+
+	struct PrototypeInfo {
+		const wchar_t* PrototypeName;
+		const std::type_info& typeInfo;
+	};
+
+	const PrototypeInfo Prototypes[] = {
+		{L"Prototype_Component_Model_PlayerLoad", typeid(CTool_Model)}
+	};
+
+	_matrix PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f);
+	
+	// Model Component를 현재 레벨에 추가.
+
+	//PrototypeInfo ePrototypeInfo = { strPrototypeTag.c_str(), typeid(CTool_Model) };
+
+	ifs.close();
+}
+
+void CSaveFile_Loader::Load_AnimModel(std::ifstream& ifs, CTool_Model* pModel, const _wstring& strModelTag)
+{
+
+}
+
+
+
+bool CSaveFile_Loader::Read_MapInfo(std::ifstream& ifs, MAP_PART_INFO& outModel)
 {
 	
 	/* ---------- ModelTag ---------- */

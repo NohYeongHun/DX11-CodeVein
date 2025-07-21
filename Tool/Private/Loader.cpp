@@ -109,6 +109,18 @@ HRESULT CLoader::Loading_For_Logo_Level()
 
 #pragma endregion
 
+#pragma region PLAYER
+	/* Prototype_Component_Model */
+	/*PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
+		, TEXT("Prototype_Component_Model_Player")
+		, CTool_Model::Create(m_pDevice, m_pContext, MODELTYPE::ANIM, PreTransformMatrix, "../Bin/Resources/Models/Player/Player.fbx", ))))
+		return E_FAIL;*/
+
+#pragma endregion
+
+
 
 #pragma region MAP PART
 // Map Prototype 생성.
@@ -119,7 +131,7 @@ HRESULT CLoader::Loading_For_Logo_Level()
 		if (FAILED(m_pGameInstance->Add_Prototype(
 			ENUM_CLASS(LEVEL::LOGO)
 			, Model_Prototypes[i].prototypeName
-			,CTool_Model::Create(m_pDevice, m_pContext, MODELTYPE::NONANIM, PreTransformMatrix, Model_Prototypes[i].modelPath, Model_Prototypes[i].texturePath))))
+			,CTool_Model::Create(m_pDevice, m_pContext, Model_Prototypes[i].eModelType, PreTransformMatrix, Model_Prototypes[i].modelPath, Model_Prototypes[i].texturePath))))
 			return E_FAIL;
 	}
 

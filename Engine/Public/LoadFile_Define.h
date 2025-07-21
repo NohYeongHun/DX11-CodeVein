@@ -1,42 +1,38 @@
 ﻿#pragma once
-// 1. Layer에서 첫번째 객체만 저장하고 불러와보기.
 
+NS_BEGIN(Engine)
 // 한 메시가 들고있는 정보.
-typedef struct MeshInfoHeader {
+typedef struct LoadMeshInfoHeader {
     uint32_t iMarterialIndex;
     uint32_t iVertexCount;
     uint32_t iIndicesCount;
     vector<VTXMESH> vertices;
     vector<uint32_t> indices;
-}MESH_INFO;
+}LOAD_MESH_INFO;
 
 // 한 머테리얼이 들고 있는 정보.
-typedef struct MarterialHeader {
+typedef struct LoadMarterialHeader {
     uint32_t materialPathVectorSize;
     vector<_wstring> materialPathVector;
-}MATERIAL_INFO;
+}LOAD_MATERIAL_INFO;
 
 
 //_float3 vRotation{};    // Euler deg or rad — 툴에서 쓰는 형식
-typedef struct TransformHeader {
+typedef struct LoadTransformHeader {
     _float4 vPosition{};    // (x,y,z)
     _float3 vScale{ 1.f,1.f,1.f };
-}TRANSFORM_INFO;
+}LOAD_TRANSFORM_INFO;
 
 
 // 모델이 들고 있는 정보.
-typedef struct MapPartHeader
+typedef struct LoadModelHeader
 {
     _wstring strModelTag;
     uint32_t meshVectorSize;
-    vector<MESH_INFO> meshVector;
-    
+    vector<LOAD_MESH_INFO> meshVector;
+
     uint32_t materialVectorSize;
-    vector<MATERIAL_INFO> materialVector;
+    vector<LOAD_MATERIAL_INFO> materialVector;
+}LOAD_MODEL_INFO;
 
-    TRANSFORM_INFO transformInfo;
-}MAP_PART_INFO;
-
-// 여러 모델들을 들고 있는 바이너리 파일.
-
-
+NS_END

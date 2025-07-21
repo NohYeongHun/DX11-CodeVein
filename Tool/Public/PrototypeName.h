@@ -4,6 +4,7 @@ NS_BEGIN(Tool)
 
 typedef struct ModelDesc
 {
+	MODELTYPE eModelType;
 	const _tchar* prototypeName;
 	const _char* modelPath;
 	const _char* texturePath;

@@ -56,10 +56,10 @@ public:
 
 #pragma region PROTOTYPE_MANAGER
 public:
-	/*void Add_Prototype_To_List(list<)*/
-	//void Get_PrototypeName_List(list<_wstring>& outList, _uint iLevelIndex);
 	HRESULT Add_Prototype(_uint iPrototpyeLevelIndex, const _wstring& strPrototypeTag, class CBase* pPrototype);
 	class CBase* Clone_Prototype(PROTOTYPE ePrototype, _uint iPrototpyeLevelIndex, const _wstring& strPrototypeTag, void* pArg = nullptr);
+	class CBase* Get_Prototype(PROTOTYPE ePrototype, _uint iPrototpyeLevelIndex, const _wstring& strPrototypeTag);
+	
 #pragma endregion
 
 #pragma region OBJECT_MANAGER

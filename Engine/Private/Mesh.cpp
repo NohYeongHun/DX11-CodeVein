@@ -58,7 +58,6 @@ HRESULT CMesh::Initialize_Prototype(MODELTYPE eModelType, const aiMesh* pAIMesh,
 		return E_FAIL;
 
 	Safe_Delete_Array(pIndices);
-
 	return S_OK;
 }
 
@@ -247,7 +246,7 @@ HRESULT CMesh::Ready_Vertices_For_Anim(const aiMesh* pAIMesh, const vector<CBone
 
 		_uint iBoneIndex = { 0 };
 
-		auto iter = find_if(Bones.begin(), Bones.end(), [&](CBone* pBone) {
+		auto iter = find_if(Bones.begin(), Bones.end(), [&](CBone* pBone)->_bool {
 			if (true == pBone->Compare_Name(m_szName))
 				return true;
 

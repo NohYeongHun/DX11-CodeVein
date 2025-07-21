@@ -74,15 +74,15 @@ void CMap_Tool::Render()
     else
         Render_Model_Edit();
 
-    // MenuBar 렌더링.
-    Render_MenuBar();
+    // Render_SaveLoad 렌더링.
+    Render_SaveLoad();
 
     // 디버그 정보는 항상 렌더링
     Render_Debug_Window();
 
 }
 
-void CMap_Tool::Render_MenuBar()
+void CMap_Tool::Render_SaveLoad()
 {
     if (!m_IsPossible_SaveLoad)
         return;
@@ -120,7 +120,12 @@ void CMap_Tool::Render_MenuBar()
     if (ImGuiFileDialog::Instance()->Display("ChooseFileDlgKey")) {
         if (ImGuiFileDialog::Instance()->IsOk()) {
             std::string load_path = ImGuiFileDialog::Instance()->GetFilePathName();
-            m_pSaveFile_Loader->Load_File(load_path, m_eCurLevel);
+
+            /* Save 타입에 따라 저장 방식이 달라집니다. */
+            if (m_eSaveMode == SAVEMODE::MAP_OBJECT)
+                m_pSaveFile_Loader->Load_MapFile(load_path, m_eCurLevel);
+            else if (m_eSaveMode == SAVEMODE::MODEL_COMPONENT)
+                m_pSaveFile_Loader->Load_ModelFile(load_path, m_eCurLevel);
         }
         ImGuiFileDialog::Instance()->Close();
     }
@@ -131,7 +136,11 @@ void CMap_Tool::Render_MenuBar()
         if (ImGuiFileDialog::Instance()->IsOk())
         {
             std::string save_path = ImGuiFileDialog::Instance()->GetFilePathName();
-            m_pSaveFile_Loader->Save_File(save_path);
+
+            if (m_eSaveMode == SAVEMODE::MAP_OBJECT)
+                m_pSaveFile_Loader->Save_MapFile(save_path);
+            else if (m_eSaveMode == SAVEMODE::MODEL_COMPONENT)
+                m_pSaveFile_Loader->Save_ModelFile(save_path, m_wSelected_PrototypeModelTag);
         }
         ImGuiFileDialog::Instance()->Close();
     }
@@ -167,11 +176,19 @@ void CMap_Tool::Render_Debug_Window()
     const char* modeStr = (m_eToolMode == TOOLMODE::CREATE) ? "CREATE" : "EDIT";
     ImGui::Text("Tool Mode: %s", modeStr);
     ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
-
+    ImGui::Text("Select Model : %s", m_Selected_PrototypeModelTag.c_str());
     // 체크박스 추가 - 피킹 가능 여부
     ImGui::Checkbox("Enable Picking", &m_IsPossible_Picking);
     // 체크박스 추가 - 파일 Load Save 여부
     ImGui::Checkbox("Enable SaveLoad", &m_IsPossible_SaveLoad);
+    
+    const char* items[] = { "Map", "Model" };
+
+    // enum -> int
+    int iCurMode = static_cast<int>(m_eSaveMode);
+    ImGui::Combo("Save Type", static_cast<int*>(&iCurMode), items, IM_ARRAYSIZE(items));
+        m_eSaveMode = static_cast<SAVEMODE>(iCurMode); // int → enum
+    
 
     ImGui::End();
 }
@@ -282,6 +299,8 @@ void CMap_Tool::Render_Prototype_Inspector(ImVec2 vPos)
                 return;
             }
         }
+
+
     }
     else if (m_IsPicking_Create)
     {
@@ -310,11 +329,12 @@ void CMap_Tool::Register_Prototype_Hierarchy(_uint iPrototypeLevelIndex, const _
     string strObject = szFullPath;
 
 
+    // 전역 변수로 저장해둠.
     for (_uint i = 0; i < Model_PrototypeSize; ++i)
         outList.push_back(Model_Prototypes[i].prototypeName);
     
 
-    for (auto& modelName : outList)
+     for (auto& modelName : outList)
     {
         _char szModelName[MAX_PATH] = {};
         WideCharToMultiByte(CP_ACP, 0, modelName.c_str(), -1, szModelName, MAX_PATH, nullptr, nullptr);
@@ -364,7 +384,7 @@ void CMap_Tool::Render_Model_Edit()
     if (m_IsPossible_SaveLoad)
         return;
 
-    Render_Edit_Hierarchy();
+    //Render_Edit_Hierarchy();
 }
 
 /*

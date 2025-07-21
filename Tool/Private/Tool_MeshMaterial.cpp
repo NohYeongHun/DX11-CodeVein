@@ -1,4 +1,5 @@
 ﻿#include "MeshMaterial.h"
+#include "Tool_MeshMaterial.h"
 
 CTool_MeshMaterial::CTool_MeshMaterial(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: m_pDevice {pDevice}
@@ -44,6 +45,55 @@ HRESULT CTool_MeshMaterial::Bind_Resources(CShader* pShader, const _char* pConst
 		return E_FAIL;
 
 	return pShader->Bind_SRV(pConstantName, m_SRVs[eTextureType][iTextureIndex]);
+}
+
+void CTool_MeshMaterial::Save_Materials(const _char* modelDir, const aiMaterial* pAIMaterial, MATERIAL_INFO& materialInfo)
+{
+	_char			szModelDir[MAX_PATH] = {};
+	_splitpath_s(modelDir, nullptr, 0, szModelDir, MAX_PATH, nullptr, 0, nullptr, 0);
+
+	materialInfo.materialPathVectorSize = AI_TEXTURE_TYPE_MAX;
+
+	// AIScene에서 만든 Material
+	
+	// Material 정보를 담을 벡터.
+	vector<_wstring>& pathVector = materialInfo.materialPathVector;
+	pathVector.resize(AI_TEXTURE_TYPE_MAX);
+
+	for (_uint i = 1; i < AI_TEXTURE_TYPE_MAX; i++)
+	{
+		aiTextureType textureType = static_cast<aiTextureType>(i);
+		_uint iNumtextures = pAIMaterial->GetTextureCount(textureType);
+
+		aiString strTexturePath;
+
+		if (iNumtextures == 0)
+			continue;
+
+		// TextureType DIFFUSE, AMBIENT 등등..
+		if (FAILED(pAIMaterial->GetTexture(textureType, 0, &strTexturePath)))
+			break;
+
+		_char			szFullPath[MAX_PATH] = {};
+		_char			szDrive[MAX_PATH] = {};
+		_char			szDir[MAX_PATH] = {};
+		_char			szFileName[MAX_PATH] = {};
+		_char			szExt[MAX_PATH] = {};
+
+		_splitpath_s(strTexturePath.data, nullptr, 0, szDir, MAX_PATH, szFileName, MAX_PATH, szExt, MAX_PATH);
+		// 총 필요한 경로. ModelPath도 필요함.
+
+		strcpy_s(szFullPath, szDrive);
+		strcat_s(szFullPath, szModelDir);
+		strcat_s(szFullPath, szDir);
+		strcat_s(szFullPath, szFileName);
+		strcat_s(szFullPath, szExt);
+
+		_tchar			szTextureFilePath[MAX_PATH] = {};
+		MultiByteToWideChar(CP_ACP, 0, szFullPath, strlen(szFullPath), szTextureFilePath, MAX_PATH);
+
+		pathVector[i] = szTextureFilePath;
+	}
 }
 
 HRESULT CTool_MeshMaterial::Initialize_FBX(const _char* pModelFilePath, const aiMaterial* pAIMaterial, string strDirPath)
@@ -101,10 +151,6 @@ HRESULT CTool_MeshMaterial::Initialize_FBX(const _char* pModelFilePath, const ai
 
 			if (FAILED(hr))
 				return E_FAIL;
-
-
-			//texPath = L"Material Name (" + to_wstring(iNum) + L") " + texPath;
-			//MSG_BOX(texPath.c_str());
 
 			m_SRVs[i].emplace_back(pSRV);
 		}

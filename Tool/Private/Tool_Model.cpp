@@ -27,38 +27,79 @@ CTool_Model::CTool_Model(const CTool_Model& Prototype)
 		Safe_AddRef(bone);
 }
 
-const MAP_PART_INFO& CTool_Model::Save_ModelInfo(_fmatrix PreTransformMatrix, _wstring strModelTag)
+HRESULT CTool_Model::Initialize_Prototype(MODELTYPE eModelType, _fmatrix PreTransformMatrix, const _char* pModelFilePath, const _char* pTextureFolderPath)
 {
-	m_ModelInfo.strModelTag = strModelTag;
-	m_ModelInfo.meshVectorSize = m_pAIScene->mNumMeshes;
-	m_ModelInfo.meshVector.resize(m_pAIScene->mNumMeshes);
-	m_ModelInfo.materialVectorSize = m_pAIScene->mNumMaterials;
-	m_ModelInfo.materialVector.resize(m_pAIScene->mNumMaterials);
-	
 
-	// 공간 할당.
-	if (FAILED(Save_Meshes(PreTransformMatrix)))
-	{
-		MSG_BOX(TEXT("Mesh Save Failed"));
-		return m_ModelInfo;
-	}
+	_uint iFlag = { aiProcess_ConvertToLeftHanded | aiProcessPreset_TargetRealtime_Fast };
 
-	if (FAILED(Save_Marterials()))
-	{
-		MSG_BOX(TEXT("Material Save Failed"));
-		return m_ModelInfo;
-	}
+	m_ModelType = eModelType;
 
-	return m_ModelInfo;
+	if (MODELTYPE::NONANIM == eModelType)
+		iFlag |= aiProcess_PreTransformVertices; // Animation 사용하지 않는 경우.
+
+	m_pAIScene = m_Importer.ReadFile(pModelFilePath, iFlag);
+	if (nullptr == m_pAIScene)
+		return E_FAIL;
+
+	XMStoreFloat4x4(&m_PreTransformMatrix, PreTransformMatrix);
+
+	m_ModelDir = pModelFilePath;
+	std::replace(m_ModelDir.begin(), m_ModelDir.end(), '/', '\\');
+
+	if (FAILED(Ready_Bones(m_pAIScene->mRootNode, -1)))
+		CRASH()
+
+	if (FAILED(Ready_Meshes(PreTransformMatrix)))
+		CRASH()
+
+	if (FAILED(Ready_Materials(pModelFilePath, pTextureFolderPath)))
+		CRASH()
+
+
+
+	return S_OK;
 }
 
-HRESULT CTool_Model::Save_Meshes(_fmatrix PreTransformMatrix)
+HRESULT CTool_Model::Initialize_Clone(void* pArg)
+{
+	return S_OK;
+}
+
+
+#pragma region NONANIM MODEL
+const MODEL_INFO& CTool_Model::Save_NonAminModel(_fmatrix PreTransformMatrix, _wstring strModelTag)
+{
+	m_NonAnimModelInfo.strModelTag = strModelTag;
+	m_NonAnimModelInfo.meshVectorSize = m_pAIScene->mNumMeshes;
+	m_NonAnimModelInfo.meshVector.resize(m_pAIScene->mNumMeshes);
+	m_NonAnimModelInfo.materialVectorSize = m_pAIScene->mNumMaterials;
+	m_NonAnimModelInfo.materialVector.resize(m_pAIScene->mNumMaterials);
+
+
+	// 공간 할당.
+	if (FAILED(Save_NonAnimMeshes(PreTransformMatrix)))
+	{
+		MSG_BOX(TEXT("Mesh Save Failed"));
+		return m_NonAnimModelInfo;
+	}
+
+	if (FAILED(Save_NonAnimMarterials()))
+	{
+		MSG_BOX(TEXT("Material Save Failed"));
+		return m_NonAnimModelInfo;
+	}
+
+	return m_NonAnimModelInfo;
+}
+
+
+HRESULT CTool_Model::Save_NonAnimMeshes(_fmatrix PreTransformMatrix)
 {
 	for (_uint i = 0; i < m_pAIScene->mNumMeshes; i++)
 	{
 		/* 1. Mesh 정보 넣어주기. */
 		aiMesh* pAIMesh = m_pAIScene->mMeshes[i];
-		MESH_INFO& dst = m_ModelInfo.meshVector[i];
+		MESH_INFO& dst = m_NonAnimModelInfo.meshVector[i];
 
 		// (1) 기본 메타
 		dst.iMarterialIndex = pAIMesh->mMaterialIndex;
@@ -97,7 +138,10 @@ HRESULT CTool_Model::Save_Meshes(_fmatrix PreTransformMatrix)
 	return S_OK;
 }
 
-HRESULT CTool_Model::Save_Marterials()
+#pragma endregion
+
+
+HRESULT CTool_Model::Save_NonAnimMarterials()
 {
 	_uint iNumMaterials = m_pAIScene->mNumMaterials;
 
@@ -107,14 +151,14 @@ HRESULT CTool_Model::Save_Marterials()
 	for (_uint i = 0; i < m_iNumMaterials; i++)
 	{
 		// Material 정보를 저장할 구조체.
-		MATERIAL_INFO& dst = m_ModelInfo.materialVector[i];
+		MATERIAL_INFO& dst = m_NonAnimModelInfo.materialVector[i];
 		dst.materialPathVectorSize = AI_TEXTURE_TYPE_MAX;
 		
 		// AIScene에서 만든 Material
 		const aiMaterial* pAIMaterial = m_pAIScene->mMaterials[i];
 
 		// Material 정보를 담을 벡터.
-		vector<_wstring>& pathVector = m_ModelInfo.materialVector[i].materialPathVector;
+		vector<_wstring>& pathVector = m_NonAnimModelInfo.materialVector[i].materialPathVector;
 		
 		pathVector.resize(AI_TEXTURE_TYPE_MAX);
 
@@ -157,6 +201,87 @@ HRESULT CTool_Model::Save_Marterials()
 	return S_OK;
 }
 
+#pragma region ANIM_MODEL
+
+void CTool_Model::Save_AnimModel(ANIMMODEL_INFO& AnimModelInfo, _fmatrix PreTransformMatrix)
+{
+	
+	if (FAILED(Save_Bones(AnimModelInfo)))
+		CRASH();
+	
+	if (FAILED(Save_AnimMeshes(AnimModelInfo, PreTransformMatrix)))
+		CRASH();
+		
+	if (FAILED(Save_AnimMaterials(AnimModelInfo)))
+		CRASH();
+
+	return;
+}
+
+HRESULT CTool_Model::Save_AnimMeshes(ANIMMODEL_INFO& AnimModelInfo, _fmatrix PreTransformMatrix)
+{
+	// 1. Mesh vector size 설정.
+	AnimModelInfo.meshVectorSize = m_iNumMeshes;
+	AnimModelInfo.meshVector.reserve(m_iNumMeshes);
+	
+	for (_uint i = 0; i < m_iNumMeshes; i++)
+	{
+		vector<ANIMMESH_INFO>& meshVector = AnimModelInfo.meshVector;
+
+		ANIMMESH_INFO dst{};
+		// 2. 채울 수 있는 정보를 Mesh에서 채워오기
+		m_Meshes[i]->Save_AnimMeshes(m_pAIScene->mMeshes[i], dst);
+
+		// 8. 최종 결과 저장.
+		meshVector.emplace_back(dst);
+	}
+	
+	return S_OK;
+}
+
+HRESULT CTool_Model::Save_AnimMaterials(ANIMMODEL_INFO& AnimModelInfo)
+{
+	// 1. Material 정보 채우기.
+	AnimModelInfo.materialVectorSize = m_iNumMaterials;
+	AnimModelInfo.materialVector.reserve(m_iNumMaterials);
+
+	for (_uint i = 0; i < m_iNumMaterials; i++)
+	{
+		vector<MATERIAL_INFO>& materialVector = AnimModelInfo.materialVector;
+
+		MATERIAL_INFO dst{};
+		// 2. 채울 수 있는 정보를 material에서 채워오기.
+		m_Materials[i]->Save_Materials(m_ModelDir.c_str(), m_pAIScene->mMaterials[i], dst);
+
+		materialVector.emplace_back(dst);
+	}
+
+	return S_OK;
+}
+
+HRESULT CTool_Model::Save_Bones(ANIMMODEL_INFO& AnimModelInfo)
+{
+	// 1. size 채워주기.
+	AnimModelInfo.boneVectorSize = m_Bones.size();
+	AnimModelInfo.boneVector.reserve(m_Bones.size());
+
+	// 2. 본정보 추가.
+	for (auto& pBone : m_Bones)
+	{
+		BONE_INFO boneInfo = {};
+
+		// Bone 벡터를 순회하면서 필요한 정보를 넣어줍니다.
+		pBone->Save_Bones(boneInfo);
+		// 채워진 정보를 Vector에 추가해줍니다. => 새로운 객체 생성되서 추가됨.
+		AnimModelInfo.boneVector.emplace_back(boneInfo);
+	}
+
+	return S_OK;
+}
+#pragma endregion
+
+
+
 const _bool CTool_Model::Is_Ray_Hit(const _float3& rayOrigin, const _float3& rayDir, _float* pOutDist)
 {
 	_bool IsHit = false;
@@ -171,41 +296,6 @@ const _bool CTool_Model::Is_Ray_Hit(const _float3& rayOrigin, const _float3& ray
 	return false;
 }
 
-HRESULT CTool_Model::Initialize_Prototype(MODELTYPE eModelType, _fmatrix PreTransformMatrix, const _char* pModelFilePath, const _char* pTextureFolderPath)
-{
-	
-	_uint iFlag = { aiProcess_ConvertToLeftHanded | aiProcessPreset_TargetRealtime_Fast };
-
-	m_ModelType = eModelType;
-
-	if (MODELTYPE::NONANIM == eModelType)
-		iFlag |= aiProcess_PreTransformVertices; // Animation 사용하지 않는 경우.
-
-	m_pAIScene = m_Importer.ReadFile(pModelFilePath, iFlag);
-	if (nullptr == m_pAIScene)
-		return E_FAIL;
-
-	XMStoreFloat4x4(&m_PreTransformMatrix, PreTransformMatrix);
-
-	m_ModelDir = pModelFilePath;
-	std::replace(m_ModelDir.begin(), m_ModelDir.end(), '/', '\\');
-
-	if (FAILED(Ready_Meshes(PreTransformMatrix)))
-		return E_FAIL;
-
-	if (FAILED(Ready_Materials(pModelFilePath, pTextureFolderPath)))
-		return E_FAIL;
-
-	
-
-    return S_OK;
-}
-
-HRESULT CTool_Model::Initialize_Clone(void* pArg)
-{
-
-    return S_OK;
-}
 
 HRESULT CTool_Model::Bind_Materials(CShader* pShader, const _char* pConstantName, _uint iMeshIndex, aiTextureType eTextureType, _uint iTextureIndex)
 {
@@ -220,6 +310,23 @@ HRESULT CTool_Model::Bind_Materials(CShader* pShader, const _char* pConstantName
 	return m_Materials[iMaterialIndex]->Bind_Resources(pShader, pConstantName, eTextureType, iTextureIndex);
 }
 
+HRESULT CTool_Model::Bind_BoneMatrices(CShader* pShader, const _char* pConstantName, _uint iMeshIndex)
+{
+	if (iMeshIndex >= m_iNumMeshes)
+		return E_FAIL;
+
+	return m_Meshes[iMeshIndex]->Bind_BoneMatrices(pShader, pConstantName, m_Bones);
+}
+
+
+void CTool_Model::Play_Animation(_float fTimeDelta)
+{
+	for (auto& pBone : m_Bones)
+	{
+		pBone->Update_CombinedTransformationMatrix(m_PreTransformMatrix, m_Bones);
+	}
+}
+
 HRESULT CTool_Model::Render(_uint iNumMesh)
 {
 	if (FAILED(m_Meshes[iNumMesh]->Bind_Resources()))
@@ -231,18 +338,15 @@ HRESULT CTool_Model::Render(_uint iNumMesh)
 	return S_OK;
 }
 
+
+
 HRESULT CTool_Model::Ready_Meshes(_fmatrix PreTransformMatrix)
 {
 	m_iNumMeshes = m_pAIScene->mNumMeshes;
 
 	for (_uint i = 0; i < m_iNumMeshes; i++)
 	{
-		//string szPath = m_pAIScene->mMeshes[i]->mName.data;
-		//_wstring MeshName(szPath.begin(), szPath.end());
-		//MeshName += L" : " + to_wstring(i);
-		//MSG_BOX(MeshName.c_str());
-
-		CTool_Mesh* pMesh = CTool_Mesh::Create(m_pDevice, m_pContext, m_ModelType, m_pAIScene->mMeshes[i], PreTransformMatrix);
+		CTool_Mesh* pMesh = CTool_Mesh::Create(m_pDevice, m_pContext, m_ModelType, m_pAIScene->mMeshes[i],m_Bones, PreTransformMatrix);
 		if (nullptr == pMesh)
 			return E_FAIL;
 
@@ -287,10 +391,8 @@ HRESULT CTool_Model::Ready_Bones(const aiNode* pAiNode, _int iParentBoneIndex)
 }
 
 
-
 CTool_Model* CTool_Model::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, MODELTYPE eModelType, _fmatrix PreTransformMatrix, const _char* pModelFilePath, const _char* pTextureFolderPath)
 {
-
 	CTool_Model* pInstance = new CTool_Model(pDevice, pContext);
 
 	if (FAILED(pInstance->Initialize_Prototype(eModelType, PreTransformMatrix, pModelFilePath, pTextureFolderPath)))
