@@ -22,7 +22,8 @@ public:
 
 
 public:
-	HRESULT Bind_Materials(CShader* pShader, const _char* pConstantName, _uint iMeshIndex, aiTextureType eTextureType, _uint iTextureIndex);
+	HRESULT Bind_Materials(class CShader* pShader, const _char* pConstantName, _uint iMeshIndex, aiTextureType eTextureType, _uint iTextureIndex);
+	HRESULT Bind_BoneMatrices(class CShader* pShader, const _char* pConstantName, _uint iMeshIndex);
 	void Play_Animation(_float fTimeDelta);
 
 private:
@@ -51,7 +52,7 @@ private:
 
 
 private:
-	HRESULT Ready_Meshes(_fmatrix PreTransformMatrix);
+	HRESULT Ready_Meshes();
 	HRESULT Ready_Materials(const _char* pModelFilePath);
 	HRESULT Ready_Bones(const aiNode* pAiNode, _int iParentBoneIndex);
 

@@ -14,6 +14,7 @@ HRESULT CMainApp::Initialize_Clone()
 //	AllocConsole();
 //#endif // DEBUG
 
+#ifdef  _DEBUG
 	AllocConsole();
 
 	// 표준 출력, 에러, 입력 핸들을 콘솔에 연결
@@ -25,6 +26,9 @@ HRESULT CMainApp::Initialize_Clone()
 
 	// 콘솔 버퍼 동기화
 	std::ios::sync_with_stdio(true);
+#endif //  _DEBUG
+
+	
 	
 	ENGINE_DESC		EngineDesc{};
 
@@ -94,6 +98,10 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxMesh.hlsl"), VTXMESH::Elements, VTXMESH::iNumElements))))
 		return E_FAIL;
 
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxAnimMesh"),
+		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxAnimMesh.hlsl"), VTXANIMMESH::Elements, VTXANIMMESH::iNumElements))))
+		return E_FAIL;
+
 
 	/* ==================================================== Other ====================================================*/
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_VIBuffer_Rect"),
@@ -147,7 +155,6 @@ HRESULT CMainApp::Ready_Prototype_ForUsageTexture()
 // 2. Model Prototype Static에 생성.
 HRESULT CMainApp::Ready_Prototype_ForModel()
 {
-
 	_matrix		PreTransformMatrix = XMMatrixIdentity();
 
 	/* Prototype_Component_Model */
@@ -155,7 +162,7 @@ HRESULT CMainApp::Ready_Prototype_ForModel()
 
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
 		, TEXT("Prototype_Component_Model_Player")
-		, CModel::Create(m_pDevice, m_pContext, MODELTYPE::NONANIM ,PreTransformMatrix,  "../Bin/Resources/Models/Player/Player.fbx"))))
+		, CModel::Create(m_pDevice, m_pContext, MODELTYPE::ANIM ,PreTransformMatrix,  "../Bin/Resources/Models/Player/Player.fbx"))))
 		return E_FAIL;
 
 	
@@ -430,10 +437,11 @@ void CMainApp::Free()
 {
 	__super::Free();
 
-//#ifdef _DEBUG
-//	FreeConsole();
-//#endif // DEBUG
+#ifdef _DEBUG
 	FreeConsole();
+#endif // _DEBUG
+
+
 
 	Safe_Release(m_pImGui_Manager);
 

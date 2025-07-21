@@ -45,8 +45,6 @@ HRESULT CMeshMaterial::Bind_Resources(CShader* pShader, const _char* pConstantNa
 
 HRESULT CMeshMaterial::Initialize_FBX(const _char* pModelFilePath, const aiMaterial* pAIMaterial, string strDirPath)
 {
-	static _uint iNum = 0;
-
 	for (_uint i = 1; i < AI_TEXTURE_TYPE_MAX; i++)
 	{
 
@@ -97,15 +95,9 @@ HRESULT CMeshMaterial::Initialize_FBX(const _char* pModelFilePath, const aiMater
 			if (FAILED(hr))
 				return E_FAIL;
 
-
-			//texPath = L"Material Name (" + to_wstring(iNum) + L") " + texPath;
-			//MSG_BOX(texPath.c_str());
-
 			m_SRVs[i].emplace_back(pSRV);
 		}
 	}
-
-	iNum++;
 
 	return S_OK;
 }

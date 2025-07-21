@@ -79,8 +79,7 @@ HRESULT CShader::Begin(_uint iPassIndex)
 	return S_OK;
 }
 
-//m_pShaderCom->Bind_Matrix("g_WorldMatrix", )
-
+/* Shader에 단일 Matrix를 바인딩합니다. */
 HRESULT CShader::Bind_Matrix(const _char* pConstantName, const _float4x4* pMatrix)
 {
 	ID3DX11EffectVariable*	pVariable = m_pEffect->GetVariableByName(pConstantName);
@@ -92,6 +91,26 @@ HRESULT CShader::Bind_Matrix(const _char* pConstantName, const _float4x4* pMatri
 		return E_FAIL;
 
 	return pMatrixVariable->SetMatrix(reinterpret_cast<const _float*>(pMatrix));	
+}
+
+/* Shader에 Matrix 배열을 바인딩합니다. */
+HRESULT CShader::Bind_Matrices(const _char* pConstantName, const _float4x4* pMatrix, _uint iNumMatrices)
+{
+	ID3DX11EffectVariable* pVariable = m_pEffect->GetVariableByName(pConstantName);
+	if (nullptr == pVariable)
+		return E_FAIL;
+
+	ID3DX11EffectMatrixVariable* pMatrixVariable = pVariable->AsMatrix();
+	if (nullptr == pMatrixVariable)
+		return E_FAIL;
+
+	if (FAILED(pMatrixVariable->SetMatrixArray(reinterpret_cast<const _float*>(pMatrix), 0, iNumMatrices)))
+	{
+		MSG_BOX(TEXT("Set Matrix Array Failed "));
+		return E_FAIL;
+	}
+
+	return S_OK;
 }
 
 HRESULT CShader::Bind_SRV(const _char* pConstantName, ID3D11ShaderResourceView* pSRV)

@@ -16,14 +16,14 @@ CModel::CModel(const CModel& Prototype)
 	, m_PreTransformMatrix { Prototype.m_PreTransformMatrix }
 	, m_Bones{ Prototype.m_Bones }
 {
-	for (auto& mesh : m_Meshes)
-		Safe_AddRef(mesh);
+	for (auto& pMesh : m_Meshes)
+		Safe_AddRef(pMesh);
 
-	for (auto& material : m_Materials)
-		Safe_AddRef(material);
+	for (auto& pMaterial : m_Materials)
+		Safe_AddRef(pMaterial);
 
-	for (auto& bone : m_Bones)
-		Safe_AddRef(bone);
+	for (auto& pBone : m_Bones)
+		Safe_AddRef(pBone);
 }
 
 HRESULT CModel::Initialize_Prototype(MODELTYPE eModelType, _fmatrix PreTransformMatrix, const _char* pModelFilePath)
@@ -31,6 +31,9 @@ HRESULT CModel::Initialize_Prototype(MODELTYPE eModelType, _fmatrix PreTransform
 	_uint iFlag = { aiProcess_ConvertToLeftHanded | aiProcessPreset_TargetRealtime_Fast };
 
 	m_ModelType = eModelType;
+
+	// PreTransform 저장. => 모델을 생성할 때. 지정해주어야할 PreTransformMatrix
+	XMStoreFloat4x4(&m_PreTransformMatrix, PreTransformMatrix);
 
 	if (MODELTYPE::NONANIM == eModelType)
 		iFlag |= aiProcess_PreTransformVertices; // Animation 사용하지 않는 경우.
@@ -41,15 +44,17 @@ HRESULT CModel::Initialize_Prototype(MODELTYPE eModelType, _fmatrix PreTransform
 
 	XMStoreFloat4x4(&m_PreTransformMatrix, PreTransformMatrix);
 	
+	/* 본 정보를 Mesh에서 활용해야 하므로 Bone 부터 정의한다. */
+	if (FAILED(Ready_Bones(m_pAIScene->mRootNode, -1)))
+		return E_FAIL;
 
-	if (FAILED(Ready_Meshes(PreTransformMatrix)))
+	if (FAILED(Ready_Meshes()))
 		return E_FAIL;
 
 	if (FAILED(Ready_Materials(pModelFilePath)))
 		return E_FAIL;
 
-	if (FAILED(Ready_Bones(m_pAIScene->mRootNode, -1)))
-		return E_FAIL;
+	
 
     return S_OK;
 }
@@ -73,6 +78,14 @@ HRESULT CModel::Bind_Materials(CShader* pShader, const _char* pConstantName, _ui
 	return m_Materials[iMaterialIndex]->Bind_Resources(pShader, pConstantName, eTextureType, iTextureIndex);
 }
 
+HRESULT CModel::Bind_BoneMatrices(CShader* pShader, const _char* pConstantName, _uint iMeshIndex)
+{
+	if (iMeshIndex >= m_iNumMeshes)
+		return E_FAIL;
+
+	return m_Meshes[iMeshIndex]->Bind_BoneMatrices(pShader, pConstantName, m_Bones);
+}
+
 void CModel::Play_Animation(_float fTimeDelta)
 {
 	/* 현재 시간에 맞는 뼈의 상태대로 특정 뼈들의 TransformationMatrix를 갱신해준다. */
@@ -81,7 +94,7 @@ void CModel::Play_Animation(_float fTimeDelta)
    /* 바꿔야할 뼈들의 Transforemation행렬이 갱신되었다면, 정점들에게 직접 전달되야할 CombindTransformationMatrix를 만들어준다. */
 	for (auto& pBone : m_Bones)
 	{
-		pBone->Update_CombinedTransformationMatrix(m_Bones);
+		pBone->Update_CombinedTransformationMatrix(m_PreTransformMatrix, m_Bones);
 	}
 }
 
@@ -96,18 +109,13 @@ HRESULT CModel::Render(_uint iNumMesh)
 	return S_OK;
 }
 
-HRESULT CModel::Ready_Meshes(_fmatrix PreTransformMatrix)
+HRESULT CModel::Ready_Meshes()
 {
 	m_iNumMeshes = m_pAIScene->mNumMeshes;
 
 	for (_uint i = 0; i < m_iNumMeshes; i++)
 	{
-		//string szPath = m_pAIScene->mMeshes[i]->mName.data;
-		//_wstring MeshName(szPath.begin(), szPath.end());
-		//MeshName += L" : " + to_wstring(i);
-		//MSG_BOX(MeshName.c_str());
-
-		CMesh* pMesh = CMesh::Create(m_pDevice, m_pContext, m_ModelType, m_pAIScene->mMeshes[i], PreTransformMatrix);
+		CMesh* pMesh = CMesh::Create(m_pDevice, m_pContext, m_ModelType, m_pAIScene->mMeshes[i], m_Bones, XMLoadFloat4x4(&m_PreTransformMatrix));
 		if (nullptr == pMesh)
 			return E_FAIL;
 
@@ -140,12 +148,11 @@ HRESULT CModel::Ready_Bones(const aiNode* pAiNode, _int iParentBoneIndex)
 
 	m_Bones.push_back(pBone);
 
-	_int iOwnBoneIndex = m_Bones.size() - 1; // 자식 객체에 부여할 부모 인덱스는 자신의 인덱스.
+	_int iIndex = m_Bones.size() - 1; // 자식 객체에 부여할 부모 인덱스는 자신의 인덱스.
 
 	for (_uint i = 0; i < pAiNode->mNumChildren; i++)
 	{
-		if (FAILED(Ready_Bones(pAiNode->mChildren[i], iOwnBoneIndex)))
-			return E_FAIL;
+		Ready_Bones(pAiNode->mChildren[i], iIndex);
 	}
 
 	return S_OK;

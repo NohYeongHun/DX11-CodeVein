@@ -364,22 +364,113 @@ void CMap_Tool::Render_Model_Edit()
     if (m_IsPossible_SaveLoad)
         return;
 
-    Render_Layer_Hierarchy();
+    Render_Edit_Hierarchy();
 }
 
-void CMap_Tool::Render_Layer_Hierarchy()
+/*
+*  Object Layer에서 Hierarchy에 불러옵니다.
+* 객체들이 생성되고 삭제될 수 있으므로 동적으로 불러와야 합니다.
+* Layer에 변동사항이 있을때마다 호출합니다.
+*/
+void CMap_Tool::Load_Layer(const _wstring& strLayerTag)
 {
-    ImGui::SetNextWindowSize(ImVec2(300, 400), ImGuiCond_Always);
-    ImGui::Begin("Hierarchy", nullptr, ImGuiWindowFlags_MenuBar);
-
-    _uint id = 0;
     for (auto& pair : m_Layer_Objects)
     {
-        if (ImGui::TreeNode(pair.first.c_str()))
+        Safe_Release(pair.second);
+        m_Layer_Objects.clear();
+    }
+        
+
+    CLayer* pLayer = m_pGameInstance->Get_Layer(ENUM_CLASS(m_eCurLevel), strLayerTag);
+
+    if (nullptr == pLayer)
+        return;
+
+    // 1. Layer Objects에 지정해둡니다.
+    list<CGameObject*> GameObjects = pLayer->Get_GameObjects();
+
+    // 2. Layer에서 _wstring => string으로 치환해줍니다.
+    for (auto& pGameObject : GameObjects)
+    {
+        // wstring to string
+        const _tchar* wstrValue = pGameObject->Get_ObjectTag().c_str();
+        _char szFullPath[MAX_PATH] = {};
+        WideCharToMultiByte(CP_ACP, 0, wstrValue, -1, szFullPath, MAX_PATH, nullptr, nullptr);
+        string strValue = szFullPath;
+
+        strValue += pGameObject->Get_ID();
+        m_Layer_Objects.emplace_back(strValue, pGameObject);
+        Safe_AddRef(pGameObject);
+    }
+}
+
+void CMap_Tool::Render_Edit_Hierarchy()
+{
+    ImGui::SetNextWindowPos(ImVec2(g_iWinSizeX - 310.f, 10.f), ImGuiCond_Always);
+    ImGui::SetNextWindowSize(ImVec2(300, 400), ImGuiCond_Once);
+    ImGui::Begin("Edit_Hierarchy", nullptr, ImGuiWindowFlags_NoCollapse);
+
+    static int iSelectedIndex = -1;
+    _uint id = 0;
+
+    _wstring objTag = {};
+    _wstring modelTag = {};
+    ImVec2 hierarchyPos = ImGui::GetWindowPos();
+    ImVec2 hierarchySize = ImGui::GetWindowSize();
+
+    
+
+    for (auto& pair : m_Layer_Objects)
+    {
+        // 선택되었을 때만.
+        if (ImGui::Selectable(pair.first.c_str(), id == iSelectedIndex))
         {
-            ImGui::TreePop();
+            m_EditinspectorPos = ImVec2(hierarchyPos.x - 310.f, hierarchyPos.y); // 왼쪽 붙이기
+            m_iSelectedIndex = id; // 선택한 인덱스.
+            m_Selected_EditObjTag = pair.first;
+            m_pSelectedObject = pair.second;
         }
     }
+
+
+    if (iSelectedIndex >= 0 && iSelectedIndex < m_PrototypeNames.size())
+        Render_Edit_Inspector(m_EditinspectorPos);
+
+    ImGui::End();
+}
+
+void CMap_Tool::Render_Edit_Inspector(ImVec2 vPos)
+{
+    ImGui::SetNextWindowPos(vPos, ImGuiCond_Always);
+    ImGui::SetNextWindowSize(ImVec2(300, 250), ImGuiCond_Once);
+    ImGui::Begin("Edit_Transform");
+
+    ImGui::Text(m_Selected_EditObjTag.c_str());
+
+
+    if (nullptr == m_pSelectedObject)
+        return;
+
+    CTransform* pTransformCom = static_cast<CTransform*>(m_pSelectedObject->Get_Component(L"Com_Transform"));
+    
+    pTransformCom->Get_State(STATE::POSITION);
+
+        
+    
+    static float fPosition[3] = { 0.f, 0.f, 0.f };
+    ImGui::InputFloat3("Position", fPosition);
+
+    static float fRotation[3] = { 0.f, 0.f, 0.f };
+    ImGui::InputFloat3("Rotation", fRotation);
+
+    static float fScale[3] = { 1.f, 1.f, 1.f };
+    ImGui::InputFloat3("Scale", fScale);
+
+    
+    
+
+    /* 인스턴스 생성. */
+    ImGui::Checkbox("Picking Create", &m_IsPicking_Create);
 
     ImGui::End();
 }
@@ -501,8 +592,12 @@ void CMap_Tool::Free()
 {
     __super::Free();
 
-    m_Layer_Objects.clear();
     m_PrototypeNames.clear();
+
+    /* Edit Mode Object Clear */
+    for (auto& pair : m_Layer_Objects)
+        Safe_Release(pair.second);
+    m_Layer_Objects.clear();
 
     Safe_Release(m_pSaveFile_Loader);
     Safe_Release(m_pCamera);

@@ -21,7 +21,6 @@ private:
 
 public:
 	HRESULT Initialize(LEVEL eLevel);
-	HRESULT Ready_Events();
 
 public:
 	void Change_SelectObject(class CGameObject* pSelectedObject);
@@ -43,7 +42,9 @@ public:
 #pragma region Edit Mode
 public:
 	void Render_Model_Edit();
-	void Render_Layer_Hierarchy();
+	void Load_Layer(const _wstring& strLayerTag);
+	void Render_Edit_Hierarchy();
+	void Render_Edit_Inspector(ImVec2 vPos);
 	void Register_Layer_HierarchyObjects(class CGameObject* pGameObject);
 	void Register_Layer_Hierarchy(class CLayer* pLayer);
 	void Handle_EditMode_SelectedObject();
@@ -79,6 +80,10 @@ private:
 
 private:
 	list<pair<string, class CGameObject*>> m_Layer_Objects = {};
+	string m_Selected_EditObjTag = {};
+	/* Edit Hierarchy Pos 저장 */
+	ImVec2 m_EditinspectorPos = {};
+	int m_iSelectedIndex = { -1 };
 #pragma endregion
 
 #pragma region 공통

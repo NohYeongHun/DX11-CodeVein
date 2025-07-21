@@ -37,13 +37,8 @@ HRESULT CPlayer::Initialize_Clone(void* pArg)
 void CPlayer::Priority_Update(_float fTimeDelta)
 {
     __super::Priority_Update(fTimeDelta);
-}
 
-void CPlayer::Update(_float fTimeDelta)
-{
-    __super::Update(fTimeDelta);
-
-    if (m_pGameInstance->Get_KeyPress(DIK_W))
+    /*if (m_pGameInstance->Get_KeyPress(DIK_W))
     {
         m_pTransformCom->Go_Straight(fTimeDelta);
     }
@@ -61,7 +56,15 @@ void CPlayer::Update(_float fTimeDelta)
     if (m_pGameInstance->Get_KeyPress(DIK_D))
     {
         m_pTransformCom->Go_Right(fTimeDelta);
-    }
+    }*/
+
+}
+
+void CPlayer::Update(_float fTimeDelta)
+{
+    __super::Update(fTimeDelta);
+
+    m_pModelCom->Play_Animation(fTimeDelta);
 }
 
 void CPlayer::Late_Update(_float fTimeDelta)
@@ -74,21 +77,21 @@ void CPlayer::Late_Update(_float fTimeDelta)
 
 HRESULT CPlayer::Render()
 {
-    if (ImGui::IsWindowAppearing())              // 또는 static bool once=true;
-    {
-        ImGui::SetNextWindowPos({ 100, 100 }, ImGuiCond_Appearing);
-        ImGui::SetNextWindowSize({ 460, 240 }, ImGuiCond_Appearing); // ← 원하는 픽셀
-    }
+    //if (ImGui::IsWindowAppearing())              // 또는 static bool once=true;
+    //{
+    //    ImGui::SetNextWindowPos({ 100, 100 }, ImGuiCond_Appearing);
+    //    ImGui::SetNextWindowSize({ 460, 240 }, ImGuiCond_Appearing); // ← 원하는 픽셀
+    //}
 
-    string str = "Player Transform [" + to_string(Get_ID()) + ']';
-    ImGui::Begin(str.c_str());
-    _float4 vPosition = {};
-    XMStoreFloat4(&vPosition, m_pTransformCom->Get_State(STATE::POSITION));
+    //string str = "Player Transform [" + to_string(Get_ID()) + ']';
+    //ImGui::Begin(str.c_str());
+    //_float4 vPosition = {};
+    //XMStoreFloat4(&vPosition, m_pTransformCom->Get_State(STATE::POSITION));
 
-    ImGui::InputFloat("X : ", &vPosition.x);
-    ImGui::InputFloat("Y : ", &vPosition.y);
-    ImGui::InputFloat("Z : ", &vPosition.z);
-    ImGui::End();
+    //ImGui::InputFloat("X : ", &vPosition.x);
+    //ImGui::InputFloat("Y : ", &vPosition.y);
+    //ImGui::InputFloat("Z : ", &vPosition.z);
+    //ImGui::End();
 
 
     if (FAILED(Ready_Render_Resources()))
@@ -99,6 +102,12 @@ HRESULT CPlayer::Render()
     {
         m_pModelCom->Bind_Materials(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE, 0);
         
+        if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
+        {
+            MSG_BOX(TEXT("Bind_Bone Failed Player"));
+            return E_FAIL;
+        }
+            
 
         if (FAILED(m_pShaderCom->Begin(0)))
             return E_FAIL;
@@ -126,7 +135,7 @@ void CPlayer::On_Collision_Exit(CGameObject* pOther)
 HRESULT CPlayer::Ready_Components(PLAYER_DESC* pDesc)
 {
 
-    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxMesh"),
+    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxAnimMesh"),
         TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom), nullptr)))
         return E_FAIL;
 
@@ -148,6 +157,25 @@ HRESULT CPlayer::Ready_Render_Resources()
         return E_FAIL;
 
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_Transform_Float4x4(D3DTS::PROJ))))
+        return E_FAIL;
+
+    const LIGHT_DESC* pLightDesc = m_pGameInstance->Get_LightDesc(0);
+    if (nullptr == pLightDesc)
+        return E_FAIL;
+
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDir", &pLightDesc->vDirection, sizeof(_float4))))
+        return E_FAIL;
+
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDiffuse", &pLightDesc->vDiffuse, sizeof(_float4))))
+        return E_FAIL;
+
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightAmbient", &pLightDesc->vAmbient, sizeof(_float4))))
+        return E_FAIL;
+
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightSpecular", &pLightDesc->vSpecular, sizeof(_float4))))
+        return E_FAIL;
+
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
         return E_FAIL;
 
 

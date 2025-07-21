@@ -8,10 +8,6 @@
 #include <DirectXCollision.h>
 
 
-
-
-
-
 /* DX의 Device Input 사용.*/
 #define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
@@ -54,6 +50,11 @@ using namespace DirectX;
 using namespace std;
 
 
+namespace Engine
+{
+	// 한 메시에서 최대로 사용가능한 Bone의 개수.
+	static const unsigned int g_iMaxNumBones = 512;
+}
 
 
 #include "Engine_Typedef.h"
@@ -61,8 +62,6 @@ using namespace std;
 #include "Engine_Macro.h"
 #include "Engine_Struct.h"
 #include "Engine_Function.h"
-
-
 
 
 #ifdef _DEBUG

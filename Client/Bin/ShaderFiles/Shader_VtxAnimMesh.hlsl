@@ -10,8 +10,8 @@ vector g_vCamPosition;
 
 /*재질*/
 texture2D g_DiffuseTexture;
-vector    g_vMtrlAmbient = 1.f;
-vector    g_vMtrlSpecular = 1.f;
+vector g_vMtrlAmbient = 1.f;
+vector g_vMtrlSpecular = 1.f;
 
 /* 모델 전체 뼈기준(x) */
 /* 특정 메시에 영향ㅇ르 주는 뼈들 */
@@ -20,7 +20,7 @@ matrix g_BoneMatrices[512];
 
 sampler DefaultSampler = sampler_state
 {
-    filter = min_mag_mip_linear;   
+    filter = min_mag_mip_linear;
     AddressU = wrap;
     AddressV = wrap;
 };
@@ -31,7 +31,7 @@ struct VS_IN
     float3 vNormal : NORMAL;
     float3 vTangent : TANGENT;
     float3 vBinormal : BINORMAL;
-    uint4  vBlendIndex : BLENDINDEX;
+    uint4 vBlendIndex : BLENDINDEX;
     float4 vBlendWeight : BLENDWEIGHT;
     float2 vTexcoord : TEXCOORD0;
 };
@@ -53,13 +53,16 @@ VS_OUT VS_MAIN(VS_IN In)
     
     /* 정점의 로컬위치 * 월드 * 뷰 * 투영 */ 
     
+    float fWeightW = 1.f - (In.vBlendWeight.x + In.vBlendWeight.y + In.vBlendWeight.z);
+    
     matrix BoneMatrix =
         g_BoneMatrices[In.vBlendIndex.x] * In.vBlendWeight.x +
         g_BoneMatrices[In.vBlendIndex.y] * In.vBlendWeight.y +
         g_BoneMatrices[In.vBlendIndex.z] * In.vBlendWeight.z +
-        g_BoneMatrices[In.vBlendIndex.w] * In.vBlendWeight.w;
+        g_BoneMatrices[In.vBlendIndex.w] * fWeightW;
     
     vector vPosition = mul(float4(In.vPosition, 1.f), BoneMatrix);
+    vector vNormal = mul(float4(In.vNormal, 0.f), BoneMatrix);
         
     float4x4 matWV, matWVP;
     
@@ -67,9 +70,9 @@ VS_OUT VS_MAIN(VS_IN In)
     matWVP = mul(matWV, g_ProjMatrix);
     
     Out.vPosition = mul(vPosition, matWVP);
-    Out.vNormal = mul(float4(In.vNormal, 0.f), g_WorldMatrix);
+    Out.vNormal = mul(vNormal, g_WorldMatrix);
     Out.vTexcoord = In.vTexcoord;
-    Out.vWorldPos = mul(float4(In.vPosition, 1.f), g_WorldMatrix);
+    Out.vWorldPos = mul(vPosition, g_WorldMatrix);
     
     return Out;
 }
@@ -101,7 +104,7 @@ PS_OUT PS_MAIN(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
     
-    vector      vMtrlDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
+    vector vMtrlDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
     
     if (vMtrlDiffuse.a < 0.3f)
         discard;
@@ -114,7 +117,7 @@ PS_OUT PS_MAIN(PS_IN In)
     
     float fSpecular = pow(max(dot(normalize(vLook) * -1.f, normalize(vReflect)), 0.f), 50.0f);
     
-    Out.vColor = (g_vLightDiffuse * vMtrlDiffuse) * saturate(fShade + (g_vLightAmbient * g_vMtrlAmbient)) + 
+    Out.vColor = (g_vLightDiffuse * vMtrlDiffuse) * saturate(fShade + (g_vLightAmbient * g_vMtrlAmbient)) +
                     (g_vLightSpecular * g_vMtrlSpecular) * fSpecular;
     
     return Out;
