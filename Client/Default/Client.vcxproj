@@ -114,6 +114,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>ClientPch.h</PrecompiledHeaderFile>
       <ForcedIncludeFiles>ClientPch.h</ForcedIncludeFiles>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -140,6 +141,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>ClientPch.h</PrecompiledHeaderFile>
       <ForcedIncludeFiles>ClientPch.h</ForcedIncludeFiles>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -193,7 +195,6 @@
     <ClInclude Include="..\Public\Loading_Slot.h" />
     <ClInclude Include="..\Public\Map.h" />
     <ClInclude Include="..\Public\Player.h" />
-    <ClInclude Include="..\Public\SaveFile_Define.h" />
     <ClInclude Include="..\Public\SkillUI.h" />
     <ClInclude Include="..\Public\SkillUI_Icon.h" />
     <ClInclude Include="..\Public\SkillUI_Panel.h" />

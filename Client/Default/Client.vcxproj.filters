@@ -255,9 +255,6 @@
     <ClInclude Include="..\Public\Map.h">
       <Filter>02. GameObject\Map</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\SaveFile_Define.h">
-      <Filter>99. Defines</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">

@@ -2,14 +2,12 @@
 #include "Component.h"
 
 NS_BEGIN(Engine)
-class CLoad_Model final : public CComponent
+class ENGINE_DLL CLoad_Model final : public CComponent
 {
 private:
 	explicit CLoad_Model(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	explicit CLoad_Model(const CLoad_Model& Prototype);
 	virtual ~CLoad_Model() = default;
-
-
 
 public:
 	_uint Get_NumMeshes() const {
@@ -24,10 +22,14 @@ public:
 public:
 	virtual HRESULT Initialize_Prototype(MODELTYPE eModelType, _fmatrix PreTransformMatrix, string filePath);
 	virtual HRESULT Initialize_Clone(void* pArg);
+	HRESULT Render(_uint iNumMesh);
 	
 public:
 	HRESULT Bind_Materials(CShader* pShader, const _char* pConstantName, _uint iMeshIndex, aiTextureType eTextureType, _uint iTextureIndex);
-	HRESULT Render(_uint iNumMesh);
+	HRESULT Bind_BoneMatrices(class CShader* pShader, const _char* pConstantName, _uint iMeshIndex);
+	void Play_Animation(_float fTimeDelta);
+
+
 
 
 private:

@@ -32,7 +32,10 @@ public:
 
 
 private:
-	class CModel* m_pModelCom = { nullptr };
+	// Load Model;
+
+	//class CModel* m_pModelCom = { nullptr };
+	class CLoad_Model* m_pModelCom = { nullptr };
 	class CShader* m_pShaderCom = { nullptr };
 
 

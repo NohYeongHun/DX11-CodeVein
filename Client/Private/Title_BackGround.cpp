@@ -64,12 +64,12 @@ void CTitle_BackGround::Late_Update(_float fTimeDelta)
 
 HRESULT CTitle_BackGround::Render()
 {
-    wstring_convert<codecvt_utf8<wchar_t>> converter;
+   /* wstring_convert<codecvt_utf8<wchar_t>> converter;
     string str = converter.to_bytes(m_strObjTag);
 
     ImGui::Begin("Title BackGround");
     ImGui::SliderFloat(str.c_str(), &m_fAlpha, 0.f, 1.f);
-    ImGui::End();
+    ImGui::End();*/
 
     __super::Begin();
 

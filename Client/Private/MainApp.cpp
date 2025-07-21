@@ -162,8 +162,13 @@ HRESULT CMainApp::Ready_Prototype_ForModel()
 
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
 		, TEXT("Prototype_Component_Model_Player")
-		, CModel::Create(m_pDevice, m_pContext, MODELTYPE::ANIM ,PreTransformMatrix,  "../Bin/Resources/Models/Player/Player.fbx"))))
+		, CLoad_Model::Create(m_pDevice, m_pContext, MODELTYPE::ANIM, PreTransformMatrix, "../Bin/Resources/SaveFile/playerModel.dat"))))
 		return E_FAIL;
+
+	/*if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
+		, TEXT("Prototype_Component_Model_Player")
+		, CModel::Create(m_pDevice, m_pContext, MODELTYPE::ANIM ,PreTransformMatrix,  "../Bin/Resources/Models/Player/Player.fbx"))))
+		return E_FAIL;*/
 
 	/*if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
 		, TEXT("Prototype_Component_Model_Player")

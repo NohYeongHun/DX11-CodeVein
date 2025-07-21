@@ -43,13 +43,14 @@ const _bool CLoad_Model::Is_Ray_Hit(const _float3& rayOrigin, const _float3& ray
 
 HRESULT CLoad_Model::Initialize_Prototype(MODELTYPE eModelType, _fmatrix PreTransformMatrix, string filePath)
 {
-	m_ModelType = eModelType;
-
-	XMStoreFloat4x4(&m_PreTransformMatrix, PreTransformMatrix);
-
 	std::ifstream ifs(filePath, std::ios::binary);
 	if (!ifs.is_open())
 		return E_FAIL;
+
+	// Model 타입 지정.
+	m_ModelType = eModelType;
+
+	XMStoreFloat4x4(&m_PreTransformMatrix, PreTransformMatrix);
 
 	/* ---------- ModelTag ---------- */
 
@@ -57,18 +58,16 @@ HRESULT CLoad_Model::Initialize_Prototype(MODELTYPE eModelType, _fmatrix PreTran
 	_wstring strModelTag = ReadWString(ifs);
 
 	if (strModelTag.empty())
-		CRASH();
+		CRASH("MODEL EMPTY");
 
 	if (FAILED(Load_Meshes(PreTransformMatrix, ifs)))
-		CRASH();
+		CRASH("LOAD MESH FAILED");
 
 	if (FAILED(Load_Materials(ifs)))
-		CRASH();
+		CRASH("LOAD MATERIALS FAILED");
 
 	if (FAILED(Load_Bones(ifs)))
-		CRASH();
-	
-	
+		CRASH("LOAD BONES FAILED");
 
 	ifs.close();
 	
@@ -93,6 +92,26 @@ HRESULT CLoad_Model::Bind_Materials(CShader* pShader, const _char* pConstantName
 		return E_FAIL;
 
 	return m_Materials[iMaterialIndex]->Bind_Resources(pShader, pConstantName, eTextureType, iTextureIndex);
+}
+
+HRESULT CLoad_Model::Bind_BoneMatrices(CShader* pShader, const _char* pConstantName, _uint iMeshIndex)
+{
+	if (iMeshIndex >= m_iNumMeshes)
+		return E_FAIL;
+
+	return m_Meshes[iMeshIndex]->Bind_BoneMatrices(pShader, pConstantName, m_Bones);
+}
+
+void CLoad_Model::Play_Animation(_float fTimeDelta)
+{
+	/* 현재 시간에 맞는 뼈의 상태대로 특정 뼈들의 TransformationMatrix를 갱신해준다. */
+
+
+   /* 바꿔야할 뼈들의 Transforemation행렬이 갱신되었다면, 정점들에게 직접 전달되야할 CombindTransformationMatrix를 만들어준다. */
+	for (auto& pBone : m_Bones)
+	{
+		pBone->Update_CombinedTransformationMatrix(m_PreTransformMatrix, m_Bones);
+	}
 }
 
 HRESULT CLoad_Model::Render(_uint iNumMesh)
@@ -122,7 +141,7 @@ HRESULT CLoad_Model::Load_Meshes(_fmatrix PreTransformMatrix, std::ifstream& ifs
 		// 3. Vector size만큼 순회 돌리면서 Mesh 생성.
 		CLoad_Mesh* pLoadMesh = CLoad_Mesh::Create(m_pDevice, m_pContext, m_ModelType, PreTransformMatrix, ifs);
 		if (nullptr == pLoadMesh)
-			CRASH();
+			CRASH("LOAD MESH NULLPTR");
 
 		m_Meshes.emplace_back(pLoadMesh);
 	}
@@ -145,7 +164,7 @@ HRESULT CLoad_Model::Load_Materials(std::ifstream& ifs)
 		// 4. Vector size만큼 순회 돌리면서 Material 생성.
 		CLoad_MeshMaterial* pLoadMesh = CLoad_MeshMaterial::Create(m_pDevice, m_pContext, ifs);
 		if (nullptr == pLoadMesh)
-			CRASH();
+			CRASH("LOAD MESH");
 
 		m_Materials.emplace_back(pLoadMesh);
 	}
@@ -168,7 +187,7 @@ HRESULT CLoad_Model::Load_Bones(std::ifstream& ifs)
 		// 5. 순회하면서 값채워넣기.
 		CLoad_Bone* pLoadBone = CLoad_Bone::Create(ifs);
 		if (nullptr == pLoadBone)
-			CRASH();
+			CRASH("LOAD BONE FAILED");
 
 		m_Bones.emplace_back(pLoadBone);
 	}

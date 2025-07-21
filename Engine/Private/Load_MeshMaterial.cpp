@@ -20,7 +20,9 @@ HRESULT CLoad_MeshMaterial::Initialize(std::ifstream& ifs)
 	
 	// 1. Material VectorSize 가져오기.
 	if (!ReadBytes(ifs, &mat.materialPathVectorSize, sizeof(uint32_t)))
-		return E_FAIL;
+		CRASH("Material Vector Size Get Failed");
+
+	mat.materialPathVector.resize(mat.materialPathVectorSize);
 
 	// 2. 가져온 Material VectorSize로부터 Texture Path 가져오기.
 	for (uint32_t t = 0; t < mat.materialPathVectorSize; ++t)
@@ -32,17 +34,24 @@ HRESULT CLoad_MeshMaterial::Initialize(std::ifstream& ifs)
 		mat.materialPathVector[t] = texPath;
 	}
 
+	// 현재 materialPath Vector에는 Texture 종류별로 1장씩만 들어가게 되어있음.
 	vector<_wstring>& materialVector = mat.materialPathVector;
 
+
 	// 3. 가져온 TexturePath로 Material 만들기. => Texture ShaderResourceView 만들기.
-	for (auto& vec : materialVector)
+	for (uint32_t i = 0; i < mat.materialPathVectorSize; ++i)
 	{
+		_wstring strTexturePath = mat.materialPathVector[i];
+
+		// 비어있다면 비어있는채로 둡니다.
+		if (strTexturePath.empty()) 
+			continue;
+
 		ID3D11ShaderResourceView* pSRV = { nullptr };
 
 		_tchar			szExt[MAX_PATH] = {};
-		
-		
-		_wsplitpath_s(vec.c_str(), nullptr, 0, nullptr, 0, nullptr, 0, szExt, MAX_PATH);
+
+		_wsplitpath_s(strTexturePath.c_str(), nullptr, 0, nullptr, 0, nullptr, 0, szExt, MAX_PATH);
 
 		HRESULT		hr = {};
 
@@ -50,15 +59,16 @@ HRESULT CLoad_MeshMaterial::Initialize(std::ifstream& ifs)
 			hr = E_FAIL;
 
 		if (L".dds" == szExt)
-			hr = CreateDDSTextureFromFile(m_pDevice, vec.c_str(), nullptr, &pSRV);
-		else 
-			hr = CreateWICTextureFromFile(m_pDevice, vec.c_str(), nullptr, &pSRV);
+			hr = CreateDDSTextureFromFile(m_pDevice, strTexturePath.c_str(), nullptr, &pSRV);
+		else
+			hr = CreateWICTextureFromFile(m_pDevice, strTexturePath.c_str(), nullptr, &pSRV);
 
 		if (FAILED(hr))
-			return E_FAIL;
+			CRASH("Texture Create Failed");
 
-		m_SRVs->emplace_back(pSRV);
+		m_SRVs[i].emplace_back(pSRV);
 	}
+	
 	
 	
 

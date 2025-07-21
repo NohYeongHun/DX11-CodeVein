@@ -10,36 +10,7 @@ CLoad_Mesh::CLoad_Mesh(const CLoad_Mesh& Prototype)
 {
 }
 
-const _bool CLoad_Mesh::Is_Ray_Hit(const _float3& rayOrigin, const _float3& rayDir, _float* pOutDist)
-{
-	_bool bHit = false;
-	_float fClosestDist = 1000.f;
 
-	_fvector vRayOrigin = XMLoadFloat3(&rayOrigin);
-	_fvector vRayDir = XMLoadFloat3(&rayDir);
-
-	for (_uint i = 0; i < m_vecIndices.size(); i+= 3)
-	{
-		_fvector v0 = XMLoadFloat3(&m_vecPositions[m_vecIndices[i]]);
-		_gvector v1 = XMLoadFloat3(&m_vecPositions[m_vecIndices[i + 1]]);
-		_hvector v2 = XMLoadFloat3(&m_vecPositions[m_vecIndices[i + 2]]);
-
-		_float fDist = 0.f;
-		if (TriangleTests::Intersects(vRayOrigin, vRayDir, v0, v1, v2, fDist))
-		{
-			if (fDist < fClosestDist)
-			{
-				fClosestDist = fDist;
-				bHit = true;
-			}
-		}
-	}
-
-	if (bHit && pOutDist)
-		*pOutDist = fClosestDist;
-
-	return bHit;
-}
 
 HRESULT CLoad_Mesh::Initialize_Prototype(MODELTYPE eModelType, _fmatrix PreTransformMatrix, std::ifstream& ifs)
 {
@@ -88,9 +59,10 @@ HRESULT CLoad_Mesh::Initialize_Vertex_For_Anim(std::ifstream& ifs)
 
 	// 4. 버텍스 데이터에 정점 데이터 채워넣기.
 	if (!ReadBytes(ifs, info.vertices.data(), sizeof(VTXANIMMESH) * info.iVertexCount))
-		CRASH();
+		CRASH("READ VERTICES FAILED");
 
 	// 5. 채워넣은 데이터로 값 채워넣기.	
+	m_iVertexStride = sizeof(VTXANIMMESH);
 	m_iNumVertices = info.iVertexCount;
 	m_iMaterialIndex = info.iMarterialIndex;
 	m_iNumIndices = info.iIndicesCount;
@@ -133,7 +105,7 @@ HRESULT CLoad_Mesh::Initialize_Vertex_For_Anim(std::ifstream& ifs)
 	VBInitialData.pSysMem = pVertices;
 
 	if (FAILED(m_pDevice->CreateBuffer(&VBDesc, &VBInitialData, &m_pVB)))
-		return E_FAIL;
+		CRASH("Create Buffer FAILED");
 
 	Safe_Delete_Array(pVertices);
 
@@ -141,7 +113,7 @@ HRESULT CLoad_Mesh::Initialize_Vertex_For_Anim(std::ifstream& ifs)
 	// 8. 인덱스 데이터 읽어오기.
 	info.indices.resize(info.iIndicesCount);
 	if (!ReadBytes(ifs, info.indices.data(), sizeof(uint32_t) * info.iIndicesCount))
-		CRASH();
+		CRASH("READ INDICIES FAILED");
 
 	D3D11_BUFFER_DESC		IBDesc{};
 	IBDesc.ByteWidth = m_iNumIndices * m_iIndexStride;
@@ -167,27 +139,79 @@ HRESULT CLoad_Mesh::Initialize_Vertex_For_Anim(std::ifstream& ifs)
 	IBInitialData.pSysMem = pIndices;
 
 	if (FAILED(m_pDevice->CreateBuffer(&IBDesc, &IBInitialData, &m_pIB)))
-		return E_FAIL;
+		CRASH("CREATE INDEX BUFFER FAILED");
 
 	Safe_Delete_Array(pIndices);
 
 	/* 10. Bone 정보 채워넣기.*/
 	ifs.read(reinterpret_cast<char*>(&info.BoneIndexVectorSize), sizeof(uint32_t));
-	
+
 	info.Boneindices.resize(info.BoneIndexVectorSize);
 
 	// 11. Bone Vector 채우기.
 	if (!ReadBytes(ifs, info.Boneindices.data(), sizeof(_int) * info.BoneIndexVectorSize))
-		CRASH();
+		CRASH("BONE VECTOR READ FAILED");
 
 	// 12. Offset 정보 채워넣기.
 	ifs.read(reinterpret_cast<char*>(&info.OffSetVectorSize), sizeof(uint32_t));
+	info.OffsetMatrices.resize(info.OffSetVectorSize);
 
 	// 13. Offset matrix 정보 채워넣기.
 	if (!ReadBytes(ifs, info.OffsetMatrices.data(), sizeof(_float4x4) * info.OffSetVectorSize))
-		CRASH();
+		CRASH("OFFSET MATRIX FAILED");
+
+	// 14. BoneIndices, OffSetMatrices Vector에 값 복사하기. 
+	m_BoneIndices = info.Boneindices;
+	m_OffsetMatrices = info.OffsetMatrices;
+	
 
 	return S_OK;
+}
+
+const _bool CLoad_Mesh::Is_Ray_Hit(const _float3& rayOrigin, const _float3& rayDir, _float* pOutDist)
+{
+	_bool bHit = false;
+	_float fClosestDist = 1000.f;
+
+	_fvector vRayOrigin = XMLoadFloat3(&rayOrigin);
+	_fvector vRayDir = XMLoadFloat3(&rayDir);
+
+	for (_uint i = 0; i < m_vecIndices.size(); i += 3)
+	{
+		_fvector v0 = XMLoadFloat3(&m_vecPositions[m_vecIndices[i]]);
+		_gvector v1 = XMLoadFloat3(&m_vecPositions[m_vecIndices[i + 1]]);
+		_hvector v2 = XMLoadFloat3(&m_vecPositions[m_vecIndices[i + 2]]);
+
+		_float fDist = 0.f;
+		if (TriangleTests::Intersects(vRayOrigin, vRayDir, v0, v1, v2, fDist))
+		{
+			if (fDist < fClosestDist)
+			{
+				fClosestDist = fDist;
+				bHit = true;
+			}
+		}
+	}
+
+	if (bHit && pOutDist)
+		*pOutDist = fClosestDist;
+
+	return bHit;
+}
+
+
+
+
+HRESULT CLoad_Mesh::Bind_BoneMatrices(CShader* pShader, const _char* pConstantName, const vector<class CLoad_Bone*>& Bones)
+{
+	// 매 프레임 Bone Matrix 행렬을 초기화합니다.
+	for (_uint i = 0; i < m_iNumBones; i++)
+	{
+		XMStoreFloat4x4(&m_BoneMatrices[i],
+			XMLoadFloat4x4(&m_OffsetMatrices[i]) * Bones[m_BoneIndices[i]]->Get_CombinedTransformationMatrix());
+	}
+
+	return pShader->Bind_Matrices(pConstantName, m_BoneMatrices, m_iNumBones);
 }
 
 HRESULT CLoad_Mesh::Bind_Resources()
@@ -227,7 +251,7 @@ CLoad_Mesh* CLoad_Mesh::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pCont
 	{
 		MSG_BOX(TEXT("Create Failed : Load_Mesh"));
 		Safe_Release(pInstance);
-		CRASH();
+		CRASH("LOAD MESH FAILED");
 	}
 	
 	return pInstance;
