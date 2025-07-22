@@ -16,14 +16,14 @@ public:
 	virtual HRESULT Initialize_Prototype(MODELTYPE eModelType, const aiMesh* pMesh, const vector<class CTool_Bone*>& Bones, _fmatrix PreTransformMatrix);
 	virtual HRESULT Initialize_Clone(void* pArg) override;
 
-#pragma region Tool 에서 추출할 Mesh 정보들
+
 public:
 	const _uint Get_MaterialIndex() { return m_iMaterialIndex; }
 	const _bool Is_Ray_Hit(const _float3& rayOrigin, const _float3& rayDir, _float* pOutDist);
-
 	void Set_BondIndexVector(vector<_int>& boneIndicies);
 
-
+#pragma region Tool 에서 추출할 Mesh 정보들
+public:
 	void Save_AnimMeshes(const aiMesh* pAIMesh, ANIMMESH_INFO& AnimMeshInfo);
 #pragma endregion
 
@@ -50,8 +50,8 @@ private:
 	vector<_float4x4> m_OffsetMatrices;
 
 	/* 저장용 Mesh 데이터 */
-	vector<VTXMESH> m_NonAnimVertices;
-	vector<VTXANIMMESH> m_AnimVertices;
+	//vector<VTXMESH> m_NonAnimVertices;
+	vector<VTXANIMMESH> m_Vertices;
 	
 
 

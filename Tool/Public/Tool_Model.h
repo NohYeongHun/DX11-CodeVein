@@ -42,6 +42,7 @@ private:
 	HRESULT Save_AnimMeshes(ANIMMODEL_INFO& AnimModelInfo, _fmatrix PreTransformMatrix);
 	HRESULT Save_AnimMaterials(ANIMMODEL_INFO& AnimModelInfo);
 	HRESULT Save_Bones(ANIMMODEL_INFO& AnimModelInfo);
+	HRESULT Save_AnimationInfo(ANIMMODEL_INFO& AnimModelInfo);
 
 #pragma endregion
 
@@ -83,8 +84,13 @@ private:
 	vector<class CTool_Bone*> m_Bones;
 
 private:
-	MODEL_INFO m_NonAnimModelInfo = {};
+	/* Animations */
+	_uint m_iCurrentAnimIndex = { 0 };
+	_uint m_iNumAnimations = { 0 };
+	vector<class CTool_Animation*> m_Animations;
 
+private:
+	MODEL_INFO m_NonAnimModelInfo = {};
 	string m_ModelDir = {};
 
 
@@ -92,6 +98,7 @@ private:
 	HRESULT Ready_Meshes(_fmatrix PreTransformMatrix);
 	HRESULT Ready_Materials(const _char* pModelFilePath, const _char* pTextureFolderPath);
 	HRESULT Ready_Bones(const aiNode* pAiNode, _int iParentBoneIndex);
+	HRESULT Ready_Animations();
 
 
 public:

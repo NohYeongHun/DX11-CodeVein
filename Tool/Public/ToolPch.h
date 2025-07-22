@@ -31,9 +31,11 @@
 #pragma endregion
 
 #pragma region Model
+#include "Tool_Bone.h"
+#include "Tool_Channel.h"
+#include "Tool_Animation.h"
 #include "Tool_Mesh.h"
 #include "Tool_MeshMaterial.h"
-#include "Tool_Bone.h"
 #include "Tool_Model.h"
 #pragma endregion
 

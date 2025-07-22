@@ -82,6 +82,16 @@ namespace Engine
 		};
 	}VTXMESH;
 
+	/* KEYFRAME에 대한 정보. */
+	typedef struct tagKeyFrame
+	{
+		XMFLOAT3	vScale;
+		XMFLOAT4	vRotation;
+		XMFLOAT3	vTranslation;
+
+		float		fTrackPosition;
+	}KEYFRAME;
+
 	typedef struct tagVertexAnimMesh
 	{
 		XMFLOAT3		vPosition;

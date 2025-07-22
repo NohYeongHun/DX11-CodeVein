@@ -159,11 +159,17 @@ HRESULT CMainApp::Ready_Prototype_ForModel()
 
 	/* Prototype_Component_Model */
 	PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
-
+	 
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
 		, TEXT("Prototype_Component_Model_Player")
-		, CLoad_Model::Create(m_pDevice, m_pContext, MODELTYPE::ANIM, PreTransformMatrix, "../Bin/Resources/SaveFile/playerModel.dat"))))
+		, CLoad_Model::Create(m_pDevice, m_pContext, MODELTYPE::ANIM, PreTransformMatrix, "../../SaveFile/Model/Player/Player.dat"))))
 		return E_FAIL;
+
+	/* Non Anim Test */
+	/*if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
+		, TEXT("Prototype_Component_Model_Player")
+		, CLoad_Model::Create(m_pDevice, m_pContext, MODELTYPE::NONANIM, PreTransformMatrix, "../Bin/Resources/SaveFile/map.dat"))))
+		return E_FAIL;*/
 
 	/*if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
 		, TEXT("Prototype_Component_Model_Player")

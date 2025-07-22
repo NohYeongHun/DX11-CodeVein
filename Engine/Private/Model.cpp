@@ -15,6 +15,9 @@ CModel::CModel(const CModel& Prototype)
 	, m_iNumMaterials { Prototype.m_iNumMaterials }
 	, m_PreTransformMatrix { Prototype.m_PreTransformMatrix }
 	, m_Bones{ Prototype.m_Bones }
+	, m_iCurrentAnimIndex{ Prototype.m_iCurrentAnimIndex }
+	, m_iNumAnimations{ Prototype.m_iNumAnimations }
+	, m_Animations { Prototype.m_Animations }
 {
 	for (auto& pMesh : m_Meshes)
 		Safe_AddRef(pMesh);
@@ -24,6 +27,9 @@ CModel::CModel(const CModel& Prototype)
 
 	for (auto& pBone : m_Bones)
 		Safe_AddRef(pBone);
+
+	for (auto& pAnimation : m_Animations)
+		Safe_AddRef(pAnimation);
 }
 
 HRESULT CModel::Initialize_Prototype(MODELTYPE eModelType, _fmatrix PreTransformMatrix, const _char* pModelFilePath)
@@ -54,6 +60,8 @@ HRESULT CModel::Initialize_Prototype(MODELTYPE eModelType, _fmatrix PreTransform
 	if (FAILED(Ready_Materials(pModelFilePath)))
 		return E_FAIL;
 
+	if (FAILED(Ready_Animations()))
+		return E_FAIL;
 	
 
     return S_OK;
@@ -151,8 +159,24 @@ HRESULT CModel::Ready_Bones(const aiNode* pAiNode, _int iParentBoneIndex)
 	_int iIndex = m_Bones.size() - 1; // 자식 객체에 부여할 부모 인덱스는 자신의 인덱스.
 
 	for (_uint i = 0; i < pAiNode->mNumChildren; i++)
-	{
 		Ready_Bones(pAiNode->mChildren[i], iIndex);
+
+	return S_OK;
+}
+
+HRESULT CModel::Ready_Animations()
+{
+	// 애니메이션 개수 저장
+	m_iNumAnimations = m_pAIScene->mNumAnimations;
+	for (_uint i = 0; i < m_iNumAnimations; i++)
+	{
+		CAnimation* pAnimation = CAnimation::Create(m_pAIScene->mAnimations[i], m_Bones);
+		if (nullptr == pAnimation)
+		{
+			CRASH("Animation Create Failed");
+			return E_FAIL;
+		}
+		m_Animations.emplace_back(pAnimation);
 	}
 
 	return S_OK;
@@ -202,6 +226,11 @@ void CModel::Free()
 
 	m_Bones.clear();
 	
+	for (auto& pAnimation : m_Animations)
+		Safe_Release(pAnimation);
+	
+	m_Animations.clear();
+
 	//Safe_Delete(m_pAIScene);
 	m_Importer.FreeScene();
 

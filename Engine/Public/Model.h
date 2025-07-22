@@ -49,12 +49,17 @@ private:
 	_uint m_iNumBones = {};
 	vector<class CBone*> m_Bones;
 
-
+private:
+	/* Animations */
+	_uint m_iCurrentAnimIndex = { 0 };
+	_uint m_iNumAnimations = { 0 };
+	vector<class CAnimation*> m_Animations;
 
 private:
 	HRESULT Ready_Meshes();
 	HRESULT Ready_Materials(const _char* pModelFilePath);
 	HRESULT Ready_Bones(const aiNode* pAiNode, _int iParentBoneIndex);
+	HRESULT Ready_Animations();
 
 
 public:

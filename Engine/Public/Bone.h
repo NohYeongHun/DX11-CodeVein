@@ -13,6 +13,12 @@ public:
 		return XMLoadFloat4x4(&m_CombinedTransformationMatrix);
 	}
 
+	/* 외부 애니메이션 동작 시 뼈의 상태행렬을 변경해줍니다. */
+	void Set_TransformMatrix(_fmatrix TransformationMatrix)
+	{
+		XMStoreFloat4x4(&m_TransformationMatrix, TransformationMatrix);
+	}
+
 	_bool Compare_Name(const _char* pName)
 	{
 		return !strcmp(pName, m_szName);
@@ -24,8 +30,6 @@ public:
 	// 읽기 전용으로 벡터를 가져와서 부모 본의 변환 행렬과 결합된 본의 변환 행렬을 업데이트합니다.
 	void Update_CombinedTransformationMatrix(const _float4x4& PreTransformMatrix, const vector<CBone*>& Bones);
 	
-
-
 private:
 	_char m_szName[MAX_PATH] = {}; // Bone의 이름.
 	_float4x4 m_TransformationMatrix = {}; // 본의 변환 행렬.

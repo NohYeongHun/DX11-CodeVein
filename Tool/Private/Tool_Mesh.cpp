@@ -122,13 +122,13 @@ void CTool_Mesh::Save_AnimMeshes(const aiMesh* pAIMesh, ANIMMESH_INFO& AnimMeshI
 	AnimMeshInfo.OffsetMatrices = m_OffsetMatrices; // 깊은 복사.
 	
 	// 정점 벡터 복사.
-	AnimMeshInfo.vertices = m_AnimVertices;
+	AnimMeshInfo.vertices = m_Vertices;
 	// 정점 Incidies 복사.
 	AnimMeshInfo.indices = m_vecIndices;
 }
 
 
-HRESULT CTool_Mesh::Bind_BoneMatrices(CShader* pShader, const _char* pConstantName, const vector<class CTool_Bone*>& Bones)
+HRESULT CTool_Mesh::Bind_BoneMatrices(CShader* pShader, const _char* pConstantName, const vector<CTool_Bone*>& Bones)
 {
 	// 매 프레임 Bone Matrix 행렬을 초기화합니다.
 	for (_uint i = 0; i < m_iNumBones; i++)
@@ -173,7 +173,7 @@ HRESULT CTool_Mesh::Render()
 
 HRESULT CTool_Mesh::Ready_Vertices_For_NonAnim(const aiMesh* pAIMesh, _fmatrix PreTransformMatrix)
 {
-	m_iVertexStride = sizeof(VTXMESH);
+	m_iVertexStride = sizeof(VTXANIMMESH);
 
 	D3D11_BUFFER_DESC		VBDesc{};
 	VBDesc.ByteWidth = m_iNumVertices * m_iVertexStride;
@@ -183,7 +183,7 @@ HRESULT CTool_Mesh::Ready_Vertices_For_NonAnim(const aiMesh* pAIMesh, _fmatrix P
 	VBDesc.MiscFlags = 0;
 	VBDesc.StructureByteStride = m_iVertexStride;
 
-	VTXMESH* pVertices = new VTXMESH[m_iNumVertices];
+	VTXANIMMESH* pVertices = new VTXANIMMESH[m_iNumVertices];
 
 	for (_uint i = 0; i < m_iNumVertices; i++)
 	{
@@ -200,6 +200,10 @@ HRESULT CTool_Mesh::Ready_Vertices_For_NonAnim(const aiMesh* pAIMesh, _fmatrix P
 		/* 충돌 확인용 Vertex Position 설정. */
 		m_vecPositions.push_back(pVertices[i].vPosition);
 	}
+
+	m_Vertices.reserve(m_iNumVertices);
+	for (_uint i = 0; i < m_iNumVertices; ++i)
+		m_Vertices.emplace_back(pVertices[i]);
 
 	D3D11_SUBRESOURCE_DATA	VBInitialData{};
 	VBInitialData.pSysMem = pVertices;
@@ -236,7 +240,6 @@ HRESULT CTool_Mesh::Ready_Vertices_For_Anim(const aiMesh* pAIMesh, const vector<
 		memcpy(&pVertices[i].vTangent, &pAIMesh->mTangents[i], sizeof(_float3));
 		memcpy(&pVertices[i].vBinormal, &pAIMesh->mBitangents[i], sizeof(_float3));
 		memcpy(&pVertices[i].vTexcoord, &pAIMesh->mTextureCoords[0][i], sizeof(_float2));
-
 	}
 
 	m_iNumBones = pAIMesh->mNumBones;
@@ -328,9 +331,9 @@ HRESULT CTool_Mesh::Ready_Vertices_For_Anim(const aiMesh* pAIMesh, const vector<
 	}
 
 	/* 여기서 저장할 정보를 Emplace Back 한다. */
-	m_AnimVertices.reserve(m_iNumVertices);
+	m_Vertices.reserve(m_iNumVertices);
 	for (_uint i = 0; i < m_iNumVertices; ++i)
-		m_AnimVertices.emplace_back(pVertices[i]);
+		m_Vertices.emplace_back(pVertices[i]);
 
 	D3D11_SUBRESOURCE_DATA	VBInitialData{};
 	VBInitialData.pSysMem = pVertices;

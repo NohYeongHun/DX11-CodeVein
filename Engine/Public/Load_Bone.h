@@ -9,8 +9,6 @@ private:
 	virtual ~CLoad_Bone() = default;
 
 
-
-
 public:
 	HRESULT Initialize(std::ifstream& ifs);
 

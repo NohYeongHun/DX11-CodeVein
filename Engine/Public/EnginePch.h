@@ -33,14 +33,19 @@
 #include "Texture.h"
 #include "Texture_Manager.h"
 
+/* Model */
+#include "Channel.h"
+#include "Animation.h"
 #include "MeshMaterial.h"
 #include "Mesh.h"
 #include "Bone.h"
 #include "Model.h"
 
+#include "Load_Channel.h"
+#include "Load_Animation.h"
+#include "Load_Bone.h"
 #include "Load_MeshMaterial.h"
 #include "Load_Mesh.h"
-#include "Load_Bone.h"
 #include "Load_Model.h"
 
 #pragma endregion

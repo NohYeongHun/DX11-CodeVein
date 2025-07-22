@@ -47,7 +47,6 @@ typedef struct AnimMeshInfoHeader {
     uint32_t iIndicesCount;
     uint32_t iBoneCount;
 
-
     string strName; // Mesh 이름
 
     vector<VTXANIMMESH> vertices;
@@ -68,6 +67,23 @@ typedef struct BoneInfoHeader {
     _float4x4 TransformMatrix; // TransformMatrix
 }BONE_INFO;
 
+
+typedef struct ChannelInfoHeader
+{
+    string channelName;
+    uint32_t iBoneIndex;
+    uint32_t iNumKeyFrames;
+    vector<KEYFRAME> KeyFrames;
+}CHANNEL_INFO;
+
+typedef struct AnimationInfoHeader {
+    _float fDuration;
+    _float fTickPerSecond;
+    _float fCurrentTrackPostion;
+    uint32_t iNumChannels; // channel 크기.
+    vector<CHANNEL_INFO> Channels;
+}ANIMATION_INFO;
+
 // 모델이 들고 있는 정보. => 모델 Prototype 생성시 만듭니다.
 typedef struct AnimModelHeader
 {
@@ -80,6 +96,10 @@ typedef struct AnimModelHeader
 
     uint32_t boneVectorSize;
     vector <BONE_INFO> boneVector;
+
+    uint32_t iCurrentAnimIndex;
+    uint32_t iNumAnimations;   // vector 크기.
+    vector<ANIMATION_INFO> animationVector;
 }ANIMMODEL_INFO;
 #pragma endregion
 

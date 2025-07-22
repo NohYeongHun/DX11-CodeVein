@@ -159,7 +159,9 @@
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\Public\Tool_Animation.h" />
     <ClInclude Include="..\Public\Camera_Free.h" />
+    <ClInclude Include="..\Public\Tool_Channel.h" />
     <ClInclude Include="..\Public\Map_Part.h" />
     <ClInclude Include="..\Public\SaveFile_Loader.h" />
     <ClInclude Include="..\Public\imconfig.h" />
@@ -174,7 +176,6 @@
     <ClInclude Include="..\Public\imstb_rectpack.h" />
     <ClInclude Include="..\Public\imstb_textedit.h" />
     <ClInclude Include="..\Public\imstb_truetype.h" />
-    <ClInclude Include="..\Public\SaveFile_Define.h" />
     <ClInclude Include="..\Public\Level_Loading.h" />
     <ClInclude Include="..\Public\Level_Logo.h" />
     <ClInclude Include="..\Public\Loader.h" />
@@ -197,7 +198,9 @@
     <ClInclude Include="Tool.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\Private\Tool_Animation.cpp" />
     <ClCompile Include="..\Private\Camera_Free.cpp" />
+    <ClCompile Include="..\Private\Tool_Channel.cpp" />
     <ClCompile Include="..\Private\Map_Part.cpp" />
     <ClCompile Include="..\Private\SaveFile_Loader.cpp" />
     <ClCompile Include="..\Private\imgui.cpp" />

@@ -52,6 +52,12 @@ private:
 	vector<class CLoad_Bone*> m_Bones;
 
 private:
+	/* Animations */
+	_uint m_iCurrentAnimIndex = { 0 };
+	_uint m_iNumAnimations = { 0 };
+	vector<class CLoad_Animation*> m_Animations;
+
+private:
 	string m_ModelDir = {};
 
 
@@ -59,6 +65,7 @@ private:
 	HRESULT Load_Meshes(_fmatrix PreTransformMatrix, std::ifstream& ifs);
 	HRESULT Load_Materials( std::ifstream& ifs);
 	HRESULT Load_Bones(std::ifstream& ifs);
+	HRESULT Load_Animations(std::ifstream& ifs);
 
 
 

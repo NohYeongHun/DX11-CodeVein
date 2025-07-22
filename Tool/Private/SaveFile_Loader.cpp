@@ -184,8 +184,9 @@ void CSaveFile_Loader::Save_ModelFile(string filePath, const _wstring& strProtot
 		return;
 	}
 
+	Save_AnimModel(ofs, pModel, strPrototypeTag);
 
-	switch (pModel->Get_ModelType())
+	/*switch (pModel->Get_ModelType())
 	{
 	case MODELTYPE::ANIM:
 		Save_AnimModel(ofs, pModel, strPrototypeTag);
@@ -194,7 +195,7 @@ void CSaveFile_Loader::Save_ModelFile(string filePath, const _wstring& strProtot
 	case MODELTYPE::NONANIM:
 		Save_NonAnimModel(ofs, pModel, strPrototypeTag);
 		break;
-	}
+	}*/
 	
 	
 
@@ -204,7 +205,7 @@ void CSaveFile_Loader::Save_ModelFile(string filePath, const _wstring& strProtot
 void CSaveFile_Loader::Save_AnimModel(std::ofstream& ofs, CTool_Model* pModel, const _wstring& strModelTag)
 {
 	if (nullptr == pModel)
-		CRASH();
+		CRASH("Model NULLPTR");
 
 	ANIMMODEL_INFO animModelInfo = {};
 	// Model Tag는 선택된 Prototype Tag로 저장됩니다.
@@ -270,6 +271,30 @@ void CSaveFile_Loader::Save_AnimModel(std::ofstream& ofs, CTool_Model* pModel, c
 		ofs.write(reinterpret_cast<const char*>(&bone.iParentBoneIndex), sizeof(_int));
 		WriteString(ofs, bone.strName);
 		ofs.write(reinterpret_cast<const char*>(&bone.TransformMatrix), sizeof(_float4x4));
+	}
+
+	/* ---------- Animation 정보 저장. ---------- */
+	ofs.write(reinterpret_cast<const char*>(&animModelInfo.iCurrentAnimIndex), sizeof(uint32_t));
+	ofs.write(reinterpret_cast<const char*>(&animModelInfo.iNumAnimations), sizeof(uint32_t));
+
+	for (const ANIMATION_INFO& anim : animModelInfo.animationVector)
+	{
+		ofs.write(reinterpret_cast<const char*>(&anim.fDuration), sizeof(_float));
+		ofs.write(reinterpret_cast<const char*>(&anim.fTickPerSecond), sizeof(_float));
+		ofs.write(reinterpret_cast<const char*>(&anim.fCurrentTrackPostion), sizeof(_float));
+		ofs.write(reinterpret_cast<const char*>(&anim.iNumChannels), sizeof(uint32_t));
+
+		
+		/* Channel 정보 저장. */
+		for (const CHANNEL_INFO& channel : anim.Channels)
+		{
+			// string 저장.
+			WriteString(ofs, channel.channelName);
+			ofs.write(reinterpret_cast<const char*>(&channel.iBoneIndex), sizeof(uint32_t));
+			ofs.write(reinterpret_cast<const char*>(&channel.iNumKeyFrames), sizeof(uint32_t));
+			ofs.write(reinterpret_cast<const char*>(channel.KeyFrames.data()),
+				channel.iNumKeyFrames * sizeof(KEYFRAME));
+		}
 	}
 
 }

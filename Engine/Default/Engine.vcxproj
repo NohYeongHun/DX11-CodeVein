@@ -159,6 +159,7 @@ call copy.bat</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\Private\Animation.cpp" />
     <ClCompile Include="..\Private\Base.cpp" />
     <ClCompile Include="..\Private\Bone.cpp" />
     <ClCompile Include="..\Private\Bounding_OBB.cpp" />
@@ -166,6 +167,7 @@ call copy.bat</Command>
     <ClCompile Include="..\Private\Bounding_AABB.cpp" />
     <ClCompile Include="..\Private\Bounding_Sphere.cpp" />
     <ClCompile Include="..\Private\Camera.cpp" />
+    <ClCompile Include="..\Private\Channel.cpp" />
     <ClCompile Include="..\Private\Collider.cpp" />
     <ClCompile Include="..\Private\Collider_Manager.cpp" />
     <ClCompile Include="..\Private\Component.cpp" />
@@ -186,6 +188,8 @@ call copy.bat</Command>
     <ClCompile Include="..\Private\Level_Manager.cpp" />
     <ClCompile Include="..\Private\Light.cpp" />
     <ClCompile Include="..\Private\Light_Manager.cpp" />
+    <ClCompile Include="..\Private\Load_Animation.cpp" />
+    <ClCompile Include="..\Private\Load_Channel.cpp" />
     <ClCompile Include="..\Private\Mesh.cpp" />
     <ClCompile Include="..\Private\MeshMaterial.cpp" />
     <ClCompile Include="..\Private\Model.cpp" />
@@ -210,6 +214,7 @@ call copy.bat</Command>
     <ClCompile Include="..\Private\VIBuffer_Terrain.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Public\Animation.h" />
     <ClInclude Include="..\Public\Base.h" />
     <ClInclude Include="..\Public\Bone.h" />
     <ClInclude Include="..\Public\Bounding.h" />
@@ -217,6 +222,7 @@ call copy.bat</Command>
     <ClInclude Include="..\Public\Bounding_OBB.h" />
     <ClInclude Include="..\Public\Bounding_Sphere.h" />
     <ClInclude Include="..\Public\Camera.h" />
+    <ClInclude Include="..\Public\Channel.h" />
     <ClInclude Include="..\Public\Collider.h" />
     <ClInclude Include="..\Public\Collider_Manager.h" />
     <ClInclude Include="..\Public\Component.h" />
@@ -242,6 +248,8 @@ call copy.bat</Command>
     <ClInclude Include="..\Public\Light.h" />
     <ClInclude Include="..\Public\Light_Manager.h" />
     <ClInclude Include="..\Public\LoadFile_Define.h" />
+    <ClInclude Include="..\Public\Load_Animation.h" />
+    <ClInclude Include="..\Public\Load_Channel.h" />
     <ClInclude Include="..\Public\Mesh.h" />
     <ClInclude Include="..\Public\MeshMaterial.h" />
     <ClInclude Include="..\Public\Model.h" />

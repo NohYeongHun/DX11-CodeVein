@@ -96,7 +96,7 @@ void CMap_Tool::Render_SaveLoad()
             if (ImGui::MenuItem("open"))
             {
                 IGFD::FileDialogConfig config;
-                config.path = "../Bin/Resources/SaveFile/";
+                config.path = "../../SaveFile/Model/";
                 config.flags = ImGuiFileDialogFlags_ReadOnlyFileNameField;
 
                 // 파일 다이얼로그 열기
@@ -105,7 +105,7 @@ void CMap_Tool::Render_SaveLoad()
             if (ImGui::MenuItem("save"))
             {
                 IGFD::FileDialogConfig config;
-                config.path = "../Bin/Resources/SaveFile/";
+                config.path = "../../SaveFile/Model/";
                 config.flags = ImGuiFileDialogFlags_ConfirmOverwrite;
 
                 ImGuiFileDialog::Instance()->OpenDialog("SaveFileDlgKey", "Choose File", ".dat", config);

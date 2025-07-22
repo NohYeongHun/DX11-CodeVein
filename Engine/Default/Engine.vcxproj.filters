@@ -148,6 +148,18 @@
     <Filter Include="01. Utility\03. Component\LoadModel\Mesh">
       <UniqueIdentifier>{5a79b8f7-2ba7-43ff-8e1a-af77debd529e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01. Utility\03. Component\Model\Animation">
+      <UniqueIdentifier>{bcd79043-fbe1-4cb7-ad7a-8d9ee306b274}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\03. Component\Model\Animation\Channel">
+      <UniqueIdentifier>{574790ed-abe6-4b3e-917e-c685c21928ba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\03. Component\LoadModel\Animation">
+      <UniqueIdentifier>{c59177f6-81be-4b94-9dd7-3d34ffae6430}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\03. Component\LoadModel\Animation\Channel">
+      <UniqueIdentifier>{032794f5-5f76-4b23-b7cc-bacea3a40a98}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Timer.cpp">
@@ -287,6 +299,18 @@
     </ClCompile>
     <ClCompile Include="..\Private\Load_MeshMaterial.cpp">
       <Filter>01. Utility\03. Component\LoadModel\Material</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Animation.cpp">
+      <Filter>01. Utility\03. Component\Model\Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Channel.cpp">
+      <Filter>01. Utility\03. Component\Model\Animation\Channel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Load_Animation.cpp">
+      <Filter>01. Utility\03. Component\LoadModel\Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Load_Channel.cpp">
+      <Filter>01. Utility\03. Component\LoadModel\Animation\Channel</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -454,6 +478,18 @@
     </ClInclude>
     <ClInclude Include="..\Public\SaveFile_Define.h">
       <Filter>99 .Defines</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Animation.h">
+      <Filter>01. Utility\03. Component\Model\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Channel.h">
+      <Filter>01. Utility\03. Component\Model\Animation\Channel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Load_Animation.h">
+      <Filter>01. Utility\03. Component\LoadModel\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Load_Channel.h">
+      <Filter>01. Utility\03. Component\LoadModel\Animation\Channel</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

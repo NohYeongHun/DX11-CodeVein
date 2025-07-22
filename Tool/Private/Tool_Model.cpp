@@ -16,6 +16,9 @@ CTool_Model::CTool_Model(const CTool_Model& Prototype)
 	, m_PreTransformMatrix { Prototype.m_PreTransformMatrix }
 	, m_Bones{ Prototype.m_Bones }
 	, m_ModelDir{ Prototype.m_ModelDir }
+	, m_iCurrentAnimIndex { Prototype.m_iCurrentAnimIndex }
+	, m_iNumAnimations{ Prototype.m_iNumAnimations }
+	, m_Animations { Prototype.m_Animations}
 {
 	for (auto& mesh : m_Meshes)
 		Safe_AddRef(mesh);
@@ -25,6 +28,9 @@ CTool_Model::CTool_Model(const CTool_Model& Prototype)
 
 	for (auto& bone : m_Bones)
 		Safe_AddRef(bone);
+
+	for (auto& pAnimation : m_Animations)
+		Safe_AddRef(pAnimation);
 }
 
 HRESULT CTool_Model::Initialize_Prototype(MODELTYPE eModelType, _fmatrix PreTransformMatrix, const _char* pModelFilePath, const _char* pTextureFolderPath)
@@ -47,13 +53,16 @@ HRESULT CTool_Model::Initialize_Prototype(MODELTYPE eModelType, _fmatrix PreTran
 	std::replace(m_ModelDir.begin(), m_ModelDir.end(), '/', '\\');
 
 	if (FAILED(Ready_Bones(m_pAIScene->mRootNode, -1)))
-		CRASH()
+		CRASH("READY BONE FAILED");
 
 	if (FAILED(Ready_Meshes(PreTransformMatrix)))
-		CRASH()
+		CRASH("READY MESH FAILED");
 
 	if (FAILED(Ready_Materials(pModelFilePath, pTextureFolderPath)))
-		CRASH()
+		CRASH("READY MARTERIAL FAILED");
+
+	if (FAILED(Ready_Animations()))
+		CRASH("READY ANIMATION FAILED");
 
 
 
@@ -207,13 +216,16 @@ void CTool_Model::Save_AnimModel(ANIMMODEL_INFO& AnimModelInfo, _fmatrix PreTran
 {
 	
 	if (FAILED(Save_Bones(AnimModelInfo)))
-		CRASH();
+		CRASH("Save Bones Failed");
 	
 	if (FAILED(Save_AnimMeshes(AnimModelInfo, PreTransformMatrix)))
-		CRASH();
+		CRASH("Save AnimMeshes Failed");
 		
 	if (FAILED(Save_AnimMaterials(AnimModelInfo)))
-		CRASH();
+		CRASH("Save AnimMaterials Failed");
+
+	if (FAILED(Save_AnimationInfo(AnimModelInfo)))
+		CRASH("Save AnimationInfo Failed")
 
 	return;
 }
@@ -274,6 +286,34 @@ HRESULT CTool_Model::Save_Bones(ANIMMODEL_INFO& AnimModelInfo)
 		pBone->Save_Bones(boneInfo);
 		// 채워진 정보를 Vector에 추가해줍니다. => 새로운 객체 생성되서 추가됨.
 		AnimModelInfo.boneVector.emplace_back(boneInfo);
+	}
+
+	return S_OK;
+}
+/* 
+	uint32_t iCurrentAnimIndex;
+    uint32_t iNumAnimations;
+    vector<ANIMATION_INFO> animationVector;
+*/
+
+// 1. Animation 정보 저장.
+HRESULT CTool_Model::Save_AnimationInfo(ANIMMODEL_INFO& AnimModelInfo)
+{
+	// 2. index, animation 개수 저장.
+	AnimModelInfo.iCurrentAnimIndex = m_iCurrentAnimIndex;
+	AnimModelInfo.iNumAnimations = m_iNumAnimations;
+
+	// 3. 벡터 크기 설정.
+	AnimModelInfo.animationVector.reserve(m_iNumAnimations);
+
+	vector<ANIMATION_INFO>& animVector = AnimModelInfo.animationVector;
+
+	// 4. vector에 Animation 정보 구조체 단위로 저장.
+	for (_uint i = 0; i < m_iNumAnimations; i++)
+	{
+		ANIMATION_INFO animInfo = {};
+		m_Animations[i]->Save_Animation(animInfo);
+		animVector.emplace_back(animInfo);
 	}
 
 	return S_OK;
@@ -390,6 +430,24 @@ HRESULT CTool_Model::Ready_Bones(const aiNode* pAiNode, _int iParentBoneIndex)
 	return S_OK;
 }
 
+HRESULT CTool_Model::Ready_Animations()
+{
+	// 애니메이션 개수 저장
+	m_iNumAnimations = m_pAIScene->mNumAnimations;
+	for (_uint i = 0; i < m_iNumAnimations; i++)
+	{
+		CTool_Animation* pAnimation = CTool_Animation::Create(m_pAIScene->mAnimations[i], m_Bones);
+		if (nullptr == pAnimation)
+		{
+			CRASH("Animation Create Failed");
+			return E_FAIL;
+		}
+		m_Animations.emplace_back(pAnimation);
+	}
+
+	return S_OK;
+}
+
 
 CTool_Model* CTool_Model::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, MODELTYPE eModelType, _fmatrix PreTransformMatrix, const _char* pModelFilePath, const _char* pTextureFolderPath)
 {
@@ -435,6 +493,11 @@ void CTool_Model::Free()
 
 	m_Bones.clear();
 	
+	for (auto& pAnimation : m_Animations)
+		Safe_Release(pAnimation);
+
+	m_Animations.clear();
+
 	//Safe_Delete(m_pAIScene);
 	m_Importer.FreeScene();
 }

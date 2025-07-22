@@ -15,6 +15,9 @@ CLoad_Model::CLoad_Model(const CLoad_Model& Prototype)
 	, m_PreTransformMatrix { Prototype.m_PreTransformMatrix }
 	, m_Bones{ Prototype.m_Bones }
 	, m_ModelDir{ Prototype.m_ModelDir }
+	, m_Animations { Prototype.m_Animations }
+	, m_iNumAnimations { Prototype.m_iNumAnimations }
+	, m_iCurrentAnimIndex { Prototype.m_iCurrentAnimIndex }
 {
 	for (auto& mesh : m_Meshes)
 		Safe_AddRef(mesh);
@@ -24,6 +27,9 @@ CLoad_Model::CLoad_Model(const CLoad_Model& Prototype)
 
 	for (auto& bone : m_Bones)
 		Safe_AddRef(bone);
+
+	for (auto& pAnimation : m_Animations)
+		Safe_AddRef(pAnimation);
 }
 
 
@@ -69,6 +75,10 @@ HRESULT CLoad_Model::Initialize_Prototype(MODELTYPE eModelType, _fmatrix PreTran
 	if (FAILED(Load_Bones(ifs)))
 		CRASH("LOAD BONES FAILED");
 
+	if (FAILED(Load_Animations(ifs)))
+		CRASH("LOAD ANIMATION FAILED");
+
+	// Load가 끝났다면 삭제.
 	ifs.close();
 	
 
@@ -196,6 +206,29 @@ HRESULT CLoad_Model::Load_Bones(std::ifstream& ifs)
 	return S_OK;
 }
 
+/* 1. Animation Load */
+HRESULT CLoad_Model::Load_Animations(std::ifstream& ifs)
+{
+	uint32_t iCurrentAnimIndex = {};
+	ifs.read(reinterpret_cast<char*>(&iCurrentAnimIndex), sizeof(uint32_t));
+
+	uint32_t iNumAnimations = {};
+	ifs.read(reinterpret_cast<char*>(&iNumAnimations), sizeof(uint32_t));
+
+	for (uint32_t i = 0; i < iNumAnimations; ++i)
+	{
+		CLoad_Animation* pAnimation = CLoad_Animation::Create(ifs);
+		if (nullptr == pAnimation)
+			CRASH("LOAD ANIMATION FAILED");
+
+		m_Animations.emplace_back(pAnimation);
+	}
+
+	m_iNumAnimations = iNumAnimations;
+
+	return S_OK;
+}
+
 CLoad_Model* CLoad_Model::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, MODELTYPE eModelType, _fmatrix PreTransformMatrix, string filepath)
 {
 	CLoad_Model* pInstance = new CLoad_Model(pDevice, pContext);
@@ -239,6 +272,11 @@ void CLoad_Model::Free()
 		Safe_Release(pBone);
 
 	m_Bones.clear();
+
+	for (auto& pAnimation : m_Animations)
+		Safe_Release(pAnimation);
+
+	m_Animations.clear();
 	
 	//Safe_Delete(m_pAIScene);
 }
