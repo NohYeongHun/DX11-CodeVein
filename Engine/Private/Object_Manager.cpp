@@ -1,9 +1,4 @@
 ﻿#include "Object_Manager.h"
-#include "GameInstance.h"
-
-#include "GameObject.h"
-
-#include "Layer.h"
 
 CObject_Manager::CObject_Manager()
 	: m_pGameInstance{ CGameInstance::GetInstance() }
@@ -12,10 +7,11 @@ CObject_Manager::CObject_Manager()
 }
 
 
+#pragma region ENGINE에 제공
 CComponent* CObject_Manager::Get_Component(_uint iLayerLevelIndex, const _wstring& strLayerTag, const _wstring& strComponentTag, _uint iIndex)
 {
-	CLayer*		pLayer = Find_Layer(iLayerLevelIndex, strLayerTag);
-	if(nullptr == pLayer)
+	CLayer* pLayer = Find_Layer(iLayerLevelIndex, strLayerTag);
+	if (nullptr == pLayer)
 		return nullptr;
 
 	return pLayer->Get_Component(strComponentTag, iIndex);
@@ -26,16 +22,62 @@ CLayer* CObject_Manager::Get_Layer(_uint iLayerIndex, const _wstring& strLayerTa
 	return Find_Layer(iLayerIndex, strLayerTag);
 }
 
-/* Layer 객체들이 Picking이 되었는지 확인하기. */
-//CGameObject* CObject_Manager::Get_PickingObject(_uint iLayerLevelIndex, const _wstring strLayerTag, const _float3& vRayOrigin, const _float3& vRayDir, _float* pOutDist)
-//{
-//
-//	CLayer* pLayer = Find_Layer(iLayerLevelIndex, strLayerTag);
-//	if (nullptr == pLayer)
-//		return nullptr;
-//
-//	return pLayer->Get_PickingObject(vRayOrigin, vRayDir, pOutDist);
-//}
+/* 읽기 전용 Layer를 내보냅니다. */
+const LayerTable& CObject_Manager::Export_EditLayer(_uint iLayerLevelIndex)
+{	
+	return m_pLayers[iLayerLevelIndex];
+}
+
+/* 수정용 이벤트. */
+void CObject_Manager::Request_EditObject(_uint iLayerLevelIndex, const _wstring& strLayerTag, uint32_t objID, const EditPayload& payload)
+{
+	switch (payload.type)
+	{
+	case EEditType::Transform:
+		Edit_Transform(iLayerLevelIndex, strLayerTag, objID, payload);
+		break;
+	default:
+		break;
+	}
+}
+
+/* 삭제용 이벤트. */
+void CObject_Manager::Request_DeleteObject(_uint iLayerLevelIndex, const _wstring& strLayerTag, uint32_t objID)
+{
+	CLayer* pLayer = Find_Layer(iLayerLevelIndex, strLayerTag);
+	if (nullptr == pLayer)
+	{
+		CRASH("Failed Find Layer");
+		return;
+	}
+	
+	std::list<CGameObject*>& objList = pLayer->Get_GameObjects();
+
+	// Iter 방식 순회.
+	for (auto it = objList.begin(); it != objList.end(); /* no ++ here */)
+	{
+		CGameObject* pObj = *it;
+		if (pObj && pObj->Get_ID() == objID)
+		{
+			Safe_Release(pObj);        
+			it = objList.erase(it); 
+			return;                    
+		}
+		else
+		{
+			++it;                      // 다음 원소
+		}
+	}
+
+	// 여기까지 왔다는 건 못 찾은 것
+	CRASH("Object ID not found in Layer");
+
+}
+
+#pragma endregion
+
+
+
 
 RAYHIT_DESC CObject_Manager::Get_PickingLocalObject(_uint iLayerLevelIndex, const _wstring strLayerTag, _float* pOutDist)
 {
@@ -130,6 +172,45 @@ CLayer* CObject_Manager::Find_Layer(_uint iLayerLevelIndex, const _wstring& strL
 		return nullptr;
 
 	return iter->second;
+}
+
+/* 트랜스폼 전용 수정 함수. */
+void CObject_Manager::Edit_Transform(_uint iLayerLevelIndex, const _wstring& strLayerTag, uint32_t objID, const EditPayload& payload)
+{
+	CLayer* pLayer = Find_Layer(iLayerLevelIndex, strLayerTag);
+	if (nullptr == pLayer)
+	{
+		CRASH("Edit Find Layer Failed");
+		return;
+	}
+	
+	CTransform* pTransform = { nullptr };
+
+	const TransformData& data = get<TransformData>(payload.data);
+
+	for (auto& pGameObject : pLayer->Get_GameObjects())
+	{
+		// 찾았다면?
+		if (pGameObject->Get_ID() == objID)
+		{
+			pTransform = static_cast<CTransform*>(pGameObject->Get_Component(TEXT("Com_Transform")));
+			pTransform->Set_State(STATE::POSITION, XMLoadFloat4(&data.pos));
+
+			// 회전한다.
+			if (data.rot.x > 0.f)
+				pTransform->Rotation(XMVectorSet(1.f, 0.f, 0.f, 0.f), XMConvertToRadians(data.rot.x));
+			else if(data.rot.y > 0.f)
+				pTransform->Rotation(XMVectorSet(0.f, 1.f, 0.f, 0.f), XMConvertToRadians(data.rot.y));
+			else if (data.rot.z > 0.f)
+				pTransform->Rotation(XMVectorSet(0.f, 0.f, 1.f, 0.f), XMConvertToRadians(data.rot.z));
+			
+			pTransform->Scaling(data.scale);
+
+			return;
+		}
+	}
+
+	
 }
 
 CObject_Manager* CObject_Manager::Create(_uint iNumLevels)

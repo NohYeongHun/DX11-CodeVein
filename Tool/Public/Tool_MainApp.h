@@ -14,9 +14,6 @@ public:
 	void Update(_float fTimeDelta);
 	HRESULT Render();
 
-public:
-	HRESULT ImGui_Register_Objects();
-
 private:
 	CGameInstance* m_pGameInstance = { nullptr };
 	ID3D11Device* m_pDevice = { nullptr };

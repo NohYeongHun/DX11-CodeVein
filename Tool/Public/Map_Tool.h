@@ -2,6 +2,9 @@
 #include "Base.h"
 
 NS_BEGIN(Tool)
+
+using LayerTable = map<const _wstring, class CLayer*>;
+
 class CMap_Tool final : public CBase
 {
 public:
@@ -32,6 +35,7 @@ public:
 public:
 	void Change_SelectObject(class CGameObject* pSelectedObject);
 	void Update(_float fTimeDelta);
+	
 	void Render();
 	void Render_SaveLoad();
 	void Render_Debug_Window();
@@ -44,16 +48,15 @@ public:
 	void Render_Prototype_Inspector(ImVec2 vPos);
 	void Register_Prototype_Hierarchy(_uint iPrototypeLevelIndex, const _wstring& strObjectTag, const _wstring& strModelPrefix);
 	void Handle_CreateMode_SelectedObject();
+	void Picking_Create();
 #pragma endregion
 
 #pragma region Edit Mode
 public:
 	void Render_Model_Edit();
-	void Load_Layer(const _wstring& strLayerTag);
+	void Load_Layer();
 	void Render_Edit_Hierarchy();
 	void Render_Edit_Inspector(ImVec2 vPos);
-	void Register_Layer_HierarchyObjects(class CGameObject* pGameObject);
-	void Register_Layer_Hierarchy(class CLayer* pLayer);
 	void Handle_EditMode_SelectedObject();
 #pragma endregion
 
@@ -61,16 +64,17 @@ public:
 #pragma region Map Tool의 기능들
 public:
 	void Update_Picking(_uint iLayerLevelIndex, const _wstring& strLevelLayerTag);
-	void Transform_Render(const string& name, class CTransform* pTransform);
-		
-	//void Spawn_Object(const _wstring& prototypeTag, const _float3& position);
+	void Load_EditObject(); // 현재 레벨에 생성된 객체들을 모두 불러옵니다.
+
+	string WString_ToString(const wstring& ws);
+	void SelectObject(class CGameObject* pObj);
+	
 #pragma endregion
 
 
 
 #pragma region CREATE 시 사용 변수
 private:
-
 	/* 현재 선택된 SelectedObjTag */
 	string m_Selected_PrototypeObjTag = {};
 	string m_Selected_PrototypeModelTag = {};
@@ -87,8 +91,10 @@ private:
 #pragma region EDIT 시 사용 변수.
 
 private:
-	list<pair<string, class CGameObject*>> m_Layer_Objects = {};
 	string m_Selected_EditObjTag = {};
+	uint32_t m_Selected_EditObjID = {};
+	_wstring m_Selected_EditLayerTag = {};
+
 	/* Edit Hierarchy Pos 저장 */
 	ImVec2 m_EditinspectorPos = {};
 	int m_iSelectedIndex = { -1 };
@@ -100,7 +106,8 @@ private:
 	_bool m_IsPossible_Picking = { false };
 	_bool m_IsPossible_SaveLoad = { false };
 	
-	class CGameObject* m_pSelectedObject = { nullptr }; // 선택된 객체.
+	class CGameObject* m_pSelectedObject = { nullptr }; // 선택된 객체
+	class CLayer* m_pSelectedLayer = { nullptr };
 	TOOLMODE m_eToolMode = { TOOLMODE::CREATE }; // 상태 저장.
 
 	LEVEL m_eCurLevel = {};
@@ -108,6 +115,7 @@ private:
 	_float3 m_vInterval = {};
 
 	SAVEMODE m_eSaveMode = {};
+
 private:
 	class CGameInstance* m_pGameInstance = { nullptr };
 	class CCamera_Free* m_pCamera = { nullptr };
@@ -117,11 +125,15 @@ private:
 	ID3D11Device* m_pDevice = { nullptr };
 	ID3D11DeviceContext* m_pDeviceContext = { nullptr };
 	CImgui_Manager* m_pImgui_Manager = { nullptr };
+
+	LayerTable m_LayerTable = {};
+	vector<EventType> m_Events = {};
 #pragma endregion
 
 
 private:
 	HRESULT Ready_Imgui();
+	HRESULT Ready_Events();
 	
 
 

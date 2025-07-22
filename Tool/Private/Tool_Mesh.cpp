@@ -173,7 +173,7 @@ HRESULT CTool_Mesh::Render()
 
 HRESULT CTool_Mesh::Ready_Vertices_For_NonAnim(const aiMesh* pAIMesh, _fmatrix PreTransformMatrix)
 {
-	m_iVertexStride = sizeof(VTXANIMMESH);
+	m_iVertexStride = sizeof(VTXMESH);
 
 	D3D11_BUFFER_DESC		VBDesc{};
 	VBDesc.ByteWidth = m_iNumVertices * m_iVertexStride;
@@ -183,7 +183,7 @@ HRESULT CTool_Mesh::Ready_Vertices_For_NonAnim(const aiMesh* pAIMesh, _fmatrix P
 	VBDesc.MiscFlags = 0;
 	VBDesc.StructureByteStride = m_iVertexStride;
 
-	VTXANIMMESH* pVertices = new VTXANIMMESH[m_iNumVertices];
+	VTXMESH* pVertices = new VTXMESH[m_iNumVertices];
 
 	for (_uint i = 0; i < m_iNumVertices; i++)
 	{
@@ -201,9 +201,9 @@ HRESULT CTool_Mesh::Ready_Vertices_For_NonAnim(const aiMesh* pAIMesh, _fmatrix P
 		m_vecPositions.push_back(pVertices[i].vPosition);
 	}
 
-	m_Vertices.reserve(m_iNumVertices);
+	/*m_Vertices.reserve(m_iNumVertices);
 	for (_uint i = 0; i < m_iNumVertices; ++i)
-		m_Vertices.emplace_back(pVertices[i]);
+		m_Vertices.emplace_back(pVertices[i]);*/
 
 	D3D11_SUBRESOURCE_DATA	VBInitialData{};
 	VBInitialData.pSysMem = pVertices;

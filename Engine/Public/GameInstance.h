@@ -4,6 +4,8 @@
 
 NS_BEGIN(Engine)
 
+using LayerTable = map<const _wstring, class CLayer*>;
+
 class ENGINE_DLL CGameInstance final : public CBase
 {
 	DECLARE_SINGLETON(CGameInstance)
@@ -66,6 +68,12 @@ public:
 public:
 	class CComponent* Find_Component(_uint iLayerLevelIndex, const _wstring& strLayerTag, const _wstring& strComponentTag, _uint iIndex = 0);
 	class CLayer* Get_Layer(_uint iLayerIndex, const _wstring& strLayerTag);
+
+	/* 맵 툴에 현재 레벨의 레이어 정보를 담아서 전달합니다. 읽기 전용 */
+	const LayerTable& Export_EditLayer(_uint iLayerLevelIndex);
+	void Request_EditObject(_uint iLayerLevelIndex, const _wstring& strLayerTag, uint32_t objID, const EditPayload& payload);
+	void Request_DeleteObject(_uint iLayerLevelIndex, const _wstring& strLayerTag, uint32_t objID);
+
 	HRESULT Add_GameObject_ToLayer(_uint iLayerLevelIndex, const _wstring& strLayerTag, _uint iPrototypeLevelIndex, const _wstring& strPrototypeTag, void* pArg = nullptr);
 	RAYHIT_DESC Get_PickingLocalObject(_uint iLayerLevelIndex, const _wstring strLayerTag, _float* pOutDist);
 #pragma endregion

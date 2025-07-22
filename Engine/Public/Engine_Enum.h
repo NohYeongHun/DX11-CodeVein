@@ -29,6 +29,40 @@ namespace Engine
 		, END
 	};
 
+
+	// EditObject.h
+	enum class EEditType : uint8_t
+	{
+		Transform,          // 위치·회전·스케일
+		Rename,             // 태그·이름 바꾸기
+		ComponentValue,     // 컴포넌트 파라미터 (예: 머티리얼 색상)
+		Custom              // 툴 전용 스크립트 등
+	};
+
+	// 세부 페이로드
+	struct TransformData
+	{
+		_float4 pos;
+		_float3 rot;
+		_float3 scale;
+	};
+
+	struct RenameData { std::wstring newName; };
+	struct ComponentData      // 예시: 머티리얼 파라미터 하나 바꾸기
+	{
+		std::wstring componentTag;
+		std::wstring paramName;
+		float        fValue;
+	};
+
+	// 공용 래퍼
+	struct EditPayload
+	{
+		EEditType type;
+		std::variant<TransformData, RenameData, ComponentData> data;
+	};
+
+
 	enum KEY_CODE
 	{
 		KEY_START = 0,

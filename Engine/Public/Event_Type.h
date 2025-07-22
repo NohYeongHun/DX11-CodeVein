@@ -103,11 +103,8 @@ typedef struct tagSkillInfoSkillChangeDesc
 #pragma endregion
 
 
-/* Map Tool*/
+#pragma region MAP_TOOL
 
-typedef struct tagMapToolSelectedEventDesc
-{
-	class CGameObject* pSelectedObject = { nullptr }; // 선택한 객체 포인터 전달해주기.
-}TOOL_SELECT_OBJECT_DESC;
+#pragma endregion
 
 NS_END

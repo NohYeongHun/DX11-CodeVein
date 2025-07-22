@@ -143,9 +143,6 @@ void CTransform::LookAt(_fvector vAt)
 	Set_State(STATE::LOOK, XMVector3Normalize(vLook) * vScaled.z);
 }
 
-void CTransform::Set_Rotation(_float3 vAngle)
-{
-}
 
 //void CTransform::Set_Rotation(_float3 vAngle)
 //{

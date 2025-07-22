@@ -287,6 +287,22 @@ CLayer* CGameInstance::Get_Layer(_uint iLayerIndex, const _wstring& strLayerTag)
 	return m_pObject_Manager->Get_Layer(iLayerIndex, strLayerTag);
 }
 
+/* 읽기 전용 Export EditLayer*/
+const LayerTable& CGameInstance::Export_EditLayer(_uint iLayerLevelIndex)
+{
+	return m_pObject_Manager->Export_EditLayer(iLayerLevelIndex);
+}
+
+void CGameInstance::Request_EditObject(_uint iLayerLevelIndex, const _wstring& strLayerTag, uint32_t objID, const EditPayload& payload)
+{
+	m_pObject_Manager->Request_EditObject(iLayerLevelIndex, strLayerTag, objID, payload);
+}
+
+void CGameInstance::Request_DeleteObject(_uint iLayerLevelIndex, const _wstring& strLayerTag, uint32_t objID)
+{
+	m_pObject_Manager->Request_DeleteObject(iLayerLevelIndex, strLayerTag, objID);
+}
+
 HRESULT CGameInstance::Add_GameObject_ToLayer(_uint iLayerLevelIndex, const _wstring& strLayerTag, _uint iPrototypeLevelIndex, const _wstring& strPrototypeTag, void* pArg)
 {
 	if (nullptr == m_pObject_Manager)

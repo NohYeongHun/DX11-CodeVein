@@ -47,6 +47,7 @@ using namespace DirectX;
 #include <io.h>
 #include <iostream>
 #include <fstream>
+#include <variant>
 
 using namespace std;
 

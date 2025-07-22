@@ -12,6 +12,7 @@ CCamera_Free::CCamera_Free(const CCamera_Free& Prototype)
 
 HRESULT CCamera_Free::Initialize_Prototype()
 {
+	m_strObjTag = TEXT("Camera Free");
 	return S_OK;
 }
 

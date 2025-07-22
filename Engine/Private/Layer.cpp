@@ -1,7 +1,5 @@
 ﻿#include "Layer.h"
 
-#include "GameObject.h"
-
 CLayer::CLayer()
 {
 
@@ -16,18 +14,6 @@ CComponent* CLayer::Get_Component(const _wstring& strComponentTag, _uint iIndex)
 	
 	return (*iter)->Get_Component(strComponentTag);
 }
-
-//CGameObject* CLayer::Get_PickingObject(const _float3& vRayOrigin, const _float3& vRayDir, _float* pOutDist)
-//{
-//	for (auto& pGameObject : m_GameObjects)
-//	{
-//		// 가장 먼저 Ray에 맞은 객체를 반환.
-//		if (pGameObject->Is_Ray_Hit(vRayOrigin, vRayDir, pOutDist))
-//			return pGameObject;
-//	}
-//		
-//	return nullptr;
-//}
 
 RAYHIT_DESC CLayer::Get_PickingLocalObject(_float* pOutDist)
 {
