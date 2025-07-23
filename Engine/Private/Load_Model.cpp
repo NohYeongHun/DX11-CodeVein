@@ -19,17 +19,34 @@ CLoad_Model::CLoad_Model(const CLoad_Model& Prototype)
 	, m_iNumAnimations { Prototype.m_iNumAnimations }
 	, m_iCurrentAnimIndex { Prototype.m_iCurrentAnimIndex }
 {
-	for (auto& mesh : m_Meshes)
-		Safe_AddRef(mesh);
+
+	for (auto& pAnimation : m_Animations)
+		Safe_AddRef(pAnimation);
 
 	for (auto& material : m_Materials)
 		Safe_AddRef(material);
 
-	for (auto& bone : m_Bones)
-		Safe_AddRef(bone);
+	for (auto& mesh : m_Meshes)
+		Safe_AddRef(mesh);
 
-	for (auto& pAnimation : m_Animations)
-		Safe_AddRef(pAnimation);
+	for (auto& pBone : m_Bones)
+		Safe_AddRef(pBone);
+}
+
+const _float4x4* CLoad_Model::Get_CombindTransformationMatrix(const _char* pBoneName) const
+{
+	auto	iter = find_if(m_Bones.begin(), m_Bones.end(), [&](CLoad_Bone* pBone)
+		{
+			if (false == strcmp(pBone->Get_Name(), pBoneName))
+				return true;
+
+			return false;
+		});
+
+	if (iter == m_Bones.end())
+		return nullptr;
+
+	return (*iter)->Get_CombinedTransformationMatrix_Ptr();
 }
 
 
@@ -66,7 +83,8 @@ HRESULT CLoad_Model::Initialize_Prototype(MODELTYPE eModelType, _fmatrix PreTran
 	if (strModelTag.empty())
 		CRASH("MODEL EMPTY");
 
-	ScopedTimer allTimer("Initialize_Prototype");   // 전체 시간
+	// 소멸자 호출되면서 시간 출력.
+	ScopedTimer allTimer(filePath.c_str());   // 전체 시간
 
 	{
 		ScopedTimer LoadMesh("Load_Meshes");
@@ -96,14 +114,35 @@ HRESULT CLoad_Model::Initialize_Prototype(MODELTYPE eModelType, _fmatrix PreTran
 	// Load가 끝났다면 삭제.
 	ifs.close();
 	
-
+	
     return S_OK;
 }
 
 HRESULT CLoad_Model::Initialize_Clone(void* pArg)
 {
-
+	
     return S_OK;
+}
+
+
+// 1. Player에서 호출.
+_bool CLoad_Model::Play_Animation(_float fTimeDelta)
+{
+	/* 현재 시간에 맞는 뼈의 상태대로 특정 뼈들의 TransformationMatrix를 갱신해준다. */
+	_bool		isFinished = { false };
+
+	/* 뼈들의 m_TransformationMatrix를 애니메이터분들이 제공해준 시간에 맞는 뼈의 상태로 갱신해준다. */
+
+	CLoad_Animation*& animInfo = m_Animations[m_iCurrentAnimIndex];
+	animInfo->Update_TransformationMatrices(m_Bones, fTimeDelta);
+	
+	//m_Animations[m_iCurrentAnimIndex]->Update_TransformationMatrices(fTimeDelta, m_Bones, m_isLoop);
+
+	/* 바꿔야할 뼈들의 Transforemation행렬이 갱신되었다면, 정점들에게 직접 전달되야할 CombindTransformationMatrix를 만들어준다. */
+	for (auto&  pBone : m_Bones)
+		pBone->Update_CombinedTransformationMatrix(m_PreTransformMatrix, m_Bones);
+
+	return isFinished;
 }
 
 HRESULT CLoad_Model::Bind_Materials(CShader* pShader, const _char* pConstantName, _uint iMeshIndex, aiTextureType eTextureType, _uint iTextureIndex)
@@ -127,17 +166,6 @@ HRESULT CLoad_Model::Bind_BoneMatrices(CShader* pShader, const _char* pConstantN
 	return m_Meshes[iMeshIndex]->Bind_BoneMatrices(pShader, pConstantName, m_Bones);
 }
 
-void CLoad_Model::Play_Animation(_float fTimeDelta)
-{
-	/* 현재 시간에 맞는 뼈의 상태대로 특정 뼈들의 TransformationMatrix를 갱신해준다. */
-
-
-   /* 바꿔야할 뼈들의 Transforemation행렬이 갱신되었다면, 정점들에게 직접 전달되야할 CombindTransformationMatrix를 만들어준다. */
-	for (auto& pBone : m_Bones)
-	{
-		pBone->Update_CombinedTransformationMatrix(m_PreTransformMatrix, m_Bones);
-	}
-}
 
 HRESULT CLoad_Model::Render(_uint iNumMesh)
 {

@@ -62,15 +62,55 @@ HRESULT CChannel::Initialize(const aiNodeAnim* pAIChannel, const vector<class CB
     return S_OK;
 }
 
-void CChannel::Update_TransformationMatrix(const vector<class CBone*>& Bones, _float fCurrentTrackPosition)
+void CChannel::Update_TransformationMatrix(_float fCurrentTrackPosition, const vector<class CBone*>& Bones, _uint* pCurrentKeyFrameIndex)
 {
-    //_vector vScale, vRotation, vTranslation;
+    if (0.f == fCurrentTrackPosition)
+    {
+        (*pCurrentKeyFrameIndex) = 0;
+    }
 
-    /*_matrix         TransformationMatrix = XMMatrixScaling() * XMMatrixRotationQuaternion() * XMMatrixTranslation();*/
-    //_matrix TransformationMatrix = XMMatrixAffineTransformation();
+    KEYFRAME		LastKeyFrame = m_KeyFrames.back();
 
-    //Bones[m_iBoneIndex]->Set_TransformationMatrix(TransformationMatrix);
+    _vector			vScale, vRotation, vTranslation;
 
+    if (fCurrentTrackPosition >= LastKeyFrame.fTrackPosition)
+    {
+        /*마지막 모션을 취한다. */
+        vScale = XMLoadFloat3(&LastKeyFrame.vScale);
+        vRotation = XMLoadFloat4(&LastKeyFrame.vRotation);
+        vTranslation = XMVectorSetW(XMLoadFloat3(&LastKeyFrame.vTranslation), 1.f);
+
+        (*pCurrentKeyFrameIndex) = m_iNumKeyFrames - 1;
+    }
+    else
+    {
+        while (fCurrentTrackPosition >= m_KeyFrames[(*pCurrentKeyFrameIndex) + 1].fTrackPosition)
+            ++(*pCurrentKeyFrameIndex);
+
+        _float		fRatio = (fCurrentTrackPosition - m_KeyFrames[(*pCurrentKeyFrameIndex)].fTrackPosition) /
+            (m_KeyFrames[(*pCurrentKeyFrameIndex) + 1].fTrackPosition - m_KeyFrames[(*pCurrentKeyFrameIndex)].fTrackPosition);
+
+        /* 선형보간한다. */
+        _vector		vLeftScale, vRightScale;
+        _vector		vLeftRotation, vRightRotation;
+        _vector		vLeftTranslation, vRightTranslation;
+
+        vLeftScale = XMLoadFloat3(&m_KeyFrames[(*pCurrentKeyFrameIndex)].vScale);
+        vLeftRotation = XMLoadFloat4(&m_KeyFrames[(*pCurrentKeyFrameIndex)].vRotation);
+        vLeftTranslation = XMVectorSetW(XMLoadFloat3(&m_KeyFrames[(*pCurrentKeyFrameIndex)].vTranslation), 1.f);
+
+        vRightScale = XMLoadFloat3(&m_KeyFrames[(*pCurrentKeyFrameIndex) + 1].vScale);
+        vRightRotation = XMLoadFloat4(&m_KeyFrames[(*pCurrentKeyFrameIndex) + 1].vRotation);
+        vRightTranslation = XMVectorSetW(XMLoadFloat3(&m_KeyFrames[(*pCurrentKeyFrameIndex) + 1].vTranslation), 1.f);
+
+        vScale = XMVectorLerp(vLeftScale, vRightScale, fRatio);
+        vRotation = XMQuaternionSlerp(vLeftRotation, vRightRotation, fRatio);
+        vTranslation = XMVectorSetW(XMVectorLerp(vLeftTranslation, vRightTranslation, fRatio), 1.f);
+    }
+
+    _matrix			TransformationMatrix = XMMatrixAffineTransformation(vScale, XMVectorSet(0.f, 0.f, 0.f, 1.f), vRotation, vTranslation);
+
+    Bones[m_iBoneIndex]->Set_TransformationMatrix(TransformationMatrix);
 }
 
 CChannel* CChannel::Create(const aiNodeAnim* pAIChannel, const vector<class CBone*>& Bones)
@@ -83,6 +123,7 @@ CChannel* CChannel::Create(const aiNodeAnim* pAIChannel, const vector<class CBon
     }
     return pInstance;
 }
+
 
 void CChannel::Free()
 {

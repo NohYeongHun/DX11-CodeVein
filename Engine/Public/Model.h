@@ -15,8 +15,15 @@ public:
 		return m_iNumMeshes;
 	}
 
+	const _float4x4* Get_CombindTransformationMatrix(const _char* pBoneName) const;
+
+	void Set_Animation(_uint iAnimIndex, _bool isLoop = true) {
+		m_iCurrentAnimIndex = iAnimIndex;
+		m_isLoop = isLoop;
+	}
+
 public:
-	virtual HRESULT Initialize_Prototype(MODELTYPE eModelType, _fmatrix PreTransformMatrix, const _char* pModelFilePath);
+	virtual HRESULT Initialize_Prototype(MODELTYPE eModelType, _fmatrix PreTransformMatrix, const _char* pModelFilePath, const _char* pTextureFolderPath);
 	virtual HRESULT Initialize_Clone(void* pArg);
 	HRESULT Render(_uint iNumMesh);
 
@@ -24,7 +31,7 @@ public:
 public:
 	HRESULT Bind_Materials(class CShader* pShader, const _char* pConstantName, _uint iMeshIndex, aiTextureType eTextureType, _uint iTextureIndex);
 	HRESULT Bind_BoneMatrices(class CShader* pShader, const _char* pConstantName, _uint iMeshIndex);
-	void Play_Animation(_float fTimeDelta);
+	_bool Play_Animation(_float fTimeDelta);
 
 private:
 	const aiScene* m_pAIScene = { nullptr };
@@ -52,18 +59,19 @@ private:
 private:
 	/* Animations */
 	_uint m_iCurrentAnimIndex = { 0 };
+	_bool m_isLoop = { false };
 	_uint m_iNumAnimations = { 0 };
 	vector<class CAnimation*> m_Animations;
 
 private:
 	HRESULT Ready_Meshes();
-	HRESULT Ready_Materials(const _char* pModelFilePath);
+	HRESULT Ready_Materials(const _char* pModelFilePath, const _char* pTextureFolderPath);
 	HRESULT Ready_Bones(const aiNode* pAiNode, _int iParentBoneIndex);
 	HRESULT Ready_Animations();
 
 
 public:
-	static CModel* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, MODELTYPE eModelType, _fmatrix PreTransformMatrix, const _char* pModelFilePath);
+	static CModel* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, MODELTYPE eModelType, _fmatrix PreTransformMatrix, const _char* pModelFilePath, const _char* pTextureFolderPath);
 	virtual CComponent* Clone(void* pArg) override;
 	virtual void Free() override;
 };

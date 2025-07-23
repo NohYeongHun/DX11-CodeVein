@@ -118,12 +118,19 @@ HRESULT CShader::Bind_SRV(const _char* pConstantName, ID3D11ShaderResourceView* 
 
 	ID3DX11EffectVariable* pVariable = m_pEffect->GetVariableByName(pConstantName);
 	if (nullptr == pVariable)
+	{
+		CRASH("Shader Search Variable Name Failed");
 		return E_FAIL;
+	}
+		
 
 	ID3DX11EffectShaderResourceVariable* pShaderResourceVariable = pVariable->AsShaderResource();
 	if (nullptr == pShaderResourceVariable)
+	{
+		CRASH("Shader AsShaderResource Failed");
 		return E_FAIL;
-
+	}
+	
 	return pShaderResourceVariable->SetResource(pSRV);
 }
 

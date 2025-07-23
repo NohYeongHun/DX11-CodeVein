@@ -29,21 +29,17 @@ HRESULT CBone::Initialize(const aiNode* pAINode, _int iParentBoneIndex)
     return S_OK;
 }
 
-void CBone::Update_CombinedTransformationMatrix(const _float4x4& PreTransformMatrix, const vector<CBone*>& Bones)
+void CBone::Update_CombinedTransformationMatrix(const vector<CBone*>& Bones, _fmatrix PreTransformMatrix)
 {
-	// 부모 본의 인덱스가 -1이면, 즉 루트 본이면
-	if (m_iParentBoneIndex == - 1)
-	{
-		/* 최상위 부모 Bone에 PreTransform을 곱해줍니다. 
-        * 자식 객체는 부모 본의 행렬을 거듭해서 곱해지므로 PreTransform이 모두 적용됩니다.
-        */
-        XMStoreFloat4x4(&m_CombinedTransformationMatrix, XMLoadFloat4x4(&PreTransformMatrix) * XMLoadFloat4x4(&m_TransformationMatrix));
-        return;
-	}
+    if (-1 == m_iParentBoneIndex)
+        XMStoreFloat4x4(&m_CombinedTransformationMatrix, XMLoadFloat4x4(&m_TransformationMatrix) * PreTransformMatrix);
 
-	// 부모 본의 결합된 변환 행렬을 가져와서 현재 본의 변환 행렬과 곱합니다.
-    XMStoreFloat4x4(&m_CombinedTransformationMatrix,
-        XMLoadFloat4x4(&m_TransformationMatrix) * XMLoadFloat4x4(&Bones[m_iParentBoneIndex]->m_CombinedTransformationMatrix));
+    else
+    {
+        XMStoreFloat4x4(&m_CombinedTransformationMatrix,
+            XMLoadFloat4x4(&m_TransformationMatrix) *
+            XMLoadFloat4x4(&Bones[m_iParentBoneIndex]->m_CombinedTransformationMatrix));
+    }
 }
 
 
@@ -59,6 +55,12 @@ CBone* CBone::Create(const aiNode* pAINode, _int iParentBoneIndex)
 
     return pInstance;
 }
+
+CBone* CBone::Clone()
+{
+    return new CBone(*this);
+}
+
 
 void CBone::Free()
 {

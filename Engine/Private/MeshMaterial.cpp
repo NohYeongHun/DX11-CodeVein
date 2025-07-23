@@ -8,7 +8,7 @@ CMeshMaterial::CMeshMaterial(ID3D11Device* pDevice, ID3D11DeviceContext* pContex
 	Safe_AddRef(m_pContext);
 }
 
-HRESULT CMeshMaterial::Initialize(const _char* pModelFilePath, const aiMaterial* pAIMaterial, const aiScene* pAiscene)
+HRESULT CMeshMaterial::Initialize(const _char* pModelFilePath, const _char* pTextureFolderPath, const aiMaterial* pAIMaterial, const aiScene* pAiscene)
 {
 	
 	// 폴더 경로 지정. szDrive, szDir
@@ -27,7 +27,7 @@ HRESULT CMeshMaterial::Initialize(const _char* pModelFilePath, const aiMaterial*
 	string strExt = string(szExt);
 
 	if (strExt == ".fbx")
-		Initialize_FBX(pModelFilePath, pAIMaterial, strDirPath);
+		Initialize_FBX(pModelFilePath, pTextureFolderPath, pAIMaterial, strDirPath);
 	else if (strExt == ".glb")
 		Initialize_GLB(pModelFilePath, pAIMaterial, pAiscene, strDirPath);
 	
@@ -38,12 +38,15 @@ HRESULT CMeshMaterial::Initialize(const _char* pModelFilePath, const aiMaterial*
 HRESULT CMeshMaterial::Bind_Resources(CShader* pShader, const _char* pConstantName, aiTextureType eTextureType, _uint iTextureIndex)
 {
 	if (iTextureIndex >= m_SRVs[eTextureType].size())
+	{
+		CRASH("Size Error");
 		return E_FAIL;
+	}
 
 	return pShader->Bind_SRV(pConstantName, m_SRVs[eTextureType][iTextureIndex]);
 }
 
-HRESULT CMeshMaterial::Initialize_FBX(const _char* pModelFilePath, const aiMaterial* pAIMaterial, string strDirPath)
+HRESULT CMeshMaterial::Initialize_FBX(const _char* pModelFilePath, const _char* pTextureFolderPath, const aiMaterial* pAIMaterial, string strDirPath)
 {
 	for (_uint i = 1; i < AI_TEXTURE_TYPE_MAX; i++)
 	{
@@ -75,8 +78,13 @@ HRESULT CMeshMaterial::Initialize_FBX(const _char* pModelFilePath, const aiMater
 
 			strcpy_s(szFullPath, szDrive);
 			strcat_s(szFullPath, szDir);
+			strcat_s(szFullPath, pTextureFolderPath);
 			strcat_s(szFullPath, szFileName);
-			strcat_s(szFullPath, szExt);
+			//strcat_s(szFullPath, szExt);
+			string dds = ".dds";
+
+			//strcat_s(szFullPath, szExt);
+			strcat_s(szFullPath, dds.c_str());
 
 			_tchar			szTextureFilePath[MAX_PATH] = {};
 			MultiByteToWideChar(CP_ACP, 0, szFullPath, strlen(szFullPath), szTextureFilePath, MAX_PATH);
@@ -86,14 +94,20 @@ HRESULT CMeshMaterial::Initialize_FBX(const _char* pModelFilePath, const aiMater
 
 			if (false == strcmp(".tga", szExt))
 				hr = E_FAIL;
-
-			if (false == strcmp(".dds", szExt))
+			else 
 				hr = CreateDDSTextureFromFile(m_pDevice, szTextureFilePath, nullptr, &pSRV);
-			else
-				hr = CreateWICTextureFromFile(m_pDevice, szTextureFilePath, nullptr, &pSRV);
+			
+			//if (false == strcmp(".dds", szExt))
+			//	hr = CreateDDSTextureFromFile(m_pDevice, szTextureFilePath, nullptr, &pSRV);
+			//else
+			//	hr = CreateWICTextureFromFile(m_pDevice, szTextureFilePath, nullptr, &pSRV);
 
 			if (FAILED(hr))
+			{
+				CRASH("Failed Create Texture");
 				return E_FAIL;
+			}
+				
 
 			m_SRVs[i].emplace_back(pSRV);
 		}
@@ -147,11 +161,11 @@ HRESULT CMeshMaterial::Initialize_GLB(const _char* pModelFilePath, const aiMater
 	return S_OK;
 }
 
-CMeshMaterial* CMeshMaterial::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _char* pModelFilePath, const aiMaterial* pAIMaterial, const aiScene* pAiScene)
+CMeshMaterial* CMeshMaterial::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _char* pModelFilePath, const _char* pTextureFolderPath, const aiMaterial* pAIMaterial, const aiScene* pAiScene)
 {
 	CMeshMaterial* pInstance = new CMeshMaterial(pDevice, pContext);
 
-	if (FAILED(pInstance->Initialize(pModelFilePath, pAIMaterial, pAiScene)))
+	if (FAILED(pInstance->Initialize(pModelFilePath, pTextureFolderPath, pAIMaterial, pAiScene)))
 	{
 		MSG_BOX(TEXT("Create Failed : CMeshMaterial"));
 		Safe_Release(pInstance);

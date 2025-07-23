@@ -42,6 +42,7 @@ struct VS_OUT
     float4 vNormal : NORMAL;
     float2 vTexcoord : TEXCOORD0;
     float4 vWorldPos : TEXCOORD1;
+    float4 vProjPos : TEXCOORD2;
 };
 
 /* 정점쉐이더 : 정점 위치의 스페이스 변환(로컬 -> 월드 -> 뷰 -> 투영). */ 
@@ -87,7 +88,6 @@ struct PS_IN
     float4 vNormal : NORMAL;
     float2 vTexcoord : TEXCOORD0;
     float4 vWorldPos : TEXCOORD1;
-
 };
 
 struct PS_OUT

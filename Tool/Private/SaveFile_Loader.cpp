@@ -279,6 +279,8 @@ void CSaveFile_Loader::Save_AnimModel(std::ofstream& ofs, CTool_Model* pModel, c
 
 	for (const ANIMATION_INFO& anim : animModelInfo.animationVector)
 	{
+		// 애니메이션 이름 저장.
+		WriteString(ofs, anim.strAnimName);
 		ofs.write(reinterpret_cast<const char*>(&anim.fDuration), sizeof(_float));
 		ofs.write(reinterpret_cast<const char*>(&anim.fTickPerSecond), sizeof(_float));
 		ofs.write(reinterpret_cast<const char*>(&anim.fCurrentTrackPostion), sizeof(_float));
@@ -295,6 +297,12 @@ void CSaveFile_Loader::Save_AnimModel(std::ofstream& ofs, CTool_Model* pModel, c
 			ofs.write(reinterpret_cast<const char*>(channel.KeyFrames.data()),
 				channel.iNumKeyFrames * sizeof(KEYFRAME));
 		}
+
+		/* Current KeyFrame 크기 저장. */
+		ofs.write(reinterpret_cast<const char*>(&anim.iNumKeyFrameIndices), sizeof(uint32_t));
+		/* Current KeyFrameIndex 정보 저장.*/
+		ofs.write(reinterpret_cast<const char*>(anim.CurrentKeyFrameIndices.data()),
+			anim.iNumKeyFrameIndices * sizeof(uint32_t));
 	}
 
 }

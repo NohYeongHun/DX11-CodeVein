@@ -77,11 +77,15 @@ typedef struct ChannelInfoHeader
 }CHANNEL_INFO;
 
 typedef struct AnimationInfoHeader {
+    string strAnimName;
     _float fDuration;
     _float fTickPerSecond;
     _float fCurrentTrackPostion;
     uint32_t iNumChannels; // channel 크기.
     vector<CHANNEL_INFO> Channels;
+
+    uint32_t iNumKeyFrameIndices; // Vector 크기.
+    vector<uint32_t> CurrentKeyFrameIndices;
 }ANIMATION_INFO;
 
 // 모델이 들고 있는 정보. => 모델 Prototype 생성시 만듭니다.

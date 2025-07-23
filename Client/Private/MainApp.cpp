@@ -166,20 +166,21 @@ HRESULT CMainApp::Ready_Prototype_ForModel()
 	/* Non Anim Test */
 	/*if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
 		, TEXT("Prototype_Component_Model_Player")
-		, CLoad_Model::Create(m_pDevice, m_pContext, MODELTYPE::NONANIM, PreTransformMatrix, "../Bin/Resources/SaveFile/map.dat"))))
+		, CModel::Create(m_pDevice, m_pContext, MODELTYPE::ANIM, PreTransformMatrix, "../Bin/Resources/Models/Player/Player.fbx", "../Bin/Resources/Models/Player/Textures/Player/"))))
 		return E_FAIL;*/
 
 	/*if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
 		, TEXT("Prototype_Component_Model_Player")
-		, CModel::Create(m_pDevice, m_pContext, MODELTYPE::ANIM ,PreTransformMatrix,  "../Bin/Resources/Models/Player/Player.fbx"))))
+		, CModel::Create(m_pDevice, m_pContext, MODELTYPE::ANIM, PreTransformMatrix, "../Bin/Resources/Models/Fiona/Fiona.fbx", "/"))))
 		return E_FAIL;*/
 
-	/*if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
-		, TEXT("Prototype_Component_Model_Player")
-		, CModel::Create(m_pDevice, m_pContext, MODELTYPE::ANIM, PreTransformMatrix, "../Bin/Resources/Models/Player/Chest/Treasure_Chest.fbx"))))
-		return E_FAIL;*/
+
 
 	
+	/*if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
+		, TEXT("Prototype_Component_Model_Player")
+		, CLoad_Model::Create(m_pDevice, m_pContext, MODELTYPE::ANIM, PreTransformMatrix, "../../SaveFile/Model/Player/Fiona.dat", L""))))
+		return E_FAIL;*/
 
 	return S_OK;
 }

@@ -70,10 +70,12 @@ HRESULT CLoad_MeshMaterial::Initialize(std::ifstream& ifs, _wstring textureFolde
 		// dds로만 읽어오게 변경.
 		wcscat_s(szFinalPath, wExt.c_str());
 
-		if (L".dds" == szExt)
-			hr = CreateDDSTextureFromFile(m_pDevice, szFinalPath, nullptr, &pSRV);
-		else
-			hr = CreateWICTextureFromFile(m_pDevice, szFinalPath, nullptr, &pSRV);
+		hr = CreateDDSTextureFromFile(m_pDevice, szFinalPath, nullptr, &pSRV);
+
+		//if (L".dds" == szExt)
+		//	hr = CreateDDSTextureFromFile(m_pDevice, szFinalPath, nullptr, &pSRV);
+		//else
+		//	hr = CreateWICTextureFromFile(m_pDevice, szFinalPath, nullptr, &pSRV);
 
 		if (FAILED(hr))
 			CRASH("Texture Create Failed");
@@ -88,8 +90,6 @@ HRESULT CLoad_MeshMaterial::Bind_Resources(CShader* pShader, const _char* pConst
 {
 	if (iTextureIndex >= m_SRVs[eTextureType].size())
 		return E_FAIL;
-
-	if(m_SRVs[eTextureType][iTextureIndex] )
 
 	return pShader->Bind_SRV(pConstantName, m_SRVs[eTextureType][iTextureIndex]);
 }

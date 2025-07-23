@@ -22,12 +22,19 @@ HRESULT CLevel_Logo::Initialize_Clone()
 
 void CLevel_Logo::Update(_float fTimeDelta)
 {
-	if (!m_IsLogoEnd && m_pGameInstance->Get_KeyUp(DIK_RETURN))
+	if (!m_IsLogoEnd)
 	{
 		m_IsLogoEnd = true;
 		m_pGameInstance->Publish<CTitle>(EventType::LOGO_END, nullptr);
 		return;
 	}
+
+	/*if (!m_IsLogoEnd && m_pGameInstance->Get_KeyUp(DIK_RETURN))
+	{
+		m_IsLogoEnd = true;
+		m_pGameInstance->Publish<CTitle>(EventType::LOGO_END, nullptr);
+		return;
+	}*/
 
 	return;
 }

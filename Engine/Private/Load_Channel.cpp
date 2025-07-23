@@ -23,6 +23,27 @@ HRESULT CLoad_Channel::Initialize(std::ifstream& ifs)
 
 void CLoad_Channel::Update_TransformationMatrix(const vector<class CLoad_Bone*>& Bones, _float fCurrentTrackPosition)
 {
+    // 보간된 값을 TransformMatrix에 전달한다.
+    _vector         vScale, vRotation, vTranslation;
+
+    // 전달받은 키프레임 시간을 이용.
+    
+    KEYFRAME LastKeyFrame = m_KeyFrames.back();
+
+    /*마지막 모션을 취한다. */
+    vScale = XMLoadFloat3(&LastKeyFrame.vScale);
+    vRotation = XMLoadFloat4(&LastKeyFrame.vRotation);
+    
+    vTranslation = XMVectorSetW(XMLoadFloat3(&LastKeyFrame.vTranslation), 1.f);
+    
+    
+
+    /*_matrix         TransformationMatrix = XMMatrixScaling() * XMMatrixRotationQuaternion() * XMMatrixTranslation();*/
+    _matrix         TransformationMatrix = XMMatrixAffineTransformation(vScale
+        , XMVectorSet(0.f, 0.f, 0.f, 1.f)
+        , vRotation, vTranslation);
+
+    Bones[m_iBoneIndex]->Set_TransformationMatrix(TransformationMatrix);
 }
 
 /*

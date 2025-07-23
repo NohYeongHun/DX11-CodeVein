@@ -14,6 +14,13 @@ public:
 		return m_iNumMeshes;
 	}
 
+	const _float4x4* Get_CombindTransformationMatrix(const _char* pBoneName) const;
+
+	void Set_Animation(_uint iAnimIndex, _bool isLoop = true) {
+		m_iCurrentAnimIndex = iAnimIndex;
+		m_isLoop = isLoop;
+	}
+
 	
 public:
 	const _bool Is_Ray_Hit(const _float3& rayOrigin, const _float3& rayDir, _float* pOutDist);
@@ -25,13 +32,11 @@ public:
 	HRESULT Render(_uint iNumMesh);
 	
 public:
+	_bool Play_Animation(_float fTimeDelta);
+
 	HRESULT Bind_Materials(CShader* pShader, const _char* pConstantName, _uint iMeshIndex, aiTextureType eTextureType, _uint iTextureIndex);
 	HRESULT Bind_BoneMatrices(class CShader* pShader, const _char* pConstantName, _uint iMeshIndex);
-	void Play_Animation(_float fTimeDelta);
-
-
-
-
+	
 private:
 	MODELTYPE m_ModelType = {};
 	_float4x4 m_PreTransformMatrix = {};
@@ -54,6 +59,7 @@ private:
 private:
 	/* Animations */
 	_uint m_iCurrentAnimIndex = { 0 };
+	_bool m_isLoop = { false };
 	_uint m_iNumAnimations = { 0 };
 	vector<class CLoad_Animation*> m_Animations;
 

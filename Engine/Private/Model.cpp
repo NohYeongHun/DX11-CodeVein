@@ -13,12 +13,18 @@ CModel::CModel(const CModel& Prototype)
 	, m_Materials { Prototype.m_Materials}
 	, m_iNumMeshes { Prototype.m_iNumMeshes }
 	, m_iNumMaterials { Prototype.m_iNumMaterials }
-	, m_PreTransformMatrix { Prototype.m_PreTransformMatrix }
 	, m_Bones{ Prototype.m_Bones }
 	, m_iCurrentAnimIndex{ Prototype.m_iCurrentAnimIndex }
 	, m_iNumAnimations{ Prototype.m_iNumAnimations }
 	, m_Animations { Prototype.m_Animations }
+	, m_PreTransformMatrix{ Prototype.m_PreTransformMatrix }
 {
+	/*for (auto& pPrototypeAnimation : Prototype.m_Animations)
+		m_Animations.push_back(pPrototypeAnimation->Clone());*/
+
+	for (auto& pAnimation : m_Animations)
+		Safe_AddRef(pAnimation);
+		
 	for (auto& pMesh : m_Meshes)
 		Safe_AddRef(pMesh);
 
@@ -27,12 +33,26 @@ CModel::CModel(const CModel& Prototype)
 
 	for (auto& pBone : m_Bones)
 		Safe_AddRef(pBone);
-
-	for (auto& pAnimation : m_Animations)
-		Safe_AddRef(pAnimation);
 }
 
-HRESULT CModel::Initialize_Prototype(MODELTYPE eModelType, _fmatrix PreTransformMatrix, const _char* pModelFilePath)
+
+const _float4x4* CModel::Get_CombindTransformationMatrix(const _char* pBoneName) const
+{
+	auto	iter = find_if(m_Bones.begin(), m_Bones.end(), [&](CBone* pBone)
+		{
+			if (false == strcmp(pBone->Get_Name(), pBoneName))
+				return true;
+
+			return false;
+		});
+
+	if (iter == m_Bones.end())
+		return nullptr;
+
+	return (*iter)->Get_CombinedTransformationMatrix_Ptr();
+}
+
+HRESULT CModel::Initialize_Prototype(MODELTYPE eModelType, _fmatrix PreTransformMatrix, const _char* pModelFilePath, const _char* pTextureFolderPath)
 {
 	_uint iFlag = { aiProcess_ConvertToLeftHanded | aiProcessPreset_TargetRealtime_Fast };
 
@@ -57,7 +77,7 @@ HRESULT CModel::Initialize_Prototype(MODELTYPE eModelType, _fmatrix PreTransform
 	if (FAILED(Ready_Meshes()))
 		return E_FAIL;
 
-	if (FAILED(Ready_Materials(pModelFilePath)))
+	if (FAILED(Ready_Materials(pModelFilePath, pTextureFolderPath)))
 		return E_FAIL;
 
 	if (FAILED(Ready_Animations()))
@@ -76,12 +96,18 @@ HRESULT CModel::Initialize_Clone(void* pArg)
 HRESULT CModel::Bind_Materials(CShader* pShader, const _char* pConstantName, _uint iMeshIndex, aiTextureType eTextureType, _uint iTextureIndex)
 {
 	if (iMeshIndex >= m_iNumMeshes)
+	{
+		CRASH("MeshIndex >= m_iNumMeshes");
 		return E_FAIL;
+	}
 
 	_uint       iMaterialIndex = m_Meshes[iMeshIndex]->Get_MaterialIndex();
 
 	if (m_iNumMaterials <= iMaterialIndex)
+	{
+		CRASH("NumMaterials <= MaterialIndex");
 		return E_FAIL;
+	}
 
 	return m_Materials[iMaterialIndex]->Bind_Resources(pShader, pConstantName, eTextureType, iTextureIndex);
 }
@@ -94,16 +120,17 @@ HRESULT CModel::Bind_BoneMatrices(CShader* pShader, const _char* pConstantName, 
 	return m_Meshes[iMeshIndex]->Bind_BoneMatrices(pShader, pConstantName, m_Bones);
 }
 
-void CModel::Play_Animation(_float fTimeDelta)
+_bool CModel::Play_Animation(_float fTimeDelta)
 {
-	/* 현재 시간에 맞는 뼈의 상태대로 특정 뼈들의 TransformationMatrix를 갱신해준다. */
+	_bool		isFinished = { false };
+	/* 뼈들의 m_TransformationMatrix를 애니메이터분들이 제공해준 시간에 맞는 뼈의 상태로 갱신해준다. */
+	isFinished = m_Animations[m_iCurrentAnimIndex]->Update_TransformationMatrices(fTimeDelta, m_Bones, m_isLoop);
 
-
-   /* 바꿔야할 뼈들의 Transforemation행렬이 갱신되었다면, 정점들에게 직접 전달되야할 CombindTransformationMatrix를 만들어준다. */
+	/* 모든 뼈들의 CombinedTransformationMatrix를 셋한다. */
 	for (auto& pBone : m_Bones)
-	{
-		pBone->Update_CombinedTransformationMatrix(m_PreTransformMatrix, m_Bones);
-	}
+		pBone->Update_CombinedTransformationMatrix(m_Bones, XMLoadFloat4x4(&m_PreTransformMatrix));
+
+	return isFinished;
 }
 
 HRESULT CModel::Render(_uint iNumMesh)
@@ -133,13 +160,13 @@ HRESULT CModel::Ready_Meshes()
 	return S_OK;
 }
 
-HRESULT CModel::Ready_Materials(const _char* pModelFilePath)
+HRESULT CModel::Ready_Materials(const _char* pModelFilePath, const _char* pTextureFolderPath)
 {
 	m_iNumMaterials = m_pAIScene->mNumMaterials;
 
 	for (_uint i = 0; i < m_iNumMaterials; i++)
 	{
-		CMeshMaterial* pMaterial = CMeshMaterial::Create(m_pDevice, m_pContext, pModelFilePath, m_pAIScene->mMaterials[i], m_pAIScene);
+		CMeshMaterial* pMaterial = CMeshMaterial::Create(m_pDevice, m_pContext, pModelFilePath, pTextureFolderPath, m_pAIScene->mMaterials[i], m_pAIScene);
 		if (nullptr == pMaterial)
 			return E_FAIL;
 
@@ -182,11 +209,11 @@ HRESULT CModel::Ready_Animations()
 	return S_OK;
 }
 
-CModel* CModel::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, MODELTYPE eModelType, _fmatrix PreTransformMatrix, const _char* pModelFilePath)
+CModel* CModel::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, MODELTYPE eModelType, _fmatrix PreTransformMatrix, const _char* pModelFilePath, const _char* pTextureFolderPath)
 {
 	CModel* pInstance = new CModel(pDevice, pContext);
 
-	if (FAILED(pInstance->Initialize_Prototype(eModelType, PreTransformMatrix, pModelFilePath)))
+	if (FAILED(pInstance->Initialize_Prototype(eModelType, PreTransformMatrix, pModelFilePath, pTextureFolderPath)))
 	{
 		MSG_BOX(TEXT("Failed to Created : CModel"));
 		Safe_Release(pInstance);
@@ -211,25 +238,27 @@ CComponent* CModel::Clone(void* pArg)
 void CModel::Free()
 {
 	__super::Free();
-	for (auto& pMesh : m_Meshes)
-		Safe_Release(pMesh);
 
-	m_Meshes.clear();
+	for (auto& pAnimation : m_Animations)
+		Safe_Release(pAnimation);
+
+	m_Animations.clear();
+
+	for (auto& pBone : m_Bones)
+		Safe_Release(pBone);
+
+	m_Bones.clear();
 
 	for (auto& pMaterial : m_Materials)
 		Safe_Release(pMaterial);
 
 	m_Materials.clear();
 
-	for (auto& pBone : m_Bones)
-		Safe_Release(pBone);
+	for (auto& pMesh : m_Meshes)
+		Safe_Release(pMesh);
 
-	m_Bones.clear();
-	
-	for (auto& pAnimation : m_Animations)
-		Safe_Release(pAnimation);
-	
-	m_Animations.clear();
+	m_Meshes.clear();
+
 
 	//Safe_Delete(m_pAIScene);
 	m_Importer.FreeScene();

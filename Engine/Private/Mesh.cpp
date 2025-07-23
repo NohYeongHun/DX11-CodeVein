@@ -70,11 +70,11 @@ HRESULT CMesh::Initialize_Clone(void* pArg)
 
 HRESULT CMesh::Bind_BoneMatrices(CShader* pShader, const _char* pConstantName, const vector<class CBone*>& Bones)
 {
-	// 매 프레임 Bone Matrix 행렬을 초기화합니다.
-	for (_uint i = 0; i < m_iNumBones; i++)
+	ZeroMemory(m_BoneMatrices, sizeof(_float4x4) * g_iMaxNumBones);
+
+	for (size_t i = 0; i < m_iNumBones; i++)
 	{
-		XMStoreFloat4x4(&m_BoneMatrices[i],
-			XMLoadFloat4x4(&m_OffsetMatrices[i]) * Bones[m_BoneIndices[i]]->Get_CombinedTransformationMatrix());
+		XMStoreFloat4x4(&m_BoneMatrices[i], XMLoadFloat4x4(&m_OffsetMatrices[i]) * Bones[m_BoneIndices[i]]->Get_CombinedTransformationMatrix());
 	}
 
  	return pShader->Bind_Matrices(pConstantName, m_BoneMatrices, m_iNumBones);
@@ -134,6 +134,9 @@ HRESULT CMesh::Ready_Vertices_For_NonAnim(const aiMesh* pAIMesh, _fmatrix PreTra
 		XMStoreFloat3(&pVertices[i].vNormal, XMVector3TransformNormal(XMLoadFloat3(&pVertices[i].vNormal), PreTransformMatrix));
 
 		memcpy(&pVertices[i].vTangent, &pAIMesh->mTangents[i], sizeof(_float3));
+		XMStoreFloat3(&pVertices[i].vTangent,
+			XMVector3TransformNormal(XMLoadFloat3(&pVertices[i].vTangent), PreTransformMatrix));
+
 		memcpy(&pVertices[i].vBinormal, &pAIMesh->mBitangents[i], sizeof(_float3));
 		memcpy(&pVertices[i].vTexcoord, &pAIMesh->mTextureCoords[0][i], sizeof(_float2));
 	}

@@ -31,6 +31,9 @@ HRESULT CPlayer::Initialize_Clone(void* pArg)
     // Player 정면 바라보게 하기?
     //m_pTransformCom->Rotation(XMVectorSet(1.f, 0.f, 0.f, 0.f), XMConvertToRadians(270.f));
 
+    m_pModelCom->Set_Animation(17);
+    
+
     return S_OK;
 }
 
@@ -64,7 +67,12 @@ void CPlayer::Update(_float fTimeDelta)
 {
     __super::Update(fTimeDelta);
 
-    m_pModelCom->Play_Animation(fTimeDelta);
+    if (true == m_pModelCom->Play_Animation(fTimeDelta))
+    {
+        int a = 10;
+    }
+
+    
 }
 
 void CPlayer::Late_Update(_float fTimeDelta)
@@ -77,40 +85,28 @@ void CPlayer::Late_Update(_float fTimeDelta)
 
 HRESULT CPlayer::Render()
 {
-    //if (ImGui::IsWindowAppearing())              // 또는 static bool once=true;
-    //{
-    //    ImGui::SetNextWindowPos({ 100, 100 }, ImGuiCond_Appearing);
-    //    ImGui::SetNextWindowSize({ 460, 240 }, ImGuiCond_Appearing); // ← 원하는 픽셀
-    //}
-
-    //string str = "Player Transform [" + to_string(Get_ID()) + ']';
-    //ImGui::Begin(str.c_str());
-    //_float4 vPosition = {};
-    //XMStoreFloat4(&vPosition, m_pTransformCom->Get_State(STATE::POSITION));
-
-    //ImGui::InputFloat("X : ", &vPosition.x);
-    //ImGui::InputFloat("Y : ", &vPosition.y);
-    //ImGui::InputFloat("Z : ", &vPosition.z);
-    //ImGui::End();
-
-
     if (FAILED(Ready_Render_Resources()))
+    {
+        CRASH("Ready Render Resource Failed");
         return E_FAIL;
+    }
+        
 
     _uint iNumMeshes = m_pModelCom->Get_NumMeshes();
     for (_uint i = 0; i < iNumMeshes; i++)
     {
-        m_pModelCom->Bind_Materials(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE, 0);
-        
+        if (FAILED(m_pModelCom->Bind_Materials(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE, 0)))
+            CRASH("Ready Bine Materials Failed");
+
         if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
-            CRASH()
+            CRASH("Ready Bone Matrices Failed");
             
 
         if (FAILED(m_pShaderCom->Begin(0)))
-            CRASH()
+            CRASH("Ready Shader Begin Failed");
 
         if (FAILED(m_pModelCom->Render(i)))
-            CRASH()
+            CRASH("Ready Render Failed");
     }
     
 
