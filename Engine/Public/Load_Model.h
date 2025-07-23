@@ -20,7 +20,7 @@ public:
 
 
 public:
-	virtual HRESULT Initialize_Prototype(MODELTYPE eModelType, _fmatrix PreTransformMatrix, string filePath);
+	virtual HRESULT Initialize_Prototype(MODELTYPE eModelType, _fmatrix PreTransformMatrix, string filePath, _wstring textureFolderPath);
 	virtual HRESULT Initialize_Clone(void* pArg);
 	HRESULT Render(_uint iNumMesh);
 	
@@ -63,7 +63,7 @@ private:
 
 private:
 	HRESULT Load_Meshes(_fmatrix PreTransformMatrix, std::ifstream& ifs);
-	HRESULT Load_Materials( std::ifstream& ifs);
+	HRESULT Load_Materials( std::ifstream& ifs, _wstring textureFolderPath);
 	HRESULT Load_Bones(std::ifstream& ifs);
 	HRESULT Load_Animations(std::ifstream& ifs);
 
@@ -71,7 +71,7 @@ private:
 
 
 public:
-	static CLoad_Model* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, MODELTYPE eModelType, _fmatrix PreTransformMatrix, string filepath);
+	static CLoad_Model* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, MODELTYPE eModelType, _fmatrix PreTransformMatrix, string filepath, _wstring textureFolderPath);
 	virtual CComponent* Clone(void* pArg) override;
 	virtual void Free() override;
 };

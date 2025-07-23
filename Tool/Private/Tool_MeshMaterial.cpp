@@ -74,6 +74,12 @@ void CTool_MeshMaterial::Save_Materials(const _char* modelDir, const aiMaterial*
 		if (FAILED(pAIMaterial->GetTexture(textureType, 0, &strTexturePath)))
 			break;
 
+		_bool IsColone = { false };
+		string str = strTexturePath.data;
+
+		if (str == ".")
+			continue;
+
 		_char			szFullPath[MAX_PATH] = {};
 		_char			szDrive[MAX_PATH] = {};
 		_char			szDir[MAX_PATH] = {};

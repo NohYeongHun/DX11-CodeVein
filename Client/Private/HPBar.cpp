@@ -142,7 +142,7 @@ HRESULT CHPBar::Render()
     m_pVIBufferCom->Render();
 
     // 폰트 출력.
-    Render_HP();
+    // Render_HP();
 
     __super::End();
 

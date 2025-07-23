@@ -110,8 +110,8 @@ HRESULT CSkillUI_Panel::Render()
 
     m_pVIBufferCom->Render();
 
-    if (m_ePanelType == PANELTYPE::SKILL_UI)
-        Render_Explain();
+    //if (m_ePanelType == PANELTYPE::SKILL_UI)
+    //    Render_Explain();
 
     __super::End();
 

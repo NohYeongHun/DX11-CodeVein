@@ -170,10 +170,10 @@ HRESULT CTool_Mesh::Render()
 	return S_OK;
 }
 
-
 HRESULT CTool_Mesh::Ready_Vertices_For_NonAnim(const aiMesh* pAIMesh, _fmatrix PreTransformMatrix)
 {
-	m_iVertexStride = sizeof(VTXMESH);
+	
+	m_iVertexStride = sizeof(VTXANIMMESH);
 
 	D3D11_BUFFER_DESC		VBDesc{};
 	VBDesc.ByteWidth = m_iNumVertices * m_iVertexStride;
@@ -183,7 +183,8 @@ HRESULT CTool_Mesh::Ready_Vertices_For_NonAnim(const aiMesh* pAIMesh, _fmatrix P
 	VBDesc.MiscFlags = 0;
 	VBDesc.StructureByteStride = m_iVertexStride;
 
-	VTXMESH* pVertices = new VTXMESH[m_iNumVertices];
+	VTXANIMMESH* pVertices = new VTXANIMMESH[m_iNumVertices];
+	ZeroMemory(pVertices, sizeof(VTXANIMMESH) * m_iNumVertices);
 
 	for (_uint i = 0; i < m_iNumVertices; i++)
 	{
@@ -201,9 +202,11 @@ HRESULT CTool_Mesh::Ready_Vertices_For_NonAnim(const aiMesh* pAIMesh, _fmatrix P
 		m_vecPositions.push_back(pVertices[i].vPosition);
 	}
 
-	/*m_Vertices.reserve(m_iNumVertices);
+	m_iNumBones = 0;
+
+	m_Vertices.reserve(m_iNumVertices);
 	for (_uint i = 0; i < m_iNumVertices; ++i)
-		m_Vertices.emplace_back(pVertices[i]);*/
+		m_Vertices.emplace_back(pVertices[i]);
 
 	D3D11_SUBRESOURCE_DATA	VBInitialData{};
 	VBInitialData.pSysMem = pVertices;
@@ -216,6 +219,52 @@ HRESULT CTool_Mesh::Ready_Vertices_For_NonAnim(const aiMesh* pAIMesh, _fmatrix P
 
 	return S_OK;
 }
+
+//HRESULT CTool_Mesh::Ready_Vertices_For_NonAnim(const aiMesh* pAIMesh, _fmatrix PreTransformMatrix)
+//{
+//	m_iVertexStride = sizeof(VTXMESH);
+//
+//	D3D11_BUFFER_DESC		VBDesc{};
+//	VBDesc.ByteWidth = m_iNumVertices * m_iVertexStride;
+//	VBDesc.Usage = D3D11_USAGE_DEFAULT;
+//	VBDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+//	VBDesc.CPUAccessFlags = 0;
+//	VBDesc.MiscFlags = 0;
+//	VBDesc.StructureByteStride = m_iVertexStride;
+//
+//	VTXMESH* pVertices = new VTXMESH[m_iNumVertices];
+//
+//	for (_uint i = 0; i < m_iNumVertices; i++)
+//	{
+//		// 모델 생성시 Transform 설정.
+//		memcpy(&pVertices[i].vPosition, &pAIMesh->mVertices[i], sizeof(_float3));
+//		XMStoreFloat3(&pVertices[i].vPosition, XMVector3TransformCoord(XMLoadFloat3(&pVertices[i].vPosition), PreTransformMatrix));
+//		memcpy(&pVertices[i].vNormal, &pAIMesh->mNormals[i], sizeof(_float3));
+//		XMStoreFloat3(&pVertices[i].vNormal, XMVector3TransformNormal(XMLoadFloat3(&pVertices[i].vNormal), PreTransformMatrix));
+//
+//		memcpy(&pVertices[i].vTangent, &pAIMesh->mTangents[i], sizeof(_float3));
+//		memcpy(&pVertices[i].vBinormal, &pAIMesh->mBitangents[i], sizeof(_float3));
+//		memcpy(&pVertices[i].vTexcoord, &pAIMesh->mTextureCoords[0][i], sizeof(_float2));
+//
+//		/* 충돌 확인용 Vertex Position 설정. */
+//		m_vecPositions.push_back(pVertices[i].vPosition);
+//	}
+//
+//	/*m_Vertices.reserve(m_iNumVertices);
+//	for (_uint i = 0; i < m_iNumVertices; ++i)
+//		m_Vertices.emplace_back(pVertices[i]);*/
+//
+//	D3D11_SUBRESOURCE_DATA	VBInitialData{};
+//	VBInitialData.pSysMem = pVertices;
+//
+//	if (FAILED(m_pDevice->CreateBuffer(&VBDesc, &VBInitialData, &m_pVB)))
+//		return E_FAIL;
+//
+//	/* MeshInfo Header에 생성과 동시에 저장가능한 정보들을 채워줍니다. */
+//	Safe_Delete_Array(pVertices);
+//
+//	return S_OK;
+//}
 
 HRESULT CTool_Mesh::Ready_Vertices_For_Anim(const aiMesh* pAIMesh, const vector<CTool_Bone*>& Bones)
 {
@@ -240,6 +289,7 @@ HRESULT CTool_Mesh::Ready_Vertices_For_Anim(const aiMesh* pAIMesh, const vector<
 		memcpy(&pVertices[i].vTangent, &pAIMesh->mTangents[i], sizeof(_float3));
 		memcpy(&pVertices[i].vBinormal, &pAIMesh->mBitangents[i], sizeof(_float3));
 		memcpy(&pVertices[i].vTexcoord, &pAIMesh->mTextureCoords[0][i], sizeof(_float2));
+		m_vecPositions.push_back(pVertices[i].vPosition);
 	}
 
 	m_iNumBones = pAIMesh->mNumBones;

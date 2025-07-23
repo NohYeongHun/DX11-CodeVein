@@ -15,11 +15,17 @@ CLoad_Mesh::CLoad_Mesh(const CLoad_Mesh& Prototype)
 HRESULT CLoad_Mesh::Initialize_Prototype(MODELTYPE eModelType, _fmatrix PreTransformMatrix, std::ifstream& ifs)
 {
 	
-	HRESULT hr = eModelType == MODELTYPE::ANIM ? Initialize_Vertex_For_Anim(ifs)
-		: Initialize_Vertex_For_NonAnim(ifs, PreTransformMatrix);
+	HRESULT hr = Initialize_Vertex_For_Anim(ifs);
+
+	/*HRESULT hr = eModelType == MODELTYPE::ANIM ? Initialize_Vertex_For_Anim(ifs)
+		: Initialize_Vertex_For_NonAnim(ifs, PreTransformMatrix);*/
 
 	if (FAILED(hr))
+	{
+		CRASH("Load Mesh Failed");
 		return E_FAIL;
+	}
+		
 
 	return S_OK;
 }

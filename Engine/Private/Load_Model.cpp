@@ -47,7 +47,7 @@ const _bool CLoad_Model::Is_Ray_Hit(const _float3& rayOrigin, const _float3& ray
 	return false;
 }
 
-HRESULT CLoad_Model::Initialize_Prototype(MODELTYPE eModelType, _fmatrix PreTransformMatrix, string filePath)
+HRESULT CLoad_Model::Initialize_Prototype(MODELTYPE eModelType, _fmatrix PreTransformMatrix, string filePath, _wstring textureFolderPath)
 {
 	std::ifstream ifs(filePath, std::ios::binary);
 	if (!ifs.is_open())
@@ -66,17 +66,32 @@ HRESULT CLoad_Model::Initialize_Prototype(MODELTYPE eModelType, _fmatrix PreTran
 	if (strModelTag.empty())
 		CRASH("MODEL EMPTY");
 
-	if (FAILED(Load_Meshes(PreTransformMatrix, ifs)))
-		CRASH("LOAD MESH FAILED");
+	ScopedTimer allTimer("Initialize_Prototype");   // 전체 시간
 
-	if (FAILED(Load_Materials(ifs)))
-		CRASH("LOAD MATERIALS FAILED");
+	{
+		ScopedTimer LoadMesh("Load_Meshes");
+		if (FAILED(Load_Meshes(PreTransformMatrix, ifs)))
+			CRASH("LOAD MESH FAILED");
+	}
 
-	if (FAILED(Load_Bones(ifs)))
-		CRASH("LOAD BONES FAILED");
+	
+	{
+		ScopedTimer LoadMaterial("Load_Materials");
+		if (FAILED(Load_Materials(ifs, textureFolderPath)))
+			CRASH("LOAD MATERIALS FAILED");
+	}
 
-	if (FAILED(Load_Animations(ifs)))
-		CRASH("LOAD ANIMATION FAILED");
+	{
+		ScopedTimer LoadBone("Load_Bones");
+		if (FAILED(Load_Bones(ifs)))
+			CRASH("LOAD BONES FAILED");
+	}
+
+	{
+		ScopedTimer LoadAnimation("Load_Animations");
+		if (FAILED(Load_Animations(ifs)))
+			CRASH("LOAD ANIMATION FAILED");
+	}
 
 	// Load가 끝났다면 삭제.
 	ifs.close();
@@ -161,7 +176,8 @@ HRESULT CLoad_Model::Load_Meshes(_fmatrix PreTransformMatrix, std::ifstream& ifs
 	return S_OK;
 }
 
-HRESULT CLoad_Model::Load_Materials(std::ifstream& ifs)
+/* 각 모델마다 텍스쳐 폴더를 다르게 저장할 것. => 구별하기 위해서. */
+HRESULT CLoad_Model::Load_Materials(std::ifstream& ifs, _wstring textureFolderPath)
 {
 	/* ---------- Material ---------- */
 
@@ -172,7 +188,7 @@ HRESULT CLoad_Model::Load_Materials(std::ifstream& ifs)
 	for (uint32_t i = 0; i < materialVectorSize; ++i)
 	{
 		// 4. Vector size만큼 순회 돌리면서 Material 생성.
-		CLoad_MeshMaterial* pLoadMesh = CLoad_MeshMaterial::Create(m_pDevice, m_pContext, ifs);
+		CLoad_MeshMaterial* pLoadMesh = CLoad_MeshMaterial::Create(m_pDevice, m_pContext, ifs, textureFolderPath);
 		if (nullptr == pLoadMesh)
 			CRASH("LOAD MESH");
 
@@ -229,11 +245,11 @@ HRESULT CLoad_Model::Load_Animations(std::ifstream& ifs)
 	return S_OK;
 }
 
-CLoad_Model* CLoad_Model::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, MODELTYPE eModelType, _fmatrix PreTransformMatrix, string filepath)
+CLoad_Model* CLoad_Model::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, MODELTYPE eModelType, _fmatrix PreTransformMatrix, string filepath, _wstring textureFloderPath)
 {
 	CLoad_Model* pInstance = new CLoad_Model(pDevice, pContext);
 
-	if (FAILED(pInstance->Initialize_Prototype(eModelType, PreTransformMatrix, filepath)))
+	if (FAILED(pInstance->Initialize_Prototype(eModelType, PreTransformMatrix, filepath, textureFloderPath)))
 	{
 		MSG_BOX(TEXT("Failed to Cloned : CLoad_Model"));
 		Safe_Release(pInstance);

@@ -27,6 +27,8 @@ struct VS_IN
     float3 vNormal : NORMAL;
     float3 vTangent : TANGENT;
     float3 vBinormal : BINORMAL;
+    uint4 vBlendIndex : BLENDINDEX;
+    float4 vBlendWeight : BLENDWEIGHT;
     float2 vTexcoord : TEXCOORD0;
 };
 

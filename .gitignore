@@ -17,6 +17,7 @@
 *.psk
 *.json
 *.mat
+*.dat
 #Client/Bin/Resources
 
 Client/Bin/**

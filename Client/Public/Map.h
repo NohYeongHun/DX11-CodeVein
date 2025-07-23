@@ -5,10 +5,10 @@ NS_BEGIN(Client)
 class CMap final : public CGameObject
 {
 public:
-	typedef struct tagPlayerDesc : public CGameObject::GAMEOBJECT_DESC
+	typedef struct tagMapDesc : public CGameObject::GAMEOBJECT_DESC
 	{
-		const _char* pModelFilePath;
-	}PLAYER_DESC;
+		const _tchar* PrototypeTag;
+	}MAP_DESC;
 
 private:
 	CMap(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -32,12 +32,12 @@ public:
 
 
 private:
-	class CModel* m_pModelCom = { nullptr };
+	class CLoad_Model* m_pModelCom = { nullptr };
 	class CShader* m_pShaderCom = { nullptr };
 
 
 private:
-	HRESULT Ready_Components(PLAYER_DESC* pDesc);
+	HRESULT Ready_Components(MAP_DESC* pDesc);
 	HRESULT Ready_Render_Resources();
 
 public:

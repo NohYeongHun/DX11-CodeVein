@@ -20,7 +20,7 @@ HRESULT CMap::Initialize_Prototype()
 
 HRESULT CMap::Initialize_Clone(void* pArg)
 {
-    PLAYER_DESC* pDesc = static_cast<PLAYER_DESC*>(pArg);
+    MAP_DESC* pDesc = static_cast<MAP_DESC*>(pArg);
     
     if (FAILED(__super::Initialize_Clone(pDesc)))
         return E_FAIL;
@@ -63,10 +63,18 @@ HRESULT CMap::Render()
         m_pModelCom->Bind_Materials(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE, 0);
 
         if (FAILED(m_pShaderCom->Begin(0)))
+        {
+            CRASH("Shader Begin Failed");
             return E_FAIL;
+        }
+            
 
         if (FAILED(m_pModelCom->Render(i)))
+        {
+            CRASH("Shader Begin Failed");
             return E_FAIL;
+        }
+            
     }
     
 
@@ -85,7 +93,7 @@ void CMap::On_Collision_Exit(CGameObject* pOther)
 {
 }
 
-HRESULT CMap::Ready_Components(PLAYER_DESC* pDesc)
+HRESULT CMap::Ready_Components(MAP_DESC* pDesc)
 {
 
     if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxMesh"),
@@ -98,7 +106,7 @@ HRESULT CMap::Ready_Components(PLAYER_DESC* pDesc)
         return E_FAIL;*/
 
     if (FAILED(__super::Add_Component(ENUM_CLASS(LEVEL::GAMEPLAY)
-        , TEXT("Prototype_Component_Model_Map")
+        , pDesc->PrototypeTag
         , TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom), nullptr)))
         return E_FAIL;
 

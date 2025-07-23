@@ -8,11 +8,11 @@ HRESULT CLoader_GamePlay::Loading_Resource(ID3D11Device* pDevice, ID3D11DeviceCo
 		return E_FAIL;
 	}
 
-	/*if (FAILED(Add_Prototype_Map(pDevice, pContext, pGameInstance)))
-	{
-		MSG_BOX(TEXT("Create Failed Loading : GamePlay Map "));
-		return E_FAIL;
-	}*/
+	//if (FAILED(Add_Prototype_Map(pDevice, pContext, pGameInstance)))
+	//{
+	//	MSG_BOX(TEXT("Create Failed Loading : GamePlay Map "));
+	//	return E_FAIL;
+	//}
 
 
 	if (FAILED(Add_Prototype_Camera_Free(pDevice, pContext, pGameInstance)))
@@ -53,17 +53,27 @@ HRESULT CLoader_GamePlay::Add_Prototype_Player(ID3D11Device* pDevice, ID3D11Devi
 	return S_OK;
 }
 
-// 1.
+// 1. Game 에서 사용할 Model.
 HRESULT CLoader_GamePlay::Add_Prototype_Map(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
 {
 	_matrix		PreTransformMatrix = XMMatrixIdentity();
 
-	// Map Prototype 생성.
+	PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f);
+ 	/*if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level)
+		, TEXT("Prototype_Component_Model_CircleFloor")
+		, CLoad_Model::Create(pDevice, pContext, MODELTYPE::NONANIM, PreTransformMatrix, "../../SaveFile/Model/Map/CircleFloor.dat", L"CircleFloor\\"))))
+		return E_FAIL;*/
+
 	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level)
-		, TEXT("Prototype_Component_Model_Map")
-		, CModel::Create(pDevice, pContext, MODELTYPE::NONANIM, PreTransformMatrix, "../Bin/Resources/Models/Map/BossMap.glb"))))
+		, TEXT("Prototype_Component_Model_BossStage")
+		, CLoad_Model::Create(pDevice, pContext, MODELTYPE::NONANIM, PreTransformMatrix, "../../SaveFile/Model/Map/BossStage1.dat", L"BossStage\\"))))
 		return E_FAIL;
 
+	/*if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level)
+		, TEXT("Prototype_Component_Model_BossStage")
+		, CModel::Create(pDevice, pContext, MODELTYPE::NONANIM, PreTransformMatrix, "../Bin/Resources/Models/Map/BossMap/BossMap.fbx"))))
+		return E_FAIL;*/
+	
 	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level)
 		, TEXT("Prototype_GameObject_Map")
 		, CMap::Create(pDevice, pContext))))

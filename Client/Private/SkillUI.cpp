@@ -31,10 +31,6 @@ void CSkillUI::Set_Visibility()
         for (auto& val : m_SkillUI_Panels)
             val->Update_SelectedInfo(m_iSelect_PanelType, m_iSelect_PanelIndex, m_iSelect_SlotIndex);
     }
-
-
-
-    m_pGameInstance->Publish<CInventory>(EventType::INVENTORY_DISPLAY, nullptr);
 }
 
 

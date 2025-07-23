@@ -197,16 +197,13 @@ void CMap_Tool::Render_Debug_Window()
     if (ImGui::Button("Edit Mode"))
     {
         m_eToolMode = TOOLMODE::EDIT;
+        // 현재 생성된 Layer 정보를 Load합니다.
         Load_Layer();
-        // Event 발생?
     }
     
     if (ImGui::Button("Create Mode"))
     {
         m_eToolMode = TOOLMODE::CREATE;
-        
-        // Event 발생 => Load ObjectManger Layer.
-
     }
 
 
@@ -477,82 +474,6 @@ void CMap_Tool::Render_Edit_Hierarchy()
     ImGui::End();
 }
 
-//void CMap_Tool::Render_Edit_Hierarchy()
-//{
-//    ImGui::SetNextWindowPos(ImVec2(g_iWinSizeX - 310.f, 10.f), ImGuiCond_Always);
-//    ImGui::SetNextWindowSize(ImVec2(300, 400), ImGuiCond_Once);
-//    ImGui::Begin("Edit_Hierarchy", nullptr, ImGuiWindowFlags_NoCollapse);
-//
-//    static uint32_t selLayerIdx = UINT32_MAX;
-//    static uint32_t selObjIdx = UINT32_MAX;
-//
-//    uint32_t layerIdx = 0;
-//
-//    // ───────── 레이어 루프 ─────────
-//    for (LayerTable::const_iterator itLayer = m_LayerTable.begin();
-//        itLayer != m_LayerTable.end(); ++itLayer, ++layerIdx)
-//    {
-//        const wstring& tagW = itLayer->first;   // 키
-//        CLayer* pLayer = itLayer->second; // 값
-//
-//        string tag = WString_ToString(tagW);
-//
-//        ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_SpanFullWidth
-//            | ImGuiTreeNodeFlags_DefaultOpen;
-//        if (layerIdx == selLayerIdx) flags |= ImGuiTreeNodeFlags_Selected;
-//
-//        
-//        bool open = ImGui::TreeNodeEx(tag.c_str(), flags);
-//        if (ImGui::IsItemClicked())
-//        {
-//            selLayerIdx = layerIdx;
-//            selObjIdx = UINT32_MAX;   // 레이어 클릭 → 오브젝트 선택 해제
-//        }
-//
-//        // ───────── 레이어 내부 오브젝트 루프 ─────────
-//        if (open && pLayer)
-//        {
-//            uint32_t objIdx = 0;
-//
-//            const list<CGameObject*>& objList = pLayer->Get_GameObjects();
-//            for (list<CGameObject*>::const_iterator itObj = objList.begin();
-//                itObj != objList.end(); ++itObj, ++objIdx)
-//            {
-//                CGameObject* pObj = *itObj;
-//                if (pObj == nullptr) continue;
-//
-//                string objTag = WString_ToString(pObj->Get_ObjectTag());
-//
-//                // ID 충돌 방지
-//                ImGui::PushID(static_cast<int>(objIdx)); 
-//                bool objSelected = (objIdx == selObjIdx);
-//
-//                string displayObjTag = objTag + to_string(objIdx);
-//                
-//                if (ImGui::Selectable(displayObjTag.c_str(), objSelected))
-//                {
-//                    selLayerIdx = layerIdx;
-//                    selObjIdx = objIdx;
-//                    m_Selected_EditObjTag = objTag;
-//                    m_Selected_EditObjID = pObj->Get_ID();
-//                    m_Selected_EditLayerTag = tagW;
-//                    m_pSelectedObject = pObj;
-//                }
-//                ImGui::PopID();
-//            }
-//            ImGui::TreePop();
-//        }
-//    }
-//
-//    // ── 선택된 오브젝트 Inspector 띄우기 ──
-//    if (selLayerIdx != UINT32_MAX && selObjIdx != UINT32_MAX)
-//    {
-//        ImVec2 pos(ImGui::GetWindowPos().x - 310.f, ImGui::GetWindowPos().y);
-//        Render_Edit_Inspector(pos);
-//    }
-//
-//    ImGui::End();
-//}
 
 void CMap_Tool::Render_Edit_Inspector(ImVec2 vPos)
 {

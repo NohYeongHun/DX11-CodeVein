@@ -116,6 +116,20 @@ namespace Engine
 	}VTXANIMMESH;
 
 
+	typedef struct ScopedTimer {
+		const char* tag;
+		LARGE_INTEGER  start, freq;
+		ScopedTimer(const char* t) : tag(t) {
+			QueryPerformanceFrequency(&freq);
+			QueryPerformanceCounter(&start);
+		}
+		~ScopedTimer() {
+			LARGE_INTEGER end;
+			QueryPerformanceCounter(&end);
+			double ms = (end.QuadPart - start.QuadPart) * 1000.0 / freq.QuadPart;
+			printf("%s : %.3f ms\n", tag, ms);
+		}
+	}SCOPE_TIMER;
 }
 
 #include "Event_Type.h"

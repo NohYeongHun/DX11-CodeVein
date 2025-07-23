@@ -20,8 +20,8 @@ HRESULT CLevel_GamePlay::Initialize_Clone()
 	//if (FAILED(Ready_Layer_Map(TEXT("Layer_Map"))))
 	//	return E_FAIL;
 	
-	if (FAILED(Ready_Layer_Terrain(TEXT("Layer_Terrain"))))
-		return E_FAIL;
+	//if (FAILED(Ready_Layer_Terrain(TEXT("Layer_Terrain"))))
+	//	return E_FAIL;
 
 	if (FAILED(Ready_Lights()))
 		return E_FAIL;
@@ -130,7 +130,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_Player(const _wstring& strLayerTag)
 	Desc.fRotationPerSec = XMConvertToRadians(90.0f);
 
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel), strLayerTag,
-		ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_Player"))))
+		ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_Player"), &Desc)))
 		return E_FAIL;
 
 	return S_OK;
@@ -138,9 +138,12 @@ HRESULT CLevel_GamePlay::Ready_Layer_Player(const _wstring& strLayerTag)
 
 HRESULT CLevel_GamePlay::Ready_Layer_Map(const _wstring& strLayerTag)
 {
+	CMap::MAP_DESC Desc = {};
+
+	Desc.PrototypeTag = L"Prototype_Component_Model_BossStage";
 
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel), strLayerTag,
-		ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_Map"))))
+		ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_Map"), &Desc)))
 		return E_FAIL;
 
 	return S_OK;

@@ -295,7 +295,6 @@ HRESULT CTool_Model::Save_Bones(ANIMMODEL_INFO& AnimModelInfo)
     uint32_t iNumAnimations;
     vector<ANIMATION_INFO> animationVector;
 */
-
 // 1. Animation 정보 저장.
 HRESULT CTool_Model::Save_AnimationInfo(ANIMMODEL_INFO& AnimModelInfo)
 {

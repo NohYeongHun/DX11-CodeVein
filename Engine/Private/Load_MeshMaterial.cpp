@@ -8,7 +8,7 @@ CLoad_MeshMaterial::CLoad_MeshMaterial(ID3D11Device* pDevice, ID3D11DeviceContex
 	Safe_AddRef(m_pContext);
 }
 
-HRESULT CLoad_MeshMaterial::Initialize(std::ifstream& ifs)
+HRESULT CLoad_MeshMaterial::Initialize(std::ifstream& ifs, _wstring textureFolderPath)
 {
 
 	/*
@@ -50,27 +50,36 @@ HRESULT CLoad_MeshMaterial::Initialize(std::ifstream& ifs)
 		ID3D11ShaderResourceView* pSRV = { nullptr };
 
 		_tchar			szExt[MAX_PATH] = {};
-
-		_wsplitpath_s(strTexturePath.c_str(), nullptr, 0, nullptr, 0, nullptr, 0, szExt, MAX_PATH);
-
+		_tchar			szDir[MAX_PATH] = {};
+		_tchar			szFilePath[MAX_PATH] = {};
+		
+		_wsplitpath_s(strTexturePath.c_str(), nullptr, 0, szDir, MAX_PATH, szFilePath, MAX_PATH, szExt, MAX_PATH);
+		
+		// wstring 결합.
+		_tchar			szFinalPath[MAX_PATH] = {};
+		wcscpy_s(szFinalPath, szDir);
+		wcscat_s(szFinalPath, textureFolderPath.c_str());
+		wcscat_s(szFinalPath, szFilePath);
+		
 		HRESULT		hr = {};
 
 		if (L".tga" == szExt)
 			hr = E_FAIL;
 
+		_wstring wExt = L".dds";
+		// dds로만 읽어오게 변경.
+		wcscat_s(szFinalPath, wExt.c_str());
+
 		if (L".dds" == szExt)
-			hr = CreateDDSTextureFromFile(m_pDevice, strTexturePath.c_str(), nullptr, &pSRV);
+			hr = CreateDDSTextureFromFile(m_pDevice, szFinalPath, nullptr, &pSRV);
 		else
-			hr = CreateWICTextureFromFile(m_pDevice, strTexturePath.c_str(), nullptr, &pSRV);
+			hr = CreateWICTextureFromFile(m_pDevice, szFinalPath, nullptr, &pSRV);
 
 		if (FAILED(hr))
 			CRASH("Texture Create Failed");
 
 		m_SRVs[i].emplace_back(pSRV);
 	}
-	
-	
-	
 
 	return S_OK;
 }
@@ -80,14 +89,16 @@ HRESULT CLoad_MeshMaterial::Bind_Resources(CShader* pShader, const _char* pConst
 	if (iTextureIndex >= m_SRVs[eTextureType].size())
 		return E_FAIL;
 
+	if(m_SRVs[eTextureType][iTextureIndex] )
+
 	return pShader->Bind_SRV(pConstantName, m_SRVs[eTextureType][iTextureIndex]);
 }
 
-CLoad_MeshMaterial* CLoad_MeshMaterial::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, std::ifstream& ifs)
+CLoad_MeshMaterial* CLoad_MeshMaterial::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, std::ifstream& ifs, _wstring textureFolderPath)
 {
 	CLoad_MeshMaterial* pInstance = new CLoad_MeshMaterial(pDevice, pContext);
 
-	if (FAILED(pInstance->Initialize(ifs)))
+	if (FAILED(pInstance->Initialize(ifs, textureFolderPath)))
 	{
 		MSG_BOX(TEXT("Create Failed : CLoad_MeshMaterial"));
 		Safe_Release(pInstance);
