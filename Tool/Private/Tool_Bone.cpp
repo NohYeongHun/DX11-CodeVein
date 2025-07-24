@@ -21,7 +21,19 @@ HRESULT CTool_Bone::Initialize(const aiNode* pAINode, _int iParentBoneIndex)
     // Col Major에서 Row Major로 변경 => DirectX에서는 Row Major를 사용합니다.
     XMStoreFloat4x4(&m_TransformationMatrix, XMMatrixTranspose(XMLoadFloat4x4(&m_TransformationMatrix)));
 
+    //const _float4x4& m = m_TransformationMatrix;
+    //std::wstringstream ss;
+    //ss  << m._11 << L' ' << m._12 << L' ' << m._13 << L' ' << m._14 << L'\n'
+    //    << m._21 << L' ' << m._22 << L' ' << m._23 << L' ' << m._24 << L'\n'
+    //    << m._31 << L' ' << m._32 << L' ' << m._33 << L' ' << m._34 << L'\n'
+    //    << m._41 << L' ' << m._42 << L' ' << m._43 << L' ' << m._44 << L'\n';
+    //
+    //_wstring strBoneDebug = ss.str();
+    //OutputDebugString(strBoneDebug.c_str());
+
     XMStoreFloat4x4(&m_CombinedTransformationMatrix, XMMatrixIdentity());
+
+    
 
     // 부모 본 인덱스 설정하기.
     m_iParentBoneIndex = iParentBoneIndex;
@@ -62,6 +74,11 @@ CTool_Bone* CTool_Bone::Create(const aiNode* pAINode, _int iParentBoneIndex)
     }
 
     return pInstance;
+}
+
+CTool_Bone* CTool_Bone::Clone()
+{
+    return new CTool_Bone(*this);
 }
 
 void CTool_Bone::Free()

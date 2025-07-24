@@ -34,6 +34,8 @@ HRESULT CTool_Animation::Initialize(const aiAnimation* pAIAnimation, const vecto
     
     for (_uint i = 0; i < m_iNumChannels; i++)
     {
+        _wstring strChannelDebug = L"============= Current Channel Index : " + to_wstring(i) + L" ========================\n";
+        //OutputDebugString(strChannelDebug.c_str());
         CTool_Channel* pChannel = CTool_Channel::Create(pAIAnimation->mChannels[i], Bones);
         if (nullptr == pChannel)
         {
@@ -49,22 +51,21 @@ HRESULT CTool_Animation::Initialize(const aiAnimation* pAIAnimation, const vecto
 }
 
 /* Animation에서 Transform 행렬들을 모두 업데이트해줍니다. */
-void CTool_Animation::Update_TransformationMatrices(const vector<class CTool_Bone*>& Bones, _float fTimeDelta, _bool isLoop)
+void CTool_Animation::Update_TransformationMatrices(const vector<class CTool_Bone*>& Bones, _bool isLoop, _bool* pFinished, _float fTimeDelta)
 {
-    _bool		isFinished = { false };
-
     /* 현재 재생위치를 계산하자. */
     m_fCurrentTrackPosition += m_fTickPerSecond * fTimeDelta;
-
 
     if (m_fCurrentTrackPosition >= m_fDuration)
     {
         if (false == isLoop)
-            isFinished = true;
-        else
         {
-            m_fCurrentTrackPosition = 0.f;
+            *pFinished = true;
+            m_fCurrentTrackPosition = m_fDuration;
+            return;
         }
+        else
+            m_fCurrentTrackPosition = 0.f;
     }
 
     for (auto& pChannel : m_Channels)

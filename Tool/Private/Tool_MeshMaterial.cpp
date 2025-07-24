@@ -138,8 +138,8 @@ HRESULT CTool_MeshMaterial::Initialize_FBX(const _char* pModelFilePath, const ai
 			strcat_s(szFullPath, szDir);
 			strcat_s(szFullPath, strDirPath.c_str()); // Add texture folder path
 			strcat_s(szFullPath, szFileName);
-			strcat_s(szFullPath, ext.c_str());
-			//strcat_s(szFullPath, szExt);
+			//strcat_s(szFullPath, ext.c_str());
+			strcat_s(szFullPath, szExt);
 
 			_tchar			szTextureFilePath[MAX_PATH] = {};
 			MultiByteToWideChar(CP_ACP, 0, szFullPath, strlen(szFullPath), szTextureFilePath, MAX_PATH);
@@ -147,13 +147,21 @@ HRESULT CTool_MeshMaterial::Initialize_FBX(const _char* pModelFilePath, const ai
 
 			HRESULT		hr = {};
 
-			if (false == strcmp(".tga", ext.c_str()))
+			if (false == strcmp(".tga", szExt))
+				hr = E_FAIL;
+
+			if (false == strcmp(".dds", szExt))
+				hr = CreateDDSTextureFromFile(m_pDevice, szTextureFilePath, nullptr, &pSRV);
+			else
+				hr = CreateWICTextureFromFile(m_pDevice, szTextureFilePath, nullptr, &pSRV);
+
+			/*if (false == strcmp(".tga", ext.c_str()))
 				hr = E_FAIL;
 
 			if (false == strcmp(".dds", ext.c_str()))
  				hr = CreateDDSTextureFromFile(m_pDevice, szTextureFilePath, nullptr, &pSRV);
 			else
-				hr = CreateWICTextureFromFile(m_pDevice, szTextureFilePath, nullptr, &pSRV);
+				hr = CreateWICTextureFromFile(m_pDevice, szTextureFilePath, nullptr, &pSRV);*/
 
 			if (FAILED(hr))
 				return E_FAIL;
