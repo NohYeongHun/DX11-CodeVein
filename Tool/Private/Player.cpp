@@ -43,7 +43,7 @@ void CPlayer::Update(_float fTimeDelta)
 {
     __super::Update(fTimeDelta);
 
-    if (m_pGameInstance->Get_KeyPress(DIK_W))
+ /*   if (m_pGameInstance->Get_KeyPress(DIK_W))
     {
         m_pTransformCom->Go_Straight(fTimeDelta);
     }
@@ -61,7 +61,7 @@ void CPlayer::Update(_float fTimeDelta)
     if (m_pGameInstance->Get_KeyPress(DIK_D))
     {
         m_pTransformCom->Go_Right(fTimeDelta);
-    }
+    }*/
 }
 
 void CPlayer::Late_Update(_float fTimeDelta)
@@ -74,21 +74,21 @@ void CPlayer::Late_Update(_float fTimeDelta)
 
 HRESULT CPlayer::Render()
 {
-    if (ImGui::IsWindowAppearing())              // 또는 static bool once=true;
-    {
-        ImGui::SetNextWindowPos({ 100, 100 }, ImGuiCond_Appearing);
-        ImGui::SetNextWindowSize({ 460, 240 }, ImGuiCond_Appearing); // ← 원하는 픽셀
-    }
+    //if (ImGui::IsWindowAppearing())              // 또는 static bool once=true;
+    //{
+    //    ImGui::SetNextWindowPos({ 100, 100 }, ImGuiCond_Appearing);
+    //    ImGui::SetNextWindowSize({ 460, 240 }, ImGuiCond_Appearing); // ← 원하는 픽셀
+    //}
 
-    string str = "Player Transform [" + to_string(Get_ID()) + ']';
-    ImGui::Begin(str.c_str());
-    _float4 vPosition = {};
-    XMStoreFloat4(&vPosition, m_pTransformCom->Get_State(STATE::POSITION));
+    //string str = "Player Transform [" + to_string(Get_ID()) + ']';
+    //ImGui::Begin(str.c_str());
+    //_float4 vPosition = {};
+    //XMStoreFloat4(&vPosition, m_pTransformCom->Get_State(STATE::POSITION));
 
-    ImGui::InputFloat("X : ", &vPosition.x);
-    ImGui::InputFloat("Y : ", &vPosition.y);
-    ImGui::InputFloat("Z : ", &vPosition.z);
-    ImGui::End();
+    //ImGui::InputFloat("X : ", &vPosition.x);
+    //ImGui::InputFloat("Y : ", &vPosition.y);
+    //ImGui::InputFloat("Z : ", &vPosition.z);
+    //ImGui::End();
 
 
     if (FAILED(Ready_Render_Resources()))
@@ -97,7 +97,8 @@ HRESULT CPlayer::Render()
     _uint iNumMeshes = m_pModelCom->Get_NumMeshes();
     for (_uint i = 0; i < iNumMeshes; i++)
     {
-        m_pModelCom->Bind_Materials(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE, 0);
+        if(FAILED(m_pModelCom->Bind_Materials(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE, 0)))
+            CRASH("Bine Materials Failed");
         
 
         if (FAILED(m_pShaderCom->Begin(0)))
@@ -126,14 +127,21 @@ void CPlayer::On_Collision_Exit(CGameObject* pOther)
 HRESULT CPlayer::Ready_Components(PLAYER_DESC* pDesc)
 {
 
-    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxMesh"),
+    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxAnimMesh"),
         TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom), nullptr)))
+    {
+        CRASH("Shader Create Failed");
         return E_FAIL;
+    }
+        
 
-    if (FAILED(__super::Add_Component(ENUM_CLASS(LEVEL::STATIC)
+    if (FAILED(__super::Add_Component(ENUM_CLASS(LEVEL::LOGO)
         , TEXT("Prototype_Component_Model_Player")
         ,TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom), nullptr)))
+    {
+        CRASH("Model Create Failed");
         return E_FAIL;
+    }
 
 
     return S_OK;

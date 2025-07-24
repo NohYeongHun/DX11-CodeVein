@@ -11,7 +11,7 @@ private:
 
 public:
 	HRESULT Initialize(const aiAnimation* pAIAnimation, const vector<class CTool_Bone*>& Bones);
-	void Update_TransformationMatrices(const vector<class CTool_Bone*>& Bones, _float fTimeDelta, _bool isLoop);
+	void Update_TransformationMatrices(const vector<class CTool_Bone*>& Bones, _bool isLoop, _bool* pFinished, _float fTimeDelta);
 
 #pragma region 저장 로직.
 public:

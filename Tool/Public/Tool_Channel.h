@@ -24,6 +24,7 @@ private:
 	_uint m_iBoneIndex = {};
 
 	/* 시간에 따른 뼈의 상태를 보관합니다. */
+	_uint m_iCurrentKeyFrameIndex = {};
 	_uint m_iNumKeyFrames = {};
 	vector<KEYFRAME> m_KeyFrames = {};
 

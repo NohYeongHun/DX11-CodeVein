@@ -138,7 +138,20 @@ HRESULT CLoader::Loading_For_Logo_Level()
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LOGO)
 		, TEXT("Prototype_GameObject_Map_Part")
 		, CToolMap_Part::Create(m_pDevice, m_pContext))))
+	{
+		CRASH("Prototype GameObject Create Failed");
 		return E_FAIL;
+	}
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LOGO)
+		, TEXT("Prototype_GameObject_Player")
+		, CPlayer::Create(m_pDevice, m_pContext))))
+	{
+		CRASH("Prototype GameObject Create Failed");
+		return E_FAIL;
+	}
+		
+
 #pragma endregion
 
 #pragma region CAMERA

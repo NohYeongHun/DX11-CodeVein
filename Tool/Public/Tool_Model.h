@@ -23,14 +23,19 @@ public:
 		return m_ModelType;
 	}
 
+	void Set_Animation(_uint iAnimIndex, _bool isLoop = false) {
+		m_iCurrentAnimIndex = iAnimIndex;
+		m_isLoop = isLoop;
+	}
+
 	
 #pragma region 저장용 함수.
-public:
-	const MODEL_INFO& Save_NonAminModel(_fmatrix PreTransformMatrix, _wstring pModelTag);
-	
-private:
-	HRESULT Save_NonAnimMeshes(_fmatrix PreTransformMatrix);
-	HRESULT Save_NonAnimMarterials();
+//public:
+//	const MODEL_INFO& Save_NonAminModel(_fmatrix PreTransformMatrix, _wstring pModelTag);
+//	
+//private:
+//	HRESULT Save_NonAnimMeshes(_fmatrix PreTransformMatrix);
+//	HRESULT Save_NonAnimMarterials();
 
 
 /* 애니메이션 */
@@ -55,8 +60,7 @@ public:
 public:
 	HRESULT Bind_Materials(CShader* pShader, const _char* pConstantName, _uint iMeshIndex, aiTextureType eTextureType, _uint iTextureIndex);
 	HRESULT Bind_BoneMatrices(class CShader* pShader, const _char* pConstantName, _uint iMeshIndex);
-	
-	void Play_Animation(_float fTimeDelta);
+	_bool Play_Animation(_float fTimeDelta);
 
 
 
@@ -85,12 +89,14 @@ private:
 
 private:
 	/* Animations */
+	_bool m_isFinished = { false };
 	_uint m_iCurrentAnimIndex = { 0 };
 	_uint m_iNumAnimations = { 0 };
+	_bool m_isLoop = { false };
 	vector<class CTool_Animation*> m_Animations;
 
 private:
-	MODEL_INFO m_NonAnimModelInfo = {};
+	//MODEL_INFO m_NonAnimModelInfo = {};
 	string m_ModelDir = {};
 
 
