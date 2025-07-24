@@ -73,7 +73,12 @@
 #include "Terrain.h"
 #include "Map.h"
 
+
+
 /* ======================================== Actor Object ===================================== */
+#include "PlayerState.h"
+#include "Player_IdleState.h"
+#include "Player_WalkState.h"
 #include "Player.h"
 
 #pragma endregion

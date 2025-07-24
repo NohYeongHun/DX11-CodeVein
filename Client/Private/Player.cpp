@@ -28,10 +28,15 @@ HRESULT CPlayer::Initialize_Clone(void* pArg)
     if (FAILED(Ready_Components(pDesc)))
         return E_FAIL;
 
+    if (FAILED(Ready_Fsm()))
+        return E_FAIL;
+
     // Player 정면 바라보게 하기?
     //m_pTransformCom->Rotation(XMVectorSet(1.f, 0.f, 0.f, 0.f), XMConvertToRadians(270.f));
 
-    m_pModelCom->Set_Animation(0, true);
+    //m_pModelCom->Set_Animation(6, true);
+
+    
     
 
     return S_OK;
@@ -41,25 +46,27 @@ void CPlayer::Priority_Update(_float fTimeDelta)
 {
     __super::Priority_Update(fTimeDelta);
 
+
+
     /*if (m_pGameInstance->Get_KeyPress(DIK_W))
-    {
-        m_pTransformCom->Go_Straight(fTimeDelta);
-    }
+   {
+       m_pTransformCom->Go_Straight(fTimeDelta);
+   }
 
-    if (m_pGameInstance->Get_KeyPress(DIK_S))
-    {
-        m_pTransformCom->Go_Backward(fTimeDelta);
-    }
+   if (m_pGameInstance->Get_KeyPress(DIK_S))
+   {
+       m_pTransformCom->Go_Backward(fTimeDelta);
+   }
 
-    if (m_pGameInstance->Get_KeyPress(DIK_A))
-    {
-        m_pTransformCom->Go_Left(fTimeDelta);
-    }
+   if (m_pGameInstance->Get_KeyPress(DIK_A))
+   {
+       m_pTransformCom->Go_Left(fTimeDelta);
+   }
 
-    if (m_pGameInstance->Get_KeyPress(DIK_D))
-    {
-        m_pTransformCom->Go_Right(fTimeDelta);
-    }*/
+   if (m_pGameInstance->Get_KeyPress(DIK_D))
+   {
+       m_pTransformCom->Go_Right(fTimeDelta);
+   }*/
 
 }
 
@@ -67,9 +74,12 @@ void CPlayer::Update(_float fTimeDelta)
 {
     __super::Update(fTimeDelta);
 
+    if (nullptr != m_pFsmCom)
+        m_pFsmCom->Update(fTimeDelta);
+
     if (true == m_pModelCom->Play_Animation(fTimeDelta))
     {
-        int a = 10;
+        int a = 0;
     }
 
     
@@ -85,6 +95,24 @@ void CPlayer::Late_Update(_float fTimeDelta)
 
 HRESULT CPlayer::Render()
 {
+#ifdef _DEBUG
+    ImGuiIO& io = ImGui::GetIO();
+    ImVec2 windowPos = ImVec2(10.f, io.DisplaySize.y - 350.f);
+    ImVec2 windowSize = ImVec2(300.f, 300.f);
+
+    // Cond_Once: 최초 한 번만 위치 적용 → 이후 드래그 가능
+    ImGui::SetNextWindowPos(windowPos, ImGuiCond_Once);
+    ImGui::SetNextWindowSize(windowSize, ImGuiCond_Once);
+
+    ImGui::Begin("Debug", nullptr, ImGuiWindowFlags_NoCollapse);
+    _float3 vPos = {};
+    XMStoreFloat3(&vPos, m_pTransformCom->Get_State(STATE::POSITION));
+    ImGui::Text("Player Pos: (%.2f, %.2f, %.2f)", vPos.x, vPos.y, vPos.z);
+    ImGui::End();
+#endif // _DEBUG
+
+
+
     if (FAILED(Ready_Render_Resources()))
     {
         CRASH("Ready Render Resource Failed");
@@ -125,6 +153,16 @@ void CPlayer::On_Collision_Exit(CGameObject* pOther)
 {
 }
 
+#pragma region 플레이어 상태 함수들
+void CPlayer::Change_Animation(_uint iAnimationIndex, _bool isLoop)
+{
+    m_pModelCom->Set_Animation(iAnimationIndex, isLoop);
+}
+
+#pragma endregion
+
+
+
 HRESULT CPlayer::Ready_Components(PLAYER_DESC* pDesc)
 {
 
@@ -132,12 +170,62 @@ HRESULT CPlayer::Ready_Components(PLAYER_DESC* pDesc)
         TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom), nullptr)))
         return E_FAIL;
 
+    CLoad_Model::LOADMODEL_DESC Desc{};
+    Desc.pGameObject = this;
+
     if (FAILED(__super::Add_Component(ENUM_CLASS(LEVEL::STATIC)
         , TEXT("Prototype_Component_Model_Player")
-        ,TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom), nullptr)))
+        ,TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom), &Desc)))
         return E_FAIL;
 
 
+    return S_OK;
+}
+
+HRESULT CPlayer::Ready_Fsm()
+{
+    CFsm::FSM_DESC Desc{};
+    Desc.pOwner = this;
+
+    if (FAILED(__super::Add_Component(ENUM_CLASS(LEVEL::STATIC)
+        , TEXT("Prototype_Component_Fsm")
+        , TEXT("Com_Fsm"), reinterpret_cast<CComponent**>(&m_pFsmCom), &Desc)))
+        return E_FAIL;
+
+
+    
+    CPlayer_IdleState::PLAYER_IDLESTATE_DESC Idle{};
+    Idle.pFsm = m_pFsmCom;
+    Idle.pOwner = this;
+
+    m_pFsmCom->Add_State(CPlayer_IdleState::Create(PLAYER_STATE::IDLE, &Idle));
+
+    CPlayer_WalkState::PLAYER_WALKSTATE_DESC walk{};
+    walk.pFsm = m_pFsmCom;
+    walk.pOwner = this;
+
+    m_pFsmCom->Add_State(CPlayer_WalkState::Create(PLAYER_STATE::WALK, &walk));
+    /*m_pFsmCom->Add_State(CState_Player_Parry::Create(m_pFsmCom, this, PARRY, &Desc));
+    m_pFsmCom->Add_State(CState_Player_Heal::Create(m_pFsmCom, this, HEAL, &Desc));
+    m_pFsmCom->Add_State(CState_Player_ChangeWeapon::Create(m_pFsmCom, this, CHANGEWEP, &Desc));
+    m_pFsmCom->Add_State(CState_Player_Ladder::Create(m_pFsmCom, this, LADDER, &Desc));
+    m_pFsmCom->Add_State(CState_Player_Lift::Create(m_pFsmCom, this, LIFT, &Desc));
+    m_pFsmCom->Add_State(CState_Player_Chest::Create(m_pFsmCom, this, CHEST, &Desc));
+    m_pFsmCom->Add_State(CState_Player_ItemGet::Create(m_pFsmCom, this, ITEMGET, &Desc));
+    m_pFsmCom->Add_State(CState_Player_Stargazer::Create(m_pFsmCom, this, STARGAZER, &Desc));
+    m_pFsmCom->Add_State(CState_Player_Teleport::Create(m_pFsmCom, this, TELEPORT, &Desc));
+    m_pFsmCom->Add_State(CState_Player_Grinder::Create(m_pFsmCom, this, GRINDER, &Desc));
+    m_pFsmCom->Add_State(CState_Player_GetUp::Create(m_pFsmCom, this, GETUP, &Desc));
+    m_pFsmCom->Add_State(CState_Player_ThrowItem::Create(m_pFsmCom, this, THROW_ITEM, &Desc));
+    m_pFsmCom->Add_State(CState_Player_DebuffResistance::Create(m_pFsmCom, this, DEBUFF_RESISTANCE, &Desc));
+    m_pFsmCom->Add_State(CState_Player_DebuffReset::Create(m_pFsmCom, this, DEBUFF_RESET, &Desc));
+    m_pFsmCom->Add_State(CState_Player_RetryBoss::Create(m_pFsmCom, this, RETRY_BOSS, &Desc));
+    m_pFsmCom->Add_State(CState_Player_Die::Create(m_pFsmCom, this, DIE, &Desc));*/
+
+    CPlayer_IdleState::PLAYERIDLE_ENTER_DESC enter{};
+    enter.iAnimation_IdleIndex = 17;
+
+    m_pFsmCom->Change_State(PLAYER_STATE::IDLE, &enter);
     return S_OK;
 }
 
@@ -211,4 +299,5 @@ void CPlayer::Free()
     __super::Free();
     Safe_Release(m_pModelCom);
     Safe_Release(m_pShaderCom);
+    Safe_Release(m_pFsmCom);
 }

@@ -178,6 +178,7 @@ call copy.bat</Command>
     <ClCompile Include="..\Private\Event_Manager.cpp" />
     <ClCompile Include="..\Private\Font.cpp" />
     <ClCompile Include="..\Private\Font_Manager.cpp" />
+    <ClCompile Include="..\Private\Fsm.cpp" />
     <ClCompile Include="..\Private\GameInstance.cpp" />
     <ClCompile Include="..\Private\GameObject.cpp" />
     <ClCompile Include="..\Private\Graphic_Device.cpp" />
@@ -199,6 +200,7 @@ call copy.bat</Command>
     <ClCompile Include="..\Private\Prototype_Manager.cpp" />
     <ClCompile Include="..\Private\Renderer.cpp" />
     <ClCompile Include="..\private\Shader.cpp" />
+    <ClCompile Include="..\Private\State.cpp" />
     <ClCompile Include="..\Private\Texture.cpp" />
     <ClCompile Include="..\Private\Texture_Manager.cpp" />
     <ClCompile Include="..\Private\Timer.cpp" />
@@ -237,6 +239,7 @@ call copy.bat</Command>
     <ClInclude Include="..\Public\Event_Type.h" />
     <ClInclude Include="..\Public\Font.h" />
     <ClInclude Include="..\Public\Font_Manager.h" />
+    <ClInclude Include="..\Public\Fsm.h" />
     <ClInclude Include="..\Public\GameInstance.h" />
     <ClInclude Include="..\Public\GameObject.h" />
     <ClInclude Include="..\Public\Graphic_Device.h" />
@@ -260,6 +263,7 @@ call copy.bat</Command>
     <ClInclude Include="..\Public\Renderer.h" />
     <ClInclude Include="..\Public\SaveFile_Define.h" />
     <ClInclude Include="..\public\Shader.h" />
+    <ClInclude Include="..\Public\State.h" />
     <ClInclude Include="..\Public\Texture.h" />
     <ClInclude Include="..\Public\Texture_Manager.h" />
     <ClInclude Include="..\Public\Timer.h" />

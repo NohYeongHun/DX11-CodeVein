@@ -106,6 +106,12 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 		CVIBuffer_Rect::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
 
+	/* ==================================================== FSM ====================================================*/
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Fsm"),
+		CFsm::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+
 	if (FAILED(Ready_Prototype_ForUsageTexture()))
 		return E_FAIL;
 	

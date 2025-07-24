@@ -23,8 +23,12 @@ HRESULT CLoad_Channel::Initialize(std::ifstream& ifs)
 
 void CLoad_Channel::Update_TransformationMatrix(const vector<class CLoad_Bone*>& Bones, _float fCurrentTrackPosition)
 {
-    if (fCurrentTrackPosition == 0.f)
+    
+    if (fCurrentTrackPosition < m_KeyFrames[m_iCurrentKeyFrameIndex].fTrackPosition)
         m_iCurrentKeyFrameIndex = 0;
+
+    /*if (fCurrentTrackPosition == 0.f)
+        m_iCurrentKeyFrameIndex = 0;*/
 
     /* 선택된 애니메이션이 이용하고 있는 이 뼈(Channel)의 현재 재생된 위치(fCurrrentTrackPosition)에 맞는 상태행렬을 만들어 준다. */
     _vector         vScale, vRotation, vTranslation;

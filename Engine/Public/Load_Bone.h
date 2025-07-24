@@ -29,6 +29,14 @@ public:
 		return &m_CombinedTransformationMatrix;
 	}
 
+	_matrix Get_TransformationMatrix() const {
+		return XMLoadFloat4x4(&m_TransformationMatrix);
+	}
+
+	const _float4x4* Get_TransformationMatrix_Ptr() const {
+		return &m_TransformationMatrix;
+	}
+
 	void Set_TransformationMatrix(_fmatrix TransformationMatrix) {
 		XMStoreFloat4x4(&m_TransformationMatrix, TransformationMatrix);
 	}

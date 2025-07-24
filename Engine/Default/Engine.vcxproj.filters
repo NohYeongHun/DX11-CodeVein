@@ -160,6 +160,12 @@
     <Filter Include="01. Utility\03. Component\LoadModel\Animation\Channel">
       <UniqueIdentifier>{032794f5-5f76-4b23-b7cc-bacea3a40a98}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01. Utility\03. Component\FSM">
+      <UniqueIdentifier>{cc75312e-cd23-43e9-aee6-34539d0db09c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\03. Component\FSM\State">
+      <UniqueIdentifier>{622c5828-59aa-4b6d-b3eb-90de4f32eef1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Timer.cpp">
@@ -311,6 +317,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\Load_Channel.cpp">
       <Filter>01. Utility\03. Component\LoadModel\Animation\Channel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\State.cpp">
+      <Filter>01. Utility\03. Component\FSM\State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Fsm.cpp">
+      <Filter>01. Utility\03. Component\FSM</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -490,6 +502,12 @@
     </ClInclude>
     <ClInclude Include="..\Public\Load_Channel.h">
       <Filter>01. Utility\03. Component\LoadModel\Animation\Channel</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\State.h">
+      <Filter>01. Utility\03. Component\FSM\State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Fsm.h">
+      <Filter>01. Utility\03. Component\FSM</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

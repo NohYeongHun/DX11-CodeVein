@@ -195,6 +195,9 @@
     <ClInclude Include="..\Public\Loading_Slot.h" />
     <ClInclude Include="..\Public\Map.h" />
     <ClInclude Include="..\Public\Player.h" />
+    <ClInclude Include="..\Public\PlayerState.h" />
+    <ClInclude Include="..\Public\Player_IdleState.h" />
+    <ClInclude Include="..\Public\Player_WalkState.h" />
     <ClInclude Include="..\Public\SkillUI.h" />
     <ClInclude Include="..\Public\SkillUI_Icon.h" />
     <ClInclude Include="..\Public\SkillUI_Panel.h" />
@@ -254,6 +257,9 @@
     <ClCompile Include="..\Private\Loading_Slot.cpp" />
     <ClCompile Include="..\Private\Map.cpp" />
     <ClCompile Include="..\Private\Player.cpp" />
+    <ClCompile Include="..\Private\PlayerState.cpp" />
+    <ClCompile Include="..\Private\Player_IdleState.cpp" />
+    <ClCompile Include="..\Private\Player_WalkState.cpp" />
     <ClCompile Include="..\Private\SkillUI.cpp" />
     <ClCompile Include="..\Private\SkillUI_Icon.cpp" />
     <ClCompile Include="..\Private\SkillUI_Panel.cpp" />

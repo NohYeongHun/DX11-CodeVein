@@ -28,8 +28,10 @@ HRESULT CLoad_Animation::Initialize(std::ifstream& ifs)
 }
 
 /* 뼈들의 m_TransformationMatrix를 애니메이터분들이 제공해준 시간에 맞는 뼈의 상태로 갱신해준다. */
-void CLoad_Animation::Update_TransformationMatrices(const vector<class CLoad_Bone*>& Bones, _bool isLoop, _bool* pFinished, _float fTimeDelta)
+void CLoad_Animation::Update_TransformationMatrices(const vector<class CLoad_Bone*>& Bones, _bool isLoop, _bool* pFinished, _bool* pTrackEnd, _float fTimeDelta)
 {
+    // 1. 현재 RootPos 저장.
+
     m_fCurrentTrackPosition += m_fTickPerSecond * fTimeDelta;
   
     if (m_fCurrentTrackPosition >= m_fDuration)
@@ -41,9 +43,20 @@ void CLoad_Animation::Update_TransformationMatrices(const vector<class CLoad_Bon
             return;
         }
         else
+        {
+            // Duration을 지났고 isLoop가 True라면 현재 TrackPosition을 0으로 초기화.
             m_fCurrentTrackPosition = 0.f;
+            //*pTrackEnd = true;
+            //m_fCurrentTrackPosition = fmodf(m_fCurrentTrackPosition, m_fDuration);
+            //bLooped = true;
+            
+            //m_fCurrentTrackPosition = fmodf(m_fCurrentTrackPosition, m_fDuration);
+            //bLooped = true;          // 나중에 키프레임 인덱스 리셋용
+        }
+            
     }
 
+    // 여기서 Channel과 연관된 Bone의 TransformationMatrix가 변환됩니다.
     for (auto& pChannel : m_Channels)
         pChannel->Update_TransformationMatrix(Bones, m_fCurrentTrackPosition);
 }
@@ -55,6 +68,14 @@ void CLoad_Animation::Update_TransformationMatrices(const vector<class CLoad_Bon
     uint32_t iNumChannels; 
     vector<CHANNEL_INFO> Channels;
 */
+
+// 매 프레임 RootMotion 값을 Transform에 더해줍니다.
+void CLoad_Animation::ApplyRootMotion(_float fTimeDelta)
+{
+
+}
+
+
 HRESULT CLoad_Animation::Load_Channels(std::ifstream& ifs)
 {
     ANIMATION_INFO info = {};

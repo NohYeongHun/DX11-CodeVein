@@ -87,8 +87,10 @@ HRESULT CModel::Initialize_Prototype(MODELTYPE eModelType, _fmatrix PreTransform
     return S_OK;
 }
 
+// 부모 설정.
 HRESULT CModel::Initialize_Clone(void* pArg)
 {
+
 
     return S_OK;
 }

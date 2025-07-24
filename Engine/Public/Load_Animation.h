@@ -13,7 +13,7 @@ private:
 
 public:
 	HRESULT Initialize(std::ifstream& ifs);
-	void Update_TransformationMatrices(const vector<class CLoad_Bone*>& Bones, _bool isLoop, _bool* pFinished, _float fTimeDelta);
+	void Update_TransformationMatrices(const vector<class CLoad_Bone*>& Bones, _bool isLoop, _bool* pFinished, _bool* pTrackEnd, _float fTimeDelta);
 
 
 private:
@@ -33,9 +33,12 @@ private:
 	// 최근에 재생한 키프레임의 인덱스들.
 	vector<_uint> m_ChannelCurrentKeyFrameIndices;
 
+private:
+	void ApplyRootMotion(_float fTimeDelta);
 
 private:
 	HRESULT Load_Channels(std::ifstream& ifs);
+	
 
 public:
 	static CLoad_Animation* Create(std::ifstream& ifs);

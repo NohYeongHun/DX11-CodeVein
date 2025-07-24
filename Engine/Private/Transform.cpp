@@ -32,10 +32,13 @@ HRESULT CTransform::Bind_Shader_Resource(CShader* pShader, const _char* pConstan
 	return pShader->Bind_Matrix(pConstantName, &m_WorldMatrix);
 }
 
-void CTransform::Editor()
+// 매프레임 Update 되어야할 정보.
+void CTransform::Update_Transform()
 {
 
 }
+
+
 
 /* 크기 1기준으로 들어온 vScale 값을 곱해줍니다.
 * => 누적이 아닙니다. 
@@ -141,6 +144,10 @@ void CTransform::LookAt(_fvector vAt)
 	Set_State(STATE::RIGHT, XMVector3Normalize(vRight) * vScaled.x);
 	Set_State(STATE::UP, XMVector3Normalize(vUp) * vScaled.y);
 	Set_State(STATE::LOOK, XMVector3Normalize(vLook) * vScaled.z);
+}
+
+void CTransform::Set_Rotation(_float3 vAngle)
+{
 }
 
 

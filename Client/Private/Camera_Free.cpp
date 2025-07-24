@@ -33,21 +33,21 @@ void CCamera_Free::Priority_Update(_float fTimeDelta)
 {
 	__super::Priority_Update(fTimeDelta);
 
-	if (m_pGameInstance->Get_KeyPress(DIK_W))
+	if (m_pGameInstance->Get_KeyPress(DIK_UPARROW))
 	{
 		m_pTransformCom->Go_Straight(fTimeDelta);
 	}
 
-	if (m_pGameInstance->Get_KeyPress(DIK_S))
+	if (m_pGameInstance->Get_KeyPress(DIK_DOWNARROW))
 	{
 		m_pTransformCom->Go_Backward(fTimeDelta);
 	}
 
-	if (m_pGameInstance->Get_KeyPress(DIK_A))
+	if (m_pGameInstance->Get_KeyPress(DIK_LEFTARROW))
 	{
 		m_pTransformCom->Go_Left(fTimeDelta);
 	}
-	if (m_pGameInstance->Get_KeyPress(DIK_D))
+	if (m_pGameInstance->Get_KeyPress(DIK_RIGHTARROW))
 	{
 		m_pTransformCom->Go_Right(fTimeDelta);
 	}

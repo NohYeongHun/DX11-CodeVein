@@ -17,6 +17,8 @@ CLoad_Model::CLoad_Model(const CLoad_Model& Prototype)
 	, m_iCurrentAnimIndex{ Prototype.m_iCurrentAnimIndex }
 	, m_iNumAnimations { Prototype.m_iNumAnimations }
 	, m_Animations{ Prototype.m_Animations }
+	, m_iRoot_BoneIndex {Prototype.m_iRoot_BoneIndex }
+	, m_gPrevRootTM { Prototype.m_gPrevRootTM }
 {
 
 	for (auto& pAnimation : m_Animations)
@@ -87,12 +89,17 @@ HRESULT CLoad_Model::Initialize_Prototype(MODELTYPE eModelType, _fmatrix PreTran
 	// Load가 끝났다면 삭제.
 	ifs.close();
 
+	XMStoreFloat4x4(&m_gPrevRootTM, XMMatrixIdentity());
 
 	return S_OK;
 }
 
 HRESULT CLoad_Model::Initialize_Clone(void* pArg)
 {
+	LOADMODEL_DESC* pDesc = static_cast<LOADMODEL_DESC*>(pArg);
+	m_pOwner = pDesc->pGameObject;
+
+
 	return S_OK;
 }
 
@@ -122,9 +129,6 @@ const _bool CLoad_Model::Is_Ray_Hit(const _float3& rayOrigin, const _float3& ray
 
 	return false;
 }
-
-
-
 
 // 1. Player에서 호출.
 
@@ -156,18 +160,89 @@ _bool CLoad_Model::Play_Animation(_float fTimeDelta)
 	/* 현재 시간에 맞는 뼈의 상태대로 특정 뼈들의 TransformationMatrix를 갱신해준다. */
 	m_isFinished = false;
 
+	// Loop가 무한히 반복되는 경우에. 해당 값을 이용하여 확인한다. 
+	m_IsTrackEnd = false ;
+	// 1. 여기서 루트본의 행렬을 저장한다?
+
 	/* 뼈들의 m_TransformationMatrix를 애니메이터분들이 제공해준 시간에 맞는 뼈의 상태로 갱신해준다. */
+	m_Animations[m_iCurrentAnimIndex]->Update_TransformationMatrices(m_Bones, m_isLoop, &m_isFinished, &m_IsTrackEnd, fTimeDelta);
 
-	m_Animations[m_iCurrentAnimIndex]->Update_TransformationMatrices(m_Bones, m_isLoop, &m_isFinished, fTimeDelta);
+	// 새로운 루트 이동 회전 계산된 값.
+	/*_matrix rootTM = m_Bones[m_iRoot_BoneIndex]->Get_TransformationMatrix();
+	XMFLOAT3 newPos; XMStoreFloat3(&newPos, rootTM.r[3]);
 
-	//m_Animations[m_iCurrentAnimIndex]->Update_TransformationMatrices(fTimeDelta, m_Bones, m_isLoop);
+	XMFLOAT3 delta = { 0,0,0 };
+	if (!m_bFirstFrame) {
+		delta.x = newPos.x - m_vPrevRootPos.x;
+		delta.y = newPos.y - m_vPrevRootPos.y;
+		delta.z = newPos.z - m_vPrevRootPos.z;
+	}
+	else
+	{
+		m_vPrevRootPos = newPos;
+		m_bFirstFrame = false;
+		m_pOwner->Translate(XMLoadFloat3(&delta));
+		rootTM.r[3] = XMVectorSet(0, 0, 0, 1);
+		m_Bones[m_iRoot_BoneIndex]->Set_TransformationMatrix(rootTM);
+		if (m_IsTrackEnd)
+			m_bFirstFrame = true;
+
+	}*/
+
+	
 
 	/* 바꿔야할 뼈들의 Transforemation행렬이 갱신되었다면, 정점들에게 직접 전달되야할 CombindTransformationMatrix를 만들어준다. */
 	for (auto& pBone : m_Bones)
 		pBone->Update_CombinedTransformationMatrix(m_PreTransformMatrix, m_Bones);
+	
+	
 
 	return m_isFinished;
 }
+
+//_bool CLoad_Model::Play_Animation(_float fTimeDelta)
+//{
+//	/* 현재 시간에 맞는 뼈의 상태대로 특정 뼈들의 TransformationMatrix를 갱신해준다. */
+//	m_isFinished = false;
+//
+//
+//	// ─── 1) 현재 루트 본(모델 공간) 행렬
+//	_matrix curRootTM = m_Bones[m_iRoot_BoneIndex]->Get_TransformationMatrix();
+//
+//	// Loop가 무한히 반복되는 경우에. 해당 값을 이용하여 확인한다. 
+//	m_IsTrackEnd = false;
+//	// 1. 여기서 루트본의 행렬을 저장한다?
+//
+//	/* 뼈들의 m_TransformationMatrix를 애니메이터분들이 제공해준 시간에 맞는 뼈의 상태로 갱신해준다. */
+//	m_Animations[m_iCurrentAnimIndex]->Update_TransformationMatrices(m_Bones, m_isLoop, &m_isFinished, &m_IsTrackEnd, fTimeDelta);
+//	
+//	// ─── 2) 첫 프레임이면 초기화
+//	if (m_bFirstFrame)
+//	{
+//		m_bFirstFrame = false;
+//	}
+//	else
+//	{
+//		_vector deltaPos = curRootTM.r[3] - m_Bones[m_iRoot_BoneIndex]->Get_TransformationMatrix().r[3];
+//		m_pOwner->Translate(deltaPos); // Actor 이동
+//
+//		m_Bones[m_iRoot_BoneIndex]->Set_TransformationMatrix(curRootTM);
+//		
+//		if (m_IsTrackEnd)
+//			m_bFirstFrame = true;
+//
+//	}
+//
+//	XMStoreFloat4x4(&m_gPrevRootTM, curRootTM);
+//
+//	/* 바꿔야할 뼈들의 Transforemation행렬이 갱신되었다면, 정점들에게 직접 전달되야할 CombindTransformationMatrix를 만들어준다. */
+//	for (auto& pBone : m_Bones)
+//		pBone->Update_CombinedTransformationMatrix(m_PreTransformMatrix, m_Bones);
+//
+//
+//
+//	return m_isFinished;
+//}
 
 
 
@@ -233,6 +308,12 @@ HRESULT CLoad_Model::Load_Bones(std::ifstream& ifs)
 	{
 		// 5. 순회하면서 값채워넣기.
 		CLoad_Bone* pLoadBone = CLoad_Bone::Create(ifs);
+
+		if (pLoadBone->Compare_Name("Hips")) 
+			m_iRoot_BoneIndex = i;
+		
+
+
 		if (nullptr == pLoadBone)
 			CRASH("LOAD BONE FAILED");
 
@@ -295,6 +376,8 @@ CComponent* CLoad_Model::Clone(void* pArg)
 void CLoad_Model::Free()
 {
 	__super::Free();
+	m_pOwner = nullptr;
+		
 	for (auto& pMesh : m_Meshes)
 		Safe_Release(pMesh);
 

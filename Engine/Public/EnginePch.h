@@ -48,6 +48,10 @@
 #include "Load_Mesh.h"
 #include "Load_Model.h"
 
+/* FSM */
+#include "State.h"
+#include "Fsm.h"
+
 #pragma endregion
 
 

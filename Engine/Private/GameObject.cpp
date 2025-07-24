@@ -1,7 +1,5 @@
 ﻿#include "GameObject.h"
 
-#include "GameInstance.h"
-
 CGameObject::CGameObject(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: m_pDevice{ pDevice }
 	, m_pContext { pContext }
@@ -128,6 +126,21 @@ HRESULT CGameObject::Change_Component(const _wstring& strComponentTag, CComponen
 	
 
 	return S_OK;
+}
+
+/* 이동량 만큼을 더해줍니다. */
+void CGameObject::Translate(_fvector vTranslate)
+{
+	if (nullptr == m_pTransformCom)
+	{
+		CRASH("Transform Component Not Exist");
+		return;
+	}
+	
+	_vector vPos = m_pTransformCom->Get_State(STATE::POSITION);
+	vPos += vTranslate;
+	XMVectorSetW(vPos, 1.f);
+	m_pTransformCom->Set_State(STATE::POSITION, vPos);
 }
 
 const _wstring& CGameObject::Get_ObjectTag()

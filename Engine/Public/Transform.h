@@ -18,6 +18,14 @@ private:
 	CTransform(const CTransform& Prototype) = delete;
 	virtual ~CTransform() = default;
 
+public:
+	virtual HRESULT Initialize_Prototype();
+	virtual HRESULT Initialize_Clone(void* pArg);
+
+public:
+	HRESULT Bind_Shader_Resource(class CShader* pShader, const _char* pConstantName);
+	void Update_Transform();
+
 public:	
 	
 	_vector Get_State(STATE eState) const {
@@ -48,22 +56,6 @@ public:
 	_float3 Get_Eular_Degree() {
 		return { m_fPitch, m_fRoll, m_fYaw }; // 어떤 축으로 어떻게 회전했는지가 나옵니다.
 	}
-
-
-public:
-	virtual HRESULT Initialize_Prototype();
-	virtual HRESULT Initialize_Clone(void* pArg);
-
-public:
-	HRESULT Bind_Shader_Resource(class CShader* pShader, const _char* pConstantName);
-
-
-
-
-#pragma region 헬퍼 기능 - 외부 툴 연계
-public:
-	void Editor();
-#pragma endregion
 
 public:
 	void Scale(_float3 vScale);

@@ -91,6 +91,9 @@
     <Filter Include="02. GameObject\Map">
       <UniqueIdentifier>{ab12065f-d5da-4899-b59f-399fd5a47036}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. GameObject\Player\State">
+      <UniqueIdentifier>{e295dba5-4027-4e6d-adb0-a4191fb44015}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -258,6 +261,15 @@
     <ClInclude Include="PlayerDefine.h">
       <Filter>99. Defines</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Player_IdleState.h">
+      <Filter>02. GameObject\Player\State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\PlayerState.h">
+      <Filter>02. GameObject\Player\State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Player_WalkState.h">
+      <Filter>02. GameObject\Player\State</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -416,6 +428,15 @@
     </ClCompile>
     <ClCompile Include="..\Private\Map.cpp">
       <Filter>02. GameObject\Map</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Player_IdleState.cpp">
+      <Filter>02. GameObject\Player\State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\PlayerState.cpp">
+      <Filter>02. GameObject\Player\State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Player_WalkState.cpp">
+      <Filter>02. GameObject\Player\State</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

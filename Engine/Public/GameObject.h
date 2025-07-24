@@ -23,6 +23,10 @@ public:
 	class CComponent* Get_Component(const _wstring& strComponentTag);
 	HRESULT Change_Component(const _wstring& strComponentTag, CComponent** ppOut, CComponent* pChangeComponent);
 
+	class CTransform* Get_Transform() { return m_pTransformCom; }
+
+	void Translate(_fvector vTranslate);
+
 public:
 	const _wstring& Get_ObjectTag();
 

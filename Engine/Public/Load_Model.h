@@ -4,6 +4,12 @@
 NS_BEGIN(Engine)
 class ENGINE_DLL CLoad_Model final : public CComponent
 {
+public:
+	typedef struct tagLoadModelDesc
+	{
+		class CGameObject* pGameObject = { nullptr };
+	}LOADMODEL_DESC;
+
 private:
 	explicit CLoad_Model(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	explicit CLoad_Model(const CLoad_Model& Prototype);
@@ -20,8 +26,19 @@ public:
 	}
 
 	void Set_Animation(_uint iAnimIndex, _bool isLoop = false) {
+		m_bFirstFrame = true;
 		m_iCurrentAnimIndex = iAnimIndex;
 		m_isLoop = isLoop;
+	}
+
+	void Set_Loop(_bool isLoop)
+	{
+		m_isLoop = isLoop;
+	}
+
+	const _bool Is_Finished()
+	{
+		return m_isFinished;
 	}
 	
 public:
@@ -36,6 +53,9 @@ public:
 private:
 	MODELTYPE m_ModelType = {};
 	_float4x4 m_PreTransformMatrix = {};
+
+private:
+	class CGameObject* m_pOwner = { nullptr };
 
 private:
 	/* Meshes */
@@ -59,6 +79,16 @@ private:
 	_bool m_isLoop = { false };
 	_uint m_iNumAnimations = { 0 };
 	vector<class CLoad_Animation*> m_Animations;
+
+private:
+	// RootNode Index;
+	_bool m_IsTrackEnd = { false };
+	_bool m_bFirstFrame = { true };
+	_float4x4 m_gPrevRootTM = {};
+
+	_uint m_iRoot_BoneIndex = {};
+	_float3 m_vPrevRootPos = { 0.f, 0.f, 0.f};
+	
 
 private:
 	string m_ModelDir = {};
