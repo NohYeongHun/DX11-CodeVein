@@ -31,7 +31,7 @@ HRESULT CPlayer::Initialize_Clone(void* pArg)
     // Player 정면 바라보게 하기?
     //m_pTransformCom->Rotation(XMVectorSet(1.f, 0.f, 0.f, 0.f), XMConvertToRadians(270.f));
 
-    m_pModelCom->Set_Animation(17);
+    m_pModelCom->Set_Animation(0, true);
     
 
     return S_OK;

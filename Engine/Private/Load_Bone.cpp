@@ -9,8 +9,6 @@ HRESULT CLoad_Bone::Initialize(std::ifstream& ifs)
     _int iParentBoneIndex = {};
     ifs.read(reinterpret_cast<char*>(&iParentBoneIndex), sizeof(_int));
 
-    m_iParentBoneIndex = iParentBoneIndex;
-
     // 2. Bone 이름
     string strBoneName = ReadString(ifs);
 
@@ -23,6 +21,8 @@ HRESULT CLoad_Bone::Initialize(std::ifstream& ifs)
 
     m_TransformationMatrix = TransformMatrix;
     XMStoreFloat4x4(&m_CombinedTransformationMatrix, XMMatrixIdentity());
+
+    m_iParentBoneIndex = iParentBoneIndex;
 
     return S_OK;
 }
@@ -42,8 +42,7 @@ void CLoad_Bone::Update_CombinedTransformationMatrix(const _float4x4& PreTransfo
 
     // 부모 본의 결합된 변환 행렬을 가져와서 현재 본의 변환 행렬과 곱합니다.
     XMStoreFloat4x4(&m_CombinedTransformationMatrix,
-        XMLoadFloat4x4(&m_TransformationMatrix) * 
-        XMLoadFloat4x4(&Bones[m_iParentBoneIndex]->m_CombinedTransformationMatrix));
+        XMLoadFloat4x4(&m_TransformationMatrix) * XMLoadFloat4x4(&Bones[m_iParentBoneIndex]->m_CombinedTransformationMatrix));
 }
 
 CLoad_Bone* CLoad_Bone::Create(std::ifstream& ifs)

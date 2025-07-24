@@ -34,7 +34,7 @@ HRESULT CTool_Animation::Initialize(const aiAnimation* pAIAnimation, const vecto
     
     for (_uint i = 0; i < m_iNumChannels; i++)
     {
-        _wstring strChannelDebug = L"============= Current Channel Index : " + to_wstring(i) + L" ========================\n";
+        //_wstring strChannelDebug = L"============= Current Channel Index : " + to_wstring(i) + L" ========================\n";
         //OutputDebugString(strChannelDebug.c_str());
         CTool_Channel* pChannel = CTool_Channel::Create(pAIAnimation->mChannels[i], Bones);
         if (nullptr == pChannel)

@@ -28,22 +28,24 @@ HRESULT CLoad_Animation::Initialize(std::ifstream& ifs)
 }
 
 /* 뼈들의 m_TransformationMatrix를 애니메이터분들이 제공해준 시간에 맞는 뼈의 상태로 갱신해준다. */
-void CLoad_Animation::Update_TransformationMatrices(const vector<class CLoad_Bone*>& Bones, _float fTimeDelta)
+void CLoad_Animation::Update_TransformationMatrices(const vector<class CLoad_Bone*>& Bones, _bool isLoop, _bool* pFinished, _float fTimeDelta)
 {
     m_fCurrentTrackPosition += m_fTickPerSecond * fTimeDelta;
   
-    cout << "CurrentTrack Position : " <<  m_fCurrentTrackPosition << " | Duration : " << m_fDuration << endl;
-    
     if (m_fCurrentTrackPosition >= m_fDuration)
     {
-        m_fCurrentTrackPosition = 0.f;
+        if (false == isLoop)
+        {
+            *pFinished = true;
+            m_fCurrentTrackPosition = m_fDuration;
+            return;
+        }
+        else
+            m_fCurrentTrackPosition = 0.f;
     }
-        
 
     for (auto& pChannel : m_Channels)
-    {
         pChannel->Update_TransformationMatrix(Bones, m_fCurrentTrackPosition);
-    }
 }
 
 /*

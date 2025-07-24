@@ -13,7 +13,7 @@ private:
 
 public:
 	HRESULT Initialize(std::ifstream& ifs);
-	void Update_TransformationMatrices(const vector<class CLoad_Bone*>& Bones, _float fTimeDelta);
+	void Update_TransformationMatrices(const vector<class CLoad_Bone*>& Bones, _bool isLoop, _bool* pFinished, _float fTimeDelta);
 
 
 private:

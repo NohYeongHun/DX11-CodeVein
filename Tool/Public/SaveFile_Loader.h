@@ -15,13 +15,13 @@ public:
 	HRESULT Initialize();
 
 public:
-	void Save_MapFile(string filePath);
+	//void Save_MapFile(string filePath);
 	void Load_MapFile(string filePath, LEVEL eLevel);
 
 	// Model Component만 저장
 	void Save_ModelFile(string filePath, const _wstring& strPrototypeTag); 
 	void Save_AnimModel(std::ofstream& ofs, class CTool_Model* pModel, const _wstring& strModelTag);
-	void Save_NonAnimModel(std::ofstream& ofs, class CTool_Model* pModel, const _wstring& strModelTag);
+	//void Save_NonAnimModel(std::ofstream& ofs, class CTool_Model* pModel, const _wstring& strModelTag);
 
 	void Load_ModelFile(string filePath, LEVEL eLevel);
 	void Load_AnimModel(std::ifstream& ifs, class CTool_Model* pModel, const _wstring& strModelTag);

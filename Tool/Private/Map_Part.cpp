@@ -10,19 +10,7 @@ CMap_Part::CMap_Part(const CMap_Part& Prototype)
 }
 
 
-const MAP_PART_INFO& CMap_Part::Save_NonAminModel(_fmatrix PreTransformMatrix)
-{
-    MODEL_INFO modelInfo = m_pModelCom->Save_NonAminModel(PreTransformMatrix, m_strObjTag);
 
-
-    return {
-        modelInfo.strModelTag,
-        modelInfo.meshVectorSize,
-        modelInfo.meshVector,
-        modelInfo.materialVectorSize,
-        modelInfo.materialVector
-    };
-}
 
 HRESULT CMap_Part::Initialize_Prototype()
 {

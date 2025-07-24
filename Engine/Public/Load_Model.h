@@ -10,32 +10,28 @@ private:
 	virtual ~CLoad_Model() = default;
 
 public:
+	virtual HRESULT Initialize_Prototype(MODELTYPE eModelType, _fmatrix PreTransformMatrix, string filePath, _wstring textureFolderPath);
+	virtual HRESULT Initialize_Clone(void* pArg);
+	HRESULT Render(_uint iNumMesh);
+
+public:
 	_uint Get_NumMeshes() const {
 		return m_iNumMeshes;
 	}
 
-	const _float4x4* Get_CombindTransformationMatrix(const _char* pBoneName) const;
-
-	void Set_Animation(_uint iAnimIndex, _bool isLoop = true) {
+	void Set_Animation(_uint iAnimIndex, _bool isLoop = false) {
 		m_iCurrentAnimIndex = iAnimIndex;
 		m_isLoop = isLoop;
 	}
-
 	
 public:
 	const _bool Is_Ray_Hit(const _float3& rayOrigin, const _float3& rayDir, _float* pOutDist);
 
-
-public:
-	virtual HRESULT Initialize_Prototype(MODELTYPE eModelType, _fmatrix PreTransformMatrix, string filePath, _wstring textureFolderPath);
-	virtual HRESULT Initialize_Clone(void* pArg);
-	HRESULT Render(_uint iNumMesh);
 	
 public:
-	_bool Play_Animation(_float fTimeDelta);
-
 	HRESULT Bind_Materials(CShader* pShader, const _char* pConstantName, _uint iMeshIndex, aiTextureType eTextureType, _uint iTextureIndex);
 	HRESULT Bind_BoneMatrices(class CShader* pShader, const _char* pConstantName, _uint iMeshIndex);
+	_bool Play_Animation(_float fTimeDelta);
 	
 private:
 	MODELTYPE m_ModelType = {};
@@ -58,6 +54,7 @@ private:
 
 private:
 	/* Animations */
+	_bool m_isFinished = { false };
 	_uint m_iCurrentAnimIndex = { 0 };
 	_bool m_isLoop = { false };
 	_uint m_iNumAnimations = { 0 };

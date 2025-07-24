@@ -28,6 +28,8 @@ HRESULT CPlayer::Initialize_Clone(void* pArg)
     if (FAILED(Ready_Components(pDesc)))
         return E_FAIL;
 
+    m_pModelCom->Set_Animation(0, true);
+
     // Player 정면 바라보게 하기?
     //m_pTransformCom->Rotation(XMVectorSet(1.f, 0.f, 0.f, 0.f), XMConvertToRadians(270.f));
 
@@ -42,6 +44,8 @@ void CPlayer::Priority_Update(_float fTimeDelta)
 void CPlayer::Update(_float fTimeDelta)
 {
     __super::Update(fTimeDelta);
+    if (true == m_pModelCom->Play_Animation(fTimeDelta))
+        int a = 10;
 
  /*   if (m_pGameInstance->Get_KeyPress(DIK_W))
     {
@@ -97,9 +101,19 @@ HRESULT CPlayer::Render()
     _uint iNumMeshes = m_pModelCom->Get_NumMeshes();
     for (_uint i = 0; i < iNumMeshes; i++)
     {
-        if(FAILED(m_pModelCom->Bind_Materials(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE, 0)))
+        if (FAILED(m_pModelCom->Bind_Materials(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE, 0)))
+        {
             CRASH("Bine Materials Failed");
+            return E_FAIL;
+        }
+            
         
+        if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
+        {
+            CRASH("Bind Bone Matrices Failed");
+            return E_FAIL;
+        }
+            
 
         if (FAILED(m_pShaderCom->Begin(0)))
             return E_FAIL;

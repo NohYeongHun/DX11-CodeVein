@@ -18,8 +18,8 @@ HRESULT CLevel_Logo::Initialize_Clone()
 	//if (FAILED(Ready_Layer_Map(TEXT("Layer_Map"))))
 	//	return E_FAIL;
 
-	//if (FAILED(Ready_Layer_Player(TEXT("Layer_Player"))))
-	//	return E_FAIL;
+	if (FAILED(Ready_Layer_Player(TEXT("Layer_Player"))))
+		return E_FAIL;
 
 	if (FAILED(Ready_Layer_Map_Parts(TEXT("Layer_Map_Part"))))
 		return E_FAIL;

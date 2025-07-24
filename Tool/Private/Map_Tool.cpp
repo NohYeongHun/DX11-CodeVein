@@ -136,9 +136,7 @@ void CMap_Tool::Render_SaveLoad()
         {
             std::string save_path = ImGuiFileDialog::Instance()->GetFilePathName();
 
-            if (m_eSaveMode == SAVEMODE::MAP_OBJECT)
-                m_pSaveFile_Loader->Save_MapFile(save_path);
-            else if (m_eSaveMode == SAVEMODE::MODEL_COMPONENT)
+            if (m_eSaveMode == SAVEMODE::MODEL_COMPONENT)
                 m_pSaveFile_Loader->Save_ModelFile(save_path, m_wSelected_PrototypeModelTag);
         }
         ImGuiFileDialog::Instance()->Close();
