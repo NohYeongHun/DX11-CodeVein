@@ -59,6 +59,9 @@
 
 #include "IdGen.h"
 #include "GameObject.h"
+#include "PartObject.h"
+#include "ContainerObject.h"
+
 #include "Transform.h"
 #include "Layer.h"
 #include "Object_Manager.h"

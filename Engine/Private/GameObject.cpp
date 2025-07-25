@@ -139,7 +139,7 @@ void CGameObject::Translate(_fvector vTranslate)
 	
 	_vector vPos = m_pTransformCom->Get_State(STATE::POSITION);
 	vPos += vTranslate;
-	XMVectorSetW(vPos, 1.f);
+	vPos = XMVectorSetW(vPos, 1.f);
 	m_pTransformCom->Set_State(STATE::POSITION, vPos);
 }
 

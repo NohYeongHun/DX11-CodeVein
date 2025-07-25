@@ -13,16 +13,16 @@ CLoad_Model::CLoad_Model(const CLoad_Model& Prototype)
 	, m_iNumMeshes { Prototype.m_iNumMeshes }
 	, m_iNumMaterials { Prototype.m_iNumMaterials }
 	, m_PreTransformMatrix { Prototype.m_PreTransformMatrix }
-	, m_ModelDir{ Prototype.m_ModelDir }
-	, m_iCurrentAnimIndex{ Prototype.m_iCurrentAnimIndex }
 	, m_iNumAnimations { Prototype.m_iNumAnimations }
-	, m_Animations{ Prototype.m_Animations }
 	, m_iRoot_BoneIndex {Prototype.m_iRoot_BoneIndex }
-	, m_gPrevRootTM { Prototype.m_gPrevRootTM }
+	, m_ModelDir{ Prototype.m_ModelDir }
 {
 
-	for (auto& pAnimation : m_Animations)
-		Safe_AddRef(pAnimation);
+	for (auto& pPrototypeAnimation : Prototype.m_Animations)
+		m_Animations.push_back(pPrototypeAnimation->Clone());
+
+	/*for (auto& pAnimation : m_Animations)
+		Safe_AddRef(pAnimation);*/
 
 	for (auto& pPrototypeBone : Prototype.m_Bones)
 		m_Bones.push_back(pPrototypeBone->Clone());
@@ -89,7 +89,7 @@ HRESULT CLoad_Model::Initialize_Prototype(MODELTYPE eModelType, _fmatrix PreTran
 	// Load가 끝났다면 삭제.
 	ifs.close();
 
-	XMStoreFloat4x4(&m_gPrevRootTM, XMMatrixIdentity());
+	
 
 	return S_OK;
 }
@@ -160,36 +160,38 @@ _bool CLoad_Model::Play_Animation(_float fTimeDelta)
 	/* 현재 시간에 맞는 뼈의 상태대로 특정 뼈들의 TransformationMatrix를 갱신해준다. */
 	m_isFinished = false;
 
+	/* 현재 트랙이 종료되었는지 확인 */
+	m_isTrackEnd = false;
+	
 	// Loop가 무한히 반복되는 경우에. 해당 값을 이용하여 확인한다. 
-	m_IsTrackEnd = false ;
-	// 1. 여기서 루트본의 행렬을 저장한다?
-
-	/* 뼈들의 m_TransformationMatrix를 애니메이터분들이 제공해준 시간에 맞는 뼈의 상태로 갱신해준다. */
-	m_Animations[m_iCurrentAnimIndex]->Update_TransformationMatrices(m_Bones, m_isLoop, &m_isFinished, &m_IsTrackEnd, fTimeDelta);
-
-	// 새로운 루트 이동 회전 계산된 값.
-	/*_matrix rootTM = m_Bones[m_iRoot_BoneIndex]->Get_TransformationMatrix();
-	XMFLOAT3 newPos; XMStoreFloat3(&newPos, rootTM.r[3]);
-
-	XMFLOAT3 delta = { 0,0,0 };
-	if (!m_bFirstFrame) {
-		delta.x = newPos.x - m_vPrevRootPos.x;
-		delta.y = newPos.y - m_vPrevRootPos.y;
-		delta.z = newPos.z - m_vPrevRootPos.z;
-	}
-	else
-	{
-		m_vPrevRootPos = newPos;
-		m_bFirstFrame = false;
-		m_pOwner->Translate(XMLoadFloat3(&delta));
-		rootTM.r[3] = XMVectorSet(0, 0, 0, 1);
-		m_Bones[m_iRoot_BoneIndex]->Set_TransformationMatrix(rootTM);
-		if (m_IsTrackEnd)
-			m_bFirstFrame = true;
-
-	}*/
 
 	
+	// 1. RootBone 위치를 저장한다.
+	_vector vOldRootPos = m_Bones[m_iRoot_BoneIndex]->Get_TransformationMatrix().r[3];
+
+	/* 뼈들의 m_TransformationMatrix를 애니메이터분들이 제공해준 시간에 맞는 뼈의 상태로 갱신해준다. */
+	m_Animations[m_iCurrentAnimIndex]->Update_TransformationMatrices(m_Bones, m_isLoop, &m_isFinished, &m_isTrackEnd, fTimeDelta);
+	
+	_vector vNewRootPos = m_Bones[m_iRoot_BoneIndex]->Get_TransformationMatrix().r[3];
+
+	// 2. 행렬이 변한 이후에 루트본의 matix를 가져온다.
+	_matrix rootMatrix = m_Bones[m_iRoot_BoneIndex]->Get_TransformationMatrix();
+	//
+	
+	//// 3. 차이값을 구한다.
+	_vector vTranslate = vNewRootPos - vOldRootPos;
+	//
+	vTranslate = XMVector3TransformCoord(vTranslate, XMLoadFloat4x4(&m_PreTransformMatrix));
+	// 4. 만약 Track이 종료되었다면? => 위치를 바꿔주지않습니다.
+
+	if (!m_isTrackEnd)
+	{
+		m_pOwner->Translate(vTranslate);
+	}
+
+	// 5. 루트본을 이동값이 지워진 위치로 재갱신합니다.
+	rootMatrix.r[3] = vOldRootPos;
+	m_Bones[m_iRoot_BoneIndex]->Set_TransformationMatrix(rootMatrix);	
 
 	/* 바꿔야할 뼈들의 Transforemation행렬이 갱신되었다면, 정점들에게 직접 전달되야할 CombindTransformationMatrix를 만들어준다. */
 	for (auto& pBone : m_Bones)
@@ -200,40 +202,47 @@ _bool CLoad_Model::Play_Animation(_float fTimeDelta)
 	return m_isFinished;
 }
 
+
 //_bool CLoad_Model::Play_Animation(_float fTimeDelta)
 //{
 //	/* 현재 시간에 맞는 뼈의 상태대로 특정 뼈들의 TransformationMatrix를 갱신해준다. */
 //	m_isFinished = false;
 //
-//
-//	// ─── 1) 현재 루트 본(모델 공간) 행렬
-//	_matrix curRootTM = m_Bones[m_iRoot_BoneIndex]->Get_TransformationMatrix();
+//	/* 현재 트랙이 종료되었는지 확인 */
+//	m_isTrackEnd = false;
 //
 //	// Loop가 무한히 반복되는 경우에. 해당 값을 이용하여 확인한다. 
-//	m_IsTrackEnd = false;
-//	// 1. 여기서 루트본의 행렬을 저장한다?
+//
+//
+//	// 1. RootBone 위치를 저장한다.
+//	_vector vOldRoot = m_Bones[m_iRoot_BoneIndex]->Get_TransformationMatrix().r[3];
 //
 //	/* 뼈들의 m_TransformationMatrix를 애니메이터분들이 제공해준 시간에 맞는 뼈의 상태로 갱신해준다. */
-//	m_Animations[m_iCurrentAnimIndex]->Update_TransformationMatrices(m_Bones, m_isLoop, &m_isFinished, &m_IsTrackEnd, fTimeDelta);
+//	m_Animations[m_iCurrentAnimIndex]->Update_TransformationMatrices(m_Bones, m_isLoop, &m_isFinished, &m_isTrackEnd, fTimeDelta);
+//
+//	// 2. 행렬이 변한 이후에 루트본의 matix를 가져온다.
+//	_vector vNewRoot = m_Bones[m_iRoot_BoneIndex]->Get_TransformationMatrix().r[3];
+//
+//	// 3. 이동 값 저장
+//	_vector vTranslate = vNewRoot - vOldRoot;
+//	vTranslate.m128_f32[1] = 0.f; // y축 고정.
+//
+//	// 3. PreTransform 보정.
+//	vTranslate = XMVector3TransformNormal(vTranslate, XMLoadFloat4x4(&m_PreTransformMatrix));
+//
 //	
-//	// ─── 2) 첫 프레임이면 초기화
-//	if (m_bFirstFrame)
-//	{
-//		m_bFirstFrame = false;
-//	}
-//	else
-//	{
-//		_vector deltaPos = curRootTM.r[3] - m_Bones[m_iRoot_BoneIndex]->Get_TransformationMatrix().r[3];
-//		m_pOwner->Translate(deltaPos); // Actor 이동
 //
-//		m_Bones[m_iRoot_BoneIndex]->Set_TransformationMatrix(curRootTM);
-//		
-//		if (m_IsTrackEnd)
-//			m_bFirstFrame = true;
-//
+//	// 4. 루트모션 누적 적용
+//	if (!m_isFinished) // 애니메이션 진행 중일 때만 이동
+//	{
+//		//XMStoreFloat3(&m_vAccumulatedMotion, XMLoadFloat3(&m_vAccumulatedMotion) + vTranslate);
+//		m_pOwner->Translate(vTranslate);
 //	}
 //
-//	XMStoreFloat4x4(&m_gPrevRootTM, curRootTM);
+//	// 5. 루트본 위치 되돌리기
+//	_matrix rootMatrix = m_Bones[m_iRoot_BoneIndex]->Get_TransformationMatrix();
+//	rootMatrix.r[3] = XMVectorSetW(vOldRoot, 1.f);
+//	m_Bones[m_iRoot_BoneIndex]->Set_TransformationMatrix(rootMatrix);
 //
 //	/* 바꿔야할 뼈들의 Transforemation행렬이 갱신되었다면, 정점들에게 직접 전달되야할 CombindTransformationMatrix를 만들어준다. */
 //	for (auto& pBone : m_Bones)
@@ -243,7 +252,6 @@ _bool CLoad_Model::Play_Animation(_float fTimeDelta)
 //
 //	return m_isFinished;
 //}
-
 
 
 

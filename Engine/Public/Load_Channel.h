@@ -13,7 +13,7 @@ private:
 
 public:
 	HRESULT Initialize(std::ifstream& ifs);
-	void Update_TransformationMatrix(const vector<class CLoad_Bone*>& Bones, _float fCurrentTrackPosition);
+	void Update_TransformationMatrix(const vector<class CLoad_Bone*>& Bones, _float fCurrentTrackPosition, _uint* pCurrentKeyFrameIndex);
 
 private:
 	_char m_szName[MAX_PATH] = {};

@@ -166,6 +166,12 @@
     <Filter Include="01. Utility\03. Component\FSM\State">
       <UniqueIdentifier>{622c5828-59aa-4b6d-b3eb-90de4f32eef1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01. Utility\02. GameObject\ContainerObject">
+      <UniqueIdentifier>{340cb543-9b3b-4fb6-b94c-e1cd74806e9c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\02. GameObject\ContainerObject\PartObject">
+      <UniqueIdentifier>{8e80b7e8-9a72-461b-bb17-1000660e7fcc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Timer.cpp">
@@ -323,6 +329,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\Fsm.cpp">
       <Filter>01. Utility\03. Component\FSM</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\ContainerObject.cpp">
+      <Filter>01. Utility\02. GameObject\ContainerObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\PartObject.cpp">
+      <Filter>01. Utility\02. GameObject\ContainerObject\PartObject</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -508,6 +520,12 @@
     </ClInclude>
     <ClInclude Include="..\Public\Fsm.h">
       <Filter>01. Utility\03. Component\FSM</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\ContainerObject.h">
+      <Filter>01. Utility\02. GameObject\ContainerObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\PartObject.h">
+      <Filter>01. Utility\02. GameObject\ContainerObject\PartObject</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

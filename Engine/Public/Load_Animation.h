@@ -31,7 +31,7 @@ private:
 	_uint m_iNumChannels = {};
 	vector<class CLoad_Channel*> m_Channels = {};
 	// 최근에 재생한 키프레임의 인덱스들.
-	vector<_uint> m_ChannelCurrentKeyFrameIndices;
+	vector<_uint> m_CurrentKeyFrameIndices;
 
 private:
 	void ApplyRootMotion(_float fTimeDelta);

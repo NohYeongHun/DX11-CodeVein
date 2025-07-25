@@ -10,7 +10,7 @@ CLoad_Animation::CLoad_Animation(const CLoad_Animation& Prototype)
     , m_fCurrentTrackPosition{ Prototype.m_fCurrentTrackPosition }
     , m_iNumChannels{ Prototype.m_iNumChannels }
     , m_Channels{ Prototype.m_Channels }
-    , m_ChannelCurrentKeyFrameIndices{ Prototype.m_ChannelCurrentKeyFrameIndices }
+    , m_CurrentKeyFrameIndices{ Prototype.m_CurrentKeyFrameIndices }
 {
     strcpy_s(m_szName, Prototype.m_szName);
     for (auto& pChannel : m_Channels)
@@ -46,29 +46,17 @@ void CLoad_Animation::Update_TransformationMatrices(const vector<class CLoad_Bon
         {
             // Duration을 지났고 isLoop가 True라면 현재 TrackPosition을 0으로 초기화.
             m_fCurrentTrackPosition = 0.f;
-            //*pTrackEnd = true;
-            //m_fCurrentTrackPosition = fmodf(m_fCurrentTrackPosition, m_fDuration);
-            //bLooped = true;
-            
-            //m_fCurrentTrackPosition = fmodf(m_fCurrentTrackPosition, m_fDuration);
-            //bLooped = true;          // 나중에 키프레임 인덱스 리셋용
         }
-            
     }
 
     // 여기서 Channel과 연관된 Bone의 TransformationMatrix가 변환됩니다.
-    for (auto& pChannel : m_Channels)
-        pChannel->Update_TransformationMatrix(Bones, m_fCurrentTrackPosition);
+    for (_uint i = 0; i < m_iNumChannels; ++i)
+    {
+        m_Channels[i]->Update_TransformationMatrix(Bones, m_fCurrentTrackPosition, &m_CurrentKeyFrameIndices[i]);
+    }
+        
 }
-
-/*
-    _float fDuration;
-    _float fTickPerSecond;
-    _float fCurrentTrackPostion;
-    uint32_t iNumChannels; 
-    vector<CHANNEL_INFO> Channels;
-*/
-
+    
 // 매 프레임 RootMotion 값을 Transform에 더해줍니다.
 void CLoad_Animation::ApplyRootMotion(_float fTimeDelta)
 {
@@ -112,7 +100,7 @@ HRESULT CLoad_Animation::Load_Channels(std::ifstream& ifs)
         CRASH("READ INDICIES FAILED");
 
     // 최근 키프레임 정보 저장.
-    m_ChannelCurrentKeyFrameIndices = move(info.CurrentKeyFrameIndices);
+    m_CurrentKeyFrameIndices = move(info.CurrentKeyFrameIndices);
 
     return S_OK;
 }
@@ -142,5 +130,5 @@ void CLoad_Animation::Free()
         Safe_Release(pChannel);
     m_Channels.clear();
 
-    m_ChannelCurrentKeyFrameIndices.clear();
+    m_CurrentKeyFrameIndices.clear();
 }

@@ -35,7 +35,7 @@ HRESULT CPlayer::Initialize_Clone(void* pArg)
     //m_pTransformCom->Rotation(XMVectorSet(1.f, 0.f, 0.f, 0.f), XMConvertToRadians(270.f));
 
     //m_pModelCom->Set_Animation(6, true);
-
+    m_pModelCom->Set_Animation(38, true);
     
     
 
@@ -74,8 +74,8 @@ void CPlayer::Update(_float fTimeDelta)
 {
     __super::Update(fTimeDelta);
 
-    if (nullptr != m_pFsmCom)
-        m_pFsmCom->Update(fTimeDelta);
+    //if (nullptr != m_pFsmCom)
+    //    m_pFsmCom->Update(fTimeDelta);
 
     if (true == m_pModelCom->Play_Animation(fTimeDelta))
     {

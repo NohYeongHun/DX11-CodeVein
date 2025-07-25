@@ -26,7 +26,6 @@ public:
 	}
 
 	void Set_Animation(_uint iAnimIndex, _bool isLoop = false) {
-		m_bFirstFrame = true;
 		m_iCurrentAnimIndex = iAnimIndex;
 		m_isLoop = isLoop;
 	}
@@ -81,13 +80,10 @@ private:
 	vector<class CLoad_Animation*> m_Animations;
 
 private:
-	// RootNode Index;
-	_bool m_IsTrackEnd = { false };
-	_bool m_bFirstFrame = { true };
-	_float4x4 m_gPrevRootTM = {};
-
-	_uint m_iRoot_BoneIndex = {};
-	_float3 m_vPrevRootPos = { 0.f, 0.f, 0.f};
+	/* Root Bone */
+	_uint m_iRoot_BoneIndex = { };
+	_bool   m_isTrackEnd = { }; // 애니메이션 한 프레임이 종료된 상태를 저장합니다.
+	_float3 m_vAccumulatedMotion = {};
 	
 
 private:
