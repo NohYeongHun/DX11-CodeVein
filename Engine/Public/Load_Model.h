@@ -5,6 +5,19 @@ NS_BEGIN(Engine)
 class ENGINE_DLL CLoad_Model final : public CComponent
 {
 public:
+	typedef struct BlendDesc
+	{
+		_bool isBlending = false;
+		_float fElapsed = 0.f;
+		_float fBlendDuration = 2.f;
+
+		uint32_t iPrevAnimIndex = 0;
+		_float fPrevAnimTime = 0.f;
+
+		uint32_t iNextAnimIndex = 0;
+	}BLEND_DESC;
+
+public:
 	typedef struct tagLoadModelDesc
 	{
 		class CGameObject* pGameObject = { nullptr };
@@ -28,6 +41,8 @@ public:
 	void Set_Animation(_uint iAnimIndex, _bool isLoop = false) {
 		m_iCurrentAnimIndex = iAnimIndex;
 		m_isLoop = isLoop;
+		if (!isLoop)
+			CRASH("isLoop == false");
 	}
 
 	void Set_Loop(_bool isLoop)
@@ -39,6 +54,9 @@ public:
 	{
 		return m_isFinished;
 	}
+
+	void Restart_Animation();
+		
 	
 public:
 	const _bool Is_Ray_Hit(const _float3& rayOrigin, const _float3& rayDir, _float* pOutDist);
@@ -48,6 +66,10 @@ public:
 	HRESULT Bind_Materials(CShader* pShader, const _char* pConstantName, _uint iMeshIndex, aiTextureType eTextureType, _uint iTextureIndex);
 	HRESULT Bind_BoneMatrices(class CShader* pShader, const _char* pConstantName, _uint iMeshIndex);
 	_bool Play_Animation(_float fTimeDelta);
+	void Blend_Animation(_float fTimeDelta);
+	void Change_Animation_WithBlend(uint32_t iNextAnimIndex, _float fBlendTime);
+
+	void Apply_RootMotion(_vector vOld, _vector vNew);
 	
 private:
 	MODELTYPE m_ModelType = {};
@@ -78,6 +100,9 @@ private:
 	_bool m_isLoop = { false };
 	_uint m_iNumAnimations = { 0 };
 	vector<class CLoad_Animation*> m_Animations;
+
+	_bool m_isBlending = { false };
+	BLEND_DESC m_BlendDesc = {};
 
 private:
 	/* Root Bone */

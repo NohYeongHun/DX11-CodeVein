@@ -41,8 +41,8 @@ void CFsm::Change_State(_uint iState, void* pArg)
     if (m_pNowState != nullptr)
     {
         m_pPreState = m_pNowState;
-        m_pNowState->Exit(); // 종료시 동작할 작업 진행.
-        m_pNowState->Reset(); // 현재 상태 초기화.
+        //m_pNowState->Exit(); // 종료시 동작할 작업 진행.
+        //m_pNowState->Reset(); // 현재 상태 초기화.
     }
 
     m_pNowState = m_States[iState];

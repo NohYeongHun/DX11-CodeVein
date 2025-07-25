@@ -56,6 +56,16 @@ void CLoad_Animation::Update_TransformationMatrices(const vector<class CLoad_Bon
     }
         
 }
+
+_matrix CLoad_Animation::Get_BoneMatrixAtTime(_uint iBoneIndex, _float fCurrentTrackPosition)
+{
+    return _matrix();
+}
+
+void CLoad_Animation::Reset()
+{
+    m_fCurrentTrackPosition = 0.f;
+}
     
 // 매 프레임 RootMotion 값을 Transform에 더해줍니다.
 void CLoad_Animation::ApplyRootMotion(_float fTimeDelta)

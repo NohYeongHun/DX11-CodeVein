@@ -8,21 +8,30 @@ HRESULT CLoader_GamePlay::Loading_Resource(ID3D11Device* pDevice, ID3D11DeviceCo
 		return E_FAIL;
 	}
 
-	//if (FAILED(Add_Prototype_Map(pDevice, pContext, pGameInstance)))
-	//{
-	//	MSG_BOX(TEXT("Create Failed Loading : GamePlay Map "));
-	//	return E_FAIL;
-	//}
+	if (FAILED(Add_Prototype_Map(pDevice, pContext, pGameInstance)))
+	{
+		MSG_BOX(TEXT("Create Failed Loading : GamePlay Map "));
+		return E_FAIL;
+	}
 
 
 	if (FAILED(Add_Prototype_Camera_Free(pDevice, pContext, pGameInstance)))
 	{
+		CRASH("Create Camera Free Failed");
 		MSG_BOX(TEXT("Create Failed Loading : GamePlay Camera_Free "));
+		return E_FAIL;
+	}
+
+	if (FAILED(Add_Prototype_Camera_Player(pDevice, pContext, pGameInstance)))
+	{
+		CRASH("Create Camera Player Failed");
+		MSG_BOX(TEXT("Create Failed Loading : GamePlay Camera_Player "));
 		return E_FAIL;
 	}
 
 	if (FAILED(Add_Prototype_Player(pDevice, pContext, pGameInstance)))
 	{
+		CRASH("Create Player Failed");
 		MSG_BOX(TEXT("Create Failed Loading : GamePlay Player "));
 		return E_FAIL;
 	}
@@ -106,6 +115,16 @@ HRESULT CLoader_GamePlay::Add_Prototype_Camera_Free(ID3D11Device* pDevice, ID3D1
 	// Free 시점 카메라 생성.
 	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level), TEXT("Prototype_GameObject_Camera_Free"),
 		CCamera_Free::Create(pDevice, pContext))))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+/* Camera Player Create */
+HRESULT CLoader_GamePlay::Add_Prototype_Camera_Player(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
+{
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level), TEXT("Prototype_GameObject_Camera_Player"),
+		CCamera_Player::Create(pDevice, pContext))))
 		return E_FAIL;
 
 	return S_OK;

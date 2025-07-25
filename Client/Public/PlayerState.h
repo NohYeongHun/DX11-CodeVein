@@ -15,6 +15,8 @@ protected:
 protected:
 	class CPlayer* m_pPlayer = { nullptr };
 	class CLoad_Model* m_pModelCom = { nullptr };
+	class CTransform* m_pTransformCom = { nullptr };
+	_float4 m_vMoveDir = {};
 
 public:
 	virtual void Free() override;

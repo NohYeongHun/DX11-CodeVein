@@ -94,6 +94,9 @@
     <Filter Include="02. GameObject\Player\State">
       <UniqueIdentifier>{e295dba5-4027-4e6d-adb0-a4191fb44015}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. GameObject\Camera\Player">
+      <UniqueIdentifier>{ed4863a5-215c-40bf-8da1-5a277240cb2e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -270,6 +273,12 @@
     <ClInclude Include="..\Public\Player_WalkState.h">
       <Filter>02. GameObject\Player\State</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Player_RunState.h">
+      <Filter>02. GameObject\Player\State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Camera_Player.h">
+      <Filter>02. GameObject\Camera\Player</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -437,6 +446,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\Player_WalkState.cpp">
       <Filter>02. GameObject\Player\State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Player_RunState.cpp">
+      <Filter>02. GameObject\Player\State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Camera_Player.cpp">
+      <Filter>02. GameObject\Camera\Player</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

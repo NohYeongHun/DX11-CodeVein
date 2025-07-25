@@ -14,6 +14,18 @@ CCamera::CCamera(const CCamera& Prototype)
 {
 }
 
+const _vector CCamera::Get_LookVector()
+{
+    return m_pTransformCom->Get_LookDirection_NoPitch();
+}
+
+const _vector CCamera::Get_RightVector()
+{
+    return m_pTransformCom->Get_RightDirection_NoPitch();
+}
+
+
+
 HRESULT CCamera::Initialize_Prototype()
 {
     return S_OK;
@@ -30,7 +42,9 @@ HRESULT CCamera::Initialize_Clone(void* pArg)
     m_pTransformCom->Set_State(STATE::POSITION, XMLoadFloat4(&pDesc->vEye));
 
     // 2. Transform Component에 카메라의 바라보는 방향 (vAt) 설정.
-    m_pTransformCom->LookAt(XMLoadFloat4(&pDesc->vAt));
+    _float3 vPos = {};
+    XMStoreFloat3(&vPos, XMLoadFloat4(&pDesc->vAt));
+    m_pTransformCom->LookAt(vPos);
 
     // 3. ViewPort 정보 가져와서 설정.
     _uint iNumViewPorts{ 1 };

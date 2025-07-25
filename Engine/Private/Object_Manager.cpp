@@ -198,13 +198,13 @@ void CObject_Manager::Edit_Transform(_uint iLayerLevelIndex, const _wstring& str
 
 			// 회전한다.
 			if (data.rot.x > 0.f)
-				pTransform->Rotation(XMVectorSet(1.f, 0.f, 0.f, 0.f), XMConvertToRadians(data.rot.x));
+				pTransform->Add_Rotation(0.f, XMConvertToRadians(data.rot.x), 0.f);
 			else if(data.rot.y > 0.f)
-				pTransform->Rotation(XMVectorSet(0.f, 1.f, 0.f, 0.f), XMConvertToRadians(data.rot.y));
+				pTransform->Add_Rotation(XMConvertToRadians(data.rot.y), 0.f, 0.f);
 			else if (data.rot.z > 0.f)
-				pTransform->Rotation(XMVectorSet(0.f, 0.f, 1.f, 0.f), XMConvertToRadians(data.rot.z));
+				pTransform->Add_Rotation(0.f, 0.f, XMConvertToRadians(data.rot.z));
 			
-			pTransform->Scaling(data.scale);
+			pTransform->Set_Scale(data.scale);
 
 			return;
 		}

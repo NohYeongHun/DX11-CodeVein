@@ -48,7 +48,7 @@ void CMap::Late_Update(_float fTimeDelta)
 {
     __super::Late_Update(fTimeDelta);
 
-    if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::BLEND, this)))
+    if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::NONBLEND, this)))
         return;
 }
 
@@ -105,9 +105,11 @@ HRESULT CMap::Ready_Components(MAP_DESC* pDesc)
         ,TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom), nullptr)))
         return E_FAIL;*/
 
+    CLoad_Model::LOADMODEL_DESC Desc{};
+    Desc.pGameObject = this;
     if (FAILED(__super::Add_Component(ENUM_CLASS(LEVEL::GAMEPLAY)
         , pDesc->PrototypeTag
-        , TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom), nullptr)))
+        , TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom), &Desc)))
         return E_FAIL;
 
     

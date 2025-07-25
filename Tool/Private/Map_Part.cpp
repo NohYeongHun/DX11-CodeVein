@@ -155,11 +155,11 @@ HRESULT CMap_Part::Ready_Transform(MODEL_CREATE_DESC* pDesc)
     m_pTransformCom->Scale(pDesc->vScale);
 
     if (pDesc->vRotate.x > 0.f) 
-		m_pTransformCom->Rotation(XMVectorSet(1.f, 0.f, 0.f, 0.f), XMConvertToRadians(pDesc->vRotate.x));
+		m_pTransformCom->Add_Rotation(0.f, XMConvertToRadians(pDesc->vScale.x), 0.f);
     else if (pDesc->vRotate.y > 0.f)
-        m_pTransformCom->Rotation(XMVectorSet(0.f, 1.f, 0.f, 0.f), XMConvertToRadians(pDesc->vRotate.y));
+        m_pTransformCom->Add_Rotation(XMConvertToRadians(pDesc->vScale.y),0.f, 0.f);
 	else if (pDesc->vRotate.z > 0.f)
-		m_pTransformCom->Rotation(XMVectorSet(0.f, 0.f, 1.f, 0.f), XMConvertToRadians(pDesc->vRotate.z));
+		m_pTransformCom->Add_Rotation(0.f, 0.f, XMConvertToRadians(pDesc->vScale.z));
 
     return S_OK;
 }

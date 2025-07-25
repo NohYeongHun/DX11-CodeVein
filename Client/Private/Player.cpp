@@ -10,6 +10,59 @@ CPlayer::CPlayer(const CPlayer& Prototype)
 {
 }
 
+void CPlayer::Move_By_Camera_Direction_8Way(DIR eDir, _float fTimeDelta, _float fSpeed)
+{
+    CCamera* pCamera = m_pGameInstance->Get_MainCamera();
+    if (!pCamera)
+    {
+        CRASH("Camera Not Found");
+        return;
+    }
+
+    _vector vLook = pCamera->Get_LookVector();  // Y 제거 포함된 형태여야 함
+    _vector vRight = pCamera->Get_RightVector();
+
+    vLook = XMVectorSetY(vLook, 0.f);
+    vRight = XMVectorSetY(vRight, 0.f);
+    vLook = XMVector3Normalize(vLook);
+    vRight = XMVector3Normalize(vRight);
+
+    _vector vMoveDir = XMVectorZero();
+
+    switch (eDir)
+    {
+        case DIR::U:   vMoveDir = vLook; break;
+        case DIR::D:   vMoveDir = -vLook; break;
+        case DIR::L:   vMoveDir = -vRight; break;
+        case DIR::R:   vMoveDir = vRight; break;
+        case DIR::LU:  vMoveDir = XMVector3Normalize(vLook - vRight); break;
+        case DIR::LD:  vMoveDir = XMVector3Normalize(-vLook - vRight); break;
+        case DIR::RU:  vMoveDir = XMVector3Normalize(vLook + vRight); break;
+        case DIR::RD:  vMoveDir = XMVector3Normalize(-vLook + vRight); break;
+        default: return;
+    }
+
+    vMoveDir = XMVectorSetY(vMoveDir, 0.f);
+
+    if (XMVector3Equal(vMoveDir, XMVectorZero()))
+        return;
+
+    vMoveDir = XMVector3Normalize(vMoveDir);
+
+    // 2. 이동 방향 기준 Yaw 회전 계산
+    _float x = XMVectorGetX(vMoveDir);
+    _float z = XMVectorGetZ(vMoveDir);
+    _float fYaw = atan2f(x, z); // <- 회전 각도
+
+    // 3. 회전 쿼터니언 적용
+    _vector qRot = XMQuaternionRotationAxis(XMVectorSet(0.f, 1.f, 0.f, 0.f), fYaw);
+    m_pTransformCom->Set_Quaternion(qRot);
+
+    // 4. 이동 적용
+    m_pTransformCom->Move_Direction(vMoveDir, fTimeDelta * 0.5f);
+}
+
+
 HRESULT CPlayer::Initialize_Prototype()
 {
     if (FAILED(__super::Initialize_Prototype()))
@@ -31,11 +84,16 @@ HRESULT CPlayer::Initialize_Clone(void* pArg)
     if (FAILED(Ready_Fsm()))
         return E_FAIL;
 
+    _float3 vPos = { 0.f, 10.f, 0.f };
+    m_pTransformCom->Set_State(STATE::POSITION, XMLoadFloat3(&vPos));
+
+    //m_pTransformCom->Rotation({ 0.f, 1.f, 0.f }, XMConvertToRadians(180.f));
+
     // Player 정면 바라보게 하기?
     //m_pTransformCom->Rotation(XMVectorSet(1.f, 0.f, 0.f, 0.f), XMConvertToRadians(270.f));
 
     //m_pModelCom->Set_Animation(6, true);
-    m_pModelCom->Set_Animation(38, true);
+    //m_pModelCom->Set_Animation(38, true);
     
     
 
@@ -74,8 +132,8 @@ void CPlayer::Update(_float fTimeDelta)
 {
     __super::Update(fTimeDelta);
 
-    //if (nullptr != m_pFsmCom)
-    //    m_pFsmCom->Update(fTimeDelta);
+    if (nullptr != m_pFsmCom)
+        m_pFsmCom->Update(fTimeDelta);
 
     if (true == m_pModelCom->Play_Animation(fTimeDelta))
     {
@@ -157,6 +215,9 @@ void CPlayer::On_Collision_Exit(CGameObject* pOther)
 void CPlayer::Change_Animation(_uint iAnimationIndex, _bool isLoop)
 {
     m_pModelCom->Set_Animation(iAnimationIndex, isLoop);
+    if (!isLoop)
+        CRASH("현재 루프가 안됌");
+        
 }
 
 #pragma endregion
@@ -193,37 +254,16 @@ HRESULT CPlayer::Ready_Fsm()
         return E_FAIL;
 
 
-    
-    CPlayer_IdleState::PLAYER_IDLESTATE_DESC Idle{};
-    Idle.pFsm = m_pFsmCom;
-    Idle.pOwner = this;
+    CPlayerState::PLAYER_STATE_DESC PlayerDesc{};
+    PlayerDesc.pFsm = m_pFsmCom;
+    PlayerDesc.pOwner = this;
 
-    m_pFsmCom->Add_State(CPlayer_IdleState::Create(PLAYER_STATE::IDLE, &Idle));
+    m_pFsmCom->Add_State(CPlayer_IdleState::Create(PLAYER_STATE::IDLE, &PlayerDesc));
+    m_pFsmCom->Add_State(CPlayer_WalkState::Create(PLAYER_STATE::WALK, &PlayerDesc));
+    m_pFsmCom->Add_State(CPlayer_RunState::Create(PLAYER_STATE::RUN, &PlayerDesc));
 
-    CPlayer_WalkState::PLAYER_WALKSTATE_DESC walk{};
-    walk.pFsm = m_pFsmCom;
-    walk.pOwner = this;
-
-    m_pFsmCom->Add_State(CPlayer_WalkState::Create(PLAYER_STATE::WALK, &walk));
-    /*m_pFsmCom->Add_State(CState_Player_Parry::Create(m_pFsmCom, this, PARRY, &Desc));
-    m_pFsmCom->Add_State(CState_Player_Heal::Create(m_pFsmCom, this, HEAL, &Desc));
-    m_pFsmCom->Add_State(CState_Player_ChangeWeapon::Create(m_pFsmCom, this, CHANGEWEP, &Desc));
-    m_pFsmCom->Add_State(CState_Player_Ladder::Create(m_pFsmCom, this, LADDER, &Desc));
-    m_pFsmCom->Add_State(CState_Player_Lift::Create(m_pFsmCom, this, LIFT, &Desc));
-    m_pFsmCom->Add_State(CState_Player_Chest::Create(m_pFsmCom, this, CHEST, &Desc));
-    m_pFsmCom->Add_State(CState_Player_ItemGet::Create(m_pFsmCom, this, ITEMGET, &Desc));
-    m_pFsmCom->Add_State(CState_Player_Stargazer::Create(m_pFsmCom, this, STARGAZER, &Desc));
-    m_pFsmCom->Add_State(CState_Player_Teleport::Create(m_pFsmCom, this, TELEPORT, &Desc));
-    m_pFsmCom->Add_State(CState_Player_Grinder::Create(m_pFsmCom, this, GRINDER, &Desc));
-    m_pFsmCom->Add_State(CState_Player_GetUp::Create(m_pFsmCom, this, GETUP, &Desc));
-    m_pFsmCom->Add_State(CState_Player_ThrowItem::Create(m_pFsmCom, this, THROW_ITEM, &Desc));
-    m_pFsmCom->Add_State(CState_Player_DebuffResistance::Create(m_pFsmCom, this, DEBUFF_RESISTANCE, &Desc));
-    m_pFsmCom->Add_State(CState_Player_DebuffReset::Create(m_pFsmCom, this, DEBUFF_RESET, &Desc));
-    m_pFsmCom->Add_State(CState_Player_RetryBoss::Create(m_pFsmCom, this, RETRY_BOSS, &Desc));
-    m_pFsmCom->Add_State(CState_Player_Die::Create(m_pFsmCom, this, DIE, &Desc));*/
-
-    CPlayer_IdleState::PLAYERIDLE_ENTER_DESC enter{};
-    enter.iAnimation_IdleIndex = 17;
+    CPlayer_IdleState::IDLE_ENTER_DESC enter{};
+    enter.iAnimation_Index = 17;
 
     m_pFsmCom->Change_State(PLAYER_STATE::IDLE, &enter);
     return S_OK;

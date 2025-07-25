@@ -68,6 +68,7 @@
 #include "UIObject.h"
 #include "Input_Device.h"
 #include "Camera.h"
+#include "Camera_Manager.h"
 
 #pragma endregion
 

@@ -8,14 +8,14 @@ class CPlayer_WalkState final : public CPlayerState
 public:
 	typedef struct tagPlayerWalkEnterDesc
 	{
-		_uint iAnimation_WalkIdx = {};
-	}PLAYERWALK_ENTER_DESC;
+		_uint iAnimation_Idx = {};
+	}WALK_ENTER_DESC;
 
 public:
 	typedef struct tagPlayerWalkStateDesc : public CPlayerState::PLAYER_STATE_DESC
 	{
 
-	}PLAYER_WALKSTATE_DESC;
+	}WALKSTATE_DESC;
 
 private:
 	explicit CPlayer_WalkState();

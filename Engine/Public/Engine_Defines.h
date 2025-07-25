@@ -113,6 +113,7 @@ static inline bool ReadBytes(std::ifstream& ifs, void* dst, size_t bytes)
 static inline wstring ReadWString(std::ifstream& ifs)
 {
     uint32_t len = 0;
+
     if (!ReadBytes(ifs, &len, sizeof(uint32_t)))
         return {};
 

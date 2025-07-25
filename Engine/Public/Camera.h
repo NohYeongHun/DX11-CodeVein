@@ -17,6 +17,8 @@ protected:
 	virtual ~CCamera() = default;
 
 public:
+	const _vector Get_LookVector();
+	const _vector Get_RightVector();
 
 public:
 	virtual HRESULT Initialize_Prototype();
@@ -25,6 +27,7 @@ public:
 	virtual void Update(_float fTimeDelta);
 	virtual void Late_Update(_float fTimeDelta);
 	virtual HRESULT Render();
+
 
 public:
 	void Update_PipeLines();

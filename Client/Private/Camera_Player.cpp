@@ -1,0 +1,119 @@
+﻿#include "Camera_Free.h"
+
+CCamera_Player::CCamera_Player(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+	: CCamera(pDevice, pContext)
+{
+}
+
+CCamera_Player::CCamera_Player(const CCamera_Player& Prototype)
+	: CCamera(Prototype)
+{
+}
+
+HRESULT CCamera_Player::Initialize_Prototype()
+{
+	return S_OK;
+}
+
+HRESULT CCamera_Player::Initialize_Clone(void* pArg)
+{
+	CAMERA_PLAYER_DESC* pDesc = static_cast<CAMERA_PLAYER_DESC*>(pArg);
+
+	m_fMouseSensor = pDesc->fMouseSensor;
+
+	if (FAILED(__super::Initialize_Clone(pArg)))
+		return E_FAIL;
+
+
+	return S_OK;
+}
+
+// 카메라에 대한 이동 전환은 Priority_Update에서 완료 후 Pipe Line에 행렬이 전달됨.
+void CCamera_Player::Priority_Update(_float fTimeDelta)
+{
+	__super::Priority_Update(fTimeDelta);
+
+	
+}
+
+void CCamera_Player::Update(_float fTimeDelta)
+{
+	__super::Update(fTimeDelta);
+
+	if (m_pGameInstance->Get_KeyPress(DIK_UPARROW))
+	{
+		m_pTransformCom->Go_Straight(fTimeDelta);
+	}
+
+	if (m_pGameInstance->Get_KeyPress(DIK_DOWNARROW))
+	{
+		m_pTransformCom->Go_Backward(fTimeDelta);
+	}
+
+	if (m_pGameInstance->Get_KeyPress(DIK_LEFTARROW))
+	{
+		m_pTransformCom->Go_Left(fTimeDelta);
+	}
+	if (m_pGameInstance->Get_KeyPress(DIK_RIGHTARROW))
+	{
+		m_pTransformCom->Go_Right(fTimeDelta);
+	} 
+
+
+	if (m_pGameInstance->Get_MouseKeyPress(MOUSEKEYSTATE::LB))
+	{
+		_long		MouseMove = {};
+		if (MouseMove = m_pGameInstance->Get_DIMouseMove(MOUSEMOVESTATE::X))
+			m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta * MouseMove * m_fMouseSensor);
+
+		if (MouseMove = m_pGameInstance->Get_DIMouseMove(MOUSEMOVESTATE::Y))
+			m_pTransformCom->Turn(m_pTransformCom->Get_State(STATE::RIGHT), fTimeDelta * MouseMove * m_fMouseSensor);
+	}
+
+
+	__super::Update_PipeLines();
+}
+
+void CCamera_Player::Late_Update(_float fTimeDelta)
+{
+	// 여기서 마우스 이전 프레임 위치 저장.
+	
+	__super::Late_Update(fTimeDelta);
+}
+
+HRESULT CCamera_Player::Render()
+{
+	return S_OK;
+}
+
+CCamera_Player* CCamera_Player::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+{
+	CCamera_Player* pInstance = new CCamera_Player(pDevice, pContext);
+
+	if (FAILED(pInstance->Initialize_Prototype()))
+	{
+		MSG_BOX(TEXT("Create Failed : CCamera_Player"));
+		Safe_Release(pInstance);
+	}
+
+	return pInstance;
+}
+
+CGameObject* CCamera_Player::Clone(void* pArg)
+{
+	CCamera_Player* pInstance = new CCamera_Player(*this);
+
+	if (FAILED(pInstance->Initialize_Clone(pArg)))
+	{
+		MSG_BOX(TEXT("Clone Failed : CCamera_Player"));
+		Safe_Release(pInstance);
+	}
+
+	return pInstance;
+}
+
+void CCamera_Player::Free()
+{
+	__super::Free();
+}
+

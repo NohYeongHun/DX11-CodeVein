@@ -74,6 +74,11 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11De
 	if (nullptr == m_pLight_Manager)
 		return E_FAIL;
 
+	// Camera Manager
+	m_pCamera_Manager = CCamera_Manager::Create(EngineDesc.iNumLevels);
+	if (nullptr == m_pCamera_Manager)
+		return E_FAIL;
+
 	return S_OK;
 }
 
@@ -87,12 +92,13 @@ void CGameInstance::Update_Engine(_float fTimeDelta)
 
 	m_pInput_Device->Update();
 
-	/* 내 게임내에서 반복적인 갱신이 필요한 객체들이 있다라면 갱신을 여기에서 모아서 수행하낟. */
+	/* 내 게임내에서 반복적인 갱신이 필요한 객체들이 있다라면 갱신을 여기에서 모아서 수행한다.. */
 	m_pObject_Manager->Priority_Update(fTimeDelta);
-
 	/* 카메라에 대한 이동 조정은 Object Manager의 Priority Update 단계에서 끝나고 
 	* 해당 단계를 이용해서 각 객체들에 적용할 행렬들을 생성해둡니다.
+	* 현재 카메라를 갱신해줍니다.
 	*/
+	m_pCamera_Manager->Update(fTimeDelta);
 	m_pPipleLine->Update();
 
 	/*
@@ -115,9 +121,13 @@ void CGameInstance::Update_Engine(_float fTimeDelta)
 HRESULT CGameInstance::Clear_Resources(_uint iClearLevelID)
 {
 	/* 기존레벨용 자원들을 날린다. */
+	m_pObject_Manager->Clear(iClearLevelID);
+	// 오브젝트 매니저에서 관리하지 않는다.
+	m_pCamera_Manager->Clear(iClearLevelID); 
+
 	m_pPrototype_Manager->Clear(iClearLevelID);
 
-	m_pObject_Manager->Clear(iClearLevelID);
+	
 	
 
 	return S_OK;
@@ -519,6 +529,27 @@ void CGameInstance::Transform_To_LocalSpace(_matrix WorldInverseMatrix)
 {
 	m_pPicking->Transform_To_LocalSpace(WorldInverseMatrix);
 }
+
+
+#pragma endregion
+
+#pragma region CAMERA_MANAGER
+HRESULT CGameInstance::Add_Camera(const _wstring& strCameraTag, _uint iLevelIndex, const _wstring& strPrototypeTag, void* pArg)
+{
+	return m_pCamera_Manager->Add_Camera(strCameraTag, iLevelIndex, strPrototypeTag, pArg);
+}
+CCamera* CGameInstance::Find_Camera(const _wstring& strCameraTag, _uint iLevelIndex)
+{
+	return m_pCamera_Manager->Find_Camera(strCameraTag, iLevelIndex);
+}
+CCamera* CGameInstance::Get_MainCamera()
+{
+	return m_pCamera_Manager->Get_MainCamera();
+}
+HRESULT CGameInstance::Change_Camera(const _wstring& strCameraTag, _uint iLevelIndex)
+{
+	return m_pCamera_Manager->Change_Camera(strCameraTag, iLevelIndex);
+}
 #pragma endregion
 
 
@@ -541,6 +572,8 @@ void CGameInstance::Release_Engine()
 	Safe_Release(m_pPipleLine);
 	Safe_Release(m_pLight_Manager);
 	Safe_Release(m_pPicking);
+	Safe_Release(m_pCamera_Manager);
+
 
 	Safe_Release(m_pInput_Device);
 	Safe_Release(m_pGraphic_Device);

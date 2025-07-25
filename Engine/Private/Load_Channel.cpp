@@ -21,6 +21,7 @@ HRESULT CLoad_Channel::Initialize(std::ifstream& ifs)
     return S_OK;
 }
 
+// 현재 채널이 소유한 BoneIndex만 변경한다.
 void CLoad_Channel::Update_TransformationMatrix(const vector<class CLoad_Bone*>& Bones, _float fCurrentTrackPosition, _uint* pCurrentKeyFrameIndex)
 {
     
@@ -63,10 +64,10 @@ void CLoad_Channel::Update_TransformationMatrix(const vector<class CLoad_Bone*>&
 
         _float      fRatio = (fCurrentTrackPosition - m_KeyFrames[*pCurrentKeyFrameIndex].fTrackPosition) / (m_KeyFrames[m_iCurrentKeyFrameIndex + 1].fTrackPosition - m_KeyFrames[m_iCurrentKeyFrameIndex].fTrackPosition);
 
+        // 이게 Load_Model => Blend 보간과 동일.
         vScale = XMVectorLerp(vSourScale, vDestScale, fRatio);
         vRotation = XMQuaternionSlerp(vSourRotation, vDestRotation, fRatio);
         vTranslation = XMVectorSetW(XMVectorLerp(vSourTranslation, vDestTranslation, fRatio), 1.f);
-
 
     }
 

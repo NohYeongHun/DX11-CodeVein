@@ -200,12 +200,12 @@ HRESULT CToolMap_Part::Ready_Transform(MODEL_CREATE_DESC* pDesc)
     m_pTransformCom->Set_State(STATE::POSITION, XMLoadFloat4(&pDesc->vPosition));
     m_pTransformCom->Scale(pDesc->vScale);
 
-    if (pDesc->vRotate.x > 0.f) 
-		m_pTransformCom->Rotation(XMVectorSet(1.f, 0.f, 0.f, 0.f), XMConvertToRadians(pDesc->vRotate.x));
+    if (pDesc->vRotate.x > 0.f)
+        m_pTransformCom->Add_Rotation(0.f, XMConvertToRadians(pDesc->vScale.x), 0.f);
     else if (pDesc->vRotate.y > 0.f)
-        m_pTransformCom->Rotation(XMVectorSet(0.f, 1.f, 0.f, 0.f), XMConvertToRadians(pDesc->vRotate.y));
-	else if (pDesc->vRotate.z > 0.f)
-		m_pTransformCom->Rotation(XMVectorSet(0.f, 0.f, 1.f, 0.f), XMConvertToRadians(pDesc->vRotate.z));
+        m_pTransformCom->Add_Rotation(XMConvertToRadians(pDesc->vScale.y), 0.f, 0.f);
+    else if (pDesc->vRotate.z > 0.f)
+        m_pTransformCom->Add_Rotation(0.f, 0.f, XMConvertToRadians(pDesc->vScale.z));
 
     return S_OK;
 }

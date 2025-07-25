@@ -172,6 +172,9 @@
     <Filter Include="01. Utility\02. GameObject\ContainerObject\PartObject">
       <UniqueIdentifier>{8e80b7e8-9a72-461b-bb17-1000660e7fcc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01. Utility\02. GameObject\Camera\Manager">
+      <UniqueIdentifier>{6b4dc82e-d6ca-453e-90ef-b59acb97b321}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Timer.cpp">
@@ -335,6 +338,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\PartObject.cpp">
       <Filter>01. Utility\02. GameObject\ContainerObject\PartObject</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Camera_Manager.cpp">
+      <Filter>01. Utility\02. GameObject\Camera\Manager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -526,6 +532,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\PartObject.h">
       <Filter>01. Utility\02. GameObject\ContainerObject\PartObject</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Camera_Manager.h">
+      <Filter>01. Utility\02. GameObject\Camera\Manager</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -17,8 +17,8 @@ HRESULT CLevel_GamePlay::Initialize_Clone()
 	if (FAILED(Ready_Layer_Player(TEXT("Layer_Player"))))
 		return E_FAIL;
 
-	//if (FAILED(Ready_Layer_Map(TEXT("Layer_Map"))))
-	//	return E_FAIL;
+	if (FAILED(Ready_Layer_Map(TEXT("Layer_Map"))))
+		return E_FAIL;
 	
 	//if (FAILED(Ready_Layer_Terrain(TEXT("Layer_Terrain"))))
 	//	return E_FAIL;
@@ -110,9 +110,25 @@ HRESULT CLevel_GamePlay::Ready_Layer_Camera(const _wstring& strLayerTag)
 	CameraDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 	CameraDesc.fMouseSensor = 0.1f;
 
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel), strLayerTag,
-		ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_Camera_Free"), &CameraDesc )))
+	if (FAILED(m_pGameInstance->Add_Camera(TEXT("FreeCamera"), ENUM_CLASS(LEVEL::GAMEPLAY)
+		, TEXT("Prototype_GameObject_Camera_Free"), &CameraDesc)))
+	{
+		CRASH("Add Free Camera Failed");
 		return E_FAIL;
+	}
+
+	if (FAILED(m_pGameInstance->Change_Camera(TEXT("FreeCamera"), ENUM_CLASS(LEVEL::GAMEPLAY))))
+	{
+		CRASH("Change Camera Failed");
+		return E_FAIL;
+	}
+
+
+	//if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel), strLayerTag,
+	//	ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_Camera_Free"), &CameraDesc )))
+	//	return E_FAIL;
+
+
 
 	return S_OK; 
 }

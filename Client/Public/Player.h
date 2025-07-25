@@ -26,6 +26,9 @@ private:
 	virtual ~CPlayer() = default;
 
 public:
+	void Move_By_Camera_Direction_8Way(DIR eDir, _float fTimeDelta, _float fSpeed);
+
+public:
 	virtual HRESULT Initialize_Prototype();
 	virtual HRESULT Initialize_Clone(void* pArg);
 	virtual void Priority_Update(_float fTimeDelta);

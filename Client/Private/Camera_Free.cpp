@@ -33,6 +33,13 @@ void CCamera_Free::Priority_Update(_float fTimeDelta)
 {
 	__super::Priority_Update(fTimeDelta);
 
+	
+}
+
+void CCamera_Free::Update(_float fTimeDelta)
+{
+	__super::Update(fTimeDelta);
+
 	if (m_pGameInstance->Get_KeyPress(DIK_UPARROW))
 	{
 		m_pTransformCom->Go_Straight(fTimeDelta);
@@ -55,21 +62,26 @@ void CCamera_Free::Priority_Update(_float fTimeDelta)
 
 	if (m_pGameInstance->Get_MouseKeyPress(MOUSEKEYSTATE::LB))
 	{
-		_long		MouseMove = {};
-		if (MouseMove = m_pGameInstance->Get_DIMouseMove(MOUSEMOVESTATE::X))
-			m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta * MouseMove * m_fMouseSensor);
+		_long MouseMoveX = m_pGameInstance->Get_DIMouseMove(MOUSEMOVESTATE::X);
+		_long MouseMoveY = m_pGameInstance->Get_DIMouseMove(MOUSEMOVESTATE::Y);
+		if (MouseMoveX != 0)
+		{
+			// Y축(Yaw 회전)
+			_float fAngle = fTimeDelta * MouseMoveX * m_fMouseSensor;
+			m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fAngle);
+		}
 
-		if (MouseMove = m_pGameInstance->Get_DIMouseMove(MOUSEMOVESTATE::Y))
-			m_pTransformCom->Turn(m_pTransformCom->Get_State(STATE::RIGHT), fTimeDelta * MouseMove * m_fMouseSensor);
+		if (MouseMoveY != 0)
+		{
+			// 카메라 기준 Pitch 회전 (자기 기준 오른쪽 축)
+			_float fAngle = fTimeDelta * MouseMoveY * m_fMouseSensor;
+			_vector vRight = m_pTransformCom->Get_State(STATE::RIGHT);
+			m_pTransformCom->Turn(vRight, fAngle);
+		}
 	}
 
 
 	__super::Update_PipeLines();
-}
-
-void CCamera_Free::Update(_float fTimeDelta)
-{
-	__super::Update(fTimeDelta);
 }
 
 void CCamera_Free::Late_Update(_float fTimeDelta)

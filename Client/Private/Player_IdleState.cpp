@@ -6,8 +6,7 @@ CPlayer_IdleState::CPlayer_IdleState()
 
 HRESULT CPlayer_IdleState::Initialize(_uint iStateNum, void* pArg)
 {
-	PLAYER_IDLESTATE_DESC* pDesc = static_cast<PLAYER_IDLESTATE_DESC*>(pArg);
-	if (FAILED(__super::Initialize(iStateNum, pDesc)))
+	if (FAILED(__super::Initialize(iStateNum, pArg)))
 		return E_FAIL;
 	
 	return S_OK;
@@ -16,10 +15,10 @@ HRESULT CPlayer_IdleState::Initialize(_uint iStateNum, void* pArg)
 /* State 시작 시*/
 void CPlayer_IdleState::Enter(void* pArg)
 {
-	PLAYERIDLE_ENTER_DESC* pDesc = static_cast<PLAYERIDLE_ENTER_DESC*>(pArg);
+	IDLE_ENTER_DESC* pDesc = static_cast<IDLE_ENTER_DESC*>(pArg);
 
 	// 애니메이션 인덱스를 변경해줍니다.
-	m_iAnimation_IdleIdx = pDesc->iAnimation_IdleIndex;
+	m_iAnimation_IdleIdx = pDesc->iAnimation_Index;
 	m_pPlayer->Change_Animation(m_iAnimation_IdleIdx, m_isLoop);
 }
 
@@ -27,6 +26,8 @@ void CPlayer_IdleState::Enter(void* pArg)
 void CPlayer_IdleState::Update(_float fTimeDelta)
 {
 	Handle_Input();
+	if (!m_isLoop)
+		CRASH("m_is Loop Failed");
 }
 
 // 종료될 때 실행할 동작..
@@ -44,29 +45,67 @@ void CPlayer_IdleState::Reset()
 // 상태 전환 구현 (키 입력 감지)
 void CPlayer_IdleState::Handle_Input()
 {
-	CPlayer_WalkState::PLAYERWALK_ENTER_DESC Desc{};
+	CPlayer_RunState::RUN_ENTER_DESC RunDesc{};
+	CPlayer_WalkState::WALK_ENTER_DESC WalkDesc{};
 	// RUNDESC 추가 예정 
 
 	if (m_pGameInstance->Get_KeyPress(DIK_W))
 	{
-		Desc.iAnimation_WalkIdx = 13;
-		m_pFsm->Change_State(CPlayer::PLAYER_STATE::WALK, &Desc);
+		// SHIFT 같이 누르면 걷기.
+		if (m_pGameInstance->Get_KeyPress(DIK_LSHIFT))
+		{
+			WalkDesc.iAnimation_Idx = 13;
+			m_pFsm->Change_State(CPlayer::PLAYER_STATE::WALK, &WalkDesc);
+		}
+		else
+		{
+			RunDesc.iAnimation_Idx = 6;
+			m_pFsm->Change_State(CPlayer::PLAYER_STATE::RUN, &RunDesc);
+		}
 	}
-	if (m_pGameInstance->Get_KeyPress(DIK_S))
+	else if (m_pGameInstance->Get_KeyPress(DIK_S))
 	{
-		Desc.iAnimation_WalkIdx = 12;
-		m_pFsm->Change_State(CPlayer::PLAYER_STATE::WALK, &Desc);
+		// SHIFT 같이 누르면 걷기.
+		if (m_pGameInstance->Get_KeyPress(DIK_LSHIFT))
+		{
+			WalkDesc.iAnimation_Idx = 12;
+			m_pFsm->Change_State(CPlayer::PLAYER_STATE::WALK, &WalkDesc);
+		}
+		else
+		{
+			RunDesc.iAnimation_Idx = 4;
+			m_pFsm->Change_State(CPlayer::PLAYER_STATE::RUN, &RunDesc);
+		}
 	}
-	if (m_pGameInstance->Get_KeyPress(DIK_A))
+	else if (m_pGameInstance->Get_KeyPress(DIK_A))
 	{
-		Desc.iAnimation_WalkIdx = 14;
-		m_pFsm->Change_State(CPlayer::PLAYER_STATE::WALK, &Desc);
-
+		// SHIFT 같이 누르면 걷기.
+		if (m_pGameInstance->Get_KeyPress(DIK_LSHIFT))
+		{
+			WalkDesc.iAnimation_Idx = 14;
+			m_pFsm->Change_State(CPlayer::PLAYER_STATE::WALK, &WalkDesc);
+		}
+		else
+		{
+			RunDesc.iAnimation_Idx = 8;
+			m_pFsm->Change_State(CPlayer::PLAYER_STATE::RUN, &RunDesc);
+		}
+		
 	}
-	if (m_pGameInstance->Get_KeyPress(DIK_D))
+	else if (m_pGameInstance->Get_KeyPress(DIK_D))
 	{
-		Desc.iAnimation_WalkIdx = 15;
-		m_pFsm->Change_State(CPlayer::PLAYER_STATE::WALK, &Desc);
+		// SHIFT 같이 누르면 걷기.
+		if (m_pGameInstance->Get_KeyPress(DIK_LSHIFT))
+		{
+			WalkDesc.iAnimation_Idx = 15;
+			m_pFsm->Change_State(CPlayer::PLAYER_STATE::WALK, &WalkDesc);
+		}
+		else 
+		{
+			RunDesc.iAnimation_Idx = 10;
+			m_pFsm->Change_State(CPlayer::PLAYER_STATE::RUN, &RunDesc);
+		}
+		
 	}
 	
 

@@ -8,6 +8,7 @@ namespace Engine
 		, NONANIM = 1
 		, STATIC  = 2
 	};
+	enum class DIR { U, RU, R, RD, D, LD, L, LU, END};
 	enum class STATE { RIGHT, UP, LOOK, POSITION };
 	enum class PROTOTYPE { GAMEOBJECT, COMPONENT };
 	enum class RENDERGROUP { PRIORITY, NONBLEND, BLEND, UI, STATIC_UI, CAMERA, END };

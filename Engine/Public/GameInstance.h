@@ -160,6 +160,14 @@ public:
 #pragma endregion
 
 		
+#pragma region CAMERA_MANAGER
+public:
+	HRESULT Add_Camera(const _wstring& strCameraTag, _uint iLevelIndex, const _wstring& strPrototypeTag, void* pArg = nullptr);
+	class CCamera* Find_Camera(const _wstring& strCameraTag, _uint iLevelIndex);
+	class CCamera* Get_MainCamera();
+	HRESULT Change_Camera(const _wstring& strCameraTag, _uint iLevelIndex);
+#pragma endregion
+
 
 //
 //#pragma region PICKING 
@@ -183,6 +191,7 @@ private:
 	class CPipeLine*			m_pPipleLine = { nullptr };
 	class CInput_Device*		m_pInput_Device = { nullptr };
 	class CLight_Manager*		m_pLight_Manager = { nullptr };
+	class CCamera_Manager*		m_pCamera_Manager = { nullptr };
 	
 	_float m_fTimeDelta = {};
 	

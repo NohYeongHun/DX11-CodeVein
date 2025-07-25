@@ -8,14 +8,14 @@ class CPlayer_IdleState final : public CPlayerState
 public:
 	typedef struct tagPlayerIdleEnterDesc
 	{
-		_uint iAnimation_IdleIndex = {};
-	}PLAYERIDLE_ENTER_DESC;
+		_uint iAnimation_Index = {};
+	}IDLE_ENTER_DESC;
 
 public:
 	typedef struct tagPlayerIdleStateDesc : public CPlayerState::PLAYER_STATE_DESC
 	{
 
-	}PLAYER_IDLESTATE_DESC;
+	}IDLESTATE_DESC;
 
 private:
 	explicit CPlayer_IdleState();

@@ -32,6 +32,7 @@
 
 #include "BackGround.h"
 #include "Camera_Free.h"
+#include "Camera_Player.h"
 /* =========================================== Title Object ===================================== */
 #include "Title_BackGround.h"
 #include "TitleText.h"
@@ -79,6 +80,7 @@
 #include "PlayerState.h"
 #include "Player_IdleState.h"
 #include "Player_WalkState.h"
+#include "Player_RunState.h"
 #include "Player.h"
 
 #pragma endregion
