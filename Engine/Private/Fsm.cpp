@@ -40,11 +40,6 @@ void CFsm::Change_State(_uint iState, void* pArg)
     // 이전 상태를 현재 상태로 변경.
     if (m_pNowState != nullptr)
     {
-        if (m_pNowState->Get_StateNum() == 2)
-        {
-            _wstring debug = L"to RunDebug : " + to_wstring(m_pNowState->Get_StateNum()) + L'\n';
-            OutputDebugString(debug.c_str());
-        }
 
         m_pPreState = m_pNowState;
         m_pNowState->Exit(); // 종료시 동작할 작업 진행.

@@ -42,8 +42,6 @@ public:
 	void Set_Animation(_uint iAnimIndex, _bool isLoop = false) {
 		m_iCurrentAnimIndex = iAnimIndex;
 		m_isLoop = isLoop;
-		if (!isLoop)
-			CRASH("isLoop == false");
 	}
 
 	void Set_Loop(_bool isLoop)
@@ -64,6 +62,11 @@ public:
 	_uint Get_CurrentAnimationIndex()
 	{
 		return m_iCurrentAnimIndex;
+	}
+
+	_matrix Get_RootBoneMatrix()
+	{
+		return m_Bones[m_iRoot_BoneIndex]->Get_TransformationMatrix();
 	}
 
 public:
@@ -90,6 +93,9 @@ public:
 	void Change_Animation_Immediate(_uint iAnimIndex);
 	_vector QuaternionSlerpShortest(_vector q1, _vector q2, _float t);
 
+
+public:
+	void Animation_Reset();
 	
 private:
 	MODELTYPE m_ModelType = {};

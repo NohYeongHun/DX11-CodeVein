@@ -16,6 +16,12 @@ private:
 	virtual ~CCamera_Player() = default;
 
 public:
+	_float Get_Yaw() const;
+	void Set_Yaw(_float fYaw);
+	void Add_Yaw(_float fYawDelta);
+	void Set_TargetOffset(_float4 vOffset);
+
+public:
 	virtual HRESULT Initialize_Prototype();
 	virtual HRESULT Initialize_Clone(void* pArg);
 	virtual void Priority_Update(_float fTimeDelta);

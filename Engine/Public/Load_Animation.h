@@ -24,7 +24,6 @@ public:
 	void Reset();
 	void Update_TrackPosition(_float fTimeDelta);
 	CLoad_Channel* Find_Channel(_uint iBoneIndex);
-	KEYFRAME Get_KeyFrameAtTime(_float fTime);
 
 private:
 	/* 채널 이름 */

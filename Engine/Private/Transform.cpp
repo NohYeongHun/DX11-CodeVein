@@ -1,21 +1,21 @@
 ﻿#include "Transform.h"
 
+
 CTransform::CTransform(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-	: CComponent { pDevice, pContext }
+	: CComponent{ pDevice, pContext }
 {
 
 }
 
 void CTransform::Set_State(STATE eState, _fvector vState)
 {
-
 	XMStoreFloat4(reinterpret_cast<_float4*>(&m_WorldMatrix.m[ENUM_CLASS(eState)]), vState);
 
 	switch (eState)
 	{
 	case STATE::POSITION:
 		XMStoreFloat3(&m_vPosition, vState);
-		m_bIsDirty = true; 
+		m_bIsDirty = true;
 		break;
 
 	case STATE::RIGHT:
@@ -36,13 +36,18 @@ void CTransform::Set_State(STATE eState, _fvector vState)
 		};
 
 		m_QuatRotation = XMQuaternionRotationMatrix(matRot);
+		m_bIsDirty = true; // ✅ 수정: 월드 행렬 갱신 필요
 	}
-		break;
+	break;
 	default:
 		break;
 	}
 
-	m_bIsDirty = false; // WorldMatrix는 직접 갱신했으므로
+	// ✅ 수정: POSITION의 경우만 m_bIsDirty를 false로 하지 않음
+	if (eState != STATE::POSITION)
+	{
+		m_bIsDirty = true; // 회전이나 다른 상태 변경 시 갱신 필요
+	}
 }
 
 _float CTransform::GetYawFromQuaternion() const
@@ -108,13 +113,13 @@ HRESULT CTransform::Initialize_Clone(void* pArg)
 	m_fSpeedPerSec = pDesc->fSpeedPerSec;
 	m_fRotationPerSec = pDesc->fRotationPerSec;
 
-	
-
 	return S_OK;
 }
 
 HRESULT CTransform::Bind_Shader_Resource(CShader* pShader, const _char* pConstantName)
 {
+	// ✅ 수정: Shader 바인딩 전에 반드시 월드 행렬 갱신
+	Update_WorldMatrix();
 	return pShader->Bind_Matrix(pConstantName, &m_WorldMatrix);
 }
 
@@ -130,6 +135,9 @@ void CTransform::Update_WorldMatrix()
 	_matrix world = matScale * matRotation * matTranslation;
 
 	XMStoreFloat4x4(&m_WorldMatrix, world);
+
+	// ✅ 수정: 갱신 완료 후 플래그 해제
+	m_bIsDirty = false;
 }
 
 void CTransform::Go_Straight(_float fTimeDelta)
@@ -176,8 +184,6 @@ void CTransform::Go_Right(_float fTimeDelta)
 	m_bIsDirty = true;
 }
 
-
-
 _float3 CTransform::Get_EulerAngles() const
 {
 	_float3 angles;
@@ -216,7 +222,6 @@ void CTransform::LookAt(const _float3& vTargetPos, const _float3& vUp)
 	m_QuatRotation = XMQuaternionRotationMatrix(matRot);
 
 	// Transform 상태 변경됨 → 월드행렬 재계산 필요
-	//m_isDirty = true;
 	m_bIsDirty = true;
 }
 
@@ -234,26 +239,22 @@ void CTransform::LookAt_YawOnly(_vector vTargetDir)
 	m_bIsDirty = true;
 }
 
-
 void CTransform::Set_Position(const _float3& vPos)
 {
 	m_vPosition = vPos;
 	m_bIsDirty = true;
-	//m_isDirty = true;
 }
 
 void CTransform::Set_Scale(const XMFLOAT3& vScale)
 {
 	m_vScale = vScale;
 	m_bIsDirty = true;
-	//m_isDirty = true;
 }
 
 void CTransform::Scale(const XMFLOAT3& vScale)
 {
 	m_vScale = vScale;
 	m_bIsDirty = true;
-	//m_isDirty = true;
 }
 
 void CTransform::Turn(_fvector vAxis, _float fAngle)
@@ -262,7 +263,6 @@ void CTransform::Turn(_fvector vAxis, _float fAngle)
 	m_QuatRotation = XMQuaternionNormalize(XMQuaternionMultiply(qRot, m_QuatRotation)); // 누적
 	m_bIsDirty = true;
 }
-
 
 _float3 CTransform::Get_Scale()
 {
@@ -274,16 +274,11 @@ void CTransform::Add_Rotation(_float fPitch, _float fYaw, _float fRoll)
 {
 	// 1. 회전 쿼터니언 생성 (Yaw-Pitch-Roll 순서)
 	_vector deltaQuat = XMQuaternionRotationRollPitchYaw(fPitch, fYaw, fRoll);
-	//_vector deltaQuat = XMQuaternionRotationRollPitchYaw(fPitch, fYaw, fRoll);
 
 	// 2. 기존 쿼터니언과 곱해 누적 (순서 주의: 새 회전을 뒤에 곱한다)
 	m_QuatRotation = XMQuaternionNormalize(XMQuaternionMultiply(m_QuatRotation, deltaQuat));
 	m_bIsDirty = true;
 }
-
-
-
-
 
 CTransform* CTransform::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {

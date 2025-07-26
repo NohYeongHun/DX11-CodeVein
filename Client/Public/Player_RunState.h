@@ -12,10 +12,11 @@ public:
 	typedef struct tagPlayerRunEnterDesc
 	{
 		_uint iAnimation_Idx = {};
+		DIR eDirection;
 	}RUN_ENTER_DESC;
 
 public:
-	typedef struct tagPlayerWalkStateDesc : public CPlayerState::PLAYER_STATE_DESC
+	typedef struct tagPlayerRunStateDesc : public CPlayerState::PLAYER_STATE_DESC
 	{
 
 	}RUNSTATE_DESC;

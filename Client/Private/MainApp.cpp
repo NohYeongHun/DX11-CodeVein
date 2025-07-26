@@ -162,8 +162,10 @@ HRESULT CMainApp::Ready_Prototype_ForModel()
 	_matrix		PreTransformMatrix = XMMatrixIdentity();
 
 	/* Prototype_Component_Model */
-	//PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
+	//PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XM_PI);
+	
 	PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f);
+	///PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f);
 	 
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
 		, TEXT("Prototype_Component_Model_Player")

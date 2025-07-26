@@ -70,22 +70,13 @@ void CPlayer_WalkState::Handle_Input(_float fTimeDelta)
 {
 	m_isKeyInput = false;
 
-	const _bool bW = m_pGameInstance->Get_KeyPress(DIK_W);
-	const _bool bS = m_pGameInstance->Get_KeyPress(DIK_S);
-	const _bool bA = m_pGameInstance->Get_KeyPress(DIK_A);
-	const _bool bD = m_pGameInstance->Get_KeyPress(DIK_D);
-	if (bW || bS || bA || bD)
+	m_isKeyInput = false;
+
+	auto input = Get_MoveMentInfo();
+	if (input.bAnyMovementKey)
 		m_isKeyInput = true;
 
-	// 방향 결정
-	if (bW && bA)      m_eDir = DIR::LU;
-	else if (bW && bD) m_eDir = DIR::RU;
-	else if (bS && bA) m_eDir = DIR::LD;
-	else if (bS && bD) m_eDir = DIR::RD;
-	else if (bW)       m_eDir = DIR::U;
-	else if (bS)       m_eDir = DIR::D;
-	else if (bA)       m_eDir = DIR::L;
-	else if (bD)       m_eDir = DIR::R;
+	m_eDir = input.eDirection;
 	
 
 }

@@ -10,7 +10,9 @@ public:
 	// 순서대로 벡터에 추가.
 	enum PLAYER_STATE : _int
 	{
-		IDLE = 0, WALK, RUN, SWORD_IDLE, STATE_END
+		IDLE = 0, WALK, RUN, SWORD_STRONG_ATTACK,
+		SWORD_IDLE,
+		STATE_END
 	};
 #pragma endregion
 
@@ -51,12 +53,10 @@ public:
 #pragma region PLAYER 함수 정의.
 public:
 	void HandleState(_float fTimeDelta);
-	// 애니메이션이 끝날때 받아와야한다.
 	void Change_Animation(_uint iAnimationIndex, _bool isLoop);
+	_vector  Calculate_Move_Direction(DIR eDir);
 	
 	const _bool IsLockOn() { return m_isLockOn; }
-	void LockOn() { m_isLockOn = true; }
-	void LockOff() { m_isLockOn = false; }
 #pragma endregion
 
 

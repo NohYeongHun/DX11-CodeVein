@@ -199,6 +199,7 @@
     <ClInclude Include="..\Public\PlayerState.h" />
     <ClInclude Include="..\Public\Player_IdleState.h" />
     <ClInclude Include="..\Public\Player_RunState.h" />
+    <ClInclude Include="..\Public\Player_StrongAttackState.h" />
     <ClInclude Include="..\Public\Player_WalkState.h" />
     <ClInclude Include="..\Public\SkillUI.h" />
     <ClInclude Include="..\Public\SkillUI_Icon.h" />
@@ -263,6 +264,7 @@
     <ClCompile Include="..\Private\PlayerState.cpp" />
     <ClCompile Include="..\Private\Player_IdleState.cpp" />
     <ClCompile Include="..\Private\Player_RunState.cpp" />
+    <ClCompile Include="..\Private\Player_StrongAttackState.cpp" />
     <ClCompile Include="..\Private\Player_WalkState.cpp" />
     <ClCompile Include="..\Private\SkillUI.cpp" />
     <ClCompile Include="..\Private\SkillUI_Icon.cpp" />

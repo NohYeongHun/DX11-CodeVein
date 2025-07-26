@@ -1,5 +1,7 @@
 ﻿#include "Player_IdleState.h"
 
+
+static _uint iDebugCnt = 0;
 CPlayer_IdleState::CPlayer_IdleState()
 {
 }
@@ -15,30 +17,42 @@ HRESULT CPlayer_IdleState::Initialize(_uint iStateNum, void* pArg)
 /* State 시작 시*/
 void CPlayer_IdleState::Enter(void* pArg)
 {
-	IDLE_ENTER_DESC* pDesc = static_cast<IDLE_ENTER_DESC*>(pArg);
+	if (iDebugCnt == 1)
+	{
+		static _float currentYaw = m_pPlayer->Get_Transform()->GetYawFromQuaternion();
+		OutputDebugString((L"[CPlayer_IdleState2] Player Yaw: " + std::to_wstring(XMConvertToDegrees(currentYaw)) + L"°\n").c_str());
+	}
 
+	IDLE_ENTER_DESC* pDesc = static_cast<IDLE_ENTER_DESC*>(pArg);
+	
+	//m_pModelCom->Set_RootMotionEnabled(false);
 	m_iNextIdx = -1;
 	// 애니메이션 인덱스를 변경해줍니다.
 	m_iAnimation_IdleIdx = pDesc->iAnimation_Index;
 	m_pPlayer->Change_Animation(m_iAnimation_IdleIdx, m_isLoop);
+
+	//m_pModelCom->Set_RootMotionEnabled(false);
+
 }
 
 /* State 실행 */
 void CPlayer_IdleState::Update(_float fTimeDelta)
 {
 	Handle_Input();
-
-	if (m_isKeyInput)
-	{
-		Change_State();
-	}
 }
 
 // 종료될 때 실행할 동작..
 void CPlayer_IdleState::Exit()
 {
+	// 한번만 
+	
+	iDebugCnt++;
+	//static _float currentYaw = m_pPlayer->Get_Transform()->GetYawFromQuaternion();
+	//OutputDebugString((L"[CPlayer_IdleState] Player Yaw: " + std::to_wstring(XMConvertToDegrees(currentYaw)) + L"°\n").c_str());
+
 	//if (m_iNextIdx > -1)
-	//	m_pModelCom->Change_Animation_WithBlend(m_iNextIdx, 2.f);
+	//	m_pModelCom->Change_Animation_WithBlend(m_iNextIdx, 0.2f);
+	//m_pModelCom->Set_RootMotionEnabled(true);
 }
 
 // 상태 초기화
@@ -48,15 +62,30 @@ void CPlayer_IdleState::Reset()
 	m_eDir = { DIR::END };
 }
 
-void CPlayer_IdleState::Change_State()
+void CPlayer_IdleState::Change_State(const INPUT_INFO& eInputInfo)
 {
 	CPlayer_WalkState::WALK_ENTER_DESC Walk{};
 	CPlayer_RunState::RUN_ENTER_DESC Run{};
+	CPlayer_StrongAttackState::STRONG_ENTER_DESC StrongAttack{};
 
+	INPUT_INFO realTimeInput = Get_MoveMentInfo();
 
-	m_iNextIdx = 6;
-	Run.iAnimation_Idx = 6;
-	m_pFsm->Change_State(CPlayer::PLAYER_STATE::RUN, &Run);
+	/*if (eInputInfo.bMouseL)
+	{
+		m_iNextIdx = 38;
+		Run.iAnimation_Idx = 38;
+		Run.eDirection = eInputInfo.eDirection;
+		m_pFsm->Change_State(CPlayer::PLAYER_STATE::SWORD_STRONG_ATTACK, &StrongAttack);
+	}*/
+	if (eInputInfo.bA || eInputInfo.bD || eInputInfo.bW || eInputInfo.bS)
+	{
+		m_iNextIdx = 6;
+		Run.iAnimation_Idx = 6;
+		Run.eDirection = eInputInfo.eDirection;
+		m_pFsm->Change_State(CPlayer::PLAYER_STATE::RUN, &Run);
+	}
+	
+	
 	
 }
 
@@ -65,28 +94,13 @@ void CPlayer_IdleState::Handle_Input()
 {
 	m_isKeyInput = false;
 
-	const _bool bW = m_pGameInstance->Get_KeyPress(DIK_W);
-	const _bool bS = m_pGameInstance->Get_KeyPress(DIK_S);
-	const _bool bA = m_pGameInstance->Get_KeyPress(DIK_A);
-	const _bool bD = m_pGameInstance->Get_KeyPress(DIK_D);
-	// Walk로 변경.
-
-	if (bW || bS || bA || bD)
+	auto input = Get_MoveMentInfo();
+	if (input.bAnyMovementKey)
 		m_isKeyInput = true;
 
-	// 방향 결정
-	if (bW && bA)      m_eDir = DIR::LU;
-	else if (bW && bD) m_eDir = DIR::RU;
-	else if (bS && bA) m_eDir = DIR::LD;
-	else if (bS && bD) m_eDir = DIR::RD;
-	else if (bW)       m_eDir = DIR::U;
-	else if (bS)       m_eDir = DIR::D;
-	else if (bA)       m_eDir = DIR::L;
-	else if (bD)       m_eDir = DIR::R;
+	m_eDir = input.eDirection;
 
-	
-
-
+	Change_State(input);
 }
 
 CPlayer_IdleState* CPlayer_IdleState::Create(_uint iStateNum, void* pArg)

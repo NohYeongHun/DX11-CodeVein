@@ -144,7 +144,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_Player(const _wstring& strLayerTag)
 
 
 	CCamera_Player::CAMERA_PLAYER_DESC CameraPlayerDesc{};
-	CameraPlayerDesc.vEye = _float4(0.f, 20.f, -15.f, 1.f);
+	CameraPlayerDesc.vEye = _float4(0.f, 10.f, -20.f, 1.f);
 	CameraPlayerDesc.vAt = _float4(0.f, 0.f, 0.f, 1.f);
 	CameraPlayerDesc.fFovy = XMConvertToRadians(60.0f);
 	CameraPlayerDesc.fNear = 0.1f;

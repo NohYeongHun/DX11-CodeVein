@@ -64,7 +64,6 @@ HRESULT CLoad_Model::Initialize_Prototype(MODELTYPE eModelType, _fmatrix PreTran
 			CRASH("LOAD MESH FAILED");
 	}
 
-
 	{
 		ScopedTimer LoadMaterial("Load_Materials");
 		if (FAILED(Load_Materials(ifs, textureFolderPath)))
@@ -171,7 +170,7 @@ _bool CLoad_Model::Play_Animation(_float fTimeDelta)
 	m_isFinished = false;
 	m_isTrackEnd = false;
 
-	// 변경 전 Root Bone (루트 모션용)
+	//// 변경 전 Root Bone (루트 모션용)
 	_matrix vOldRootMatrix = XMMatrixIdentity();
 	if (m_iRoot_BoneIndex < m_Bones.size())
 		vOldRootMatrix = m_Bones[m_iRoot_BoneIndex]->Get_TransformationMatrix();
@@ -186,8 +185,8 @@ _bool CLoad_Model::Play_Animation(_float fTimeDelta)
 		vNewRootMatrix = m_Bones[m_iRoot_BoneIndex]->Get_TransformationMatrix();
 
 	// 루트 모션 적용 (필요시 주석 해제)
-	 if (!m_isTrackEnd)
-	     Apply_RootMotion(vOldRootMatrix, vNewRootMatrix);
+	//if (!m_isTrackEnd)
+	//     Apply_RootMotion(vOldRootMatrix, vNewRootMatrix);
 
 	/* 바꿔야할 뼈들의 Transformation행렬이 갱신되었다면, 정점들에게 직접 전달되야할 CombinedTransformationMatrix를 만들어준다. */
 	for (auto& pBone : m_Bones)
@@ -206,22 +205,11 @@ _bool CLoad_Model::Play_Animation(_float fTimeDelta)
 
 void CLoad_Model::Blend_Animation(_float fTimeDelta)
 {
-	// 현재 있는 디버그 출력 외에 추가
-	//OutputDebugString((L"[BLEND] t: " + std::to_wstring(fTimeDelta) +
-	//	L", PrevAnim: " + std::to_wstring(m_BlendDesc.iPrevAnimIndex) +
-	//	L", NextAnim: " + std::to_wstring(m_iCurrentAnimIndex) + L"\n").c_str());
-
 	m_BlendDesc.fElapsed += fTimeDelta;
 
 	// clamp용 시간. => 보간 시간.
 	_float t = m_BlendDesc.fElapsed / m_BlendDesc.fBlendDuration;
 	t = min(t, 1.f); // clamp
-
-	// 디버그 출력
-	//if (static_cast<_uint>(m_BlendDesc.fElapsed * 10) % 5 == 0) // 0.5초마다 출력
-	//{
-	//	OutputDebugString((L"[BLEND] Progress: " + std::to_wstring(t * 100.f) + L"%\n").c_str());
-	//}
 
 	// 애니메이션 유효성 검사
 	if (m_BlendDesc.iPrevAnimIndex >= m_Animations.size() ||
@@ -236,12 +224,18 @@ void CLoad_Model::Blend_Animation(_float fTimeDelta)
 	const auto& prevAnim = m_Animations[m_BlendDesc.iPrevAnimIndex];
 	const auto& nextAnim = m_Animations[m_iCurrentAnimIndex];
 
+
+	// 디버깅 추가
+	//OutputDebugString((L"[BLEND] PrevAnimTime: " + std::to_wstring(m_BlendDesc.fPrevAnimTime) + L"\n").c_str());
+	//OutputDebugString((L"[BLEND] CurrentTime: " + std::to_wstring(nextAnim->Get_CurrentTrackPosition()) + L"\n").c_str());
+
 	// 2. 다음 애니메이션의 TrackPosition을 변경한다.
 	nextAnim->Update_TrackPosition(fTimeDelta);
 
 	// 3. 실제 블랜딩 진행.
 	for (_uint i = 0; i < m_Bones.size(); ++i)
 	{
+
 		// 4. 이 시간대에 영향받는 본을 가져온다.
 		_matrix matPrev = prevAnim->Get_BoneMatrixAtTime(i, m_BlendDesc.fPrevAnimTime);
 		_matrix matNext = nextAnim->Get_BoneMatrixAtTime(i, nextAnim->Get_CurrentTrackPosition());
@@ -286,8 +280,12 @@ void CLoad_Model::Change_Animation_WithBlend(uint32_t iNextAnimIndex, _float fBl
 		return;
 	}
 
+	//Change_Animation_Immediate(iNextAnimIndex);
+	//return;
+
 	m_BlendDesc.isBlending = true;
 	m_BlendDesc.fElapsed = 0.f;
+
 	m_BlendDesc.fBlendDuration = fBlendTime;
 
 	// 1. 현재 실행되고 있는 애니메이션 인덱스 담기.
@@ -307,6 +305,7 @@ void CLoad_Model::Change_Animation_WithBlend(uint32_t iNextAnimIndex, _float fBl
 
 	// 5. 다음 애니메이션을 처음부터 시작
 	m_Animations[iNextAnimIndex]->Reset();
+
 
 	// 6. 상태 플래그 초기화
 	m_isTrackEnd = false;
@@ -341,12 +340,6 @@ void CLoad_Model::Apply_RootMotion(_matrix matOld, _matrix matNew)
 	if (fLength > 0.001f && fLength < 10.0f) // 최소/최대 이동량 제한
 	{
 		m_pOwner->Get_Transform()->Move_Direction(vTranslate, 1.0f);
-
-		// 디버그 출력
-		/*OutputDebugString((L"[ROOT_MOTION] Translation: (" +
-			std::to_wstring(XMVectorGetX(vTranslate)) + L", " +
-			std::to_wstring(XMVectorGetZ(vTranslate)) + L"), Length: " +
-			std::to_wstring(fLength) + L"\n").c_str());*/
 	}
 
 	// 회전 처리
@@ -369,7 +362,7 @@ void CLoad_Model::Apply_RootMotion(_matrix matOld, _matrix matNew)
 				1.0f - 2.0f * (XMVectorGetY(qDelta) * XMVectorGetY(qDelta) +
 					XMVectorGetZ(qDelta) * XMVectorGetZ(qDelta)));
 
-			// 루트 모션 회전 적용 (강도 조절 가능)
+			//// 루트 모션 회전 적용 (강도 조절 가능)
 			if (fabsf(yaw) > 0.001f)
 			{
 				m_pOwner->Get_Transform()->Add_Rotation(0.0f, yaw * 0.5f, 0.0f); // 50% 강도
@@ -443,6 +436,11 @@ _vector CLoad_Model::QuaternionSlerpShortest(_vector q1, _vector q2, _float t)
 
 	// 구면 선형 보간
 	return XMQuaternionSlerp(q1, q2, t);
+}
+
+void CLoad_Model::Animation_Reset()
+{
+	m_Animations[m_iCurrentAnimIndex]->Reset();
 }
 
 

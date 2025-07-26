@@ -279,6 +279,9 @@
     <ClInclude Include="..\Public\Camera_Player.h">
       <Filter>02. GameObject\Camera\Player</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Player_StrongAttackState.h">
+      <Filter>02. GameObject\Player\State</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -452,6 +455,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Camera_Player.cpp">
       <Filter>02. GameObject\Camera\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Player_StrongAttackState.cpp">
+      <Filter>02. GameObject\Player\State</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

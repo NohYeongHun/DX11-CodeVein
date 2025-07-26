@@ -86,37 +86,71 @@ void CGameInstance::Update_Engine(_float fTimeDelta)
 {
 	m_fTimeDelta = fTimeDelta;
 
-	// Task Queue에 들어가있으면 해당 작업을 우선 처리한다.
-	if(FAILED(Task()))
+	// Task Queue 우선 처리
+	if (FAILED(Task()))
 		return;
 
+	// 1. 입력 처리
 	m_pInput_Device->Update();
 
-	/* 내 게임내에서 반복적인 갱신이 필요한 객체들이 있다라면 갱신을 여기에서 모아서 수행한다.. */
+	// 2. 게임 오브젝트 우선 업데이트
 	m_pObject_Manager->Priority_Update(fTimeDelta);
-	/* 카메라에 대한 이동 조정은 Object Manager의 Priority Update 단계에서 끝나고 
-	* 해당 단계를 이용해서 각 객체들에 적용할 행렬들을 생성해둡니다.
-	* 현재 카메라를 갱신해줍니다.
-	*/
-	m_pCamera_Manager->Update(fTimeDelta);
-	m_pPipleLine->Update();
 
-	/*
-	* 피킹 Update 진행. => 갱신된 PipeLine 정보 이용.
-	*/
-	m_pPicking->Update();
-
-	/*m_pPicking->Update();*/
-
+	// 3. 게임 오브젝트 일반 업데이트 (플레이어 움직임 완료)
 	m_pObject_Manager->Update(fTimeDelta);
+
+	// 4. 게임 오브젝트 Late 업데이트
 	m_pObject_Manager->Late_Update(fTimeDelta);
 
-	m_pCollider_Manager->Update();
-	
+	// 5. ⭐ 카메라 업데이트 (최신 플레이어 위치로 View 행렬 계산)
+	m_pCamera_Manager->Update(fTimeDelta);
 
+	// 6. ⭐ 파이프라인 업데이트 (카메라에서 설정한 View 행렬 적용)
+	m_pPipleLine->Update();
+
+	// 7. ⭐ 피킹 업데이트 (최신 View/Projection 행렬 사용)
+	m_pPicking->Update();
+
+	// 8. 충돌 처리
+	m_pCollider_Manager->Update();
+
+	// 9. 레벨 업데이트
 	m_pLevel_Manager->Update(fTimeDelta);
-	
+
 }
+
+
+//void CGameInstance::Update_Engine(_float fTimeDelta)
+//{
+//	m_fTimeDelta = fTimeDelta;
+//
+//	// Task Queue에 들어가있으면 해당 작업을 우선 처리한다.
+//	if(FAILED(Task()))
+//		return;
+//
+//	m_pInput_Device->Update();
+//
+//	/* 내 게임내에서 반복적인 갱신이 필요한 객체들이 있다라면 갱신을 여기에서 모아서 수행한다.. */
+//	m_pObject_Manager->Priority_Update(fTimeDelta);
+//	m_pCamera_Manager->Update(fTimeDelta);
+//	m_pPipleLine->Update();
+//
+//	/*
+//	* 피킹 Update 진행. => 갱신된 PipeLine 정보 이용.
+//	*/
+//	m_pPicking->Update();
+//
+//	/*m_pPicking->Update();*/
+//
+//	m_pObject_Manager->Update(fTimeDelta);
+//	m_pObject_Manager->Late_Update(fTimeDelta);
+//
+//	m_pCollider_Manager->Update();
+//	
+//
+//	m_pLevel_Manager->Update(fTimeDelta);
+//	
+//}
 
 HRESULT CGameInstance::Clear_Resources(_uint iClearLevelID)
 {
