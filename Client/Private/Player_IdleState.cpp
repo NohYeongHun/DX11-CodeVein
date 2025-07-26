@@ -17,6 +17,7 @@ void CPlayer_IdleState::Enter(void* pArg)
 {
 	IDLE_ENTER_DESC* pDesc = static_cast<IDLE_ENTER_DESC*>(pArg);
 
+	m_iNextIdx = -1;
 	// 애니메이션 인덱스를 변경해줍니다.
 	m_iAnimation_IdleIdx = pDesc->iAnimation_Index;
 	m_pPlayer->Change_Animation(m_iAnimation_IdleIdx, m_isLoop);
@@ -26,88 +27,65 @@ void CPlayer_IdleState::Enter(void* pArg)
 void CPlayer_IdleState::Update(_float fTimeDelta)
 {
 	Handle_Input();
-	if (!m_isLoop)
-		CRASH("m_is Loop Failed");
+
+	if (m_isKeyInput)
+	{
+		Change_State();
+	}
 }
 
 // 종료될 때 실행할 동작..
 void CPlayer_IdleState::Exit()
 {
-
+	//if (m_iNextIdx > -1)
+	//	m_pModelCom->Change_Animation_WithBlend(m_iNextIdx, 2.f);
 }
 
 // 상태 초기화
 void CPlayer_IdleState::Reset()
 {
+	m_iNextIdx = -1;
+	m_eDir = { DIR::END };
+}
 
+void CPlayer_IdleState::Change_State()
+{
+	CPlayer_WalkState::WALK_ENTER_DESC Walk{};
+	CPlayer_RunState::RUN_ENTER_DESC Run{};
+
+
+	m_iNextIdx = 6;
+	Run.iAnimation_Idx = 6;
+	m_pFsm->Change_State(CPlayer::PLAYER_STATE::RUN, &Run);
+	
 }
 
 // 상태 전환 구현 (키 입력 감지)
 void CPlayer_IdleState::Handle_Input()
 {
-	CPlayer_RunState::RUN_ENTER_DESC RunDesc{};
-	CPlayer_WalkState::WALK_ENTER_DESC WalkDesc{};
-	// RUNDESC 추가 예정 
+	m_isKeyInput = false;
 
-	if (m_pGameInstance->Get_KeyPress(DIK_W))
-	{
-		// SHIFT 같이 누르면 걷기.
-		if (m_pGameInstance->Get_KeyPress(DIK_LSHIFT))
-		{
-			WalkDesc.iAnimation_Idx = 13;
-			m_pFsm->Change_State(CPlayer::PLAYER_STATE::WALK, &WalkDesc);
-		}
-		else
-		{
-			RunDesc.iAnimation_Idx = 6;
-			m_pFsm->Change_State(CPlayer::PLAYER_STATE::RUN, &RunDesc);
-		}
-	}
-	else if (m_pGameInstance->Get_KeyPress(DIK_S))
-	{
-		// SHIFT 같이 누르면 걷기.
-		if (m_pGameInstance->Get_KeyPress(DIK_LSHIFT))
-		{
-			WalkDesc.iAnimation_Idx = 12;
-			m_pFsm->Change_State(CPlayer::PLAYER_STATE::WALK, &WalkDesc);
-		}
-		else
-		{
-			RunDesc.iAnimation_Idx = 4;
-			m_pFsm->Change_State(CPlayer::PLAYER_STATE::RUN, &RunDesc);
-		}
-	}
-	else if (m_pGameInstance->Get_KeyPress(DIK_A))
-	{
-		// SHIFT 같이 누르면 걷기.
-		if (m_pGameInstance->Get_KeyPress(DIK_LSHIFT))
-		{
-			WalkDesc.iAnimation_Idx = 14;
-			m_pFsm->Change_State(CPlayer::PLAYER_STATE::WALK, &WalkDesc);
-		}
-		else
-		{
-			RunDesc.iAnimation_Idx = 8;
-			m_pFsm->Change_State(CPlayer::PLAYER_STATE::RUN, &RunDesc);
-		}
-		
-	}
-	else if (m_pGameInstance->Get_KeyPress(DIK_D))
-	{
-		// SHIFT 같이 누르면 걷기.
-		if (m_pGameInstance->Get_KeyPress(DIK_LSHIFT))
-		{
-			WalkDesc.iAnimation_Idx = 15;
-			m_pFsm->Change_State(CPlayer::PLAYER_STATE::WALK, &WalkDesc);
-		}
-		else 
-		{
-			RunDesc.iAnimation_Idx = 10;
-			m_pFsm->Change_State(CPlayer::PLAYER_STATE::RUN, &RunDesc);
-		}
-		
-	}
+	const _bool bW = m_pGameInstance->Get_KeyPress(DIK_W);
+	const _bool bS = m_pGameInstance->Get_KeyPress(DIK_S);
+	const _bool bA = m_pGameInstance->Get_KeyPress(DIK_A);
+	const _bool bD = m_pGameInstance->Get_KeyPress(DIK_D);
+	// Walk로 변경.
+
+	if (bW || bS || bA || bD)
+		m_isKeyInput = true;
+
+	// 방향 결정
+	if (bW && bA)      m_eDir = DIR::LU;
+	else if (bW && bD) m_eDir = DIR::RU;
+	else if (bS && bA) m_eDir = DIR::LD;
+	else if (bS && bD) m_eDir = DIR::RD;
+	else if (bW)       m_eDir = DIR::U;
+	else if (bS)       m_eDir = DIR::D;
+	else if (bA)       m_eDir = DIR::L;
+	else if (bD)       m_eDir = DIR::R;
+
 	
+
 
 }
 

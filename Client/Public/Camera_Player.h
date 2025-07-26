@@ -7,6 +7,7 @@ public:
 	typedef struct tagCameraPlayerDesc : public CCamera::CAMERA_DESC
 	{
 		_float fMouseSensor{};
+		class CPlayer* pTarget = {};
 	}CAMERA_PLAYER_DESC;
 
 private:
@@ -24,7 +25,11 @@ public:
 
 
 private:
+	class CPlayer* m_pTarget = {};
 	_float m_fMouseSensor = {};
+	_float4 m_vTargetOffset = {};
+	_float m_fYaw = 0.f;
+	_float m_fPitch = 0.f; // 필요 
 
 public:
 	static CCamera_Player* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

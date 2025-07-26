@@ -7,6 +7,7 @@ HRESULT CPlayerState::Initialize(_uint iStateNum, void* pArg)
     m_pPlayer = dynamic_cast<CPlayer*>(pDesc->pOwner);
     m_pModelCom = dynamic_cast<CLoad_Model*>(m_pPlayer->Get_Component(TEXT("Com_Model")));
     m_pTransformCom = dynamic_cast<CTransform*>(m_pPlayer->Get_Component(TEXT("Com_Transform")));
+    m_iStateNum = iStateNum;
     if (nullptr == m_pModelCom)
     {
         CRASH("Create Failed Player State");

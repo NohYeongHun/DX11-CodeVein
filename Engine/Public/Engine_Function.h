@@ -59,6 +59,8 @@ namespace Engine
 		return (value < minV) ? minV : (value > maxV) ? maxV : value;
 	}
 
+
+
 }
 
 #endif // Engine_Function_h__

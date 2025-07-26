@@ -117,13 +117,6 @@ HRESULT CLevel_GamePlay::Ready_Layer_Camera(const _wstring& strLayerTag)
 		return E_FAIL;
 	}
 
-	if (FAILED(m_pGameInstance->Change_Camera(TEXT("FreeCamera"), ENUM_CLASS(LEVEL::GAMEPLAY))))
-	{
-		CRASH("Change Camera Failed");
-		return E_FAIL;
-	}
-
-
 	//if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel), strLayerTag,
 	//	ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_Camera_Free"), &CameraDesc )))
 	//	return E_FAIL;
@@ -148,6 +141,38 @@ HRESULT CLevel_GamePlay::Ready_Layer_Player(const _wstring& strLayerTag)
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel), strLayerTag,
 		ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_Player"), &Desc)))
 		return E_FAIL;
+
+
+	CCamera_Player::CAMERA_PLAYER_DESC CameraPlayerDesc{};
+	CameraPlayerDesc.vEye = _float4(0.f, 20.f, -15.f, 1.f);
+	CameraPlayerDesc.vAt = _float4(0.f, 0.f, 0.f, 1.f);
+	CameraPlayerDesc.fFovy = XMConvertToRadians(60.0f);
+	CameraPlayerDesc.fNear = 0.1f;
+	CameraPlayerDesc.fFar = 500.f;
+	CameraPlayerDesc.fSpeedPerSec = 10.f;
+	CameraPlayerDesc.fRotationPerSec = XMConvertToRadians(9.0f);
+	CameraPlayerDesc.fMouseSensor = 0.3f;
+	
+	list<CGameObject*> pGameObjects = m_pGameInstance->Get_Layer(ENUM_CLASS(LEVEL::GAMEPLAY), strLayerTag)->Get_GameObjects();
+	auto iter = pGameObjects.begin();
+
+	CameraPlayerDesc.pTarget = dynamic_cast<CPlayer*>(*iter);
+	if (nullptr == CameraPlayerDesc.pTarget)
+		CRASH("Failed CameraPlayer Add");
+
+	if (FAILED(m_pGameInstance->Add_Camera(TEXT("PlayerCamera"), ENUM_CLASS(LEVEL::GAMEPLAY)
+		, TEXT("Prototype_GameObject_Camera_Player"), &CameraPlayerDesc)))
+	{
+		CRASH("Add Camera Player Failed");
+		return E_FAIL;
+	}
+
+	if (FAILED(m_pGameInstance->Change_Camera(TEXT("PlayerCamera"), ENUM_CLASS(LEVEL::GAMEPLAY))))
+	{
+		CRASH("Change Camera Failed");
+		return E_FAIL;
+	}
+
 
 	return S_OK;
 }

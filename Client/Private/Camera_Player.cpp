@@ -20,6 +20,9 @@ HRESULT CCamera_Player::Initialize_Clone(void* pArg)
 	CAMERA_PLAYER_DESC* pDesc = static_cast<CAMERA_PLAYER_DESC*>(pArg);
 
 	m_fMouseSensor = pDesc->fMouseSensor;
+	m_pTarget = pDesc->pTarget;
+
+	XMStoreFloat4(&m_vTargetOffset, (XMVectorSet(0.f, 3.f, -5.f, 0.f))); // 타겟 기준 뒤에서 바라봄
 
 	if (FAILED(__super::Initialize_Clone(pArg)))
 		return E_FAIL;
@@ -40,35 +43,40 @@ void CCamera_Player::Update(_float fTimeDelta)
 {
 	__super::Update(fTimeDelta);
 
-	if (m_pGameInstance->Get_KeyPress(DIK_UPARROW))
+	// 1. 타겟 위치
+	_vector vTargetPos = m_pTarget->Get_Transform()->Get_State(STATE::POSITION);
+
+	POINT ptMouse = m_pGameInstance->Get_Mouse_Cursor(g_hWnd); // ← 여기서 가져옴
+	RECT rcClient;
+	GetClientRect(g_hWnd, &rcClient); // 클라이언트 영역 (0,0) ~ (width,height)
+
+	if (PtInRect(&rcClient, ptMouse)) // 마우스가 클라이언트 내부일 때만 회전 허용
 	{
-		m_pTransformCom->Go_Straight(fTimeDelta);
+		// 2. 마우스 입력으로 Yaw 회전 누적
+		if (_long MouseMove = m_pGameInstance->Get_DIMouseMove(MOUSEMOVESTATE::X))
+		{
+			m_fYaw += (_float)MouseMove * m_fMouseSensor * fTimeDelta;
+		}
 	}
 
-	if (m_pGameInstance->Get_KeyPress(DIK_DOWNARROW))
-	{
-		m_pTransformCom->Go_Backward(fTimeDelta);
-	}
+	
 
-	if (m_pGameInstance->Get_KeyPress(DIK_LEFTARROW))
-	{
-		m_pTransformCom->Go_Left(fTimeDelta);
-	}
-	if (m_pGameInstance->Get_KeyPress(DIK_RIGHTARROW))
-	{
-		m_pTransformCom->Go_Right(fTimeDelta);
-	} 
+	// 3. 회전 행렬 (Yaw)
+	_matrix matRotY = XMMatrixRotationY(m_fYaw);
+	_vector vRotatedOffset = XMVector3TransformNormal(XMLoadFloat4(&m_vTargetOffset), matRotY);
 
+	// 4. 카메라 위치 = 타겟 위치 + 회전된 오프셋
+	_vector vCamPos = vTargetPos + vRotatedOffset;
+	m_pTransformCom->Set_State(STATE::POSITION, vCamPos);
 
-	if (m_pGameInstance->Get_MouseKeyPress(MOUSEKEYSTATE::LB))
-	{
-		_long		MouseMove = {};
-		if (MouseMove = m_pGameInstance->Get_DIMouseMove(MOUSEMOVESTATE::X))
-			m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta * MouseMove * m_fMouseSensor);
+	// 5. 카메라가 타겟을 바라보는 방향 계산
+	_vector vLook = XMVector3Normalize(vTargetPos - vCamPos);
+	_vector vRight = XMVector3Normalize(XMVector3Cross(XMVectorSet(0.f, 1.f, 0.f, 0.f), vLook));
+	_vector vUp = XMVector3Cross(vLook, vRight);
 
-		if (MouseMove = m_pGameInstance->Get_DIMouseMove(MOUSEMOVESTATE::Y))
-			m_pTransformCom->Turn(m_pTransformCom->Get_State(STATE::RIGHT), fTimeDelta * MouseMove * m_fMouseSensor);
-	}
+	m_pTransformCom->Set_State(STATE::LOOK, vLook);
+	m_pTransformCom->Set_State(STATE::RIGHT, vRight);
+	m_pTransformCom->Set_State(STATE::UP, vUp);
 
 
 	__super::Update_PipeLines();

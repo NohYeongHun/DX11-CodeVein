@@ -42,9 +42,11 @@ public:
 
 private:
 	_uint		   m_iCurIdx = {};
-	_uint		   m_iPrevIdx = {};
+	_bool		   m_iNextIdx = {};
+	DIR			   m_eDir = { DIR::END };
 	_bool		   m_isLoop = { true };
 	_bool		   m_isKeyInput = { false };
+	
 
 public:
 	static CPlayer_WalkState* Create(_uint iStateNum, void* pArg);

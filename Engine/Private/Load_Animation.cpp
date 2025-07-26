@@ -11,10 +11,13 @@ CLoad_Animation::CLoad_Animation(const CLoad_Animation& Prototype)
     , m_iNumChannels{ Prototype.m_iNumChannels }
     , m_Channels{ Prototype.m_Channels }
     , m_CurrentKeyFrameIndices{ Prototype.m_CurrentKeyFrameIndices }
+    , m_BoneChannelCache { Prototype.m_BoneChannelCache }
 {
     strcpy_s(m_szName, Prototype.m_szName);
     for (auto& pChannel : m_Channels)
         Safe_AddRef(pChannel);
+
+
 }
 
 
@@ -57,23 +60,65 @@ void CLoad_Animation::Update_TransformationMatrices(const vector<class CLoad_Bon
         
 }
 
+// "그 시간에서의 최종 Bone 변환 행렬이 뭐야?" 라는 질문
+// → 즉, 해당 시간의 보간된 결과.
 _matrix CLoad_Animation::Get_BoneMatrixAtTime(_uint iBoneIndex, _float fCurrentTrackPosition)
 {
-    return _matrix();
+    // 해당 본의 채널을 찾기
+    CLoad_Channel* pChannel = Find_Channel(iBoneIndex);
+    if (!pChannel)
+    {
+        // 채널이 없으면 단위 행렬 반환
+        return XMMatrixIdentity();
+    }
+
+
+    if (iBoneIndex >= m_BoneChannelCache.size() || m_BoneChannelCache[iBoneIndex] == nullptr)
+        return XMMatrixIdentity(); // 해당 뼈에 대한 애니메이션 없음
+
+    return m_BoneChannelCache[iBoneIndex]->Get_TransformMatrixAtTime(fCurrentTrackPosition);
+}
+
+void CLoad_Animation::Build_BoneChannelCache(_uint iNumBones)
+{
+    m_BoneChannelCache.clear();
+    m_BoneChannelCache.resize(iNumBones, nullptr);
+
+    for (auto& pChannel : m_Channels)
+    {
+        _uint idx = pChannel->Get_BoneIndex();
+        if (idx < m_BoneChannelCache.size())
+            m_BoneChannelCache[idx] = pChannel;
+        else
+        {
+            CRASH("Get Failed Bone Index");
+            return;
+        }
+    }
 }
 
 void CLoad_Animation::Reset()
 {
     m_fCurrentTrackPosition = 0.f;
 }
-    
-// 매 프레임 RootMotion 값을 Transform에 더해줍니다.
-void CLoad_Animation::ApplyRootMotion(_float fTimeDelta)
-{
 
+void CLoad_Animation::Update_TrackPosition(_float fTimeDelta)
+{
+    m_fCurrentTrackPosition += m_fTickPerSecond * fTimeDelta;
+
+    if (m_fCurrentTrackPosition >= m_fDuration)
+    {
+        m_fCurrentTrackPosition = m_fDuration;
+    }
+}
+
+CLoad_Channel* CLoad_Animation::Find_Channel(_uint iBoneIndex)
+{
+    return m_BoneChannelCache[iBoneIndex];
 }
 
 
+   
 HRESULT CLoad_Animation::Load_Channels(std::ifstream& ifs)
 {
     ANIMATION_INFO info = {};
@@ -109,12 +154,17 @@ HRESULT CLoad_Animation::Load_Channels(std::ifstream& ifs)
     if (!ReadBytes(ifs, info.CurrentKeyFrameIndices.data(), sizeof(uint32_t) * info.iNumKeyFrameIndices))
         CRASH("READ INDICIES FAILED");
 
+    // ... 채널 로딩 완료 후
+    
+
+
     // 최근 키프레임 정보 저장.
     m_CurrentKeyFrameIndices = move(info.CurrentKeyFrameIndices);
 
     return S_OK;
 }
 
+// Bone 캐쉬용 개수 전달.
 CLoad_Animation* CLoad_Animation::Create(std::ifstream& ifs)
 {
     CLoad_Animation* pInstance = new CLoad_Animation();

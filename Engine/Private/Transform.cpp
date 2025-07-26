@@ -45,6 +45,42 @@ void CTransform::Set_State(STATE eState, _fvector vState)
 	m_bIsDirty = false; // WorldMatrix는 직접 갱신했으므로
 }
 
+_float CTransform::GetYawFromQuaternion() const
+{
+	_float w = XMVectorGetW(m_QuatRotation);
+	_float x = XMVectorGetX(m_QuatRotation);
+	_float y = XMVectorGetY(m_QuatRotation);
+	_float z = XMVectorGetZ(m_QuatRotation);
+
+	return atan2f(2.0f * (w * y + x * z), 1.0f - 2.0f * (y * y + z * z));
+}
+
+_float CTransform::GetPitchFromQuaternion() const
+{
+	float w = XMVectorGetW(m_QuatRotation);
+	_float x = XMVectorGetX(m_QuatRotation);
+	_float y = XMVectorGetY(m_QuatRotation);
+	_float z = XMVectorGetZ(m_QuatRotation);
+
+	// Pitch (X축 회전) 계산
+	_float sinp = 2.0f * (w * x - y * z);
+	if (fabsf(sinp) >= 1.0f)
+		return copysignf(XM_PIDIV2, sinp); // Gimbal lock 방지
+	else
+		return asinf(sinp);
+}
+
+_float CTransform::GetRollFromQuaternion() const
+{
+	_float w = XMVectorGetW(m_QuatRotation);
+	_float x = XMVectorGetX(m_QuatRotation);
+	_float y = XMVectorGetY(m_QuatRotation);
+	_float z = XMVectorGetZ(m_QuatRotation);
+
+	// Roll (Z축 회전) 계산
+	return atan2f(2.0f * (w * z + x * y), 1.0f - 2.0f * (x * x + z * z));
+}
+
 void CTransform::Move_Direction(_vector vDir, _float fTimeDelta)
 {
 	_vector vPos = Get_State(STATE::POSITION);
@@ -234,15 +270,15 @@ _float3 CTransform::Get_Scale()
 }
 
 /* Add Rotation */
-void CTransform::Add_Rotation(_float fYaw, _float fPitch, _float fRoll)
+void CTransform::Add_Rotation(_float fPitch, _float fYaw, _float fRoll)
 {
 	// 1. 회전 쿼터니언 생성 (Yaw-Pitch-Roll 순서)
 	_vector deltaQuat = XMQuaternionRotationRollPitchYaw(fPitch, fYaw, fRoll);
+	//_vector deltaQuat = XMQuaternionRotationRollPitchYaw(fPitch, fYaw, fRoll);
 
 	// 2. 기존 쿼터니언과 곱해 누적 (순서 주의: 새 회전을 뒤에 곱한다)
 	m_QuatRotation = XMQuaternionNormalize(XMQuaternionMultiply(m_QuatRotation, deltaQuat));
 	m_bIsDirty = true;
-	//m_isDirty = true;
 }
 
 

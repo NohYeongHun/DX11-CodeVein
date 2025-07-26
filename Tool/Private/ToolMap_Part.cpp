@@ -201,9 +201,9 @@ HRESULT CToolMap_Part::Ready_Transform(MODEL_CREATE_DESC* pDesc)
     m_pTransformCom->Scale(pDesc->vScale);
 
     if (pDesc->vRotate.x > 0.f)
-        m_pTransformCom->Add_Rotation(0.f, XMConvertToRadians(pDesc->vScale.x), 0.f);
+        m_pTransformCom->Add_Rotation(XMConvertToRadians(pDesc->vScale.x), 0.f, 0.f);
     else if (pDesc->vRotate.y > 0.f)
-        m_pTransformCom->Add_Rotation(XMConvertToRadians(pDesc->vScale.y), 0.f, 0.f);
+        m_pTransformCom->Add_Rotation(0.f, XMConvertToRadians(pDesc->vScale.y), 0.f);
     else if (pDesc->vRotate.z > 0.f)
         m_pTransformCom->Add_Rotation(0.f, 0.f, XMConvertToRadians(pDesc->vScale.z));
 

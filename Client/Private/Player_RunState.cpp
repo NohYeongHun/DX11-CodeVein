@@ -1,4 +1,5 @@
-﻿
+﻿#include "Player_RunState.h"
+
 CPlayer_RunState::CPlayer_RunState()
 {
 }
@@ -8,7 +9,6 @@ HRESULT CPlayer_RunState::Initialize(_uint iStateNum, void* pArg)
 	if (FAILED(__super::Initialize(iStateNum, pArg)))
 		return E_FAIL;
 
-
 	return S_OK;
 }
 
@@ -17,13 +17,9 @@ void CPlayer_RunState::Enter(void* pArg)
 {
 	RUN_ENTER_DESC* pDesc = static_cast<RUN_ENTER_DESC*>(pArg);
 
+	m_iNextIdx = -1;
 	// 애니메이션 인덱스를 변경해줍니다.
 	m_iCurIdx = 6;
-	//m_iCurIdx = pDesc->iAnimation_Idx;
-
-	//_wstring wstrLoop = TEXT("Loop가 안됌");
-	//if (!m_isLoop)
-	//	OutputDebugString(wstrLoop.c_str());
 
 	m_pPlayer->Change_Animation(m_iCurIdx, m_isLoop);
 
@@ -40,37 +36,52 @@ void CPlayer_RunState::Update(_float fTimeDelta)
 	if (!m_isLoop)
 		CRASH("m_is Loop Failed");
 
+	// Key Input 상태더라도? LockOn이라면 애니메이션 체인지. => Idle로
 	if (m_isKeyInput)
 	{
-		m_pPlayer->Move_By_Camera_Direction_8Way(m_eDir, fTimeDelta, 0.5f);
+		m_pPlayer->Move_By_Camera_Direction_8Way(m_eDir, fTimeDelta, 1.f);
+		/*if (m_pPlayer->IsLockOn())
+			Change_State();
+		else*/
+			
 	}
 	else
-	{
-		CPlayer_IdleState::IDLE_ENTER_DESC Desc{};
-		Desc.iAnimation_Index = 17;
-		m_pFsm->Change_State(CPlayer::PLAYER_STATE::IDLE, &Desc);
-		// Loop를 종료합니다.
-		//m_pModelCom->Set_Loop(false);
-
-		// 애니메이션이 끝났다면?
-		//if (m_pModelCom->Is_Finished())
-		//{
-		//	CPlayer_IdleState::IDLE_ENTER_DESC Desc{};
-		//	Desc.iAnimation_Index = 17;
-		//	m_pFsm->Change_State(CPlayer::PLAYER_STATE::IDLE, &Desc);
-		//}
-	}		
+		Change_State();
 }
 
 // 종료될 때 실행할 동작..
 void CPlayer_RunState::Exit()
 {
-	
+	//_wstring debug = L"to RunDebug : "+ to_wstring(m_iNextIdx) + L'\n';
+	//OutputDebugString(debug.c_str());
+	 if (m_iNextIdx > -1) // NextIndex가 있는경우 블렌딩 시작.
+    {
+        // ★★★ 블렌딩 시간을 0.2초 → 0.5초로 증가 ★★★
+        m_pModelCom->Change_Animation_WithBlend(m_iNextIdx, 0.5f);
+        
+        // ★★★ 블렌딩 시작 시 현재 플레이어 방향 저장 ★★★
+        _float currentYaw = m_pPlayer->Get_Transform()->GetYawFromQuaternion();
+        OutputDebugString((L"[BLEND START] Player Yaw: " + std::to_wstring(XMConvertToDegrees(currentYaw)) + L"°\n").c_str());
+    }
+		
 }
 
 // 상태 초기화
 void CPlayer_RunState::Reset()
 {
+	m_eDir = { DIR::END };
+	m_iCurIdx = -1;
+	m_iNextIdx = -1;
+}
+
+/* 상태에 따른 변경을 정의합니다. */
+void CPlayer_RunState::Change_State()
+{
+	CPlayer_IdleState::IDLE_ENTER_DESC Idle{};
+
+	Idle.iAnimation_Index = 17;
+	m_iNextIdx = CPlayer::PLAYER_STATE::IDLE;
+	m_pFsm->Change_State(CPlayer::PLAYER_STATE::IDLE, &Idle);
 	
 }
 
@@ -83,6 +94,7 @@ void CPlayer_RunState::Handle_Input(_float fTimeDelta)
 	const _bool bS = m_pGameInstance->Get_KeyPress(DIK_S);
 	const _bool bA = m_pGameInstance->Get_KeyPress(DIK_A);
 	const _bool bD = m_pGameInstance->Get_KeyPress(DIK_D);
+	// Walk로 변경.
 
 	if (bW || bS || bA || bD)
 		m_isKeyInput = true;

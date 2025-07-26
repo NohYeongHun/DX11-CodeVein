@@ -10,6 +10,9 @@ CPlayer::CPlayer(const CPlayer& Prototype)
 {
 }
 
+// =========================================
+// 해결책 2: 애니메이션 블렌딩 중에는 회전 제한
+// =========================================
 void CPlayer::Move_By_Camera_Direction_8Way(DIR eDir, _float fTimeDelta, _float fSpeed)
 {
     CCamera* pCamera = m_pGameInstance->Get_MainCamera();
@@ -19,7 +22,7 @@ void CPlayer::Move_By_Camera_Direction_8Way(DIR eDir, _float fTimeDelta, _float 
         return;
     }
 
-    _vector vLook = pCamera->Get_LookVector();  // Y 제거 포함된 형태여야 함
+    _vector vLook = pCamera->Get_LookVector();
     _vector vRight = pCamera->Get_RightVector();
 
     vLook = XMVectorSetY(vLook, 0.f);
@@ -28,18 +31,21 @@ void CPlayer::Move_By_Camera_Direction_8Way(DIR eDir, _float fTimeDelta, _float 
     vRight = XMVector3Normalize(vRight);
 
     _vector vMoveDir = XMVectorZero();
+    
+    Debug_CameraVectors();
 
+    // 이동은 문제가 아님.
     switch (eDir)
     {
-        case DIR::U:   vMoveDir = vLook; break;
-        case DIR::D:   vMoveDir = -vLook; break;
-        case DIR::L:   vMoveDir = -vRight; break;
-        case DIR::R:   vMoveDir = vRight; break;
-        case DIR::LU:  vMoveDir = XMVector3Normalize(vLook - vRight); break;
-        case DIR::LD:  vMoveDir = XMVector3Normalize(-vLook - vRight); break;
-        case DIR::RU:  vMoveDir = XMVector3Normalize(vLook + vRight); break;
-        case DIR::RD:  vMoveDir = XMVector3Normalize(-vLook + vRight); break;
-        default: return;
+    case DIR::U:   vMoveDir = vLook; break;
+    case DIR::D:   vMoveDir = -vLook; break;
+    case DIR::L:   vMoveDir = -vRight; break;
+    case DIR::R:   vMoveDir = vRight; break;
+    case DIR::LU:  vMoveDir = XMVector3Normalize(vLook - vRight); break;
+    case DIR::LD:  vMoveDir = XMVector3Normalize(-vLook - vRight); break;
+    case DIR::RU:  vMoveDir = XMVector3Normalize(vLook + vRight); break;
+    case DIR::RD:  vMoveDir = XMVector3Normalize(-vLook + vRight); break;
+    default: return;
     }
 
     vMoveDir = XMVectorSetY(vMoveDir, 0.f);
@@ -49,17 +55,126 @@ void CPlayer::Move_By_Camera_Direction_8Way(DIR eDir, _float fTimeDelta, _float 
 
     vMoveDir = XMVector3Normalize(vMoveDir);
 
-    // 2. 이동 방향 기준 Yaw 회전 계산
+    // 1. 목표 방향 계산
     _float x = XMVectorGetX(vMoveDir);
     _float z = XMVectorGetZ(vMoveDir);
-    _float fYaw = atan2f(x, z); // <- 회전 각도
+    _float fTargetYaw = atan2f(x, z);
 
-    // 3. 회전 쿼터니언 적용
-    _vector qRot = XMQuaternionRotationAxis(XMVectorSet(0.f, 1.f, 0.f, 0.f), fYaw);
-    m_pTransformCom->Set_Quaternion(qRot);
+    // 2. Run 애니메이션이 -Z 방향을 향하므로 180도 보정
+    _uint currentAnimIndex = m_pModelCom->Get_CurrentAnimationIndex();
+    //if (currentAnimIndex == 6) // Run 애니메이션
+    //{
+    //    fTargetYaw += XM_PI; // 180도 추가
+    //}
 
-    // 4. 이동 적용
-    m_pTransformCom->Move_Direction(vMoveDir, fTimeDelta * 0.5f);
+    // 3. 각도 정규화
+    while (fTargetYaw > XM_PI) fTargetYaw -= XM_2PI;
+    while (fTargetYaw < -XM_PI) fTargetYaw += XM_2PI;
+
+    // 4. 현재 회전과 부드러운 보간
+    _float fCurrentYaw = m_pTransformCom->GetYawFromQuaternion();
+    _float fYawDiff = fTargetYaw - fCurrentYaw;
+
+    // 최단 경로
+    while (fYawDiff > XM_PI) fYawDiff -= XM_2PI;
+    while (fYawDiff < -XM_PI) fYawDiff += XM_2PI;
+
+    // 회전 속도 조절
+    _float fRotationSpeed = 8.0f;
+    if (m_pModelCom && m_pModelCom->Is_Blending())
+    {
+        fRotationSpeed *= 0.2f;
+    }
+
+    _float fMaxRotation = fRotationSpeed * fTimeDelta;
+    if (fabsf(fYawDiff) > fMaxRotation)
+    {
+        fYawDiff = (fYawDiff > 0) ? fMaxRotation : -fMaxRotation;
+    }
+
+    // 5. 새로운 회전 적용
+    _float fNewYaw = fCurrentYaw + fYawDiff;
+    _vector qNewRot = XMQuaternionRotationAxis(XMVectorSet(0.f, 1.f, 0.f, 0.f), fNewYaw);
+    m_pTransformCom->Set_Quaternion(qNewRot);
+
+    // 6. 이동 적용
+    m_pTransformCom->Move_Direction(vMoveDir, fTimeDelta * fSpeed);
+
+    //// 디버그 출력 개선
+    //OutputDebugString((L"[FIXED] Move: (" + std::to_wstring(XMVectorGetX(vMoveDir)) +
+    //    L", " + std::to_wstring(XMVectorGetZ(vMoveDir)) +
+    //    L"), Target Yaw: " + std::to_wstring(XMConvertToDegrees(fTargetYaw)) +
+    //    L"°, Anim: " + std::to_wstring(currentAnimIndex) + L"\n").c_str());
+}
+
+void CPlayer::UpdatePlayerRotationSmooth(_vector vMoveDir, _float fTimeDelta)
+{
+    // 목표 방향 계산
+    _float x = XMVectorGetX(vMoveDir);
+    _float z = XMVectorGetZ(vMoveDir);
+    _float fTargetYaw = atan2f(x, z);
+
+    // 현재 방향
+    _float fCurrentYaw = m_pTransformCom->GetYawFromQuaternion();
+
+    // 각도 차이 (최단 경로)
+    _float fYawDiff = fTargetYaw - fCurrentYaw;
+
+    // ±180도 범위로 정규화
+    while (fYawDiff > XM_PI) fYawDiff -= XM_2PI;
+    while (fYawDiff < -XM_PI) fYawDiff += XM_2PI;
+
+    // 회전 속도 조절 (상황에 따라)
+    _float fRotationSpeed = 8.0f; // 기본 속도
+
+    // 블렌딩 중이면 회전 속도 감소
+    if (m_pModelCom && m_pModelCom->Is_Blending())
+    {
+        fRotationSpeed *= 0.3f; // 30%로 감소
+    }
+
+    // 각도 차이가 작으면 더 빠르게 (30도 = π/6 라디안)
+    if (fabsf(fYawDiff) < (XM_PI / 6.0f)) // ← 직접 계산
+    {
+        fRotationSpeed *= 2.0f;
+    }
+
+    // 최대 회전량 제한
+    _float fMaxRotation = fRotationSpeed * fTimeDelta;
+
+    if (fabsf(fYawDiff) > fMaxRotation)
+    {
+        fYawDiff = (fYawDiff > 0) ? fMaxRotation : -fMaxRotation;
+    }
+
+    // 새로운 회전 적용
+    _float fNewYaw = fCurrentYaw + fYawDiff;
+    _vector qNewRot = XMQuaternionRotationAxis(XMVectorSet(0.f, 1.f, 0.f, 0.f), fNewYaw);
+    m_pTransformCom->Set_Quaternion(qNewRot);
+}
+
+void CPlayer::Debug_CameraVectors()
+{
+    CCamera* pCamera = m_pGameInstance->Get_MainCamera();
+    if (!pCamera)
+        return;
+
+    _vector vLook = pCamera->Get_LookVector();
+    _vector vRight = pCamera->Get_RightVector();
+
+    // Y축 제거 전/후 비교
+    OutputDebugString((L"[CAM] Original Look: (" +
+        std::to_wstring(XMVectorGetX(vLook)) + L", " +
+        std::to_wstring(XMVectorGetY(vLook)) + L", " +
+        std::to_wstring(XMVectorGetZ(vLook)) + L")\n").c_str());
+
+    vLook = XMVectorSetY(vLook, 0.f);
+    vLook = XMVector3Normalize(vLook);
+
+    OutputDebugString((L"[CAM] Final Look: (" +
+        std::to_wstring(XMVectorGetX(vLook)) + L", " +
+        std::to_wstring(XMVectorGetY(vLook)) + L", " +
+        std::to_wstring(XMVectorGetZ(vLook)) + L")\n").c_str());
 }
 
 
@@ -87,11 +202,7 @@ HRESULT CPlayer::Initialize_Clone(void* pArg)
     _float3 vPos = { 0.f, 10.f, 0.f };
     m_pTransformCom->Set_State(STATE::POSITION, XMLoadFloat3(&vPos));
 
-    //m_pTransformCom->Rotation({ 0.f, 1.f, 0.f }, XMConvertToRadians(180.f));
-
-    // Player 정면 바라보게 하기?
     //m_pTransformCom->Rotation(XMVectorSet(1.f, 0.f, 0.f, 0.f), XMConvertToRadians(270.f));
-
     //m_pModelCom->Set_Animation(6, true);
     //m_pModelCom->Set_Animation(38, true);
     
@@ -103,44 +214,14 @@ HRESULT CPlayer::Initialize_Clone(void* pArg)
 void CPlayer::Priority_Update(_float fTimeDelta)
 {
     __super::Priority_Update(fTimeDelta);
-
-
-
-    /*if (m_pGameInstance->Get_KeyPress(DIK_W))
-   {
-       m_pTransformCom->Go_Straight(fTimeDelta);
-   }
-
-   if (m_pGameInstance->Get_KeyPress(DIK_S))
-   {
-       m_pTransformCom->Go_Backward(fTimeDelta);
-   }
-
-   if (m_pGameInstance->Get_KeyPress(DIK_A))
-   {
-       m_pTransformCom->Go_Left(fTimeDelta);
-   }
-
-   if (m_pGameInstance->Get_KeyPress(DIK_D))
-   {
-       m_pTransformCom->Go_Right(fTimeDelta);
-   }*/
-
 }
 
 void CPlayer::Update(_float fTimeDelta)
 {
     __super::Update(fTimeDelta);
 
-    if (nullptr != m_pFsmCom)
-        m_pFsmCom->Update(fTimeDelta);
-
-    if (true == m_pModelCom->Play_Animation(fTimeDelta))
-    {
-        int a = 0;
-    }
-
-    
+    // 플레이어 상태 제어.
+    HandleState(fTimeDelta);
 }
 
 void CPlayer::Late_Update(_float fTimeDelta)
@@ -212,6 +293,23 @@ void CPlayer::On_Collision_Exit(CGameObject* pOther)
 }
 
 #pragma region 플레이어 상태 함수들
+void CPlayer::HandleState(_float fTimeDelta)
+{
+    // Lock On 상태는 플레이어 전체에 적용되므로 플레이어가 제어.
+    if (m_pGameInstance->Get_MouseKeyUp(MOUSEKEYSTATE::MB))
+        m_isLockOn = !m_isLockOn;
+
+
+    if (nullptr != m_pFsmCom)
+        m_pFsmCom->Update(fTimeDelta);
+
+    if (true == m_pModelCom->Play_Animation(fTimeDelta))
+    {
+        int a = 0;
+    }
+
+   
+}
 void CPlayer::Change_Animation(_uint iAnimationIndex, _bool isLoop)
 {
     m_pModelCom->Set_Animation(iAnimationIndex, isLoop);

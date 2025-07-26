@@ -48,7 +48,7 @@ using namespace DirectX;
 #include <iostream>
 #include <fstream>
 #include <variant>
-
+#include <sstream>
 using namespace std;
 
 
@@ -145,6 +145,8 @@ static inline string ReadString(std::ifstream& ifs)
 
     return out;
 }
+
+
 
 
 

@@ -66,6 +66,17 @@ public:
 		m_bIsDirty = true; // 월드 행렬
 	}
 
+	_vector Get_Quaternion()
+	{
+		return m_QuatRotation;
+	}
+
+	_float  GetYawFromQuaternion() const;
+	_float  GetPitchFromQuaternion() const;
+	_float  GetRollFromQuaternion() const;
+	
+
+
 	void Move_Direction(_vector vDir, _float fTimeDelta);
 
 public:
@@ -93,10 +104,11 @@ public:
 	void Turn(_vector vAxis, _float fAngle);
 	_float3 Get_Scale();
 
-	void Add_Rotation(_float fYaw, _float _fPitch, _float fRoll);
+	void Add_Rotation(_float fPitch, _float fYaw, _float fRoll);
 	_float3 Get_EulerAngles() const;
 	void LookAt(const _float3& vTargetPos, const _float3& vUp = { 0.f, 1.f, 0.f });
 	void LookAt_YawOnly(_vector vTargetDir);
+
 
 	/*void Update_Transform();
 	void Set_Parent(CTransform* pTarget);*/

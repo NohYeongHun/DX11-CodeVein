@@ -15,6 +15,7 @@ public:
 		_float fPrevAnimTime = 0.f;
 
 		uint32_t iNextAnimIndex = 0;
+		_matrix matPrevRoot;
 	}BLEND_DESC;
 
 public:
@@ -55,9 +56,21 @@ public:
 		return m_isFinished;
 	}
 
-	void Restart_Animation();
-		
+	const _bool Is_Blending()
+	{
+		return m_isBlending;
+	}
 	
+	_uint Get_CurrentAnimationIndex()
+	{
+		return m_iCurrentAnimIndex;
+	}
+
+public:
+	void Set_RootMotionEnabled(_bool bEnable) { m_bEnableRootMotion = bEnable; }
+	void Set_RootMotionScale(_float fScale) { m_fRootMotionScale = fScale; }
+	void Set_RootRotationEnabled(_bool bEnable) { m_bEnableRootRotation = bEnable; }
+
 public:
 	const _bool Is_Ray_Hit(const _float3& rayOrigin, const _float3& rayDir, _float* pOutDist);
 
@@ -65,15 +78,23 @@ public:
 public:
 	HRESULT Bind_Materials(CShader* pShader, const _char* pConstantName, _uint iMeshIndex, aiTextureType eTextureType, _uint iTextureIndex);
 	HRESULT Bind_BoneMatrices(class CShader* pShader, const _char* pConstantName, _uint iMeshIndex);
+
+public:
+	/* 보간*/
 	_bool Play_Animation(_float fTimeDelta);
 	void Blend_Animation(_float fTimeDelta);
 	void Change_Animation_WithBlend(uint32_t iNextAnimIndex, _float fBlendTime);
 
-	void Apply_RootMotion(_vector vOld, _vector vNew);
+	void Apply_RootMotion(_matrix vOld, _matrix vNew);
+	void Change_Animation(_uint iAnimIndex, _float fBlendTime = 0.2f);
+	void Change_Animation_Immediate(_uint iAnimIndex);
+	_vector QuaternionSlerpShortest(_vector q1, _vector q2, _float t);
+
 	
 private:
 	MODELTYPE m_ModelType = {};
 	_float4x4 m_PreTransformMatrix = {};
+	
 
 private:
 	class CGameObject* m_pOwner = { nullptr };
@@ -108,7 +129,10 @@ private:
 	/* Root Bone */
 	_uint m_iRoot_BoneIndex = { };
 	_bool   m_isTrackEnd = { }; // 애니메이션 한 프레임이 종료된 상태를 저장합니다.
-	_float3 m_vAccumulatedMotion = {};
+
+	_bool m_bEnableRootMotion = true;           // 루트 모션 활성화 여부
+	_float m_fRootMotionScale = 1.0f;           // 루트 모션 스케일
+	_bool m_bEnableRootRotation = true;         // 루트 회전 활성화 여부
 	
 
 private:

@@ -40,12 +40,14 @@ public:
 	// State 초기값으로 설정
 	virtual void Reset() override;
 
+	void Change_State();
+
 public:
 	void Handle_Input(_float fTimeDelta);
 
 private:
-	_uint		   m_iCurIdx = {};
-	_uint		   m_iPrevIdx = {};
+	_int		   m_iCurIdx = {};
+	_int		   m_iNextIdx = {};
 	_bool		   m_isLoop = { true };
 	_bool		   m_isKeyInput = { false };
 	DIR			   m_eDir = { DIR::END };

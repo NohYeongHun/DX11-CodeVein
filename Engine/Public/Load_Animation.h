@@ -16,8 +16,15 @@ public:
 	void Update_TransformationMatrices(const vector<class CLoad_Bone*>& Bones, _bool isLoop, _bool* pFinished, _bool* pTrackEnd, _float fTimeDelta);
 	const _float Get_CurrentTrackPosition() { return m_fCurrentTrackPosition; }
 	_matrix Get_BoneMatrixAtTime(_uint iBoneIndex, _float fCurrentTrackPosition);
-	void Reset();
+	
 
+	/* 보간 */
+public:
+	void Build_BoneChannelCache(_uint iNumBones); // 채널과 Bone과의 관계를 캐시해두기
+	void Reset();
+	void Update_TrackPosition(_float fTimeDelta);
+	CLoad_Channel* Find_Channel(_uint iBoneIndex);
+	KEYFRAME Get_KeyFrameAtTime(_float fTime);
 
 private:
 	/* 채널 이름 */
@@ -33,6 +40,9 @@ private:
 	/* CChannel == 뼈들을 위한 상태 행렬 저장*/
 	_uint m_iNumChannels = {};
 	vector<class CLoad_Channel*> m_Channels = {};
+
+	// 본 인덱스에 맞는 채널들 캐싱
+	vector<class CLoad_Channel*> m_BoneChannelCache; 
 	// 최근에 재생한 키프레임의 인덱스들.
 	vector<_uint> m_CurrentKeyFrameIndices;
 

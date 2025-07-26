@@ -17,6 +17,7 @@ protected:
 	class CLoad_Model* m_pModelCom = { nullptr };
 	class CTransform* m_pTransformCom = { nullptr };
 	_float4 m_vMoveDir = {};
+	_bool m_LockOn = {}; // LockOn
 
 public:
 	virtual void Free() override;

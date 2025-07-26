@@ -154,84 +154,95 @@ HRESULT CLoad_Model::Bind_BoneMatrices(CShader* pShader, const _char* pConstantN
 
 _bool CLoad_Model::Play_Animation(_float fTimeDelta)
 {
-	static _bool isLoop = m_isLoop;
-
 	if (m_BlendDesc.isBlending)
 	{
 		Blend_Animation(fTimeDelta);
-		return false;
+		return false; // 블렌딩 중에는 완료되지 않은 것으로 처리
 	}
-	
+
+	// 애니메이션 유효성 검사
+	if (m_iCurrentAnimIndex >= m_Animations.size())
+	{
+		OutputDebugString(L"[ERROR] Invalid current animation index\n");
+		return true;
+	}
+
 	/* 현재 시간에 맞는 뼈의 상태대로 특정 뼈들의 TransformationMatrix를 갱신해준다. */
 	m_isFinished = false;
-
-	/* 현재 트랙이 종료되었는지 확인 */
 	m_isTrackEnd = false;
-	
-	// Loop가 무한히 반복되는 경우에. 해당 값을 이용하여 확인한다. 
-	
-	_vector vOldRootPos = m_Bones[m_iRoot_BoneIndex]->Get_TransformationMatrix().r[3];
+
+	// 변경 전 Root Bone (루트 모션용)
+	_matrix vOldRootMatrix = XMMatrixIdentity();
+	if (m_iRoot_BoneIndex < m_Bones.size())
+		vOldRootMatrix = m_Bones[m_iRoot_BoneIndex]->Get_TransformationMatrix();
 
 	m_Animations[m_iCurrentAnimIndex]->Update_TransformationMatrices(
 		m_Bones, m_isLoop, &m_isFinished, &m_isTrackEnd, fTimeDelta
 	);
 
-	_vector vNewRootPos = m_Bones[m_iRoot_BoneIndex]->Get_TransformationMatrix().r[3];
+	// 변경 이후 Root Bone 위치 (루트 모션용)
+	_matrix vNewRootMatrix = XMMatrixIdentity();
+	if (m_iRoot_BoneIndex < m_Bones.size())
+		vNewRootMatrix = m_Bones[m_iRoot_BoneIndex]->Get_TransformationMatrix();
 
-	if (!m_isTrackEnd)
-		Apply_RootMotion(vOldRootPos, vNewRootPos);
+	// 루트 모션 적용 (필요시 주석 해제)
+	 if (!m_isTrackEnd)
+	     Apply_RootMotion(vOldRootMatrix, vNewRootMatrix);
 
-	//// 2. 행렬이 변한 이후에 루트본의 matix를 가져온다.
-	//_matrix rootMatrix = m_Bones[m_iRoot_BoneIndex]->Get_TransformationMatrix();
-	////
-	//
-	////// 3. 차이값을 구한다.
-	//_vector vTranslate = vNewRootPos - vOldRootPos;
-	////
-	//vTranslate = XMVector3TransformCoord(vTranslate, XMLoadFloat4x4(&m_PreTransformMatrix));
-	//// 4. 만약 Track이 종료되었다면? => 위치를 바꿔주지않습니다.
-
-	//if (!m_isTrackEnd)
-	//{
-	//	_float fLength = XMVectorGetX(XMVector3Length(vTranslate));
-	//	if (fLength > 0.01f)  // 민감도 조정 가능
-	//		m_pOwner->Translate(vTranslate);
-	//}
-
-	//// 5. 루트본을 이동값이 지워진 위치로 재갱신합니다.
-	//rootMatrix.r[3] = vOldRootPos;
-	//m_Bones[m_iRoot_BoneIndex]->Set_TransformationMatrix(rootMatrix);	
-
-	/* 바꿔야할 뼈들의 Transforemation행렬이 갱신되었다면, 정점들에게 직접 전달되야할 CombindTransformationMatrix를 만들어준다. */
+	/* 바꿔야할 뼈들의 Transformation행렬이 갱신되었다면, 정점들에게 직접 전달되야할 CombinedTransformationMatrix를 만들어준다. */
 	for (auto& pBone : m_Bones)
 		pBone->Update_CombinedTransformationMatrix(m_PreTransformMatrix, m_Bones);
-	
-	
 
 	return m_isFinished;
 }
 
+// 1. 저번에 실행되던 애니메이션의 KeyFrame Left, Right를 가져와
+// 2. 그 두 KeyFrame을 보간해
+// 3. 보간한 KeyFrame과 내 다음 애니메이션 키프레임을 보간해.
+// 4. 문제는 PlayAnimation은 계속 실행되는거야.
+// 5. 그러므로 보간할 키프레임은 고정인데.
+// 6. 다음 애니메이션 키프레임은 계속변경됨.
+
+
 void CLoad_Model::Blend_Animation(_float fTimeDelta)
 {
+	// 현재 있는 디버그 출력 외에 추가
+	//OutputDebugString((L"[BLEND] t: " + std::to_wstring(fTimeDelta) +
+	//	L", PrevAnim: " + std::to_wstring(m_BlendDesc.iPrevAnimIndex) +
+	//	L", NextAnim: " + std::to_wstring(m_iCurrentAnimIndex) + L"\n").c_str());
+
 	m_BlendDesc.fElapsed += fTimeDelta;
-	
-	// clamp용 시간.
+
+	// clamp용 시간. => 보간 시간.
 	_float t = m_BlendDesc.fElapsed / m_BlendDesc.fBlendDuration;
 	t = min(t, 1.f); // clamp
 
+	// 디버그 출력
+	//if (static_cast<_uint>(m_BlendDesc.fElapsed * 10) % 5 == 0) // 0.5초마다 출력
+	//{
+	//	OutputDebugString((L"[BLEND] Progress: " + std::to_wstring(t * 100.f) + L"%\n").c_str());
+	//}
+
+	// 애니메이션 유효성 검사
+	if (m_BlendDesc.iPrevAnimIndex >= m_Animations.size() ||
+		m_iCurrentAnimIndex >= m_Animations.size())
+	{
+		OutputDebugString(L"[ERROR] Invalid animation indices in blending\n");
+		m_BlendDesc.isBlending = false;
+		return;
+	}
+
 	// 1. 현재 실행되었던 애니메이션.
 	const auto& prevAnim = m_Animations[m_BlendDesc.iPrevAnimIndex];
-
-	// 2. 다음 실행 애니메이션 => 이거는 같은 뼈를 공유하는 애니메이션끼리만 가능하다.
-	// 3. Idle이 존재해. 오른쪽 공격이 존재해
-	// 4. Idle로 넘어간 시점에 Idle은 오른쪽 공격에 해당하는 프레임을 가지고 있어요.
-
 	const auto& nextAnim = m_Animations[m_iCurrentAnimIndex];
+
+	// 2. 다음 애니메이션의 TrackPosition을 변경한다.
+	nextAnim->Update_TrackPosition(fTimeDelta);
 
 	// 3. 실제 블랜딩 진행.
 	for (_uint i = 0; i < m_Bones.size(); ++i)
 	{
-		// 4. 이 시간대에 영향받는 모든 본을 가져온다.
+		// 4. 이 시간대에 영향받는 본을 가져온다.
 		_matrix matPrev = prevAnim->Get_BoneMatrixAtTime(i, m_BlendDesc.fPrevAnimTime);
 		_matrix matNext = nextAnim->Get_BoneMatrixAtTime(i, nextAnim->Get_CurrentTrackPosition());
 
@@ -255,49 +266,184 @@ void CLoad_Model::Blend_Animation(_float fTimeDelta)
 	if (t >= 1.f)
 	{
 		m_BlendDesc.isBlending = false;
+		OutputDebugString(L"[BLEND] Blending completed!\n");
 	}
+
+	// 모든 본들의 CombinedTransformationMatrix 업데이트
+	for (auto& pBone : m_Bones)
+		pBone->Update_CombinedTransformationMatrix(m_PreTransformMatrix, m_Bones);
 	
 }
+
 
 // 1. Animation Blending을 위한 정보를 교체합니다.
 void CLoad_Model::Change_Animation_WithBlend(uint32_t iNextAnimIndex, _float fBlendTime)
 {
+	// 유효성 검사
+	if (iNextAnimIndex >= m_Animations.size())
+	{
+		OutputDebugString(L"[ERROR] Invalid next animation index in blend\n");
+		return;
+	}
+
 	m_BlendDesc.isBlending = true;
 	m_BlendDesc.fElapsed = 0.f;
 	m_BlendDesc.fBlendDuration = fBlendTime;
 
 	// 1. 현재 실행되고 있는 애니메이션 인덱스 담기.
 	m_BlendDesc.iPrevAnimIndex = m_iCurrentAnimIndex;
-	// 2. 현재 실행되고 있는 애니메이션의 시간 담기. => Key프레임을 가져 와야합니다.
-	m_BlendDesc.fPrevAnimTime = m_Animations[m_iCurrentAnimIndex]->Get_CurrentTrackPosition();
+
+	// 2. 현재 실행되고 있는 애니메이션의 시간 담기.
+	if (m_iCurrentAnimIndex < m_Animations.size())
+		m_BlendDesc.fPrevAnimTime = m_Animations[m_iCurrentAnimIndex]->Get_CurrentTrackPosition();
+	else
+		m_BlendDesc.fPrevAnimTime = 0.f;
+
 	// 3. 다음 실행될 애니메이션.
 	m_BlendDesc.iNextAnimIndex = iNextAnimIndex;
 
 	// 4. Animation Index를 변경.
 	m_iCurrentAnimIndex = iNextAnimIndex;
+
+	// 5. 다음 애니메이션을 처음부터 시작
 	m_Animations[iNextAnimIndex]->Reset();
+
+	// 6. 상태 플래그 초기화
 	m_isTrackEnd = false;
 	m_isFinished = false;
 }
 
-void CLoad_Model::Apply_RootMotion(_vector vOld, _vector vNew)
-{
-	_vector vTranslate = vNew - vOld;
 
-	// 모델이 PreTransformMatrix를 갖고 있으면 이를 반영
+void CLoad_Model::Apply_RootMotion(_matrix matOld, _matrix matNew)
+{
+	// 루트 모션이 비활성화되어 있으면 무시
+	if (!m_bEnableRootMotion)
+		return;
+
+	// 소유자가 없으면 무시
+	if (!m_pOwner || !m_pOwner->Get_Transform())
+		return;
+
+	// Translate
+	_vector vTranslate = matNew.r[3] - matOld.r[3];
+
+	// PreTransformMatrix 적용 (모델 좌표계 → 월드 좌표계)
 	vTranslate = XMVector3TransformCoord(vTranslate, XMLoadFloat4x4(&m_PreTransformMatrix));
 
-	// 민감도 체크
-	_float fLength = XMVectorGetX(XMVector3Length(vTranslate));
-	if (fLength > 0.01f)
-		m_pOwner->Translate(vTranslate);
+	// Y축 이동 제거 (지상 이동만)
+	vTranslate = XMVectorSetY(vTranslate, 0.f);
 
-	// 루트본의 행렬 되돌리기
-	_matrix rootMatrix = m_Bones[m_iRoot_BoneIndex]->Get_TransformationMatrix();
-	rootMatrix.r[3] = vOld;
-	m_Bones[m_iRoot_BoneIndex]->Set_TransformationMatrix(rootMatrix);
+	// 루트 모션 스케일 적용
+	vTranslate = XMVectorScale(vTranslate, m_fRootMotionScale);
+
+	// 이동량 검증 및 적용
+	_float fLength = XMVectorGetX(XMVector3Length(vTranslate));
+	if (fLength > 0.001f && fLength < 10.0f) // 최소/최대 이동량 제한
+	{
+		m_pOwner->Get_Transform()->Move_Direction(vTranslate, 1.0f);
+
+		// 디버그 출력
+		/*OutputDebugString((L"[ROOT_MOTION] Translation: (" +
+			std::to_wstring(XMVectorGetX(vTranslate)) + L", " +
+			std::to_wstring(XMVectorGetZ(vTranslate)) + L"), Length: " +
+			std::to_wstring(fLength) + L"\n").c_str());*/
+	}
+
+	// 회전 처리
+	if (m_bEnableRootRotation)
+	{
+		_vector scale, qOld, qNew, translation;
+		XMMatrixDecompose(&scale, &qOld, &translation, matOld);
+		XMMatrixDecompose(&scale, &qNew, &translation, matNew);
+
+		// 회전 차이 계산
+		_vector qDelta = XMQuaternionMultiply(XMQuaternionInverse(qOld), qNew);
+
+		// 회전량이 너무 크지 않을 때만 적용 (노이즈 방지)
+		_float rotationAngle = 2.0f * acosf(fabsf(XMVectorGetW(qDelta)));
+		if (rotationAngle < XM_PIDIV4) // 45도 이하
+		{
+			// Y축 회전만 추출 (Yaw)
+			_float yaw = atan2f(2.0f * (XMVectorGetW(qDelta) * XMVectorGetY(qDelta) +
+				XMVectorGetX(qDelta) * XMVectorGetZ(qDelta)),
+				1.0f - 2.0f * (XMVectorGetY(qDelta) * XMVectorGetY(qDelta) +
+					XMVectorGetZ(qDelta) * XMVectorGetZ(qDelta)));
+
+			// 루트 모션 회전 적용 (강도 조절 가능)
+			if (fabsf(yaw) > 0.001f)
+			{
+				m_pOwner->Get_Transform()->Add_Rotation(0.0f, yaw * 0.5f, 0.0f); // 50% 강도
+
+				OutputDebugString((L"[ROOT_MOTION] Rotation: " +
+					std::to_wstring(XMConvertToDegrees(yaw)) + L"°\n").c_str());
+			}
+		}
+	}
+
+	// 루트본 위치 복원 
+	if (m_iRoot_BoneIndex < m_Bones.size())
+	{
+		_matrix rootMatrix = m_Bones[m_iRoot_BoneIndex]->Get_TransformationMatrix();
+		rootMatrix.r[3] = matOld.r[3]; // 이전 위치로 복원
+		m_Bones[m_iRoot_BoneIndex]->Set_TransformationMatrix(rootMatrix);
+	}
+
 }
 
+void CLoad_Model::Change_Animation(_uint iAnimIndex, _float fBlendTime)
+{
+	if (fBlendTime > 0.f && m_iCurrentAnimIndex != iAnimIndex)
+		Change_Animation_WithBlend(iAnimIndex, fBlendTime);
+	else
+		Change_Animation_Immediate(iAnimIndex); // 즉시 변경 함수도 필요
+
+}
+
+void CLoad_Model::Change_Animation_Immediate(_uint iAnimIndex)
+{
+	// 블렌딩 상태 초기화
+	m_BlendDesc.isBlending = false;
+	m_BlendDesc.fElapsed = 0.f;
+
+	// 애니메이션 인덱스 변경
+	m_iCurrentAnimIndex = iAnimIndex;
+
+	// 애니메이션 리셋 (처음부터 시작)
+	if (iAnimIndex < m_Animations.size())
+	{
+		m_Animations[iAnimIndex]->Reset();
+	}
+
+	// 상태 플래그 초기화
+	m_isTrackEnd = false;
+	m_isFinished = false;
+
+	OutputDebugString((L"[INFO] Animation changed immediately to " + std::to_wstring(iAnimIndex) + L"\n").c_str());
+}
+
+_vector CLoad_Model::QuaternionSlerpShortest(_vector q1, _vector q2, _float t)
+{
+	// 내적 계산 (코사인 각도)
+	_float dot = XMVectorGetX(XMQuaternionDot(q1, q2));
+
+	// 내적이 음수면 더 긴 경로로 보간하게 되므로
+	// q2를 -q2로 바꿔서 최단 경로 선택
+	if (dot < 0.0f)
+	{
+		q2 = XMVectorNegate(q2);
+		dot = -dot;
+	}
+
+	// 거의 같은 방향이면 선형 보간 (수치 안정성)
+	if (dot > 0.9995f)
+	{
+		_vector result = XMVectorLerp(q1, q2, t);
+		return XMQuaternionNormalize(result);
+	}
+
+	// 구면 선형 보간
+	return XMQuaternionSlerp(q1, q2, t);
+}
 
 
 HRESULT CLoad_Model::Load_Meshes(_fmatrix PreTransformMatrix, std::ifstream& ifs)
@@ -387,6 +533,7 @@ HRESULT CLoad_Model::Load_Animations(std::ifstream& ifs)
 
 	for (uint32_t i = 0; i < iNumAnimations; ++i)
 	{
+
 		CLoad_Animation* pAnimation = CLoad_Animation::Create(ifs);
 		if (nullptr == pAnimation)
 			CRASH("LOAD ANIMATION FAILED");
@@ -395,6 +542,23 @@ HRESULT CLoad_Model::Load_Animations(std::ifstream& ifs)
 	}
 
 	m_iNumAnimations = iNumAnimations;
+
+	// Bone 개수 확인
+	if (m_Bones.empty())
+	{
+		OutputDebugString(L"[ERROR] No bones loaded! Cache build failed.\n");
+		return E_FAIL;
+	}
+
+	// 각 애니메이션에 대해 Bone 채널 캐싱
+	for (auto& pAnimation : m_Animations)
+	{
+		pAnimation->Build_BoneChannelCache(m_Bones.size());
+
+		// 디버그: 캐시 크기 확인
+		//OutputDebugString((L"[INFO] Animation cache built, bone count: " +
+		//	std::to_wstring(m_Bones.size()) + L"\n").c_str());
+	}
 
 	return S_OK;
 }

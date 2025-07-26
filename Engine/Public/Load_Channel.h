@@ -14,7 +14,16 @@ private:
 public:
 	HRESULT Initialize(std::ifstream& ifs);
 	void Update_TransformationMatrix(const vector<class CLoad_Bone*>& Bones, _float fCurrentTrackPosition, _uint* pCurrentKeyFrameIndex);
+	
+
+public:
+	/* 보간*/
 	_uint Get_BoneIndex() { return m_iBoneIndex; }
+	void Reset() { m_iCurrentKeyFrameIndex = 0; }
+	_matrix Get_TransformMatrixAtTime(_float fCurrentTrackPosition); // 현재 시간에 맞는 TransformMatrix를 가져옵니다.
+	KEYFRAME Get_KeyFrameAtTime(_float fTime);
+	_vector QuaternionSlerpShortest(_vector q1, _vector q2, _float t);
+
 
 private:
 	_char m_szName[MAX_PATH] = {};
