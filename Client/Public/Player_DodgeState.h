@@ -1,29 +1,29 @@
 ﻿#pragma once
 #include "PlayerState.h"
 
-/* 모든 동작의 기본이 되는 동작. */
+
 NS_BEGIN(Client)
-class CPlayer_RunState final : public CPlayerState
+class CPlayer_DodgeState final : public CPlayerState
 {
 public:
 
 
 public:
-	typedef struct tagPlayerRunEnterDesc
+	typedef struct tagPlayerDodgeEnterDesc
 	{
 		_uint iAnimation_Idx = {};
 		DIR eDirection;
-	}RUN_ENTER_DESC;
+	}DODGE_ENTER_DESC;
 
 public:
-	typedef struct tagPlayerRunStateDesc : public CPlayerState::PLAYER_STATE_DESC
+	typedef struct tagPlayerDodgeStateDesc : public CPlayerState::PLAYER_STATE_DESC
 	{
 
-	}RUNSTATE_DESC;
+	}DODGESTATE_DESC;
 
 private:
-	explicit CPlayer_RunState();
-	virtual ~CPlayer_RunState() = default;
+	explicit CPlayer_DodgeState();
+	virtual ~CPlayer_DodgeState() = default;
 
 public:
 	// 시작 초기화
@@ -41,18 +41,14 @@ public:
 	// State 초기값으로 설정
 	virtual void Reset() override;
 
-	void Change_State(_float fTimeDelta);
-
-public:
-	void Handle_Input(_float fTimeDelta);
+	void Change_State();
 
 private:
-	_bool		   m_isLoop = { true };
-	
+	DIR			   m_eDir = { DIR::END };
 	
 
 public:
-	static CPlayer_RunState* Create(_uint iStateNum, void* pArg);
+	static CPlayer_DodgeState* Create(_uint iStateNum, void* pArg);
 	virtual void Free() override;
 
 

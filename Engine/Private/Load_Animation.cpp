@@ -21,7 +21,6 @@ CLoad_Animation::CLoad_Animation(const CLoad_Animation& Prototype)
 }
 
 
-
 HRESULT CLoad_Animation::Initialize(std::ifstream& ifs)
 {
     if (FAILED(Load_Channels(ifs)))
@@ -30,13 +29,89 @@ HRESULT CLoad_Animation::Initialize(std::ifstream& ifs)
     return S_OK;
 }
 
-/* 뼈들의 m_TransformationMatrix를 애니메이터분들이 제공해준 시간에 맞는 뼈의 상태로 갱신해준다. */
-void CLoad_Animation::Update_TransformationMatrices(const vector<class CLoad_Bone*>& Bones, _bool isLoop, _bool* pFinished, _bool* pTrackEnd, _float fTimeDelta)
+void CLoad_Animation::Update_TransformationMatrices(const vector<class CLoad_Bone*>& Bones, _bool isLoop, _bool* pFinished, BLEND_DESC& blendDesc, _float fTimeDelta)
 {
-    // 1. 현재 RootPos 저장.
-
     m_fCurrentTrackPosition += m_fTickPerSecond * fTimeDelta;
-  
+
+    if (blendDesc.isBlending)
+    {
+        m_fBlendTrackPosition += fTimeDelta;
+
+        // 시간 따로 계산.
+        _float fRatio = m_fBlendTrackPosition / blendDesc.fBlendDuration;
+        fRatio = min(fRatio, 1.f);
+
+        /*_wstring wstrDebug = L"Ratio : " + to_wstring(fRatio) + L'\n';
+        OutputDebugString(wstrDebug.c_str());
+
+        _wstring wstrDuration = L"Blend Duration : " + to_wstring(blendDesc.fBlendDuration) + L'\n';
+        OutputDebugString(wstrDuration.c_str());*/
+        
+
+        // Blending 종료. => 한번에 되버리잖아?
+        if (m_fBlendTrackPosition >= blendDesc.fBlendDuration)
+            blendDesc.isBlending = false;
+        else
+        {
+            // 1. 일단 블렌딩 이전 애니메이션 Channel들을 가져오자.
+            if (nullptr == blendDesc.pLoad_Animation)
+                CRASH("Failed Blend Load Animation");
+            
+            // 나는 시간을 알고있어.
+
+            _float fPrevAnimTime = blendDesc.fPrevAnimTime;
+
+            // 2. 복사 해서 쓰는 것이 아닌 참조로
+            const vector<CLoad_Channel*>& prevAnimChannels = blendDesc.pLoad_Animation->Get_Channels();
+
+            _vector vScale, vRotation, vTranslation;
+
+            // 3. AnimChannels 로부터. KeyFrame 정보들을 가져옵니다.
+            for (_uint i = 0; i < m_iNumChannels; ++i)
+            {
+                // Prev TransformMatirx Channel.
+                KEYFRAME prevKeyFrame = prevAnimChannels[i]->Get_KeyFrameAtTime(blendDesc.fPrevAnimTime);
+                _matrix matCur = m_Channels[i]->Get_TransformMatrixAtTime(m_fCurrentTrackPosition);
+
+
+                _vector vSourScale, vDestScale;
+                _vector vSourRotation, vDestRotation;
+                _vector vSourTranslation, vDestTranslation;
+
+                vSourScale = XMLoadFloat3(&prevKeyFrame.vScale);
+                vSourRotation = XMLoadFloat4(&prevKeyFrame.vRotation);
+                vSourTranslation = XMLoadFloat3(&prevKeyFrame.vTranslation);
+
+                //XMMatrixDecompose(&vSourScale, &vSourRotation, &vSourTranslation, matPrev);
+                XMMatrixDecompose(&vDestScale, &vDestRotation, &vDestTranslation, matCur);
+
+                if (blendDesc.bScale)
+                    vScale = XMVectorLerp(vSourScale, vDestScale, fRatio);
+                else
+                    vScale = vDestScale;
+
+                if (blendDesc.bRotate)
+                    vRotation = XMQuaternionSlerp(vSourRotation, vDestRotation, fRatio);
+                else
+                    vRotation = vDestRotation;
+
+                if (blendDesc.bTranslate)
+                    vTranslation = XMVectorSetW(XMVectorLerp(vSourTranslation, vDestTranslation, fRatio), 1.f);
+                else
+                    vTranslation = vDestTranslation;
+
+                _matrix blendedMatrix = XMMatrixAffineTransformation(vScale, XMVectorZero(), vRotation, vTranslation);
+                Bones[m_Channels[i]->Get_BoneIndex()]->Set_TransformationMatrix(blendedMatrix);
+            }
+        }
+
+
+        return;
+    }
+
+
+    //m_fCurrentTrackPosition += m_fTickPerSecond * fTimeDelta;
+
     if (m_fCurrentTrackPosition >= m_fDuration)
     {
         if (false == isLoop)
@@ -47,17 +122,14 @@ void CLoad_Animation::Update_TransformationMatrices(const vector<class CLoad_Bon
         }
         else
         {
-            // Duration을 지났고 isLoop가 True라면 현재 TrackPosition을 0으로 초기화.
             m_fCurrentTrackPosition = 0.f;
         }
     }
 
-    // 여기서 Channel과 연관된 Bone의 TransformationMatrix가 변환됩니다.
     for (_uint i = 0; i < m_iNumChannels; ++i)
     {
         m_Channels[i]->Update_TransformationMatrix(Bones, m_fCurrentTrackPosition, &m_CurrentKeyFrameIndices[i]);
     }
-        
 }
 
 // "그 시간에서의 최종 Bone 변환 행렬이 뭐야?" 라는 질문
@@ -79,6 +151,8 @@ _matrix CLoad_Animation::Get_BoneMatrixAtTime(_uint iBoneIndex, _float fCurrentT
     return m_BoneChannelCache[iBoneIndex]->Get_TransformMatrixAtTime(fCurrentTrackPosition);
 }
 
+//
+
 void CLoad_Animation::Build_BoneChannelCache(_uint iNumBones)
 {
     m_BoneChannelCache.clear();
@@ -99,7 +173,12 @@ void CLoad_Animation::Build_BoneChannelCache(_uint iNumBones)
 
 void CLoad_Animation::Reset()
 {
+    m_fBlendTrackPosition = 0.f;
     m_fCurrentTrackPosition = 0.f;
+
+    for (_uint i = 0; i < m_CurrentKeyFrameIndices.size(); ++i)
+        m_CurrentKeyFrameIndices[i] = 0;
+    
 }
 
 void CLoad_Animation::Update_TrackPosition(_float fTimeDelta)
@@ -107,14 +186,19 @@ void CLoad_Animation::Update_TrackPosition(_float fTimeDelta)
     m_fCurrentTrackPosition += m_fTickPerSecond * fTimeDelta;
 
     if (m_fCurrentTrackPosition >= m_fDuration)
-    {
         m_fCurrentTrackPosition = m_fDuration;
-    }
+
+
 }
 
 CLoad_Channel* CLoad_Animation::Find_Channel(_uint iBoneIndex)
 {
     return m_BoneChannelCache[iBoneIndex];
+}
+
+_uint CLoad_Animation::Get_CurrentKeyFrame()
+{
+    return _uint();
 }
 
 
@@ -131,7 +215,7 @@ HRESULT CLoad_Animation::Load_Channels(std::ifstream& ifs)
     
     strcpy_s(m_szName, strAnimName.c_str()); // 이름 복사.
     m_fDuration = info.fDuration;
-    m_fTickPerSecond = info.fTickPerSecond;
+    m_fTickPerSecond = info.fTickPerSecond * 2.f;
     m_fCurrentTrackPosition = info.fCurrentTrackPostion;
     m_iNumChannels = info.iNumChannels;
 

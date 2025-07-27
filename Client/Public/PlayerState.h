@@ -22,18 +22,19 @@ protected:
 	virtual HRESULT Initialize(_uint iStateNum, void* pArg) override;
 
 protected:
-	INPUT_INFO Get_MoveMentInfo();
-	DIR Calculate_Direction(_bool bW, _bool bS, _bool bA, _bool bD); // 방향 계산
-
-protected:
 	class CPlayer* m_pPlayer = { nullptr };
 	class CLoad_Model* m_pModelCom = { nullptr };
 	class CTransform* m_pTransformCom = { nullptr };
+	_uint m_iNextAnimIdx = {}; // 다음 애니메이션 인덱스 => PlayerDefine.h에 정의.
+	_uint m_iCurAnimIdx = {};  // 현재 애니메이션 인덱스  => PlayerDefine.h에 정의
+	_uint m_iNextState = {};  // 다음 State => Player에 정의
+	uint16_t m_KeyInput = {};
 	_float4 m_vMoveDir = {};
 	_bool m_LockOn = {}; // LockOn
-
 	_bool m_bFirstFrame = false;
-	_bool m_bKeyState[MAX_PATH];
+	DIR	  m_eDir = { DIR::END };
+	_bool  m_isLoop = { true };
+	
 
 public:
 	virtual void Free() override;

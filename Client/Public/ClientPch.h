@@ -81,6 +81,7 @@
 #include "Player_IdleState.h"
 #include "Player_WalkState.h"
 #include "Player_RunState.h"
+#include "Player_DodgeState.h"
 #include "Player_StrongAttackState.h"
 #include "Player.h"
 

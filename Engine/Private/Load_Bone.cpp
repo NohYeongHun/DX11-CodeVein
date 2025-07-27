@@ -36,6 +36,7 @@ void CLoad_Bone::Update_CombinedTransformationMatrix(const _float4x4& PreTransfo
         * 최상위 부모 Bone에 PreTransform을 곱해줍니다.
         * 자식 객체는 부모 본의 행렬을 거듭해서 곱해지므로 PreTransform이 모두 적용됩니다.
         */
+        
         XMStoreFloat4x4(&m_CombinedTransformationMatrix, XMLoadFloat4x4(&PreTransformMatrix) * XMLoadFloat4x4(&m_TransformationMatrix));
         return;
     }

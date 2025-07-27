@@ -13,10 +13,10 @@ private:
 
 public:
 	HRESULT Initialize(std::ifstream& ifs);
-	void Update_TransformationMatrices(const vector<class CLoad_Bone*>& Bones, _bool isLoop, _bool* pFinished, _bool* pTrackEnd, _float fTimeDelta);
+	void Update_TransformationMatrices(const vector<class CLoad_Bone*>& Bones, _bool isLoop, _bool* pFinished, BLEND_DESC& blendDesc, _float fTimeDelta);
 	const _float Get_CurrentTrackPosition() { return m_fCurrentTrackPosition; }
 	_matrix Get_BoneMatrixAtTime(_uint iBoneIndex, _float fCurrentTrackPosition);
-	
+	const _float Get_Duration() { return m_fDuration; } // ⭐ 새로 추가
 
 	/* 보간 */
 public:
@@ -24,6 +24,11 @@ public:
 	void Reset();
 	void Update_TrackPosition(_float fTimeDelta);
 	CLoad_Channel* Find_Channel(_uint iBoneIndex);
+
+	const vector<class CLoad_Channel*>& Get_Channels() { return m_Channels; }
+
+	_uint Get_CurrentKeyFrame();
+
 
 private:
 	/* 채널 이름 */
@@ -34,9 +39,9 @@ private:
 	/* 초당 이동해야할 재생 거리 */
 	_float m_fTickPerSecond = {};
 	_float m_fCurrentTrackPosition = {};
+	_float m_fBlendTrackPosition = {};
 
 	/* 이 동작을 위한 뼈들의 상태 */
-	/* CChannel == 뼈들을 위한 상태 행렬 저장*/
 	_uint m_iNumChannels = {};
 	vector<class CLoad_Channel*> m_Channels = {};
 
@@ -44,9 +49,6 @@ private:
 	vector<class CLoad_Channel*> m_BoneChannelCache; 
 	// 최근에 재생한 키프레임의 인덱스들.
 	vector<_uint> m_CurrentKeyFrameIndices;
-
-private:
-	void ApplyRootMotion(_float fTimeDelta);
 
 private:
 	HRESULT Load_Channels(std::ifstream& ifs);

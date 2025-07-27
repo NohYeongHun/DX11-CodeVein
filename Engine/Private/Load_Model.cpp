@@ -16,6 +16,7 @@ CLoad_Model::CLoad_Model(const CLoad_Model& Prototype)
 	, m_iNumAnimations { Prototype.m_iNumAnimations }
 	, m_iRoot_BoneIndex {Prototype.m_iRoot_BoneIndex }
 	, m_ModelDir{ Prototype.m_ModelDir }
+	, m_vOldPos { Prototype.m_vOldPos }
 {
 
 	for (auto& pPrototypeAnimation : Prototype.m_Animations)
@@ -86,6 +87,7 @@ HRESULT CLoad_Model::Initialize_Prototype(MODELTYPE eModelType, _fmatrix PreTran
 	ifs.close();
 
 	
+	XMStoreFloat4(&m_vOldPos, m_Bones[m_iRoot_BoneIndex]->Get_TransformationMatrix().r[3]);
 
 	return S_OK;
 }
@@ -127,8 +129,6 @@ const _bool CLoad_Model::Is_Ray_Hit(const _float3& rayOrigin, const _float3& ray
 }
 
 // 1. Player에서 호출.
-
-
 HRESULT CLoad_Model::Bind_Materials(CShader* pShader, const _char* pConstantName, _uint iMeshIndex, aiTextureType eTextureType, _uint iTextureIndex)
 {
 	if (iMeshIndex >= m_iNumMeshes)
@@ -151,46 +151,64 @@ HRESULT CLoad_Model::Bind_BoneMatrices(CShader* pShader, const _char* pConstantN
 }
 
 
+// 내가 한실수는 애니메이션 굴리기전에 Root뼈를 못움직이게 해야함.
+// 애니메이션 굴린다음에 루트뼈를 못움직이게함.
+// 다른 뼈들은 이미 움직여버림.
+// 굴리기전에 이동량 죽이고 
+// => 트랜스폼에 적용하는건 움직인 정보니까.
 _bool CLoad_Model::Play_Animation(_float fTimeDelta)
 {
-	if (m_BlendDesc.isBlending)
-	{
-		Blend_Animation(fTimeDelta);
-		return false; // 블렌딩 중에는 완료되지 않은 것으로 처리
-	}
-
-	// 애니메이션 유효성 검사
-	if (m_iCurrentAnimIndex >= m_Animations.size())
-	{
-		OutputDebugString(L"[ERROR] Invalid current animation index\n");
-		return true;
-	}
-
 	/* 현재 시간에 맞는 뼈의 상태대로 특정 뼈들의 TransformationMatrix를 갱신해준다. */
 	m_isFinished = false;
 	m_isTrackEnd = false;
 
-	//// 변경 전 Root Bone (루트 모션용)
-	_matrix vOldRootMatrix = XMMatrixIdentity();
-	if (m_iRoot_BoneIndex < m_Bones.size())
-		vOldRootMatrix = m_Bones[m_iRoot_BoneIndex]->Get_TransformationMatrix();
-
+	// 2. 애니메이션을 실행합니다. => 실행하기전에 루트 움직이지마라.
+	// 여기서 블렌딩 진행.
 	m_Animations[m_iCurrentAnimIndex]->Update_TransformationMatrices(
-		m_Bones, m_isLoop, &m_isFinished, &m_isTrackEnd, fTimeDelta
+		m_Bones, m_isLoop, &m_isFinished, m_BlendDesc, fTimeDelta
 	);
 
-	// 변경 이후 Root Bone 위치 (루트 모션용)
-	_matrix vNewRootMatrix = XMMatrixIdentity();
-	if (m_iRoot_BoneIndex < m_Bones.size())
-		vNewRootMatrix = m_Bones[m_iRoot_BoneIndex]->Get_TransformationMatrix();
+	for (_uint i = 0; i < m_Bones.size(); ++i)
+	{
+		m_Bones[i]->Update_CombinedTransformationMatrix(m_PreTransformMatrix, m_Bones);
 
-	// 루트 모션 적용 (필요시 주석 해제)
-	//if (!m_isTrackEnd)
-	//     Apply_RootMotion(vOldRootMatrix, vNewRootMatrix);
+		if (i == m_iRoot_BoneIndex)
+		{
+			_matrix rootMatrix = m_Bones[i]->Get_CombinedTransformationMatrix();
+			_vector vNewRootPos = rootMatrix.r[3];
 
-	/* 바꿔야할 뼈들의 Transformation행렬이 갱신되었다면, 정점들에게 직접 전달되야할 CombinedTransformationMatrix를 만들어준다. */
-	for (auto& pBone : m_Bones)
-		pBone->Update_CombinedTransformationMatrix(m_PreTransformMatrix, m_Bones);
+			if (!m_isFinished)
+			{
+				_vector vLocalTranslate = vNewRootPos - XMLoadFloat4(&m_vOldPos);
+				vLocalTranslate = XMVectorSetY(vLocalTranslate, 0.f); // Y축 제거
+
+				// 이동량이 유효한 경우에만 적용
+				_float fLength = XMVectorGetX(XMVector3Length(vLocalTranslate));
+				if (fLength > 0.001f && fLength < 5.0f) // 과도한 이동 방지
+				{
+					// 플레이어의 현재 회전을 Root Motion에 적용
+					_matrix playerWorldMatrix = m_pOwner->Get_Transform()->Get_WorldMatrix();
+					_vector playerScale, playerRot, playerTrans;
+					XMMatrixDecompose(&playerScale, &playerRot, &playerTrans, playerWorldMatrix);
+					_matrix playerRotMatrix = XMMatrixRotationQuaternion(playerRot);
+
+					// 이동방향을 플레이어 방향으로 회전.
+					_vector vWorldTranslate = XMVector3TransformNormal(vLocalTranslate, playerRotMatrix);
+					m_pOwner->Translate(vWorldTranslate);
+				}
+
+				// 다음 프레임을 위한 위치 저장
+				XMStoreFloat4(&m_vOldPos, vNewRootPos);
+			}
+
+			  // ⭐ 루트본 위치를 항상 원점으로 리셋 (애니메이션 완료 여부와 관계없이)
+			rootMatrix.r[3] = XMVectorSet(0.f, 0.f, 0.f, 1.f);
+			m_Bones[i]->Set_CombinedTransformationMatrix(rootMatrix);
+		}
+	}
+		
+	if (m_isFinished)
+		XMStoreFloat4(&m_vOldPos, XMVectorSet(0.f, 0.f, 0.f, 1.f));
 
 	return m_isFinished;
 }
@@ -203,75 +221,8 @@ _bool CLoad_Model::Play_Animation(_float fTimeDelta)
 // 6. 다음 애니메이션 키프레임은 계속변경됨.
 
 
-void CLoad_Model::Blend_Animation(_float fTimeDelta)
-{
-	m_BlendDesc.fElapsed += fTimeDelta;
-
-	// clamp용 시간. => 보간 시간.
-	_float t = m_BlendDesc.fElapsed / m_BlendDesc.fBlendDuration;
-	t = min(t, 1.f); // clamp
-
-	// 애니메이션 유효성 검사
-	if (m_BlendDesc.iPrevAnimIndex >= m_Animations.size() ||
-		m_iCurrentAnimIndex >= m_Animations.size())
-	{
-		OutputDebugString(L"[ERROR] Invalid animation indices in blending\n");
-		m_BlendDesc.isBlending = false;
-		return;
-	}
-
-	// 1. 현재 실행되었던 애니메이션.
-	const auto& prevAnim = m_Animations[m_BlendDesc.iPrevAnimIndex];
-	const auto& nextAnim = m_Animations[m_iCurrentAnimIndex];
-
-
-	// 디버깅 추가
-	//OutputDebugString((L"[BLEND] PrevAnimTime: " + std::to_wstring(m_BlendDesc.fPrevAnimTime) + L"\n").c_str());
-	//OutputDebugString((L"[BLEND] CurrentTime: " + std::to_wstring(nextAnim->Get_CurrentTrackPosition()) + L"\n").c_str());
-
-	// 2. 다음 애니메이션의 TrackPosition을 변경한다.
-	nextAnim->Update_TrackPosition(fTimeDelta);
-
-	// 3. 실제 블랜딩 진행.
-	for (_uint i = 0; i < m_Bones.size(); ++i)
-	{
-
-		// 4. 이 시간대에 영향받는 본을 가져온다.
-		_matrix matPrev = prevAnim->Get_BoneMatrixAtTime(i, m_BlendDesc.fPrevAnimTime);
-		_matrix matNext = nextAnim->Get_BoneMatrixAtTime(i, nextAnim->Get_CurrentTrackPosition());
-
-		// Slerp or Lerp each component
-		_vector prevScale, prevRot, prevTrans;
-		_vector nextScale, nextRot, nextTrans;
-
-		XMMatrixDecompose(&prevScale, &prevRot, &prevTrans, matPrev);
-		XMMatrixDecompose(&nextScale, &nextRot, &nextTrans, matNext);
-
-		// t값을 이용해서 보간합니다.
-		_vector blendScale = XMVectorLerp(prevScale, nextScale, t);
-		_vector blendRot = XMQuaternionSlerp(prevRot, nextRot, t);
-		_vector blendTrans = XMVectorLerp(prevTrans, nextTrans, t);
-
-		_matrix blendedMat = XMMatrixAffineTransformation(blendScale, XMVectorZero(), blendRot, blendTrans);
-		m_Bones[i]->Set_TransformationMatrix(blendedMat);
-	}
-
-	// 블렌딩 시간이 다되면 Blending을 제거합니다.
-	if (t >= 1.f)
-	{
-		m_BlendDesc.isBlending = false;
-		OutputDebugString(L"[BLEND] Blending completed!\n");
-	}
-
-	// 모든 본들의 CombinedTransformationMatrix 업데이트
-	for (auto& pBone : m_Bones)
-		pBone->Update_CombinedTransformationMatrix(m_PreTransformMatrix, m_Bones);
-	
-}
-
-
-// 1. Animation Blending을 위한 정보를 교체합니다.
-void CLoad_Model::Change_Animation_WithBlend(uint32_t iNextAnimIndex, _float fBlendTime)
+// 블렌딩 상태를 저장합니다.
+void CLoad_Model::Set_BlendInfo(uint32_t iNextAnimIndex, _float fBlendTime, _bool bScale, _bool bRotation, _bool bTranslation)
 {
 	// 유효성 검사
 	if (iNextAnimIndex >= m_Animations.size())
@@ -280,139 +231,42 @@ void CLoad_Model::Change_Animation_WithBlend(uint32_t iNextAnimIndex, _float fBl
 		return;
 	}
 
-	//Change_Animation_Immediate(iNextAnimIndex);
-	//return;
-
+	// 블렌딩 플래그. 
 	m_BlendDesc.isBlending = true;
 	m_BlendDesc.fElapsed = 0.f;
-
 	m_BlendDesc.fBlendDuration = fBlendTime;
+	m_BlendDesc.bRotate = bRotation;
+	m_BlendDesc.bScale = bScale;
+	m_BlendDesc.bTranslate = bTranslation;
 
-	// 1. 현재 실행되고 있는 애니메이션 인덱스 담기.
+	// 1. 현재 실행되고 있는 애니메이션 인덱스 담기
 	m_BlendDesc.iPrevAnimIndex = m_iCurrentAnimIndex;
 
-	// 2. 현재 실행되고 있는 애니메이션의 시간 담기.
+	// 2. ⭐ 문제 2: KeepLastFrame 관련 코드 제거
 	if (m_iCurrentAnimIndex < m_Animations.size())
+	{
+		// 현재 실행되는 시간.
 		m_BlendDesc.fPrevAnimTime = m_Animations[m_iCurrentAnimIndex]->Get_CurrentTrackPosition();
+	}
 	else
 		m_BlendDesc.fPrevAnimTime = 0.f;
 
-	// 3. 다음 실행될 애니메이션.
-	m_BlendDesc.iNextAnimIndex = iNextAnimIndex;
-
-	// 4. Animation Index를 변경.
-	m_iCurrentAnimIndex = iNextAnimIndex;
-
-	// 5. 다음 애니메이션을 처음부터 시작
+	// 3. 다음 실행될 애니메이션
+	// 4. Animation Index를 변경
+	// m_iCurrentAnimIndex = iNextAnimIndex;
 	m_Animations[iNextAnimIndex]->Reset();
 
+	// 5. 사용할 Animation Pointer 전달.
+	m_BlendDesc.pLoad_Animation = m_Animations[m_iCurrentAnimIndex];
 
 	// 6. 상태 플래그 초기화
 	m_isTrackEnd = false;
 	m_isFinished = false;
-}
-
-
-void CLoad_Model::Apply_RootMotion(_matrix matOld, _matrix matNew)
-{
-	// 루트 모션이 비활성화되어 있으면 무시
-	if (!m_bEnableRootMotion)
-		return;
-
-	// 소유자가 없으면 무시
-	if (!m_pOwner || !m_pOwner->Get_Transform())
-		return;
-
-	// Translate
-	_vector vTranslate = matNew.r[3] - matOld.r[3];
-
-	// PreTransformMatrix 적용 (모델 좌표계 → 월드 좌표계)
-	vTranslate = XMVector3TransformCoord(vTranslate, XMLoadFloat4x4(&m_PreTransformMatrix));
-
-	// Y축 이동 제거 (지상 이동만)
-	vTranslate = XMVectorSetY(vTranslate, 0.f);
-
-	// 루트 모션 스케일 적용
-	vTranslate = XMVectorScale(vTranslate, m_fRootMotionScale);
-
-	// 이동량 검증 및 적용
-	_float fLength = XMVectorGetX(XMVector3Length(vTranslate));
-	if (fLength > 0.001f && fLength < 10.0f) // 최소/최대 이동량 제한
-	{
-		m_pOwner->Get_Transform()->Move_Direction(vTranslate, 1.0f);
-	}
-
-	// 회전 처리
-	if (m_bEnableRootRotation)
-	{
-		_vector scale, qOld, qNew, translation;
-		XMMatrixDecompose(&scale, &qOld, &translation, matOld);
-		XMMatrixDecompose(&scale, &qNew, &translation, matNew);
-
-		// 회전 차이 계산
-		_vector qDelta = XMQuaternionMultiply(XMQuaternionInverse(qOld), qNew);
-
-		// 회전량이 너무 크지 않을 때만 적용 (노이즈 방지)
-		_float rotationAngle = 2.0f * acosf(fabsf(XMVectorGetW(qDelta)));
-		if (rotationAngle < XM_PIDIV4) // 45도 이하
-		{
-			// Y축 회전만 추출 (Yaw)
-			_float yaw = atan2f(2.0f * (XMVectorGetW(qDelta) * XMVectorGetY(qDelta) +
-				XMVectorGetX(qDelta) * XMVectorGetZ(qDelta)),
-				1.0f - 2.0f * (XMVectorGetY(qDelta) * XMVectorGetY(qDelta) +
-					XMVectorGetZ(qDelta) * XMVectorGetZ(qDelta)));
-
-			//// 루트 모션 회전 적용 (강도 조절 가능)
-			if (fabsf(yaw) > 0.001f)
-			{
-				m_pOwner->Get_Transform()->Add_Rotation(0.0f, yaw * 0.5f, 0.0f); // 50% 강도
-
-				OutputDebugString((L"[ROOT_MOTION] Rotation: " +
-					std::to_wstring(XMConvertToDegrees(yaw)) + L"°\n").c_str());
-			}
-		}
-	}
-
-	// 루트본 위치 복원 
-	if (m_iRoot_BoneIndex < m_Bones.size())
-	{
-		_matrix rootMatrix = m_Bones[m_iRoot_BoneIndex]->Get_TransformationMatrix();
-		rootMatrix.r[3] = matOld.r[3]; // 이전 위치로 복원
-		m_Bones[m_iRoot_BoneIndex]->Set_TransformationMatrix(rootMatrix);
-	}
 
 }
 
-void CLoad_Model::Change_Animation(_uint iAnimIndex, _float fBlendTime)
-{
-	if (fBlendTime > 0.f && m_iCurrentAnimIndex != iAnimIndex)
-		Change_Animation_WithBlend(iAnimIndex, fBlendTime);
-	else
-		Change_Animation_Immediate(iAnimIndex); // 즉시 변경 함수도 필요
 
-}
 
-void CLoad_Model::Change_Animation_Immediate(_uint iAnimIndex)
-{
-	// 블렌딩 상태 초기화
-	m_BlendDesc.isBlending = false;
-	m_BlendDesc.fElapsed = 0.f;
-
-	// 애니메이션 인덱스 변경
-	m_iCurrentAnimIndex = iAnimIndex;
-
-	// 애니메이션 리셋 (처음부터 시작)
-	if (iAnimIndex < m_Animations.size())
-	{
-		m_Animations[iAnimIndex]->Reset();
-	}
-
-	// 상태 플래그 초기화
-	m_isTrackEnd = false;
-	m_isFinished = false;
-
-	OutputDebugString((L"[INFO] Animation changed immediately to " + std::to_wstring(iAnimIndex) + L"\n").c_str());
-}
 
 _vector CLoad_Model::QuaternionSlerpShortest(_vector q1, _vector q2, _float t)
 {

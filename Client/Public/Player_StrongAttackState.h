@@ -12,6 +12,7 @@ public:
 	typedef struct tagPlayerStrongAttackEnterDesc
 	{
 		_uint iAnimation_Idx = {};
+		DIR eDirection = {};
 	}STRONG_ENTER_DESC;
 
 public:

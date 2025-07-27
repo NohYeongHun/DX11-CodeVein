@@ -41,11 +41,7 @@ public:
 	void Handle_Input(_float fTimeDelta);
 
 private:
-	_uint		   m_iCurIdx = {};
-	_bool		   m_iNextIdx = {};
-	DIR			   m_eDir = { DIR::END };
-	_bool		   m_isLoop = { true };
-	_bool		   m_isKeyInput = { false };
+	
 	
 
 public:

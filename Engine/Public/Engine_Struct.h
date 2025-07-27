@@ -130,6 +130,24 @@ namespace Engine
 			printf("%s : %.3f ms\n", tag, ms);
 		}
 	}SCOPE_TIMER;
+
+	typedef struct BlendDesc
+	{
+		_bool isBlending = false;
+		_float fElapsed = 0.f;
+		_float fBlendDuration = 2.f;
+
+		uint32_t iPrevAnimIndex = 0;
+		_float fPrevAnimTime = 0.f;
+
+		uint32_t iNextAnimIndex = 0;
+		_matrix matPrevRoot;
+		class CLoad_Animation* pLoad_Animation = { nullptr };
+		_bool bScale = { true };
+		_bool bRotate = { true };
+		_bool bTranslate = { true };
+		
+	}BLEND_DESC;
 }
 
 #include "Event_Type.h"

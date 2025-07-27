@@ -25,21 +25,17 @@ HRESULT CLoad_Channel::Initialize(std::ifstream& ifs)
     return S_OK;
 }
 
-// 현재 채널이 소유한 BoneIndex만 변경한다.
+
 void CLoad_Channel::Update_TransformationMatrix(const vector<class CLoad_Bone*>& Bones, _float fCurrentTrackPosition, _uint* pCurrentKeyFrameIndex)
 {
-    
+
     if (fCurrentTrackPosition == 0.f)
         *pCurrentKeyFrameIndex = 0;
 
-    /*if (fCurrentTrackPosition == 0.f)
-        m_iCurrentKeyFrameIndex = 0;*/
+    // 나머지는 기존 코드와 동일
+    _vector vScale, vRotation, vTranslation;
 
-    /* 선택된 애니메이션이 이용하고 있는 이 뼈(Channel)의 현재 재생된 위치(fCurrrentTrackPosition)에 맞는 상태행렬을 만들어 준다. */
-    _vector         vScale, vRotation, vTranslation;
-
-    /* 마지막 키프레임상태를 취하낟. */
-    KEYFRAME        LastKeyFrame = m_KeyFrames.back();
+    KEYFRAME LastKeyFrame = m_KeyFrames.back();
 
     if (fCurrentTrackPosition >= LastKeyFrame.fTrackPosition)
     {
@@ -47,16 +43,14 @@ void CLoad_Channel::Update_TransformationMatrix(const vector<class CLoad_Bone*>&
         vRotation = XMLoadFloat4(&LastKeyFrame.vRotation);
         vTranslation = XMVectorSetW(XMLoadFloat3(&LastKeyFrame.vTranslation), 1.f);
     }
-
-    /* 양쪽 키프레임사이에서의 중간상태를 보간하여 만든다. */
     else
     {
         while (fCurrentTrackPosition >= m_KeyFrames[*pCurrentKeyFrameIndex + 1].fTrackPosition)
             ++*pCurrentKeyFrameIndex;
 
-        _vector    vSourScale, vDestScale;
-        _vector    vSourRotation, vDestRotation;
-        _vector    vSourTranslation, vDestTranslation;
+        _vector vSourScale, vDestScale;
+        _vector vSourRotation, vDestRotation;
+        _vector vSourTranslation, vDestTranslation;
 
         vSourScale = XMLoadFloat3(&m_KeyFrames[*pCurrentKeyFrameIndex].vScale);
         vSourRotation = XMLoadFloat4(&m_KeyFrames[*pCurrentKeyFrameIndex].vRotation);
@@ -66,70 +60,21 @@ void CLoad_Channel::Update_TransformationMatrix(const vector<class CLoad_Bone*>&
         vDestRotation = XMLoadFloat4(&m_KeyFrames[*pCurrentKeyFrameIndex + 1].vRotation);
         vDestTranslation = XMVectorSetW(XMLoadFloat3(&m_KeyFrames[*pCurrentKeyFrameIndex + 1].vTranslation), 1.f);
 
-        _float      fRatio = (fCurrentTrackPosition - m_KeyFrames[*pCurrentKeyFrameIndex].fTrackPosition) / (m_KeyFrames[m_iCurrentKeyFrameIndex + 1].fTrackPosition - m_KeyFrames[m_iCurrentKeyFrameIndex].fTrackPosition);
 
-        // 이게 Load_Model => Blend 보간과 동일.
+        _float      fRatio = (fCurrentTrackPosition - m_KeyFrames[*pCurrentKeyFrameIndex].fTrackPosition) / (m_KeyFrames[*pCurrentKeyFrameIndex + 1].fTrackPosition - m_KeyFrames[*pCurrentKeyFrameIndex].fTrackPosition);
+
         vScale = XMVectorLerp(vSourScale, vDestScale, fRatio);
         vRotation = XMQuaternionSlerp(vSourRotation, vDestRotation, fRatio);
         vTranslation = XMVectorSetW(XMVectorLerp(vSourTranslation, vDestTranslation, fRatio), 1.f);
-
     }
 
-    /*_matrix         TransformationMatrix = XMMatrixScaling() * XMMatrixRotationQuaternion() * XMMatrixTranslation();*/
-    _matrix         TransformationMatrix = XMMatrixAffineTransformation(vScale, XMVectorSet(0.f, 0.f, 0.f, 1.f), vRotation, vTranslation);
-
+    // 이 값을 가져와야한다?
+    _matrix TransformationMatrix = XMMatrixAffineTransformation(vScale, XMVectorSet(0.f, 0.f, 0.f, 1.f), vRotation, vTranslation);
     Bones[m_iBoneIndex]->Set_TransformationMatrix(TransformationMatrix);
 }
 
-// 현재 시간에 맞는 TransformMatrix를 KeyFrame으로부터 가져옵니다.
-// 이 Matrix는 현재 시간에 맞게 보간되어있어야함. => 사이값의 경우.
-//_matrix CLoad_Channel::Get_TransformMatrixAtTime(_float fCurrentTrackPosition)
-//{
-//    // KeyFrame이 없는 채널의 경우?
-//    if (m_KeyFrames.empty())
-//        return XMMatrixIdentity();
-//
-//    // 마지막 프레임 넘은 경우: 마지막 키프레임 값 사용
-//    if (fCurrentTrackPosition >= m_KeyFrames.back().fTrackPosition)
-//    {
-//        const auto& key = m_KeyFrames.back();
-//        return XMMatrixAffineTransformation(
-//            XMLoadFloat3(&key.vScale),
-//            XMVectorZero(),
-//            XMLoadFloat4(&key.vRotation),
-//            XMLoadFloat3(&key.vTranslation));
-//    }
-//
-//    for (_uint i = 0; i < m_KeyFrames.size() - 1; ++i)
-//    {
-//        if (fCurrentTrackPosition < m_KeyFrames[i + 1].fTrackPosition)
-//        {
-//            // 보간할 키프레임 찾기.
-//            const auto& key0 = m_KeyFrames[i];
-//            const auto& key1 = m_KeyFrames[i + 1];
-//
-//            _float delta = key1.fTrackPosition - key0.fTrackPosition;
-//            // 보간 Ratio
-//            _float t = (delta == 0.f) ? 0.f : (fCurrentTrackPosition - key0.fTrackPosition) / delta; 
-//
-//            _vector vScale = XMVectorLerp(XMLoadFloat3(&key0.vScale), XMLoadFloat3(&key1.vScale), t);
-//            _vector vRot = XMQuaternionSlerp(XMLoadFloat4(&key0.vRotation), XMLoadFloat4(&key1.vRotation), t);
-//            _vector vTrans = XMVectorLerp(XMLoadFloat3(&key0.vTranslation), XMLoadFloat3(&key1.vTranslation), t);
-//
-//            return XMMatrixAffineTransformation(vScale, XMVectorZero(), vRot, vTrans);
-//
-//        }
-//    }
-//
-//#ifdef _DEBUG
-//    CRASH("Exepection");
-//    OutputDebugStringA("CLoad_Channel::Get_TransformMatrixAtTime - KeyFrame 보간 실패\n");
-//#endif
-//    
-//
-//    return XMMatrixIdentity(); // 예외 상황
-//
-//}
+
+
 
 _matrix CLoad_Channel::Get_TransformMatrixAtTime(_float fCurrentTrackPosition)
 {
@@ -162,8 +107,7 @@ _matrix CLoad_Channel::Get_TransformMatrixAtTime(_float fCurrentTrackPosition)
 
             _vector vScale = XMVectorLerp(XMLoadFloat3(&key0.vScale), XMLoadFloat3(&key1.vScale), t);
 
-            // ★★★ 쿼터니언 최단 경로 보간 적용 ★★★
-            _vector vRot = QuaternionSlerpShortest(XMLoadFloat4(&key0.vRotation), XMLoadFloat4(&key1.vRotation), t);
+            _vector vRot = XMQuaternionSlerp(XMLoadFloat4(&key0.vRotation), XMLoadFloat4(&key1.vRotation), t);
 
             _vector vTrans = XMVectorLerp(XMLoadFloat3(&key0.vTranslation), XMLoadFloat3(&key1.vTranslation), t);
 
@@ -175,6 +119,7 @@ _matrix CLoad_Channel::Get_TransformMatrixAtTime(_float fCurrentTrackPosition)
 
 }
 
+// 현재 애니메이션의 현재 시간에맞는 키프레임 추출.
 KEYFRAME CLoad_Channel::Get_KeyFrameAtTime(_float fTime)
 {
     if (m_KeyFrames.empty())

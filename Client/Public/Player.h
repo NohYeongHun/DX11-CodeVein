@@ -7,10 +7,11 @@ class CPlayer final : public CGameObject
 
 #pragma region PLAYER STATE 정의 STATE != ANIMATION
 public:
-	// 순서대로 벡터에 추가.
+	// Add_State 순서대로 넣습니다.
 	enum PLAYER_STATE : _int
 	{
-		IDLE = 0, WALK, RUN, SWORD_STRONG_ATTACK,
+		IDLE = 0, WALK, RUN, DODGE,
+		SWORD_STRONG_ATTACK,
 		SWORD_IDLE,
 		STATE_END
 	};
@@ -57,6 +58,27 @@ public:
 	_vector  Calculate_Move_Direction(DIR eDir);
 	
 	const _bool IsLockOn() { return m_isLockOn; }
+
+public:
+	// 키 입력 상태 확인 함수들
+	uint16_t Get_KeyInput() { return m_KeyInput;  }
+
+	_bool Is_KeyPressed(PLAYER_KEY ePlayerKey) const { 
+		return (m_KeyInput & static_cast<uint16_t>(ePlayerKey)) != 0;
+	}
+
+	// 움직임 키 확인
+	_bool Is_MovementKeyPressed() const {
+		return Is_KeyPressed(PLAYER_KEY::MOVE_FORWARD) ||
+			Is_KeyPressed(PLAYER_KEY::MOVE_BACKWARD) ||
+			Is_KeyPressed(PLAYER_KEY::MOVE_LEFT) ||
+			Is_KeyPressed(PLAYER_KEY::MOVE_RIGHT);
+	}
+	DIR Get_Direction() { return m_eCurrentDirection; }
+
+private:
+	DIR Calculate_Direction();
+	void Update_KeyInput();
 #pragma endregion
 
 
@@ -72,6 +94,14 @@ private:
 	/* 상태 정의 */
 	_bool m_isLockOn = { false };
 
+
+private:
+	/* 키 코드 상태 16개 까지 관리 */
+	uint16_t m_KeyInput = {};
+	// 키 매핑 테이블 (PLAYER_KEY -> DirectInput 키코드)
+	static const _uint m_KeyboardMappingsCount;
+	static const pair<PLAYER_KEY, _ubyte> m_KeyboardMappings[];
+	DIR m_eCurrentDirection = {};
 
 private:
 	HRESULT Ready_Components(PLAYER_DESC* pDesc);

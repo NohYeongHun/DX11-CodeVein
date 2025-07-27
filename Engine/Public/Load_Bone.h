@@ -41,6 +41,11 @@ public:
 		XMStoreFloat4x4(&m_TransformationMatrix, TransformationMatrix);
 	}
 
+	void Set_CombinedTransformationMatrix(_fmatrix CombinedTransformationMatrix)
+	{
+		XMStoreFloat4x4(&m_CombinedTransformationMatrix, CombinedTransformationMatrix);
+	}
+
 	_bool Compare_Name(const _char* pName)
 	{
 		return !strcmp(pName, m_szName);

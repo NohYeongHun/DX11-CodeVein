@@ -1,5 +1,25 @@
 ﻿#include "Player.h"
 
+#pragma region KEY CODE 미리 정의
+const _uint CPlayer::m_KeyboardMappingsCount = 12;
+const std::pair<PLAYER_KEY, _ubyte> CPlayer::m_KeyboardMappings[] = {
+    { PLAYER_KEY::MOVE_FORWARD,  DIK_W },
+    { PLAYER_KEY::MOVE_BACKWARD, DIK_S },
+    { PLAYER_KEY::MOVE_LEFT,     DIK_A },
+    { PLAYER_KEY::MOVE_RIGHT,    DIK_D },
+    { PLAYER_KEY::DODGE,         DIK_SPACE },
+    { PLAYER_KEY::INTERACT,      DIK_F },
+    { PLAYER_KEY::INVENTORY,     DIK_I },
+    { PLAYER_KEY::SKILL_1,       DIK_Z },
+    { PLAYER_KEY::SKILL_2,       DIK_X },
+    { PLAYER_KEY::SKILL_3,       DIK_C },
+    { PLAYER_KEY::SKILL_4,       DIK_V },
+    { PLAYER_KEY::CROUCH,        DIK_LCONTROL }
+};
+#pragma endregion
+
+
+
 CPlayer::CPlayer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CGameObject(pDevice, pContext)
 {
@@ -12,88 +32,6 @@ CPlayer::CPlayer(const CPlayer& Prototype)
 
 /* 이동 함수 8방향 .*/
 #pragma region 움직임 구현
-//void CPlayer::Move_By_Camera_Direction_8Way(DIR eDir, _float fTimeDelta, _float fSpeed)
-//{
-//    CCamera* pCamera = m_pGameInstance->Get_MainCamera();
-//    if (!pCamera)
-//    {
-//        CRASH("Camera Not Found");
-//        return;
-//    }
-//
-//    _vector vLook = pCamera->Get_LookVector();
-//    _vector vRight = pCamera->Get_RightVector();
-//
-//    vLook = XMVectorSetY(vLook, 0.f);
-//    vRight = XMVectorSetY(vRight, 0.f);
-//    vLook = XMVector3Normalize(vLook);
-//    vRight = XMVector3Normalize(vRight);
-//
-//    _vector vMoveDir = XMVectorZero();
-//
-//    //Debug_CameraVectors();
-//
-//    // 이동은 문제가 아님.
-//    switch (eDir)
-//    {
-//    case DIR::U:   vMoveDir = vLook; break;
-//    case DIR::D:   vMoveDir = -vLook; break;
-//    case DIR::L:   vMoveDir = -vRight; break;
-//    case DIR::R:   vMoveDir = vRight; break;
-//    case DIR::LU:  vMoveDir = XMVector3Normalize(vLook - vRight); break;
-//    case DIR::LD:  vMoveDir = XMVector3Normalize(-vLook - vRight); break;
-//    case DIR::RU:  vMoveDir = XMVector3Normalize(vLook + vRight); break;
-//    case DIR::RD:  vMoveDir = XMVector3Normalize(-vLook + vRight); break;
-//    default: return;
-//    }
-//
-//    vMoveDir = XMVectorSetY(vMoveDir, 0.f);
-//
-//    if (XMVector3Equal(vMoveDir, XMVectorZero()))
-//        return;
-//
-//    vMoveDir = XMVector3Normalize(vMoveDir);
-//
-//    // 1. 목표 방향 계산
-//    _float x = XMVectorGetX(vMoveDir);
-//    _float z = XMVectorGetZ(vMoveDir);
-//    _float fTargetYaw = atan2f(x, z);
-//
-//    // 2. 각도 정규화
-//    while (fTargetYaw > XM_PI) fTargetYaw -= XM_2PI;
-//    while (fTargetYaw < -XM_PI) fTargetYaw += XM_2PI;
-//
-//    // 3. 현재 회전과 부드러운 보간
-//    _float fCurrentYaw = m_pTransformCom->GetYawFromQuaternion();
-//    _float fYawDiff = fTargetYaw - fCurrentYaw;
-//
-//    // 최단 경로
-//    while (fYawDiff > XM_PI) fYawDiff -= XM_2PI;
-//    while (fYawDiff < -XM_PI) fYawDiff += XM_2PI;
-//
-//    // 회전 속도 조절
-//    _float fRotationSpeed = 8.0f;
-//    if (m_pModelCom && m_pModelCom->Is_Blending())
-//    {
-//        fRotationSpeed *= 0.2f;
-//    }
-//
-//    _float fMaxRotation = fRotationSpeed * fTimeDelta;
-//    if (fabsf(fYawDiff) > fMaxRotation)
-//    {
-//        fYawDiff = (fYawDiff > 0) ? fMaxRotation : -fMaxRotation;
-//    }
-//
-//    // 5. 새로운 회전 적용
-//    _float fNewYaw = fCurrentYaw + fYawDiff;
-//    _vector qNewRot = XMQuaternionRotationAxis(XMVectorSet(0.f, 1.f, 0.f, 0.f), fNewYaw);
-//    m_pTransformCom->Set_Quaternion(qNewRot);
-//
-//    // 6. 이동 적용
-//    m_pTransformCom->Move_Direction(vMoveDir, fTimeDelta * fSpeed);
-//
-//}
-
 void CPlayer::Move_By_Camera_Direction_8Way(DIR eDir, _float fTimeDelta, _float fSpeed)
 {
     CCamera* pCamera = m_pGameInstance->Get_MainCamera();
@@ -252,8 +190,6 @@ void CPlayer::Debug_CameraVectors()
 #pragma endregion
 
 
-
-
 HRESULT CPlayer::Initialize_Prototype()
 {
     if (FAILED(__super::Initialize_Prototype()))
@@ -292,6 +228,8 @@ void CPlayer::Priority_Update(_float fTimeDelta)
 void CPlayer::Update(_float fTimeDelta)
 {
     __super::Update(fTimeDelta);
+    // 플레이어 Input 제어.
+    Update_KeyInput();
 
     // 플레이어 상태 제어.
     HandleState(fTimeDelta);
@@ -318,8 +256,10 @@ HRESULT CPlayer::Render()
 
     ImGui::Begin("Debug", nullptr, ImGuiWindowFlags_NoCollapse);
     _float3 vPos = {};
+    _float3 vAngle = {};
     XMStoreFloat3(&vPos, m_pTransformCom->Get_State(STATE::POSITION));
     ImGui::Text("Player Pos: (%.2f, %.2f, %.2f)", vPos.x, vPos.y, vPos.z);
+    //ImGui::Text("Player Rotation : (%.2f, %.2f, %.2f)", vPos.x, vPos.y, vPos.z);
     ImGui::End();
 #endif // _DEBUG
 
@@ -375,7 +315,7 @@ void CPlayer::HandleState(_float fTimeDelta)
 
     if (true == m_pModelCom->Play_Animation(fTimeDelta))
     {
-        m_pModelCom->Animation_Reset();
+        //m_pModelCom->Animation_Reset();
     }
 
    
@@ -399,12 +339,7 @@ _vector CPlayer::Calculate_Move_Direction(DIR eDir)
     switch (eDir)
     {
     case DIR::U:   return vLook;
-    case DIR::D: {
-
-        OutputDebugString(L"[CALC_MOVE] Direction: D (Backward)\n");
-        return -vLook;
-        break;
-    }
+    case DIR::D:   return -vLook;
     case DIR::L:   return -vRight;
     case DIR::R:   return vRight;
     case DIR::LU:  return XMVector3Normalize(vLook - vRight);
@@ -414,6 +349,52 @@ _vector CPlayer::Calculate_Move_Direction(DIR eDir)
     default: return XMVectorZero();
     }
 
+}
+void CPlayer::Update_KeyInput()
+{
+
+    // 이전 프레임 키 상태 초기화
+    m_KeyInput = 0;
+
+    // 키보드 키만 순회
+    for (_uint i = 0; i < m_KeyboardMappingsCount; ++i)
+    {
+        const auto& keyMapping = m_KeyboardMappings[i];
+        if (m_pGameInstance->Get_KeyPress(keyMapping.second))
+        {
+            m_KeyInput |= static_cast<uint16_t>(keyMapping.first);
+        }
+    }
+
+    // 마우스 입력 확인
+    if (m_pGameInstance->Get_MouseKeyPress(MOUSEKEYSTATE::LB))
+        m_KeyInput |= static_cast<uint16_t>(PLAYER_KEY::ATTACK);
+    if (m_pGameInstance->Get_MouseKeyPress(MOUSEKEYSTATE::MB))  // ⭐ MB로 수정!
+        m_KeyInput |= static_cast<uint16_t>(PLAYER_KEY::LOCK_ON);
+    if (m_pGameInstance->Get_MouseKeyPress(MOUSEKEYSTATE::RB))
+        m_KeyInput |= static_cast<uint16_t>(PLAYER_KEY::STRONG_ATTACK);
+
+    // 방향 계산 추가
+    m_eCurrentDirection = Calculate_Direction();
+}
+DIR CPlayer::Calculate_Direction()
+{
+    _bool bW = Is_KeyPressed(PLAYER_KEY::MOVE_FORWARD);
+    _bool bS = Is_KeyPressed(PLAYER_KEY::MOVE_BACKWARD);
+    _bool bA = Is_KeyPressed(PLAYER_KEY::MOVE_LEFT);
+    _bool bD = Is_KeyPressed(PLAYER_KEY::MOVE_RIGHT);
+
+    // 방향 결정
+    if (bW && bA)      return DIR::LU;
+    else if (bW && bD) return DIR::RU;
+    else if (bS && bA) return DIR::LD;
+    else if (bS && bD) return DIR::RD;
+    else if (bW)       return DIR::U;
+    else if (bS)       return DIR::D;
+    else if (bA)       return DIR::L;
+    else if (bD)       return DIR::R;
+
+    return DIR::END;
 }
 #pragma endregion
 
@@ -456,15 +437,18 @@ HRESULT CPlayer::Ready_Fsm()
     m_pFsmCom->Add_State(CPlayer_IdleState::Create(PLAYER_STATE::IDLE, &PlayerDesc));
     m_pFsmCom->Add_State(CPlayer_WalkState::Create(PLAYER_STATE::WALK, &PlayerDesc));
     m_pFsmCom->Add_State(CPlayer_RunState::Create(PLAYER_STATE::RUN, &PlayerDesc));
+    m_pFsmCom->Add_State(CPlayer_DodgeState::Create(PLAYER_STATE::DODGE, &PlayerDesc));
     m_pFsmCom->Add_State(CPlayer_StrongAttackState::Create(PLAYER_STATE::SWORD_STRONG_ATTACK, &PlayerDesc));
+    
 
     CPlayer_IdleState::IDLE_ENTER_DESC enter{};
     enter.iAnimation_Index = 17;
 
     CPlayer_RunState::RUN_ENTER_DESC Run{};
+    Run.iAnimation_Idx = 6;
     m_pFsmCom->Change_State(PLAYER_STATE::RUN, &Run);
 
-    //m_pFsmCom->Change_State(PLAYER_STATE::IDLE, &enter);
+    m_pFsmCom->Change_State(PLAYER_STATE::IDLE, &enter);
     return S_OK;
 }
 

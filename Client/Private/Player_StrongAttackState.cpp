@@ -17,11 +17,13 @@ void CPlayer_StrongAttackState::Enter(void* pArg)
 {
 	STRONG_ENTER_DESC* pDesc = static_cast<STRONG_ENTER_DESC*>(pArg);
 
+	m_isLoop = false;
+
 	m_iNextIdx = -1;
 	// 애니메이션 인덱스를 변경해줍니다.
-	m_iCurIdx = 38;
-
-	m_pPlayer->Change_Animation(m_iCurIdx, false);
+	m_iCurAnimIdx = pDesc->iAnimation_Idx;
+	m_eDir = pDesc->eDirection;
+	m_pModelCom->Set_Animation(m_iCurAnimIdx, m_isLoop);
 
 	// 이 때 검에 콜라이더 활성화 이런 과정 진행
 }
@@ -33,6 +35,7 @@ void CPlayer_StrongAttackState::Update(_float fTimeDelta)
 
 	if (m_pModelCom->Is_Finished())
 	{
+		m_iNextAnimIdx = 17;
 		Idle.iAnimation_Index = 17;
 		m_iNextIdx = 17; // Blend용 Next Animation
 		m_pFsm->Change_State(CPlayer::PLAYER_STATE::IDLE, &Idle);
@@ -44,7 +47,14 @@ void CPlayer_StrongAttackState::Exit()
 {
 	//if (m_iNextIdx > -1) // NextIndex가 있는경우 블렌딩 시작.
 	//	m_pModelCom->Change_Animation_WithBlend(m_iNextIdx, 0.5f);
+	// 여기서 동작해야합니다.
+	if (m_iNextState != -1) // NextIndex가 있는경우 블렌딩 시작.
+	{
+		if (m_iNextState == CPlayer::PLAYER_STATE::IDLE)
+			m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, false);
 
+		m_pModelCom->Animation_Reset();
+	}
 	
 }
 

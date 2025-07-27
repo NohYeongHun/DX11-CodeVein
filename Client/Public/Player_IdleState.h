@@ -37,16 +37,14 @@ public:
 	// State 초기값으로 설정
 	virtual void Reset() override;
 
-	void Change_State(const INPUT_INFO& eInputInfo);
+	void Change_State();
 
 public:
 	void Handle_Input();
 
 private:
-	_uint          m_iAnimation_IdleIdx = { };
 	_bool		   m_isLoop = { true }; // Loop 상태인가?
 	_bool		   m_isKeyInput = { false };
-	_int		   m_iNextIdx = { -1};
 	DIR			   m_eDir = { DIR::END };
 
 public:

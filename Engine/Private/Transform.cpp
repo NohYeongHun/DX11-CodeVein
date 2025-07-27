@@ -88,9 +88,13 @@ _float CTransform::GetRollFromQuaternion() const
 
 void CTransform::Move_Direction(_vector vDir, _float fTimeDelta)
 {
-	_vector vPos = Get_State(STATE::POSITION);
-	vPos += vDir * (m_fSpeedPerSec * fTimeDelta);
-	Set_State(STATE::POSITION, vPos);
+	_vector vMovement = vDir * (m_fSpeedPerSec * fTimeDelta);
+
+	m_vPosition.x += XMVectorGetX(vMovement);
+	m_vPosition.y += XMVectorGetY(vMovement);
+	m_vPosition.z += XMVectorGetZ(vMovement);
+
+	m_bIsDirty = true;
 }
 
 HRESULT CTransform::Initialize_Prototype()

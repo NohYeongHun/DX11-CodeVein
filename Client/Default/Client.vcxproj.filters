@@ -97,6 +97,9 @@
     <Filter Include="02. GameObject\Camera\Player">
       <UniqueIdentifier>{ed4863a5-215c-40bf-8da1-5a277240cb2e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. GameObject\Player\State\Move">
+      <UniqueIdentifier>{5b67a0dd-7022-40b9-8e47-9ddaaf4c616e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -264,16 +267,7 @@
     <ClInclude Include="PlayerDefine.h">
       <Filter>99. Defines</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Player_IdleState.h">
-      <Filter>02. GameObject\Player\State</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\PlayerState.h">
-      <Filter>02. GameObject\Player\State</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\Player_WalkState.h">
-      <Filter>02. GameObject\Player\State</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\Player_RunState.h">
       <Filter>02. GameObject\Player\State</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Camera_Player.h">
@@ -281,6 +275,18 @@
     </ClInclude>
     <ClInclude Include="..\Public\Player_StrongAttackState.h">
       <Filter>02. GameObject\Player\State</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Player_DodgeState.h">
+      <Filter>02. GameObject\Player\State\Move</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Player_IdleState.h">
+      <Filter>02. GameObject\Player\State\Move</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Player_RunState.h">
+      <Filter>02. GameObject\Player\State\Move</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Player_WalkState.h">
+      <Filter>02. GameObject\Player\State\Move</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -441,16 +447,7 @@
     <ClCompile Include="..\Private\Map.cpp">
       <Filter>02. GameObject\Map</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Player_IdleState.cpp">
-      <Filter>02. GameObject\Player\State</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\PlayerState.cpp">
-      <Filter>02. GameObject\Player\State</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Player_WalkState.cpp">
-      <Filter>02. GameObject\Player\State</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\Player_RunState.cpp">
       <Filter>02. GameObject\Player\State</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Camera_Player.cpp">
@@ -458,6 +455,18 @@
     </ClCompile>
     <ClCompile Include="..\Private\Player_StrongAttackState.cpp">
       <Filter>02. GameObject\Player\State</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Player_DodgeState.cpp">
+      <Filter>02. GameObject\Player\State\Move</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Player_IdleState.cpp">
+      <Filter>02. GameObject\Player\State\Move</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Player_RunState.cpp">
+      <Filter>02. GameObject\Player\State\Move</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Player_WalkState.cpp">
+      <Filter>02. GameObject\Player\State\Move</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
