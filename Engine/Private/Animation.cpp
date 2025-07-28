@@ -21,6 +21,10 @@ CAnimation::CAnimation(const CAnimation& Prototype)
 HRESULT CAnimation::Initialize(const aiAnimation* pAIAnimation, const vector<CBone*>& Bones)
 {
     strcpy_s(m_szName, pAIAnimation->mName.data);
+    string str = m_szName;
+    _wstring wstr = L"Animation Name: " + _wstring(str.begin(), str.end()) + L"\n";
+    OutputDebugString(wstr.c_str());
+    
 
     m_fTickPerSecond = static_cast<_float>(pAIAnimation->mTicksPerSecond);
     m_fDuration = static_cast<_float>(pAIAnimation->mDuration);

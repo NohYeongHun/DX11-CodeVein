@@ -22,6 +22,9 @@ CModel::CModel(const CModel& Prototype)
 	/*for (auto& pPrototypeAnimation : Prototype.m_Animations)
 		m_Animations.push_back(pPrototypeAnimation->Clone());*/
 
+	_wstring wstr = L"Animation Debug : \n";
+	
+	OutputDebugString(wstr.c_str());
 	for (auto& pAnimation : m_Animations)
 		Safe_AddRef(pAnimation);
 		
@@ -196,9 +199,15 @@ HRESULT CModel::Ready_Bones(const aiNode* pAiNode, _int iParentBoneIndex)
 HRESULT CModel::Ready_Animations()
 {
 	// 애니메이션 개수 저장
+	_wstring wstr = L"Animation : \n";
+	OutputDebugString(wstr.c_str());
+
 	m_iNumAnimations = m_pAIScene->mNumAnimations;
 	for (_uint i = 0; i < m_iNumAnimations; i++)
 	{
+		_wstring wAnimIndex = L"Animation Index : ";
+		wstr += to_wstring(i) + L"\n";
+		OutputDebugString(wstr.c_str());
 		CAnimation* pAnimation = CAnimation::Create(m_pAIScene->mAnimations[i], m_Bones);
 		if (nullptr == pAnimation)
 		{

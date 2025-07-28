@@ -2,8 +2,10 @@
 #include "PlayerState.h"
 
 /* 모든 동작의 기본이 되는 동작. */
-// 23
+
 NS_BEGIN(Client)
+
+/* 32 */
 class CPlayer_AttackState final : public CPlayerState
 {
 public:
@@ -21,7 +23,8 @@ public:
 	{
 		_uint iAnimation_Idx = {};
 		ACTORDIR eDirection = {};
-		_uint iComboStep = 0;           // 현재 콤보 단계 (0: 첫 공격, 1: 두번째 공격...)
+		
+		_float fCurrentTrackPosition = { 0.f };
 	}ATTACK_ENTER_DESC;
 
 public:
@@ -51,6 +54,7 @@ public:
 	virtual void Reset() override;
 
 	void Change_State(_float fTimeDelta);
+
 
 private:
 	_float m_fAttackTime = {}; // 최소 진행 시간.

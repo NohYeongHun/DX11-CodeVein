@@ -3,7 +3,10 @@
 
 
 NS_BEGIN(Client)
-/* index : 34 End, 35 Loop, 36 Start, 37 Hit*/
+/* 28. Animation Name: SK_HumanFemale_LOD0.ao|AS_TStdUnisex_TLSword_Guard_N_End
+29. Animation Name: SK_HumanFemale_LOD0.ao|AS_TStdUnisex_TLSword_Guard_N_Loop
+30. Animation Name: SK_HumanFemale_LOD0.ao|AS_TStdUnisex_TLSword_Guard_N_Start*/
+/* index : 28 End, 29 Loop, 30 Start, 31 Hit*/
 class CPlayer_GuardState final : public CPlayerState
 {
 public:

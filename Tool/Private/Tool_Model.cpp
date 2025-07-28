@@ -442,12 +442,16 @@ HRESULT CTool_Model::Ready_Bones(const aiNode* pAiNode, _int iParentBoneIndex)
 
 HRESULT CTool_Model::Ready_Animations()
 {
+	//_wstring wstr = L"Animation : \n";
+	//OutputDebugString(wstr.c_str());
+
 	// 애니메이션 개수 저장
 	m_iNumAnimations = m_pAIScene->mNumAnimations;
 	for (_uint i = 0; i < m_iNumAnimations; i++)
 	{
-		//_wstring strAnimationDebug = L"============= Current Animation Index : " + to_wstring(i) + L" ========================\n";
-		// OutputDebugString(strAnimationDebug.c_str());
+		_wstring wAnimIndex = L"";
+		wAnimIndex += to_wstring(i) + L". ";
+		OutputDebugString(wAnimIndex.c_str());
 		CTool_Animation* pAnimation = CTool_Animation::Create(m_pAIScene->mAnimations[i], m_Bones);
 		if (nullptr == pAnimation)
 		{

@@ -1,52 +1,64 @@
 ﻿#pragma once
 
-/*
-* 데미지
-0 AS_TStdFemale_TCmn_Damage01_B.psa
-1 AS_TStdFemale_TCmn_Damage01_F.psa
-2 AS_TStdFemale_TCmn_Damage01_L.psa
-3 AS_TStdFemale_TCmn_Damage01_R.psa
-* 달리기
-4 AS_TStdFemale_TCmn_Run_B_Loop.psa
-5 AS_TStdFemale_TCmn_Run_B_RightFoot_End.psa
-6 AS_TStdFemale_TCmn_Run_F_Loop.psa
-7 AS_TStdFemale_TCmn_Run_F_RightFoot_End.psa
-8 AS_TStdFemale_TCmn_Run_L_Loop.psa
-9 AS_TStdFemale_TCmn_Run_L_RightFoot_End.psa
-10 AS_TStdFemale_TCmn_Run_R_Loop.psa
-11 AS_TStdFemale_TCmn_Run_R_RightFoot_End.psa
-* 걷기
-12 AS_TStdFemale_TCmn_Walk_B_Loop.psa
-13 AS_TStdFemale_TCmn_Walk_F_Loop.psa
-14 AS_TStdFemale_TCmn_Walk_L_Loop.psa
-15 AS_TStdFemale_TCmn_Walk_R_Loop.psa
-* IDLE 기본 상태
-16 AS_TStdFemale_TLSword_Idle_N_Loop.psa
-17 AS_TStdFemale_TSpa_Idle_N_Loop.psa
-* 스킬
-18 AS_TStdUnisex_TCmn_Renketsu_Barrier_01.psa
-19 AS_TStdUnisex_TCmn_Renketsu_BuffSelf_01.psa
-20 AS_TStdUnisex_TCmn_Renketsu_Enchant_01.psa
-21 AS_TStdUnisex_TCmn_Renketsu_Ground_01.psa
-22 AS_TStdUnisex_TCmn_Renketsu_Search_02.psa
-* 기본 공격
-23 AS_TStdUnisex_TLSword_AttackNormal01_N.psa
-24 AS_TStdUnisex_TLSword_AttackNormal02_N.psa
-25 AS_TStdUnisex_TLSword_AttackNormal03_N.psa
-26 AS_TStdUnisex_TLSword_AttackNormal04_N.psa
-27 AS_TStdUnisex_TLSword_AttackNormal05_N.psa
-28 AS_TStdUnisex_TLSword_AttackNormal06_N.psa
-29 AS_TStdUnisex_TLSword_AttackStrong01A_N.psa
-* 구르기
-30 AS_TStdUnisex_TLSword_Dodge300_B.psa
-31 AS_TStdUnisex_TLSword_Dodge300_F.psa
-32 AS_TStdUnisex_TLSword_Dodge300_L.psa
-33 AS_TStdUnisex_TLSword_Dodge300_R.psa
-* 가드
-34 AS_TStdUnisex_TLSword_Guard_N_End.psa
-35 AS_TStdUnisex_TLSword_Guard_N_Loop.psa
-36 AS_TStdUnisex_TLSword_Guard_N_Start.psa
-37 AS_TStdUnisex_TLSword_GuardHit_N.psa
-* 강공.
-38 AS_TStdUnisex_TSword_AttackStrong01A_N.psa
+/* 
+=================================== DAMAGE  ====================================
+* 0. Animation Name: SK_HumanFemale_LOD0.ao|AS_TStdFemale_TCmn_Damage01_B
+1. Animation Name: SK_HumanFemale_LOD0.ao|AS_TStdFemale_TCmn_Damage01_F
+2. Animation Name: SK_HumanFemale_LOD0.ao|AS_TStdFemale_TCmn_Damage01_L
+3. Animation Name: SK_HumanFemale_LOD0.ao|AS_TStdFemale_TCmn_Damage01_R
+=================================== RUN  ====================================
+4. Animation Name: SK_HumanFemale_LOD0.ao|AS_TStdFemale_TCmn_Run_B_Loop
+5. Animation Name: SK_HumanFemale_LOD0.ao|AS_TStdFemale_TCmn_Run_B_RightFoot_End
+6. Animation Name: SK_HumanFemale_LOD0.ao|AS_TStdFemale_TCmn_Run_F_Loop
+7. Animation Name: SK_HumanFemale_LOD0.ao|AS_TStdFemale_TCmn_Run_F_RightFoot_End
+8. Animation Name: SK_HumanFemale_LOD0.ao|AS_TStdFemale_TCmn_Run_L_Loop
+9. Animation Name: SK_HumanFemale_LOD0.ao|AS_TStdFemale_TCmn_Run_L_RightFoot_End
+10. Animation Name: SK_HumanFemale_LOD0.ao|AS_TStdFemale_TCmn_Run_R_Loop
+11. Animation Name: SK_HumanFemale_LOD0.ao|AS_TStdFemale_TCmn_Run_R_RightFoot_End
+=================================== WALK  ====================================
+12. Animation Name: SK_HumanFemale_LOD0.ao|AS_TStdFemale_TCmn_Walk_B_Loop
+13. Animation Name: SK_HumanFemale_LOD0.ao|AS_TStdFemale_TCmn_Walk_F_Loop
+14. Animation Name: SK_HumanFemale_LOD0.ao|AS_TStdFemale_TCmn_Walk_L_Loop
+15. Animation Name: SK_HumanFemale_LOD0.ao|AS_TStdFemale_TCmn_Walk_R_Loop
+=================================== IDLE  ====================================
+16. Animation Name: SK_HumanFemale_LOD0.ao|AS_TStdFemale_TLSword_Idle_N_Loop
+17. Animation Name: SK_HumanFemale_LOD0.ao|AS_TStdFemale_TSpa_Idle_N_Loop
+=================================== SKILL ====================================
+18. Animation Name: SK_HumanFemale_LOD0.ao|AS_TStdUnisex_TCmn_Renketsu_Barrier_01
+19. Animation Name: SK_HumanFemale_LOD0.ao|AS_TStdUnisex_TCmn_Renketsu_BuffSelf_01
+20. Animation Name: SK_HumanFemale_LOD0.ao|AS_TStdUnisex_TCmn_Renketsu_Enchant_01
+21. Animation Name: SK_HumanFemale_LOD0.ao|AS_TStdUnisex_TCmn_Renketsu_Ground_01
+22. Animation Name: SK_HumanFemale_LOD0.ao|AS_TStdUnisex_TCmn_Renketsu_Search_02
+=================================== EXT ====================================
+23. Animation Name: SK_HumanFemale_LOD0.ao|AS_TStdUnisex_TLSword_AttackStrong01A_N
+=================================== DODGE ====================================
+24. Animation Name: SK_HumanFemale_LOD0.ao|AS_TStdUnisex_TLSword_Dodge300_B
+25. Animation Name: SK_HumanFemale_LOD0.ao|AS_TStdUnisex_TLSword_Dodge300_F
+26. Animation Name: SK_HumanFemale_LOD0.ao|AS_TStdUnisex_TLSword_Dodge300_L
+27. Animation Name: SK_HumanFemale_LOD0.ao|AS_TStdUnisex_TLSword_Dodge300_R
+=================================== Guard ====================================
+28. Animation Name: SK_HumanFemale_LOD0.ao|AS_TStdUnisex_TLSword_Guard_N_End
+29. Animation Name: SK_HumanFemale_LOD0.ao|AS_TStdUnisex_TLSword_Guard_N_Loop
+30. Animation Name: SK_HumanFemale_LOD0.ao|AS_TStdUnisex_TLSword_Guard_N_Start
+31. Animation Name: SK_HumanFemale_LOD0.ao|AS_TStdUnisex_TLSword_GuardHit_N
+=================================== Attack ====================================
+32. Animation Name: SK_HumanFemale_LOD0.ao|AS_TStdUnisex_TSword_AttackNormal01_N
+33. Animation Name: SK_HumanFemale_LOD0.ao|AS_TStdUnisex_TSword_AttackNormal02_N
+34. Animation Name: SK_HumanFemale_LOD0.ao|AS_TStdUnisex_TSword_AttackNormal03_N
+35. Animation Name: SK_HumanFemale_LOD0.ao|AS_TStdUnisex_TSword_AttackNormal04_N
+36. Animation Name: SK_HumanFemale_LOD0.ao|AS_TStdUnisex_TSword_AttackNormal05_N
+37. Animation Name: SK_HumanFemale_LOD0.ao|AS_TStdUnisex_TSword_AttackNormal06_N
+38. Animation Name: SK_HumanFemale_LOD0.ao|AS_TStdUnisex_TSword_AttackNormal07_N
+39. Animation Name: SK_HumanFemale_LOD0.ao|AS_TStdUnisex_TSword_AttackNormal08_N
+40. Animation Name: SK_HumanFemale_LOD0.ao|AS_TStdUnisex_TSword_AttackNormal09_N
+41. Animation Name: SK_HumanFemale_LOD0.ao|AS_TStdUnisex_TSword_AttackNormal10_N
+42. Animation Name: SK_HumanFemale_LOD0.ao|AS_TStdUnisex_TSword_AttackNormal11_N
+43. Animation Name: SK_HumanFemale_LOD0.ao|AS_TStdUnisex_TSword_AttackNormal12_N
+44. Animation Name: SK_HumanFemale_LOD0.ao|AS_TStdUnisex_TSword_AttackNormal13_N
+45. Animation Name: SK_HumanFemale_LOD0.ao|AS_TStdUnisex_TSword_AttackNormal14_N
+46. Animation Name: SK_HumanFemale_LOD0.ao|AS_TStdUnisex_TSword_AttackNormal15_N
+47. Animation Name: SK_HumanFemale_LOD0.ao|AS_TStdUnisex_TSword_AttackNormal16_N
+============================ Strong Attack ====================================
+48. Animation Name: SK_HumanFemale_LOD0.ao|AS_TStdUnisex_TSword_AttackStrong01A_N
+
 */

@@ -63,7 +63,7 @@ void CPlayer_RunState::Change_State(_float fTimeDelta)
 
 	if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::DODGE)) // 구르기.
 	{
-		Dodge.iAnimation_Idx = 31;
+		Dodge.iAnimation_Idx = 25;
 		m_iNextState = CPlayer::PLAYER_STATE::DODGE;
 		m_iNextAnimIdx = 31;
 		m_pFsm->Change_State(m_iNextState, &Dodge);
@@ -73,14 +73,14 @@ void CPlayer_RunState::Change_State(_float fTimeDelta)
 		StrongAttack.iAnimation_Idx = 38;
 		StrongAttack.eDirection = m_eDir;
 		m_iNextState = CPlayer::PLAYER_STATE::SWORD_STRONG_ATTACK;
-		m_iNextAnimIdx = 38;
+		m_iNextAnimIdx = 48;
 		m_pFsm->Change_State(m_iNextState, &StrongAttack);
 	}
 	else if (m_pPlayer->Is_KeyUp(PLAYER_KEY::GUARD))
 	{
-		Guard.iAnimation_Idx = 36;
+		Guard.iAnimation_Idx = 30;
 		m_iNextState = CPlayer::PLAYER_STATE::GUARD;
-		m_iNextAnimIdx = 36;
+		m_iNextAnimIdx = 30;
 		m_pFsm->Change_State(m_iNextState, &Guard);
 		
 	}

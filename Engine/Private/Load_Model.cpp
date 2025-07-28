@@ -223,7 +223,11 @@ _bool CLoad_Model::Play_Animation(_float fTimeDelta)
 			}
 
 			  // ⭐ 루트본 위치를 항상 원점으로 리셋 (애니메이션 완료 여부와 관계없이)
+			//rootMatrix.r[3] = XMVectorSet(m_vOldPos.x, m_vOldPos.y, m_vOldPos.z, 1.f);
+			
+			// 새로운 애니메이션의 루트본을 이전벡터에 넣어둔다.
 			rootMatrix.r[3] = XMVectorSet(0.f, 0.f, 0.f, 1.f);
+			//rootMatrix.r[3] = XMVectorSet(m_vOldPos.x, m_vOldPos.y, m_vOldPos.z, 1.f);
 			m_Bones[i]->Set_CombinedTransformationMatrix(rootMatrix);
 		}
 	}
@@ -262,19 +266,12 @@ void CLoad_Model::Set_BlendInfo(uint32_t iNextAnimIndex, _float fBlendTime, _boo
 
 	// 1. 현재 실행되고 있는 애니메이션 인덱스 담기
 	m_BlendDesc.iPrevAnimIndex = m_iCurrentAnimIndex;
-
-	// 2. ⭐ 문제 2: KeepLastFrame 관련 코드 제거
-	if (m_iCurrentAnimIndex < m_Animations.size())
-	{
-		// 현재 실행되는 시간.
-		m_BlendDesc.fPrevAnimTime = m_Animations[m_iCurrentAnimIndex]->Get_CurrentTrackPosition();
-	}
-	else
-		m_BlendDesc.fPrevAnimTime = 0.f;
+	m_BlendDesc.fPrevAnimTime = m_Animations[m_iCurrentAnimIndex]->Get_CurrentTrackPosition();
 
 	// 3. 다음 실행될 애니메이션
 	// 4. Animation Index를 변경
 	// m_iCurrentAnimIndex = iNextAnimIndex;
+
 	m_Animations[iNextAnimIndex]->Reset();
 
 	// 5. 사용할 Animation Pointer 전달.

@@ -3,6 +3,7 @@
 
 
 NS_BEGIN(Client)
+/* Index = 25. */
 class CPlayer_DodgeState final : public CPlayerState
 {
 public:

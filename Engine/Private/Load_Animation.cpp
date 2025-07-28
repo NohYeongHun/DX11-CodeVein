@@ -41,13 +41,6 @@ void CLoad_Animation::Update_TransformationMatrices(const vector<class CLoad_Bon
         _float fRatio = m_fBlendTrackPosition / blendDesc.fBlendDuration;
         fRatio = min(fRatio, 1.f);
 
-        /*_wstring wstrDebug = L"Ratio : " + to_wstring(fRatio) + L'\n';
-        OutputDebugString(wstrDebug.c_str());
-
-        _wstring wstrDuration = L"Blend Duration : " + to_wstring(blendDesc.fBlendDuration) + L'\n';
-        OutputDebugString(wstrDuration.c_str());*/
-        
-
         // Blending 종료. => 한번에 되버리잖아?
         if (m_fBlendTrackPosition >= blendDesc.fBlendDuration)
             blendDesc.isBlending = false;
@@ -71,7 +64,9 @@ void CLoad_Animation::Update_TransformationMatrices(const vector<class CLoad_Bon
             {
                 // Prev TransformMatirx Channel.
                 KEYFRAME prevKeyFrame = prevAnimChannels[i]->Get_KeyFrameAtTime(blendDesc.fPrevAnimTime);
-                _matrix matCur = m_Channels[i]->Get_TransformMatrixAtTime(m_fCurrentTrackPosition);
+                KEYFRAME curKeyFrame = m_Channels[i]->Get_KeyFrameAtTime(m_fCurrentTrackPosition);
+                
+                //_matrix matCur = m_Channels[i]->Get_TransformMatrixAtTime(m_fCurrentTrackPosition);
 
 
                 _vector vSourScale, vDestScale;
@@ -82,8 +77,11 @@ void CLoad_Animation::Update_TransformationMatrices(const vector<class CLoad_Bon
                 vSourRotation = XMLoadFloat4(&prevKeyFrame.vRotation);
                 vSourTranslation = XMLoadFloat3(&prevKeyFrame.vTranslation);
 
+                vDestScale = XMLoadFloat3(&curKeyFrame.vScale);
+                vDestRotation = XMLoadFloat4(&curKeyFrame.vRotation);
+                vDestTranslation = XMLoadFloat3(&curKeyFrame.vTranslation);
                 //XMMatrixDecompose(&vSourScale, &vSourRotation, &vSourTranslation, matPrev);
-                XMMatrixDecompose(&vDestScale, &vDestRotation, &vDestTranslation, matCur);
+                //XMMatrixDecompose(&vDestScale, &vDestRotation, &vDestTranslation, matCur);
 
                 if (blendDesc.bScale)
                     vScale = XMVectorLerp(vSourScale, vDestScale, fRatio);
@@ -104,8 +102,6 @@ void CLoad_Animation::Update_TransformationMatrices(const vector<class CLoad_Bon
                 Bones[m_Channels[i]->Get_BoneIndex()]->Set_TransformationMatrix(blendedMatrix);
             }
         }
-
-
         return;
     }
 
@@ -215,7 +211,7 @@ HRESULT CLoad_Animation::Load_Channels(std::ifstream& ifs)
     
     strcpy_s(m_szName, strAnimName.c_str()); // 이름 복사.
     m_fDuration = info.fDuration;
-    m_fTickPerSecond = info.fTickPerSecond * 2.f;
+    m_fTickPerSecond = info.fTickPerSecond * 1.5f;
     m_fCurrentTrackPosition = info.fCurrentTrackPostion;
     m_iNumChannels = info.iNumChannels;
 

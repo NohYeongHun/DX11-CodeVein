@@ -3,6 +3,7 @@
 
 /* 모든 동작의 기본이 되는 동작. */
 NS_BEGIN(Client)
+/* 13 */
 class CPlayer_WalkState final : public CPlayerState
 {
 public:

@@ -10,26 +10,49 @@ CLevel_GamePlay::CLevel_GamePlay(ID3D11Device* pDevice, ID3D11DeviceContext* pCo
 HRESULT CLevel_GamePlay::Initialize_Clone()
 {
 	if (FAILED(Ready_HUD()))
+	{
+		CRASH("Failed Ready_HUD");
 		return E_FAIL;
+	}
+
+	/* 현재 레벨을 구성해주기 위한 객체들을 생성한다. */
+	if (FAILED(Ready_Layer_Camera(TEXT("Layer_Camera"))))
+	{
+		CRASH("Failed Ready_Layer_Camera");
+		return E_FAIL;
+	}
 	
 	if (FAILED(Ready_Layer_Player(TEXT("Layer_Player"))))
+	{
+		CRASH("Failed Layer_Player");
 		return E_FAIL;
+	}
+
 
 	if (FAILED(Ready_Layer_Map(TEXT("Layer_Map"))))
+	{
+		CRASH("Failed Ready_Layer_Map");
 		return E_FAIL;
+	}
+
 	
 	//if (FAILED(Ready_Layer_Terrain(TEXT("Layer_Terrain"))))
 	//	return E_FAIL;
 
 	if (FAILED(Ready_Lights()))
+	{
+		CRASH("Failed Light");
 		return E_FAIL;
+	}
+		
 
-	/* 현재 레벨을 구성해주기 위한 객체들을 생성한다. */
-	if (FAILED(Ready_Layer_Camera(TEXT("Layer_Camera"))))
-		return E_FAIL;
+
 
 	if (FAILED(Ready_Layer_BackGround(TEXT("Layer_BackGround"))))
+	{
+		CRASH("Failed Ready_Layer_BackGround");
 		return E_FAIL;
+	}
 
 	
 
@@ -37,7 +60,10 @@ HRESULT CLevel_GamePlay::Initialize_Clone()
 	//	return E_FAIL;
 
 	if (FAILED(Ready_Layer_Effect(TEXT("Layer_Effect"))))
+	{
+		CRASH("Failed Ready_Layer_Effect");
 		return E_FAIL;
+	}
 
 	
 	return S_OK;
@@ -115,6 +141,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_Camera(const _wstring& strLayerTag)
 		return E_FAIL;
 	}
 
+
 	//if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel), strLayerTag,
 	//	ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_Camera_Free"), &CameraDesc )))
 	//	return E_FAIL;
@@ -167,6 +194,12 @@ HRESULT CLevel_GamePlay::Ready_Layer_Player(const _wstring& strLayerTag)
 		CRASH("Add Camera Player Failed");
 		return E_FAIL;
 	}
+
+	/*if (FAILED(m_pGameInstance->Change_Camera(TEXT("FreeCamera"), ENUM_CLASS(LEVEL::GAMEPLAY))))
+	{
+		CRASH("Change Camera Failed");
+		return E_FAIL;
+	}*/
 
 	if (FAILED(m_pGameInstance->Change_Camera(TEXT("PlayerCamera"), ENUM_CLASS(LEVEL::GAMEPLAY))))
 	{
