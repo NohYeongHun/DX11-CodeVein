@@ -217,6 +217,7 @@ _bool CLoad_Model::Play_Animation(_float fTimeDelta)
 				//	_vector vWorldTranslate = XMVector3TransformNormal(vLocalTranslate, playerRotMatrix);
 				//	m_pOwner->Translate(vWorldTranslate);
 				//}
+				m_pOwner->Translate(vLocalTranslate);
 
 				// 다음 프레임을 위한 위치 저장
 				XMStoreFloat4(&m_vOldPos, vNewRootPos);
@@ -234,14 +235,14 @@ _bool CLoad_Model::Play_Animation(_float fTimeDelta)
 			XMStoreFloat4(&vPos, m_Bones[i]->Get_CombinedTransformationMatrix().r[3]);
 
 			/* 루트본 디버깅 */
-			_wstring wstrDebug = L" RootBone x : " + to_wstring(vPos.x) + L" y :  " + to_wstring(vPos.y) + L" z :  " + to_wstring(vPos.z) + L'\n';
-			OutputDebugString(wstrDebug.c_str());
+			/*_wstring wstrDebug = L" RootBone x : " + to_wstring(vPos.x) + L" y :  " + to_wstring(vPos.y) + L" z :  " + to_wstring(vPos.z) + L'\n';
+			OutputDebugString(wstrDebug.c_str());*/
 
-			//if (m_iCurrentAnimIndex >= 32 && m_iCurrentAnimIndex <= 48)
-			//{
-			//	_wstring wAttack = L" x : " + to_wstring(m_vOldPos.x) + L" x : " + to_wstring(m_vOldPos.y) + L" x : " + to_wstring(m_vOldPos.z) + L'\n';
-			//	OutputDebugString(wAttack.c_str());
-			//}
+			if (m_iCurrentAnimIndex >= 32 && m_iCurrentAnimIndex <= 48)
+			{
+				_wstring wAttack = L" x : " + to_wstring(m_vOldPos.x) + L" x : " + to_wstring(m_vOldPos.y) + L" x : " + to_wstring(m_vOldPos.z) + L'\n';
+				OutputDebugString(wAttack.c_str());
+			}
 		}
 	}
 		

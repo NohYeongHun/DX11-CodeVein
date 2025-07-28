@@ -85,7 +85,6 @@ void CPlayer_IdleState::Change_State()
 		Run.iAnimation_Idx = 6;
 		Run.eDirection = m_eDir;
 		m_pFsm->Change_State(m_iNextState, &Run);
-		//m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, true);
 
 	}
 	else if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::DODGE)) // 구르기.
