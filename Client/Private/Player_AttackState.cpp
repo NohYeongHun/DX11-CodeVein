@@ -57,7 +57,7 @@ void CPlayer_AttackState::Exit()
 		}
 		else
 		{
-			//m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.1f, true, true, false);
+			m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.1f, true, true, true);
 		}
 		
 	}
@@ -91,8 +91,6 @@ void CPlayer_AttackState::Change_State(_float fTimeDelta)
 	}
 	else
 	{
-		
-
 		if (m_fCurTime >= m_fAttackTime && m_pPlayer->Is_KeyPressed(PLAYER_KEY::ATTACK))
 		{
 			if (m_iCurAnimIdx == 47) // 마지막이면
@@ -106,10 +104,12 @@ void CPlayer_AttackState::Change_State(_float fTimeDelta)
 			}
 			else
 			{
-				m_iNextAnimIdx = m_iCurAnimIdx + 1;
+				
 				CPlayer_AttackState::ATTACK_ENTER_DESC Attack{};
+				m_iNextAnimIdx = m_iCurAnimIdx + 1;
+				m_iNextState = CPlayer::PLAYER_STATE::ATTACK;
 				Attack.iAnimation_Idx = m_iNextAnimIdx;
-				m_pFsm->Change_State(CPlayer::PLAYER_STATE::ATTACK, &Attack);
+				m_pFsm->Change_State(m_iNextState, &Attack);
 			}
 		}
 	}

@@ -131,6 +131,7 @@ private:
 
 	_matrix m_oldMatrix = {};
 	_float4 m_vOldPos = {};
+	_float4 m_vSameOldPos = {};
 	
 
 private:

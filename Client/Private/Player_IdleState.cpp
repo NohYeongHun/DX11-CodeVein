@@ -20,10 +20,10 @@ HRESULT CPlayer_IdleState::Initialize(_uint iStateNum, void* pArg)
 void CPlayer_IdleState::Enter(void* pArg)
 {
 	// ✅ 구문 수정
-	_vector vPos = m_pPlayer->Get_Transform()->Get_State(STATE::POSITION);
-	OutputDebugString((L"[IDLE ENTER] Position: " +
-		std::to_wstring(XMVectorGetX(vPos)) + L", " +
-		std::to_wstring(XMVectorGetZ(vPos)) + L"\n").c_str());
+	//_vector vPos = m_pPlayer->Get_Transform()->Get_State(STATE::POSITION);
+	//OutputDebugString((L"[IDLE ENTER] Position: " +
+	//	std::to_wstring(XMVectorGetX(vPos)) + L", " +
+	//	std::to_wstring(XMVectorGetZ(vPos)) + L"\n").c_str());
 
 	IDLE_ENTER_DESC* pDesc = static_cast<IDLE_ENTER_DESC*>(pArg);
 

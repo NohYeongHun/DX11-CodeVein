@@ -54,7 +54,7 @@ void CPlayer_GuardState::Exit()
 	// 보간 안해도 됨.
 
 	if (m_iNextState == CPlayer::PLAYER_STATE::IDLE)
-		m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, true);
+		m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, false);
 		
 }
 
@@ -81,15 +81,15 @@ void CPlayer_GuardState::Change_State(_float fTimeDelta)
 	{
 		if (m_pPlayer->Is_KeyUp(PLAYER_KEY::GUARD))
 		{
-			if (m_iCurAnimIdx == 36)
+			if (m_iCurAnimIdx == 30)
 			{
 				m_iNextState = CPlayer::PLAYER_STATE::GUARD;
-				m_iNextAnimIdx = 34;
-				Guard.iAnimation_Idx = 34;
+				m_iNextAnimIdx = 28;
+				Guard.iAnimation_Idx = 28;
 				m_pFsm->Change_State(m_iNextState, &Guard);
 			}
 		}
-		else if (m_iCurAnimIdx == 34)
+		else if (m_iCurAnimIdx == 28)
 		{
 			m_iNextState = CPlayer::PLAYER_STATE::IDLE;
 			m_iNextAnimIdx = 16;

@@ -229,6 +229,12 @@ _bool CLoad_Model::Play_Animation(_float fTimeDelta)
 			rootMatrix.r[3] = XMVectorSet(0.f, 0.f, 0.f, 1.f);
 			//rootMatrix.r[3] = XMVectorSet(m_vOldPos.x, m_vOldPos.y, m_vOldPos.z, 1.f);
 			m_Bones[i]->Set_CombinedTransformationMatrix(rootMatrix);
+
+			if (m_iCurrentAnimIndex >= 32 && m_iCurrentAnimIndex <= 48)
+			{
+				_wstring wAttack = L" x : " + to_wstring(m_vOldPos.x) + L" x : " + to_wstring(m_vOldPos.y) + L" x : " + to_wstring(m_vOldPos.z) + L'\n';
+				OutputDebugString(wAttack.c_str());
+			}
 		}
 	}
 		
