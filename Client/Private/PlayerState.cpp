@@ -23,6 +23,12 @@ HRESULT CPlayerState::Initialize(_uint iStateNum, void* pArg)
     return S_OK;
 }
 
+void CPlayerState::Handle_Input()
+{
+    m_eDir = m_pPlayer->Get_Direction();
+    m_KeyInput = m_pPlayer->Get_KeyInput();
+}
+
 
 void CPlayerState::Free()
 {

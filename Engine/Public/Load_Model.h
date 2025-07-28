@@ -22,6 +22,7 @@ public:
 	HRESULT Render(_uint iNumMesh);
 
 public:
+#pragma region GET_SET
 	_uint Get_NumMeshes() const {
 		return m_iNumMeshes;
 	}
@@ -45,22 +46,27 @@ public:
 	{
 		return m_isBlending;
 	}
-	
+
 	_uint Get_CurrentAnimationIndex()
 	{
 		return m_iCurrentAnimIndex;
 	}
+
+	const _float Get_CurrentTrackPosition() { return m_Animations[m_iCurrentAnimIndex]->Get_CurrentTrackPosition(); }
+	void Set_CurrentTrackPosition(_float fTrackPosition) { m_Animations[m_iCurrentAnimIndex]->Set_CurrentTrackPosition(fTrackPosition); }
+	void Set_AnimationTrackPosition(_uint iAnimIndex, _float fTrackPosition) { m_Animations[iAnimIndex]->Set_CurrentTrackPosition(fTrackPosition); }
 
 	_matrix Get_RootBoneMatrix()
 	{
 		return m_Bones[m_iRoot_BoneIndex]->Get_TransformationMatrix();
 	}
 
+	_float4x4* Get_BoneMatrix(const _char* pBoneName);
 
-public:
-	void Set_RootMotionEnabled(_bool bEnable) { m_bEnableRootMotion = bEnable; }
-	void Set_RootMotionScale(_float fScale) { m_fRootMotionScale = fScale; }
-	void Set_RootRotationEnabled(_bool bEnable) { m_bEnableRootRotation = bEnable; }
+	_uint Get_CurrentFrame();
+#pragma endregion
+
+	
 
 public:
 	const _bool Is_Ray_Hit(const _float3& rayOrigin, const _float3& rayDir, _float* pOutDist);

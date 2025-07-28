@@ -23,7 +23,7 @@ protected:
 	map<const _wstring, class CPartObject*>		m_PartObjects;
 
 protected:
-	HRESULT Add_PartObject(const _wstring& strPartObjectTag, _uint iPrototypeLevelIndex, const _wstring& strPrototypeTag, void* pArg = nullptr);
+	HRESULT Add_PartObject(const _wstring& strPartObjectTag, _uint iPrototypeLevelIndex, const _wstring& strPrototypeTag, CPartObject** ppPart, void* pArg = nullptr);
 	class CPartObject* Find_PartObject(const _wstring& strPartObjectTag);
 
 public:

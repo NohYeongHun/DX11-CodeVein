@@ -19,7 +19,8 @@ void CPlayer_StrongAttackState::Enter(void* pArg)
 
 	m_isLoop = false;
 
-	m_iNextIdx = -1;
+			
+	m_iNextAnimIdx = -1;
 	// 애니메이션 인덱스를 변경해줍니다.
 	m_iCurAnimIdx = pDesc->iAnimation_Idx;
 	m_eDir = pDesc->eDirection;
@@ -35,9 +36,8 @@ void CPlayer_StrongAttackState::Update(_float fTimeDelta)
 
 	if (m_pModelCom->Is_Finished())
 	{
-		m_iNextAnimIdx = 17;
-		Idle.iAnimation_Index = 17;
-		m_iNextIdx = 17; // Blend용 Next Animation
+		m_iNextAnimIdx = 16;
+		Idle.iAnimation_Idx = 16;
 		m_pFsm->Change_State(CPlayer::PLAYER_STATE::IDLE, &Idle);
 	}
 }
@@ -53,7 +53,6 @@ void CPlayer_StrongAttackState::Exit()
 		if (m_iNextState == CPlayer::PLAYER_STATE::IDLE)
 			m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, false);
 
-		m_pModelCom->Animation_Reset();
 	}
 	
 }
@@ -61,9 +60,10 @@ void CPlayer_StrongAttackState::Exit()
 // 상태 초기화
 void CPlayer_StrongAttackState::Reset()
 {
-	m_eDir = { DIR::END };
-	m_iCurIdx = -1;
-	m_iNextIdx = -1;
+	m_eDir = { ACTORDIR::END };
+	m_iCurAnimIdx = -1;
+	m_iNextAnimIdx = -1;
+	m_pModelCom->Animation_Reset();
 }
 
 

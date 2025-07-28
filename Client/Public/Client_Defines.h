@@ -18,14 +18,14 @@ namespace Client
 		MOVE_BACKWARD = 1 << 1,  // S  
 		MOVE_LEFT = 1 << 2,		 // A
 		MOVE_RIGHT = 1 << 3,	 // D
-		DODGE = 1 << 4,			 // SHIFT
+		DODGE = 1 << 4,			 // SPACE
 		INTERACT = 1 << 5,		 // F
 		INVENTORY = 1 << 6,		 // I
 		SKILL_1 = 1 << 7,		 // Z
 		SKILL_2 = 1 << 8,		 // X
 		SKILL_3 = 1 << 9,		 // C
 		SKILL_4 = 1 << 10,		 // V
-		CROUCH = 1 << 11,		 // CTRL
+		GUARD = 1 << 11,		 // DIK_LSHIFT
 		/* Mouse */
 		ATTACK = 1 << 12,		 // MOUSE_L
 		LOCK_ON = 1 << 13,		 // MOUSE MB

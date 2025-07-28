@@ -46,6 +46,11 @@ public:
 		return XMLoadFloat4x4(&m_WorldMatrix);
 	}
 
+	const _float4x4* Get_WorldMatrixPtr() {
+		Update_WorldMatrix();  // 최신화를 보장한다.
+		return &m_WorldMatrix;
+	}
+
 	_vector Get_LookDirection_NoPitch()
 	{
 		_vector vLook = XMVector3Normalize(Get_State(STATE::LOOK));
@@ -76,6 +81,7 @@ public:
 	_float  GetRollFromQuaternion() const;
 	
 
+	
 
 	void Move_Direction(_vector vDir, _float fTimeDelta);
 
@@ -101,7 +107,6 @@ public:
 	void Set_ScaleX(float fX) { m_vScale.x = fX; m_bIsDirty = true; }
 	void Set_ScaleY(float fY) { m_vScale.y = fY; m_bIsDirty = true; }
 	void Set_ScaleZ(float fZ) { m_vScale.z = fZ; m_bIsDirty = true; }
-	void Turn(_vector vAxis, _float fAngle);
 	_float3 Get_Scale();
 
 	void Add_Rotation(_float fPitch, _float fYaw, _float fRoll);
@@ -109,11 +114,16 @@ public:
 	void LookAt(const _float3& vTargetPos, const _float3& vUp = { 0.f, 1.f, 0.f });
 	void LookAt_YawOnly(_vector vTargetDir);
 
+	void Set_ParentMatrix(const _float4x4* pParentWorldMatrix);
 
+	void Turn(_fvector vAxis, _float fAngle);
 	/*void Update_Transform();
 	void Set_Parent(CTransform* pTarget);*/
 
 private:
+	const _float4x4*		m_pParentWorldMatrix = {};
+
+	_float4x4	    m_CombineMatrix = {};
 	_float4x4		m_WorldMatrix = {};
 	_float3			m_vPosition = {};
 	_float3			m_vScale = {};

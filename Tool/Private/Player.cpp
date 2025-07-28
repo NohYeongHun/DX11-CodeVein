@@ -96,7 +96,11 @@ HRESULT CPlayer::Render()
 
 
     if (FAILED(Ready_Render_Resources()))
+    {
+        CRASH("Render Resource Failed");
         return E_FAIL;
+    }
+        
 
     _uint iNumMeshes = m_pModelCom->Get_NumMeshes();
     for (_uint i = 0; i < iNumMeshes; i++)
@@ -149,13 +153,22 @@ HRESULT CPlayer::Ready_Components(PLAYER_DESC* pDesc)
     }
         
 
-    if (FAILED(__super::Add_Component(ENUM_CLASS(LEVEL::LOGO)
-        , TEXT("Prototype_Component_Model_Player")
-        ,TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom), nullptr)))
-    {
-        CRASH("Model Create Failed");
-        return E_FAIL;
-    }
+    //if (FAILED(__super::Add_Component(ENUM_CLASS(LEVEL::LOGO)
+    //    , TEXT("Prototype_Component_Model_Player")
+    //    ,TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom), nullptr)))
+    //{
+    //    CRASH("Model Create Failed");
+    //    return E_FAIL;
+    //}
+
+
+    //if (FAILED(__super::Add_Component(ENUM_CLASS(LEVEL::LOGO)
+    //    , TEXT("Prototype_Component_Model_Sword")
+    //    , TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom), nullptr)))
+    //{
+    //    CRASH("Model Create Failed");
+    //    return E_FAIL;
+    //}
 
 
     return S_OK;

@@ -12,7 +12,7 @@ public:
 	typedef struct tagPlayerRunEnterDesc
 	{
 		_uint iAnimation_Idx = {};
-		DIR eDirection;
+		ACTORDIR eDirection;
 	}RUN_ENTER_DESC;
 
 public:
@@ -42,9 +42,6 @@ public:
 	virtual void Reset() override;
 
 	void Change_State(_float fTimeDelta);
-
-public:
-	void Handle_Input(_float fTimeDelta);
 
 private:
 	_bool		   m_isLoop = { true };

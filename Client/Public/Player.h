@@ -2,7 +2,7 @@
 #include "GameObject.h"
 
 NS_BEGIN(Client)
-class CPlayer final : public CGameObject
+class CPlayer final : public CContainerObject
 {
 
 #pragma region PLAYER STATE 정의 STATE != ANIMATION
@@ -11,7 +11,7 @@ public:
 	enum PLAYER_STATE : _int
 	{
 		IDLE = 0, WALK, RUN, DODGE,
-		SWORD_STRONG_ATTACK,
+		SWORD_STRONG_ATTACK, GUARD, ATTACK,
 		SWORD_IDLE,
 		STATE_END
 	};
@@ -20,7 +20,7 @@ public:
 public:
 	typedef struct tagPlayerDesc : public CGameObject::GAMEOBJECT_DESC
 	{
-		const _char* pModelFilePath;
+		LEVEL eCurLevel;
 	}PLAYER_DESC;
 
 private:
@@ -28,11 +28,6 @@ private:
 	CPlayer(const CPlayer& Prototype);
 	virtual ~CPlayer() = default;
 
-public:
-	void Move_By_Camera_Direction_8Way(DIR eDir, _float fTimeDelta, _float fSpeed);
-	
-	void UpdatePlayerRotationSmooth(_vector vMoveDir, _float fTimeDelta);
-	void Debug_CameraVectors();
 
 public:
 	virtual HRESULT Initialize_Prototype();
@@ -53,10 +48,9 @@ public:
 
 #pragma region PLAYER 함수 정의.
 public:
+
 	void HandleState(_float fTimeDelta);
-	void Change_Animation(_uint iAnimationIndex, _bool isLoop);
-	_vector  Calculate_Move_Direction(DIR eDir);
-	
+	_vector  Calculate_Move_Direction(ACTORDIR eDir);
 	const _bool IsLockOn() { return m_isLockOn; }
 
 public:
@@ -64,7 +58,17 @@ public:
 	uint16_t Get_KeyInput() { return m_KeyInput;  }
 
 	_bool Is_KeyPressed(PLAYER_KEY ePlayerKey) const { 
-		return (m_KeyInput & static_cast<uint16_t>(ePlayerKey)) != 0;
+		return m_KeyInput & static_cast<uint16_t>(ePlayerKey);
+	}
+
+	_bool Is_KeyUp(PLAYER_KEY ePlayerKey) const {
+		return (m_PrevKeyInput & static_cast<uint16_t>(ePlayerKey)) &&
+			!(m_KeyInput & static_cast<uint16_t>(ePlayerKey));
+	}
+
+	_bool Is_KeyDown(PLAYER_KEY ePlayerKey) const {
+		return !(m_PrevKeyInput & static_cast<uint16_t>(ePlayerKey)) &&
+			(m_KeyInput & static_cast<uint16_t>(ePlayerKey));
 	}
 
 	// 움직임 키 확인
@@ -74,39 +78,60 @@ public:
 			Is_KeyPressed(PLAYER_KEY::MOVE_LEFT) ||
 			Is_KeyPressed(PLAYER_KEY::MOVE_RIGHT);
 	}
-	DIR Get_Direction() { return m_eCurrentDirection; }
+	ACTORDIR Get_Direction() { return m_eCurrentDirection; }
+
+
+
+public:
+	void Move_By_Camera_Direction_8Way(ACTORDIR eDir, _float fTimeDelta, _float fSpeed);
+	void Debug_CameraVectors();
+	
+	// 현재 프레임 가져오기.
+
+
+	// Animation 교체.
+	void Change_Animation(_uint iAnimIndex, _bool IsLoop, _float fDuration, _uint iStartFrame, _bool bEitherBoundary, _bool bSameChange);
 
 private:
-	DIR Calculate_Direction();
+	
+	ACTORDIR Calculate_Direction();
 	void Update_KeyInput();
 #pragma endregion
 
 
 private:
 	// Load Model;
-
-	//class CModel* m_pModelCom = { nullptr };
 	class CLoad_Model* m_pModelCom = { nullptr };
 	class CShader* m_pShaderCom = { nullptr };
+	class CWeapon* m_pPlayerWeapon = { nullptr };
 	class CFsm* m_pFsmCom = { nullptr };
+
+	// 
+	class CCamera_Player* m_pPlayerCamera = { nullptr };
+	
 	
 private:
 	/* 상태 정의 */
 	_bool m_isLockOn = { false };
 
+private:
+	LEVEL m_eCurLevel;
 
 private:
-	/* 키 코드 상태 16개 까지 관리 */
+	uint16_t m_PrevKeyInput = {};
 	uint16_t m_KeyInput = {};
-	// 키 매핑 테이블 (PLAYER_KEY -> DirectInput 키코드)
 	static const _uint m_KeyboardMappingsCount;
 	static const pair<PLAYER_KEY, _ubyte> m_KeyboardMappings[];
-	DIR m_eCurrentDirection = {};
+	ACTORDIR m_eCurrentDirection = {};
+
+
+
 
 private:
 	HRESULT Ready_Components(PLAYER_DESC* pDesc);
 	HRESULT Ready_Fsm();
 	HRESULT Ready_Render_Resources();
+	HRESULT Ready_PartObjects();
 
 public:
 	static CPlayer* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

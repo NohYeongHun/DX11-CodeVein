@@ -132,14 +132,11 @@ HRESULT CLevel_GamePlay::Ready_Layer_BackGround(const _wstring& strLayerTag)
 
 HRESULT CLevel_GamePlay::Ready_Layer_Player(const _wstring& strLayerTag)
 {
+	
 	CPlayer::PLAYER_DESC Desc{};
 	Desc.fSpeedPerSec = 10.f;
 	Desc.fRotationPerSec = XMConvertToRadians(90.0f);
-
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel), strLayerTag,
-		ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_Player"), &Desc)))
-		return E_FAIL;
-
+	Desc.eCurLevel = m_eCurLevel;
 
 	CCamera_Player::CAMERA_PLAYER_DESC CameraPlayerDesc{};
 	CameraPlayerDesc.vEye = _float4(0.f, 10.f, -20.f, 1.f);
@@ -151,6 +148,12 @@ HRESULT CLevel_GamePlay::Ready_Layer_Player(const _wstring& strLayerTag)
 	CameraPlayerDesc.fRotationPerSec = XMConvertToRadians(9.0f);
 	CameraPlayerDesc.fMouseSensor = 0.3f;
 	
+
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel), strLayerTag,
+		ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_Player"), &Desc)))
+		return E_FAIL;
+	
+
 	list<CGameObject*> pGameObjects = m_pGameInstance->Get_Layer(ENUM_CLASS(LEVEL::GAMEPLAY), strLayerTag)->Get_GameObjects();
 	auto iter = pGameObjects.begin();
 

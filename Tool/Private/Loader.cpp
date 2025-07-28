@@ -150,6 +150,14 @@ HRESULT CLoader::Loading_For_Logo_Level()
 		CRASH("Prototype GameObject Create Failed");
 		return E_FAIL;
 	}
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LOGO)
+		, TEXT("Prototype_GameObject_Weapon")
+		, CPlayer::Create(m_pDevice, m_pContext))))
+	{
+		CRASH("Prototype GameObject Create Failed");
+		return E_FAIL;
+	}
 		
 
 #pragma endregion

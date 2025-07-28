@@ -12,7 +12,7 @@ public:
 	typedef struct tagPlayerStrongAttackEnterDesc
 	{
 		_uint iAnimation_Idx = {};
-		DIR eDirection = {};
+		ACTORDIR eDirection = {};
 	}STRONG_ENTER_DESC;
 
 public:
@@ -42,14 +42,6 @@ public:
 	virtual void Reset() override;
 
 
-
-private:
-	_int		   m_iCurIdx = {};
-	_int		   m_iNextIdx = {};
-	_bool		   m_isLoop = { true };
-	_bool		   m_isKeyInput = { false };
-	DIR			   m_eDir = { DIR::END };
-	
 
 public:
 	static CPlayer_StrongAttackState* Create(_uint iStateNum, void* pArg);

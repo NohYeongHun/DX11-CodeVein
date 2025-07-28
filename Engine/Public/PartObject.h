@@ -7,7 +7,7 @@ NS_BEGIN(Engine)
 class ENGINE_DLL CPartObject abstract : public CGameObject
 {
 public:
-	typedef struct tagPartObjectDesc
+	typedef struct tagPartObjectDesc : CGameObject::GAMEOBJECT_DESC
 	{
 		const _float4x4* pParentMatrix;
 	}PARTOBJECT_DESC;
@@ -26,6 +26,10 @@ public:
 
 protected:
 	const _float4x4* m_pParentMatrix = { nullptr };
+	_float4x4 m_CombinedWorldMatrix = {};
+
+protected:
+	void Update_CombinedMatrix();
 
 public:
 	virtual CGameObject* Clone(void* pArg) = 0;

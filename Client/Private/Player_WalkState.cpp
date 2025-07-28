@@ -23,7 +23,7 @@ void CPlayer_WalkState::Enter(void* pArg)
 	m_iNextState = -1;
 	m_iNextAnimIdx = -1;
 	m_iCurAnimIdx = pDesc->iAnimation_Idx;
-	m_pPlayer->Change_Animation(m_iCurAnimIdx, m_isLoop);
+	m_pModelCom->Set_Animation(m_iCurAnimIdx, m_isLoop);
 }
 
 // LockOn일 때만 Walk 상태
@@ -42,7 +42,7 @@ void CPlayer_WalkState::Update(_float fTimeDelta)
 	else
 	{
 		CPlayer_IdleState::IDLE_ENTER_DESC Desc{};
-		Desc.iAnimation_Index = 17;
+		Desc.iAnimation_Idx = 16;
 		m_pFsm->Change_State(CPlayer::PLAYER_STATE::IDLE, &Desc);
 		m_iNextAnimIdx = CPlayer::PLAYER_STATE::IDLE;
 	}		
@@ -53,14 +53,17 @@ void CPlayer_WalkState::Exit()
 {
 	if (m_iNextState != -1)
 		m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.5f, true, true, true);
+
+
 }
 
 // 상태 초기화
 void CPlayer_WalkState::Reset()
 {
-	m_eDir = { DIR::END };
+	m_eDir = { ACTORDIR::END };
 	m_iCurAnimIdx = -1;
 	m_iNextAnimIdx = -1;
+	m_pModelCom->Animation_Reset();
 }
 
 // 상태 전환 구현 (키 입력 감지)

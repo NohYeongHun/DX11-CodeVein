@@ -130,9 +130,6 @@ HRESULT CTransform::Bind_Shader_Resource(CShader* pShader, const _char* pConstan
 // 매프레임 업데이트
 void CTransform::Update_WorldMatrix()
 {
-	if (!m_bIsDirty)
-		return;
-
 	_matrix matScale = XMMatrixScaling(m_vScale.x, m_vScale.y, m_vScale.z);
 	_matrix matRotation = XMMatrixRotationQuaternion(m_QuatRotation);
 	_matrix matTranslation = XMMatrixTranslation(m_vPosition.x, m_vPosition.y, m_vPosition.z);
@@ -241,6 +238,11 @@ void CTransform::LookAt_YawOnly(_vector vTargetDir)
 	_vector qRot = XMQuaternionRotationMatrix(XMMatrixLookToLH(XMVectorZero(), vTargetDir, XMVectorSet(0.f, 1.f, 0.f, 0.f)));
 	m_QuatRotation = qRot;
 	m_bIsDirty = true;
+}
+
+void CTransform::Set_ParentMatrix(const _float4x4* pParentWorldMatrix)
+{
+	m_pParentWorldMatrix = pParentWorldMatrix;
 }
 
 void CTransform::Set_Position(const _float3& vPos)

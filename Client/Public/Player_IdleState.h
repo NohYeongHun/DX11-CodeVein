@@ -8,7 +8,7 @@ class CPlayer_IdleState final : public CPlayerState
 public:
 	typedef struct tagPlayerIdleEnterDesc
 	{
-		_uint iAnimation_Index = {};
+		_uint iAnimation_Idx = {};
 	}IDLE_ENTER_DESC;
 
 public:
@@ -39,13 +39,9 @@ public:
 
 	void Change_State();
 
-public:
-	void Handle_Input();
 
 private:
 	_bool		   m_isLoop = { true }; // Loop 상태인가?
-	_bool		   m_isKeyInput = { false };
-	DIR			   m_eDir = { DIR::END };
 
 public:
 	static CPlayer_IdleState* Create(_uint iStateNum, void* pArg);

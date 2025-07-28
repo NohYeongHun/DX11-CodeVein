@@ -30,7 +30,7 @@ void CPlayer_IdleState::Enter(void* pArg)
 	// Idle 시에는 RootMotion 비활성화
 
 	m_iNextState = -1;
-	m_iCurAnimIdx = pDesc->iAnimation_Index;
+	m_iCurAnimIdx = pDesc->iAnimation_Idx;
 	m_pModelCom->Set_Animation(m_iCurAnimIdx, m_isLoop);
 
 
@@ -40,15 +40,12 @@ void CPlayer_IdleState::Enter(void* pArg)
 void CPlayer_IdleState::Update(_float fTimeDelta)
 {
 	Handle_Input();
+	Change_State();
 }
 
 // 종료될 때 실행할 동작..
 void CPlayer_IdleState::Exit()
 {
-	//if (m_iNextState != -1)
-	// 
-	//	m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, true);
-
 	if (m_iNextState != -1)
 	{
 		if (m_iNextState == CPlayer::PLAYER_STATE::SWORD_STRONG_ATTACK)
@@ -62,7 +59,7 @@ void CPlayer_IdleState::Exit()
 void CPlayer_IdleState::Reset()
 {
 	m_iNextState = -1;
-	m_eDir = { DIR::END };
+	m_eDir = { ACTORDIR::END };
 }
 
 void CPlayer_IdleState::Change_State()
@@ -71,6 +68,8 @@ void CPlayer_IdleState::Change_State()
 	CPlayer_RunState::RUN_ENTER_DESC Run{};
 	CPlayer_DodgeState::DODGE_ENTER_DESC Dodge{};
 	CPlayer_StrongAttackState::STRONG_ENTER_DESC StrongAttack{};
+	CPlayer_AttackState::ATTACK_ENTER_DESC Attack{};
+	CPlayer_GuardState::GUARD_ENTER_DESC Guard{};
 
 
 	if (m_pPlayer->Is_MovementKeyPressed())
@@ -94,21 +93,23 @@ void CPlayer_IdleState::Change_State()
 		StrongAttack.iAnimation_Idx = 38;
 		StrongAttack.eDirection = m_eDir;
 		m_pFsm->Change_State(m_iNextState, &StrongAttack);
-		
 	}
-	
-	
+	else if (m_pPlayer->Is_KeyUp(PLAYER_KEY::GUARD))
+	{
+		m_iNextState = CPlayer::PLAYER_STATE::GUARD;
+		Guard.iAnimation_Idx = 36;
+		m_pFsm->Change_State(m_iNextState, &Guard);
+	}
+	else if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::ATTACK))
+	{
+		m_iNextState = CPlayer::PLAYER_STATE::ATTACK;
+		Attack.iAnimation_Idx = 25;
+		m_pFsm->Change_State(m_iNextState, &Attack);
+	}
+
 	
 }
 
-// 상태 전환 구현 (키 입력 감지)
-void CPlayer_IdleState::Handle_Input()
-{
-	m_isKeyInput = m_pPlayer->Is_MovementKeyPressed();
-	m_eDir = m_pPlayer->Get_Direction();
-	m_KeyInput = m_KeyInput;	
-	Change_State();
-}
 
 CPlayer_IdleState* CPlayer_IdleState::Create(_uint iStateNum, void* pArg)
 {

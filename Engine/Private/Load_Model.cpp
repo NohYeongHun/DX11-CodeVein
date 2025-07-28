@@ -114,6 +114,27 @@ HRESULT CLoad_Model::Render(_uint iNumMesh)
 
 
 
+_float4x4* CLoad_Model::Get_BoneMatrix(const _char* pBoneName)
+{
+	auto    iter = find_if(m_Bones.begin(), m_Bones.end(), [&](CLoad_Bone* pBone) {
+		if (true == pBone->Compare_Name(pBoneName))
+			return true;
+		return false;
+		});
+
+	if (iter == m_Bones.end())
+		return nullptr;
+
+	return (*iter)->Get_CombinedTransformationMatrixPtr();
+}
+
+_uint CLoad_Model::Get_CurrentFrame()
+{
+	
+
+	return _uint();
+}
+
 const _bool CLoad_Model::Is_Ray_Hit(const _float3& rayOrigin, const _float3& rayDir, _float* pOutDist)
 {
 	_bool IsHit = false;

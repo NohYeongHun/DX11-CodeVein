@@ -100,6 +100,15 @@
     <Filter Include="02. GameObject\Player\State\Move">
       <UniqueIdentifier>{5b67a0dd-7022-40b9-8e47-9ddaaf4c616e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. GameObject\Player\Body">
+      <UniqueIdentifier>{4cc7216b-d317-442e-855b-0e39f69cda3b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Player\Weapon">
+      <UniqueIdentifier>{03550db2-50d0-4a33-9fe6-dcbeeee18850}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Player\State\Attack">
+      <UniqueIdentifier>{da512e54-bb12-4279-a70d-a39248ec0f81}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -243,9 +252,6 @@
     <ClInclude Include="..\Public\InventoryStatus_Info.h">
       <Filter>02. GameObject\UI\Player\Inventory\Status</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Player.h">
-      <Filter>02. GameObject\Player</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\HUD.h">
       <Filter>02. GameObject\UI\Player\HUD</Filter>
     </ClInclude>
@@ -273,9 +279,6 @@
     <ClInclude Include="..\Public\Camera_Player.h">
       <Filter>02. GameObject\Camera\Player</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Player_StrongAttackState.h">
-      <Filter>02. GameObject\Player\State</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\Player_DodgeState.h">
       <Filter>02. GameObject\Player\State\Move</Filter>
     </ClInclude>
@@ -287,6 +290,21 @@
     </ClInclude>
     <ClInclude Include="..\Public\Player_WalkState.h">
       <Filter>02. GameObject\Player\State\Move</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Player.h">
+      <Filter>02. GameObject\Player\Body</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Weapon.h">
+      <Filter>02. GameObject\Player\Weapon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Player_StrongAttackState.h">
+      <Filter>02. GameObject\Player\State\Attack</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Player_GuardState.h">
+      <Filter>02. GameObject\Player\State\Attack</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Player_AttackState.h">
+      <Filter>02. GameObject\Player\State\Attack</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -423,9 +441,6 @@
     <ClCompile Include="..\Private\InventoryStatus_Info.cpp">
       <Filter>02. GameObject\UI\Player\Inventory\Status</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Player.cpp">
-      <Filter>02. GameObject\Player</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\Loader.cpp">
       <Filter>01. Levels\99. Loading\Loader</Filter>
     </ClCompile>
@@ -453,9 +468,6 @@
     <ClCompile Include="..\Private\Camera_Player.cpp">
       <Filter>02. GameObject\Camera\Player</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Player_StrongAttackState.cpp">
-      <Filter>02. GameObject\Player\State</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\Player_DodgeState.cpp">
       <Filter>02. GameObject\Player\State\Move</Filter>
     </ClCompile>
@@ -467,6 +479,21 @@
     </ClCompile>
     <ClCompile Include="..\Private\Player_WalkState.cpp">
       <Filter>02. GameObject\Player\State\Move</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Player.cpp">
+      <Filter>02. GameObject\Player\Body</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Weapon.cpp">
+      <Filter>02. GameObject\Player\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Player_GuardState.cpp">
+      <Filter>02. GameObject\Player\State\Attack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Player_StrongAttackState.cpp">
+      <Filter>02. GameObject\Player\State\Attack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Player_AttackState.cpp">
+      <Filter>02. GameObject\Player\State\Attack</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

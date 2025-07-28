@@ -148,6 +148,15 @@ namespace Engine
 		_bool bTranslate = { true };
 		
 	}BLEND_DESC;
+
+	// Animation Chnage Desc
+	typedef struct tagChangeAnimationDesc
+	{
+		_uint	iNextAnimIndex;
+		_uint	iStartFrame;
+		_float	fChangeTime = 0.f;
+		_float	fChangeDuration = 0.f;
+	}CHANGEANIMATION_DESC;
 }
 
 #include "Event_Type.h"

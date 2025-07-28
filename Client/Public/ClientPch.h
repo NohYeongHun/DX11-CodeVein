@@ -83,7 +83,11 @@
 #include "Player_RunState.h"
 #include "Player_DodgeState.h"
 #include "Player_StrongAttackState.h"
+#include "Player_AttackState.h"
+#include "Player_GuardState.h"
+#include "Weapon.h"
 #include "Player.h"
+
 
 #pragma endregion
 

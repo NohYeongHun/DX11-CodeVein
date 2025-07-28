@@ -22,6 +22,10 @@ public:
 	void Update_CombinedTransformationMatrix(const _float4x4& PreTransformMatrix, const vector<CLoad_Bone*>& Bones);
 
 public:
+	_float4x4* Get_CombinedTransformationMatrixPtr() {
+		return &m_CombinedTransformationMatrix;
+	}
+
 	_matrix Get_CombinedTransformationMatrix() const {
 		return XMLoadFloat4x4(&m_CombinedTransformationMatrix);
 	}

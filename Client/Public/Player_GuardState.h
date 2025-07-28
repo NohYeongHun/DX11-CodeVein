@@ -3,27 +3,27 @@
 
 
 NS_BEGIN(Client)
-class CPlayer_DodgeState final : public CPlayerState
+/* index : 34 End, 35 Loop, 36 Start, 37 Hit*/
+class CPlayer_GuardState final : public CPlayerState
 {
 public:
 
 
 public:
-	typedef struct tagPlayerDodgeEnterDesc
+	typedef struct tagPlayerGuardEnterDesc
 	{
 		_uint iAnimation_Idx = {};
-		ACTORDIR eDirection;
-	}DODGE_ENTER_DESC;
+	}GUARD_ENTER_DESC;
 
 public:
-	typedef struct tagPlayerDodgeStateDesc : public CPlayerState::PLAYER_STATE_DESC
+	typedef struct tagPlayerGuardStateDesc : public CPlayerState::PLAYER_STATE_DESC
 	{
 
-	}DODGESTATE_DESC;
+	}GUARDSTATE_DESC;
 
 private:
-	explicit CPlayer_DodgeState();
-	virtual ~CPlayer_DodgeState() = default;
+	explicit CPlayer_GuardState();
+	virtual ~CPlayer_GuardState() = default;
 
 public:
 	// 시작 초기화
@@ -41,14 +41,15 @@ public:
 	// State 초기값으로 설정
 	virtual void Reset() override;
 
-	void Change_State();
+	void Change_State(_float fTimeDelta);
+	
 
 private:
 	ACTORDIR			   m_eDir = { ACTORDIR::END };
 	
 
 public:
-	static CPlayer_DodgeState* Create(_uint iStateNum, void* pArg);
+	static CPlayer_GuardState* Create(_uint iStateNum, void* pArg);
 	virtual void Free() override;
 
 

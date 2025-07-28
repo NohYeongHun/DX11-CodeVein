@@ -120,37 +120,6 @@ void CGameInstance::Update_Engine(_float fTimeDelta)
 }
 
 
-//void CGameInstance::Update_Engine(_float fTimeDelta)
-//{
-//	m_fTimeDelta = fTimeDelta;
-//
-//	// Task Queue에 들어가있으면 해당 작업을 우선 처리한다.
-//	if(FAILED(Task()))
-//		return;
-//
-//	m_pInput_Device->Update();
-//
-//	/* 내 게임내에서 반복적인 갱신이 필요한 객체들이 있다라면 갱신을 여기에서 모아서 수행한다.. */
-//	m_pObject_Manager->Priority_Update(fTimeDelta);
-//	m_pCamera_Manager->Update(fTimeDelta);
-//	m_pPipleLine->Update();
-//
-//	/*
-//	* 피킹 Update 진행. => 갱신된 PipeLine 정보 이용.
-//	*/
-//	m_pPicking->Update();
-//
-//	/*m_pPicking->Update();*/
-//
-//	m_pObject_Manager->Update(fTimeDelta);
-//	m_pObject_Manager->Late_Update(fTimeDelta);
-//
-//	m_pCollider_Manager->Update();
-//	
-//
-//	m_pLevel_Manager->Update(fTimeDelta);
-//	
-//}
 
 HRESULT CGameInstance::Clear_Resources(_uint iClearLevelID)
 {

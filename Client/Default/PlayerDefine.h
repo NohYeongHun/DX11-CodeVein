@@ -43,10 +43,10 @@
 32 AS_TStdUnisex_TLSword_Dodge300_L.psa
 33 AS_TStdUnisex_TLSword_Dodge300_R.psa
 * 가드
-34 AS_TStdUnisex_TLSword_GuardHit_N.psa
-35 AS_TStdUnisex_TLSword_Guard_N_End.psa
-36 AS_TStdUnisex_TLSword_Guard_N_Loop.psa
-37 AS_TStdUnisex_TLSword_Guard_N_Start.psa
+34 AS_TStdUnisex_TLSword_Guard_N_End.psa
+35 AS_TStdUnisex_TLSword_Guard_N_Loop.psa
+36 AS_TStdUnisex_TLSword_Guard_N_Start.psa
+37 AS_TStdUnisex_TLSword_GuardHit_N.psa
 * 강공.
 38 AS_TStdUnisex_TSword_AttackStrong01A_N.psa
 */

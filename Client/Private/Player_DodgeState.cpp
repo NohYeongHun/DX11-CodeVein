@@ -17,11 +17,6 @@ HRESULT CPlayer_DodgeState::Initialize(_uint iStateNum, void* pArg)
 void CPlayer_DodgeState::Enter(void* pArg)
 {
 
-	_vector vPos = m_pPlayer->Get_Transform()->Get_State(STATE::POSITION); // 구문 수정
-	OutputDebugString((L"[DODGE ENTER] Position: " +
-		std::to_wstring(XMVectorGetX(vPos)) + L", " +
-		std::to_wstring(XMVectorGetZ(vPos)) + L"\n").c_str());
-
 	DODGE_ENTER_DESC* pDesc = static_cast<DODGE_ENTER_DESC*>(pArg);
 	m_iNextState = -1;
 	m_iNextAnimIdx = -1;
@@ -58,9 +53,10 @@ void CPlayer_DodgeState::Update(_float fTimeDelta)
 // 종료될 때 실행할 동작.=> 왠만하면 Idle
 void CPlayer_DodgeState::Exit()
 {
-	// 여기서 동작해야합니다.
+	//여기서 동작해야합니다.
 	if (m_iNextState != -1) // NextIndex가 있는경우 블렌딩 시작.
 	{
+		
 		if (m_iNextState == CPlayer::PLAYER_STATE::IDLE)
 			m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, false);
 	}
@@ -70,10 +66,10 @@ void CPlayer_DodgeState::Exit()
 // 상태 초기화
 void CPlayer_DodgeState::Reset()
 {
-	m_eDir = { DIR::END };
+	m_eDir = { ACTORDIR::END };
 	m_iNextAnimIdx = -1;
 	m_iCurAnimIdx = -1;
-
+	m_pModelCom->Animation_Reset();
 }
 
 /* 상태에 따른 변경을 정의합니다. */
@@ -82,8 +78,8 @@ void CPlayer_DodgeState::Change_State()
 
 	CPlayer_IdleState::IDLE_ENTER_DESC Idle{};
 	m_iNextState = CPlayer::PLAYER_STATE::IDLE;
-	m_iNextAnimIdx = 17;
-	Idle.iAnimation_Index = 17;
+	m_iNextAnimIdx = 16;
+	Idle.iAnimation_Idx = 16;
 	m_pFsm->Change_State(m_iNextState, &Idle);
 	//m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.5f, true, true, false);
 }
