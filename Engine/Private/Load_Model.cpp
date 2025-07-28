@@ -205,18 +205,18 @@ _bool CLoad_Model::Play_Animation(_float fTimeDelta)
 
 				// 이동량이 유효한 경우에만 적용
 				_float fLength = XMVectorGetX(XMVector3Length(vLocalTranslate));
-				if (fLength > 0.001f && fLength < 5.0f) // 과도한 이동 방지
-				{
-					// 플레이어의 현재 회전을 Root Motion에 적용
-					_matrix playerWorldMatrix = m_pOwner->Get_Transform()->Get_WorldMatrix();
-					_vector playerScale, playerRot, playerTrans;
-					XMMatrixDecompose(&playerScale, &playerRot, &playerTrans, playerWorldMatrix);
-					_matrix playerRotMatrix = XMMatrixRotationQuaternion(playerRot);
-
-					// 이동방향을 플레이어 방향으로 회전.
-					_vector vWorldTranslate = XMVector3TransformNormal(vLocalTranslate, playerRotMatrix);
-					m_pOwner->Translate(vWorldTranslate);
-				}
+				//if (fLength > 0.001f && fLength < 5.0f) // 과도한 이동 방지
+				//{
+				//	// 플레이어의 현재 회전을 Root Motion에 적용
+				//	_matrix playerWorldMatrix = m_pOwner->Get_Transform()->Get_WorldMatrix();
+				//	_vector playerScale, playerRot, playerTrans;
+				//	XMMatrixDecompose(&playerScale, &playerRot, &playerTrans, playerWorldMatrix);
+				//	_matrix playerRotMatrix = XMMatrixRotationQuaternion(playerRot);
+				//
+				//	// 이동방향을 플레이어 방향으로 회전.
+				//	_vector vWorldTranslate = XMVector3TransformNormal(vLocalTranslate, playerRotMatrix);
+				//	m_pOwner->Translate(vWorldTranslate);
+				//}
 
 				// 다음 프레임을 위한 위치 저장
 				XMStoreFloat4(&m_vOldPos, vNewRootPos);
