@@ -42,7 +42,9 @@ public:
 
 
 private:
-	_bool		   m_isLoop = { true }; // Loop 상태인가?
+	_bool   m_isLoop = { true }; // Loop 상태인가?
+
+	_float  m_fCoolTime[CPlayer::PLAYER_STATE::STATE_END] = { 0.f };
 
 public:
 	static CPlayer_IdleState* Create(_uint iStateNum, void* pArg);

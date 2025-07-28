@@ -195,17 +195,17 @@ HRESULT CLevel_GamePlay::Ready_Layer_Player(const _wstring& strLayerTag)
 		return E_FAIL;
 	}
 
-	if (FAILED(m_pGameInstance->Change_Camera(TEXT("FreeCamera"), ENUM_CLASS(LEVEL::GAMEPLAY))))
-	{
-		CRASH("Change Camera Failed");
-		return E_FAIL;
-	}
-
-	//if (FAILED(m_pGameInstance->Change_Camera(TEXT("PlayerCamera"), ENUM_CLASS(LEVEL::GAMEPLAY))))
+	//if (FAILED(m_pGameInstance->Change_Camera(TEXT("FreeCamera"), ENUM_CLASS(LEVEL::GAMEPLAY))))
 	//{
 	//	CRASH("Change Camera Failed");
 	//	return E_FAIL;
 	//}
+
+	if (FAILED(m_pGameInstance->Change_Camera(TEXT("PlayerCamera"), ENUM_CLASS(LEVEL::GAMEPLAY))))
+	{
+		CRASH("Change Camera Failed");
+		return E_FAIL;
+	}
 
 
 	return S_OK;

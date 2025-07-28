@@ -1,10 +1,9 @@
 ﻿#pragma once
 #include "PlayerState.h"
 
-/* 모든 동작의 기본이 되는 동작. */
 
 NS_BEGIN(Client)
-
+/* 바로 못돌아오게하는 처리도 필요해보임*/
 /* 32 */
 class CPlayer_AttackState final : public CPlayerState
 {

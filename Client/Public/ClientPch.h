@@ -77,6 +77,8 @@
 
 
 /* ======================================== Actor Object ===================================== */
+#include "Weapon.h"
+#include "Player.h"
 #include "PlayerState.h"
 #include "Player_IdleState.h"
 #include "Player_WalkState.h"
@@ -85,8 +87,7 @@
 #include "Player_StrongAttackState.h"
 #include "Player_AttackState.h"
 #include "Player_GuardState.h"
-#include "Weapon.h"
-#include "Player.h"
+
 
 
 #pragma endregion

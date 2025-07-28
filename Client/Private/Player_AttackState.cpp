@@ -27,6 +27,7 @@ void CPlayer_AttackState::Enter(void* pArg)
 	m_eDir = pDesc->eDirection;
 	
 	m_pModelCom->Set_Animation(m_iCurAnimIdx, m_isLoop);
+	//m_pModelCom->Set_CurrentTrackPosition(pDesc->fCurrentTrackPosition);
 	
 
 	// 디버그 출력
@@ -93,15 +94,8 @@ void CPlayer_AttackState::Change_State(_float fTimeDelta)
 	{
 		if (m_fCurTime >= m_fAttackTime && m_pPlayer->Is_KeyPressed(PLAYER_KEY::ATTACK))
 		{
-			if (m_iCurAnimIdx == 47) // 마지막이면
-			{
-				// Idle 상태로 전환
-				m_iNextState = CPlayer::PLAYER_STATE::IDLE;
-				m_iNextAnimIdx = 16;
-				Idle.iAnimation_Idx = 16;
-				m_pFsm->Change_State(CPlayer::PLAYER_STATE::IDLE, &Idle);
-				
-			}
+			if (m_iCurAnimIdx == 34) // 마지막이면 무시
+				return;
 			else
 			{
 				
@@ -109,6 +103,7 @@ void CPlayer_AttackState::Change_State(_float fTimeDelta)
 				m_iNextAnimIdx = m_iCurAnimIdx + 1;
 				m_iNextState = CPlayer::PLAYER_STATE::ATTACK;
 				Attack.iAnimation_Idx = m_iNextAnimIdx;
+				//Attack.fCurrentTrackPosition = m_pModelCom->Get_CurrentTrackPosition();
 				m_pFsm->Change_State(m_iNextState, &Attack);
 			}
 		}
