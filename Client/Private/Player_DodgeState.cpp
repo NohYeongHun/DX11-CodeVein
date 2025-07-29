@@ -25,6 +25,7 @@ void CPlayer_DodgeState::Enter(void* pArg)
 	// ⭐ Dodge는 non-loop으로 변경
 	m_isLoop = false;
 	m_pModelCom->Set_Animation(m_iCurAnimIdx, m_isLoop);
+	m_pModelCom->Set_RootMotionRotation(true);
 }
 
 /* State 실행 */

@@ -27,10 +27,7 @@ public:
 		return m_iNumMeshes;
 	}
 
-	void Set_Animation(_uint iAnimIndex, _bool isLoop = false) {
-		m_iCurrentAnimIndex = iAnimIndex;
-		m_isLoop = isLoop;
-	}
+	void Set_Animation(_uint iAnimIndex, _bool isLoop = false);
 
 	void Set_Loop(_bool isLoop)
 	{
@@ -82,6 +79,12 @@ public:
 	void Set_BlendInfo(uint32_t iNextAnimIndex, _float fBlendTime, _bool bScale, _bool bRotation, _bool bTranslation);
 	_vector QuaternionSlerpShortest(_vector q1, _vector q2, _float t);
 
+	void Set_RootMotionRotation(_bool bRootRotation = false) { m_bRootMotionRotate = bRootRotation; }
+	void Set_RootMotionTranslate(_bool bRootTranslate = true) { m_bRootMotionTranslate = bRootTranslate; }
+
+
+private:
+	void Handle_RootMotion(_float fTimeDelta);
 
 public:
 	void Animation_Reset();
@@ -134,9 +137,13 @@ private:
 	_float4 m_vSameOldPos = {};
 	
 
+	_bool m_bRootMotionRotate = { false };
+	_bool m_bRootMotionTranslate = { false };
+
 private:
 	string m_ModelDir = {};
 
+	
 
 private:
 	HRESULT Load_Meshes(_fmatrix PreTransformMatrix, std::ifstream& ifs);
