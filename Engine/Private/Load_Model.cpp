@@ -112,6 +112,18 @@ HRESULT CLoad_Model::Render(_uint iNumMesh)
 	return S_OK;
 }
 
+void CLoad_Model::Set_Animation(_uint iAnimIndex, _bool isLoop)
+{
+	m_isLoop = isLoop;
+	if (m_iCurrentAnimIndex != iAnimIndex)
+	{
+		Reset_RootMotion();
+	}
+	m_iCurrentAnimIndex = iAnimIndex;
+	
+
+}
+
 
 
 _float4x4* CLoad_Model::Get_BoneMatrix(const _char* pBoneName)
@@ -189,61 +201,13 @@ _bool CLoad_Model::Play_Animation(_float fTimeDelta)
 		m_Bones, m_isLoop, &m_isFinished, m_BlendDesc, fTimeDelta
 	);
 
+
 	for (_uint i = 0; i < m_Bones.size(); ++i)
 	{
 		m_Bones[i]->Update_CombinedTransformationMatrix(m_PreTransformMatrix, m_Bones);
 
 		if (i == m_iRoot_BoneIndex)
-		{
-			_matrix rootMatrix = m_Bones[i]->Get_CombinedTransformationMatrix();
-			_vector vNewRootPos = rootMatrix.r[3];
-
-			if (!m_isFinished)
-			{
-				_vector vLocalTranslate = vNewRootPos - XMLoadFloat4(&m_vOldPos);
-				vLocalTranslate = XMVectorSetY(vLocalTranslate, 0.f); // Y축 제거
-
-				// 이동량이 유효한 경우에만 적용
-				_float fLength = XMVectorGetX(XMVector3Length(vLocalTranslate));
-				//if (fLength > 0.001f && fLength < 5.0f) // 과도한 이동 방지
-				//{
-				//	// 플레이어의 현재 회전을 Root Motion에 적용
-				//	_matrix playerWorldMatrix = m_pOwner->Get_Transform()->Get_WorldMatrix();
-				//	_vector playerScale, playerRot, playerTrans;
-				//	XMMatrixDecompose(&playerScale, &playerRot, &playerTrans, playerWorldMatrix);
-				//	_matrix playerRotMatrix = XMMatrixRotationQuaternion(playerRot);
-				//
-				//	// 이동방향을 플레이어 방향으로 회전.
-				//	_vector vWorldTranslate = XMVector3TransformNormal(vLocalTranslate, playerRotMatrix);
-				//	m_pOwner->Translate(vWorldTranslate);
-				//}
-				m_pOwner->Translate(vLocalTranslate);
-
-				// 다음 프레임을 위한 위치 저장
-				XMStoreFloat4(&m_vOldPos, vNewRootPos);
-			}
-
-			  // ⭐ 루트본 위치를 항상 원점으로 리셋 (애니메이션 완료 여부와 관계없이)
-			//rootMatrix.r[3] = XMVectorSet(m_vOldPos.x, m_vOldPos.y, m_vOldPos.z, 1.f);
-			
-			// 새로운 애니메이션의 루트본을 이전벡터에 넣어둔다.
-			rootMatrix.r[3] = XMVectorSet(0.f, 0.f, 0.f, 1.f);
-			//rootMatrix.r[3] = XMVectorSet(m_vOldPos.x, m_vOldPos.y, m_vOldPos.z, 1.f);
-			m_Bones[i]->Set_CombinedTransformationMatrix(rootMatrix);
-
-			_float4 vPos = {};
-			XMStoreFloat4(&vPos, m_Bones[i]->Get_CombinedTransformationMatrix().r[3]);
-
-			/* 루트본 디버깅 */
-			/*_wstring wstrDebug = L" RootBone x : " + to_wstring(vPos.x) + L" y :  " + to_wstring(vPos.y) + L" z :  " + to_wstring(vPos.z) + L'\n';
-			OutputDebugString(wstrDebug.c_str());*/
-
-			if (m_iCurrentAnimIndex >= 32 && m_iCurrentAnimIndex <= 48)
-			{
-				_wstring wAttack = L" x : " + to_wstring(m_vOldPos.x) + L" x : " + to_wstring(m_vOldPos.y) + L" x : " + to_wstring(m_vOldPos.z) + L'\n';
-				OutputDebugString(wAttack.c_str());
-			}
-		}
+			Handle_RootMotion(fTimeDelta);
 	}
 		
 	if (m_isFinished)
@@ -252,7 +216,7 @@ _bool CLoad_Model::Play_Animation(_float fTimeDelta)
 	return m_isFinished;
 }
 
-// 1. 저번에 실행되던 애니메이션의 KeyFrame Left, Right를 가져와
+// 1. 저번에 실행되던 애니메이션의 KeyFrame Lefft, Right를 가져와
 // 2. 그 두 KeyFrame을 보간해
 // 3. 보간한 KeyFrame과 내 다음 애니메이션 키프레임을 보간해.
 // 4. 문제는 PlayAnimation은 계속 실행되는거야.
@@ -322,6 +286,54 @@ _vector CLoad_Model::QuaternionSlerpShortest(_vector q1, _vector q2, _float t)
 
 	// 구면 선형 보간
 	return XMQuaternionSlerp(q1, q2, t);
+}
+
+void CLoad_Model::Handle_RootMotion(_float fTimeDelta)
+{
+	//Handle_RootMotion(fTimeDelta);
+
+	_matrix rootMatrix = m_Bones[m_iRoot_BoneIndex]->Get_CombinedTransformationMatrix();
+	_vector vNewRootPos = rootMatrix.r[3];
+	
+
+	
+
+	if (!m_isFinished)
+	{
+		// 0. 뼈의 이동 구하기.
+		_vector vLocalTranslate = vNewRootPos - XMLoadFloat4(&m_vOldPos);
+		vLocalTranslate = XMVectorSetY(vLocalTranslate, 0.f); // Y축 제거
+		_vector vWorldTranslate = vLocalTranslate; // 기본값
+
+		// 1. 플레이어 RotMatrix 추출 => 만약 RootMotionRotate 설정을 할것이라면?
+		if (m_bRootMotionRotate)
+		{
+			_matrix playerWorldMatrix = m_pOwner->Get_Transform()->Get_WorldMatrix();
+			_vector playerScale, playerRot, playerTrans;
+			XMMatrixDecompose(&playerScale, &playerRot, &playerTrans, playerWorldMatrix);
+			_matrix playerRotMatrix = XMMatrixRotationQuaternion(playerRot);
+			_vector vWorldTranslate = XMVector3TransformNormal(vLocalTranslate, playerRotMatrix);
+		}
+		// 2. 월드 이동 구하기 => Translate 설정할.
+
+		// 3. 이동값을 월드에 적용할 것인지 모션에서 설정
+		if (m_bRootMotionTranslate)
+			m_pOwner->Translate(vWorldTranslate);
+			
+
+
+		XMStoreFloat4(&m_vOldPos, vNewRootPos);
+		
+	}
+	// 새로운 애니메이션의 루트본을 이전벡터에 넣어둔다.
+	rootMatrix.r[3] = XMVectorSet(0.f, 0.f, 0.f, 1.f);
+	m_Bones[m_iRoot_BoneIndex]->Set_CombinedTransformationMatrix(rootMatrix);	
+}
+
+void CLoad_Model::Reset_RootMotion()
+{
+	_matrix rootMatrix = m_Bones[m_iRoot_BoneIndex]->Get_CombinedTransformationMatrix();
+	XMStoreFloat4(&m_vOldPos, rootMatrix.r[3]);
 }
 
 void CLoad_Model::Animation_Reset()

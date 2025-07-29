@@ -14,6 +14,7 @@ private:
 public:
 	HRESULT Initialize(std::ifstream& ifs);
 	void Update_TransformationMatrices(const vector<class CLoad_Bone*>& Bones, _bool isLoop, _bool* pFinished, BLEND_DESC& blendDesc, _float fTimeDelta);
+	void Blend_Update_TransformationMatrices(const vector<class CLoad_Bone*>& Bones, _bool isLoop, _bool* pFinished, BLEND_DESC& blendDesc, _float fTimeDelta);
 	const _float Get_CurrentTrackPosition() { return m_fCurrentTrackPosition; }
 	void Set_CurrentTrackPosition(_float fTrackPosition) { m_fCurrentTrackPosition = fTrackPosition; }
 	_matrix Get_BoneMatrixAtTime(_uint iBoneIndex, _float fCurrentTrackPosition);

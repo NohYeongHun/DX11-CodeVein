@@ -85,7 +85,7 @@ public:
 
 private:
 	void Handle_RootMotion(_float fTimeDelta);
-
+	void Reset_RootMotion();
 public:
 	void Animation_Reset();
 	
