@@ -78,7 +78,7 @@ public:
 			Is_KeyPressed(PLAYER_KEY::MOVE_RIGHT);
 	}
 	ACTORDIR Get_Direction() { return m_eCurrentDirection; }
-
+	ACTORDIR Calculate_Direction();
 
 
 public:
@@ -93,7 +93,7 @@ public:
 
 private:
 	
-	ACTORDIR Calculate_Direction();
+	
 	void Update_KeyInput();
 #pragma endregion
 

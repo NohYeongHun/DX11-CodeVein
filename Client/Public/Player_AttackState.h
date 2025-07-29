@@ -52,9 +52,23 @@ public:
 	// State 초기값으로 설정
 	virtual void Reset() override;
 
+private:
 	void Change_State(_float fTimeDelta);
+	void Handle_DirectionInput(_float fTimeDelta);
+	void Move_By_Camera_Forward(_float fTimeDelta, _float fSpeed);
+	void Move_By_Camera_Direction_With_Input(_float fTimeDelta, _float fSpeed);
+	void Move_By_Player_LookVector(_float fTimeDelta, _float fSpeed);
+	_vector Calculate_Input_Direction_From_Camera();
+	void Rotate_Player_To_Direction(_vector vTargetDirection, _float fTimeDelta);
 
 
+	
+private:
+	// 새로운 멤버 변수 추가
+	_bool m_bCanChangeDirection = true;     // 방향 변경 가능 여부
+	_float m_fDirectionLockTime = 0.3f;     // 방향 고정 시간 (초)
+	_float m_fCurrentLockTime = 0.0f;       // 현재 경과 시간
+	_bool m_bIsDirectionLocked = false;     // 방향이 고정되었는지 여부
 
 public:
 	static CPlayer_AttackState* Create(_uint iStateNum, void* pArg);

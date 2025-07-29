@@ -104,6 +104,7 @@ void CPlayer_RunState::Change_State(_float fTimeDelta)
 		m_iNextState = CPlayer::PLAYER_STATE::ATTACK;
 		m_iNextAnimIdx = 32;
 		Attack.iAnimation_Idx = 32;
+		Attack.eDirection = m_eDir;
 		m_pFsm->Change_State(m_iNextState, &Attack);
 		return;
 	}

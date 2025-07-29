@@ -30,6 +30,8 @@ public:
 	virtual void Late_Update(_float fTimeDelta);
 	virtual HRESULT Render();
 
+private:
+	void Update_Chase_Target(_float fTimeDelta);
 
 private:
 	class CPlayer_Body* m_pBodyTarget = {};
@@ -38,6 +40,14 @@ private:
 	_float4 m_vTargetOffset = {};
 	_float m_fYaw = 0.f;
 	_float m_fPitch = 0.f; // 필요 
+
+private:
+	// 부드러운 추적을 위한 새로운 멤버 변수들
+	_float4 m_vCurrentCameraPos = {};    // 현재 카메라 위치
+	_float4 m_vTargetCameraPos = {};     // 목표 카메라 위치
+	_float m_fSmoothSpeed = 5.0f;        // 추적 속도 (높을수록 빠름)
+	_bool m_bFirstUpdate = true;         // 첫 번째 업데이트 체크
+
 
 public:
 	static CCamera_Player* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

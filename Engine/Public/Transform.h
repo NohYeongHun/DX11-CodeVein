@@ -129,6 +129,7 @@ private:
 	_float3			m_vScale = {};
 	_vector			m_QuatRotation = {}; // 누적 쿼터니언 회전.
 
+	
 	_float			m_fSpeedPerSec = {};
 	_float			m_fRotationPerSec = {};
 

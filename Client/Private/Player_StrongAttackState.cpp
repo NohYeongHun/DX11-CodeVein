@@ -84,19 +84,6 @@ void CPlayer_StrongAttackState::Change_State()
 	if (m_pFsm->Is_ExitCoolTimeEnd(m_iStateNum))
 	{
 
-		//if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::GUARD))
-		//{
-		//	// 해당 동작은 쿨타임이 있는경우 무시됨.
-		//	if (!m_pFsm->Is_CoolTimeEnd(CPlayer::GUARD))
-		//		return;
-
-		//	m_iNextAnimIdx = 30;
-		//	m_iNextState = CPlayer::GUARD;
-		//	Guard.iAnimation_Idx = m_iNextAnimIdx;
-		//	m_pFsm->Change_State(m_iNextState, &Guard);
-		//	return;
-		//}
-
 		if (m_pPlayer->Is_MovementKeyPressed())
 		{
 			m_iNextAnimIdx = 6;

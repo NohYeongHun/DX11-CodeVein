@@ -293,6 +293,7 @@ void CPlayer::HandleState(_float fTimeDelta)
 _vector CPlayer::Calculate_Move_Direction(ACTORDIR eDir)
 {
     CCamera* pCamera = m_pGameInstance->Get_MainCamera();
+
     _vector vLook = pCamera->Get_LookVector();
     _vector vRight = pCamera->Get_RightVector();
 
@@ -446,7 +447,7 @@ void CPlayer::Register_CoolTime()
     m_pFsmCom->Register_StateExitCoolTime(PLAYER_STATE::RUN, 0.f);
     m_pFsmCom->Register_StateExitCoolTime(PLAYER_STATE::DODGE, 1.5f);
     m_pFsmCom->Register_StateExitCoolTime(PLAYER_STATE::STRONG_ATTACK, 1.3f);
-    m_pFsmCom->Register_StateExitCoolTime(PLAYER_STATE::ATTACK, 0.5f);
+    m_pFsmCom->Register_StateExitCoolTime(PLAYER_STATE::ATTACK, 0.7f);
     m_pFsmCom->Register_StateExitCoolTime(PLAYER_STATE::GUARD, 0.4f);
 }
 

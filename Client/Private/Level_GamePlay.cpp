@@ -35,18 +35,12 @@ HRESULT CLevel_GamePlay::Initialize_Clone()
 		return E_FAIL;
 	}
 
-	
-	//if (FAILED(Ready_Layer_Terrain(TEXT("Layer_Terrain"))))
-	//	return E_FAIL;
-
 	if (FAILED(Ready_Lights()))
 	{
 		CRASH("Failed Light");
 		return E_FAIL;
 	}
-		
-
-
+	
 
 	if (FAILED(Ready_Layer_BackGround(TEXT("Layer_BackGround"))))
 	{
@@ -54,10 +48,6 @@ HRESULT CLevel_GamePlay::Initialize_Clone()
 		return E_FAIL;
 	}
 
-	
-
-	//if (FAILED(Ready_Layer_Monster(TEXT("Layer_Monster"))))
-	//	return E_FAIL;
 
 	if (FAILED(Ready_Layer_Effect(TEXT("Layer_Effect"))))
 	{
