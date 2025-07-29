@@ -12,8 +12,8 @@ CRenderer::CRenderer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 
 HRESULT CRenderer::Initialize_Clone()
 {
-    if (FAILED(Ready_Render_State()))
-        return E_FAIL;
+    /*if (FAILED(Ready_Render_State()))
+        return E_FAIL;*/
 
     return S_OK;
 }

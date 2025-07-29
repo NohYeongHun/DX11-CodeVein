@@ -62,6 +62,8 @@ public:
 
 	_uint Get_CurrentFrame();
 
+	_float Get_Current_Ratio();
+
 #pragma endregion
 
 	

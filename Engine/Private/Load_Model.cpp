@@ -142,9 +142,12 @@ _float4x4* CLoad_Model::Get_BoneMatrix(const _char* pBoneName)
 
 _uint CLoad_Model::Get_CurrentFrame()
 {
-	
-
 	return _uint();
+}
+
+_float CLoad_Model::Get_Current_Ratio()
+{
+	return m_Animations[m_iCurrentAnimIndex]->Get_CurrentTrackPosition() / m_Animations[m_iCurrentAnimIndex]->Get_Duration();
 }
 
 const _bool CLoad_Model::Is_Ray_Hit(const _float3& rayOrigin, const _float3& rayDir, _float* pOutDist)

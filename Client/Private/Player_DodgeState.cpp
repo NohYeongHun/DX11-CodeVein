@@ -17,7 +17,7 @@ HRESULT CPlayer_DodgeState::Initialize(_uint iStateNum, void* pArg)
 void CPlayer_DodgeState::Enter(void* pArg)
 {
 
-	DODGE_ENTER_DESC* pDesc = static_cast<DODGE_ENTER_DESC*>(pArg);
+  	DODGE_ENTER_DESC* pDesc = static_cast<DODGE_ENTER_DESC*>(pArg);
 	__super::Enter(pDesc); // 기본 쿨타임 설정.
 
 	m_iNextState = -1;

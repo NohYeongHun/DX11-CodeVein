@@ -53,7 +53,7 @@ void CPlayer_IdleState::Exit()
 		if (m_iNextState == CPlayer::PLAYER_STATE::STRONG_ATTACK)
 			m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, true);
 		else if (m_iNextState == CPlayer::PLAYER_STATE::DODGE)
-			m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, true);
+			m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, false);
 		else if (m_iNextState == CPlayer::GUARD)
 			m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, false);
 		else if (m_iNextState == CPlayer::PLAYER_STATE::ATTACK)

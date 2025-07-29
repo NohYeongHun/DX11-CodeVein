@@ -54,6 +54,12 @@ HRESULT CLevel_GamePlay::Initialize_Clone()
 		CRASH("Failed Ready_Layer_Effect");
 		return E_FAIL;
 	}
+	
+	if (FAILED(Ready_Layer_SkyBox(TEXT("Layer_SkyBox"))))
+	{
+		CRASH("Failed Ready_Layer_");
+		return E_FAIL;
+	}
 
 	
 	return S_OK;
@@ -224,6 +230,13 @@ HRESULT CLevel_GamePlay::Ready_Layer_Effect(const _wstring& strLayerTag)
 {
 	
 	return S_OK;
+}
+
+HRESULT CLevel_GamePlay::Ready_Layer_SkyBox(const _wstring& strLayerTag)
+{
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::GAMEPLAY), strLayerTag,
+		ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Sky"))))
+		return E_FAIL;
 }
 
 

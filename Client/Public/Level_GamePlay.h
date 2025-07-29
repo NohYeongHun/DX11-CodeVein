@@ -25,6 +25,7 @@ private:
 	HRESULT Ready_Layer_BackGround(const _wstring& strLayerTag);
 	HRESULT Ready_Layer_Monster(const _wstring& strLayerTag);
 	HRESULT Ready_Layer_Effect(const _wstring& strLayerTag);
+	HRESULT Ready_Layer_SkyBox(const _wstring& strLayerTag);
 
 private:
 	LEVEL m_eCurLevel = { LEVEL::GAMEPLAY };

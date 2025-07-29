@@ -89,7 +89,7 @@ void CPlayer_RunState::Change_State(_float fTimeDelta)
 		if (!m_pFsm->Is_CoolTimeEnd(CPlayer::STRONG_ATTACK))
 			return;
 
-		StrongAttack.iAnimation_Idx = 38;
+		StrongAttack.iAnimation_Idx = 48;
 		m_iNextState = CPlayer::PLAYER_STATE::STRONG_ATTACK;
 		m_iNextAnimIdx = 48;
 		m_pFsm->Change_State(m_iNextState, &StrongAttack);

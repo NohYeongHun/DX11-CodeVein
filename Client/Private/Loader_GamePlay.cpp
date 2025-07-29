@@ -36,6 +36,13 @@ HRESULT CLoader_GamePlay::Loading_Resource(ID3D11Device* pDevice, ID3D11DeviceCo
 		return E_FAIL;
 	}
 
+	if (FAILED(Add_Prototype_SkyBox(pDevice, pContext, pGameInstance)))
+	{
+		CRASH("Create SkyBox Failed");
+		MSG_BOX(TEXT("Create Failed Loading : GamePlay Player "));
+		return E_FAIL;
+	}
+
 	return S_OK;
 }
 
@@ -138,6 +145,29 @@ HRESULT CLoader_GamePlay::Add_Prototype_Camera_Player(ID3D11Device* pDevice, ID3
 	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level), TEXT("Prototype_GameObject_Camera_Player"),
 		CCamera_Player::Create(pDevice, pContext))))
 		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CLoader_GamePlay::Add_Prototype_SkyBox(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
+{
+	/* Prototype_Component_Texture_Sky */
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level), TEXT("Prototype_Component_Texture_Sky"),
+		CTexture::Create(pDevice, pContext, TEXT("../Bin/Resources/Textures/SkyBox/Sky_%d.dds"), 4))))
+		return E_FAIL;
+
+	//if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level), TEXT("Prototype_Component_Texture_Sky"),
+	//	CTexture::Create(pDevice, pContext, TEXT("../Bin/Resources/Textures/SkyBox/SkyStar%d.dds"), 1))))
+	//	return E_FAIL;
+
+	/* Prototype_GameObject_Sky */
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Sky"),
+		CSky::Create(pDevice, pContext))))
+	{
+		CRASH("Sky Box Create Failed");
+		return E_FAIL;
+	}
+		
 
 	return S_OK;
 }

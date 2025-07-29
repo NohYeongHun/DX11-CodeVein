@@ -24,9 +24,13 @@ HRESULT CCamera_Player::Initialize_Clone(void* pArg)
 
 	// 타겟 기준 뒤에서 바라보는 오프셋 (플레이어 뒤쪽 5미터, 위쪽 3미터)
 	XMStoreFloat4(&m_vTargetOffset, XMVectorSet(0.f, 2.f, -6.f, 0.f));
+	m_vOriginalOffset = m_vTargetOffset;
 
 	// 초기 Yaw 각도 (0도 = 플레이어 정면을 바라봄)
 	m_fYaw = 0.f;
+
+	// 줌인 시 오프셋 (더 가까이, 살짝 위에서)
+	XMStoreFloat4(&m_vZoomTargetOffset, XMVectorSet(0.f, 2.5f, -3.f, 0.f));
 
 	if (FAILED(__super::Initialize_Clone(pArg)))
 		return E_FAIL;
@@ -43,7 +47,13 @@ void CCamera_Player::Update(_float fTimeDelta)
 {
 	__super::Update(fTimeDelta);
 
+	// 줌 업데이트 (마우스 처리 전에)
+	Update_Zoom(fTimeDelta);
+
+
 	Update_Chase_Target(fTimeDelta);
+
+
 
 	// 6. 파이프라인 업데이트
 	__super::Update_PipeLines();
@@ -58,6 +68,91 @@ HRESULT CCamera_Player::Render()
 {
 	return S_OK;
 }
+
+
+// Getter 함수들 (필요시 추가)
+_float CCamera_Player::Get_Yaw() const
+{
+	return m_fYaw;
+}
+
+void CCamera_Player::Set_Yaw(_float fYaw)
+{
+	m_fYaw = fYaw;
+}
+
+void CCamera_Player::Add_Yaw(_float fYawDelta)
+{
+	m_fYaw += fYawDelta;
+}
+
+void CCamera_Player::Set_TargetOffset(_float4 vOffset)
+{
+	m_vTargetOffset = vOffset;
+}
+
+void CCamera_Player::Start_Zoom_In(_float fZoomDuration)
+{
+	if (m_bIsZooming && m_bZoomIn) return; // 이미 줌인 중이면 무시
+
+	m_bIsZooming = true;
+	m_bZoomIn = true;
+	m_fZoomLerpTime = 0.f;
+	m_fZoomMaxTime = fZoomDuration;
+}
+
+void CCamera_Player::Start_Zoom_Out(_float fZoomDuration)
+{
+	if (m_bIsZooming && !m_bZoomIn) return; // 이미 줌아웃 중이면 무시
+
+	m_bIsZooming = true;
+	m_bZoomIn = false;
+	m_fZoomLerpTime = 0.f;
+	m_fZoomMaxTime = fZoomDuration;
+}
+
+void CCamera_Player::Update_Zoom(_float fTimeDelta)
+{
+	if (!m_bIsZooming) return;
+
+	m_fZoomLerpTime += fTimeDelta;
+	_float fLerpRatio = m_fZoomLerpTime / m_fZoomMaxTime;
+
+	if (fLerpRatio >= 1.f)
+	{
+		fLerpRatio = 1.f;
+		m_bIsZooming = false;
+	}
+
+	// 부드러운 보간을 위한 easing 함수 적용 (선택사항)
+	fLerpRatio = fLerpRatio * fLerpRatio * (3.f - 2.f * fLerpRatio); // smoothstep
+
+	_vector vCurrentOffset, vTargetOffset;
+
+	if (m_bZoomIn)
+	{
+		// 줌인: 원래 오프셋 -> 줌 오프셋
+		vCurrentOffset = XMLoadFloat4(&m_vOriginalOffset);
+		vTargetOffset = XMLoadFloat4(&m_vZoomTargetOffset);
+	}
+	else
+	{
+		// 줌아웃: 줌 오프셋 -> 원래 오프셋
+		vCurrentOffset = XMLoadFloat4(&m_vZoomTargetOffset);
+		vTargetOffset = XMLoadFloat4(&m_vOriginalOffset);
+	}
+
+	_vector vLerpedOffset = XMVectorLerp(vCurrentOffset, vTargetOffset, fLerpRatio);
+	XMStoreFloat4(&m_vTargetOffset, vLerpedOffset);
+}
+
+void CCamera_Player::Reset_Zoom()
+{
+	m_bIsZooming = false;
+	m_fZoomLerpTime = 0.f;
+	m_vTargetOffset = m_vOriginalOffset;
+}
+
 
 void CCamera_Player::Update_Chase_Target(_float fTimeDelta)
 {
@@ -117,26 +212,6 @@ void CCamera_Player::Update_Chase_Target(_float fTimeDelta)
 	m_pTransformCom->LookAt(vTargetPosFloat3);
 }
 
-// Getter 함수들 (필요시 추가)
-_float CCamera_Player::Get_Yaw() const
-{
-	return m_fYaw;
-}
-
-void CCamera_Player::Set_Yaw(_float fYaw)
-{
-	m_fYaw = fYaw;
-}
-
-void CCamera_Player::Add_Yaw(_float fYawDelta)
-{
-	m_fYaw += fYawDelta;
-}
-
-void CCamera_Player::Set_TargetOffset(_float4 vOffset)
-{
-	m_vTargetOffset = vOffset;
-}
 
 CCamera_Player* CCamera_Player::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {

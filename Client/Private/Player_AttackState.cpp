@@ -66,6 +66,8 @@ void CPlayer_AttackState::Exit()
 		}
 		
 	}
+
+	m_pFsm->Set_StateCoolTime(CPlayer::DODGE, 0.1f);
 	
 }
 

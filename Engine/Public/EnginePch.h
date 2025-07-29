@@ -30,6 +30,7 @@
 #include "VIBuffer.h"
 #include "VIBuffer_Rect.h"
 #include "VIBuffer_Terrain.h"
+#include "VIBuffer_Cube.h"
 #include "Texture.h"
 #include "Texture_Manager.h"
 
