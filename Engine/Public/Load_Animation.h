@@ -30,6 +30,8 @@ public:
 	const vector<class CLoad_Channel*>& Get_Channels() { return m_Channels; }
 
 	_uint Get_CurrentKeyFrame();
+	void Set_TickPerSecond(_float fTickPerSecond) { m_fTickPerSecond = fTickPerSecond;  }
+	_float Get_TickPerSecond() { return m_fTickPerSecond; }
 
 
 private:

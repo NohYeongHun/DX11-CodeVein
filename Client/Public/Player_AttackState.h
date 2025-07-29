@@ -55,10 +55,6 @@ public:
 	void Change_State(_float fTimeDelta);
 
 
-private:
-	_float m_fAttackTime = {}; // 최소 진행 시간.
-	_float m_fCurTime = {};
-	_float m_fExitTime = {}; // 탈출 시간이 지났을때 입력이 있으면 해당 애니메이션으로 탈출.
 
 public:
 	static CPlayer_AttackState* Create(_uint iStateNum, void* pArg);

@@ -115,10 +115,10 @@ HRESULT CLoad_Model::Render(_uint iNumMesh)
 void CLoad_Model::Set_Animation(_uint iAnimIndex, _bool isLoop)
 {
 	m_isLoop = isLoop;
-	if (m_iCurrentAnimIndex != iAnimIndex)
-	{
-		Reset_RootMotion();
-	}
+	//if (m_iCurrentAnimIndex != iAnimIndex)
+	//{
+	//	Reset_RootMotion();
+	//}
 	m_iCurrentAnimIndex = iAnimIndex;
 	
 
@@ -295,9 +295,6 @@ void CLoad_Model::Handle_RootMotion(_float fTimeDelta)
 	_matrix rootMatrix = m_Bones[m_iRoot_BoneIndex]->Get_CombinedTransformationMatrix();
 	_vector vNewRootPos = rootMatrix.r[3];
 	
-
-	
-
 	if (!m_isFinished)
 	{
 		// 0. 뼈의 이동 구하기.
@@ -312,7 +309,7 @@ void CLoad_Model::Handle_RootMotion(_float fTimeDelta)
 			_vector playerScale, playerRot, playerTrans;
 			XMMatrixDecompose(&playerScale, &playerRot, &playerTrans, playerWorldMatrix);
 			_matrix playerRotMatrix = XMMatrixRotationQuaternion(playerRot);
-			_vector vWorldTranslate = XMVector3TransformNormal(vLocalTranslate, playerRotMatrix);
+			vWorldTranslate = XMVector3TransformNormal(vLocalTranslate, playerRotMatrix);
 		}
 		// 2. 월드 이동 구하기 => Translate 설정할.
 

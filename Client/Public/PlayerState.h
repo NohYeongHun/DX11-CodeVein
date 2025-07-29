@@ -14,6 +14,9 @@ protected:
 	virtual HRESULT Initialize(_uint iStateNum, void* pArg) override;
 	void Handle_Input();
 
+	virtual void Enter(void* pArg) override;
+
+
 protected:
 	class CPlayer* m_pPlayer = { nullptr };
 	class CLoad_Model* m_pModelCom = { nullptr };
@@ -30,7 +33,7 @@ protected:
 	_bool m_bFirstFrame = false;
 	ACTORDIR	  m_eDir = { ACTORDIR::END };
 	_bool  m_isLoop = { true };
-	
+
 
 public:
 	virtual void Free() override;

@@ -61,6 +61,7 @@ public:
 	_float4x4* Get_BoneMatrix(const _char* pBoneName);
 
 	_uint Get_CurrentFrame();
+
 #pragma endregion
 
 	
@@ -82,12 +83,17 @@ public:
 	void Set_RootMotionRotation(_bool bRootRotation = false) { m_bRootMotionRotate = bRootRotation; }
 	void Set_RootMotionTranslate(_bool bRootTranslate = true) { m_bRootMotionTranslate = bRootTranslate; }
 
+public:
+	void Animation_Reset();
+	void Set_CurrentTickPerSecond(_uint iAnimIndex, _float fTickPerSecond) {
+		m_Animations[iAnimIndex]->Set_TickPerSecond(fTickPerSecond); 
+	}
+	_float Get_CurrentTickPerSecond(_uint iAnimIndex) { return m_Animations[iAnimIndex]->Get_TickPerSecond(); }
 
 private:
 	void Handle_RootMotion(_float fTimeDelta);
 	void Reset_RootMotion();
-public:
-	void Animation_Reset();
+
 	
 private:
 	MODELTYPE m_ModelType = {};

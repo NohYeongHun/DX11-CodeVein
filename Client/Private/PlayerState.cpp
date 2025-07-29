@@ -29,6 +29,12 @@ void CPlayerState::Handle_Input()
     m_KeyInput = m_pPlayer->Get_KeyInput();
 }
 
+void CPlayerState::Enter(void* pArg)
+{
+    m_pFsm->Set_StateCoolTime(m_iStateNum);
+    m_pFsm->Set_StateExitCoolTime(m_iStateNum);
+}
+
 
 void CPlayerState::Free()
 {

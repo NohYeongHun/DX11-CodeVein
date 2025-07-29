@@ -21,6 +21,7 @@ void CPlayer_GuardState::Enter(void* pArg)
 {
 
 	GUARD_ENTER_DESC* pDesc = static_cast<GUARD_ENTER_DESC*>(pArg);
+	__super::Enter(pDesc); // 기본 쿨타임 설정.
 	m_iNextState = -1;
 	m_iNextAnimIdx = -1;
 	m_iCurAnimIdx = pDesc->iAnimation_Idx;
@@ -28,6 +29,8 @@ void CPlayer_GuardState::Enter(void* pArg)
 	// ⭐ Dodge는 non-loop으로 변경
 	m_isLoop = false;
 	m_pModelCom->Set_Animation(m_iCurAnimIdx, m_isLoop);
+	m_pModelCom->Set_RootMotionTranslate(false);
+	m_pModelCom->Set_RootMotionRotation(true);
 }
 
 /* State 실행 */

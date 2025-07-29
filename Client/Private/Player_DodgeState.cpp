@@ -18,6 +18,8 @@ void CPlayer_DodgeState::Enter(void* pArg)
 {
 
 	DODGE_ENTER_DESC* pDesc = static_cast<DODGE_ENTER_DESC*>(pArg);
+	__super::Enter(pDesc); // 기본 쿨타임 설정.
+
 	m_iNextState = -1;
 	m_iNextAnimIdx = -1;
 	m_iCurAnimIdx = pDesc->iAnimation_Idx;
@@ -26,21 +28,14 @@ void CPlayer_DodgeState::Enter(void* pArg)
 	m_isLoop = false;
 	m_pModelCom->Set_Animation(m_iCurAnimIdx, m_isLoop);
 	m_pModelCom->Set_RootMotionRotation(true);
+	m_pModelCom->Set_RootMotionTranslate(true);
 }
 
 /* State 실행 */
 void CPlayer_DodgeState::Update(_float fTimeDelta)
 {
-	if (m_pModelCom->Is_Finished())
-	{
-		// ✅ 구문 수정
-		_vector vPos = m_pPlayer->Get_Transform()->Get_State(STATE::POSITION);
-		OutputDebugString((L"[DODGE FINISHED] Position: " +
-			std::to_wstring(XMVectorGetX(vPos)) + L", " +
-			std::to_wstring(XMVectorGetZ(vPos)) + L"\n").c_str());
-		Change_State();
-	}
-		
+	Handle_Input();
+	Change_State();
 }
 
 /*
@@ -57,10 +52,11 @@ void CPlayer_DodgeState::Exit()
 	//여기서 동작해야합니다.
 	if (m_iNextState != -1) // NextIndex가 있는경우 블렌딩 시작.
 	{
-		
-		if (m_iNextState == CPlayer::PLAYER_STATE::IDLE)
-			m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, false);
+		m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, false);
 	}
+
+	m_pModelCom->Set_RootMotionRotation(false);
+	m_pModelCom->Set_RootMotionTranslate(false);
 		
 }
 
@@ -76,13 +72,79 @@ void CPlayer_DodgeState::Reset()
 /* 상태에 따른 변경을 정의합니다. */
 void CPlayer_DodgeState::Change_State()
 {
-
 	CPlayer_IdleState::IDLE_ENTER_DESC Idle{};
-	m_iNextState = CPlayer::PLAYER_STATE::IDLE;
-	m_iNextAnimIdx = 16;
-	Idle.iAnimation_Idx = 16;
-	m_pFsm->Change_State(m_iNextState, &Idle);
-	//m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.5f, true, true, false);
+	CPlayer_RunState::RUN_ENTER_DESC Run{};
+	CPlayer_AttackState::ATTACK_ENTER_DESC Attack{};
+	CPlayer_StrongAttackState::STRONG_ENTER_DESC StrongAttack{};
+	CPlayer_GuardState::GUARD_ENTER_DESC Guard{};
+
+
+	if (m_pModelCom->Is_Finished())
+	{
+		// Idle 상태로 전환
+		m_iNextState = CPlayer::PLAYER_STATE::IDLE;
+		m_iNextAnimIdx = 16;
+		Idle.iAnimation_Idx = 16;
+		m_pFsm->Change_State(CPlayer::PLAYER_STATE::IDLE, &Idle);
+		return;
+	}
+
+
+	if (m_pFsm->Is_ExitCoolTimeEnd(m_iStateNum))
+	{
+		if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::ATTACK))
+		{
+			// 해당 동작은 쿨타임이 있는경우 무시됨.
+			if (!m_pFsm->Is_CoolTimeEnd(CPlayer::ATTACK))
+				return;
+
+			// 다음 연계공격으로 변경.
+			m_iNextAnimIdx = 32;;
+			m_iNextState = CPlayer::PLAYER_STATE::ATTACK;
+			Attack.iAnimation_Idx = m_iNextAnimIdx;
+			m_pFsm->Change_State(m_iNextState, &Attack);
+			return;
+		}
+
+		if (m_pPlayer->Is_MovementKeyPressed())
+		{
+			m_iNextAnimIdx = 6;
+			m_iNextState = CPlayer::PLAYER_STATE::RUN;
+			Run.iAnimation_Idx = m_iNextAnimIdx;
+			m_pFsm->Change_State(m_iNextState, &Run);
+			return;
+		}
+		
+
+		if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::STRONG_ATTACK))
+		{
+			// 해당 동작은 쿨타임이 있는경우 무시됨.
+			if (!m_pFsm->Is_CoolTimeEnd(CPlayer::STRONG_ATTACK))
+				return;
+
+			m_iNextAnimIdx = 48;
+			m_iNextState = CPlayer::STRONG_ATTACK;
+			StrongAttack.iAnimation_Idx = m_iNextAnimIdx;
+			m_pFsm->Change_State(m_iNextState, &StrongAttack);
+			return;
+		}
+
+		if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::GUARD))
+		{
+			// 해당 동작은 쿨타임이 있는경우 무시됨.
+			if (!m_pFsm->Is_CoolTimeEnd(CPlayer::GUARD))
+				return;
+
+			m_iNextAnimIdx = 30;
+			m_iNextState = CPlayer::GUARD;
+			StrongAttack.iAnimation_Idx = m_iNextAnimIdx;
+			m_pFsm->Change_State(m_iNextState, &Guard);
+			return;
+		}
+
+	}
+
+
 }
 
 

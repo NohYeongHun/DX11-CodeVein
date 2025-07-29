@@ -405,10 +405,16 @@ HRESULT CPlayer::Ready_Fsm()
     m_pFsmCom->Add_State(CPlayer_WalkState::Create(PLAYER_STATE::WALK, &PlayerDesc));
     m_pFsmCom->Add_State(CPlayer_RunState::Create(PLAYER_STATE::RUN, &PlayerDesc));
     m_pFsmCom->Add_State(CPlayer_DodgeState::Create(PLAYER_STATE::DODGE, &PlayerDesc));
-    m_pFsmCom->Add_State(CPlayer_StrongAttackState::Create(PLAYER_STATE::SWORD_STRONG_ATTACK, &PlayerDesc));
+    m_pFsmCom->Add_State(CPlayer_StrongAttackState::Create(PLAYER_STATE::STRONG_ATTACK, &PlayerDesc));
     m_pFsmCom->Add_State(CPlayer_GuardState::Create(PLAYER_STATE::GUARD, &PlayerDesc));
     m_pFsmCom->Add_State(CPlayer_AttackState::Create(PLAYER_STATE::ATTACK, &PlayerDesc));
 
+
+    Register_CoolTime();
+
+    // DODGE TickPerseoncd 증가.
+    m_pModelCom->Set_CurrentTickPerSecond(25, m_pModelCom->Get_CurrentTickPerSecond(25) * 1.5f);
+    m_pModelCom->Set_CurrentTickPerSecond(48, m_pModelCom->Get_CurrentTickPerSecond(48) * 1.5f);
 
     CPlayer_IdleState::IDLE_ENTER_DESC enter{};
     enter.iAnimation_Idx = 16;
@@ -419,6 +425,29 @@ HRESULT CPlayer::Ready_Fsm()
 
     m_pFsmCom->Change_State(PLAYER_STATE::IDLE, &enter);
     return S_OK;
+}
+
+void CPlayer::Register_CoolTime()
+{
+    _float fTimeDelta = m_pGameInstance->Get_TimeDelta();
+    
+
+    m_pFsmCom->Register_StateCoolTime(PLAYER_STATE::IDLE, 0.f);
+    m_pFsmCom->Register_StateCoolTime(PLAYER_STATE::WALK, 0.f);
+    m_pFsmCom->Register_StateCoolTime(PLAYER_STATE::RUN, 0.f);
+    m_pFsmCom->Register_StateCoolTime(PLAYER_STATE::DODGE, 1.f);
+    m_pFsmCom->Register_StateCoolTime(PLAYER_STATE::STRONG_ATTACK, 1.f);
+    m_pFsmCom->Register_StateCoolTime(PLAYER_STATE::ATTACK, 1.f);
+    m_pFsmCom->Register_StateCoolTime(PLAYER_STATE::GUARD, 0.5f);
+
+
+    m_pFsmCom->Register_StateExitCoolTime(PLAYER_STATE::IDLE, 0.f);
+    m_pFsmCom->Register_StateExitCoolTime(PLAYER_STATE::WALK, 0.f);
+    m_pFsmCom->Register_StateExitCoolTime(PLAYER_STATE::RUN, 0.f);
+    m_pFsmCom->Register_StateExitCoolTime(PLAYER_STATE::DODGE, 1.5f);
+    m_pFsmCom->Register_StateExitCoolTime(PLAYER_STATE::STRONG_ATTACK, 1.3f);
+    m_pFsmCom->Register_StateExitCoolTime(PLAYER_STATE::ATTACK, 0.5f);
+    m_pFsmCom->Register_StateExitCoolTime(PLAYER_STATE::GUARD, 0.4f);
 }
 
 HRESULT CPlayer::Ready_Render_Resources()

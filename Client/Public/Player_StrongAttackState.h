@@ -42,6 +42,7 @@ public:
 	// State 초기값으로 설정
 	virtual void Reset() override;
 
+	void Change_State();
 
 
 public:

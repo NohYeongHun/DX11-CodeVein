@@ -16,6 +16,7 @@ HRESULT CPlayer_StrongAttackState::Initialize(_uint iStateNum, void* pArg)
 void CPlayer_StrongAttackState::Enter(void* pArg)
 {
 	STRONG_ENTER_DESC* pDesc = static_cast<STRONG_ENTER_DESC*>(pArg);
+	__super::Enter(pDesc); // 기본 쿨타임 설정.
 
 	m_isLoop = false;
 
@@ -32,14 +33,12 @@ void CPlayer_StrongAttackState::Enter(void* pArg)
 /* State 실행 */
 void CPlayer_StrongAttackState::Update(_float fTimeDelta)
 {
-	CPlayer_IdleState::IDLE_ENTER_DESC Idle{};
+	
 
-	if (m_pModelCom->Is_Finished())
-	{
-		m_iNextAnimIdx = 16;
-		Idle.iAnimation_Idx = 16;
-		m_pFsm->Change_State(CPlayer::PLAYER_STATE::IDLE, &Idle);
-	}
+	Handle_Input();
+	Change_State();
+
+	
 }
 
 // 종료될 때 실행할 동작..
@@ -64,6 +63,51 @@ void CPlayer_StrongAttackState::Reset()
 	m_iCurAnimIdx = -1;
 	m_iNextAnimIdx = -1;
 	m_pModelCom->Animation_Reset();
+}
+
+void CPlayer_StrongAttackState::Change_State()
+{
+	CPlayer_IdleState::IDLE_ENTER_DESC Idle{};
+	CPlayer_RunState::RUN_ENTER_DESC Run{};
+	CPlayer_AttackState::ATTACK_ENTER_DESC Attack{};
+	CPlayer_StrongAttackState::STRONG_ENTER_DESC StrongAttack{};
+	CPlayer_GuardState::GUARD_ENTER_DESC Guard{};
+
+	if (m_pModelCom->Is_Finished())
+	{
+		m_iNextAnimIdx = 16;
+		Idle.iAnimation_Idx = 16;
+		m_pFsm->Change_State(CPlayer::PLAYER_STATE::IDLE, &Idle);
+		return;
+	}
+
+	if (m_pFsm->Is_ExitCoolTimeEnd(m_iStateNum))
+	{
+
+		//if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::GUARD))
+		//{
+		//	// 해당 동작은 쿨타임이 있는경우 무시됨.
+		//	if (!m_pFsm->Is_CoolTimeEnd(CPlayer::GUARD))
+		//		return;
+
+		//	m_iNextAnimIdx = 30;
+		//	m_iNextState = CPlayer::GUARD;
+		//	Guard.iAnimation_Idx = m_iNextAnimIdx;
+		//	m_pFsm->Change_State(m_iNextState, &Guard);
+		//	return;
+		//}
+
+		if (m_pPlayer->Is_MovementKeyPressed())
+		{
+			m_iNextAnimIdx = 6;
+			m_iNextState = CPlayer::PLAYER_STATE::RUN;
+			Run.iAnimation_Idx = m_iNextAnimIdx;
+			m_pFsm->Change_State(m_iNextState, &Run);
+			return;
+		}
+
+		
+	}
 }
 
 

@@ -26,6 +26,7 @@ void CPlayer_IdleState::Enter(void* pArg)
 	//	std::to_wstring(XMVectorGetZ(vPos)) + L"\n").c_str());
 
 	IDLE_ENTER_DESC* pDesc = static_cast<IDLE_ENTER_DESC*>(pArg);
+	__super::Enter(pDesc); // 기본 쿨타임 설정.
 
 	// Idle 시에는 RootMotion 비활성화
 
@@ -41,12 +42,6 @@ void CPlayer_IdleState::Update(_float fTimeDelta)
 {
 	Handle_Input();
 	Change_State();
-
-	for (_uint i = 0; i < CPlayer::STATE_END; ++i)
-	{
-		if (m_fCoolTime[i] > 0.f)
-			m_fCoolTime[i] -= fTimeDelta;
-	}
 		
 }
 
@@ -55,9 +50,13 @@ void CPlayer_IdleState::Exit()
 {
 	if (m_iNextState != -1)
 	{
-		if (m_iNextState == CPlayer::PLAYER_STATE::SWORD_STRONG_ATTACK)
+		if (m_iNextState == CPlayer::PLAYER_STATE::STRONG_ATTACK)
 			m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, true);
 		else if (m_iNextState == CPlayer::PLAYER_STATE::DODGE)
+			m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, true);
+		else if (m_iNextState == CPlayer::GUARD)
+			m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, false);
+		else if (m_iNextState == CPlayer::PLAYER_STATE::ATTACK)
 			m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, true);
 	}
 }
@@ -79,60 +78,66 @@ void CPlayer_IdleState::Change_State()
 	CPlayer_GuardState::GUARD_ENTER_DESC Guard{};
 
 
-	if (m_pPlayer->Is_MovementKeyPressed())
-	{
-		m_iNextState = CPlayer::PLAYER_STATE::RUN;
-		Run.iAnimation_Idx = 6;
-		Run.eDirection = m_eDir;
-		m_pFsm->Change_State(m_iNextState, &Run);
+	
 
-	}
-	else if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::DODGE)) // 구르기.
+	if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::DODGE)) // 구르기.
 	{
-		if (m_fCoolTime[CPlayer::DODGE] > 0.f)
+		if (!m_pFsm->Is_CoolTimeEnd(CPlayer::DODGE))
 			return;
 
 		m_iNextState = CPlayer::PLAYER_STATE::DODGE;
 		Dodge.iAnimation_Idx = 25;
 		m_iNextAnimIdx = 25;
 		m_pFsm->Change_State(m_iNextState, &Dodge);
-
-		m_fCoolTime[CPlayer::DODGE] = 1.f;
+		return;
 	}
-	else if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::STRONG_ATTACK))
+
+	if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::STRONG_ATTACK))
 	{
-		if (m_fCoolTime[CPlayer::SWORD_STRONG_ATTACK] > 0.f)
+		if (!m_pFsm->Is_CoolTimeEnd(CPlayer::STRONG_ATTACK))
 			return;
 
-		m_iNextState = CPlayer::PLAYER_STATE::SWORD_STRONG_ATTACK;
+		m_iNextState = CPlayer::PLAYER_STATE::STRONG_ATTACK;
+		m_iNextAnimIdx = 48;
 		StrongAttack.iAnimation_Idx = 48;
 		StrongAttack.eDirection = m_eDir;
 		m_pFsm->Change_State(m_iNextState, &StrongAttack);
-
-		m_fCoolTime[CPlayer::SWORD_STRONG_ATTACK] = 1.f;
+		return;
 	}
-	else if (m_pPlayer->Is_KeyUp(PLAYER_KEY::GUARD))
+
+	if (m_pPlayer->Is_KeyUp(PLAYER_KEY::GUARD))
 	{
-		if (m_fCoolTime[CPlayer::GUARD] > 0.f)
+		if (!m_pFsm->Is_CoolTimeEnd(CPlayer::GUARD))
 			return;
 
 		m_iNextState = CPlayer::PLAYER_STATE::GUARD;
+		m_iNextAnimIdx = 30;
 		Guard.iAnimation_Idx = 30;
 		m_pFsm->Change_State(m_iNextState, &Guard);
+		return;
 
-		m_fCoolTime[CPlayer::GUARD] = 1.f;
 	}
-	else if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::ATTACK))
+
+	if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::ATTACK))
 	{
-		if (m_fCoolTime[CPlayer::ATTACK] > 0.f)
+		if (!m_pFsm->Is_CoolTimeEnd(CPlayer::ATTACK))
 			return;
 
 		m_iNextState = CPlayer::PLAYER_STATE::ATTACK;
+		m_iNextAnimIdx = 32;
 		Attack.iAnimation_Idx = 32;
 		m_pFsm->Change_State(m_iNextState, &Attack);
-		m_fCoolTime[CPlayer::ATTACK] = 1.f;
+		return;
 	}
 
+	if (m_pPlayer->Is_MovementKeyPressed())
+	{
+		m_iNextState = CPlayer::PLAYER_STATE::RUN;
+		Run.iAnimation_Idx = 6;
+		Run.eDirection = m_eDir;
+		m_pFsm->Change_State(m_iNextState, &Run);
+		return;
+	}
 	
 }
 

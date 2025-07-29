@@ -147,7 +147,33 @@ static inline string ReadString(std::ifstream& ifs)
 }
 
 
+static void OutPutDebugFloat(float fDebugValue)
+{
+    wstring wstr = L" Value : " + to_wstring(fDebugValue) + L'\n';
+    OutputDebugString(wstr.c_str());
+}
 
+
+static void OutPutDebugFloat2(XMFLOAT2 vDebugValue)
+{
+    wstring wstr = L" Value x : " + to_wstring(vDebugValue.x) + L" y : " + to_wstring(vDebugValue.y) + L'\n';
+    OutputDebugString(wstr.c_str());
+}
+
+
+static void OutPutDebugFloat3(XMFLOAT3 vDebugValue)
+{
+    wstring wstr = L" Value x : " + to_wstring(vDebugValue.x) + L" y : " + to_wstring(vDebugValue.y) 
+        + L" z : " + to_wstring(vDebugValue.z)  + L'\n';
+    OutputDebugString(wstr.c_str());
+}
+
+static void OutPutDebugFloat4(XMFLOAT4 vDebugValue)
+{
+    wstring wstr = L" Value x : " + to_wstring(vDebugValue.x) + L" y : " + to_wstring(vDebugValue.y)
+        + L" z : " + to_wstring(vDebugValue.z) + L" w : " + to_wstring(vDebugValue.w) + L'\n';
+    OutputDebugString(wstr.c_str());
+}
 
 
 #pragma endregion

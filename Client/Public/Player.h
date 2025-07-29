@@ -11,8 +11,7 @@ public:
 	enum PLAYER_STATE : _int
 	{
 		IDLE = 0, WALK, RUN, DODGE,
-		SWORD_STRONG_ATTACK, GUARD, ATTACK,
-		SWORD_IDLE,
+		STRONG_ATTACK, GUARD, ATTACK,
 		STATE_END
 	};
 #pragma endregion
@@ -130,6 +129,7 @@ private:
 private:
 	HRESULT Ready_Components(PLAYER_DESC* pDesc);
 	HRESULT Ready_Fsm();
+	void Register_CoolTime();
 	HRESULT Ready_Render_Resources();
 	HRESULT Ready_PartObjects();
 
