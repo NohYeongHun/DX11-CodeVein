@@ -27,6 +27,9 @@ void CPlayer_StrongAttackState::Enter(void* pArg)
 	m_eDir = pDesc->eDirection;
 	m_pModelCom->Set_Animation(m_iCurAnimIdx, m_isLoop);
 
+	m_pModelCom->Set_RootMotionRotation(true);
+	m_pModelCom->Set_RootMotionTranslate(true);
+
 	// ★ Strong Attack 시작 시 카메라 줌인
 	//CCamera* pMainCamera = m_pGameInstance->Get_MainCamera();
 	//if (pMainCamera)
@@ -81,15 +84,32 @@ void CPlayer_StrongAttackState::Exit()
 	//	}
 	//}
 
+	
+
 	//if (m_iNextIdx > -1) // NextIndex가 있는경우 블렌딩 시작.
 	//	m_pModelCom->Change_Animation_WithBlend(m_iNextIdx, 0.5f);
 	// 여기서 동작해야합니다.
+
+	m_pModelCom->Set_RootMotionRotation(false);
+	m_pModelCom->Set_RootMotionTranslate(false);
+
 	if (m_iNextState != -1) // NextIndex가 있는경우 블렌딩 시작.
 	{
 		if (m_iNextState == CPlayer::PLAYER_STATE::IDLE)
+		{
 			m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, false);
-
-	}
+		}
+			
+		else if (m_iNextState == CPlayer::PLAYER_STATE::STRONG_ATTACK)
+		{
+			if (m_iNextAnimIdx == PLAYER_ANIM_SPECIAL_LAUNCH)
+				m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, true);
+			//if (m_iCurAnimIdx == PLAYER_ANIM_SPECIAL_LAUNCH)
+				
+			
+		}
+		else 
+			m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, false);	}
 	
 }
 
@@ -112,18 +132,31 @@ void CPlayer_StrongAttackState::Change_State()
 
 	if (m_pModelCom->Is_Finished())
 	{
-		m_iNextAnimIdx = PLAYER_ANIM_IDLE;
-		Idle.iAnimation_Idx = PLAYER_ANIM_IDLE;
+		m_iNextAnimIdx = PLAYER_ANIM_IDLE_SWORD;
+		Idle.iAnimation_Idx = PLAYER_ANIM_IDLE_SWORD;
 		m_pFsm->Change_State(CPlayer::PLAYER_STATE::IDLE, &Idle);
 		return;
 	}
 
 	if (m_pFsm->Is_ExitCoolTimeEnd(m_iStateNum))
 	{
+		if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::STRONG_ATTACK))
+		{
+			//if (m_iCurAnimIdx != PLAYER_ANIM_SPECIAL_DOWN3)
+			//	return;
+			if (m_iCurAnimIdx != PLAYER_ANIM_SPECIAL_LAUNCH)
+				return;
+
+			m_iNextAnimIdx = PLAYER_ANIM_SPECIAL_DOWN3;
+			m_iNextState = CPlayer::STRONG_ATTACK;
+			StrongAttack.iAnimation_Idx = m_iNextAnimIdx;
+			m_pFsm->Change_State(m_iNextState, &StrongAttack);
+			return;
+		}
 
 		if (m_pPlayer->Is_MovementKeyPressed())
 		{
-			m_iNextAnimIdx = PLAYER_ANIM_RUN;
+			m_iNextAnimIdx = PLAYER_ANIM_RUN_F_LOOP;
 			m_iNextState = CPlayer::PLAYER_STATE::RUN;
 			Run.iAnimation_Idx = m_iNextAnimIdx;
 			m_pFsm->Change_State(m_iNextState, &Run);

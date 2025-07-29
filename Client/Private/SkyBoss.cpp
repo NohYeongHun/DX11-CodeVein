@@ -73,23 +73,6 @@ void CSkyBoss::Late_Update(_float fTimeDelta)
 
 HRESULT CSkyBoss::Render()
 {
-#ifdef _DEBUG
-    ImGuiIO& io = ImGui::GetIO();
-    ImVec2 windowPos = ImVec2(10.f, io.DisplaySize.y + 350.f);
-    ImVec2 windowSize = ImVec2(300.f, 300.f);
-
-    // Cond_Once: 최초 한 번만 위치 적용 → 이후 드래그 가능
-    ImGui::SetNextWindowPos(windowPos, ImGuiCond_Once);
-    ImGui::SetNextWindowSize(windowSize, ImGuiCond_Once);
-
-    ImGui::Begin("Debug", nullptr, ImGuiWindowFlags_NoCollapse);
-    _float3 vPos = {};
-    _float3 vAngle = {};
-    XMStoreFloat3(&vPos, m_pTransformCom->Get_State(STATE::POSITION));
-    ImGui::Text("Boss Pos: (%.2f, %.2f, %.2f)", vPos.x, vPos.y, vPos.z);
-    //ImGui::Text("Player Rotation : (%.2f, %.2f, %.2f)", vPos.x, vPos.y, vPos.z);
-    ImGui::End();
-#endif // _DEBUG
 
     if (FAILED(Ready_Render_Resources()))
     {

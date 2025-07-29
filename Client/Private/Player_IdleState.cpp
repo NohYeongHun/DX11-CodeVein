@@ -86,8 +86,8 @@ void CPlayer_IdleState::Change_State()
 			return;
 
 		m_iNextState = CPlayer::PLAYER_STATE::DODGE;
-		Dodge.iAnimation_Idx = PLAYER_ANIM_DODGE;
-		m_iNextAnimIdx = PLAYER_ANIM_DODGE;
+		Dodge.iAnimation_Idx = PLAYER_ANIM_DODGE_F;
+		m_iNextAnimIdx = PLAYER_ANIM_DODGE_F;
 		m_pFsm->Change_State(m_iNextState, &Dodge);
 		return;
 	}
@@ -98,8 +98,8 @@ void CPlayer_IdleState::Change_State()
 			return;
 
 		m_iNextState = CPlayer::PLAYER_STATE::STRONG_ATTACK;
-		m_iNextAnimIdx = PLAYER_ANIM_STRONG_ATTACK;
-		StrongAttack.iAnimation_Idx = PLAYER_ANIM_STRONG_ATTACK;
+		m_iNextAnimIdx = PLAYER_ANIM_SPECIAL_DOWN3;
+		StrongAttack.iAnimation_Idx = m_iNextAnimIdx;
 		StrongAttack.eDirection = m_eDir;
 		m_pFsm->Change_State(m_iNextState, &StrongAttack);
 		return;
@@ -133,7 +133,7 @@ void CPlayer_IdleState::Change_State()
 	if (m_pPlayer->Is_MovementKeyPressed())
 	{
 		m_iNextState = CPlayer::PLAYER_STATE::RUN;
-		Run.iAnimation_Idx = PLAYER_ANIM_RUN;
+		Run.iAnimation_Idx = PLAYER_ANIM_RUN_F_LOOP;
 		Run.eDirection = m_eDir;
 		m_pFsm->Change_State(m_iNextState, &Run);
 		return;

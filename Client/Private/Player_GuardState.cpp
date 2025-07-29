@@ -88,9 +88,6 @@ void CPlayer_GuardState::Change_State(_float fTimeDelta)
 	if (m_pFsm->Is_ExitCoolTimeEnd(m_iStateNum))
 	{
 		
-		_wstring strName = L"현재 위치는 DODGE Finished : \n";
-		OutputDebugString(strName.c_str());
-		OutPutDebugInt(m_iCurAnimIdx);
 		if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::GUARD))
 		{
 			// 현재 상태가 시작 상태일때만 End로 변경.
@@ -113,8 +110,8 @@ void CPlayer_GuardState::Change_State(_float fTimeDelta)
 		if (m_iCurAnimIdx == PLAYER_ANIM_GUARD_END)
 		{
 			m_iNextState = CPlayer::PLAYER_STATE::IDLE;
-			m_iNextAnimIdx = PLAYER_ANIM_IDLE;
-			Idle.iAnimation_Idx = PLAYER_ANIM_IDLE;
+			m_iNextAnimIdx = PLAYER_ANIM_IDLE_SWORD;
+			Idle.iAnimation_Idx = PLAYER_ANIM_IDLE_SWORD;
 			m_pFsm->Change_State(m_iNextState, &Idle);
 			return;
 		}

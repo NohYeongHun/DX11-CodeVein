@@ -77,8 +77,8 @@ void CPlayer_RunState::Change_State(_float fTimeDelta)
 			return;
 
 		m_iNextState = CPlayer::PLAYER_STATE::DODGE;
-		Dodge.iAnimation_Idx = PLAYER_ANIM_DODGE;
-		m_iNextAnimIdx = PLAYER_ANIM_DODGE;
+		Dodge.iAnimation_Idx = PLAYER_ANIM_DODGE_F;
+		m_iNextAnimIdx = PLAYER_ANIM_DODGE_F;
 		m_pFsm->Change_State(m_iNextState, &Dodge);
 
 		return;
@@ -91,7 +91,7 @@ void CPlayer_RunState::Change_State(_float fTimeDelta)
 
 		StrongAttack.iAnimation_Idx = PLAYER_ANIM_STRONG_ATTACK;
 		m_iNextState = CPlayer::PLAYER_STATE::STRONG_ATTACK;
-		m_iNextAnimIdx = PLAYER_ANIM_STRONG_ATTACK;
+		m_iNextAnimIdx = PLAYER_ANIM_SPECIAL_DOWN3;
 		m_pFsm->Change_State(m_iNextState, &StrongAttack);
 		return;
 	}
@@ -130,9 +130,9 @@ void CPlayer_RunState::Change_State(_float fTimeDelta)
 	}
 	else
 	{
-		Idle.iAnimation_Idx = PLAYER_ANIM_IDLE;
+		Idle.iAnimation_Idx = PLAYER_ANIM_IDLE_SWORD;
 		m_iNextState = CPlayer::PLAYER_STATE::IDLE;
-		m_iNextAnimIdx = PLAYER_ANIM_IDLE;
+		m_iNextAnimIdx = PLAYER_ANIM_IDLE_SWORD;
 		m_pFsm->Change_State(m_iNextState, &Idle);
 		return;
 	}

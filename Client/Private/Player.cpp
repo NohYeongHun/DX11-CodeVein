@@ -61,7 +61,7 @@ HRESULT CPlayer::Initialize_Clone(void* pArg)
     _vector qInitRot = XMQuaternionRotationAxis(XMVectorSet(0.f, 1.f, 0.f, 0.f), 0.0f);
     m_pTransformCom->Set_Quaternion(qInitRot);
 
-    _float3 vPos = { 0.f, 10.f, 0.f };
+    _float3 vPos = { 0.f, 5.f, 0.f };
     m_pTransformCom->Set_State(STATE::POSITION, XMLoadFloat3(&vPos));
 
     m_pPlayerCamera = dynamic_cast<CCamera_Player*>(m_pGameInstance->Get_MainCamera());
@@ -393,14 +393,15 @@ HRESULT CPlayer::Ready_Fsm()
     Register_CoolTime();
 
     // DODGE TickPerseoncd 증가.
-    m_pModelCom->Set_CurrentTickPerSecond(PLAYER_ANIM_DODGE, m_pModelCom->Get_CurrentTickPerSecond(25) * 1.5f);
-    m_pModelCom->Set_CurrentTickPerSecond(PLAYER_ANIM_STRONG_ATTACK, m_pModelCom->Get_CurrentTickPerSecond(48) * 1.5f);
+    m_pModelCom->Set_CurrentTickPerSecond(PLAYER_ANIM_DODGE_F, m_pModelCom->Get_CurrentTickPerSecond(PLAYER_ANIM_DODGE_F) * 1.5f);
+    m_pModelCom->Set_CurrentTickPerSecond(PLAYER_ANIM_STRONG_ATTACK, m_pModelCom->Get_CurrentTickPerSecond(PLAYER_ANIM_DODGE_F) * 1.5f);
+    //m_pModelCom->Set_CurrentTickPerSecond(PLAYER_ANIM_SPECIAL_DOWN3, m_pModelCom->Get_CurrentTickPerSecond(PLAYER_ANIM_DODGE_F) * 1.5f);
 
     CPlayer_IdleState::IDLE_ENTER_DESC enter{};
-    enter.iAnimation_Idx = PLAYER_ANIM_IDLE;
+    enter.iAnimation_Idx = PLAYER_ANIM_IDLE_SWORD;
 
     CPlayer_RunState::RUN_ENTER_DESC Run{};
-    Run.iAnimation_Idx = PLAYER_ANIM_RUN;
+    Run.iAnimation_Idx = PLAYER_ANIM_RUN_F_LOOP;
     m_pFsmCom->Change_State(PLAYER_STATE::RUN, &Run);
 
     m_pFsmCom->Change_State(PLAYER_STATE::IDLE, &enter);
@@ -416,7 +417,7 @@ void CPlayer::Register_CoolTime()
     m_pFsmCom->Register_StateCoolTime(PLAYER_STATE::WALK, 0.f);
     m_pFsmCom->Register_StateCoolTime(PLAYER_STATE::RUN, 0.f);
     m_pFsmCom->Register_StateCoolTime(PLAYER_STATE::DODGE, 1.f);
-    m_pFsmCom->Register_StateCoolTime(PLAYER_STATE::STRONG_ATTACK, 1.f);
+    m_pFsmCom->Register_StateCoolTime(PLAYER_STATE::STRONG_ATTACK, 2.f);
     m_pFsmCom->Register_StateCoolTime(PLAYER_STATE::ATTACK, 1.f);
     m_pFsmCom->Register_StateCoolTime(PLAYER_STATE::GUARD, 0.5f);
 
@@ -425,7 +426,7 @@ void CPlayer::Register_CoolTime()
     m_pFsmCom->Register_StateExitCoolTime(PLAYER_STATE::WALK, 0.f);
     m_pFsmCom->Register_StateExitCoolTime(PLAYER_STATE::RUN, 0.f);
     m_pFsmCom->Register_StateExitCoolTime(PLAYER_STATE::DODGE, 1.5f);
-    m_pFsmCom->Register_StateExitCoolTime(PLAYER_STATE::STRONG_ATTACK, 1.3f);
+    m_pFsmCom->Register_StateExitCoolTime(PLAYER_STATE::STRONG_ATTACK, 2.f);
     m_pFsmCom->Register_StateExitCoolTime(PLAYER_STATE::ATTACK, 0.7f);
     m_pFsmCom->Register_StateExitCoolTime(PLAYER_STATE::GUARD, 0.4f);
 }

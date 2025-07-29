@@ -64,6 +64,10 @@ void CPlayer_AttackState::Exit()
 		{
 			m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, false);
 		}
+		else if (m_iNextState == CPlayer::PLAYER_STATE::STRONG_ATTACK)
+		{
+			m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, true);
+		}
 		else
 		{
 			m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.1f, true, true, true);
@@ -98,8 +102,8 @@ void CPlayer_AttackState::Change_State(_float fTimeDelta)
 	{
 		// Idle 상태로 전환
 		m_iNextState = CPlayer::PLAYER_STATE::IDLE;
-		m_iNextAnimIdx = PLAYER_ANIM_IDLE;
-		Idle.iAnimation_Idx = PLAYER_ANIM_IDLE;
+		m_iNextAnimIdx = PLAYER_ANIM_IDLE_SWORD;
+		Idle.iAnimation_Idx = PLAYER_ANIM_IDLE_SWORD;
 		m_pFsm->Change_State(CPlayer::PLAYER_STATE::IDLE, &Idle);
 
 		return;
@@ -131,22 +135,20 @@ void CPlayer_AttackState::Change_State(_float fTimeDelta)
 			return;
 		}
 
-		if (m_pPlayer->Is_MovementKeyPressed())
-		{
-			m_iNextAnimIdx = PLAYER_ANIM_RUN;
-			m_iNextState = CPlayer::PLAYER_STATE::RUN;
-			Run.iAnimation_Idx = m_iNextAnimIdx;
-			m_pFsm->Change_State(m_iNextState, &Run);
-			return;
-		}
+		
 
 		if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::STRONG_ATTACK))
 		{
+			// 2타 일때만 하자
+			if (m_iCurAnimIdx != PLAYER_ANIM_ATTACK2)
+				return;
+
 			// 해당 동작은 쿨타임이 있는경우 무시됨.
 			if (!m_pFsm->Is_CoolTimeEnd(CPlayer::STRONG_ATTACK))
 				return;
 
-			m_iNextAnimIdx = PLAYER_ANIM_STRONG_ATTACK;
+			//m_iNextAnimIdx = PLAYER_ANIM_SPECIAL_LAUNCH;
+			m_iNextAnimIdx = PLAYER_ANIM_SPECIAL_DOWN3;
 			m_iNextState = CPlayer::STRONG_ATTACK;
 			StrongAttack.iAnimation_Idx = m_iNextAnimIdx;
 			m_pFsm->Change_State(m_iNextState, &StrongAttack);
@@ -159,12 +161,20 @@ void CPlayer_AttackState::Change_State(_float fTimeDelta)
 			if (!m_pFsm->Is_CoolTimeEnd(CPlayer::GUARD))
 				return;
 
-			OutPutDebugInt(m_iCurAnimIdx);
 
 			m_iNextAnimIdx = PLAYER_ANIM_GUARD_START;
 			m_iNextState = CPlayer::GUARD;
 			Guard.iAnimation_Idx = m_iNextAnimIdx;
 			m_pFsm->Change_State(m_iNextState, &Guard);
+			return;
+		}
+
+		if (m_pPlayer->Is_MovementKeyPressed())
+		{
+			m_iNextAnimIdx = PLAYER_ANIM_RUN_F_LOOP;
+			m_iNextState = CPlayer::PLAYER_STATE::RUN;
+			Run.iAnimation_Idx = m_iNextAnimIdx;
+			m_pFsm->Change_State(m_iNextState, &Run);
 			return;
 		}
 

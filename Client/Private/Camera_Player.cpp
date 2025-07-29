@@ -19,7 +19,7 @@ HRESULT CCamera_Player::Initialize_Clone(void* pArg)
 {
 	CAMERA_PLAYER_DESC* pDesc = static_cast<CAMERA_PLAYER_DESC*>(pArg);
 
-	m_fMouseSensor = pDesc->fMouseSensor * 1.5f;
+	m_fMouseSensor = pDesc->fMouseSensor * 2.f;
 	m_pTarget = pDesc->pTarget;
 
 	// 타겟 기준 뒤에서 바라보는 오프셋 (플레이어 뒤쪽 5미터, 위쪽 3미터)
