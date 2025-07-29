@@ -32,8 +32,6 @@ CPlayer::CPlayer(const CPlayer& Prototype)
 
 /* 이동 함수 8방향 .*/
 
-
-
 HRESULT CPlayer::Initialize_Prototype()
 {
     if (FAILED(__super::Initialize_Prototype()))
@@ -227,26 +225,7 @@ void CPlayer::Move_By_Camera_Direction_8Way(ACTORDIR eDir, _float fTimeDelta, _f
 
 void CPlayer::Debug_CameraVectors()
 {
-    CCamera* pCamera = m_pGameInstance->Get_MainCamera();
-    if (!pCamera)
-        return;
-
-    _vector vLook = pCamera->Get_LookVector();
-    _vector vRight = pCamera->Get_RightVector();
-
-    // Y축 제거 전/후 비교
-    OutputDebugString((L"[CAM] Original Look: (" +
-        std::to_wstring(XMVectorGetX(vLook)) + L", " +
-        std::to_wstring(XMVectorGetY(vLook)) + L", " +
-        std::to_wstring(XMVectorGetZ(vLook)) + L")\n").c_str());
-
-    vLook = XMVectorSetY(vLook, 0.f);
-    vLook = XMVector3Normalize(vLook);
-
-    OutputDebugString((L"[CAM] Final Look: (" +
-        std::to_wstring(XMVectorGetX(vLook)) + L", " +
-        std::to_wstring(XMVectorGetY(vLook)) + L", " +
-        std::to_wstring(XMVectorGetZ(vLook)) + L")\n").c_str());
+    m_pPlayerCamera->Debug_CameraVectors();
 }
 
 /* 
@@ -414,14 +393,14 @@ HRESULT CPlayer::Ready_Fsm()
     Register_CoolTime();
 
     // DODGE TickPerseoncd 증가.
-    m_pModelCom->Set_CurrentTickPerSecond(25, m_pModelCom->Get_CurrentTickPerSecond(25) * 1.5f);
-    m_pModelCom->Set_CurrentTickPerSecond(48, m_pModelCom->Get_CurrentTickPerSecond(48) * 1.5f);
+    m_pModelCom->Set_CurrentTickPerSecond(PLAYER_ANIM_DODGE, m_pModelCom->Get_CurrentTickPerSecond(25) * 1.5f);
+    m_pModelCom->Set_CurrentTickPerSecond(PLAYER_ANIM_STRONG_ATTACK, m_pModelCom->Get_CurrentTickPerSecond(48) * 1.5f);
 
     CPlayer_IdleState::IDLE_ENTER_DESC enter{};
-    enter.iAnimation_Idx = 16;
+    enter.iAnimation_Idx = PLAYER_ANIM_IDLE;
 
     CPlayer_RunState::RUN_ENTER_DESC Run{};
-    Run.iAnimation_Idx = 6;
+    Run.iAnimation_Idx = PLAYER_ANIM_RUN;
     m_pFsmCom->Change_State(PLAYER_STATE::RUN, &Run);
 
     m_pFsmCom->Change_State(PLAYER_STATE::IDLE, &enter);

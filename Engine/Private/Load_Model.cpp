@@ -266,31 +266,6 @@ void CLoad_Model::Set_BlendInfo(uint32_t iNextAnimIndex, _float fBlendTime, _boo
 
 
 
-
-_vector CLoad_Model::QuaternionSlerpShortest(_vector q1, _vector q2, _float t)
-{
-	// 내적 계산 (코사인 각도)
-	_float dot = XMVectorGetX(XMQuaternionDot(q1, q2));
-
-	// 내적이 음수면 더 긴 경로로 보간하게 되므로
-	// q2를 -q2로 바꿔서 최단 경로 선택
-	if (dot < 0.0f)
-	{
-		q2 = XMVectorNegate(q2);
-		dot = -dot;
-	}
-
-	// 거의 같은 방향이면 선형 보간 (수치 안정성)
-	if (dot > 0.9995f)
-	{
-		_vector result = XMVectorLerp(q1, q2, t);
-		return XMQuaternionNormalize(result);
-	}
-
-	// 구면 선형 보간
-	return XMQuaternionSlerp(q1, q2, t);
-}
-
 void CLoad_Model::Handle_RootMotion(_float fTimeDelta)
 {
 	//Handle_RootMotion(fTimeDelta);

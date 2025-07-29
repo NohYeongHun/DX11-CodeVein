@@ -26,6 +26,10 @@ void CPlayer_GuardState::Enter(void* pArg)
 	m_iNextAnimIdx = -1;
 	m_iCurAnimIdx = pDesc->iAnimation_Idx;
 
+	_wstring strName = L"현재 위치는 DODGE Enter : \n";
+	OutputDebugString(strName.c_str());
+
+	OutPutDebugInt(m_iCurAnimIdx);
 	// ⭐ Dodge는 non-loop으로 변경
 	m_isLoop = false;
 	m_pModelCom->Set_Animation(m_iCurAnimIdx, m_isLoop);
@@ -80,26 +84,51 @@ void CPlayer_GuardState::Change_State(_float fTimeDelta)
 
 	// Guard 상태에서 다시 누르면?
 
-	if (m_pModelCom->Is_Finished())
+	// Exit CoolTime => 상태 변환이 가능한 시간일 때 상태를 변경해준다면?
+	if (m_pFsm->Is_ExitCoolTimeEnd(m_iStateNum))
 	{
-		if (m_pPlayer->Is_KeyUp(PLAYER_KEY::GUARD))
+		
+		_wstring strName = L"현재 위치는 DODGE Finished : \n";
+		OutputDebugString(strName.c_str());
+		OutPutDebugInt(m_iCurAnimIdx);
+		if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::GUARD))
 		{
-			if (m_iCurAnimIdx == 30)
+			// 현재 상태가 시작 상태일때만 End로 변경.
+			if (m_iCurAnimIdx == PLAYER_ANIM_GUARD_START)
 			{
 				m_iNextState = CPlayer::PLAYER_STATE::GUARD;
-				m_iNextAnimIdx = 28;
-				Guard.iAnimation_Idx = 28;
+				m_iNextAnimIdx = PLAYER_ANIM_GUARD_END;
+				Guard.iAnimation_Idx = PLAYER_ANIM_GUARD_END;
 				m_pFsm->Change_State(m_iNextState, &Guard);
+				return;
 			}
 		}
-		else if (m_iCurAnimIdx == 28)
+
+
+	}
+
+	// 모델 재생시간이 끝났는데 End 상태였다면 Idle로 변환
+	if (m_pModelCom->Is_Finished())
+	{
+		if (m_iCurAnimIdx == PLAYER_ANIM_GUARD_END)
 		{
 			m_iNextState = CPlayer::PLAYER_STATE::IDLE;
-			m_iNextAnimIdx = 16;
-			Idle.iAnimation_Idx = 16;
+			m_iNextAnimIdx = PLAYER_ANIM_IDLE;
+			Idle.iAnimation_Idx = PLAYER_ANIM_IDLE;
 			m_pFsm->Change_State(m_iNextState, &Idle);
+			return;
 		}
 	}
+
+
+
+	// 쿨타임을 바꿀 수 있다면?
+	//if (m_pFsm->Get_StateExitCoolTime(m_iStateNum))
+	//{
+	//	_wstring strName = L"현재 위치는 DODGE Exit CoolTime End : \n";
+	//	OutputDebugString(strName.c_str());
+	//	return;
+	//}
 
 
 }

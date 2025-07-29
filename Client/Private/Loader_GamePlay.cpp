@@ -36,6 +36,13 @@ HRESULT CLoader_GamePlay::Loading_Resource(ID3D11Device* pDevice, ID3D11DeviceCo
 		return E_FAIL;
 	}
 
+	if (FAILED(Add_Prototype_SkyBoss(pDevice, pContext, pGameInstance)))
+	{
+		CRASH("Create SkyBox Failed");
+		MSG_BOX(TEXT("Create Failed Loading : GamePlay Player "));
+		return E_FAIL;
+	}
+
 	if (FAILED(Add_Prototype_SkyBox(pDevice, pContext, pGameInstance)))
 	{
 		CRASH("Create SkyBox Failed");
@@ -78,6 +85,24 @@ HRESULT CLoader_GamePlay::Add_Prototype_Player(ID3D11Device* pDevice, ID3D11Devi
 
 	
 
+	return S_OK;
+}
+
+HRESULT CLoader_GamePlay::Add_Prototype_SkyBoss(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
+{
+	_matrix		PreTransformMatrix = XMMatrixIdentity();
+	PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XM_PI);
+
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level)
+		, TEXT("Prototype_Component_Model_SkyBoss")
+		, CLoad_Model::Create(pDevice, pContext, MODELTYPE::ANIM, PreTransformMatrix, "../../SaveFile/Model/Boss/SkyBoss.dat", L""))))
+		return E_FAIL;
+
+
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level)
+		, TEXT("Prototype_GameObject_SkyBoss")
+		, CSkyBoss::Create(pDevice, pContext))))
+		return E_FAIL;
 	return S_OK;
 }
 

@@ -147,6 +147,13 @@ static inline string ReadString(std::ifstream& ifs)
 }
 
 
+static void OutPutDebugInt(int iDebugValue)
+{
+    wstring wstr = L" Value : " + to_wstring(iDebugValue) + L'\n';
+    OutputDebugString(wstr.c_str());
+}
+
+
 static void OutPutDebugFloat(float fDebugValue)
 {
     wstring wstr = L" Value : " + to_wstring(fDebugValue) + L'\n';

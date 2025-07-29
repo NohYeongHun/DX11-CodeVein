@@ -28,6 +28,12 @@ HRESULT CLevel_GamePlay::Initialize_Clone()
 		return E_FAIL;
 	}
 
+	if (FAILED(Ready_Layer_SkyBoss(TEXT("Layer_Boss"))))
+	{
+		CRASH("Failed Layer_Player");
+		return E_FAIL;
+	}
+
 
 	if (FAILED(Ready_Layer_Map(TEXT("Layer_Map"))))
 	{
@@ -207,6 +213,20 @@ HRESULT CLevel_GamePlay::Ready_Layer_Player(const _wstring& strLayerTag)
 	return S_OK;
 }
 
+HRESULT CLevel_GamePlay::Ready_Layer_SkyBoss(const _wstring& strLayerTag)
+{
+	CSkyBoss::SKYBOSS_DESC Desc{};
+	Desc.fSpeedPerSec = 10.f;
+	Desc.fRotationPerSec = XMConvertToRadians(90.0f);
+	Desc.eCurLevel = m_eCurLevel;
+
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel), strLayerTag,
+		ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_SkyBoss"), &Desc)))
+		return E_FAIL;
+
+	return S_OK;
+}
+
 HRESULT CLevel_GamePlay::Ready_Layer_Map(const _wstring& strLayerTag)
 {
 	CMap::MAP_DESC Desc = {};
@@ -236,7 +256,14 @@ HRESULT CLevel_GamePlay::Ready_Layer_SkyBox(const _wstring& strLayerTag)
 {
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::GAMEPLAY), strLayerTag,
 		ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Sky"))))
+	{
+
+		CRASH("Failed SkyBox");
 		return E_FAIL;
+	}
+		
+
+	return S_OK;
 }
 
 

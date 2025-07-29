@@ -43,7 +43,7 @@ void CPlayer_WalkState::Update(_float fTimeDelta)
 	else
 	{
 		CPlayer_IdleState::IDLE_ENTER_DESC Desc{};
-		Desc.iAnimation_Idx = 16;
+		Desc.iAnimation_Idx = PLAYER_ANIM_IDLE;
 		m_pFsm->Change_State(CPlayer::PLAYER_STATE::IDLE, &Desc);
 		m_iNextAnimIdx = CPlayer::PLAYER_STATE::IDLE;
 	}		

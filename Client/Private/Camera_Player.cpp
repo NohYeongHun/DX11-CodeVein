@@ -141,7 +141,8 @@ void CCamera_Player::Update_Zoom(_float fTimeDelta)
 		vCurrentOffset = XMLoadFloat4(&m_vZoomTargetOffset);
 		vTargetOffset = XMLoadFloat4(&m_vOriginalOffset);
 	}
-
+	
+	// 현재 오프셋으로부터 TargetOffset으로 자연스럽게 보간.
 	_vector vLerpedOffset = XMVectorLerp(vCurrentOffset, vTargetOffset, fLerpRatio);
 	XMStoreFloat4(&m_vTargetOffset, vLerpedOffset);
 }
@@ -210,6 +211,30 @@ void CCamera_Player::Update_Chase_Target(_float fTimeDelta)
 	_float3 vTargetPosFloat3;
 	XMStoreFloat3(&vTargetPosFloat3, vTargetPos);
 	m_pTransformCom->LookAt(vTargetPosFloat3);
+}
+
+void CCamera_Player::Debug_CameraVectors()
+{
+	CCamera* pCamera = m_pGameInstance->Get_MainCamera();
+	if (!pCamera)
+		return;
+
+	_vector vLook = pCamera->Get_LookVector();
+	_vector vRight = pCamera->Get_RightVector();
+
+	// Y축 제거 전/후 비교
+	OutputDebugString((L"[CAM] Original Look: (" +
+		std::to_wstring(XMVectorGetX(vLook)) + L", " +
+		std::to_wstring(XMVectorGetY(vLook)) + L", " +
+		std::to_wstring(XMVectorGetZ(vLook)) + L")\n").c_str());
+
+	vLook = XMVectorSetY(vLook, 0.f);
+	vLook = XMVector3Normalize(vLook);
+
+	OutputDebugString((L"[CAM] Final Look: (" +
+		std::to_wstring(XMVectorGetX(vLook)) + L", " +
+		std::to_wstring(XMVectorGetY(vLook)) + L", " +
+		std::to_wstring(XMVectorGetZ(vLook)) + L")\n").c_str());
 }
 
 

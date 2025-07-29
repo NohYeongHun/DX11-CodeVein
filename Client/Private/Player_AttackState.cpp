@@ -60,6 +60,10 @@ void CPlayer_AttackState::Exit()
 		{
 			m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, false);
 		}
+		else if (m_iNextState == CPlayer::PLAYER_STATE::GUARD)
+		{
+			m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, false);
+		}
 		else
 		{
 			m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.1f, true, true, true);
@@ -94,8 +98,8 @@ void CPlayer_AttackState::Change_State(_float fTimeDelta)
 	{
 		// Idle 상태로 전환
 		m_iNextState = CPlayer::PLAYER_STATE::IDLE;
-		m_iNextAnimIdx = 16;
-		Idle.iAnimation_Idx = 16;
+		m_iNextAnimIdx = PLAYER_ANIM_IDLE;
+		Idle.iAnimation_Idx = PLAYER_ANIM_IDLE;
 		m_pFsm->Change_State(CPlayer::PLAYER_STATE::IDLE, &Idle);
 
 		return;
@@ -107,7 +111,7 @@ void CPlayer_AttackState::Change_State(_float fTimeDelta)
 	{
 		if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::ATTACK))
 		{
-			if (m_iCurAnimIdx == 34) // 마지막 연계공격이면  무시
+			if (m_iCurAnimIdx == PLAYER_ANIM_ATTACK4) // 마지막 연계공격이면  무시
 				return;
 
 			// **핵심**: 현재 방향키 입력 상태에 따라 방향 업데이트
@@ -129,7 +133,7 @@ void CPlayer_AttackState::Change_State(_float fTimeDelta)
 
 		if (m_pPlayer->Is_MovementKeyPressed())
 		{
-			m_iNextAnimIdx = 6;
+			m_iNextAnimIdx = PLAYER_ANIM_RUN;
 			m_iNextState = CPlayer::PLAYER_STATE::RUN;
 			Run.iAnimation_Idx = m_iNextAnimIdx;
 			m_pFsm->Change_State(m_iNextState, &Run);
@@ -142,7 +146,7 @@ void CPlayer_AttackState::Change_State(_float fTimeDelta)
 			if (!m_pFsm->Is_CoolTimeEnd(CPlayer::STRONG_ATTACK))
 				return;
 
-			m_iNextAnimIdx = 48;
+			m_iNextAnimIdx = PLAYER_ANIM_STRONG_ATTACK;
 			m_iNextState = CPlayer::STRONG_ATTACK;
 			StrongAttack.iAnimation_Idx = m_iNextAnimIdx;
 			m_pFsm->Change_State(m_iNextState, &StrongAttack);
@@ -155,9 +159,11 @@ void CPlayer_AttackState::Change_State(_float fTimeDelta)
 			if (!m_pFsm->Is_CoolTimeEnd(CPlayer::GUARD))
 				return;
 
-			m_iNextAnimIdx = 30;
+			OutPutDebugInt(m_iCurAnimIdx);
+
+			m_iNextAnimIdx = PLAYER_ANIM_GUARD_START;
 			m_iNextState = CPlayer::GUARD;
-			StrongAttack.iAnimation_Idx = m_iNextAnimIdx;
+			Guard.iAnimation_Idx = m_iNextAnimIdx;
 			m_pFsm->Change_State(m_iNextState, &Guard);
 			return;
 		}

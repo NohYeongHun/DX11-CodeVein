@@ -112,6 +112,12 @@
     <Filter Include="02. GameObject\Sky">
       <UniqueIdentifier>{3e008329-39af-4c5c-ac81-db1e8ee2f292}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. GameObject\Boss">
+      <UniqueIdentifier>{faf6a1df-e640-4366-b43c-1d6a5be89b62}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Boss\SkyBoss">
+      <UniqueIdentifier>{c1014850-7100-4288-b376-8ecc6e63f719}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -273,9 +279,6 @@
     <ClInclude Include="..\Public\Map.h">
       <Filter>02. GameObject\Map</Filter>
     </ClInclude>
-    <ClInclude Include="PlayerDefine.h">
-      <Filter>99. Defines</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\PlayerState.h">
       <Filter>02. GameObject\Player\State</Filter>
     </ClInclude>
@@ -311,6 +314,15 @@
     </ClInclude>
     <ClInclude Include="..\Public\Sky.h">
       <Filter>02. GameObject\Sky</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\SkyBoss.h">
+      <Filter>02. GameObject\Boss\SkyBoss</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerDefine.h">
+      <Filter>02. GameObject\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="SkyBossDefine.h">
+      <Filter>02. GameObject\Boss\SkyBoss</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -503,6 +515,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Sky.cpp">
       <Filter>02. GameObject\Sky</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\SkyBoss.cpp">
+      <Filter>02. GameObject\Boss\SkyBoss</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

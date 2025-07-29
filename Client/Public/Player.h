@@ -47,7 +47,6 @@ public:
 
 #pragma region PLAYER 함수 정의.
 public:
-
 	void HandleState(_float fTimeDelta);
 	_vector  Calculate_Move_Direction(ACTORDIR eDir);
 	const _bool IsLockOn() { return m_isLockOn; }

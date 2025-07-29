@@ -39,8 +39,12 @@ public:
 	void Update_Zoom(_float fTimeDelta);
 	void Reset_Zoom();
 
+public:
+	void Debug_CameraVectors();
+
 private:
 	void Update_Chase_Target(_float fTimeDelta);
+	
 
 	
 

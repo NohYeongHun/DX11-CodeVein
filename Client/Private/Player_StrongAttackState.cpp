@@ -28,13 +28,13 @@ void CPlayer_StrongAttackState::Enter(void* pArg)
 	m_pModelCom->Set_Animation(m_iCurAnimIdx, m_isLoop);
 
 	// ★ Strong Attack 시작 시 카메라 줌인
-	CCamera* pMainCamera = m_pGameInstance->Get_MainCamera();
-	if (pMainCamera)
-	{
-		CCamera_Player* pPlayerCamera = dynamic_cast<CCamera_Player*>(pMainCamera);
-		if (pPlayerCamera)
-			pPlayerCamera->Start_Zoom_In(0.2f); // 0.2초 동안 줌인
-	}
+	//CCamera* pMainCamera = m_pGameInstance->Get_MainCamera();
+	//if (pMainCamera)
+	//{
+	//	CCamera_Player* pPlayerCamera = dynamic_cast<CCamera_Player*>(pMainCamera);
+	//	if (pPlayerCamera)
+	//		pPlayerCamera->Start_Zoom_In(0.2f); // 0.2초 동안 줌인
+	//}
 
 	// 이 때 검에 콜라이더 활성화 이런 과정 진행
 }
@@ -47,23 +47,23 @@ void CPlayer_StrongAttackState::Update(_float fTimeDelta)
 
 	// ★ 애니메이션 진행도에 따른 줌아웃 시점 결정 (선택사항)
 	// 예: 애니메이션이 70% 진행되면 줌아웃 시작
-	if (m_pModelCom->Get_Current_Ratio() > 0.7f)
-	{
-		static bool bZoomOutStarted = false;
-		if (!bZoomOutStarted)
-		{
-			CCamera* pMainCamera = m_pGameInstance->Get_MainCamera();
-			if (pMainCamera)
-			{
-				CCamera_Player* pPlayerCamera = dynamic_cast<CCamera_Player*>(pMainCamera);
-				if (pPlayerCamera)
-				{
-					pPlayerCamera->Start_Zoom_Out(0.3f); // 0.3초 동안 줌아웃
-					bZoomOutStarted = true;
-				}
-			}
-		}
-	}
+	//if (m_pModelCom->Get_Current_Ratio() > 0.7f)
+	//{
+	//	static bool bZoomOutStarted = false;
+	//	if (!bZoomOutStarted)
+	//	{
+	//		CCamera* pMainCamera = m_pGameInstance->Get_MainCamera();
+	//		if (pMainCamera)
+	//		{
+	//			CCamera_Player* pPlayerCamera = dynamic_cast<CCamera_Player*>(pMainCamera);
+	//			if (pPlayerCamera)
+	//			{
+	//				pPlayerCamera->Start_Zoom_Out(0.3f); // 0.3초 동안 줌아웃
+	//				bZoomOutStarted = true;
+	//			}
+	//		}
+	//	}
+	//}
 
 }
 
@@ -71,15 +71,15 @@ void CPlayer_StrongAttackState::Update(_float fTimeDelta)
 void CPlayer_StrongAttackState::Exit()
 {
 	// ★ 상태 종료 시 카메라 줌 리셋 (안전장치)
-	CCamera* pMainCamera = m_pGameInstance->Get_MainCamera();
-	if (pMainCamera)
-	{
-		CCamera_Player* pPlayerCamera = dynamic_cast<CCamera_Player*>(pMainCamera);
-		if (pPlayerCamera)
-		{
-			pPlayerCamera->Start_Zoom_Out(0.2f); // 빠르게 원래대로
-		}
-	}
+	//CCamera* pMainCamera = m_pGameInstance->Get_MainCamera();
+	//if (pMainCamera)
+	//{
+	//	CCamera_Player* pPlayerCamera = dynamic_cast<CCamera_Player*>(pMainCamera);
+	//	if (pPlayerCamera)
+	//	{
+	//		pPlayerCamera->Start_Zoom_Out(0.2f); // 빠르게 원래대로
+	//	}
+	//}
 
 	//if (m_iNextIdx > -1) // NextIndex가 있는경우 블렌딩 시작.
 	//	m_pModelCom->Change_Animation_WithBlend(m_iNextIdx, 0.5f);
@@ -112,8 +112,8 @@ void CPlayer_StrongAttackState::Change_State()
 
 	if (m_pModelCom->Is_Finished())
 	{
-		m_iNextAnimIdx = 16;
-		Idle.iAnimation_Idx = 16;
+		m_iNextAnimIdx = PLAYER_ANIM_IDLE;
+		Idle.iAnimation_Idx = PLAYER_ANIM_IDLE;
 		m_pFsm->Change_State(CPlayer::PLAYER_STATE::IDLE, &Idle);
 		return;
 	}
@@ -123,7 +123,7 @@ void CPlayer_StrongAttackState::Change_State()
 
 		if (m_pPlayer->Is_MovementKeyPressed())
 		{
-			m_iNextAnimIdx = 6;
+			m_iNextAnimIdx = PLAYER_ANIM_RUN;
 			m_iNextState = CPlayer::PLAYER_STATE::RUN;
 			Run.iAnimation_Idx = m_iNextAnimIdx;
 			m_pFsm->Change_State(m_iNextState, &Run);

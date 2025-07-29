@@ -77,8 +77,8 @@ void CPlayer_RunState::Change_State(_float fTimeDelta)
 			return;
 
 		m_iNextState = CPlayer::PLAYER_STATE::DODGE;
-		Dodge.iAnimation_Idx = 25;
-		m_iNextAnimIdx = 25;
+		Dodge.iAnimation_Idx = PLAYER_ANIM_DODGE;
+		m_iNextAnimIdx = PLAYER_ANIM_DODGE;
 		m_pFsm->Change_State(m_iNextState, &Dodge);
 
 		return;
@@ -89,9 +89,9 @@ void CPlayer_RunState::Change_State(_float fTimeDelta)
 		if (!m_pFsm->Is_CoolTimeEnd(CPlayer::STRONG_ATTACK))
 			return;
 
-		StrongAttack.iAnimation_Idx = 48;
+		StrongAttack.iAnimation_Idx = PLAYER_ANIM_STRONG_ATTACK;
 		m_iNextState = CPlayer::PLAYER_STATE::STRONG_ATTACK;
-		m_iNextAnimIdx = 48;
+		m_iNextAnimIdx = PLAYER_ANIM_STRONG_ATTACK;
 		m_pFsm->Change_State(m_iNextState, &StrongAttack);
 		return;
 	}
@@ -102,8 +102,8 @@ void CPlayer_RunState::Change_State(_float fTimeDelta)
 			return;
 
 		m_iNextState = CPlayer::PLAYER_STATE::ATTACK;
-		m_iNextAnimIdx = 32;
-		Attack.iAnimation_Idx = 32;
+		m_iNextAnimIdx = PLAYER_ANIM_ATTACK1;
+		Attack.iAnimation_Idx = PLAYER_ANIM_ATTACK1;
 		Attack.eDirection = m_eDir;
 		m_pFsm->Change_State(m_iNextState, &Attack);
 		return;
@@ -115,9 +115,9 @@ void CPlayer_RunState::Change_State(_float fTimeDelta)
 		if (!m_pFsm->Is_CoolTimeEnd(CPlayer::GUARD))
 			return;
 
-		Guard.iAnimation_Idx = 30;
+		Guard.iAnimation_Idx = PLAYER_ANIM_GUARD_START;
 		m_iNextState = CPlayer::PLAYER_STATE::GUARD;
-		m_iNextAnimIdx = 30;
+		m_iNextAnimIdx = PLAYER_ANIM_GUARD_START;
 		m_pFsm->Change_State(m_iNextState, &Guard);
 		return;
 	}
@@ -130,9 +130,9 @@ void CPlayer_RunState::Change_State(_float fTimeDelta)
 	}
 	else
 	{
-		Idle.iAnimation_Idx = 16;
+		Idle.iAnimation_Idx = PLAYER_ANIM_IDLE;
 		m_iNextState = CPlayer::PLAYER_STATE::IDLE;
-		m_iNextAnimIdx = 16;
+		m_iNextAnimIdx = PLAYER_ANIM_IDLE;
 		m_pFsm->Change_State(m_iNextState, &Idle);
 		return;
 	}

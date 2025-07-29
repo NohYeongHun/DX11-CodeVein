@@ -83,8 +83,8 @@ void CPlayer_DodgeState::Change_State()
 	{
 		// Idle 상태로 전환
 		m_iNextState = CPlayer::PLAYER_STATE::IDLE;
-		m_iNextAnimIdx = 16;
-		Idle.iAnimation_Idx = 16;
+		m_iNextAnimIdx = PLAYER_ANIM_IDLE;
+		Idle.iAnimation_Idx = PLAYER_ANIM_IDLE;
 		m_pFsm->Change_State(CPlayer::PLAYER_STATE::IDLE, &Idle);
 		return;
 	}
@@ -99,7 +99,7 @@ void CPlayer_DodgeState::Change_State()
 				return;
 
 			// 다음 연계공격으로 변경.
-			m_iNextAnimIdx = 32;;
+			m_iNextAnimIdx = PLAYER_ANIM_ATTACK1;
 			m_iNextState = CPlayer::PLAYER_STATE::ATTACK;
 			Attack.iAnimation_Idx = m_iNextAnimIdx;
 			m_pFsm->Change_State(m_iNextState, &Attack);
@@ -108,7 +108,7 @@ void CPlayer_DodgeState::Change_State()
 
 		if (m_pPlayer->Is_MovementKeyPressed())
 		{
-			m_iNextAnimIdx = 6;
+			m_iNextAnimIdx = PLAYER_ANIM_RUN;
 			m_iNextState = CPlayer::PLAYER_STATE::RUN;
 			Run.iAnimation_Idx = m_iNextAnimIdx;
 			m_pFsm->Change_State(m_iNextState, &Run);
@@ -122,7 +122,7 @@ void CPlayer_DodgeState::Change_State()
 			if (!m_pFsm->Is_CoolTimeEnd(CPlayer::STRONG_ATTACK))
 				return;
 
-			m_iNextAnimIdx = 48;
+			m_iNextAnimIdx = PLAYER_ANIM_STRONG_ATTACK;
 			m_iNextState = CPlayer::STRONG_ATTACK;
 			StrongAttack.iAnimation_Idx = m_iNextAnimIdx;
 			m_pFsm->Change_State(m_iNextState, &StrongAttack);
@@ -135,7 +135,7 @@ void CPlayer_DodgeState::Change_State()
 			if (!m_pFsm->Is_CoolTimeEnd(CPlayer::GUARD))
 				return;
 
-			m_iNextAnimIdx = 30;
+			m_iNextAnimIdx = PLAYER_ANIM_GUARD_START;
 			m_iNextState = CPlayer::GUARD;
 			StrongAttack.iAnimation_Idx = m_iNextAnimIdx;
 			m_pFsm->Change_State(m_iNextState, &Guard);
