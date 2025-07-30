@@ -635,10 +635,6 @@ HRESULT CPlayer::Ready_Fsm()
     m_pModelCom->Set_CurrentTickPerSecond(PLAYER_ANIM_RUN_F_LOOP, m_pModelCom->Get_CurrentTickPerSecond(PLAYER_ANIM_RUN_F_LOOP) * 1.5f);
     m_pModelCom->Set_CurrentTickPerSecond(PLAYER_ANIM_DODGE_F, m_pModelCom->Get_CurrentTickPerSecond(PLAYER_ANIM_DODGE_F) * 2.f);
     m_pModelCom->Set_CurrentTickPerSecond(PLAYER_ANIM_STRONG_ATTACK, m_pModelCom->Get_CurrentTickPerSecond(PLAYER_ANIM_DODGE_F) * 2.f);
-    //m_pModelCom->Set_CurrentTickPerSecond(PLAYER_ANIM_SPECIAL_DOWN3, m_pModelCom->Get_CurrentTickPerSecond(PLAYER_ANIM_DODGE_F) * 1.5f);
-
-    // 약한 루트모션 강화.
-    //m_pModelCom->Set_RootMotion_Scale_For_Animation(PLAYER_ANIM_DODGE_F, 1.5f);
 
     CPlayer_IdleState::IDLE_ENTER_DESC enter{};
     enter.iAnimation_Idx = PLAYER_ANIM_IDLE_SWORD;

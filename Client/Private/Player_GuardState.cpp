@@ -86,7 +86,6 @@ void CPlayer_GuardState::Change_State(_float fTimeDelta)
 	// Exit CoolTime => 상태 변환이 가능한 시간일 때 상태를 변경해준다면?
 	if (m_pFsm->Is_ExitCoolTimeEnd(m_iStateNum))
 	{
-		
 		if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::GUARD))
 		{
 			// 현재 상태가 시작 상태일때만 End로 변경.

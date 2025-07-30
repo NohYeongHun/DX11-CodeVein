@@ -30,14 +30,6 @@ void CPlayer_StrongAttackState::Enter(void* pArg)
 	m_pModelCom->Set_RootMotionRotation(true);
 	m_pModelCom->Set_RootMotionTranslate(true);
 
-	// ★ Strong Attack 시작 시 카메라 줌인
-	//CCamera* pMainCamera = m_pGameInstance->Get_MainCamera();
-	//if (pMainCamera)
-	//{
-	//	CCamera_Player* pPlayerCamera = dynamic_cast<CCamera_Player*>(pMainCamera);
-	//	if (pPlayerCamera)
-	//		pPlayerCamera->Start_Zoom_In(0.2f); // 0.2초 동안 줌인
-	//}
 
 	// 이 때 검에 콜라이더 활성화 이런 과정 진행
 }
@@ -49,48 +41,12 @@ void CPlayer_StrongAttackState::Update(_float fTimeDelta)
 	Handle_Unified_Direction_Input(fTimeDelta);
 	Change_State();
 
-	// ★ 애니메이션 진행도에 따른 줌아웃 시점 결정 (선택사항)
-	// 예: 애니메이션이 70% 진행되면 줌아웃 시작
-	//if (m_pModelCom->Get_Current_Ratio() > 0.7f)
-	//{
-	//	static bool bZoomOutStarted = false;
-	//	if (!bZoomOutStarted)
-	//	{
-	//		CCamera* pMainCamera = m_pGameInstance->Get_MainCamera();
-	//		if (pMainCamera)
-	//		{
-	//			CCamera_Player* pPlayerCamera = dynamic_cast<CCamera_Player*>(pMainCamera);
-	//			if (pPlayerCamera)
-	//			{
-	//				pPlayerCamera->Start_Zoom_Out(0.3f); // 0.3초 동안 줌아웃
-	//				bZoomOutStarted = true;
-	//			}
-	//		}
-	//	}
-	//}
-
 }
 
 // 종료될 때 실행할 동작..
 void CPlayer_StrongAttackState::Exit()
 {
-	// ★ 상태 종료 시 카메라 줌 리셋 (안전장치)
-	//CCamera* pMainCamera = m_pGameInstance->Get_MainCamera();
-	//if (pMainCamera)
-	//{
-	//	CCamera_Player* pPlayerCamera = dynamic_cast<CCamera_Player*>(pMainCamera);
-	//	if (pPlayerCamera)
-	//	{
-	//		pPlayerCamera->Start_Zoom_Out(0.2f); // 빠르게 원래대로
-	//	}
-	//}
-
 	
-
-	//if (m_iNextIdx > -1) // NextIndex가 있는경우 블렌딩 시작.
-	//	m_pModelCom->Change_Animation_WithBlend(m_iNextIdx, 0.5f);
-	// 여기서 동작해야합니다.
-
 	m_pModelCom->Set_RootMotionRotation(false);
 	m_pModelCom->Set_RootMotionTranslate(false);
 
@@ -107,13 +63,11 @@ void CPlayer_StrongAttackState::Exit()
 			{
 				m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, true);
 			}
-				
-			//if (m_iCurAnimIdx == PLAYER_ANIM_SPECIAL_LAUNCH)
-				
-			
 		}
 		else 
-			m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, false);	}
+			m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, false);	
+	}
+
 	
 }
 
