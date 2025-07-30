@@ -40,8 +40,6 @@ void CPlayer_AttackState::Update(_float fTimeDelta)
 {
 	Handle_Input();
 	Handle_Unified_Direction_Input(fTimeDelta);
-	//Handle_DirectionInput(fTimeDelta);
-	
 	Change_State(fTimeDelta);
 
 }

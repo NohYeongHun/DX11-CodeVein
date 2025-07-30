@@ -89,9 +89,6 @@ public:
 
 
 
-
-
-
 #pragma region 이동 관련 함수들
 public:
 	void Move_By_Camera_Direction_8Way(ACTORDIR eDir, _float fTimeDelta, _float fSpeed);
@@ -148,7 +145,6 @@ private:
 	class CWeapon* m_pPlayerWeapon = { nullptr };
 	class CFsm* m_pFsmCom = { nullptr };
 	class CCamera_Player* m_pPlayerCamera = { nullptr };
-	//class CCamera_Action* m_pPlayerCamera = { nullptr };
 	LEVEL m_eCurLevel;
 #pragma endregion
 

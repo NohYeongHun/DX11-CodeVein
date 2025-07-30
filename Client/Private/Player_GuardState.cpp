@@ -1,8 +1,4 @@
-﻿//34 AS_TStdUnisex_TLSword_Guard_N_End.psa
-//35 AS_TStdUnisex_TLSword_Guard_N_Loop.psa
-//36 AS_TStdUnisex_TLSword_Guard_N_Start.psa
-//37 AS_TStdUnisex_TLSword_GuardHit_N.psa
-CPlayer_GuardState::CPlayer_GuardState()
+﻿CPlayer_GuardState::CPlayer_GuardState()
 {
 }
 
@@ -32,6 +28,10 @@ void CPlayer_GuardState::Enter(void* pArg)
 	m_pModelCom->Set_RootMotionTranslate(false);
 	m_pModelCom->Set_RootMotionRotation(true);
 
+	// 방향 제어 관련 초기화
+	m_bCanChangeDirection = true;
+	m_fCurrentLockTime = 0.0f;
+	m_bIsDirectionLocked = false;
 }
 
 /* State 실행 */
