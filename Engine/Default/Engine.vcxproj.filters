@@ -181,8 +181,11 @@
     <Filter Include="01. Utility\03. Component\VIBuffer\Cube">
       <UniqueIdentifier>{5f49263d-e67e-4cb7-8234-8b4bc2d99981}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01. Utility\03. Component\BehaviorTree">
+    <Filter Include="01. Utility\03. Component\BehaviourTree">
       <UniqueIdentifier>{5e137b91-376f-405a-9d1f-74a486fd1fb6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\03. Component\BehaviourTree\Node">
+      <UniqueIdentifier>{1814f11a-da9e-42a1-b1e5-5384dc789cc2}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -353,6 +356,27 @@
     </ClCompile>
     <ClCompile Include="..\Private\VIBuffer_Cube.cpp">
       <Filter>01. Utility\03. Component\VIBuffer\Cube</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BehaviourTree.cpp">
+      <Filter>01. Utility\03. Component\BehaviourTree</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BTNode.cpp">
+      <Filter>01. Utility\03. Component\BehaviourTree\Node</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BTSequence.cpp">
+      <Filter>01. Utility\03. Component\BehaviourTree\Node</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BTSelector.cpp">
+      <Filter>01. Utility\03. Component\BehaviourTree\Node</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BTAction.cpp">
+      <Filter>01. Utility\03. Component\BehaviourTree\Node</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BTCondition.cpp">
+      <Filter>01. Utility\03. Component\BehaviourTree\Node</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BTInverter.cpp">
+      <Filter>01. Utility\03. Component\BehaviourTree\Node</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -550,6 +574,27 @@
     </ClInclude>
     <ClInclude Include="..\Public\VIBuffer_Cube.h">
       <Filter>01. Utility\03. Component\VIBuffer\Cube</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BehaviourTree.h">
+      <Filter>01. Utility\03. Component\BehaviourTree</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BTNode.h">
+      <Filter>01. Utility\03. Component\BehaviourTree\Node</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BTSequence.h">
+      <Filter>01. Utility\03. Component\BehaviourTree\Node</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BTSelector.h">
+      <Filter>01. Utility\03. Component\BehaviourTree\Node</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BTAction.h">
+      <Filter>01. Utility\03. Component\BehaviourTree\Node</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BTCondition.h">
+      <Filter>01. Utility\03. Component\BehaviourTree\Node</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BTInverter.h">
+      <Filter>01. Utility\03. Component\BehaviourTree\Node</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

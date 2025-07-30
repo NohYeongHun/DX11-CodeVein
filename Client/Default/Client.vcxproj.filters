@@ -121,6 +121,9 @@
     <Filter Include="02. GameObject\Monster\Boss\SkyBoss">
       <UniqueIdentifier>{c1014850-7100-4288-b376-8ecc6e63f719}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. GameObject\Monster\BT">
+      <UniqueIdentifier>{480a8171-4723-4c9e-bd30-f9e554f2deaf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -330,6 +333,15 @@
     <ClInclude Include="..\Public\Monster.h">
       <Filter>02. GameObject\Monster</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\BT_Wait.h">
+      <Filter>02. GameObject\Monster\BT</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BT_PlayAnimation.h">
+      <Filter>02. GameObject\Monster\BT</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BT_IsTargetInRange.h">
+      <Filter>02. GameObject\Monster\BT</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -527,6 +539,15 @@
     </ClCompile>
     <ClCompile Include="..\Private\Monster.cpp">
       <Filter>02. GameObject\Monster</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BT_Wait.cpp">
+      <Filter>02. GameObject\Monster\BT</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BT_PlayAnimation.cpp">
+      <Filter>02. GameObject\Monster\BT</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BT_IsTargetInRange.cpp">
+      <Filter>02. GameObject\Monster\BT</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

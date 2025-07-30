@@ -90,6 +90,21 @@
 #include "Player_AttackState.h"
 #include "Player_GuardState.h"
 
+/* ======================================== BT Object ===================================== */
+#include "BT_AttackTarget.h"
+#include "BT_CanUseSkill.h"
+#include "BT_HasTarget.h"
+#include "BT_IsHealthLow.h"
+#include "BT_IsTargetInRange.h"
+#include "BT_MoveToTarget.h"
+#include "BT_Patrol.h"
+#include "BT_PlayAnimation.h"
+#include "BT_Wait.h"
+#include "BT_RandomChance.h"
+
+
+/* ======================================== Monster Object ===================================== */
+#include "Monster.h"
 
 /* ======================================== Sky Boss Object ===================================== */
 #include "SkyBossDefine.h"

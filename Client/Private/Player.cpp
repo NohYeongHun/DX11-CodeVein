@@ -591,6 +591,10 @@ ACTORDIR CPlayer::Calculate_Direction()
     return ACTORDIR::END;
 }
 
+void CPlayer::Take_Damage(_float fDamage, CMonster* pMonster)
+{
+}
+
 
 #pragma endregion
 

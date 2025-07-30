@@ -85,6 +85,8 @@ public:
 	}
 	ACTORDIR Get_Direction() { return m_eCurrentDirection; }
 	ACTORDIR Calculate_Direction();
+
+	void Take_Damage(_float fDamage, class CMonster* pMonster);
 #pragma endregion
 
 
@@ -159,6 +161,20 @@ private:
 
 private:
 	void Update_KeyInput();
+#pragma endregion
+
+#pragma region STAT
+
+private:
+	// 스탯 관련
+	_float m_fMaxHP = {} ;
+	_float m_fCurrentHP = {};
+	_float m_fAttackPower = {};
+	_float m_fDetectionRange = {};
+	_float m_fAttackRange = {};
+	_float m_fMoveSpeed = {};
+	_float m_fRotationSpeed = {};
+
 #pragma endregion
 
 

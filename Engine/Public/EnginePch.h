@@ -53,6 +53,16 @@
 #include "State.h"
 #include "Fsm.h"
 
+/* Behaviour Tree*/
+#include "BTNode.h"
+#include "BTAction.h"
+#include "BTSelector.h"
+#include "BTSequence.h"
+#include "BTCondition.h"
+#include "BTInverter.h"
+#include "BehaviourTree.h"
+
+
 #pragma endregion
 
 

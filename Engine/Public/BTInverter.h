@@ -1,0 +1,21 @@
+﻿#pragma once
+#include "BTNode.h"
+
+NS_BEGIN(Engine)
+class ENGINE_DLL CBTInverter : public CBTNode
+{
+public:
+	explicit CBTInverter();
+	virtual ~CBTInverter() = default;
+
+public:
+	BT_RESULT Execute(_float fTimeDelta) override;
+
+public:
+	virtual void Free() override;
+
+	// CBTNode을(를) 통해 상속됨
+	
+};
+NS_END
+

@@ -161,11 +161,18 @@ call copy.bat</Command>
   <ItemGroup>
     <ClCompile Include="..\Private\Animation.cpp" />
     <ClCompile Include="..\Private\Base.cpp" />
+    <ClCompile Include="..\Private\BehaviourTree.cpp" />
     <ClCompile Include="..\Private\Bone.cpp" />
     <ClCompile Include="..\Private\Bounding_OBB.cpp" />
     <ClCompile Include="..\Private\Bounding.cpp" />
     <ClCompile Include="..\Private\Bounding_AABB.cpp" />
     <ClCompile Include="..\Private\Bounding_Sphere.cpp" />
+    <ClCompile Include="..\Private\BTAction.cpp" />
+    <ClCompile Include="..\Private\BTCondition.cpp" />
+    <ClCompile Include="..\Private\BTInverter.cpp" />
+    <ClCompile Include="..\Private\BTNode.cpp" />
+    <ClCompile Include="..\Private\BTSelector.cpp" />
+    <ClCompile Include="..\Private\BTSequence.cpp" />
     <ClCompile Include="..\Private\Camera.cpp" />
     <ClCompile Include="..\Private\Camera_Manager.cpp" />
     <ClCompile Include="..\Private\Channel.cpp" />
@@ -222,11 +229,18 @@ call copy.bat</Command>
   <ItemGroup>
     <ClInclude Include="..\Public\Animation.h" />
     <ClInclude Include="..\Public\Base.h" />
+    <ClInclude Include="..\Public\BehaviourTree.h" />
     <ClInclude Include="..\Public\Bone.h" />
     <ClInclude Include="..\Public\Bounding.h" />
     <ClInclude Include="..\Public\Bounding_AABB.h" />
     <ClInclude Include="..\Public\Bounding_OBB.h" />
     <ClInclude Include="..\Public\Bounding_Sphere.h" />
+    <ClInclude Include="..\Public\BTAction.h" />
+    <ClInclude Include="..\Public\BTCondition.h" />
+    <ClInclude Include="..\Public\BTInverter.h" />
+    <ClInclude Include="..\Public\BTNode.h" />
+    <ClInclude Include="..\Public\BTSelector.h" />
+    <ClInclude Include="..\Public\BTSequence.h" />
     <ClInclude Include="..\Public\Camera.h" />
     <ClInclude Include="..\Public\Camera_Manager.h" />
     <ClInclude Include="..\Public\Channel.h" />

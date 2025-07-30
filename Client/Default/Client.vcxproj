@@ -160,6 +160,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\public\BackGround.h" />
+    <ClInclude Include="..\Public\BT_IsTargetInRange.h" />
+    <ClInclude Include="..\Public\BT_PlayAnimation.h" />
+    <ClInclude Include="..\Public\BT_Wait.h" />
     <ClInclude Include="..\Public\Camera_Free.h" />
     <ClInclude Include="..\Public\Camera_Player.h" />
     <ClInclude Include="..\Public\ClientPch.h" />
@@ -231,6 +234,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\BackGround.cpp" />
+    <ClCompile Include="..\Private\BT_IsTargetInRange.cpp" />
+    <ClCompile Include="..\Private\BT_PlayAnimation.cpp" />
+    <ClCompile Include="..\Private\BT_Wait.cpp" />
     <ClCompile Include="..\Private\Camera_Free.cpp" />
     <ClCompile Include="..\Private\Camera_Player.cpp" />
     <ClCompile Include="..\Private\ClientPch.cpp">
