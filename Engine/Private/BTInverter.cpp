@@ -1,15 +1,7 @@
 ﻿#include "BTInverter.h"
 
-CBTInverter::CBTInverter()
-{
-    m_eNodeType = BT_NODE_TYPE::DECORATOR;
-}
-
 BT_RESULT CBTInverter::Execute(_float fTimeDelta)
 {
-    if (m_Children.empty())
-        return BT_RESULT::FAILURE;
-
     BT_RESULT result = m_Children[0]->Execute(fTimeDelta);
 
     switch (result)
@@ -28,4 +20,7 @@ BT_RESULT CBTInverter::Execute(_float fTimeDelta)
 void CBTInverter::Free()
 {
     __super::Free();
+
+    for (auto& pNode : m_Children)
+        Safe_Release(pNode);
 }

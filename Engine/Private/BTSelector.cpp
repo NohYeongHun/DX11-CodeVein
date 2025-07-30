@@ -1,9 +1,5 @@
 ﻿#include "BTSelector.h"
 
-CBTSelector::CBTSelector()
-{
-}
-
 void CBTSelector::Add_Child(CBTNode* pChild)
 {
     if (pChild) {
@@ -36,7 +32,7 @@ BT_RESULT CBTSelector::Execute(_float fTimeDelta)
 
 CBTSelector* CBTSelector::Create()
 {
-    return new CBTSelector();
+    return new CBTSelector;
 }
 
 void CBTSelector::Reset()

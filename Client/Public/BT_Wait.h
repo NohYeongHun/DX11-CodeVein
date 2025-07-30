@@ -12,6 +12,7 @@ public:
     virtual void Reset() override;
 
 private:
+    class CGameObject* m_pOwner = { nullptr };
     _float m_fWaitTime;
     _float m_fCurrentTime = 0.f;
 
