@@ -22,11 +22,12 @@ public:
 		LEVEL eCurLevel;
 	}PLAYER_DESC;
 
+
+#pragma region 초기 함수.
 private:
 	CPlayer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CPlayer(const CPlayer& Prototype);
 	virtual ~CPlayer() = default;
-
 
 public:
 	virtual HRESULT Initialize_Prototype();
@@ -35,6 +36,9 @@ public:
 	virtual void Update(_float fTimeDelta);
 	virtual void Late_Update(_float fTimeDelta);
 	virtual HRESULT Render();
+#pragma endregion
+
+
 
 #pragma region 충돌 함수 정의
 public:

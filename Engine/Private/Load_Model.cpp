@@ -265,8 +265,6 @@ void CLoad_Model::Set_BlendInfo(uint32_t iNextAnimIndex, _float fBlendTime, _boo
 
 void CLoad_Model::Handle_RootMotion(_float fTimeDelta)
 {
-	//Handle_RootMotion(fTimeDelta);
-
 	_matrix rootMatrix = m_Bones[m_iRoot_BoneIndex]->Get_CombinedTransformationMatrix();
 	_vector vNewRootPos = rootMatrix.r[3];
 	
@@ -287,9 +285,8 @@ void CLoad_Model::Handle_RootMotion(_float fTimeDelta)
 			_matrix playerRotMatrix = XMMatrixRotationQuaternion(playerRot);
 			vWorldTranslate = XMVector3TransformNormal(vLocalTranslate, playerRotMatrix);
 		}
-		// 2. 월드 이동 구하기 => Translate 설정할.
 
-		// 3. 이동값을 월드에 적용할 것인지 모션에서 설정
+		// 2. 이동값을 월드에 적용할 것인지 모션에서 설정
 		if (m_bRootMotionTranslate)
 			m_pOwner->Translate(vWorldTranslate);
 			
@@ -426,10 +423,6 @@ HRESULT CLoad_Model::Load_Animations(std::ifstream& ifs)
 	for (auto& pAnimation : m_Animations)
 	{
 		pAnimation->Build_BoneChannelCache(m_Bones.size());
-
-		// 디버그: 캐시 크기 확인
-		//OutputDebugString((L"[INFO] Animation cache built, bone count: " +
-		//	std::to_wstring(m_Bones.size()) + L"\n").c_str());
 	}
 
 	return S_OK;
@@ -485,6 +478,5 @@ void CLoad_Model::Free()
 		Safe_Release(pAnimation);
 
 	m_Animations.clear();
-	
-	//Safe_Delete(m_pAIScene);
+
 }
