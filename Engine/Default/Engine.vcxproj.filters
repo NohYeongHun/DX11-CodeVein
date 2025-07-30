@@ -181,6 +181,9 @@
     <Filter Include="01. Utility\03. Component\VIBuffer\Cube">
       <UniqueIdentifier>{5f49263d-e67e-4cb7-8234-8b4bc2d99981}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01. Utility\03. Component\BehaviorTree">
+      <UniqueIdentifier>{5e137b91-376f-405a-9d1f-74a486fd1fb6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Timer.cpp">

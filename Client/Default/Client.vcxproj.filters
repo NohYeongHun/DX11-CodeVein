@@ -321,14 +321,14 @@
     <ClInclude Include="..\Public\SkyBoss.h">
       <Filter>02. GameObject\Monster\Boss\SkyBoss</Filter>
     </ClInclude>
-    <ClInclude Include="PlayerDefine.h">
+    <ClInclude Include="..\Public\PlayerDefine.h">
       <Filter>02. GameObject\Player</Filter>
     </ClInclude>
-    <ClInclude Include="SkyBossDefine.h">
+    <ClInclude Include="..\Public\SkyBossDefine.h">
       <Filter>02. GameObject\Monster\Boss\SkyBoss</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Camera_Action.h">
-      <Filter>02. GameObject\Camera\Player</Filter>
+    <ClInclude Include="..\Public\Monster.h">
+      <Filter>02. GameObject\Monster</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -525,8 +525,8 @@
     <ClCompile Include="..\Private\SkyBoss.cpp">
       <Filter>02. GameObject\Monster\Boss\SkyBoss</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Camera_Action.cpp">
-      <Filter>02. GameObject\Camera\Player</Filter>
+    <ClCompile Include="..\Private\Monster.cpp">
+      <Filter>02. GameObject\Monster</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

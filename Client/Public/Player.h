@@ -145,7 +145,7 @@ private:
 	class CWeapon* m_pPlayerWeapon = { nullptr };
 	class CFsm* m_pFsmCom = { nullptr };
 	class CCamera_Player* m_pPlayerCamera = { nullptr };
-	LEVEL m_eCurLevel;
+	LEVEL m_eCurLevel = { LEVEL::END };
 #pragma endregion
 
 

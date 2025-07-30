@@ -19,7 +19,7 @@ const std::pair<PLAYER_KEY, _ubyte> CPlayer::m_KeyboardMappings[] = {
 #pragma endregion
 
 
-
+#pragma region 기본 코드
 CPlayer::CPlayer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CContainerObject(pDevice, pContext)
 {
@@ -43,7 +43,7 @@ HRESULT CPlayer::Initialize_Prototype()
 HRESULT CPlayer::Initialize_Clone(void* pArg)
 {
     PLAYER_DESC* pDesc = static_cast<PLAYER_DESC*>(pArg);
-    
+
     if (FAILED(__super::Initialize_Clone(pDesc)))
         return E_FAIL;
 
@@ -79,7 +79,7 @@ void CPlayer::Update(_float fTimeDelta)
     HandleState(fTimeDelta);
 
     __super::Update(fTimeDelta);
-    
+
 }
 
 void CPlayer::Late_Update(_float fTimeDelta)
@@ -88,7 +88,7 @@ void CPlayer::Late_Update(_float fTimeDelta)
         return;
 
     __super::Late_Update(fTimeDelta);
-    
+
 }
 
 HRESULT CPlayer::Render()
@@ -138,6 +138,9 @@ HRESULT CPlayer::Render()
     return S_OK;
 
 }
+
+#pragma endregion
+
 
 #pragma region 움직임 구현
 void CPlayer::Move_By_Camera_Direction_8Way(ACTORDIR eDir, _float fTimeDelta, _float fSpeed)
@@ -269,9 +272,24 @@ void CPlayer::Search_LockOn_Target()
         return; // 적이 없으면 조용히 리턴
     }
 
+    // === 카메라 기반 정보 가져오기 ===
+    if (!m_pPlayerCamera)
+        return;
+
+    _vector vCameraPos = m_pPlayerCamera->Get_Transform()->Get_State(STATE::POSITION);
+    _vector vCameraLook = m_pPlayerCamera->Get_Transform()->Get_State(STATE::LOOK);
+    _vector vCameraRight = m_pPlayerCamera->Get_Transform()->Get_State(STATE::RIGHT);
+    _vector vCameraUp = m_pPlayerCamera->Get_Transform()->Get_State(STATE::UP);
+
+    vCameraLook = XMVector3Normalize(vCameraLook);
+    vCameraRight = XMVector3Normalize(vCameraRight);
+    vCameraUp = XMVector3Normalize(vCameraUp);
+
+    // 카메라 FOV 정보 (카메라에서 가져오거나 하드코딩)
+    _float fCameraFovY = m_pPlayerCamera->Get_FovY();
+    _float fAspectRatio = m_pPlayerCamera->Get_Aspect();
+    _float fCameraFovX = 2.0f * atanf(tanf(fCameraFovY * 0.5f) * fAspectRatio); // 가로 FOV
     _vector vPlayerPos = m_pTransformCom->Get_State(STATE::POSITION);
-    _vector vPlayerLook = m_pTransformCom->Get_State(STATE::LOOK);
-    vPlayerLook = XMVector3Normalize(vPlayerLook);
 
     CGameObject* pBestTarget = nullptr;
     _float fBestScore = -1.0f;
@@ -281,31 +299,29 @@ void CPlayer::Search_LockOn_Target()
         if (!pGameObject || pGameObject == this)
             continue;
 
-        // 타겟 유효성 검사
         if (!Is_Valid_LockOn_Target(pGameObject))
             continue;
 
         _vector vTargetPos = pGameObject->Get_Transform()->Get_State(STATE::POSITION);
-        _vector vToTarget = vTargetPos - vPlayerPos;
-        _float fDistance = XMVectorGetX(XMVector3Length(vToTarget));
 
-        // 거리 체크
+        // === 1. 카메라 시야 내 체크 ===
+        if (!m_pPlayerCamera->Is_In_Camera_Frustum(vTargetPos))
+            continue;
+
+        // === 2. 플레이어와의 거리 체크 ===
+        _vector vPlayerToTarget = vTargetPos - vPlayerPos;
+        _float fDistance = XMVectorGetX(XMVector3Length(vPlayerToTarget));
+
         if (fDistance > m_fLockOnRange || fDistance < 1.0f)
             continue;
 
-        vToTarget = XMVector3Normalize(vToTarget);
-
-        // 각도 체크 (플레이어 정면 기준)
-        _float fDot = XMVectorGetX(XMVector3Dot(vPlayerLook, vToTarget));
-        _float fAngle = XMConvertToDegrees(acosf(max(-1.0f, min(1.0f, fDot))));
-
-        if (fAngle > m_fLockOnAngle * 0.5f)
-            continue;
-
-        // 점수 계산 (거리와 각도를 고려 - 가까우면서 정면에 있을수록 높은 점수)
+        // === 3. 점수 계산 ===
         _float fDistanceScore = (m_fLockOnRange - fDistance) / m_fLockOnRange;
-        _float fAngleScore = (m_fLockOnAngle * 0.5f - fAngle) / (m_fLockOnAngle * 0.5f);
-        _float fTotalScore = fDistanceScore * 0.6f + fAngleScore * 0.4f;
+        // 화면 중앙으로부터의 거리 (0에 가까울수록 높은 점수)
+        _float fScreenDistance = m_pPlayerCamera->Get_Screen_Distance_From_Center(vTargetPos);
+        _float fCenterScore = max(0.0f, 1.0f - min(fScreenDistance, 1.0f)); // 정규화
+
+        _float fTotalScore = fDistanceScore * 0.3f + fCenterScore * 0.7f; // 화면 중앙 우선
 
         if (fTotalScore > fBestScore)
         {
@@ -314,7 +330,6 @@ void CPlayer::Search_LockOn_Target()
         }
     }
 
-    // 적합한 타겟을 찾았을 때만 락온 설정.
     if (pBestTarget)
         Set_LockOn_Target(pBestTarget);
 }
@@ -328,7 +343,7 @@ void CPlayer::Set_LockOn_Target(CGameObject* pTarget)
     // 카메라에 LockOn 타겟 설정
     if (m_pPlayerCamera)
     {
-        m_pPlayerCamera->Start_Zoom_In(0.3f);  // 0.3초 동안 줌아웃
+        m_pPlayerCamera->Start_Zoom_In(0.3f);
     }
 }
 
@@ -341,7 +356,7 @@ void CPlayer::Clear_LockOn_Target()
     // 카메라 LockOn 해제
     if (m_pPlayerCamera)
     {
-        m_pPlayerCamera->Start_Zoom_Out(0.3f);  // 0.3초 동안 줌아웃
+        m_pPlayerCamera->Start_Zoom_Out(0.3f); 
     }
 
     // UI나 이펙트 숨기기 (필요시)

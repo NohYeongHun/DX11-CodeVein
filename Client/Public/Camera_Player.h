@@ -100,12 +100,12 @@ private:
 	_bool m_bFirstUpdate = true;         // 첫 번째 업데이트 체크
 
 private:
-	_float4 m_vOriginalOffset;      // 원래 오프셋을 저장
-	_float4 m_vZoomTargetOffset;    // 줌인 시 목표 오프셋
-	_bool m_bIsZooming;             // 줌 상태 플래그
-	_float m_fZoomLerpTime;         // 줌 보간 시간
-	_float m_fZoomMaxTime;          // 줌 전체 시간
-	_bool m_bZoomIn;                // 줌인 중인지 줌아웃 중인지
+	_float4 m_vOriginalOffset = {};      // 원래 오프셋을 저장
+	_float4 m_vZoomTargetOffset = {};    // 줌인 시 목표 오프셋
+	_bool m_bIsZooming = {};             // 줌 상태 플래그
+	_float m_fZoomLerpTime = {};         // 줌 보간 시간
+	_float m_fZoomMaxTime = {};          // 줌 전체 시간
+	_bool m_bZoomIn = {};                // 줌인 중인지 줌아웃 중인지
 
 
 public:
