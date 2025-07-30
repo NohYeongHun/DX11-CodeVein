@@ -1,12 +1,14 @@
-#pragma once
+ï»¿#pragma once
 
 #include "Base.h"
 
-/* »çº» °ÔÀÓ¿ÀºêÁ§Æ®¸¦ »ı¼ºÇÏ¿© º¸°üÇÑ´Ù. */
-/* º¸°ü : ·¹º§º°·Î, »ç¿ëÀÚÀÇ Á¤ÀÇ¿¡ µû¶ó ±×·ìÁö¾î¼­ */
+/* ì‚¬ë³¸ ê²Œì„ì˜¤ë¸Œì íŠ¸ë¥¼ ìƒì„±í•˜ì—¬ ë³´ê´€í•œë‹¤. */
+/* ë³´ê´€ : ë ˆë²¨ë³„ë¡œ, ì‚¬ìš©ìì˜ ì •ì˜ì— ë”°ë¼ ê·¸ë£¹ì§€ì–´ì„œ */
 
 
 NS_BEGIN(Engine)
+
+using LayerTable = map<const _wstring, class CLayer*>;
 
 class CObject_Manager final : public CBase
 {
@@ -15,7 +17,20 @@ private:
 	virtual ~CObject_Manager() = default;
 
 public:
+#pragma region ENGINEì œê³µ
 	class CComponent* Get_Component(_uint iLayerLevelIndex, const _wstring& strLayerTag, const _wstring& strComponentTag, _uint iIndex = 0);
+	class CLayer* Get_Layer(_uint iLayerIndex, const _wstring& strLayerTag);
+	
+	/* ë§µ íˆ´ì— í˜„ì¬ ë ˆë²¨ì˜ ë ˆì´ì–´ ì •ë³´ë¥¼ ë‹´ì•„ì„œ ì „ë‹¬í•©ë‹ˆë‹¤. ì½ê¸° ì „ìš© */
+	const LayerTable& Export_EditLayer(_uint iLayerLevelIndex);
+	void Request_EditObject(_uint iLayerLevelIndex, const _wstring& strLayerTag, uint32_t objID, const EditPayload& payload);
+	void Request_DeleteObject(_uint iLayerLevelIndex, const _wstring& strLayerTag, uint32_t objID);
+
+	/* íŠ¹ì • Layer Picking ê²°ê³¼ ë°˜í™˜.*/
+	RAYHIT_DESC Get_PickingLocalObject(_uint iLayerLevelIndex, const _wstring strLayerTag, _float* pOutDist);
+#pragma endregion
+
+	
 
 public:
 	HRESULT Initialize(_uint iNumLevels);
@@ -26,12 +41,16 @@ public:
 	void Clear(_uint iLevelIndex);
 
 private:
-	class CGameInstance*					m_pGameInstance = { nullptr };
-	_uint									m_iNumLevels = {};
-	map<const _wstring, class CLayer*>*		m_pLayers = {};
+	class CGameInstance* m_pGameInstance = { nullptr };
+	_uint				 m_iNumLevels = {};
+	LayerTable*		m_pLayers = {};
+	
 
 private:
 	class CLayer* Find_Layer(_uint iLayerLevelIndex, const _wstring& strLayerTag);
+
+	void Edit_Transform(_uint iLayerLevelIndex, const _wstring& strLayerTag, uint32_t objID, const EditPayload& payload);
+	
 
 public:
 	static CObject_Manager* Create(_uint iNumLevels);

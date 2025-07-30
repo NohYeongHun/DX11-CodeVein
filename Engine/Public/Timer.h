@@ -15,7 +15,7 @@ public:
 		return m_fTimeDelta; }
 
 public:
-	HRESULT	Initialize();
+	HRESULT	Initialize_Clone();
 	void Update_Timer();
 
 private:

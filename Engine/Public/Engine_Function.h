@@ -1,10 +1,10 @@
-#ifndef Engine_Function_h__
+ï»¿#ifndef Engine_Function_h__
 #define Engine_Function_h__
 
 namespace Engine
 {
-	// ÅÛÇÃ¸´Àº ±â´ÉÀÇ Á¤ÇØÁ®ÀÖÀ¸³ª ÀÚ·áÇüÀº Á¤ÇØÁ®ÀÖÁö ¾ÊÀº °Í
-	// ±â´ÉÀ» ÀÎ½ºÅÏ½ºÈ­ ÇÏ±â À§ÇÏ¿© ¸¸µé¾îµÎ´Â Æ²
+	// í…œí”Œë¦¿ì€ ê¸°ëŠ¥ì˜ ì •í•´ì ¸ìˆìœ¼ë‚˜ ìë£Œí˜•ì€ ì •í•´ì ¸ìˆì§€ ì•Šì€ ê²ƒ
+	// ê¸°ëŠ¥ì„ ì¸ìŠ¤í„´ìŠ¤í™” í•˜ê¸° ìœ„í•˜ì—¬ ë§Œë“¤ì–´ë‘ëŠ” í‹€
 
 	template<typename T>
 	void	Safe_Delete(T& Pointer)
@@ -21,7 +21,7 @@ namespace Engine
 	{
 		if (nullptr != Pointer)
 		{
-			delete [] Pointer;
+			delete[] Pointer;
 			Pointer = nullptr;
 		}
 	}
@@ -51,6 +51,15 @@ namespace Engine
 			dwRefCnt = pInstance->AddRef();
 		return dwRefCnt;
 	}
+
+	// <, > ì—°ì‚°ì„ ì§€ì›í•˜ëŠ” ìë£Œí˜•ë§Œ ê°€ëŠ¥í•©ë‹ˆë‹¤.
+	template<typename T>
+	constexpr T Clamp(T value, T minV, T maxV)
+	{
+		return (value < minV) ? minV : (value > maxV) ? maxV : value;
+	}
+
+
 
 }
 

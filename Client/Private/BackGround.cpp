@@ -1,5 +1,4 @@
-#include "BackGround.h"
-#include "GameInstance.h"
+﻿//#include "BackGround.h"
 
 CBackGround::CBackGround(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CUIObject { pDevice, pContext }
@@ -7,7 +6,7 @@ CBackGround::CBackGround(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 }
 
 CBackGround::CBackGround(const CBackGround& Prototype)
-    : CUIObject{Prototype }
+    : CUIObject(Prototype )
 {
 }
 
@@ -16,15 +15,15 @@ HRESULT CBackGround::Initialize_Prototype()
     return S_OK;
 }
 
-HRESULT CBackGround::Initialize(void* pArg)
+HRESULT CBackGround::Initialize_Clone(void* pArg)
 {
     UIOBJECT_DESC               Desc{};
     Desc.fX = g_iWinSizeX >> 1;
     Desc.fY = g_iWinSizeY >> 1;
-    Desc.fSizeX = 200.0f;
-    Desc.fSizeY = 200.0f;
+    Desc.fSizeX = g_iWinSizeX;
+    Desc.fSizeY = g_iWinSizeY;
 
-    if (FAILED(__super::Initialize(&Desc)))
+    if (FAILED(__super::Initialize_Clone(&Desc)))
         return E_FAIL;
 
     if (FAILED(Ready_Components()))
@@ -35,16 +34,17 @@ HRESULT CBackGround::Initialize(void* pArg)
 
 void CBackGround::Priority_Update(_float fTimeDelta)
 {
-    int a = 10;
+    __super::Priority_Update(fTimeDelta);
 }
 
 void CBackGround::Update(_float fTimeDelta)
 {
-    int a = 10;
+    __super::Update(fTimeDelta);
 }
 
 void CBackGround::Late_Update(_float fTimeDelta)
 {
+    __super::Late_Update(fTimeDelta);
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::UI, this)))
         return;
 }
@@ -64,6 +64,9 @@ HRESULT CBackGround::Render()
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
         return E_FAIL;
 
+    if (FAILED(m_pTextureCom->Bind_Shader_Resource(m_pShaderCom, "g_Texture", 0)))
+        return E_FAIL;
+
     m_pShaderCom->Begin(0);    
 
     m_pVIBufferCom->Bind_Resources();
@@ -81,6 +84,10 @@ HRESULT CBackGround::Ready_Components()
 
     if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_VIBuffer_Rect"),
         TEXT("Com_VIBuffer"), reinterpret_cast<CComponent**>(&m_pVIBufferCom), nullptr)))
+        return E_FAIL;
+
+    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Loading_BackGround"),
+        TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom), nullptr)))
         return E_FAIL;
 
     return S_OK;
@@ -103,7 +110,7 @@ CGameObject* CBackGround::Clone(void* pArg)
 {
     CBackGround* pInstance = new CBackGround(*this);
 
-    if (FAILED(pInstance->Initialize(pArg)))
+    if (FAILED(pInstance->Initialize_Clone(pArg)))
     {
         MSG_BOX(TEXT("Failed to Created : CBackGround"));
         Safe_Release(pInstance);
@@ -119,4 +126,5 @@ void CBackGround::Free()
     Safe_Release(m_pVIBufferCom);
 
     Safe_Release(m_pShaderCom);
+    Safe_Release(m_pTextureCom);
 }

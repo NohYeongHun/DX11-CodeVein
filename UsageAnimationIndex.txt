@@ -1,0 +1,50 @@
+/*
+데미지
+0 AS_TStdFemale_TCmn_Damage01_B.psa 
+1 AS_TStdFemale_TCmn_Damage01_F.psa
+2 AS_TStdFemale_TCmn_Damage01_L.psa
+3 AS_TStdFemale_TCmn_Damage01_R.psa
+// 뛰기
+4 AS_TStdFemale_TCmn_Run_B_Loop.psa
+5 AS_TStdFemale_TCmn_Run_B_RightFoot_End.psa
+6 AS_TStdFemale_TCmn_Run_F_Loop.psa
+7 AS_TStdFemale_TCmn_Run_F_RightFoot_End.psa
+8 AS_TStdFemale_TCmn_Run_L_Loop.psa
+9 AS_TStdFemale_TCmn_Run_L_RightFoot_End.psa
+10 AS_TStdFemale_TCmn_Run_R_Loop.psa
+11 AS_TStdFemale_TCmn_Run_R_RightFoot_End.psa
+// 걷기
+12 AS_TStdFemale_TCmn_Walk_B_Loop.psa
+13 AS_TStdFemale_TCmn_Walk_F_Loop.psa
+14 AS_TStdFemale_TCmn_Walk_L_Loop.psa
+15 AS_TStdFemale_TCmn_Walk_R_Loop.psa
+// 기본 상태
+16 AS_TStdFemale_TLSword_Idle_N_Loop.psa
+17 AS_TStdFemale_TSpa_Idle_N_Loop.psa
+// 스킬
+18 AS_TStdUnisex_TCmn_Renketsu_Barrier_01.psa
+19 AS_TStdUnisex_TCmn_Renketsu_BuffSelf_01.psa
+20 AS_TStdUnisex_TCmn_Renketsu_Enchant_01.psa
+21 AS_TStdUnisex_TCmn_Renketsu_Ground_01.psa
+22 AS_TStdUnisex_TCmn_Renketsu_Search_02.psa
+// 검 공격
+23 AS_TStdUnisex_TLSword_AttackNormal01_N.psa
+24 AS_TStdUnisex_TLSword_AttackNormal02_N.psa
+25 AS_TStdUnisex_TLSword_AttackNormal03_N.psa
+26 AS_TStdUnisex_TLSword_AttackNormal04_N.psa
+27 AS_TStdUnisex_TLSword_AttackNormal05_N.psa
+28 AS_TStdUnisex_TLSword_AttackNormal06_N.psa
+29 AS_TStdUnisex_TLSword_AttackStrong01A_N.psa
+// 검 회피
+30 AS_TStdUnisex_TLSword_Dodge300_B.psa
+31 AS_TStdUnisex_TLSword_Dodge300_F.psa
+32 AS_TStdUnisex_TLSword_Dodge300_L.psa
+33 AS_TStdUnisex_TLSword_Dodge300_R.psa
+// 검 가드
+34 AS_TStdUnisex_TLSword_GuardHit_N.psa
+35 AS_TStdUnisex_TLSword_Guard_N_End.psa
+36 AS_TStdUnisex_TLSword_Guard_N_Loop.psa
+37 AS_TStdUnisex_TLSword_Guard_N_Start.psa
+// 강공
+38 AS_TStdUnisex_TSword_AttackStrong01A_N.psa
+*/

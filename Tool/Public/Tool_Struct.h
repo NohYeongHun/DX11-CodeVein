@@ -25,4 +25,19 @@ typedef struct tagPlayerStructInfo
 	_uint iScore;
 }PLAYER_DATA_INFO;
 
+typedef struct tagHierarchyObjectDesc
+{
+	class CGameObject* pGameObject = { nullptr };
+	const char* szName = {}; // 이름.
+}HIERARCHY_OBJECT_DSEC;
+
+
+typedef struct tagModelCreateDesc
+{
+	const _tchar* pModelTag;
+	_float4 vPosition = {}; // 일단은 위치만..
+	_float3 vRotate = {};
+	_float3 vScale = {};
+}MODEL_CREATE_DESC;
+
 NS_END

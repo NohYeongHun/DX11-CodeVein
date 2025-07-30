@@ -1,12 +1,44 @@
-#include "Prototype_Manager.h"
-#include "GameObject.h"
-#include "Component.h"
-
-#include "GameInstance.h"
+﻿#include "Prototype_Manager.h"
 
 CPrototype_Manager::CPrototype_Manager()	
 {
 	
+}
+
+/* PrototyeName 들을 List에 Add한다. */
+void CPrototype_Manager::Add_Prototype_To_List(list<_wstring>& outList, _uint iLevelIndex, list<_wstring>& nameList)
+{
+	if (nullptr == m_pPrototypes || iLevelIndex >= m_iNumLevels)
+		return;
+
+	for (auto& name : nameList)
+	{
+		for (auto& Pair : m_pPrototypes[iLevelIndex])
+		{
+			_wstring strPrototypeTag = Pair.first;
+
+			if (strPrototypeTag == name)
+				outList.push_back(Pair.first);
+		}
+	}
+	
+}
+
+void CPrototype_Manager::Get_PrototypeName_List(list<_wstring>& outList, _uint iLevelIndex, const _tchar* pPrefix)
+{
+	if (nullptr == m_pPrototypes || iLevelIndex >= m_iNumLevels)
+		return;
+
+	_wstring prefix = pPrefix;
+
+	for (auto& Pair : m_pPrototypes[iLevelIndex])
+	{
+		_wstring strPrototypeTag = Pair.first;
+		if (strPrototypeTag.compare(0, prefix.length(), prefix) == 0)
+			outList.push_back(Pair.first);
+			
+	}
+
 }
 
 HRESULT CPrototype_Manager::Initialize(_uint iNumLevels)
@@ -18,9 +50,10 @@ HRESULT CPrototype_Manager::Initialize(_uint iNumLevels)
 	return S_OK;
 }
 
+#pragma region ENGINE에 제공
 HRESULT CPrototype_Manager::Add_Prototype(_uint iPrototpyeLevelIndex, const _wstring& strPrototypeTag, CBase* pPrototype)
 {
-	if (nullptr == m_pPrototypes || 
+	if (nullptr == m_pPrototypes ||
 		m_iNumLevels <= iPrototpyeLevelIndex ||
 		nullptr != Find_Prototype(iPrototpyeLevelIndex, strPrototypeTag))
 		return E_FAIL;
@@ -50,6 +83,16 @@ CBase* CPrototype_Manager::Clone_Prototype(PROTOTYPE ePrototype, _uint iPrototyp
 	return pGameObject;
 }
 
+CBase* CPrototype_Manager::Get_Prototype(PROTOTYPE ePrototype, _uint iPrototypeLevelIndex, const _wstring& strPrototypeTag)
+{
+	return Find_Prototype(iPrototypeLevelIndex, strPrototypeTag);
+}
+
+#pragma endregion
+
+
+
+
 void CPrototype_Manager::Clear(_uint iLevelIndex)
 {
 	if (iLevelIndex >= m_iNumLevels)
@@ -64,7 +107,7 @@ void CPrototype_Manager::Clear(_uint iLevelIndex)
 
 CBase* CPrototype_Manager::Find_Prototype(_uint iPrototypeLevelIndex, const _wstring& strPrototypeTag)
 {
-	/* ����Ž�� */
+	/* 이진탐색 */
 	auto	iter = m_pPrototypes[iPrototypeLevelIndex].find(strPrototypeTag);
 
 	if (iter == m_pPrototypes[iPrototypeLevelIndex].end())

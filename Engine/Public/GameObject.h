@@ -1,13 +1,14 @@
-#pragma once
+ï»¿#pragma once
 
 #include "Transform.h"
 
-/* °ÔÀÓ¿ÀºêÁ§Æ®µéÀÇ ºÎ¸ğ°¡ µÇ´Â Å¬·¡½º. */
+/* ê²Œì„ì˜¤ë¸Œì íŠ¸ë“¤ì˜ ë¶€ëª¨ê°€ ë˜ëŠ” í´ë˜ìŠ¤. */
 
 NS_BEGIN(Engine)
 
 class ENGINE_DLL CGameObject abstract : public CBase
 {
+
 public:
 	typedef struct tagGameObject : public CTransform::TRANSFORM_DESC
 	{
@@ -20,16 +21,46 @@ protected:
 
 public:
 	class CComponent* Get_Component(const _wstring& strComponentTag);
+	HRESULT Change_Component(const _wstring& strComponentTag, CComponent** ppOut, CComponent* pChangeComponent);
+
+	class CTransform* Get_Transform() { return m_pTransformCom; }
+
+	void Translate(_fvector vTranslate);
+
+public:
+	const _wstring& Get_ObjectTag();
+
+#pragma region ìƒì¡´ ì—¬ë¶€ í™•ì¸
+public:
+	const _bool Is_Active() { return m_IsActive; }
+	const _bool Is_Dead() { return m_IsDead; }
+	void Set_Active(_bool IsActive) { m_IsActive = IsActive; }
+	void Set_Dead(_bool IsDead) { m_IsDead = IsDead; }
+
+#pragma endregion
+
 
 public:
 	virtual HRESULT Initialize_Prototype();
-	virtual HRESULT Initialize(void* pArg);
+	virtual HRESULT Initialize_Clone(void* pArg);
 	virtual void Priority_Update(_float fTimeDelta);
 	virtual void Update(_float fTimeDelta);
 	virtual void Late_Update(_float fTimeDelta);
 	virtual HRESULT Render();
 
+#pragma region ì¶©ëŒ í•¨ìˆ˜ ì •ì˜
+public:
+	virtual void On_Collision_Enter(CGameObject* pOther);
+	virtual void On_Collision_Stay(CGameObject* pOther);
+	virtual void On_Collision_Exit(CGameObject* pOther);
+
+	virtual const _bool Is_Ray_LocalHit(_float* pOutDist);
+#pragma endregion
+
+
+
 protected:
+	// ê¸°ë³¸ì ìœ¼ë¡œ ìˆì–´ì•¼ í•  ê²ƒë“¤.
 	ID3D11Device*				m_pDevice = { nullptr };
 	ID3D11DeviceContext*		m_pContext = { nullptr };
 	class CGameInstance*		m_pGameInstance = { nullptr };
@@ -37,15 +68,27 @@ protected:
 
 	map<const _wstring, class CComponent*>		m_Components;
 
+	_bool m_IsActive = { true };
+	_bool m_IsDead = { false };
+
+
 protected:
-	/*¿øÇüÄÄÆ÷³ÍÆ®¸¦ Ã£¾Æ¼­ º¹Á¦ÇÑ´Ù. */
-	/*mapÄÁÅ×ÀÌ³Ê¿¡ º¸°üÇÑ´Ù.  */
-	/*ÀÚ½ÄÀÇ ¸â¹öº¯¼ö¿¡µµ ÀúÀåÇÑ´Ù. */
+	// ë¶€ê°€ëœ ê²ƒë“¤.
+	_wstring m_strObjTag = {};
+
+protected:
+	/*ì›í˜•ì»´í¬ë„ŒíŠ¸ë¥¼ ì°¾ì•„ì„œ ë³µì œí•œë‹¤. */
+	/*mapì»¨í…Œì´ë„ˆì— ë³´ê´€í•œë‹¤.  */
+	/*ìì‹ì˜ ë©¤ë²„ë³€ìˆ˜ì—ë„ ì €ì¥í•œë‹¤. */
 	HRESULT Add_Component(_uint iPrototypeLevelIndex, const _wstring& strPrototypeTag, 
 		const _wstring& strComponentTag, CComponent** ppOut, void* pArg = nullptr);
 
+
+
+
 public:	
 	virtual CGameObject* Clone(void* pArg) = 0;
+	virtual void Destroy(); 
 	virtual void Free() override;
 
 };

@@ -1,6 +1,4 @@
-#include "Level_GamePlay.h"
-
-#include "GameInstance.h"
+ï»¿#include "Level_GamePlay.h"
 
 
 
@@ -9,28 +7,65 @@ CLevel_GamePlay::CLevel_GamePlay(ID3D11Device* pDevice, ID3D11DeviceContext* pCo
 {
 }
 
-HRESULT CLevel_GamePlay::Initialize()
+HRESULT CLevel_GamePlay::Initialize_Clone()
 {
-	if (FAILED(Ready_Lights()))
+	if (FAILED(Ready_HUD()))
+	{
+		CRASH("Failed Ready_HUD");
 		return E_FAIL;
+	}
 
-	/* ÇöÀç ·¹º§À» ±¸¼ºÇØÁÖ±â À§ÇÑ °´Ã¼µéÀ» »ý¼ºÇÑ´Ù. */
+	/* í˜„ìž¬ ë ˆë²¨ì„ êµ¬ì„±í•´ì£¼ê¸° ìœ„í•œ ê°ì²´ë“¤ì„ ìƒì„±í•œë‹¤. */
 	if (FAILED(Ready_Layer_Camera(TEXT("Layer_Camera"))))
+	{
+		CRASH("Failed Ready_Layer_Camera");
 		return E_FAIL;
+	}
+	
+	if (FAILED(Ready_Layer_Player(TEXT("Layer_Player"))))
+	{
+		CRASH("Failed Layer_Player");
+		return E_FAIL;
+	}
+
+	if (FAILED(Ready_Layer_SkyBoss(TEXT("Layer_Monster"))))
+	{
+		CRASH("Failed Layer_Monster");
+		return E_FAIL;
+	}
+
+
+	if (FAILED(Ready_Layer_Map(TEXT("Layer_Map"))))
+	{
+		CRASH("Failed Ready_Layer_Map");
+		return E_FAIL;
+	}
+
+	if (FAILED(Ready_Lights()))
+	{
+		CRASH("Failed Light");
+		return E_FAIL;
+	}
+	
 
 	if (FAILED(Ready_Layer_BackGround(TEXT("Layer_BackGround"))))
+	{
+		CRASH("Failed Ready_Layer_BackGround");
 		return E_FAIL;
+	}
 
-	if (FAILED(Ready_Layer_Player(TEXT("Layer_Player"))))
-		return E_FAIL;
-
-	if (FAILED(Ready_Layer_Monster(TEXT("Layer_Monster"))))
-		return E_FAIL;
 
 	if (FAILED(Ready_Layer_Effect(TEXT("Layer_Effect"))))
+	{
+		CRASH("Failed Ready_Layer_Effect");
 		return E_FAIL;
-
+	}
 	
+	if (FAILED(Ready_Layer_SkyBox(TEXT("Layer_SkyBox"))))
+	{
+		CRASH("Failed Ready_Layer_");
+		return E_FAIL;
+	}
 
 	
 	return S_OK;
@@ -38,25 +73,81 @@ HRESULT CLevel_GamePlay::Initialize()
 
 void CLevel_GamePlay::Update(_float fTimeDelta)
 {
+	if (m_pGameInstance->Get_KeyUp(DIK_I))
+		m_pGameInstance->Publish<CInventory>(EventType::INVENTORY_DISPLAY, nullptr);
+
 	
+
 }
 
 HRESULT CLevel_GamePlay::Render()
 {
-	SetWindowText(g_hWnd, TEXT("°ÔÀÓÇÃ·¹ÀÌ·¹º§ÀÔ´Ï´Ù."));
+	//SetWindowText(g_hWnd, TEXT("ê²Œìž„í”Œë ˆì´ë ˆë²¨ìž…ë‹ˆë‹¤."));
+
+	return S_OK;
+}
+
+HRESULT CLevel_GamePlay::Ready_HUD()
+{
+	HUDEVENT_DESC Desc{};
+	Desc.isVisibility = true;
+	 
+	// ì´ë²¤íŠ¸ ì‹¤í–‰ì´ì§€ êµ¬ë…ì´ì•„ë‹˜.
+	m_pGameInstance->Publish<HUDEVENT_DESC>(EventType::HUD_DISPLAY,  & Desc);
+
+	return S_OK;
+}
+
+HRESULT CLevel_GamePlay::Ready_Layer_Terrain(const _wstring& strLayerTag)
+{
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel), strLayerTag,
+		ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_Terrain"))))
+		return E_FAIL;
 
 	return S_OK;
 }
 
 HRESULT CLevel_GamePlay::Ready_Lights()
 {
+	LIGHT_DESC			LightDesc{};
+
+	LightDesc.eType = LIGHT_DESC::TYPE::DIRECTIONAL;
+	LightDesc.vDirection = _float4(1.f, -1.f, 1.f, 0.f);
+	LightDesc.vDiffuse = _float4(1.f, 1.f, 1.f, 1.f);
+	LightDesc.vAmbient = _float4(0.4f, 0.4f, 0.4f, 1.f);
+	LightDesc.vSpecular = _float4(1.f, 1.f, 1.f, 1.f);
+
+	if (FAILED(m_pGameInstance->Add_Light(LightDesc)))
+		return E_FAIL;
+
 
 	return S_OK;
 }
 
 HRESULT CLevel_GamePlay::Ready_Layer_Camera(const _wstring& strLayerTag)
 {
-	
+	CCamera_Free::CAMERA_FREE_DESC CameraDesc{};
+	CameraDesc.vEye = _float4(0.f, 20.f, -15.f, 1.f);
+	CameraDesc.vAt = _float4(0.f, 0.f, 0.f, 1.f);
+	CameraDesc.fFovy = XMConvertToRadians(60.0f);
+	CameraDesc.fNear = 0.1f;
+	CameraDesc.fFar = 500.f;
+	CameraDesc.fSpeedPerSec = 10.f;
+	CameraDesc.fRotationPerSec = XMConvertToRadians(90.0f);
+	CameraDesc.fMouseSensor = 0.1f;
+
+	if (FAILED(m_pGameInstance->Add_Camera(TEXT("FreeCamera"), ENUM_CLASS(LEVEL::GAMEPLAY)
+		, TEXT("Prototype_GameObject_Camera_Free"), &CameraDesc)))
+	{
+		CRASH("Add Free Camera Failed");
+		return E_FAIL;
+	}
+
+
+	//if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel), strLayerTag,
+	//	ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_Camera_Free"), &CameraDesc )))
+	//	return E_FAIL;
+
 
 
 	return S_OK; 
@@ -70,7 +161,113 @@ HRESULT CLevel_GamePlay::Ready_Layer_BackGround(const _wstring& strLayerTag)
 
 HRESULT CLevel_GamePlay::Ready_Layer_Player(const _wstring& strLayerTag)
 {
+	
+	CPlayer::PLAYER_DESC Desc{};
+	Desc.fSpeedPerSec = 10.f;
+	Desc.fRotationPerSec = XMConvertToRadians(90.0f);
+	Desc.eCurLevel = m_eCurLevel;
 
+	CCamera_Player::CAMERA_PLAYER_DESC CameraPlayerDesc{};
+	CameraPlayerDesc.vEye = _float4(0.f, 10.f, -20.f, 1.f);
+	CameraPlayerDesc.vAt = _float4(0.f, 0.f, 0.f, 1.f);
+	CameraPlayerDesc.fFovy = XMConvertToRadians(60.0f);
+	CameraPlayerDesc.fNear = 0.1f;
+	CameraPlayerDesc.fFar = 500.f;
+	CameraPlayerDesc.fSpeedPerSec = 10.f;
+	CameraPlayerDesc.fRotationPerSec = XMConvertToRadians(9.0f);
+	CameraPlayerDesc.fMouseSensor = 0.3f;
+	
+
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel), strLayerTag,
+		ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_Player"), &Desc)))
+		return E_FAIL;
+	
+
+	list<CGameObject*> pGameObjects = m_pGameInstance->Get_Layer(ENUM_CLASS(LEVEL::GAMEPLAY), strLayerTag)->Get_GameObjects();
+	auto iter = pGameObjects.begin();
+
+	CPlayer* pPlayer = dynamic_cast<CPlayer*>(*iter);
+	CameraPlayerDesc.pTarget = pPlayer;
+
+	if (nullptr == CameraPlayerDesc.pTarget)
+		CRASH("Failed CameraPlayer Add");
+
+	if (FAILED(m_pGameInstance->Add_Camera(TEXT("PlayerCamera"), ENUM_CLASS(LEVEL::GAMEPLAY)
+		, TEXT("Prototype_GameObject_Camera_Player"), &CameraPlayerDesc)))
+	{
+		CRASH("Add Camera Player Failed");
+		return E_FAIL;
+	}
+
+	/* ì•¡ì…˜ ì¹´ë©”ë¼ ìƒì„±. */
+	CCamera_Action::CAMERA_ACTION_DESC CameraActionDesc{};
+	CameraActionDesc.vEye = _float4(0.f, 10.f, -20.f, 1.f);
+	CameraActionDesc.vAt = _float4(0.f, 0.f, 0.f, 1.f);
+	CameraActionDesc.fFovy = XMConvertToRadians(60.0f);
+	CameraActionDesc.fNear = 0.1f;
+	CameraActionDesc.fFar = 500.f;
+	CameraActionDesc.fSpeedPerSec = 10.f;
+	CameraActionDesc.fRotationPerSec = XMConvertToRadians(9.0f);
+	CameraActionDesc.fMouseSensor = 0.3f;
+	
+	CameraActionDesc.pTarget = pPlayer;
+
+
+	if (FAILED(m_pGameInstance->Add_Camera(TEXT("ActionCamera"), ENUM_CLASS(LEVEL::GAMEPLAY)
+		, TEXT("Prototype_GameObject_Camera_Action"), &CameraActionDesc)))
+	{
+		CRASH("Add Camera Player Failed");
+		return E_FAIL;
+	}
+
+	//// ë©”ì¸ ì¹´ë©”ë¼ ë³€ê²½.
+	//if (FAILED(m_pGameInstance->Change_Camera(TEXT("ActionCamera"), ENUM_CLASS(LEVEL::GAMEPLAY))))
+	//{
+	//	CRASH("Change Camera Failed");
+	//	return E_FAIL;
+	//}
+
+	// ë©”ì¸ ì¹´ë©”ë¼ ë³€ê²½.
+	if (FAILED(m_pGameInstance->Change_Camera(TEXT("PlayerCamera"), ENUM_CLASS(LEVEL::GAMEPLAY))))
+	{
+		CRASH("Change Camera Failed");
+		return E_FAIL;
+	}
+
+	pPlayer->Set_Camera(dynamic_cast<CCamera_Player*>(m_pGameInstance->Get_MainCamera()));
+	//pPlayer->Set_Camera(dynamic_cast<CCamera_Action*>(m_pGameInstance->Get_MainCamera()));
+
+
+	return S_OK;
+}
+
+HRESULT CLevel_GamePlay::Ready_Layer_SkyBoss(const _wstring& strLayerTag)
+{
+	CSkyBoss::SKYBOSS_DESC Desc{};
+	Desc.fSpeedPerSec = 10.f;
+	Desc.fRotationPerSec = XMConvertToRadians(90.0f);
+	Desc.eCurLevel = m_eCurLevel;
+
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel), strLayerTag,
+		ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_SkyBoss"), &Desc)))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel), strLayerTag,
+		ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_SkyBoss"), &Desc)))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CLevel_GamePlay::Ready_Layer_Map(const _wstring& strLayerTag)
+{
+	CMap::MAP_DESC Desc = {};
+
+	Desc.PrototypeTag = L"Prototype_Component_Model_BossStage";
+
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel), strLayerTag,
+		ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_Map"), &Desc)))
+		return E_FAIL;
 
 	return S_OK;
 }
@@ -87,6 +284,20 @@ HRESULT CLevel_GamePlay::Ready_Layer_Effect(const _wstring& strLayerTag)
 	return S_OK;
 }
 
+HRESULT CLevel_GamePlay::Ready_Layer_SkyBox(const _wstring& strLayerTag)
+{
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::GAMEPLAY), strLayerTag,
+		ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Sky"))))
+	{
+
+		CRASH("Failed SkyBox");
+		return E_FAIL;
+	}
+		
+
+	return S_OK;
+}
+
 
 
 
@@ -94,7 +305,7 @@ CLevel_GamePlay* CLevel_GamePlay::Create(ID3D11Device* pDevice, ID3D11DeviceCont
 {
 	CLevel_GamePlay* pInstance = new CLevel_GamePlay(pDevice, pContext);
 
-	if (FAILED(pInstance->Initialize()))
+	if (FAILED(pInstance->Initialize_Clone()))
 	{
 		MSG_BOX(TEXT("Failed to Created : CLevel_GamePlay"));
 		Safe_Release(pInstance);

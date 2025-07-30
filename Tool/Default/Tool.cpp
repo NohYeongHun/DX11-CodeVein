@@ -53,7 +53,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     }
 
     // 1. MainApp 생성
-    CMainApp* pMainApp = CMainApp::Create();
+    CTool_MainApp* pMainApp = CTool_MainApp::Create();
     if (nullptr == pMainApp)
         return FALSE;
 
@@ -92,7 +92,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             pGameInstance->Compute_TimeDelta(TEXT("Timer_Default"));
             fTimeAcc += pGameInstance->Get_TimeDelta(TEXT("Timer_Default"));
 
-            if (fTimeAcc >= 1.f / 60.f)
+            if (fTimeAcc >= 1.f / 240.f)
             {
                 pGameInstance->Compute_TimeDelta(TEXT("Timer_60"));
 

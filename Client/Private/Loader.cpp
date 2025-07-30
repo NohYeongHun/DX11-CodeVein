@@ -1,16 +1,4 @@
-#include "Loader.h"
-
-#include "GameInstance.h"
-
-#include "BackGround.h"
-//#include "Terrain.h"
-//#include "Monster.h"
-//#include "Camera.h"
-//#include "Player.h"
-//#include "Effect.h"
-//#include "Sky.h"
-
-CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+ï»¿CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: m_pDevice{ pDevice }
 	, m_pContext { pContext }
 	, m_pGameInstance { CGameInstance::GetInstance() }
@@ -31,18 +19,16 @@ unsigned int APIENTRY LoadingMain(void* pArg)
 }
 
 
-HRESULT CLoader::Initialize(LEVEL eNextLevelID)
+HRESULT CLoader::Initialize_Clone(LEVEL eNextLevelID)
 {
 	m_eNextLevelID = eNextLevelID;
 
 	InitializeCriticalSection(&m_CriticalSection);
 
-	
+	/* ìŠ¤ë ˆë“œë¥¼ ìƒì„±í•˜ê³  */
+	/* ìƒì„±í•œ ìŠ¤ë ˆë“œê°€ ë¡œë”©ì„ í•  ìˆ˜ ìˆë„ë¡ ì²˜ë¦¬í•œë‹¤. */
 
-	/* ½º·¹µå¸¦ »ı¼ºÇÏ°í */
-	/* »ı¼ºÇÑ ½º·¹µå°¡ ·ÎµùÀ» ÇÒ ¼ö ÀÖµµ·Ï Ã³¸®ÇÑ´Ù. */
-
-	/* ½ºÅÃ ¸Ş¸ğ¸®¸¦ Á¦¿ÜÇÑ ±âÅ¸ ´Ù¸¥ ¸Ş¸ğ¸®°ø°£(Èü, µ¥ÀÌÅÍ, ÄÚµå, ) Àº ½º·¹µå°£ ¼­·Î °øÀ¯ÇÑ´Ù. */
+	/* ìŠ¤íƒ ë©”ëª¨ë¦¬ë¥¼ ì œì™¸í•œ ê¸°íƒ€ ë‹¤ë¥¸ ë©”ëª¨ë¦¬ê³µê°„(í™, ë°ì´í„°, ì½”ë“œ, ) ì€ ìŠ¤ë ˆë“œê°„ ì„œë¡œ ê³µìœ í•œë‹¤. */
 	m_hThread = (HANDLE)_beginthreadex(nullptr, 0, LoadingMain, this, 0, nullptr);
 	if (0 == m_hThread)
 		return E_FAIL;
@@ -79,103 +65,55 @@ HRESULT CLoader::Loading()
 HRESULT CLoader::Loading_For_Logo_Level()
 {
 
-	lstrcpy(m_szLoadingText, TEXT("ÅØ½ºÃÄ¸¦ ·ÎµùÁßÀÔ´Ï´Ù."));
-	///* Prototype_Component_Texture_BackGround */
-	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LEVEL_LOGO), TEXT("Prototype_Component_Texture_BackGround"),
-	//	CTexture::Create(m_pDevice, m_pContext, TEXTURE::RECT, TEXT("../Bin/Resources/Textures/Default%d.jpg"), 2))))
-	//	return E_FAIL;
+	lstrcpy(m_szLoadingText, TEXT("ë¡œê³  ë ˆë²¨ì„ ë¡œë”©ì¤‘ì…ë‹ˆë‹¤."));
 
+	if (FAILED(m_cLoader_Logo
+		.Loading_Resource(m_pDevice, m_pContext, m_pGameInstance)))
+		return E_FAIL;
 
-	lstrcpy(m_szLoadingText, TEXT("¸ğµ¨À» ·ÎµùÁßÀÔ´Ï´Ù."));
+	for (_uint i = 0; i < 99999; i++)
+	{
+		int a = 10;
+	}
+	for (_uint i = 0; i < 99999; i++)
+	{
+		int a = 10;
+	}
+	for (_uint i = 0; i < 99999; i++)
+	{
+		int a = 10;
+	}
+	for (_uint i = 0; i < 99999; i++)
+	{
+		int a = 10;
+	}
+	for (_uint i = 0; i < 99999; i++)
+	{
+		int a = 10;
+	}
+	for (_uint i = 0; i < 99999; i++)
+	{
+		int a = 10;
+	}
+	lstrcpy(m_szLoadingText, TEXT("ë¡œê³  ë ˆë²¨ ë¡œë”©ì´ ì™„ë£Œë˜ì—ˆìŠµë‹ˆë‹¤."));
 
-	lstrcpy(m_szLoadingText, TEXT("½¦ÀÌ´õ¸¦ ·ÎµùÁßÀÔ´Ï´Ù."));
-
-	lstrcpy(m_szLoadingText, TEXT("°ÔÀÓ¿ÀºêÁ§Æ®¿øÇü¸¦ ·ÎµùÁßÀÔ´Ï´Ù."));
-
-	/* Prototype_GameObject_BackGround */
-	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LOGO), TEXT("Prototype_GameObject_BackGround"),
-		CBackGround::Create(m_pDevice, m_pContext))))
-		return E_FAIL;	
-
-	lstrcpy(m_szLoadingText, TEXT("·ÎµùÀÌ ¿Ï·áµÇ¾ú½À´Ï´Ù."));
-	
 	m_isFinished = true;
-
+	
+	
 	return S_OK;
 }
 
 HRESULT CLoader::Loading_For_GamePlay_Level()
 {
-	lstrcpy(m_szLoadingText, TEXT("ÅØ½ºÃÄ¸¦ ·ÎµùÁßÀÔ´Ï´Ù."));
-	///* Prototype_Component_Texture_Terrain */
-	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LEVEL_GAMEPLAY), TEXT("Prototype_Component_Texture_Terrain"),
-	//	CTexture::Create(m_pDevice, m_pContext, TEXTURE::RECT, TEXT("../Bin/Resources/Textures/Terrain/Tile0.jpg"), 1))))
-	//	return E_FAIL;
+	lstrcpy(m_szLoadingText, TEXT("ê²Œì„í”Œë ˆì´ ë ˆë²¨ì„ ë¡œë”©ì¤‘ì…ë‹ˆë‹¤."));
 
-	///* Prototype_Component_Texture_Player */
-	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LEVEL_GAMEPLAY), TEXT("Prototype_Component_Texture_Player"),
-	//	CTexture::Create(m_pDevice, m_pContext, TEXTURE::RECT, TEXT("../Bin/Resources/Textures/Player/Player0.png"), 1))))
-	//	return E_FAIL;
-
-	///* Prototype_Component_Texture_Explosion */
-	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LEVEL_GAMEPLAY), TEXT("Prototype_Component_Texture_Explosion"),
-	//	CTexture::Create(m_pDevice, m_pContext, TEXTURE::RECT, TEXT("../Bin/Resources/Textures/Explosion/Explosion%d.png"), 90))))
-	//	return E_FAIL;
-
-
-	///* Prototype_Component_Texture_Sky */
-	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LEVEL_GAMEPLAY), TEXT("Prototype_Component_Texture_Sky"),
-	//	CTexture::Create(m_pDevice, m_pContext, TEXTURE::CUBE, TEXT("../Bin/Resources/Textures/SkyBox/Sky_%d.dds"), 4))))
-	//	return E_FAIL;
-
-	lstrcpy(m_szLoadingText, TEXT("¸ğµ¨À» ·ÎµùÁßÀÔ´Ï´Ù."));
-	///* Prototype_Component_VIBuffer_Terrain */
-	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LEVEL_GAMEPLAY), TEXT("Prototype_Component_VIBuffer_Terrain"),
-	//	CVIBuffer_Terrain::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Terrain/Height1.bmp")))))
-	//	return E_FAIL;
-
-	///* Prototype_Component_VIBuffer_Cube */
-	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LEVEL_GAMEPLAY), TEXT("Prototype_Component_VIBuffer_Cube"),
-	//	CVIBuffer_Cube::Create(m_pDevice, m_pContext))))
-	//	return E_FAIL;
-
-	//
-	lstrcpy(m_szLoadingText, TEXT("½¦ÀÌ´õ¸¦ ·ÎµùÁßÀÔ´Ï´Ù."));
-	
-	lstrcpy(m_szLoadingText, TEXT("°ÔÀÓ¿ÀºêÁ§Æ®¸¦ ·ÎµùÁßÀÔ´Ï´Ù."));
-
-	///* Prototype_GameObject_Terrain*/
-	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LEVEL_GAMEPLAY), TEXT("Prototype_GameObject_Terrain"),
-	//	CTerrain::Create(m_pDevice, m_pContext))))
-	//	return E_FAIL;
-
-	///* Prototype_GameObject_Camera*/
-	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LEVEL_GAMEPLAY), TEXT("Prototype_GameObject_Camera"),
-	//	CCamera::Create(m_pDevice, m_pContext))))
-	//	return E_FAIL;
-
-	///* Prototype_GameObject_Player */
-	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LEVEL_GAMEPLAY), TEXT("Prototype_GameObject_Player"),
-	//	CPlayer::Create(m_pDevice, m_pContext))))
-	//	return E_FAIL;
-
-	///* Prototype_GameObject_Sky */
-	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LEVEL_GAMEPLAY), TEXT("Prototype_GameObject_Sky"),
-	//	CSky::Create(m_pDevice, m_pContext))))
-	//	return E_FAIL;
-
-	///* Prototype_GameObject_Monster */
-	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LEVEL_GAMEPLAY), TEXT("Prototype_GameObject_Monster"),
-	//	CMonster::Create(m_pDevice, m_pContext))))
-	//	return E_FAIL;
-
-	///* Prototype_GameObject_Effect */
-	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LEVEL_GAMEPLAY), TEXT("Prototype_GameObject_Effect"),
-	//	CEffect::Create(m_pDevice, m_pContext))))
-	//	return E_FAIL;
+	if (FAILED(m_cLoader_GamePlay
+		.Loading_Resource(m_pDevice, m_pContext, m_pGameInstance)))
+		return E_FAIL;
 
 	
-	lstrcpy(m_szLoadingText, TEXT("·ÎµùÀÌ ¿Ï·áµÇ¾ú½À´Ï´Ù."));
+
+	lstrcpy(m_szLoadingText, TEXT("ê²Œì„í”Œë ˆì´ ë ˆë²¨ ë¡œë”©ì´ ì™„ë£Œë˜ì—ˆìŠµë‹ˆë‹¤."));
 
 	m_isFinished = true;
 
@@ -185,7 +123,7 @@ CLoader* CLoader::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, L
 {
 	CLoader* pInstance = new CLoader(pDevice, pContext);
 
-	if (FAILED(pInstance->Initialize(eNextLevelID)))
+	if (FAILED(pInstance->Initialize_Clone(eNextLevelID)))
 	{
 		MSG_BOX(TEXT("Failed to Created : CLoader"));
 		Safe_Release(pInstance);

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "Client_Defines.h"
 #include "Base.h"
@@ -16,7 +16,7 @@ private:
 	virtual ~CMainApp() = default;
 
 public:
-	HRESULT Initialize();
+	HRESULT Initialize_Clone();
 	void Update(_float fTimeDelta);
 	HRESULT Render();
 
@@ -25,8 +25,30 @@ private:
 	ID3D11Device*			m_pDevice = { nullptr };
 	ID3D11DeviceContext*	m_pContext = { nullptr };
 
+	CImgui_Manager* m_pImGui_Manager = { nullptr };
+
 private:
+#pragma region PROTOTYPE
 	HRESULT Ready_Prototype_ForStatic();
+	HRESULT Ready_Prototype_ForUsageTexture();
+	HRESULT Ready_Prototype_ForModel();
+	HRESULT Ready_Prototype_HUD();
+	HRESULT Ready_Prototype_Inventory();
+	HRESULT Ready_Prototype_SkillUI();
+	HRESULT Ready_Prototype_Fonts();
+#pragma endregion
+
+
+#pragma region STATIC OBJECT
+	HRESULT Ready_Clone_ForStatic();
+	HRESULT Ready_Clone_Texture();
+	HRESULT Ready_Clone_HUD(const _wstring& strLayerTag);
+	HRESULT Ready_Clone_Inventory(const _wstring& strLayerTag);
+	HRESULT Ready_Clone_SkillUI(const _wstring& strLayerTag);
+	
+#pragma endregion
+
+	
 	HRESULT Start_Level(LEVEL eStartLevelID);
 
 public:

@@ -19,11 +19,59 @@
     <Filter Include="97. Imgui\Dependency">
       <UniqueIdentifier>{81755cac-e94b-4be7-86bf-55d1f7fce6c9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01. Tool">
+    <Filter Include="01. Level">
+      <UniqueIdentifier>{eb04441d-918f-487f-bc82-e51605875c90}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03. Component">
+      <UniqueIdentifier>{8a0010b4-d413-402f-bcb9-04b385338c73}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03. Component\Model">
+      <UniqueIdentifier>{0b41825f-9a13-4522-948c-ca760bd9f5d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03. Component\Model\Mesh">
+      <UniqueIdentifier>{d1c551f9-90a6-4325-8ae6-3762245c3251}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03. Component\Model\Material">
+      <UniqueIdentifier>{8ac53eec-e5e6-449b-931b-bcd9c7042e30}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject">
+      <UniqueIdentifier>{2f36e197-4d6d-4863-92c0-d2954460d23d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Map">
+      <UniqueIdentifier>{ad2f92bd-06b4-4810-994d-38ffc96bcd3d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Camera">
+      <UniqueIdentifier>{136d29c2-f96c-4027-bf3e-bb452fa90673}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Map\Parts">
+      <UniqueIdentifier>{60fd107d-267a-405c-8770-863a1f977b57}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="96. ShaderFiles">
+      <UniqueIdentifier>{3ce9bf54-df44-4a4d-adf6-f537fc34fe8f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03. Component\Model\Bone">
+      <UniqueIdentifier>{c771afe9-3831-4d34-8bb7-7af8e5678a9d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Level\00. Loading">
+      <UniqueIdentifier>{40979bdc-d301-41d5-9dd6-fa1f7729bae4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Level\00. Loading\Loader">
+      <UniqueIdentifier>{9df901fd-4234-4b17-b3b9-2b9fb28c73e6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Player">
+      <UniqueIdentifier>{600840f0-0c69-4c89-9d06-5ea8533d2fc7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Level\01. Logo">
+      <UniqueIdentifier>{85f63420-076a-4247-85c4-521f6297ba4b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Level\01. Logo\00. Tool">
       <UniqueIdentifier>{e74a81c5-0205-49b3-ac94-5f9794d8e86d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01. Tool\Loader">
-      <UniqueIdentifier>{9df901fd-4234-4b17-b3b9-2b9fb28c73e6}</UniqueIdentifier>
+    <Filter Include="03. Component\Model\Animation">
+      <UniqueIdentifier>{13d4909c-a4b7-4fad-9128-bf6ec07f4b38}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03. Component\Model\Animation\Channel">
+      <UniqueIdentifier>{2447b4b4-1db1-4f10-b1bf-b4484aece1af}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -78,17 +126,65 @@
     <ClInclude Include="..\Public\imstb_truetype.h">
       <Filter>97. Imgui\Dependency</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\MainApp.h">
+    <ClInclude Include="..\Public\Tool_MainApp.h">
       <Filter>00. MainApp</Filter>
     </ClInclude>
     <ClInclude Include="..\public\Map_Tool.h">
-      <Filter>01. Tool</Filter>
+      <Filter>01. Level\01. Logo\00. Tool</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\ImGuiFileDialog.h">
       <Filter>97. Imgui\Dependency</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\ImGuiFileDialogConfig.h">
       <Filter>97. Imgui\Dependency</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Level_Loading.h">
+      <Filter>01. Level\00. Loading</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Level_Logo.h">
+      <Filter>01. Level\01. Logo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Loader.h">
+      <Filter>01. Level\00. Loading\Loader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Tool_Mesh.h">
+      <Filter>03. Component\Model\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Tool_Model.h">
+      <Filter>03. Component\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Tool_MeshMaterial.h">
+      <Filter>03. Component\Model\Material</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Map.h">
+      <Filter>02. GameObject\Map</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Camera_Free.h">
+      <Filter>02. GameObject\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\ToolMap_Part.h">
+      <Filter>02. GameObject\Map\Parts</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Tool_Bone.h">
+      <Filter>03. Component\Model\Bone</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Player.h">
+      <Filter>02. GameObject\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\PrototypeName.h">
+      <Filter>98. Define</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Map_Part.h">
+      <Filter>02. GameObject\Map\Parts</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\SaveFile_Loader.h">
+      <Filter>01. Level\01. Logo\00. Tool</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Tool_Animation.h">
+      <Filter>03. Component\Model\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Tool_Channel.h">
+      <Filter>03. Component\Model\Animation\Channel</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -130,14 +226,62 @@
     <ClCompile Include="..\Private\imgui_impl_dx11.cpp">
       <Filter>97. Imgui\Dependency</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\MainApp.cpp">
+    <ClCompile Include="..\Private\Tool_MainApp.cpp">
       <Filter>00. MainApp</Filter>
     </ClCompile>
     <ClCompile Include="..\private\Map_Tool.cpp">
-      <Filter>01. Tool</Filter>
+      <Filter>01. Level\01. Logo\00. Tool</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\ImGuiFileDialog.cpp">
       <Filter>97. Imgui\Dependency</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Level_Loading.cpp">
+      <Filter>01. Level\00. Loading</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Level_Logo.cpp">
+      <Filter>01. Level\01. Logo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Loader.cpp">
+      <Filter>01. Level\00. Loading\Loader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Tool_Mesh.cpp">
+      <Filter>03. Component\Model\Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Tool_Model.cpp">
+      <Filter>03. Component\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Tool_MeshMaterial.cpp">
+      <Filter>03. Component\Model\Material</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Map.cpp">
+      <Filter>02. GameObject\Map</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Camera_Free.cpp">
+      <Filter>02. GameObject\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\ToolMap_Part.cpp">
+      <Filter>02. GameObject\Map\Parts</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Tool_Bone.cpp">
+      <Filter>03. Component\Model\Bone</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Player.cpp">
+      <Filter>02. GameObject\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\PrototypeName.cpp">
+      <Filter>98. Define</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Map_Part.cpp">
+      <Filter>02. GameObject\Map\Parts</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\SaveFile_Loader.cpp">
+      <Filter>01. Level\01. Logo\00. Tool</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Tool_Animation.cpp">
+      <Filter>03. Component\Model\Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Tool_Channel.cpp">
+      <Filter>03. Component\Model\Animation\Channel</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -146,6 +290,22 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <None Include="..\Bin\ShaderFiles\Engine_Shader_Defines.hlsli">
+      <Filter>96. ShaderFiles</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxAnimMesh.hlsl">
+      <Filter>96. ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxMesh.hlsl">
+      <Filter>96. ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxNorTex.hlsl">
+      <Filter>96. ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPosTex.hlsl">
+      <Filter>96. ShaderFiles</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

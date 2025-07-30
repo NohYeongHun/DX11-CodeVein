@@ -1,14 +1,14 @@
-#pragma once
+ï»¿#pragma once
 
-#include "Client_Defines.h"
+//#include "Client_Defines.h"
 #include "Level.h"
 
-/* ½ÇÁ¦ ³»°¡ º¸¿©ÁÖ°íÀÚ ÇÏ´Â ·¹º§À» ÁØºñÇØÁÖ±âÀ§ÇÑ ·¹º§ Å¬·¡½º */
-/* ·Îµù -> ·Î°í */
-/* ·Îµù -> °ÔÀÓÇÃ·¹ÀÌ */
+/* ì‹¤ì œ ë‚´ê°€ ë³´ì—¬ì£¼ê³ ì í•˜ëŠ” ë ˆë²¨ì„ ì¤€ë¹„í•´ì£¼ê¸°ìœ„í•œ ë ˆë²¨ í´ë˜ìŠ¤ */
+/* ë¡œë”© -> ë¡œê³  */
+/* ë¡œë”© -> ê²Œì„í”Œë ˆì´ */
 
-/* ·Î°í, °ÔÀÓÇÃ·¹ÀÌ -> °´Ã¼, ¸®¼Ò½ºµé, »ç¿îµå, ½¦ÀÌ´õ ->ÀÚ¿øÁØºñ¸¦ °ÅÄ¡´Â °úÁ¤ => ·ÎµùÀ» ÇÏ±âÀ§ÇÑ
-·Î´õ°´Ã¼¸¦ »ı¼ºÇØÁØ´Ù¤Ó. */
+/* ë¡œê³ , ê²Œì„í”Œë ˆì´ -> ê°ì²´, ë¦¬ì†ŒìŠ¤ë“¤, ì‚¬ìš´ë“œ, ì‰ì´ë” ->ìì›ì¤€ë¹„ë¥¼ ê±°ì¹˜ëŠ” ê³¼ì • => ë¡œë”©ì„ í•˜ê¸°ìœ„í•œ
+ë¡œë”ê°ì²´ë¥¼ ìƒì„±í•´ì¤€ë‹¤ã…£. */
 
 NS_BEGIN(Client)
 
@@ -19,17 +19,26 @@ private:
 	virtual ~CLevel_Loading() = default;
 
 public:
-	virtual HRESULT Initialize(LEVEL eNextLevelID);
+	virtual HRESULT Initialize_Clone(LEVEL eNextLevelID);
 	virtual void Update(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
+
+	void Open_Level();
 
 private:
 	LEVEL				m_eNextLevelID = { LEVEL::END };
 	class CLoader*		m_pLoader = { nullptr };
+	vector<pair<EventType, uint32_t>> m_Events = {};
+
+	_bool m_IsFinished = { false };
+
 
 private:
+	HRESULT Ready_LoadingBackGround(const _wstring& strLayerTag);
+	HRESULT Ready_LoadingScene(const _wstring& strLayerTag);
 	HRESULT Ready_GameObjects();
 	HRESULT Ready_LoadingThread();
+	HRESULT Ready_Events();
 
 public:
 	static CLevel_Loading* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, LEVEL eNextLevelID);

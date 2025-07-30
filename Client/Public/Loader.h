@@ -20,7 +20,7 @@ private:
 	/* 세마포어 , 뮤텍스, 크리티컬섹션 */
 
 public:
-	HRESULT Initialize(LEVEL eNextLevelID);
+	HRESULT Initialize_Clone(LEVEL eNextLevelID);
 	HRESULT Loading();
 
 	_bool isFinished() {
@@ -44,7 +44,11 @@ private:
 
 
 private:
-
+	CLoader_Logo m_cLoader_Logo;
+	CLoader_GamePlay m_cLoader_GamePlay;
+	
+	
+private:
 	HRESULT Loading_For_Logo_Level();
 	HRESULT Loading_For_GamePlay_Level();
 

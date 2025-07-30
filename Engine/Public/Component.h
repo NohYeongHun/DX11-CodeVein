@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "Base.h"
 
@@ -13,7 +13,7 @@ protected:
 
 public:
 	virtual HRESULT Initialize_Prototype();
-	virtual HRESULT Initialize(void* pArg);
+	virtual HRESULT Initialize_Clone(void* pArg);
 
 protected:
 	ID3D11Device*					m_pDevice = { nullptr };
@@ -21,7 +21,7 @@ protected:
 	class CGameInstance*			m_pGameInstance = { nullptr };
 
 	_bool						m_isCloned = { false };
-
+	
 
 public:
 	virtual CComponent* Clone(void* pArg) = 0;

@@ -1,63 +1,120 @@
-#include "Level_Loading.h"
+ï»¿#include "Level_Loading.h"
 
-#include "Loader.h"
-#include "GameInstance.h"
-
-#include "Level_Logo.h"
-#include "Level_GamePlay.h"
 
 CLevel_Loading::CLevel_Loading(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel { pDevice, pContext }
 {
 }
 
-HRESULT CLevel_Loading::Initialize(LEVEL eNextLevelID)
+HRESULT CLevel_Loading::Initialize_Clone(LEVEL eNextLevelID)
 {
 	m_eNextLevelID = eNextLevelID;	 
 
-	/* ÇöÀç ·¹º§À» ±¸¼ºÇØÁÖ±â À§ÇÑ °´Ã¼µéÀ» »ý¼ºÇÑ´Ù. */
+	if (FAILED(Ready_LoadingScene(TEXT("Loading_BackGround"))))
+		return E_FAIL;
+
+	/* í˜„ìž¬ ë ˆë²¨ì„ êµ¬ì„±í•´ì£¼ê¸° ìœ„í•œ ê°ì²´ë“¤ì„ ìƒì„±í•œë‹¤. */
 	if (FAILED(Ready_GameObjects()))
 		return E_FAIL;
 
-	/* ´ÙÀ½ ·¹º§À» À§ÇÑ ·ÎµùÀÛ¾÷À» ½ÃÀÛ ÇÑ´Ù. */
+	/* ë‹¤ìŒ ë ˆë²¨ì„ ìœ„í•œ ë¡œë”©ìž‘ì—…ì„ ì‹œìž‘ í•œë‹¤. */
 	if (FAILED(Ready_LoadingThread()))
+		return E_FAIL;
+
+	// Eventë¡œ Loadingì„ ëëƒ…ë‹ˆë‹¤.
+	if (FAILED(Ready_Events()))
 		return E_FAIL;
 	
 	return S_OK;
 }
 
+/*
+* Loading ëë‚˜ë©´ Fade In Fade Out ë˜ë©´ì„œ ì „í™˜?
+*/
 void CLevel_Loading::Update(_float fTimeDelta)
 {
-	if (true == m_pLoader->isFinished() && 
-		GetKeyState(VK_SPACE) & 0x8000)
+	/*if (true == m_pLoader->isFinished() && 
+		GetKeyState(VK_SPACE) & 0x8000)*/
+
+	if (!m_IsFinished == m_pLoader->isFinished())
 	{
-		CLevel* pNewLevel = { nullptr };
-
-		switch (m_eNextLevelID)
-		{
-		case LEVEL::LOGO:
-			pNewLevel = CLevel_Logo::Create(m_pDevice, m_pContext);
-			break;
-		case LEVEL::GAMEPLAY:
-			pNewLevel = CLevel_GamePlay::Create(m_pDevice, m_pContext);
-			break;
-		}
-
-		if (FAILED(m_pGameInstance->Open_Level(static_cast<_uint>(m_eNextLevelID), pNewLevel)))
-			return;		
+		// Fade Out ì‹œìž‘. => ë‚˜ì¤‘ì—ëŠ” ë¡œë”ê°€ ëë‚˜ëŠ” ì‹œì ? isFinshed ë°›ìœ¼ë©´?
+		m_pGameInstance->Publish<CLoading_BackGround>(EventType::LOADING_END, nullptr);
+		m_IsFinished = true;
 	}
 }
 
 HRESULT CLevel_Loading::Render()
 {
-	/* »ý¼ºÇØ³õÀº °´Ã¼µéÀ» ·»´õÇÑ´Ù. */
+	/* ìƒì„±í•´ë†“ì€ ê°ì²´ë“¤ì„ ë Œë”í•œë‹¤. */
 	m_pLoader->Show_LoadingText();
 
 	return S_OK;
 }
 
+void CLevel_Loading::Open_Level()
+{
+	CLevel* pNewLevel = { nullptr };
+
+	switch (m_eNextLevelID)
+	{
+	case LEVEL::LOGO:
+		pNewLevel = CLevel_Logo::Create(m_pDevice, m_pContext);
+		break;
+	case LEVEL::GAMEPLAY:
+		pNewLevel = CLevel_GamePlay::Create(m_pDevice, m_pContext);
+		break;
+	}
+
+	if (FAILED(m_pGameInstance->Open_Level(static_cast<_uint>(m_eNextLevelID), pNewLevel)))
+		return;
+}
+
+HRESULT CLevel_Loading::Ready_LoadingBackGround(const _wstring& strLayerTag)
+{
+	return S_OK;
+}
+
+HRESULT CLevel_Loading::Ready_LoadingScene(const _wstring& strLayerTag)
+{
+
+	// 1. Texture
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LOADING)
+		, TEXT("Prototype_Component_Texture_Loading_BackGround")
+		, CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Loading/Loading_BackGround%d.png"), 1))))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LOADING)
+		, TEXT("Prototype_Component_Texture_Loading_Slot")
+		, CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Loading/Loading_Slot%d.png"), 1))))
+		return E_FAIL;
+
+
+
+	// 2. ê°ì²´
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LOADING), TEXT("Prototype_GameObject_Loading_BackGround"),
+		CLoading_BackGround::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LOADING), TEXT("Prototype_GameObject_Loading_Panel"),
+		CLoading_Panel::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LOADING), TEXT("Prototype_GameObject_Loading_Slot"),
+		CLoading_Slot::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	// 3. Clone
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::LOADING), strLayerTag,
+		ENUM_CLASS(LEVEL::LOADING), TEXT("Prototype_GameObject_Loading_BackGround"))))
+		return E_FAIL;
+	
+	return S_OK;
+}
+
 HRESULT CLevel_Loading::Ready_GameObjects()
 {
+
 	return S_OK;
 }
 
@@ -70,11 +127,25 @@ HRESULT CLevel_Loading::Ready_LoadingThread()
 	return S_OK;
 }
 
+HRESULT CLevel_Loading::Ready_Events()
+{
+	// Event ë“±ë¡
+	m_pGameInstance->Subscribe(EventType::OPEN_LEVEL, Get_ID(), [this](void* pData)
+		{
+			this->Open_Level();
+		});
+
+	// Event ëª©ë¡ ê´€ë¦¬.
+	m_Events.emplace_back(EventType::OPEN_LEVEL, Get_ID());
+
+	return S_OK;
+}
+
 CLevel_Loading* CLevel_Loading::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, LEVEL eNextLevelID)
 {
 	CLevel_Loading* pInstance = new CLevel_Loading(pDevice, pContext);
 
-	if (FAILED(pInstance->Initialize(eNextLevelID)))
+	if (FAILED(pInstance->Initialize_Clone(eNextLevelID)))
 	{
 		MSG_BOX(TEXT("Failed to Created : CLevel_Loading"));
 		Safe_Release(pInstance);
@@ -87,6 +158,11 @@ CLevel_Loading* CLevel_Loading::Create(ID3D11Device* pDevice, ID3D11DeviceContex
 void CLevel_Loading::Free()
 {
 	__super::Free();
+	
+	// 3. ì§€ìš¸ ë•Œ ì œê±°
+	for (auto& Event : m_Events)
+		m_pGameInstance->UnSubscribe(Event.first, Event.second);
+	
 
 	Safe_Release(m_pLoader);
 
