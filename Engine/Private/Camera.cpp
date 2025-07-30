@@ -24,7 +24,38 @@ const _vector CCamera::Get_RightVector()
     return m_pTransformCom->Get_RightDirection_NoPitch();
 }
 
+_bool CCamera::Is_In_Camera_Frustum(_vector vWorldPos) const
+{
+    // View Matrix와 Projection Matrix를 사용한 Frustum 체크
+    _matrix matView = m_pTransformCom->Get_WorldMatrix_Inverse();
+    _matrix matProj = XMMatrixPerspectiveFovLH(m_fFovy, m_fAspect, m_fNear, m_fFar);
 
+    _vector vViewPos = XMVector3TransformCoord(vWorldPos, matView);
+    _vector vProjPos = XMVector3TransformCoord(vViewPos, matProj);
+
+    _float x = XMVectorGetX(vProjPos);
+    _float y = XMVectorGetY(vProjPos);
+    _float z = XMVectorGetZ(vProjPos);
+
+    // NDC 좌표 범위 체크 (-1 ~ 1)
+    return (x >= -1.0f && x <= 1.0f &&
+        y >= -1.0f && y <= 1.0f &&
+        z >= 0.0f && z <= 1.0f);
+}
+
+_float CCamera::Get_Screen_Distance_From_Center(_vector vWorldPos) const
+{
+    _matrix matView = m_pTransformCom->Get_WorldMatrix_Inverse();
+    _matrix matProj = XMMatrixPerspectiveFovLH(m_fFovy, m_fAspect, m_fNear, m_fFar);
+
+    _vector vViewPos = XMVector3TransformCoord(vWorldPos, matView);
+    _vector vProjPos = XMVector3TransformCoord(vViewPos, matProj);
+
+    _float x = XMVectorGetX(vProjPos);
+    _float y = XMVectorGetY(vProjPos);
+
+    return sqrtf(x * x + y * y); // 화면 중앙(0,0)으로부터의 거리
+}
 
 HRESULT CCamera::Initialize_Prototype()
 {

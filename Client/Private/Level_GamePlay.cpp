@@ -199,26 +199,6 @@ HRESULT CLevel_GamePlay::Ready_Layer_Player(const _wstring& strLayerTag)
 		return E_FAIL;
 	}
 
-	/* 액션 카메라 생성. */
-	CCamera_Action::CAMERA_ACTION_DESC CameraActionDesc{};
-	CameraActionDesc.vEye = _float4(0.f, 10.f, -20.f, 1.f);
-	CameraActionDesc.vAt = _float4(0.f, 0.f, 0.f, 1.f);
-	CameraActionDesc.fFovy = XMConvertToRadians(60.0f);
-	CameraActionDesc.fNear = 0.1f;
-	CameraActionDesc.fFar = 500.f;
-	CameraActionDesc.fSpeedPerSec = 10.f;
-	CameraActionDesc.fRotationPerSec = XMConvertToRadians(9.0f);
-	CameraActionDesc.fMouseSensor = 0.3f;
-	
-	CameraActionDesc.pTarget = pPlayer;
-
-
-	if (FAILED(m_pGameInstance->Add_Camera(TEXT("ActionCamera"), ENUM_CLASS(LEVEL::GAMEPLAY)
-		, TEXT("Prototype_GameObject_Camera_Action"), &CameraActionDesc)))
-	{
-		CRASH("Add Camera Player Failed");
-		return E_FAIL;
-	}
 
 	//// 메인 카메라 변경.
 	//if (FAILED(m_pGameInstance->Change_Camera(TEXT("ActionCamera"), ENUM_CLASS(LEVEL::GAMEPLAY))))

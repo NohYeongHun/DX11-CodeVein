@@ -20,6 +20,19 @@ public:
 	const _vector Get_LookVector();
 	const _vector Get_RightVector();
 
+#pragma region 정보 가져오기.
+public:
+	const _float Get_FovY() { return m_fFovy; }
+	const _float Get_Aspect() { return m_fAspect; }
+	const _float Get_Near() { return m_fNear; }
+	const _float Get_Far() { return m_fFar; }
+
+public:
+	_bool Is_In_Camera_Frustum(_vector vWorldPos) const;
+	_float Get_Screen_Distance_From_Center(_vector vWorldPos) const;
+#pragma endregion
+
+
 public:
 	virtual HRESULT Initialize_Prototype();
 	virtual HRESULT Initialize_Clone(void* pArg);
