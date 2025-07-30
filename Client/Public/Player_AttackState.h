@@ -55,11 +55,8 @@ public:
 private:
 	void Change_State(_float fTimeDelta);
 	void Handle_DirectionInput(_float fTimeDelta);
-	void Move_By_Camera_Forward(_float fTimeDelta, _float fSpeed);
-	void Move_By_Camera_Direction_With_Input(_float fTimeDelta, _float fSpeed);
 	void Move_By_Player_LookVector(_float fTimeDelta, _float fSpeed);
 	_vector Calculate_Input_Direction_From_Camera();
-	void Rotate_Player_To_Direction(_vector vTargetDirection, _float fTimeDelta);
 
 
 	

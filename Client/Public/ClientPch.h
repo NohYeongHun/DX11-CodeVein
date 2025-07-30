@@ -33,6 +33,7 @@
 #include "BackGround.h"
 #include "Camera_Free.h"
 #include "Camera_Player.h"
+#include "Camera_Action.h"
 /* =========================================== Title Object ===================================== */
 #include "Title_BackGround.h"
 #include "TitleText.h"

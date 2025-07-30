@@ -40,12 +40,17 @@ HRESULT CSkyBoss::Initialize_Clone(void* pArg)
     _vector qInitRot = XMQuaternionRotationAxis(XMVectorSet(0.f, 1.f, 0.f, 0.f), 0.0f);
     m_pTransformCom->Set_Quaternion(qInitRot);
 
-    _float3 vPos = { 0.f, 10.f, 0.f };
+    static _uint iTest = 0;
+
+    _float3 vPos = { 0.f, 5.f, 0.f };
+    vPos.x += iTest * -10.f;
+    vPos.z += iTest * 3.f;
     m_pTransformCom->Set_State(STATE::POSITION, XMLoadFloat3(&vPos));
 
 
     m_pModelCom->Set_Animation(0, true);
 
+    iTest++;
     return S_OK;
 }
 

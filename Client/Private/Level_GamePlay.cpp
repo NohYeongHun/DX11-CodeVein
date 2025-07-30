@@ -28,9 +28,9 @@ HRESULT CLevel_GamePlay::Initialize_Clone()
 		return E_FAIL;
 	}
 
-	if (FAILED(Ready_Layer_SkyBoss(TEXT("Layer_Boss"))))
+	if (FAILED(Ready_Layer_SkyBoss(TEXT("Layer_Monster"))))
 	{
-		CRASH("Failed Layer_Player");
+		CRASH("Failed Layer_Monster");
 		return E_FAIL;
 	}
 
@@ -186,7 +186,9 @@ HRESULT CLevel_GamePlay::Ready_Layer_Player(const _wstring& strLayerTag)
 	list<CGameObject*> pGameObjects = m_pGameInstance->Get_Layer(ENUM_CLASS(LEVEL::GAMEPLAY), strLayerTag)->Get_GameObjects();
 	auto iter = pGameObjects.begin();
 
-	CameraPlayerDesc.pTarget = dynamic_cast<CPlayer*>(*iter);
+	CPlayer* pPlayer = dynamic_cast<CPlayer*>(*iter);
+	CameraPlayerDesc.pTarget = pPlayer;
+
 	if (nullptr == CameraPlayerDesc.pTarget)
 		CRASH("Failed CameraPlayer Add");
 
@@ -197,17 +199,43 @@ HRESULT CLevel_GamePlay::Ready_Layer_Player(const _wstring& strLayerTag)
 		return E_FAIL;
 	}
 
-	//if (FAILED(m_pGameInstance->Change_Camera(TEXT("FreeCamera"), ENUM_CLASS(LEVEL::GAMEPLAY))))
+	/* 액션 카메라 생성. */
+	CCamera_Action::CAMERA_ACTION_DESC CameraActionDesc{};
+	CameraActionDesc.vEye = _float4(0.f, 10.f, -20.f, 1.f);
+	CameraActionDesc.vAt = _float4(0.f, 0.f, 0.f, 1.f);
+	CameraActionDesc.fFovy = XMConvertToRadians(60.0f);
+	CameraActionDesc.fNear = 0.1f;
+	CameraActionDesc.fFar = 500.f;
+	CameraActionDesc.fSpeedPerSec = 10.f;
+	CameraActionDesc.fRotationPerSec = XMConvertToRadians(9.0f);
+	CameraActionDesc.fMouseSensor = 0.3f;
+	
+	CameraActionDesc.pTarget = pPlayer;
+
+
+	if (FAILED(m_pGameInstance->Add_Camera(TEXT("ActionCamera"), ENUM_CLASS(LEVEL::GAMEPLAY)
+		, TEXT("Prototype_GameObject_Camera_Action"), &CameraActionDesc)))
+	{
+		CRASH("Add Camera Player Failed");
+		return E_FAIL;
+	}
+
+	//// 메인 카메라 변경.
+	//if (FAILED(m_pGameInstance->Change_Camera(TEXT("ActionCamera"), ENUM_CLASS(LEVEL::GAMEPLAY))))
 	//{
 	//	CRASH("Change Camera Failed");
 	//	return E_FAIL;
 	//}
 
+	// 메인 카메라 변경.
 	if (FAILED(m_pGameInstance->Change_Camera(TEXT("PlayerCamera"), ENUM_CLASS(LEVEL::GAMEPLAY))))
 	{
 		CRASH("Change Camera Failed");
 		return E_FAIL;
 	}
+
+	pPlayer->Set_Camera(dynamic_cast<CCamera_Player*>(m_pGameInstance->Get_MainCamera()));
+	//pPlayer->Set_Camera(dynamic_cast<CCamera_Action*>(m_pGameInstance->Get_MainCamera()));
 
 
 	return S_OK;
@@ -219,6 +247,10 @@ HRESULT CLevel_GamePlay::Ready_Layer_SkyBoss(const _wstring& strLayerTag)
 	Desc.fSpeedPerSec = 10.f;
 	Desc.fRotationPerSec = XMConvertToRadians(90.0f);
 	Desc.eCurLevel = m_eCurLevel;
+
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel), strLayerTag,
+		ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_SkyBoss"), &Desc)))
+		return E_FAIL;
 
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel), strLayerTag,
 		ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_SkyBoss"), &Desc)))

@@ -324,6 +324,9 @@
     <ClInclude Include="SkyBossDefine.h">
       <Filter>02. GameObject\Boss\SkyBoss</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Camera_Action.h">
+      <Filter>02. GameObject\Camera\Player</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -518,6 +521,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\SkyBoss.cpp">
       <Filter>02. GameObject\Boss\SkyBoss</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Camera_Action.cpp">
+      <Filter>02. GameObject\Camera\Player</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

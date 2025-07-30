@@ -16,6 +16,15 @@ protected:
 
 	virtual void Enter(void* pArg) override;
 
+#pragma region LOCK ON
+protected:
+	void Handle_LockOn_Input(_float fTimeDelta);
+	void Apply_LockOn_Movement(_float fTimeDelta, _float fSpeed);
+	_bool Should_Use_LockOn_Logic() const;
+#pragma endregion
+
+
+	
 
 protected:
 	class CPlayer* m_pPlayer = { nullptr };

@@ -160,7 +160,6 @@ void CLoad_Animation::Reset()
 
     for (_uint i = 0; i < m_CurrentKeyFrameIndices.size(); ++i)
         m_CurrentKeyFrameIndices[i] = 0;
-    
 }
 
 void CLoad_Animation::Update_TrackPosition(_float fTimeDelta)
