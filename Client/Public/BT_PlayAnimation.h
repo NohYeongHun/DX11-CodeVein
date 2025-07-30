@@ -10,6 +10,7 @@ public:
     virtual void Reset() override;
 
 private:
+    class CGameObject* m_pOwner = { nullptr };
     _uint m_iAnimIndex;
     _bool m_bLoop;
     _float m_fMinDuration;

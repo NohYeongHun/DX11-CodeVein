@@ -84,9 +84,9 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 	m_pImGui_Manager = CImgui_Manager::Get_Instance(m_pDevice, m_pContext);
 	/* ==================================================== Shader ====================================================*/
 
-	/*if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_BehaviourTree"),
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_BehaviourTree"),
 		CBehaviourTree::Create(m_pDevice, m_pContext))))
-		return E_FAIL;*/
+		return E_FAIL;
 	/* ==================================================== Shader ====================================================*/
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxPosTex"),
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxPosTex.hlsl"), VTXPOSTEX::Elements, VTXPOSTEX::iNumElements))))

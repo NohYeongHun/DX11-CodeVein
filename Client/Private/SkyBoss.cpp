@@ -1,11 +1,13 @@
 ﻿#include "SkyBoss.h"
 CSkyBoss::CSkyBoss(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-    : CContainerObject(pDevice, pContext)
+    : CMonster(pDevice, pContext)
+    , m_eCurLevel { LEVEL::END }
 {
 }
 
 CSkyBoss::CSkyBoss(const CSkyBoss& Prototype)
-    : CContainerObject(Prototype)
+    : CMonster(Prototype)
+    , m_eCurLevel { Prototype.m_eCurLevel }
 {
 }
 
@@ -34,8 +36,6 @@ HRESULT CSkyBoss::Initialize_Clone(void* pArg)
     if (FAILED(Ready_PartObjects()))
         return E_FAIL;
 
-    if (FAILED(Ready_Fsm()))
-        return E_FAIL;
 
     _vector qInitRot = XMQuaternionRotationAxis(XMVectorSet(0.f, 1.f, 0.f, 0.f), 0.0f);
     m_pTransformCom->Set_Quaternion(qInitRot);
@@ -61,8 +61,14 @@ void CSkyBoss::Priority_Update(_float fTimeDelta)
 
 void CSkyBoss::Update(_float fTimeDelta)
 {
-    Handle_State(fTimeDelta);
+    /*Handle_State(fTimeDelta);*/
     __super::Update(fTimeDelta);
+
+    if (true == m_pModelCom->Play_Animation(fTimeDelta))
+    {
+        //m_pModelCom->Animation_Reset();
+    }
+   
     // 플레이어 Input 제어.
     
 }
@@ -108,21 +114,7 @@ HRESULT CSkyBoss::Render()
 }
 
 #pragma region 움직임 구현
-void CSkyBoss::Move_By_Camera_Direction_8Way(ACTORDIR eDir, _float fTimeDelta, _float fSpeed)
-{
-    
-}
 
-void CSkyBoss::Handle_State(_float fTimeDelta)
-{
-  /*  if (nullptr != m_pFsmCom)
-        m_pFsmCom->Update(fTimeDelta);*/
-
-    if (true == m_pModelCom->Play_Animation(fTimeDelta))
-    {
-        //m_pModelCom->Animation_Reset();
-    }
-}
 
 /* 
 * Animation
@@ -162,47 +154,17 @@ HRESULT CSkyBoss::Ready_Components(SKYBOSS_DESC* pDesc)
         , TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom), &Desc)))
         return E_FAIL;
 
-    return S_OK;
-}
-
-HRESULT CSkyBoss::Ready_Fsm()
-{
-    CFsm::FSM_DESC Desc{};
-    Desc.pOwner = this;
+    CBehaviourTree::BT_DESC BT{};
+    BT.pOwner = this;
 
     if (FAILED(__super::Add_Component(ENUM_CLASS(LEVEL::STATIC)
-        , TEXT("Prototype_Component_Fsm")
-        , TEXT("Com_Fsm"), reinterpret_cast<CComponent**>(&m_pFsmCom), &Desc)))
+        , TEXT("Prototype_Component_BehaviourTree")
+        , TEXT("Com_BehaviourTree"), reinterpret_cast<CComponent**>(&m_pBehaviourTreeCom), &BT)))
         return E_FAIL;
 
-
-    //CPlayerState::PLAYER_STATE_DESC PlayerDesc{};
-    //PlayerDesc.pFsm = m_pFsmCom;
-    //PlayerDesc.pOwner = this;
-
-
-
-
-    Register_CoolTime();
-
-    // DODGE TickPerseoncd 증가.
-    //m_pModelCom->Set_CurrentTickPerSecond(25, m_pModelCom->Get_CurrentTickPerSecond(25) * 1.5f);
-    //m_pModelCom->Set_CurrentTickPerSecond(48, m_pModelCom->Get_CurrentTickPerSecond(48) * 1.5f);
-
-    //CPlayer_IdleState::IDLE_ENTER_DESC enter{};
-    //enter.iAnimation_Idx = 16;
-    //
-    //CPlayer_RunState::RUN_ENTER_DESC Run{};
-    //Run.iAnimation_Idx = 6;
     return S_OK;
 }
 
-void CSkyBoss::Register_CoolTime()
-{
-    _float fTimeDelta = m_pGameInstance->Get_TimeDelta();
-    
-
-}
 
 HRESULT CSkyBoss::Ready_Render_Resources()
 {
@@ -279,9 +241,6 @@ void CSkyBoss::Destroy()
 void CSkyBoss::Free()
 {
     __super::Free();
-    Safe_Release(m_pFsmCom);
-    Safe_Release(m_pShaderCom);
-    Safe_Release(m_pModelCom);
     
         
 }

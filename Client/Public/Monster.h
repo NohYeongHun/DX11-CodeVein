@@ -161,8 +161,6 @@ public:
     void Set_UseBehaviourTree(_bool bUse) { m_bUseBehaviourTree = bUse; }
     _bool Is_Using_BehaviourTree() const { return m_bUseBehaviourTree; }
 
-protected:
-    virtual HRESULT Ready_BehaviourTree();
 #pragma endregion
 
 #pragma region 컴포넌트 준비
@@ -170,14 +168,12 @@ protected:
     virtual HRESULT Ready_Components(MONSTER_DESC* pDesc);
     virtual HRESULT Ready_Collider();
     virtual HRESULT Ready_Stats(MONSTER_DESC* pDesc);
-    virtual HRESULT Ready_Render_Resources();
 #pragma endregion
 
 protected:
     // 공통 컴포넌트들
     class CLoad_Model* m_pModelCom = { nullptr };
     class CShader* m_pShaderCom = { nullptr };
-    class CFsm* m_pFsmCom = { nullptr };
     class CCollider* m_pColliderCom = { nullptr };
     class CBehaviourTree* m_pBehaviourTreeCom = { nullptr };
 

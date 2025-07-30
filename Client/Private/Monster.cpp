@@ -35,11 +35,24 @@ CMonster::CMonster(const CMonster& Prototype)
 
 HRESULT CMonster::Initialize_Prototype()
 {
+    if (FAILED(__super::Initialize_Prototype()))
+    {
+        CRASH("Failed Prototype");
+        return E_FAIL;
+    }
+        
+
     return S_OK;
 }
 
 HRESULT CMonster::Initialize_Clone(void* pArg)
 {
+    if (FAILED(__super::Initialize_Clone(pArg)))
+    {
+        CRASH("Failed Clone");
+        return E_FAIL;
+    }
+
     return S_OK;
 }
 
@@ -51,11 +64,15 @@ void CMonster::Priority_Update(_float fTimeDelta)
 void CMonster::Update(_float fTimeDelta)
 {
     __super::Update(fTimeDelta);
+    
+
 }
 
 void CMonster::Late_Update(_float fTimeDelta)
 {
     __super::Late_Update(fTimeDelta);
+
+
 }
 
 HRESULT CMonster::Render()
@@ -244,17 +261,8 @@ void CMonster::Clear_CooldownData(const _wstring& strKey)
 {
 }
 
-HRESULT CMonster::Ready_BehaviourTree()
-{
-    return S_OK;
-}
-
+#pragma region 필수 컴포넌트 준비
 HRESULT CMonster::Ready_Components(MONSTER_DESC* pDesc)
-{
-    return S_OK;
-}
-
-HRESULT CMonster::Ready_Fsm()
 {
     return S_OK;
 }
@@ -264,14 +272,22 @@ HRESULT CMonster::Ready_Collider()
     return S_OK;
 }
 
+
 HRESULT CMonster::Ready_Stats(MONSTER_DESC* pDesc)
 {
+
     return S_OK;
 }
+#pragma endregion
 
-HRESULT CMonster::Ready_Render_Resources()
+
+
+void CMonster::Free()
 {
-    return S_OK;
+    __super::Free();
+    Safe_Release(m_pModelCom);
+    Safe_Release(m_pShaderCom);
+    Safe_Release(m_pBehaviourTreeCom);
 }
 
 // 특정 방향을 바라보기
