@@ -130,6 +130,9 @@ HRESULT CTransform::Bind_Shader_Resource(CShader* pShader, const _char* pConstan
 // 매프레임 업데이트
 void CTransform::Update_WorldMatrix()
 {
+	if (!m_bIsDirty)
+		return;
+
 	_matrix matScale = XMMatrixScaling(m_vScale.x, m_vScale.y, m_vScale.z);
 	_matrix matRotation = XMMatrixRotationQuaternion(m_QuatRotation);
 	_matrix matTranslation = XMMatrixTranslation(m_vPosition.x, m_vPosition.y, m_vPosition.z);

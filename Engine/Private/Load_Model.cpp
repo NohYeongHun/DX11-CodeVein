@@ -89,6 +89,8 @@ HRESULT CLoad_Model::Initialize_Prototype(MODELTYPE eModelType, _fmatrix PreTran
 	
 	XMStoreFloat4(&m_vOldPos, m_Bones[m_iRoot_BoneIndex]->Get_TransformationMatrix().r[3]);
 
+
+
 	return S_OK;
 }
 
@@ -115,12 +117,7 @@ HRESULT CLoad_Model::Render(_uint iNumMesh)
 void CLoad_Model::Set_Animation(_uint iAnimIndex, _bool isLoop)
 {
 	m_isLoop = isLoop;
-	//if (m_iCurrentAnimIndex != iAnimIndex)
-	//{
-	//	Reset_RootMotion();
-	//}
 	m_iCurrentAnimIndex = iAnimIndex;
-	
 
 }
 
@@ -278,6 +275,7 @@ void CLoad_Model::Handle_RootMotion(_float fTimeDelta)
 		// 0. 뼈의 이동 구하기.
 		_vector vLocalTranslate = vNewRootPos - XMLoadFloat4(&m_vOldPos);
 		vLocalTranslate = XMVectorSetY(vLocalTranslate, 0.f); // Y축 제거
+
 		_vector vWorldTranslate = vLocalTranslate; // 기본값
 
 		// 1. 플레이어 RotMatrix 추출 => 만약 RootMotionRotate 설정을 할것이라면?
@@ -310,6 +308,9 @@ void CLoad_Model::Reset_RootMotion()
 	_matrix rootMatrix = m_Bones[m_iRoot_BoneIndex]->Get_CombinedTransformationMatrix();
 	XMStoreFloat4(&m_vOldPos, rootMatrix.r[3]);
 }
+
+
+
 
 void CLoad_Model::Animation_Reset()
 {

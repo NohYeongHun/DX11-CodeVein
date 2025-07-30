@@ -43,6 +43,13 @@ public:
 	void Debug_CameraVectors();
 	void Force_Update_Target_Position();
 
+#pragma region 보간 부드럽게
+private:
+	// === 입력 처리 ===
+	void Handle_Mouse_Input(_float fTimeDelta, _float fSensitivityMultiplier = 1.0f);
+#pragma endregion
+
+
 #pragma region Target Lock On
 public:
 	void Set_LockOn_Target(CGameObject* pTarget);
@@ -52,7 +59,7 @@ public:
 	void Update_LockOn_Camera(_float fTimeDelta);
 	_bool Is_LockOn_Mode() const { return m_bLockOnMode; }
 	CGameObject* Get_LockOn_Target() const { return m_pLockOnTarget; }
-	
+
 
 private:
 	// ✨ LockOn 관련 멤버 변수들 추가
@@ -73,7 +80,7 @@ private:
 	void Update_Chase_Target(_float fTimeDelta);
 	void Calculate_LockOn_Camera_Position(_float fTimeDelta);  // LockOn 카메라 위치 계산
 	void Update_Normal_Camera(_float fTimeDelta);    // 일반 카메라 모드
-	
+
 #pragma endregion
 
 
@@ -89,7 +96,7 @@ private:
 	// 부드러운 추적을 위한 새로운 멤버 변수들
 	_float4 m_vCurrentCameraPos = {};    // 현재 카메라 위치
 	_float4 m_vTargetCameraPos = {};     // 목표 카메라 위치
-	_float m_fSmoothSpeed = 10.0f;        // 추적 속도 (높을수록 빠름)
+	_float m_fSmoothSpeed = 200.0f;        // 추적 속도 (높을수록 빠름)
 	_bool m_bFirstUpdate = true;         // 첫 번째 업데이트 체크
 
 private:

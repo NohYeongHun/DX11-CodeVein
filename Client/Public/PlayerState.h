@@ -18,9 +18,21 @@ protected:
 
 #pragma region LOCK ON
 protected:
-	void Handle_LockOn_Input(_float fTimeDelta);
-	void Apply_LockOn_Movement(_float fTimeDelta, _float fSpeed);
-	_bool Should_Use_LockOn_Logic() const;
+	_vector Calculate_Unified_Attack_Direction();
+	_vector Determine_Final_Direction(_vector vInputDirection, _vector vLockOnDirection);
+	void Handle_Attack_Movement(_vector vDirection, _float fTimeDelta);
+	_float Calculate_Attack_Move_Speed();
+
+	void Handle_Unified_Direction_Input(_float fTimeDelta);
+	void Rotate_Player_To_Direction(_vector vTargetDirection, _float fTimeDelta);
+	_float Get_Adaptive_Rotation_Speed();
+
+protected:
+	// 새로운 멤버 변수 추가
+	_bool m_bCanChangeDirection = true;     // 방향 변경 가능 여부
+	_float m_fDirectionLockTime = 0.3f;     // 방향 고정 시간 (초)
+	_float m_fCurrentLockTime = 0.0f;       // 현재 경과 시간
+	_bool m_bIsDirectionLocked = false;     // 방향이 고정되었는지 여부
 #pragma endregion
 
 

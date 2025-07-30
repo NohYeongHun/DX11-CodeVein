@@ -43,7 +43,7 @@ public:
 	virtual void Reset() override;
 
 	void Change_State(_float fTimeDelta);
-	void RockOn_State(_float fTimeDelta);
+	//void RockOn_State(_float fTimeDelta);
 
 private:
 	_bool		   m_isLoop = { true };

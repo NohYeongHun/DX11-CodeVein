@@ -46,6 +46,7 @@ void CPlayer_StrongAttackState::Enter(void* pArg)
 void CPlayer_StrongAttackState::Update(_float fTimeDelta)
 {
 	Handle_Input();
+	Handle_Unified_Direction_Input(fTimeDelta);
 	Change_State();
 
 	// ★ 애니메이션 진행도에 따른 줌아웃 시점 결정 (선택사항)
@@ -103,7 +104,10 @@ void CPlayer_StrongAttackState::Exit()
 		else if (m_iNextState == CPlayer::PLAYER_STATE::STRONG_ATTACK)
 		{
 			if (m_iNextAnimIdx == PLAYER_ANIM_SPECIAL_LAUNCH)
+			{
 				m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, true);
+			}
+				
 			//if (m_iCurAnimIdx == PLAYER_ANIM_SPECIAL_LAUNCH)
 				
 			
@@ -130,6 +134,7 @@ void CPlayer_StrongAttackState::Change_State()
 	CPlayer_StrongAttackState::STRONG_ENTER_DESC StrongAttack{};
 	CPlayer_GuardState::GUARD_ENTER_DESC Guard{};
 
+	
 	if (m_pModelCom->Is_Finished())
 	{
 		m_iNextAnimIdx = PLAYER_ANIM_IDLE_SWORD;
@@ -142,12 +147,13 @@ void CPlayer_StrongAttackState::Change_State()
 	{
 		if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::STRONG_ATTACK))
 		{
-			//if (m_iCurAnimIdx != PLAYER_ANIM_SPECIAL_DOWN3)
-			//	return;
-			if (m_iCurAnimIdx != PLAYER_ANIM_SPECIAL_LAUNCH)
+			if (m_iCurAnimIdx != PLAYER_ANIM_SPECIAL_DOWN3)
 				return;
 
-			m_iNextAnimIdx = PLAYER_ANIM_SPECIAL_DOWN3;
+			/*if (m_iCurAnimIdx != PLAYER_ANIM_SPECIAL_LAUNCH)
+				return;*/
+
+			m_iNextAnimIdx = PLAYER_ANIM_SPECIAL_LAUNCH;
 			m_iNextState = CPlayer::STRONG_ATTACK;
 			StrongAttack.iAnimation_Idx = m_iNextAnimIdx;
 			m_pFsm->Change_State(m_iNextState, &StrongAttack);

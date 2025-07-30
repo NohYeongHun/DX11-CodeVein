@@ -52,13 +52,13 @@ public:
 public:
 	void HandleState(_float fTimeDelta);
 	_vector  Calculate_Move_Direction(ACTORDIR eDir);
-	
+
 
 public:
 	// 키 입력 상태 확인 함수들
-	uint16_t Get_KeyInput() { return m_KeyInput;  }
+	uint16_t Get_KeyInput() { return m_KeyInput; }
 
-	_bool Is_KeyPressed(PLAYER_KEY ePlayerKey) const { 
+	_bool Is_KeyPressed(PLAYER_KEY ePlayerKey) const {
 		return m_KeyInput & static_cast<uint16_t>(ePlayerKey);
 	}
 
@@ -87,40 +87,6 @@ public:
 
 
 
-#pragma region LOCK ON 기능
-public:
-	// LockOn 관련 함수들
-	void Toggle_LockOn();
-	void Update_LockOn(_float fTimeDelta);
-	void Search_LockOn_Target();
-	void Set_LockOn_Target(CGameObject* pTarget);
-	void Clear_LockOn_Target();
-	CGameObject* Get_LockOn_Target() const { return m_pLockOn_Target; }
-	_vector Calculate_LockOn_Direction() const;
-	void Rotate_To_LockOn_Target(_float fTimeDelta, _float fRotSpeed = 5.0f);
-
-	// LockOn 상태에서의 이동 관련
-	void Move_With_LockOn(_float fTimeDelta, _float fSpeed);
-	_bool Is_Valid_LockOn_Target(CGameObject* pTarget) const;
-
-private:
-	// LockOn 관련 멤버 변수들 (기존 것들 + 추가)
-	class CGameObject* m_pLockOn_Target = { nullptr };
-	_bool m_isLockOn = { false };
-
-	// LockOn 설정 값들
-	_float m_fLockOnRange = 15.0f;           // LockOn 가능 거리
-	_float m_fLockOnAngle = 90.0f;           // LockOn 가능 각도 (전방 기준)
-	_float m_fLockOnLoseRange = 20.0f;       // LockOn 해제 거리
-	_float m_fLockOnCheckInterval = 0.1f;    // LockOn 타겟 체크 간격
-	_float m_fLockOnTimer = 0.0f;            // LockOn 타이머
-
-	// LockOn 회전 관련
-	_float m_fLockOnRotationSpeed = 8.0f;    // LockOn 시 플레이어 회전 속도
-	_bool m_bLockOnRotationEnabled = true;   // LockOn 시 자동 회전 활성화 여부#pragma endregion
-
-#pragma endregion
-
 
 #pragma region 이동 관련 함수들
 public:
@@ -128,6 +94,40 @@ public:
 	void Debug_CameraVectors();
 	void Rotate_Player_To_Camera_Direction();
 	// 현재 프레임 가져오기.
+#pragma endregion
+
+#pragma region 락온
+public:
+	void Toggle_LockOn();                               // LockOn 토글
+	void Search_LockOn_Target();                        // 타겟 검색
+	void Set_LockOn_Target(CGameObject* pTarget);       // 타겟 설정
+	void Clear_LockOn_Target();                         // 타겟 해제
+	void Update_LockOn(_float fTimeDelta);              // LockOn 업데이트
+	_bool Is_Valid_LockOn_Target(CGameObject* pTarget);  // 타겟 유효성 검사
+	void Rotate_To_LockOn_Target(_float fTimeDelta, _float fSpeed = 3.0f); // 타겟 방향 회전
+	_vector Calculate_LockOn_Direction() const;         // LockOn 방향 계산
+
+	// Getter 함수들
+	_bool Is_LockOn() const { return m_isLockOn; }
+	CGameObject* Get_LockOn_Target() const { return m_pLockOn_Target; }
+
+public:
+	// LockOn 방향만 반환하는 함수 (공격 시 사용)
+	_vector Get_LockOn_Attack_Direction() const;
+	_bool Has_LockOn_Target() const { return m_isLockOn && m_pLockOn_Target; }
+
+private:
+	// LockOn 시스템 관련 멤버변수들
+	CGameObject* m_pLockOn_Target = { nullptr };         // 현재 LockOn 타겟 => 위치에 UI 띄우기.
+	_bool m_isLockOn = { false };                        // LockOn 상태
+	_float m_fLockOnRange = 15.0f;                       // LockOn 최대 거리
+	_float m_fLockOnAngle = 120.0f;                      // LockOn 각도 (도 단위)
+	_float m_fLockOnTimer = 0.0f;                        // LockOn 타이머
+	_float m_fLockOnCheckInterval = 0.5f;                // LockOn 유효성 검사 주기
+	_float m_fLockOnRotationSpeed = 3.0f;                // LockOn 시 회전 속도
+	_bool m_bLockOnRotationEnabled = false;              // LockOn 시 자동 회전 여부
+private:
+	class m_pLockOn_Target* m_pTarget = { nullptr };
 #pragma endregion
 
 

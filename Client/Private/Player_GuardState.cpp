@@ -26,15 +26,12 @@ void CPlayer_GuardState::Enter(void* pArg)
 	m_iNextAnimIdx = -1;
 	m_iCurAnimIdx = pDesc->iAnimation_Idx;
 
-	_wstring strName = L"현재 위치는 DODGE Enter : \n";
-	OutputDebugString(strName.c_str());
-
-	OutPutDebugInt(m_iCurAnimIdx);
 	// ⭐ Dodge는 non-loop으로 변경
 	m_isLoop = false;
 	m_pModelCom->Set_Animation(m_iCurAnimIdx, m_isLoop);
 	m_pModelCom->Set_RootMotionTranslate(false);
 	m_pModelCom->Set_RootMotionRotation(true);
+
 }
 
 /* State 실행 */
@@ -42,6 +39,8 @@ void CPlayer_GuardState::Update(_float fTimeDelta)
 {
 	// 다시 누르면 해제.
 	Handle_Input();
+	// 상황에 맞게 Direction을 지정. if LockOn
+	Handle_Unified_Direction_Input(fTimeDelta);
 	Change_State(fTimeDelta);
 }
 
@@ -100,10 +99,7 @@ void CPlayer_GuardState::Change_State(_float fTimeDelta)
 				return;
 			}
 		}
-
-
 	}
-
 	// 모델 재생시간이 끝났는데 End 상태였다면 Idle로 변환
 	if (m_pModelCom->Is_Finished())
 	{
@@ -111,22 +107,11 @@ void CPlayer_GuardState::Change_State(_float fTimeDelta)
 		{
 			m_iNextState = CPlayer::PLAYER_STATE::IDLE;
 			m_iNextAnimIdx = PLAYER_ANIM_IDLE_SWORD;
-			Idle.iAnimation_Idx = PLAYER_ANIM_IDLE_SWORD;
+			Idle.iAnimation_Idx = PLAYER_ANIM_IDLE_SWORD;	
 			m_pFsm->Change_State(m_iNextState, &Idle);
 			return;
 		}
 	}
-
-
-
-	// 쿨타임을 바꿀 수 있다면?
-	//if (m_pFsm->Get_StateExitCoolTime(m_iStateNum))
-	//{
-	//	_wstring strName = L"현재 위치는 DODGE Exit CoolTime End : \n";
-	//	OutputDebugString(strName.c_str());
-	//	return;
-	//}
-
 
 }
 

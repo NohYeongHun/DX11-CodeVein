@@ -41,26 +41,6 @@ void CPlayer_IdleState::Enter(void* pArg)
 void CPlayer_IdleState::Update(_float fTimeDelta)
 {
 	Handle_Input();
-
-	if (m_pPlayer->Is_MovementKeyPressed())
-	{
-		if (Should_Use_LockOn_Logic())
-		{
-			// LockOn 중에는 Walk 상태로 (더 느린 이동)
-			CPlayer_WalkState::WALK_ENTER_DESC Desc{};
-			Desc.iAnimation_Idx = PLAYER_ANIM_WALK_F_LOOP;
-			m_pFsm->Change_State(CPlayer::PLAYER_STATE::WALK, &Desc);
-		}
-		else
-		{
-			// 일반적으로는 Run 상태로
-			CPlayer_RunState::RUN_ENTER_DESC Desc{};
-			Desc.iAnimation_Idx = PLAYER_ANIM_RUN_F_LOOP;
-			Desc.eDirection = m_eDir;
-			m_pFsm->Change_State(CPlayer::PLAYER_STATE::RUN, &Desc);
-		}
-	}
-
 	Change_State();
 		
 }
@@ -71,7 +51,10 @@ void CPlayer_IdleState::Exit()
 	if (m_iNextState != -1)
 	{
 		if (m_iNextState == CPlayer::PLAYER_STATE::STRONG_ATTACK)
+		{
 			m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, true);
+		}
+			
 		else if (m_iNextState == CPlayer::PLAYER_STATE::DODGE)
 			m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, false);
 		else if (m_iNextState == CPlayer::GUARD)

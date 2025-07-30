@@ -29,6 +29,8 @@ void CPlayer_DodgeState::Enter(void* pArg)
 	m_pModelCom->Set_Animation(m_iCurAnimIdx, m_isLoop);
 	m_pModelCom->Set_RootMotionRotation(true);
 	m_pModelCom->Set_RootMotionTranslate(true);
+
+
 }
 
 /* State 실행 */
@@ -36,6 +38,21 @@ void CPlayer_DodgeState::Update(_float fTimeDelta)
 {
 	Handle_Input();
 	Change_State();
+
+	if (m_pModelCom->Get_Current_Ratio() < 0.4f)
+	{
+		m_pPlayer->Get_Transform()->Move_Direction(
+			m_pPlayer->Get_Transform()->Get_LookDirection_NoPitch(), fTimeDelta * 0.5f);
+	}
+
+	//if (!m_pModelCom->Is_Finished())
+	//{
+	//	//m_eDir = m_pPlayer->Calculate_Direction();
+	//	// 이동량이 Zero라서 이동이 안된다.
+	//	m_pPlayer->Get_Transform()->Move_Direction(
+	//		m_pPlayer->Get_Transform()->Get_LookDirection_NoPitch(), fTimeDelta
+	//	);
+	//}
 }
 
 /*
@@ -57,7 +74,7 @@ void CPlayer_DodgeState::Exit()
 
 	m_pModelCom->Set_RootMotionRotation(false);
 	m_pModelCom->Set_RootMotionTranslate(false);
-		
+	
 }
 
 // 상태 초기화
@@ -79,6 +96,7 @@ void CPlayer_DodgeState::Change_State()
 	CPlayer_GuardState::GUARD_ENTER_DESC Guard{};
 
 
+
 	if (m_pModelCom->Is_Finished())
 	{
 		// Idle 상태로 전환
@@ -88,6 +106,7 @@ void CPlayer_DodgeState::Change_State()
 		m_pFsm->Change_State(CPlayer::PLAYER_STATE::IDLE, &Idle);
 		return;
 	}
+
 
 
 	if (m_pFsm->Is_ExitCoolTimeEnd(m_iStateNum))

@@ -57,6 +57,7 @@ void CGameObject::Priority_Update(_float fTimeDelta)
 
 void CGameObject::Update(_float fTimeDelta)
 {
+
 	m_pTransformCom->Update_WorldMatrix();
 }
 

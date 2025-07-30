@@ -76,19 +76,9 @@ void CPlayer::Update(_float fTimeDelta)
 {
     Update_KeyInput();
 
-    Update_LockOn(fTimeDelta);
     HandleState(fTimeDelta);
 
     __super::Update(fTimeDelta);
-
-    // 🔧 플레이어 움직임 완료 후 즉시 카메라 업데이트!
-   // 이렇게 하면 카메라가 실시간으로 플레이어를 추적함
-    //if (m_pPlayerCamera)
-    //{
-    //    // 카메라의 타겟 위치를 현재 플레이어 위치로 즉시 갱신
-    //    m_pPlayerCamera->Force_Update_Target_Position();
-    //}
-    // 플레이어 Input 제어.
     
 }
 
@@ -256,6 +246,226 @@ void CPlayer::Rotate_Player_To_Camera_Direction()
     m_pTransformCom->Set_Quaternion(qNewRot);
 }
 
+void CPlayer::Toggle_LockOn()
+{
+    if (m_isLockOn)
+        Clear_LockOn_Target();
+    else
+        Search_LockOn_Target();
+}
+
+void CPlayer::Search_LockOn_Target()
+{
+    // 현재 레벨의 적 객체들 검사
+    CLayer* pLayer = m_pGameInstance->Get_Layer(ENUM_CLASS(m_eCurLevel), TEXT("Layer_Monster"));
+    if (nullptr == pLayer)
+    {
+        return; // 레이어가 없으면 조용히 리턴
+    }
+
+    list<CGameObject*>& pEnemyObjects = pLayer->Get_GameObjects();
+    if (pEnemyObjects.size() == 0)
+    {
+        return; // 적이 없으면 조용히 리턴
+    }
+
+    _vector vPlayerPos = m_pTransformCom->Get_State(STATE::POSITION);
+    _vector vPlayerLook = m_pTransformCom->Get_State(STATE::LOOK);
+    vPlayerLook = XMVector3Normalize(vPlayerLook);
+
+    CGameObject* pBestTarget = nullptr;
+    _float fBestScore = -1.0f;
+
+    for (auto& pGameObject : pEnemyObjects)
+    {
+        if (!pGameObject || pGameObject == this)
+            continue;
+
+        // 타겟 유효성 검사
+        if (!Is_Valid_LockOn_Target(pGameObject))
+            continue;
+
+        _vector vTargetPos = pGameObject->Get_Transform()->Get_State(STATE::POSITION);
+        _vector vToTarget = vTargetPos - vPlayerPos;
+        _float fDistance = XMVectorGetX(XMVector3Length(vToTarget));
+
+        // 거리 체크
+        if (fDistance > m_fLockOnRange || fDistance < 1.0f)
+            continue;
+
+        vToTarget = XMVector3Normalize(vToTarget);
+
+        // 각도 체크 (플레이어 정면 기준)
+        _float fDot = XMVectorGetX(XMVector3Dot(vPlayerLook, vToTarget));
+        _float fAngle = XMConvertToDegrees(acosf(max(-1.0f, min(1.0f, fDot))));
+
+        if (fAngle > m_fLockOnAngle * 0.5f)
+            continue;
+
+        // 점수 계산 (거리와 각도를 고려 - 가까우면서 정면에 있을수록 높은 점수)
+        _float fDistanceScore = (m_fLockOnRange - fDistance) / m_fLockOnRange;
+        _float fAngleScore = (m_fLockOnAngle * 0.5f - fAngle) / (m_fLockOnAngle * 0.5f);
+        _float fTotalScore = fDistanceScore * 0.6f + fAngleScore * 0.4f;
+
+        if (fTotalScore > fBestScore)
+        {
+            fBestScore = fTotalScore;
+            pBestTarget = pGameObject;
+        }
+    }
+
+    // 적합한 타겟을 찾았을 때만 락온 설정.
+    if (pBestTarget)
+        Set_LockOn_Target(pBestTarget);
+}
+
+void CPlayer::Set_LockOn_Target(CGameObject* pTarget)
+{
+    m_pLockOn_Target = pTarget;
+    m_isLockOn = true;
+    m_fLockOnTimer = 0.0f;
+
+    // 카메라에 LockOn 타겟 설정
+    if (m_pPlayerCamera)
+    {
+        m_pPlayerCamera->Start_Zoom_In(0.3f);  // 0.3초 동안 줌아웃
+    }
+}
+
+void CPlayer::Clear_LockOn_Target()
+{
+    m_pLockOn_Target = nullptr;
+    m_isLockOn = false;
+    m_fLockOnTimer = 0.0f;
+
+    // 카메라 LockOn 해제
+    if (m_pPlayerCamera)
+    {
+        m_pPlayerCamera->Start_Zoom_Out(0.3f);  // 0.3초 동안 줌아웃
+    }
+
+    // UI나 이펙트 숨기기 (필요시)
+    // m_pGameInstance->Hide_LockOn_UI();
+}
+
+void CPlayer::Update_LockOn(_float fTimeDelta)
+{
+    if (!m_isLockOn || !m_pLockOn_Target)
+        return;
+
+    m_fLockOnTimer += fTimeDelta;
+
+    // 주기적으로 LockOn 타겟 유효성 검사
+    if (m_fLockOnTimer >= m_fLockOnCheckInterval)
+    {
+        m_fLockOnTimer = 0.0f;
+
+        if (!Is_Valid_LockOn_Target(m_pLockOn_Target))
+        {
+            Clear_LockOn_Target();
+            return;
+        }
+    }
+
+}
+
+_bool CPlayer::Is_Valid_LockOn_Target(CGameObject* pTarget)
+{
+    if (!pTarget)
+        return false;
+
+    // 1. 객체가 살아있는지 확인
+    if (pTarget->Is_Dead())
+        return false;
+
+    // 2. 거리 체크
+    _vector vPlayerPos = m_pTransformCom->Get_State(STATE::POSITION);
+    _vector vTargetPos = pTarget->Get_Transform()->Get_State(STATE::POSITION);
+    _float fDistance = XMVectorGetX(XMVector3Length(vTargetPos - vPlayerPos));
+
+    if (fDistance > m_fLockOnRange)
+        return false;
+
+    // 3. 추가 조건들 (필요에 따라)
+    // - 적이 스턴 상태인지
+    // - 적이 특정 상태(무적, 숨김 등)인지
+    // - 시야에 가려져 있는지 (레이캐스팅)
+
+    return true;
+}
+
+void CPlayer::Rotate_To_LockOn_Target(_float fTimeDelta, _float fSpeed)
+{
+    if (!m_isLockOn || !m_pLockOn_Target)
+        return;
+
+    _vector vDirection = Calculate_LockOn_Direction();
+    if (XMVector3Equal(vDirection, XMVectorZero()))
+        return;
+
+    // Y축만 고려한 방향으로 회전
+    vDirection = XMVectorSetY(vDirection, 0.f);
+    vDirection = XMVector3Normalize(vDirection);
+
+    // 목표 Yaw 각도 계산
+    _float x = XMVectorGetX(vDirection);
+    _float z = XMVectorGetZ(vDirection);
+    _float fTargetYaw = atan2f(x, z);
+
+    // 각도 정규화
+    while (fTargetYaw > XM_PI) fTargetYaw -= XM_2PI;
+    while (fTargetYaw < -XM_PI) fTargetYaw += XM_2PI;
+
+    // 현재 회전과 부드러운 보간
+    _float fCurrentYaw = m_pTransformCom->GetYawFromQuaternion();
+    _float fYawDiff = fTargetYaw - fCurrentYaw;
+
+    // 최단 경로로 회전
+    while (fYawDiff > XM_PI) fYawDiff -= XM_2PI;
+    while (fYawDiff < -XM_PI) fYawDiff += XM_2PI;
+
+    // 회전 속도 적용
+    _float fMaxRotation = fSpeed * fTimeDelta;
+    if (fabsf(fYawDiff) > fMaxRotation)
+    {
+        fYawDiff = (fYawDiff > 0) ? fMaxRotation : -fMaxRotation;
+    }
+
+    // 새로운 회전 적용
+    _float fNewYaw = fCurrentYaw + fYawDiff;
+    _vector qNewRot = XMQuaternionRotationAxis(XMVectorSet(0.f, 1.f, 0.f, 0.f), fNewYaw);
+    m_pTransformCom->Set_Quaternion(qNewRot);
+}
+
+_vector CPlayer::Calculate_LockOn_Direction() const
+{
+    if (!m_isLockOn || !m_pLockOn_Target)
+        return XMVectorZero();
+
+    _vector vPlayerPos = m_pTransformCom->Get_State(STATE::POSITION);
+    _vector vTargetPos = m_pLockOn_Target->Get_Transform()->Get_State(STATE::POSITION);
+
+    _vector vDirection = vTargetPos - vPlayerPos;
+    vDirection = XMVectorSetY(vDirection, 0.f); // Y축 제거
+
+    return XMVector3Normalize(vDirection);
+}
+
+_vector CPlayer::Get_LockOn_Attack_Direction() const
+{
+    if (!m_isLockOn || !m_pLockOn_Target)
+        return XMVectorZero();
+
+    _vector vPlayerPos = m_pTransformCom->Get_State(STATE::POSITION);
+    _vector vTargetPos = m_pLockOn_Target->Get_Transform()->Get_State(STATE::POSITION);
+
+    _vector vDirection = vTargetPos - vPlayerPos;
+    vDirection = XMVectorSetY(vDirection, 0.f); // Y축 제거
+
+    return XMVector3Normalize(vDirection);
+}
+
+
 /* 
 * Animation
 */
@@ -280,10 +490,6 @@ void CPlayer::On_Collision_Exit(CGameObject* pOther)
 #pragma region 플레이어 상태 함수들
 void CPlayer::HandleState(_float fTimeDelta)
 {
-    // Lock On 상태는 플레이어 전체에 적용되므로 플레이어가 제어.
-    //if (m_pGameInstance->Get_MouseKeyUp(MOUSEKEYSTATE::MB))
-    //    m_isLockOn = !m_isLockOn;
-
 
     if (nullptr != m_pFsmCom)
         m_pFsmCom->Update(fTimeDelta);
@@ -292,7 +498,6 @@ void CPlayer::HandleState(_float fTimeDelta)
     {
         //m_pModelCom->Animation_Reset();
     }
-
    
 }
 
@@ -344,23 +549,11 @@ void CPlayer::Update_KeyInput()
     if (m_pGameInstance->Get_MouseKeyPress(MOUSEKEYSTATE::LB))
         m_KeyInput |= static_cast<uint16_t>(PLAYER_KEY::ATTACK);
     if (m_pGameInstance->Get_MouseKeyUp(MOUSEKEYSTATE::MB))
-    {
-        //m_isLockOn = !m_isLockOn;
-        // LockOn 토글 처리 (마우스 휠 클릭)
-        Toggle_LockOn();
-
-        _wstring wstrDebug = L"";
-        if (m_isLockOn)
-             wstrDebug = L"LockOn\n";
-        else 
-            wstrDebug = L"LockOff\n";
-        OutputDebugString(wstrDebug.c_str());
-    }
-        
+        Toggle_LockOn(); // 기존 줌 코드 대신 LockOn 토글로 변경
     if (m_pGameInstance->Get_MouseKeyPress(MOUSEKEYSTATE::RB))
         m_KeyInput |= static_cast<uint16_t>(PLAYER_KEY::STRONG_ATTACK);
 
-    // 방향 계산 추가
+    // 방향 계산 추가 => Player State에 추가했음. HandleInput
     //m_eCurrentDirection = Calculate_Direction();
 }
 ACTORDIR CPlayer::Calculate_Direction()
@@ -383,245 +576,6 @@ ACTORDIR CPlayer::Calculate_Direction()
     return ACTORDIR::END;
 }
 
-void CPlayer::Toggle_LockOn()
-{
-    if (m_isLockOn)
-    {
-        // LockOn 해제
-        Clear_LockOn_Target();
-    }
-    else
-    {
-        // LockOn 활성화 - 가장 적합한 타겟 찾기
-        Search_LockOn_Target();
-    }
-}
-
-void CPlayer::Update_LockOn(_float fTimeDelta)
-{
-    if (!m_isLockOn || !m_pLockOn_Target)
-        return;
-
-    m_fLockOnTimer += fTimeDelta;
-
-    // 주기적으로 LockOn 타겟 유효성 검사
-    if (m_fLockOnTimer >= m_fLockOnCheckInterval)
-    {
-        m_fLockOnTimer = 0.0f;
-
-        if (!Is_Valid_LockOn_Target(m_pLockOn_Target))
-        {
-            Clear_LockOn_Target();
-            return;
-        }
-    }
-
-    // LockOn 시 플레이어 자동 회전 (옵션에 따라)
-    if (m_bLockOnRotationEnabled)
-    {
-        Rotate_To_LockOn_Target(fTimeDelta, m_fLockOnRotationSpeed);
-    }
-}
-
-void CPlayer::Search_LockOn_Target()
-{
-    // 현재 레벨의 적 객체들 검사
-    CLayer* pLayer = m_pGameInstance->Get_Layer(ENUM_CLASS(m_eCurLevel), TEXT("Layer_Monster"));
-    if (nullptr == pLayer)
-    {
-        MSG_BOX(TEXT("Not Find Layer"));
-        return;
-    }
-
-    list<CGameObject*>& pEnemyObjects = pLayer->Get_GameObjects();
-
-    if (pEnemyObjects.size() == 0)
-    {
-        MSG_BOX(TEXT("Not Find Object"));
-        return;
-    }
-        
-
-    _vector vPlayerPos = m_pTransformCom->Get_State(STATE::POSITION);
-    _vector vPlayerLook = m_pTransformCom->Get_State(STATE::LOOK);
-    vPlayerLook = XMVector3Normalize(vPlayerLook);
-
-    CGameObject* pBestTarget = nullptr;
-    _float fBestScore = -1.0f;
-
-    for (auto& pGameObject : pEnemyObjects)
-    {
-        if (!pGameObject || pGameObject == this)
-            continue;
-
-        // 타겟 유효성 검사
-        if (!Is_Valid_LockOn_Target(pGameObject))
-            continue;
-
-        _vector vTargetPos = pGameObject->Get_Transform()->Get_State(STATE::POSITION);
-        _vector vToTarget = vTargetPos - vPlayerPos;
-        _float fDistance = XMVectorGetX(XMVector3Length(vToTarget));
-
-        // 거리 체크
-        if (fDistance > m_fLockOnRange || fDistance < 1.0f)
-            continue;
-
-        vToTarget = XMVector3Normalize(vToTarget);
-
-        // 각도 체크 (플레이어 정면 기준)
-        _float fDot = XMVectorGetX(XMVector3Dot(vPlayerLook, vToTarget));
-        _float fAngle = XMConvertToDegrees(acosf(max(-1.0f, min(1.0f, fDot))));
-
-        if (fAngle > m_fLockOnAngle * 0.5f)
-            continue;
-
-        // 점수 계산 (거리와 각도를 고려 - 가까우면서 정면에 있을수록 높은 점수)
-        _float fDistanceScore = (m_fLockOnRange - fDistance) / m_fLockOnRange;
-        _float fAngleScore = (m_fLockOnAngle * 0.5f - fAngle) / (m_fLockOnAngle * 0.5f);
-        _float fTotalScore = fDistanceScore * 0.6f + fAngleScore * 0.4f;
-
-        if (fTotalScore > fBestScore)
-        {
-            fBestScore = fTotalScore;
-            pBestTarget = pGameObject;
-        }
-    }
-
-    if (pBestTarget)
-    {
-        Set_LockOn_Target(pBestTarget);
-    }
-}
-
-void CPlayer::Set_LockOn_Target(CGameObject* pTarget)
-{
-    m_pLockOn_Target = pTarget;
-    m_isLockOn = true;
-    m_fLockOnTimer = 0.0f;
-
-    //// 카메라에 LockOn 타겟 설정
-    if (m_pPlayerCamera)
-    {
-        m_pPlayerCamera->Set_LockOn_Target(pTarget);
-    }
-
-    // UI나 이펙트 표시 (필요시)
-    // m_pGameInstance->Show_LockOn_UI(pTarget);
-}
-
-void CPlayer::Clear_LockOn_Target()
-{
-    m_pLockOn_Target = nullptr;
-    m_isLockOn = false;
-    m_fLockOnTimer = 0.0f;
-
-    //// 카메라 LockOn 해제
-    if (m_pPlayerCamera)
-    {
-        m_pPlayerCamera->Clear_LockOn_Target();
-    }
-
-    // UI나 이펙트 숨기기 (필요시)
-    // m_pGameInstance->Hide_LockOn_UI();
-
-}
-
-_vector CPlayer::Calculate_LockOn_Direction() const
-{
-    if (!m_isLockOn || !m_pLockOn_Target)
-        return XMVectorZero();
-
-    _vector vPlayerPos = m_pTransformCom->Get_State(STATE::POSITION);
-    _vector vTargetPos = m_pLockOn_Target->Get_Transform()->Get_State(STATE::POSITION);
-
-    _vector vDirection = vTargetPos - vPlayerPos;
-    vDirection = XMVectorSetY(vDirection, 0.0f); // Y축 제거 (지면에서만 회전)
-
-    return XMVector3Normalize(vDirection);
-}
-
-void CPlayer::Rotate_To_LockOn_Target(_float fTimeDelta, _float fRotSpeed)
-{
-    if (!m_isLockOn || !m_pLockOn_Target)
-        return;
-
-    _vector vLockOnDir = Calculate_LockOn_Direction();
-    if (XMVectorGetX(XMVector3Length(vLockOnDir)) < 0.1f)
-        return;
-
-    _vector vCurrentLook = m_pTransformCom->Get_State(STATE::LOOK);
-    vCurrentLook = XMVectorSetY(vCurrentLook, 0.0f);
-    vCurrentLook = XMVector3Normalize(vCurrentLook);
-
-    // 회전 각도 계산
-    _float fDotProduct = XMVectorGetX(XMVector3Dot(vCurrentLook, vLockOnDir));
-    fDotProduct = max(-1.0f, min(1.0f, fDotProduct));
-    _float fAngle = acosf(fDotProduct);
-
-    // 회전이 필요한 경우에만 처리
-    if (fAngle > 0.01f) // 약 0.57도 이상일 때만 회전
-    {
-        // 회전 속도 제한
-        _float fMaxRotationThisFrame = fRotSpeed * fTimeDelta;
-        _float fActualRotation = min(fAngle, fMaxRotationThisFrame);
-
-        // 부드러운 회전을 위한 Slerp 사용
-        _float fLerpFactor = fActualRotation / fAngle;
-        _vector vNewLook = XMVectorLerp(vCurrentLook, vLockOnDir, fLerpFactor);
-        vNewLook = XMVector3Normalize(vNewLook);
-
-        // Transform 업데이트
-        m_pTransformCom->Set_State(STATE::LOOK, vNewLook);
-
-        // Right와 Up 벡터 재계산
-        _vector vUp = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-        _vector vRight = XMVector3Cross(vUp, vNewLook);
-        m_pTransformCom->Set_State(STATE::RIGHT, XMVector3Normalize(vRight));
-
-        _vector vNewUp = XMVector3Cross(vNewLook, vRight);
-        m_pTransformCom->Set_State(STATE::UP, XMVector3Normalize(vNewUp));
-    }
-}
-
-void CPlayer::Move_With_LockOn(_float fTimeDelta, _float fSpeed)
-{
-    if (!m_isLockOn || !Is_MovementKeyPressed())
-        return;
-
-    // 현재 방향 계산 (카메라 기준)
-    ACTORDIR eDirection = Calculate_Direction();
-    if (eDirection == ACTORDIR::END)
-        return;
-
-    // 이동 방향 벡터 계산 (카메라 기준)
-    _vector vMoveDirection = Calculate_Move_Direction(eDirection);
-
-    // LockOn 중에는 스트레이핑 이동 (타겟을 바라보면서 옆으로 이동)
-    _vector vCurrentPos = m_pTransformCom->Get_State(STATE::POSITION);
-    _vector vNewPos = vCurrentPos + vMoveDirection * fSpeed * fTimeDelta;
-
-    m_pTransformCom->Set_State(STATE::POSITION, vNewPos);
-}
-
-_bool CPlayer::Is_Valid_LockOn_Target(CGameObject* pTarget) const
-{
-    if (!pTarget)
-        return false;
-
-    // 거리 체크
-    _vector vPlayerPos = m_pTransformCom->Get_State(STATE::POSITION);
-    _vector vTargetPos = pTarget->Get_Transform()->Get_State(STATE::POSITION);
-    _float fDistance = XMVectorGetX(XMVector3Length(vTargetPos - vPlayerPos));
-
-    if (fDistance > m_fLockOnLoseRange)
-        return false;
-
-    // 타겟이 죽었거나 비활성화되었는지 확인 (필요시)
-     if (!pTarget->Is_Active() || pTarget->Is_Dead())
-         return false;
-
-    return true;
-}
 
 #pragma endregion
 
@@ -671,9 +625,20 @@ HRESULT CPlayer::Ready_Fsm()
     Register_CoolTime();
 
     // DODGE TickPerseoncd 증가.
-    m_pModelCom->Set_CurrentTickPerSecond(PLAYER_ANIM_DODGE_F, m_pModelCom->Get_CurrentTickPerSecond(PLAYER_ANIM_DODGE_F) * 1.5f);
-    m_pModelCom->Set_CurrentTickPerSecond(PLAYER_ANIM_STRONG_ATTACK, m_pModelCom->Get_CurrentTickPerSecond(PLAYER_ANIM_DODGE_F) * 1.5f);
+    for (_uint i = PLAYER_ANIM_ATTACK1; i < PLAYER_ANIM_ATTACK16; ++i)
+    {
+        // 모델 재생속도 증가.
+        m_pModelCom->Set_CurrentTickPerSecond(i
+            , m_pModelCom->Get_CurrentTickPerSecond(i) * 2.f);
+    }
+    
+    m_pModelCom->Set_CurrentTickPerSecond(PLAYER_ANIM_RUN_F_LOOP, m_pModelCom->Get_CurrentTickPerSecond(PLAYER_ANIM_RUN_F_LOOP) * 1.5f);
+    m_pModelCom->Set_CurrentTickPerSecond(PLAYER_ANIM_DODGE_F, m_pModelCom->Get_CurrentTickPerSecond(PLAYER_ANIM_DODGE_F) * 2.f);
+    m_pModelCom->Set_CurrentTickPerSecond(PLAYER_ANIM_STRONG_ATTACK, m_pModelCom->Get_CurrentTickPerSecond(PLAYER_ANIM_DODGE_F) * 2.f);
     //m_pModelCom->Set_CurrentTickPerSecond(PLAYER_ANIM_SPECIAL_DOWN3, m_pModelCom->Get_CurrentTickPerSecond(PLAYER_ANIM_DODGE_F) * 1.5f);
+
+    // 약한 루트모션 강화.
+    //m_pModelCom->Set_RootMotion_Scale_For_Animation(PLAYER_ANIM_DODGE_F, 1.5f);
 
     CPlayer_IdleState::IDLE_ENTER_DESC enter{};
     enter.iAnimation_Idx = PLAYER_ANIM_IDLE_SWORD;

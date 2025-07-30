@@ -29,7 +29,7 @@ void CPlayer_RunState::Update(_float fTimeDelta)
 {
 	Handle_Input();
 
-	RockOn_State(fTimeDelta);
+	//RockOn_State(fTimeDelta);
 
 	Change_State(fTimeDelta);
 }
@@ -92,7 +92,7 @@ void CPlayer_RunState::Change_State(_float fTimeDelta)
 		if (!m_pFsm->Is_CoolTimeEnd(CPlayer::STRONG_ATTACK))
 			return;
 
-		StrongAttack.iAnimation_Idx = PLAYER_ANIM_STRONG_ATTACK;
+		StrongAttack.iAnimation_Idx = PLAYER_ANIM_SPECIAL_DOWN3;
 		m_iNextState = CPlayer::PLAYER_STATE::STRONG_ATTACK;
 		m_iNextAnimIdx = PLAYER_ANIM_SPECIAL_DOWN3;
 		m_pFsm->Change_State(m_iNextState, &StrongAttack);
@@ -142,30 +142,30 @@ void CPlayer_RunState::Change_State(_float fTimeDelta)
 	
 }
 
-void CPlayer_RunState::RockOn_State(_float fTimeDelta)
-{
-	if (m_pPlayer->Is_MovementKeyPressed())
-	{
-		if (Should_Use_LockOn_Logic())
-		{
-			// LockOn 상태에서는 스트레이핑 이동
-			Apply_LockOn_Movement(fTimeDelta, 0.3f);
-		}
-		else
-		{
-			// 일반 이동 처리
-			m_eDir = m_pPlayer->Calculate_Direction();
-			m_pPlayer->Move_By_Camera_Direction_8Way(m_eDir, fTimeDelta, 0.3f);
-		}
-	}
-	else
-	{
-		// 정지 상태로 전환
-		CPlayer_IdleState::IDLE_ENTER_DESC Desc{};
-		Desc.iAnimation_Idx = PLAYER_ANIM_IDLE_SWORD;
-		m_pFsm->Change_State(CPlayer::PLAYER_STATE::IDLE, &Desc);
-	}
-}
+//void CPlayer_RunState::RockOn_State(_float fTimeDelta)
+//{
+//	if (m_pPlayer->Is_MovementKeyPressed())
+//	{
+//		if (Should_Use_LockOn_Logic())
+//		{
+//			// LockOn 상태에서는 스트레이핑 이동
+//			Apply_LockOn_Movement(fTimeDelta, 0.3f);
+//		}
+//		else
+//		{
+//			// 일반 이동 처리
+//			m_eDir = m_pPlayer->Calculate_Direction();
+//			m_pPlayer->Move_By_Camera_Direction_8Way(m_eDir, fTimeDelta, 0.3f);
+//		}
+//	}
+//	else
+//	{
+//		// 정지 상태로 전환
+//		CPlayer_IdleState::IDLE_ENTER_DESC Desc{};
+//		Desc.iAnimation_Idx = PLAYER_ANIM_IDLE_SWORD;
+//		m_pFsm->Change_State(CPlayer::PLAYER_STATE::IDLE, &Desc);
+//	}
+//}
 
 
 CPlayer_RunState* CPlayer_RunState::Create(_uint iStateNum, void* pArg)

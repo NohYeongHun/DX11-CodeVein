@@ -50,6 +50,7 @@ public:
 	}
 
 	const _float Get_CurrentTrackPosition() { return m_Animations[m_iCurrentAnimIndex]->Get_CurrentTrackPosition(); }
+	const _float Get_Duration() { return m_Animations[m_iCurrentAnimIndex]->Get_Duration(); }
 	void Set_CurrentTrackPosition(_float fTrackPosition) { m_Animations[m_iCurrentAnimIndex]->Set_CurrentTrackPosition(fTrackPosition); }
 	void Set_AnimationTrackPosition(_uint iAnimIndex, _float fTrackPosition) { m_Animations[iAnimIndex]->Set_CurrentTrackPosition(fTrackPosition); }
 
@@ -80,7 +81,6 @@ public:
 	/* 보간*/
 	_bool Play_Animation(_float fTimeDelta);
 	void Set_BlendInfo(uint32_t iNextAnimIndex, _float fBlendTime, _bool bScale, _bool bRotation, _bool bTranslation);
-	_vector QuaternionSlerpShortest(_vector q1, _vector q2, _float t);
 
 	void Set_RootMotionRotation(_bool bRootRotation = false) { m_bRootMotionRotate = bRootRotation; }
 	void Set_RootMotionTranslate(_bool bRootTranslate = true) { m_bRootMotionTranslate = bRootTranslate; }
@@ -92,9 +92,14 @@ public:
 	}
 	_float Get_CurrentTickPerSecond(_uint iAnimIndex) { return m_Animations[iAnimIndex]->Get_TickPerSecond(); }
 
+#pragma region ROOT MOTION
 private:
 	void Handle_RootMotion(_float fTimeDelta);
 	void Reset_RootMotion();
+
+#pragma endregion
+
+
 
 	
 private:
@@ -137,7 +142,7 @@ private:
 	_bool m_isTrackEnd = { }; // 애니메이션 한 프레임이 종료된 상태를 저장합니다.
 
 	_bool m_bEnableRootMotion = true;           // 루트 모션 활성화 여부
-	_float m_fRootMotionScale = 1.0f;           // 루트 모션 스케일
+	//_float m_fRootMotionScale = 1.0f;           // 루트 모션 스케일
 	_bool m_bEnableRootRotation = true;         // 루트 회전 활성화 여부
 
 	_matrix m_oldMatrix = {};

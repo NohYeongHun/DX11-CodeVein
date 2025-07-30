@@ -96,18 +96,25 @@ void CGameInstance::Update_Engine(_float fTimeDelta)
 	// 2. 게임 오브젝트 우선 업데이트
 	m_pObject_Manager->Priority_Update(fTimeDelta);
 
-	// 3. 게임 오브젝트 일반 업데이트 (플레이어 움직임 완료)
-	m_pObject_Manager->Update(fTimeDelta);
-
 	// 4. ⭐ 카메라 업데이트 (최신 플레이어 위치로 View 행렬 계산)
 	// => 플레이어 움직임 이후에 바로 이동.
 	m_pCamera_Manager->Update(fTimeDelta);
 
+	// 6. ⭐ 파이프라인 업데이트 (카메라에서 설정한 View 행렬 적용)
+	m_pPipleLine->Update();
+
+
+	// 3. 게임 오브젝트 일반 업데이트 (플레이어 움직임 완료)
+	m_pObject_Manager->Update(fTimeDelta);
+
+	
+
 	// 5. 게임 오브젝트 Late 업데이트
 	m_pObject_Manager->Late_Update(fTimeDelta);
 
-	// 6. ⭐ 파이프라인 업데이트 (카메라에서 설정한 View 행렬 적용)
-	m_pPipleLine->Update();
+	
+
+	
 
 	// 7. ⭐ 피킹 업데이트 (최신 View/Projection 행렬 사용)
 	m_pPicking->Update();
