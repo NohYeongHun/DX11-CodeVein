@@ -2,7 +2,7 @@
 #include "BehaviourTree.h"
 
 NS_BEGIN(Client)
-class CSKyBossTree final : public CBehaviourTree
+class CSkyBossTree final : public CBehaviourTree
 {
 public:
     typedef struct tagSkyBossDesc : CBehaviourTree::BT_DESC
@@ -11,13 +11,14 @@ public:
     } SKYBOSS_BT_DESC;
 
 private:
-    CSKyBossTree(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-    CSKyBossTree(const CSKyBossTree& Prototype);
-    virtual ~CSKyBossTree() = default;
+    explicit CSkyBossTree(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+    explicit CSkyBossTree(const CSkyBossTree& Prototype);
+    virtual ~CSkyBossTree() = default;
 
 public:
     virtual HRESULT Initialize(void* pArg) override;
     virtual void Update(_float fTimeDelta);
+
 
 public:
     void Set_Root_Node(CBTNode* pRootNode) {
@@ -38,6 +39,28 @@ public:
 #pragma endregion
 
 
+#pragma region Node 생성 함수들.
+private:
+    CBTNode* Create_SurvivalCheckSequence();
+    CBTNode* Create_HitBranch();
+    //CBTNode* Create_StunBranch();
+    CBTNode* Create_NormalBehaviorBranch();
+
+
+private:
+    // Noraml Behaviour
+    CBTNode* Create_ComBatBehavior();
+    //CBTNode* Create_PatrolBranch();
+    CBTNode* Create_IdleBranch();
+
+#pragma endregion
+
+#pragma region 고급 전투
+    CBTNode* Create_MeleeAttackBranch();
+    CBTNode* Create_RangedAttackBranch();
+
+
+#pragma endregion
 
 
 private:
@@ -46,7 +69,7 @@ private:
     class CPlayer* m_pPlayer = nullptr;
 
 public:
-    static CSKyBossTree* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, void* pArg);
+    static CSkyBossTree* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, void* pArg);
     virtual void Free() override;
 
 };

@@ -52,8 +52,6 @@ HRESULT CSkyBoss::Initialize_Clone(void* pArg)
     vPos.x += iTest * -10.f;
     vPos.z += iTest * 3.f;
     m_pTransformCom->Set_State(STATE::POSITION, XMLoadFloat3(&vPos));
-
-
     m_pModelCom->Set_Animation(0, true);
 
     iTest++;
@@ -140,11 +138,16 @@ void CSkyBoss::On_Collision_Exit(CGameObject* pOther)
 
 #pragma region SkyBoss 상태 함수들
 
+_bool CSkyBoss::Is_StrongHit()
+{
+    return true;
+}
 
 #pragma endregion
 
 
 #pragma region READY OBJECT, COMPONENT
+
 /* 필수 컴포넌트 */
 HRESULT CSkyBoss::Ready_Components(SKYBOSS_DESC* pDesc)
 {
@@ -167,11 +170,11 @@ HRESULT CSkyBoss::Ready_Components(SKYBOSS_DESC* pDesc)
 
 HRESULT CSkyBoss::Ready_BehaviourTree()
 {
-    CSKyBossTree::SKYBOSS_BT_DESC BT{};
+    CSkyBossTree::SKYBOSS_BT_DESC BT{};
     BT.pOwner = this;
 
     // Tree에 대한 초기화는 트리 내부에서하기.
-    m_pTree = CSKyBossTree::Create(m_pDevice, m_pContext, &BT);
+    m_pTree = CSkyBossTree::Create(m_pDevice, m_pContext, &BT);
 
     return S_OK;
 }

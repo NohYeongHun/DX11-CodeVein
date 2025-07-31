@@ -5,12 +5,8 @@ NS_BEGIN(Engine)
 // ====== 3. Sequence 노드 (AND 논리) ======
 class ENGINE_DLL CBTSequence : public CBTNode
 {
-private:
-    vector<CBTNode*> m_Children;
-    _uint m_iCurrentChild = 0;
-
-public:
-    CBTSequence() = default;
+protected:
+    explicit CBTSequence() = default;
     virtual ~CBTSequence() = default;
 
 public:
@@ -19,6 +15,10 @@ public:
     BT_RESULT Execute(_float fTimeDelta) override;
 
     void Reset() override;
+
+protected:
+    vector<CBTNode*> m_Children;
+    _uint m_iCurrentChild = 0;
 
 public:
     static CBTSequence* Create();

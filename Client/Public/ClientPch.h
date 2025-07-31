@@ -90,18 +90,32 @@
 #include "Player_AttackState.h"
 #include "Player_GuardState.h"
 
-/* ======================================== BT Object ===================================== */
 
+
+/* ======================================== BT Object ===================================== */
+#include "BT_Monster_IsAlive.h"
+#include "BT_Monster_CheckHit.h"
+#include "BT_IsTargetInRange.h"
 
 /* ======================================== Monster Object ===================================== */
 #include "Monster.h"
 
+
 /* ======================================== Sky Boss Object ===================================== */
 #include "SkyBossDefine.h"
 /* ======================================== Sky Boss BT ===================================== */
-#include "BT_SkyBoss_IsTargetInRange.h"
+#include "BT_SkyBoss_IsInAttackRange.h"
+#include "BT_SkyBoss_Attack.h"
+#include "BT_SkyBoss_Idle.h"
+
+#include "BT_SkyBoss_IsStrongHit.h"
+
+#include "BT_SkyBoss_StrongHitReaction.h"
+#include "BT_SkyBoss_NormalHitReaction.h"
 #include "BT_SkyBoss_PlayAnimation.h"
+
 #include "BT_SkyBoss_Wait.h"
+#include "BT_SkyBoss_CanStrongAttack.h"
 #include "SkyBossTree.h"
 /* ======================================== Sky Boss ===================================== */
 #include "SkyBoss.h"

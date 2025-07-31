@@ -124,6 +124,18 @@
     <Filter Include="02. GameObject\Monster\Boss\BT">
       <UniqueIdentifier>{480a8171-4723-4c9e-bd30-f9e554f2deaf}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. GameObject\Monster\BT">
+      <UniqueIdentifier>{706c06fa-0643-4fe1-a3bc-46191722de97}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Monster\Boss\BT\Hit">
+      <UniqueIdentifier>{0437d213-6ece-4994-afc0-fb9ffd1bedef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Monster\Boss\BT\Attack">
+      <UniqueIdentifier>{697aa69f-c711-42a3-beef-5fe546715af1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Monster\Boss\BT\Idle">
+      <UniqueIdentifier>{31de409e-d0c6-46f2-afac-96eec5370758}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -339,11 +351,38 @@
     <ClInclude Include="..\Public\BT_SkyBoss_PlayAnimation.h">
       <Filter>02. GameObject\Monster\Boss\BT</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\BT_SkyBoss_IsTargetInRange.h">
+    <ClInclude Include="..\Public\SkyBossTree.h">
       <Filter>02. GameObject\Monster\Boss\BT</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\SKyBossTree.h">
-      <Filter>02. GameObject\Monster\Boss\BT</Filter>
+    <ClInclude Include="..\Public\BT_Monster_IsAlive.h">
+      <Filter>02. GameObject\Monster\BT</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BT_Monster_CheckHit.h">
+      <Filter>02. GameObject\Monster\BT</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BT_IsTargetInRange.h">
+      <Filter>02. GameObject\Monster\BT</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BT_SkyBoss_CanStrongAttack.h">
+      <Filter>02. GameObject\Monster\Boss\BT\Attack</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BT_SkyBoss_IsStrongHit.h">
+      <Filter>02. GameObject\Monster\Boss\BT\Hit</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BT_SkyBoss_StrongHitReaction.h">
+      <Filter>02. GameObject\Monster\Boss\BT\Hit</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BT_SkyBoss_NormalHitReaction.h">
+      <Filter>02. GameObject\Monster\Boss\BT\Hit</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BT_SkyBoss_IsInAttackRange.h">
+      <Filter>02. GameObject\Monster\Boss\BT\Attack</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BT_SkyBoss_Attack.h">
+      <Filter>02. GameObject\Monster\Boss\BT\Attack</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BT_SkyBoss_Idle.h">
+      <Filter>02. GameObject\Monster\Boss\BT\Idle</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -549,11 +588,38 @@
     <ClCompile Include="..\Private\BT_SkyBoss_PlayAnimation.cpp">
       <Filter>02. GameObject\Monster\Boss\BT</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\BT_SkyBoss_IsTargetInRange.cpp">
+    <ClCompile Include="..\Private\SkyBossTree.cpp">
       <Filter>02. GameObject\Monster\Boss\BT</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\SKyBossTree.cpp">
-      <Filter>02. GameObject\Monster\Boss\BT</Filter>
+    <ClCompile Include="..\Private\BT_Monster_IsAlive.cpp">
+      <Filter>02. GameObject\Monster\BT</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BT_Monster_CheckHit.cpp">
+      <Filter>02. GameObject\Monster\BT</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BT_IsTargetInRange.cpp">
+      <Filter>02. GameObject\Monster\BT</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BT_SkyBoss_CanStrongAttack.cpp">
+      <Filter>02. GameObject\Monster\Boss\BT\Attack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BT_SkyBoss_IsStrongHit.cpp">
+      <Filter>02. GameObject\Monster\Boss\BT\Hit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BT_SkyBoss_StrongHitReaction.cpp">
+      <Filter>02. GameObject\Monster\Boss\BT\Hit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BT_SkyBoss_NormalHitReaction.cpp">
+      <Filter>02. GameObject\Monster\Boss\BT\Hit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BT_SkyBoss_IsInAttackRange.cpp">
+      <Filter>02. GameObject\Monster\Boss\BT\Attack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BT_SkyBoss_Attack.cpp">
+      <Filter>02. GameObject\Monster\Boss\BT\Attack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BT_SkyBoss_Idle.cpp">
+      <Filter>02. GameObject\Monster\Boss\BT\Idle</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

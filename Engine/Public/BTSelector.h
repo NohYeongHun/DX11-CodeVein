@@ -2,10 +2,10 @@
 #include "BTNode.h"
 NS_BEGIN(Engine)
 // ====== 2. Selector 노드 (OR 논리) ======
-class ENGINE_DLL CBTSelector final : public CBTNode
+class ENGINE_DLL CBTSelector : public CBTNode
 {
 
-public:
+protected:
     CBTSelector() = default;
     virtual ~CBTSelector() = default;
 
@@ -21,7 +21,7 @@ public:
 
     virtual void Free() override;
 
-private:
+protected:
     vector<CBTNode*> m_Children;
     _uint m_iCurrentChild = 0;
 
