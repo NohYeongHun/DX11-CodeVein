@@ -55,7 +55,10 @@ private:
 
 #pragma region BEHAVIOUR TREE
 private:
-	CSKyBossTree* m_pTree = { nullptr };
+	CSkyBossTree* m_pTree = { nullptr };
+
+public:
+	_bool Is_StrongHit();
 #pragma endregion
 
 
