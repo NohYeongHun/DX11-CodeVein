@@ -3,7 +3,6 @@
     , m_pGameInstance{ CGameInstance::GetInstance() }
     , m_iAnimationIndex { iAnimationIndex }
 {
-    Safe_AddRef(m_pOwner);
     Safe_AddRef(m_pGameInstance);
 }
 
@@ -14,7 +13,7 @@ BT_RESULT CBT_SkyBoss_StrongHitReaction::Perform_Action(_float fTimeDelta)
     if (!m_bAnimationStarted)
     {
         m_pOwner->Change_State(MONSTER_HURT); // Monster 상태를 피격으로 변경
-        m_pOwner->Play_Animation(m_iAnimationIndex, false); // 강한 피격 애니메이션 재생
+        m_pOwner->Chanage_Animation(m_iAnimationIndex, false); // 강한 피격 애니메이션 재생
         //m_pOwner->Add_Knockback_Force(15.f);  // 넉백 효과
         m_bAnimationStarted = true;
 
@@ -57,7 +56,6 @@ void CBT_SkyBoss_StrongHitReaction::Free()
 {
     __super::Free();
     Safe_Release(m_pGameInstance);
-    Safe_Release(m_pOwner);
 }
 
 // ============= CBT_SkyBoss_NormalHitReaction.h =============

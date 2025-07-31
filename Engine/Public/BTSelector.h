@@ -21,9 +21,7 @@ public:
 
     virtual void Free() override;
 
-protected:
-    vector<CBTNode*> m_Children;
-    _uint m_iCurrentChild = 0;
+
 
 };
 NS_END

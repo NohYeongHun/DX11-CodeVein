@@ -26,9 +26,6 @@ public:
             Safe_Release(m_pRootNode);
         }
         m_pRootNode = pRootNode;
-        if (m_pRootNode) {
-            Safe_AddRef(m_pRootNode);
-        }
     }
 
     CBTNode* Get_Root_Node() const { return m_pRootNode; }
@@ -64,7 +61,7 @@ private:
 
 
 private:
-    CBTNode* m_pRootNode = nullptr;
+    //CBTNode* m_pRootNode = nullptr;
     class CSkyBoss* m_pOwner = nullptr;
     class CPlayer* m_pPlayer = nullptr;
 

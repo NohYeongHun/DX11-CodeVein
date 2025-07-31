@@ -348,9 +348,6 @@
     <ClInclude Include="..\Public\BT_SkyBoss_Wait.h">
       <Filter>02. GameObject\Monster\Boss\BT</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\BT_SkyBoss_PlayAnimation.h">
-      <Filter>02. GameObject\Monster\Boss\BT</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\SkyBossTree.h">
       <Filter>02. GameObject\Monster\Boss\BT</Filter>
     </ClInclude>
@@ -583,9 +580,6 @@
       <Filter>02. GameObject\Monster</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\BT_SkyBoss_Wait.cpp">
-      <Filter>02. GameObject\Monster\Boss\BT</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\BT_SkyBoss_PlayAnimation.cpp">
       <Filter>02. GameObject\Monster\Boss\BT</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\SkyBossTree.cpp">

@@ -3,7 +3,6 @@ CBT_SkyBoss_NormalHitReaction::CBT_SkyBoss_NormalHitReaction(CSkyBoss* pOwner)
     : m_pOwner(pOwner)
     , m_pGameInstance{ CGameInstance::GetInstance() }
 {
-    Safe_AddRef(m_pOwner);
     Safe_AddRef(m_pGameInstance);
 }
 
@@ -58,5 +57,4 @@ void CBT_SkyBoss_NormalHitReaction::Free()
 {
     __super::Free();
     Safe_Release(m_pGameInstance);
-    Safe_Release(m_pOwner);
 }

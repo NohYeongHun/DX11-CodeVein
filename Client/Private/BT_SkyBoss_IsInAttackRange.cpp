@@ -5,6 +5,7 @@ CBT_SkyBoss_IsInAttackRange::CBT_SkyBoss_IsInAttackRange(CSkyBoss* pOwner, _floa
     , m_pGameInstance { CGameInstance::GetInstance() }
     , m_fAttackMaxRange {fAttackRange }
 {
+    Safe_AddRef(m_pGameInstance);
 }
 
 _bool CBT_SkyBoss_IsInAttackRange::Check_Condition()
@@ -35,5 +36,4 @@ void CBT_SkyBoss_IsInAttackRange::Free()
 {
     __super::Free();
     Safe_Release(m_pGameInstance);
-    Safe_Release(m_pOwner);
 }

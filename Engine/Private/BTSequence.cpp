@@ -4,7 +4,6 @@ void CBTSequence::Add_Child(CBTNode* pChild)
 {
     if (pChild) {
         m_Children.push_back(pChild);
-        Safe_AddRef(pChild);
     }
 }
 

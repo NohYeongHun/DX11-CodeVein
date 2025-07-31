@@ -71,7 +71,7 @@ void CMonster::Priority_Update(_float fTimeDelta)
 void CMonster::Update(_float fTimeDelta)
 {
     // ✅ StateManager 업데이트 (자동 상태 관리)
-    m_StateManager.Update(fTimeDelta);
+    //m_StateManager.Update(fTimeDelta);
 
     __super::Update(fTimeDelta);
 }
@@ -296,7 +296,7 @@ void CMonster::Update_Animation(_float fTimeDelta)
     // 애니메이션 업데이트 로직
 }
 
-void CMonster::Play_Animation(_uint iAnimIndex, _bool bLoop)
+void CMonster::Chanage_Animation(_uint iAnimIndex, _bool bLoop)
 {
     if (m_pModelCom)
         m_pModelCom->Set_Animation(iAnimIndex, bLoop);

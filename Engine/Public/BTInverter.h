@@ -11,8 +11,6 @@ public:
 public:
 	BT_RESULT Execute(_float fTimeDelta) override;
 
-private:
-	vector<CBTNode*> m_Children;
 
 public:
 	virtual void Free() override;
