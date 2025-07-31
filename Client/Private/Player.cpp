@@ -74,11 +74,10 @@ void CPlayer::Priority_Update(_float fTimeDelta)
 
 void CPlayer::Update(_float fTimeDelta)
 {
+    __super::Update(fTimeDelta);
     Update_KeyInput();
 
     HandleState(fTimeDelta);
-
-    __super::Update(fTimeDelta);
 
 }
 

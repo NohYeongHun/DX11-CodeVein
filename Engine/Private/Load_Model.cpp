@@ -201,7 +201,6 @@ _bool CLoad_Model::Play_Animation(_float fTimeDelta)
 		m_Bones, m_isLoop, &m_isFinished, m_BlendDesc, fTimeDelta
 	);
 
-
 	for (_uint i = 0; i < m_Bones.size(); ++i)
 	{
 		m_Bones[i]->Update_CombinedTransformationMatrix(m_PreTransformMatrix, m_Bones);
@@ -289,8 +288,6 @@ void CLoad_Model::Handle_RootMotion(_float fTimeDelta)
 		// 2. 이동값을 월드에 적용할 것인지 모션에서 설정
 		if (m_bRootMotionTranslate)
 			m_pOwner->Translate(vWorldTranslate);
-			
-
 
 		XMStoreFloat4(&m_vOldPos, vNewRootPos);
 		

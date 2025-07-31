@@ -91,9 +91,6 @@
 #include "Player_GuardState.h"
 
 /* ======================================== BT Object ===================================== */
-#include "BT_IsTargetInRange.h"
-#include "BT_PlayAnimation.h"
-#include "BT_Wait.h"
 
 
 /* ======================================== Monster Object ===================================== */
@@ -101,6 +98,12 @@
 
 /* ======================================== Sky Boss Object ===================================== */
 #include "SkyBossDefine.h"
+/* ======================================== Sky Boss BT ===================================== */
+#include "BT_SkyBoss_IsTargetInRange.h"
+#include "BT_SkyBoss_PlayAnimation.h"
+#include "BT_SkyBoss_Wait.h"
+#include "SkyBossTree.h"
+/* ======================================== Sky Boss ===================================== */
 #include "SkyBoss.h"
 #pragma endregion
 

@@ -68,6 +68,8 @@ public:
 public:
 	class CComponent* Find_Component(_uint iLayerLevelIndex, const _wstring& strLayerTag, const _wstring& strComponentTag, _uint iIndex = 0);
 	class CLayer* Get_Layer(_uint iLayerIndex, const _wstring& strLayerTag);
+	class CGameObject* Get_GameObjcet(_uint iLayerIndex, const _wstring& strLayerTag, _uint iIndex);
+
 
 	/* 맵 툴에 현재 레벨의 레이어 정보를 담아서 전달합니다. 읽기 전용 */
 	const LayerTable& Export_EditLayer(_uint iLayerLevelIndex);

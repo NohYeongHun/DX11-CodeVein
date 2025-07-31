@@ -28,10 +28,16 @@ HRESULT CSkyBoss::Initialize_Clone(void* pArg)
     if (FAILED(__super::Initialize_Clone(pDesc)))
         return E_FAIL;
 
-    m_eCurLevel = pDesc->eCurLevel;
-
     if (FAILED(Ready_Components(pDesc)))
         return E_FAIL;
+
+    if (FAILED(Ready_BehaviourTree()))
+    {
+        CRASH("Failed Ready BehaviourTree SkyBoss")
+        return E_FAIL;
+    }
+        
+
 
     if (FAILED(Ready_PartObjects()))
         return E_FAIL;
@@ -61,15 +67,14 @@ void CSkyBoss::Priority_Update(_float fTimeDelta)
 
 void CSkyBoss::Update(_float fTimeDelta)
 {
-    /*Handle_State(fTimeDelta);*/
-    __super::Update(fTimeDelta);
+    // 여기서 
 
     if (true == m_pModelCom->Play_Animation(fTimeDelta))
     {
-        //m_pModelCom->Animation_Reset();
     }
    
-    // 플레이어 Input 제어.
+    // 하위 객체들 움직임 제어는 Tree 제어 이후에
+    __super::Update(fTimeDelta);
     
 }
 
@@ -139,7 +144,8 @@ void CSkyBoss::On_Collision_Exit(CGameObject* pOther)
 #pragma endregion
 
 
-
+#pragma region READY OBJECT, COMPONENT
+/* 필수 컴포넌트 */
 HRESULT CSkyBoss::Ready_Components(SKYBOSS_DESC* pDesc)
 {
     if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxAnimMesh"),
@@ -154,13 +160,18 @@ HRESULT CSkyBoss::Ready_Components(SKYBOSS_DESC* pDesc)
         , TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom), &Desc)))
         return E_FAIL;
 
-    CBehaviourTree::BT_DESC BT{};
+
+
+    return S_OK;
+}
+
+HRESULT CSkyBoss::Ready_BehaviourTree()
+{
+    CSKyBossTree::SKYBOSS_BT_DESC BT{};
     BT.pOwner = this;
 
-    if (FAILED(__super::Add_Component(ENUM_CLASS(LEVEL::STATIC)
-        , TEXT("Prototype_Component_BehaviourTree")
-        , TEXT("Com_BehaviourTree"), reinterpret_cast<CComponent**>(&m_pBehaviourTreeCom), &BT)))
-        return E_FAIL;
+    // Tree에 대한 초기화는 트리 내부에서하기.
+    m_pTree = CSKyBossTree::Create(m_pDevice, m_pContext, &BT);
 
     return S_OK;
 }
@@ -168,7 +179,7 @@ HRESULT CSkyBoss::Ready_Components(SKYBOSS_DESC* pDesc)
 
 HRESULT CSkyBoss::Ready_Render_Resources()
 {
-      
+
     if (FAILED(m_pTransformCom->Bind_Shader_Resource(m_pShaderCom, "g_WorldMatrix")))
         return E_FAIL;
 
@@ -201,11 +212,15 @@ HRESULT CSkyBoss::Ready_Render_Resources()
 }
 
 HRESULT CSkyBoss::Ready_PartObjects()
-{   
-    
+{
+
 
     return S_OK;
 }
+
+#pragma endregion
+
+
 
 CSkyBoss* CSkyBoss::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
@@ -241,6 +256,7 @@ void CSkyBoss::Destroy()
 void CSkyBoss::Free()
 {
     __super::Free();
+    Safe_Release(m_pTree);
     
         
 }

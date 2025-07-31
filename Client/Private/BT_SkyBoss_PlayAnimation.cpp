@@ -1,10 +1,10 @@
-﻿#include "BT_PlayAnimation.h"
-CBT_PlayAnimation::CBT_PlayAnimation(_uint iAnimIndex, _bool bLoop, _float fMinDuration)
+﻿
+CBT_SkyBoss_PlayAnimation::CBT_SkyBoss_PlayAnimation(_uint iAnimIndex, _bool bLoop, _float fMinDuration)
     : m_iAnimIndex(iAnimIndex), m_bLoop(bLoop), m_fMinDuration(fMinDuration)
 {
 }
 
-BT_RESULT CBT_PlayAnimation::Execute(_float fTimeDelta)
+BT_RESULT CBT_SkyBoss_PlayAnimation::Execute(_float fTimeDelta)
 {
     CMonster* pMonster = dynamic_cast<CMonster*>(m_pOwner);
     if (nullptr == pMonster)
@@ -33,13 +33,13 @@ BT_RESULT CBT_PlayAnimation::Execute(_float fTimeDelta)
     return BT_RESULT::RUNNING;
 }
 
-void CBT_PlayAnimation::Reset()
+void CBT_SkyBoss_PlayAnimation::Reset()
 {
     m_fCurrentTime = 0.f;
     m_bAnimStarted = false;
 }
 
-void CBT_PlayAnimation::Free()
+void CBT_SkyBoss_PlayAnimation::Free()
 {
     __super::Free();
 }

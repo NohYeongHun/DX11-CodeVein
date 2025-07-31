@@ -28,6 +28,7 @@ HRESULT CLevel_GamePlay::Initialize_Clone()
 		return E_FAIL;
 	}
 
+	// 몬스터는 무조건 Player 이후에 만들어야합니다.
 	if (FAILED(Ready_Layer_SkyBoss(TEXT("Layer_Monster"))))
 	{
 		CRASH("Failed Layer_Monster");
@@ -224,9 +225,27 @@ HRESULT CLevel_GamePlay::Ready_Layer_Player(const _wstring& strLayerTag)
 HRESULT CLevel_GamePlay::Ready_Layer_SkyBoss(const _wstring& strLayerTag)
 {
 	CSkyBoss::SKYBOSS_DESC Desc{};
+	Desc.pPlayer = dynamic_cast<CPlayer*>(
+		m_pGameInstance->Get_GameObjcet(
+			ENUM_CLASS(m_eCurLevel)
+			, TEXT("Layer_Player"), 0));
+	Desc.eCurLevel = m_eCurLevel;
+	Desc.eMonsterType = MONSTER_TYPE_BOSS;
+	Desc.fMaxHP = 3000.f;
+	Desc.fAttackPower = 30.f;
+	Desc.fDetectionRange = 20.f;
+	Desc.fAttackRange = 10.f;
+	Desc.fSpeedPerSec = 10.f;
+	Desc.fMoveSpeed = 10.f;
+	/* Transform 설정.*/
 	Desc.fSpeedPerSec = 10.f;
 	Desc.fRotationPerSec = XMConvertToRadians(90.0f);
-	Desc.eCurLevel = m_eCurLevel;
+
+	if (nullptr == Desc.pPlayer)
+	{
+		CRASH("Failed Search Player");
+		return E_FAIL;
+	}
 
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel), strLayerTag,
 		ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_SkyBoss"), &Desc)))

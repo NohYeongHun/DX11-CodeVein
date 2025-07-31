@@ -50,6 +50,7 @@ class CMonster abstract : public CContainerObject
 public:
     typedef struct tagMonsterDesc : public CGameObject::GAMEOBJECT_DESC
     {
+        class CPlayer* pPlayer = { nullptr };
         LEVEL eCurLevel;
         MONSTER_TYPE eMonsterType;
         _float fMaxHP;
@@ -60,6 +61,7 @@ public:
         _float fRotationSpeed;
     }MONSTER_DESC;
 
+#pragma region 기본 함수들
 protected:
     explicit CMonster(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
     explicit CMonster(const CMonster& Prototype);
@@ -78,6 +80,9 @@ public:
     virtual void On_Collision_Enter(CGameObject* pOther) override;
     virtual void On_Collision_Stay(CGameObject* pOther) override;
     virtual void On_Collision_Exit(CGameObject* pOther) override;
+#pragma endregion
+
+
 
 #pragma region 공통 인터페이스 함수들
 public:
@@ -94,16 +99,16 @@ public:
     _bool Is_In_Combat() const { return m_bInCombat; }
 
     // 데미지 처리
-    virtual void Take_Damage(_float fDamage, CGameObject* pAttacker = nullptr);
+    virtual void Take_Damage(_float fDamage, class CPlayer* pAttacker = nullptr);
     virtual void Heal(_float fHealAmount);
 
     // 타겟 관련
-    void Set_Target(CGameObject* pTarget) { m_pTarget = pTarget; }
-    CGameObject* Get_Target() const { return m_pTarget; }
+    void Set_Target(class CPlayer* pTarget) { m_pTarget = pTarget; }
+    class CPlayer* Get_Target() const { return m_pTarget; }
     _float Get_Distance_To_Target() const;
 
     // 전투 상태 관리
-    virtual void Enter_Combat(CGameObject* pTarget = nullptr);
+    virtual void Enter_Combat(CPlayer* pTarget = nullptr);
     virtual void Exit_Combat();
 
     // BT 노드에서 사용할 Getter들
@@ -111,8 +116,14 @@ public:
     _float Get_AttackRange() const { return m_fAttackRange; }
     _float Get_MoveSpeed() const { return m_fMoveSpeed; }
     _float Get_RotationSpeed() const { return m_fRotationSpeed; }
+    _float Get_DetectionRange() const { return m_fDetectionRange;  }
     MONSTER_BASE_STATE Get_CurrentState() const { return m_eCurrentState; }
 #pragma endregion
+
+#pragma region 공통 Conidtion Check
+    _bool IsTargetInRange();
+#pragma endregion
+
 
 #pragma region 공통 행동 함수들
 public:
@@ -148,21 +159,6 @@ protected:
     virtual void Update_FSM_AI(_float fTimeDelta);
 #pragma endregion
 
-#pragma region BT 관련 메서드들
-public:
-    // BT 쿨다운 시스템
-    _bool Has_CooldownData(const _wstring& strKey) const;
-    _float Get_CooldownData(const _wstring& strKey) const;
-    void Set_CooldownData(const _wstring& strKey, _float fTime);
-    void Clear_CooldownData(const _wstring& strKey);
-
-    // BT 컴포넌트 관련
-    class CBehaviourTree* Get_BehaviourTree() const { return m_pBehaviourTreeCom; }
-    void Set_UseBehaviourTree(_bool bUse) { m_bUseBehaviourTree = bUse; }
-    _bool Is_Using_BehaviourTree() const { return m_bUseBehaviourTree; }
-
-#pragma endregion
-
 #pragma region 컴포넌트 준비
 protected:
     virtual HRESULT Ready_Components(MONSTER_DESC* pDesc);
@@ -175,7 +171,7 @@ protected:
     class CLoad_Model* m_pModelCom = { nullptr };
     class CShader* m_pShaderCom = { nullptr };
     class CCollider* m_pColliderCom = { nullptr };
-    class CBehaviourTree* m_pBehaviourTreeCom = { nullptr };
+   
 
     // 공통 데이터
     LEVEL m_eCurLevel;
@@ -193,7 +189,7 @@ protected:
     _float m_fRotationSpeed;
 
     // 타겟 및 전투
-    CGameObject* m_pTarget = { nullptr };
+    class CPlayer* m_pTarget = { nullptr };
     _bool m_bInCombat = { false };
     _float m_fCombatTimer = { 0.f };
     _float m_fLastAttackTime = { 0.f };

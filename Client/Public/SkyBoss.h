@@ -17,9 +17,9 @@ public:
 #pragma endregion
 
 public:
-	typedef struct tagSkyBossDesc : public CGameObject::GAMEOBJECT_DESC
+	typedef struct tagSkyBossDesc : public CMonster::MONSTER_DESC
 	{
-		LEVEL eCurLevel;
+
 	}SKYBOSS_DESC;
 
 private:
@@ -53,10 +53,21 @@ private:
 	ACTORDIR m_eCurrentDirection = {};
 	
 
+#pragma region BEHAVIOUR TREE
+private:
+	CSKyBossTree* m_pTree = { nullptr };
+#pragma endregion
+
+
+#pragma region READY OJBECT, COMPONENT
 private:
 	HRESULT Ready_Components(SKYBOSS_DESC* pDesc);
+	HRESULT Ready_BehaviourTree();
 	HRESULT Ready_Render_Resources();
 	HRESULT Ready_PartObjects();
+#pragma endregion
+
+
 
 public:
 	static CSkyBoss* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

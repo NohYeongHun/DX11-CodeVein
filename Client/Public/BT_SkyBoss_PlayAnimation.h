@@ -1,10 +1,10 @@
 ﻿#pragma once
 #include "BTAction.h"
-class CBT_PlayAnimation : public CBTAction
+class CBT_SkyBoss_PlayAnimation : public CBTAction
 {
 public:
-    explicit CBT_PlayAnimation(_uint iAnimIndex, _bool bLoop = false, _float fMinDuration = 1.f);
-    virtual ~CBT_PlayAnimation() = default;
+    explicit CBT_SkyBoss_PlayAnimation(_uint iAnimIndex, _bool bLoop = false, _float fMinDuration = 1.f);
+    virtual ~CBT_SkyBoss_PlayAnimation() = default;
 
     virtual BT_RESULT Execute(_float fTimeDelta) override;
     virtual void Reset() override;
