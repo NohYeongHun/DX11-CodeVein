@@ -13,6 +13,9 @@ BT_RESULT CBT_SkyBoss_Idle::Perform_Action(_float fTimeDelta)
 {
 	m_pOwner->Chanage_Animation(SKYBOSS_ANIM_AXE_IDLE, true);
 
+	
+
+
     return BT_RESULT::SUCCESS;
 }
 

@@ -251,9 +251,9 @@ HRESULT CLevel_GamePlay::Ready_Layer_SkyBoss(const _wstring& strLayerTag)
 		ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_SkyBoss"), &Desc)))
 		return E_FAIL;
 
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel), strLayerTag,
-		ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_SkyBoss"), &Desc)))
-		return E_FAIL;
+	//if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel), strLayerTag,
+	//	ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_SkyBoss"), &Desc)))
+	//	return E_FAIL;
 
 	return S_OK;
 }

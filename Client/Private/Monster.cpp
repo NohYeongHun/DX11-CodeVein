@@ -15,7 +15,6 @@ CMonster::CMonster(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     , m_fMoveSpeed(5.f)
     , m_fRotationSpeed(XMConvertToRadians(180.f))
 {
-    // ✅ 안전한 StateManager 초기화
     m_StateManager.Initialize(this);
 }
 
@@ -33,7 +32,6 @@ CMonster::CMonster(const CMonster& Prototype)
     , m_fMoveSpeed(Prototype.m_fMoveSpeed)
     , m_fRotationSpeed(Prototype.m_fRotationSpeed)
 {
-    // ✅ 복사 생성자에서도 안전한 초기화
     m_StateManager.Initialize(this);
 }
 
@@ -70,8 +68,7 @@ void CMonster::Priority_Update(_float fTimeDelta)
 
 void CMonster::Update(_float fTimeDelta)
 {
-    // ✅ StateManager 업데이트 (자동 상태 관리)
-    //m_StateManager.Update(fTimeDelta);
+    m_StateManager.Update(fTimeDelta);
 
     __super::Update(fTimeDelta);
 }
@@ -148,8 +145,20 @@ _bool CMonster::IsTargetInRange()
         return false;
 
     _vector vTargetPos = m_pTarget->Get_Transform()->Get_State(STATE::POSITION);
+
+    _wstring wstr = TEXT("Player 위치 : ");
+    OutputDebugString(wstr.c_str());
+
+    _float4 vDebugPos = {};
+    XMStoreFloat4(&vDebugPos, vTargetPos);
+    OutPutDebugFloat4(vDebugPos);
+
     _vector vPos = m_pTransformCom->Get_State(STATE::POSITION);
     _float fDistance = XMVectorGetX(XMVector3Length(vTargetPos - vPos));
+
+    _wstring wstrLength = TEXT("플레이어 와의 거리 : ");
+    OutputDebugString(wstrLength.c_str());
+    OutPutDebugFloat(fDistance);
 
     return fDistance <= m_fDetectionRange;
 }
@@ -179,6 +188,48 @@ void CMonster::Move_To_Target(_float fTimeDelta, _float fSpeed)
 
     // 방향 업데이트
     m_eCurrentDirection = Vector_To_Direction(vDirection);
+}
+
+void CMonster::Smooth_Rotate_To_Target(_float fTimeDelta, _float fRotationSpeed)
+{
+    if (!m_pTarget)
+        return;
+
+    _vector vTargetPos = m_pTarget->Get_Transform()->Get_State(STATE::POSITION);
+    _vector vPos = m_pTransformCom->Get_State(STATE::POSITION);
+    _vector vDirection = XMVector3Normalize(vTargetPos - vPos);
+
+    // Y축 제거 (지면에서의 회전만)
+    vDirection = XMVectorSetY(vDirection, 0.f);
+    if (XMVector3Length(vDirection).m128_f32[0] < 1e-6f) return; // 너무 가까우면 회전하지 않음
+
+    vDirection = XMVector3Normalize(vDirection);
+
+    // 목표 각도 계산
+    _float fTargetYaw = atan2f(XMVectorGetX(vDirection), XMVectorGetZ(vDirection));
+    _float fCurrentYaw = m_pTransformCom->GetYawFromQuaternion();
+
+    // 각도 차이 (최단 경로)
+    _float fYawDiff = fTargetYaw - fCurrentYaw;
+    while (fYawDiff > XM_PI) fYawDiff -= XM_2PI;
+    while (fYawDiff < -XM_PI) fYawDiff += XM_2PI;
+
+    // 부드러운 회전 적용
+    _float fRotationAmount = fRotationSpeed * fTimeDelta;
+
+    // 남은 각도가 작으면 더 천천히
+    if (fabsf(fYawDiff) < 0.5f) // 30도 이하일 때
+        fRotationAmount *= 0.1f; // 50% 감속
+
+    if (fabsf(fYawDiff) > fRotationAmount)
+    {
+        fYawDiff = (fYawDiff > 0) ? fRotationAmount : -fRotationAmount;
+    }
+
+    // 새로운 회전 적용
+    _float fNewYaw = fCurrentYaw + fYawDiff;
+    _vector qNewRot = XMQuaternionRotationAxis(XMVectorSet(0.f, 1.f, 0.f, 0.f), fNewYaw);
+    m_pTransformCom->Set_Quaternion(qNewRot);
 }
 
 void CMonster::Rotate_To_Target(_float fTimeDelta, _float fRotationSpeed)
@@ -303,6 +354,8 @@ void CMonster::Chanage_Animation(_uint iAnimIndex, _bool bLoop)
 
     m_iCurrentAnimIndex = iAnimIndex;
     m_bAnimationLoop = bLoop;
+
+    m_pModelCom->Animation_Reset();
 }
 
 _bool CMonster::Is_Animation_Finished() const

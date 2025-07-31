@@ -32,8 +32,6 @@ HRESULT CSkyBoss::Initialize_Clone(void* pArg)
         CRASH("Failed Ready BehaviourTree SkyBoss")
         return E_FAIL;
     }
-        
-
 
     if (FAILED(Ready_PartObjects()))
         return E_FAIL;
