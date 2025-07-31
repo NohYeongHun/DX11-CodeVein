@@ -121,7 +121,7 @@
     <Filter Include="02. GameObject\Monster\Boss\SkyBoss">
       <UniqueIdentifier>{c1014850-7100-4288-b376-8ecc6e63f719}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02. GameObject\Monster\BT">
+    <Filter Include="02. GameObject\Monster\Boss\BT">
       <UniqueIdentifier>{480a8171-4723-4c9e-bd30-f9e554f2deaf}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -333,14 +333,17 @@
     <ClInclude Include="..\Public\Monster.h">
       <Filter>02. GameObject\Monster</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\BT_Wait.h">
-      <Filter>02. GameObject\Monster\BT</Filter>
+    <ClInclude Include="..\Public\BT_SkyBoss_Wait.h">
+      <Filter>02. GameObject\Monster\Boss\BT</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\BT_PlayAnimation.h">
-      <Filter>02. GameObject\Monster\BT</Filter>
+    <ClInclude Include="..\Public\BT_SkyBoss_PlayAnimation.h">
+      <Filter>02. GameObject\Monster\Boss\BT</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\BT_IsTargetInRange.h">
-      <Filter>02. GameObject\Monster\BT</Filter>
+    <ClInclude Include="..\Public\BT_SkyBoss_IsTargetInRange.h">
+      <Filter>02. GameObject\Monster\Boss\BT</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\SKyBossTree.h">
+      <Filter>02. GameObject\Monster\Boss\BT</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -540,14 +543,17 @@
     <ClCompile Include="..\Private\Monster.cpp">
       <Filter>02. GameObject\Monster</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\BT_Wait.cpp">
-      <Filter>02. GameObject\Monster\BT</Filter>
+    <ClCompile Include="..\Private\BT_SkyBoss_Wait.cpp">
+      <Filter>02. GameObject\Monster\Boss\BT</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\BT_PlayAnimation.cpp">
-      <Filter>02. GameObject\Monster\BT</Filter>
+    <ClCompile Include="..\Private\BT_SkyBoss_PlayAnimation.cpp">
+      <Filter>02. GameObject\Monster\Boss\BT</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\BT_IsTargetInRange.cpp">
-      <Filter>02. GameObject\Monster\BT</Filter>
+    <ClCompile Include="..\Private\BT_SkyBoss_IsTargetInRange.cpp">
+      <Filter>02. GameObject\Monster\Boss\BT</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\SKyBossTree.cpp">
+      <Filter>02. GameObject\Monster\Boss\BT</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -103,6 +103,12 @@ HRESULT CLoader_GamePlay::Add_Prototype_SkyBoss(ID3D11Device* pDevice, ID3D11Dev
 		, TEXT("Prototype_GameObject_SkyBoss")
 		, CSkyBoss::Create(pDevice, pContext))))
 		return E_FAIL;
+
+	/*if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level)
+		, TEXT("Prototype_Component_SkyBossTree")
+		, CSKyBossTree::Create(pDevice, pContext))))
+		return E_FAIL;*/
+
 	return S_OK;
 }
 

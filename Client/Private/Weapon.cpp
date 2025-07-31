@@ -23,7 +23,7 @@ HRESULT CWeapon::Initialize(void* pArg)
     //m_pParentState = pDesc->pState;
     m_pSocketMatrix = pDesc->pSocketMatrix;
 
-    if (FAILED(__super::Initialize_Clone(pArg)))
+    if (FAILED(__super::Initialize_Clone(pDesc)))
         return E_FAIL;
 
     if (FAILED(Ready_Components()))

@@ -4,22 +4,21 @@
 // ============ BehaviourTree_Component.h ============
 NS_BEGIN(Engine)
 
-class ENGINE_DLL CBehaviourTree final : public CComponent
+class ENGINE_DLL CBehaviourTree abstract : public CBase
 {
 public:
     typedef struct tagBTDesc
     {
-        class CGameObject* pOwner = nullptr;
+        
     } BT_DESC;
 
-private:
+protected:
     CBehaviourTree(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
     CBehaviourTree(const CBehaviourTree& Prototype);
     virtual ~CBehaviourTree() = default;
 
 public:
-    virtual HRESULT Initialize_Prototype() override;
-    virtual HRESULT Initialize_Clone(void* pArg) override;
+    virtual HRESULT Initialize(void* pArg);
     virtual void Update(_float fTimeDelta);
 
 public:
@@ -35,13 +34,18 @@ public:
 
     CBTNode* Get_Root_Node() const { return m_pRootNode; }
 
-private:
+
+
+protected:
+    class ID3D11Device* m_pDevice = { nullptr };
+    class ID3D11DeviceContext* m_pContext = { nullptr };
+    class CGameInstance* m_pGameInstance = { nullptr };
     CBTNode* m_pRootNode = nullptr;
-    class CGameObject* m_pOwner = nullptr;
+    
 
 public:
-    static CBehaviourTree* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-    virtual CComponent* Clone(void* pArg) override;
+    //static CBehaviourTree* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+    //virtual CComponent* Clone(void* pArg) PURE;
     virtual void Free() override;
 };
 

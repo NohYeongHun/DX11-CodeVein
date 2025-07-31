@@ -45,8 +45,15 @@ HRESULT CMonster::Initialize_Prototype()
     return S_OK;
 }
 
+/* 몬스터 정보 초기화.*/
 HRESULT CMonster::Initialize_Clone(void* pArg)
 {
+
+    MONSTER_DESC* pDesc = static_cast<MONSTER_DESC*>(pArg);
+    m_eCurLevel = pDesc->eCurLevel;
+    m_pTarget = pDesc->pPlayer;
+
+
     if (FAILED(__super::Initialize_Clone(pArg)))
     {
         CRASH("Failed Clone");
@@ -92,7 +99,8 @@ void CMonster::On_Collision_Exit(CGameObject* pOther)
 {
 }
 
-void CMonster::Take_Damage(_float fDamage, CGameObject* pAttacker)
+
+void CMonster::Take_Damage(_float fDamage, CPlayer* pAttacker)
 {
 }
 
@@ -105,12 +113,28 @@ _float CMonster::Get_Distance_To_Target() const
     return _float();
 }
 
-void CMonster::Enter_Combat(CGameObject* pTarget)
+
+void CMonster::Enter_Combat(CPlayer* pTarget)
 {
 }
 
 void CMonster::Exit_Combat()
 {
+}
+
+_bool CMonster::IsTargetInRange()
+{
+    // 1. Target이 거리 안에 없으면 Return False
+    if (!m_pTarget) 
+        return false;
+
+    // 2. 있다면?
+    _vector vTargetPos = m_pTarget->Get_Transform()->Get_State(STATE::POSITION);
+    _vector vPos = m_pTransformCom->Get_State(STATE::POSITION);
+    _float fDistance = XMVectorGetX(XMVector3Length(vTargetPos - vPos));
+
+    // 3. 탐지거리보다 작거나 같다면.
+    return fDistance <= m_fDetectionRange;
 }
 
 // MONSTERDIR을 사용한 이동 함수
@@ -243,23 +267,6 @@ void CMonster::Update_FSM_AI(_float fTimeDelta)
 {
 }
 
-_bool CMonster::Has_CooldownData(const _wstring& strKey) const
-{
-    return _bool();
-}
-
-_float CMonster::Get_CooldownData(const _wstring& strKey) const
-{
-    return _float();
-}
-
-void CMonster::Set_CooldownData(const _wstring& strKey, _float fTime)
-{
-}
-
-void CMonster::Clear_CooldownData(const _wstring& strKey)
-{
-}
 
 #pragma region 필수 컴포넌트 준비
 HRESULT CMonster::Ready_Components(MONSTER_DESC* pDesc)
@@ -287,7 +294,6 @@ void CMonster::Free()
     __super::Free();
     Safe_Release(m_pModelCom);
     Safe_Release(m_pShaderCom);
-    Safe_Release(m_pBehaviourTreeCom);
 }
 
 // 특정 방향을 바라보기

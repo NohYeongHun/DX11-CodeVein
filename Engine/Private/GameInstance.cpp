@@ -308,6 +308,14 @@ CLayer* CGameInstance::Get_Layer(_uint iLayerIndex, const _wstring& strLayerTag)
 	return m_pObject_Manager->Get_Layer(iLayerIndex, strLayerTag);
 }
 
+CGameObject* CGameInstance::Get_GameObjcet(_uint iLayerIndex, const _wstring& strLayerTag, _uint iIndex)
+{
+	if (nullptr == m_pObject_Manager)
+		return nullptr;
+
+	return m_pObject_Manager->Get_GameObject(iLayerIndex, strLayerTag, iIndex);
+}
+
 /* 읽기 전용 Export EditLayer*/
 const LayerTable& CGameInstance::Export_EditLayer(_uint iLayerLevelIndex)
 {

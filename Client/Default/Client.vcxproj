@@ -160,9 +160,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\public\BackGround.h" />
-    <ClInclude Include="..\Public\BT_IsTargetInRange.h" />
-    <ClInclude Include="..\Public\BT_PlayAnimation.h" />
-    <ClInclude Include="..\Public\BT_Wait.h" />
+    <ClInclude Include="..\Public\BT_SkyBoss_IsTargetInRange.h" />
+    <ClInclude Include="..\Public\BT_SkyBoss_PlayAnimation.h" />
+    <ClInclude Include="..\Public\BT_SkyBoss_Wait.h" />
     <ClInclude Include="..\Public\Camera_Free.h" />
     <ClInclude Include="..\Public\Camera_Player.h" />
     <ClInclude Include="..\Public\ClientPch.h" />
@@ -212,6 +212,7 @@
     <ClInclude Include="..\Public\Sky.h" />
     <ClInclude Include="..\Public\SkyBoss.h" />
     <ClInclude Include="..\Public\SkyBossDefine.h" />
+    <ClInclude Include="..\Public\SKyBossTree.h" />
     <ClInclude Include="..\Public\Weapon.h" />
     <ClInclude Include="..\Public\SkillUI.h" />
     <ClInclude Include="..\Public\SkillUI_Icon.h" />
@@ -234,9 +235,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\BackGround.cpp" />
-    <ClCompile Include="..\Private\BT_IsTargetInRange.cpp" />
-    <ClCompile Include="..\Private\BT_PlayAnimation.cpp" />
-    <ClCompile Include="..\Private\BT_Wait.cpp" />
+    <ClCompile Include="..\Private\BT_SkyBoss_IsTargetInRange.cpp" />
+    <ClCompile Include="..\Private\BT_SkyBoss_PlayAnimation.cpp" />
+    <ClCompile Include="..\Private\BT_SkyBoss_Wait.cpp" />
     <ClCompile Include="..\Private\Camera_Free.cpp" />
     <ClCompile Include="..\Private\Camera_Player.cpp" />
     <ClCompile Include="..\Private\ClientPch.cpp">
@@ -286,6 +287,7 @@
     <ClCompile Include="..\Private\Player_WalkState.cpp" />
     <ClCompile Include="..\Private\Sky.cpp" />
     <ClCompile Include="..\Private\SkyBoss.cpp" />
+    <ClCompile Include="..\Private\SKyBossTree.cpp" />
     <ClCompile Include="..\Private\Weapon.cpp" />
     <ClCompile Include="..\Private\SkillUI.cpp" />
     <ClCompile Include="..\Private\SkillUI_Icon.cpp" />

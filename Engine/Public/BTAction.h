@@ -10,7 +10,7 @@ protected:
     virtual ~CBTAction() = default;
 
 public:
-    virtual BT_RESULT Perform_Action(_float fTimeDelta) = 0;
+    virtual BT_RESULT Perform_Action(_float fTimeDelta) PURE;
 
     BT_RESULT Execute(_float fTimeDelta) override {
         return Perform_Action(fTimeDelta);

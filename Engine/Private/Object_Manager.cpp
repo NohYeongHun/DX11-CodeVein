@@ -22,6 +22,22 @@ CLayer* CObject_Manager::Get_Layer(_uint iLayerIndex, const _wstring& strLayerTa
 	return Find_Layer(iLayerIndex, strLayerTag);
 }
 
+CGameObject* CObject_Manager::Get_GameObject(_uint iLayerIndex, const _wstring& strLayerTag, _uint iIndex)
+{
+	CLayer* pLayer = Find_Layer(iLayerIndex, strLayerTag);
+	if (nullptr == pLayer)
+		return nullptr;
+
+	list<CGameObject*>& gameObjects = pLayer->Get_GameObjects();
+
+	auto iter = gameObjects.begin();
+
+	for (_uint i = 0; i < iIndex; i++)
+		iter++;
+
+	return (*iter);
+}
+
 /* 읽기 전용 Layer를 내보냅니다. */
 const LayerTable& CObject_Manager::Export_EditLayer(_uint iLayerLevelIndex)
 {	

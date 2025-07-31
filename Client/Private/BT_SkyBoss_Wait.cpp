@@ -1,10 +1,9 @@
-﻿#include "BT_Wait.h"
-CBT_Wait::CBT_Wait(_float fWaitTime)
+﻿CBT_SkyBoss_Wait::CBT_SkyBoss_Wait(_float fWaitTime)
     : m_fWaitTime(fWaitTime)
 {
 }
 
-BT_RESULT CBT_Wait::Execute(_float fTimeDelta)
+BT_RESULT CBT_SkyBoss_Wait::Execute(_float fTimeDelta)
 {
     CMonster* pMonster = dynamic_cast<CMonster*>(m_pOwner);
     if (pMonster)
@@ -18,12 +17,12 @@ BT_RESULT CBT_Wait::Execute(_float fTimeDelta)
     return BT_RESULT::RUNNING;
 }
 
-void CBT_Wait::Reset()
+void CBT_SkyBoss_Wait::Reset()
 {
     m_fCurrentTime = 0.f;
 }
 
-void CBT_Wait::Free()
+void CBT_SkyBoss_Wait::Free()
 {
     __super::Free();
 }
