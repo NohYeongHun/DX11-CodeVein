@@ -26,20 +26,22 @@ HRESULT CSkyBossTree::Initialize(void* pArg)
 	// 1. RootNode 생성 -> Root를 Selector로 설정
 	CBTSelector* pRootSelector = CBTSelector::Create();
 
+	// 생존해 있으면 다음 노드로 움직여야하는데?
+	
 	// 2. 생존 체크 및 체크 (최우선)
 	pRootSelector->Add_Child(Create_SurvivalCheckSequence());
-
-	// 3. 피격 브랜치
-	//pRootSelector->Add_Child(Create_HitBranch());
-	//
-	//// 4. 스턴 브랜치  
-	//pRootSelector->Add_Child(Create_StunBranch());
 
 	// 5. 일반 행동 브랜치 (모든 상태가 false일 때만 실행)
 	pRootSelector->Add_Child(Create_NormalBehaviorBranch());
 
 	Set_Root_Node(pRootSelector);
 
+
+	// 3. 피격 브랜치
+	//pRootSelector->Add_Child(Create_HitBranch());
+	//
+	//// 4. 스턴 브랜치  
+	//pRootSelector->Add_Child(Create_StunBranch());
 
 
 	return S_OK;
@@ -65,8 +67,8 @@ CBTNode* CSkyBossTree::Create_SurvivalCheckSequence()
 {
 	CBTSequence* pSurvivalSequence = CBTSequence::Create();
 
-	// 1. 생존 체크 - 죽었으면 즉시 실패하여 다른 행동 중단
-	pSurvivalSequence->Add_Child(CBT_Monster_IsAlive::Create(m_pOwner));
+	// 1. 생존 체크 - 죽었으면 성공.
+	pSurvivalSequence->Add_Child(CBT_Monster_IsDead::Create(m_pOwner));
 
 	return pSurvivalSequence;
 }
@@ -96,10 +98,6 @@ CBTNode* CSkyBossTree::Create_HitBranch()
 	return pHitSequence;
 }
 
-
-
-
-
 //CBTNode* CSkyBossTree::Create_StunBranch()
 //{
 //	// 스턴 처리 Sequence: 스턴 상태인지 확인 → 스턴 반응
@@ -124,7 +122,6 @@ CBTNode* CSkyBossTree::Create_HitBranch()
 //
 //	return pStunSequence;
 //}
-
 CBTNode* CSkyBossTree::Create_NormalBehaviorBranch()
 {
 	// 일반 행동 Selector: 모든 특수 상태가 아닐 때 실행
@@ -161,7 +158,7 @@ CBTNode* CSkyBossTree::Create_ComBatBehavior()
 
 	// 2순위: 일반 공격 (공격 범위 내에서)
 	CBTSequence* pNormalAttackSeq = CBTSequence::Create();
-	pNormalAttackSeq->Add_Child(CBT_SkyBoss_IsInAttackRange::Create(m_pOwner, m_pOwner->Get_AttackRange()));
+	//pNormalAttackSeq->Add_Child(CBT_IsTargetInRange::Create(m_pOwner, m_pOwner->Get_AttackRange()));
 	pNormalAttackSeq->Add_Child(CBT_SkyBoss_Attack::Create(m_pOwner));
 
 	//// 3순위: 플레이어 추격

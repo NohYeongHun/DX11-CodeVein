@@ -24,6 +24,7 @@ private:
     _float m_fAttackTimer = { 0.f };
     _uint m_iSelectedAttackAnim = { 0 };
     _bool m_bDamageDealt = { false };
+    _bool m_bAnimationSet = false;
 
 public:
     explicit CBT_SkyBoss_Attack(CSkyBoss* pOwner);

@@ -160,7 +160,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\public\BackGround.h" />
-    <ClInclude Include="..\Public\BT_Monster_IsAlive.h" />
+    <ClInclude Include="..\Public\BT_Monster_IsDead.h" />
     <ClInclude Include="..\Public\BT_Monster_CheckHit.h" />
     <ClInclude Include="..\Public\BT_SkyBoss_Attack.h" />
     <ClInclude Include="..\Public\BT_SkyBoss_CanStrongAttack.h" />
@@ -243,7 +243,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\BackGround.cpp" />
-    <ClCompile Include="..\Private\BT_Monster_IsAlive.cpp" />
+    <ClCompile Include="..\Private\BT_Monster_IsDead.cpp" />
     <ClCompile Include="..\Private\BT_Monster_CheckHit.cpp" />
     <ClCompile Include="..\Private\BT_SkyBoss_Attack.cpp" />
     <ClCompile Include="..\Private\BT_SkyBoss_CanStrongAttack.cpp" />

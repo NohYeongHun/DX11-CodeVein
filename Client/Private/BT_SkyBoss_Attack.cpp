@@ -13,12 +13,22 @@ CBT_SkyBoss_Attack::CBT_SkyBoss_Attack(CSkyBoss* pOwner)
 
 BT_RESULT CBT_SkyBoss_Attack::Perform_Action(_float fTimeDelta)
 {
+   /* if (m_pOwner->Get_Target() && m_eAttackPhase == ATTACK_PHASE::PREPARING)
+    {
+        m_pOwner->Smooth_Rotate_To_Target(fTimeDelta, m_pOwner->Get_RotationSpeed());
+    }*/
+
     switch (m_eAttackPhase)
     {
     case ATTACK_PHASE::NONE:
         return StartAttack();
 
     case ATTACK_PHASE::PREPARING:
+        // ✅ PREPARING 단계에서만 회전
+        if (m_pOwner->Get_Target())
+        {
+            m_pOwner->Smooth_Rotate_To_Target(fTimeDelta, m_pOwner->Get_RotationSpeed());
+        }
         return UpdatePreparing(fTimeDelta);
 
     case ATTACK_PHASE::ATTACKING:
@@ -36,22 +46,20 @@ BT_RESULT CBT_SkyBoss_Attack::Perform_Action(_float fTimeDelta)
 
 BT_RESULT CBT_SkyBoss_Attack::StartAttack()
 {
-    // 1. 타겟 방향으로 회전
-    if (m_pOwner->Get_Target())
-    {
-        m_pOwner->Rotate_To_Target(0.016f, m_pOwner->Get_RotationSpeed());
-    }
+    if (m_eAttackPhase != ATTACK_PHASE::NONE)
+        return BT_RESULT::RUNNING;
 
-    // 2. 랜덤 공격 애니메이션 선택
+    // 1. 랜덤 공격 애니메이션 선택
     m_iSelectedAttackAnim = SelectAttackAnimation();
 
-    // 3. 공격 상태로 변경
+    // 2. 공격 상태로 변경
     m_pOwner->Change_State(MONSTER_ATTACK);
     m_pOwner->Chanage_Animation(m_iSelectedAttackAnim, false);
 
-    // 4. 다음 단계로 진행
+    // 3. 다음 단계로 진행
     m_eAttackPhase = ATTACK_PHASE::PREPARING;
     m_fAttackTimer = 0.f;
+    m_bDamageDealt = false;
 
     return BT_RESULT::RUNNING;
 }
@@ -117,17 +125,19 @@ _uint CBT_SkyBoss_Attack::SelectAttackAnimation()
     // 거리에 따른 공격 선택
     _float fDistanceToTarget = m_pOwner->Get_Distance_To_Target();
 
-    if (fDistanceToTarget <= 5.f)
-    {
-        // 근거리: 검 공격
-        int index = rand() % 3;
-        return SkyBossAnims::NORMAL_ATTACKS[index];
-    }
-    else
-    {
-        // 중거리: 도끼 공격
-        return SKYBOSS_ANIM_AXE_NORMAL_ATTACK1 + (rand() % 4);
-    }
+    // 애니메이션 초기화가 안되나본데?
+    return SKYBOSS_ANIM_SWORD_NORMAL_ATTACK1;
+    //if (fDistanceToTarget <= 5.f)
+    //{
+    //    // 근거리: 검 공격
+    //    int index = rand() % 3;
+    //    return SkyBossAnims::NORMAL_ATTACKS[index];
+    //}
+    //else
+    //{
+    //    // 중거리: 도끼 공격
+    //    return SKYBOSS_ANIM_AXE_NORMAL_ATTACK1 + (rand() % 4);
+    //}
 }
 
 void CBT_SkyBoss_Attack::DealDamageToTarget()
@@ -158,6 +168,8 @@ void CBT_SkyBoss_Attack::Reset()
     m_fAttackTimer = 0.f;
     m_bDamageDealt = false;
     m_iSelectedAttackAnim = 0;
+    
+    // m_bAnimationSet = false; ← 이 줄 제거
 }
 
 CBT_SkyBoss_Attack* CBT_SkyBoss_Attack::Create(CSkyBoss* pOwner)

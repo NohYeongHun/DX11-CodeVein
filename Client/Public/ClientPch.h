@@ -93,7 +93,7 @@
 
 
 /* ======================================== BT Object ===================================== */
-#include "BT_Monster_IsAlive.h"
+#include "BT_Monster_IsDead.h"
 #include "BT_Monster_CheckHit.h"
 #include "BT_IsTargetInRange.h"
 

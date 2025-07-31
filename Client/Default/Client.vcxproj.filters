@@ -351,7 +351,7 @@
     <ClInclude Include="..\Public\SkyBossTree.h">
       <Filter>02. GameObject\Monster\Boss\BT</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\BT_Monster_IsAlive.h">
+    <ClInclude Include="..\Public\BT_Monster_IsDead.h">
       <Filter>02. GameObject\Monster\BT</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\BT_Monster_CheckHit.h">
@@ -585,7 +585,7 @@
     <ClCompile Include="..\Private\SkyBossTree.cpp">
       <Filter>02. GameObject\Monster\Boss\BT</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\BT_Monster_IsAlive.cpp">
+    <ClCompile Include="..\Private\BT_Monster_IsDead.cpp">
       <Filter>02. GameObject\Monster\BT</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\BT_Monster_CheckHit.cpp">

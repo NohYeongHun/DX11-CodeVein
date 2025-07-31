@@ -20,8 +20,6 @@ CBT_IsTargetInRange* CBT_IsTargetInRange::Create(CMonster* pOwner, _float fRange
         CRASH("Failed Create Node");
         return nullptr;
     }
-        
-
 
     return new CBT_IsTargetInRange(pOwner, fRange);
 }

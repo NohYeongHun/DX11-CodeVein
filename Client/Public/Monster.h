@@ -241,6 +241,8 @@ public:
     // 이동 관련 - MONSTERDIR 사용
     virtual void Move_By_Direction(MONSTERDIR eDir, _float fTimeDelta, _float fSpeed);
     virtual void Move_To_Target(_float fTimeDelta, _float fSpeed);
+    // 기존 함수는 유지하고 새로운 부드러운 회전 함수 추가
+    virtual void Smooth_Rotate_To_Target(_float fTimeDelta, _float fRotationSpeed);
     virtual void Rotate_To_Target(_float fTimeDelta, _float fRotationSpeed);
     virtual void Look_At_Direction(MONSTERDIR eDir);
 
