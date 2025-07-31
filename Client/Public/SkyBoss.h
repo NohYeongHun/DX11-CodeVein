@@ -48,10 +48,6 @@ public:
 #pragma region BOSS 함수 정의.
 
 #pragma endregion
-private:
-	LEVEL m_eCurLevel;
-	ACTORDIR m_eCurrentDirection = {};
-	
 
 #pragma region BEHAVIOUR TREE
 private:

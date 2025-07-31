@@ -38,7 +38,7 @@ HRESULT CSkyBossTree::Initialize(void* pArg)
 	// 5. 일반 행동 브랜치 (모든 상태가 false일 때만 실행)
 	pRootSelector->Add_Child(Create_NormalBehaviorBranch());
 
-	m_pRootNode = pRootSelector;
+	Set_Root_Node(pRootSelector);
 
 
 
@@ -155,17 +155,17 @@ CBTNode* CSkyBossTree::Create_ComBatBehavior()
 	CBTSelector* pCombatActions = CBTSelector::Create();
 
 	// 1순위: 강공격 (특정 조건에서)
-	//CBTSequence* pStrongAttackSeq = CBTSequence::Create();
-	//pStrongAttackSeq->Add_Child(CBT_SkyBoss_CanStrongAttack::Create(m_pOwner));
-	//pStrongAttackSeq->Add_Child(CBT_SkyBoss_StrongAttack::Create(m_pOwner));
+		//CBTSequence* pStrongAttackSeq = CBTSequence::Create();
+		//pStrongAttackSeq->Add_Child(CBT_SkyBoss_CanStrongAttack::Create(m_pOwner));
+		//pStrongAttackSeq->Add_Child(CBT_SkyBoss_StrongAttack::Create(m_pOwner));
 
 	// 2순위: 일반 공격 (공격 범위 내에서)
 	CBTSequence* pNormalAttackSeq = CBTSequence::Create();
 	pNormalAttackSeq->Add_Child(CBT_SkyBoss_IsInAttackRange::Create(m_pOwner, m_pOwner->Get_AttackRange()));
 	pNormalAttackSeq->Add_Child(CBT_SkyBoss_Attack::Create(m_pOwner));
 
-	// 3순위: 플레이어 추격
-	//pCombatActions->Add_Child(pStrongAttackSeq);
+	//// 3순위: 플레이어 추격
+	////pCombatActions->Add_Child(pStrongAttackSeq);
 	pCombatActions->Add_Child(pNormalAttackSeq);
 	//pCombatActions->Add_Child(CBT_SkyBoss_ChaseTarget::Create(m_pOwner));
 
@@ -235,6 +235,14 @@ CSkyBossTree* CSkyBossTree::Create(ID3D11Device* pDevice, ID3D11DeviceContext* p
 void CSkyBossTree::Free()
 {
 	__super::Free();
+	// 1. 모든 BT 노드들 재귀적 해제
+	/*if (m_pRootNode)
+	{
+		Safe_Release(m_pRootNode);
+		m_pRootNode = nullptr;
+	}*/
+
+
 	m_pOwner = nullptr;
 	m_pPlayer = nullptr;
 }

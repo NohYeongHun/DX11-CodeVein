@@ -2,22 +2,50 @@
 #include "BTAction.h"
 
 NS_BEGIN(Client)
+
 class CBT_SkyBoss_Attack final : public CBTAction
 {
 public:
-    explicit CBT_SkyBoss_Attack(class CSkyBoss* pOwner);
-    virtual BT_RESULT Perform_Action(_float fTimeDelta) override;
+    enum class ATTACK_PHASE : _ubyte
+    {
+        NONE = 0,       // 초기 상태
+        PREPARING,      // 공격 준비 (조준, 예비동작)
+        ATTACKING,      // 실제 공격 수행
+        RECOVERY,       // 공격 후 복구
+        COMPLETED       // 완료
+    };
 
 private:
-    class CGameInstance* m_pGameInstance = { nullptr };
-    class CSkyBoss* m_pOwner;
+    CSkyBoss* m_pOwner = { nullptr };
+    CGameInstance* m_pGameInstance = { nullptr };
 
-    static constexpr _float STRONG_ATTACK_MIN_RANGE = 2.0f;    // 최소 거리
-    static constexpr _float STRONG_ATTACK_MAX_RANGE = 8.0f;    // 최대 거리
+    // 공격 단계 관리
+    ATTACK_PHASE m_eAttackPhase = { ATTACK_PHASE::NONE };
+    _float m_fAttackTimer = { 0.f };
+    _uint m_iSelectedAttackAnim = { 0 };
+    _bool m_bDamageDealt = { false };
 
 public:
-    static CBT_SkyBoss_Attack* Create(class CSkyBoss* pOwner);
+    explicit CBT_SkyBoss_Attack(CSkyBoss* pOwner);
+    virtual ~CBT_SkyBoss_Attack() = default;
+
+public:
+    virtual BT_RESULT Perform_Action(_float fTimeDelta) override;
+    virtual void Reset() override;
+
+private:
+    BT_RESULT StartAttack();
+    BT_RESULT UpdatePreparing(_float fTimeDelta);
+    BT_RESULT UpdateAttacking(_float fTimeDelta);
+    BT_RESULT UpdateRecovery(_float fTimeDelta);
+
+    _uint SelectAttackAnimation();
+    void DealDamageToTarget();
+
+public:
+    static CBT_SkyBoss_Attack* Create(CSkyBoss* pOwner);
     virtual void Free() override;
 };
+
 NS_END
 

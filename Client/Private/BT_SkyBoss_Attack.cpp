@@ -1,34 +1,178 @@
-﻿#include "BT_SkyBoss_Attack.h"
+﻿// BT_SkyBoss_Attack.cpp
+#include "BT_SkyBoss_Attack.h"
 
 CBT_SkyBoss_Attack::CBT_SkyBoss_Attack(CSkyBoss* pOwner)
-	: m_pOwner { pOwner }
-	, m_pGameInstance {CGameInstance::GetInstance()}
+    : m_pOwner(pOwner)
+    , m_pGameInstance(CGameInstance::GetInstance())
+    , m_eAttackPhase(ATTACK_PHASE::NONE)
+    , m_fAttackTimer(0.f)
+    , m_iSelectedAttackAnim(0)
 {
-
-	Safe_AddRef(m_pOwner);
-	Safe_AddRef(m_pGameInstance);
+    Safe_AddRef(m_pGameInstance);
 }
 
 BT_RESULT CBT_SkyBoss_Attack::Perform_Action(_float fTimeDelta)
 {
+    switch (m_eAttackPhase)
+    {
+    case ATTACK_PHASE::NONE:
+        return StartAttack();
 
-	return BT_RESULT();
+    case ATTACK_PHASE::PREPARING:
+        return UpdatePreparing(fTimeDelta);
+
+    case ATTACK_PHASE::ATTACKING:
+        return UpdateAttacking(fTimeDelta);
+
+    case ATTACK_PHASE::RECOVERY:
+        return UpdateRecovery(fTimeDelta);
+
+    case ATTACK_PHASE::COMPLETED:
+        return BT_RESULT::SUCCESS;
+    }
+
+    return BT_RESULT::FAILURE;
+}
+
+BT_RESULT CBT_SkyBoss_Attack::StartAttack()
+{
+    // 1. 타겟 방향으로 회전
+    if (m_pOwner->Get_Target())
+    {
+        m_pOwner->Rotate_To_Target(0.016f, m_pOwner->Get_RotationSpeed());
+    }
+
+    // 2. 랜덤 공격 애니메이션 선택
+    m_iSelectedAttackAnim = SelectAttackAnimation();
+
+    // 3. 공격 상태로 변경
+    m_pOwner->Change_State(MONSTER_ATTACK);
+    m_pOwner->Chanage_Animation(m_iSelectedAttackAnim, false);
+
+    // 4. 다음 단계로 진행
+    m_eAttackPhase = ATTACK_PHASE::PREPARING;
+    m_fAttackTimer = 0.f;
+
+    return BT_RESULT::RUNNING;
+}
+
+BT_RESULT CBT_SkyBoss_Attack::UpdatePreparing(_float fTimeDelta)
+{
+    m_fAttackTimer += fTimeDelta;
+
+    // 공격 준비 시간 (애니메이션 초반부)
+    const _float fPrepareTime = 0.3f;
+
+    if (m_fAttackTimer >= fPrepareTime)
+    {
+        m_eAttackPhase = ATTACK_PHASE::ATTACKING;
+        m_fAttackTimer = 0.f;
+    }
+
+    return BT_RESULT::RUNNING;
+}
+
+BT_RESULT CBT_SkyBoss_Attack::UpdateAttacking(_float fTimeDelta)
+{
+    m_fAttackTimer += fTimeDelta;
+
+    // 데미지 처리 (한 번만 실행)
+    if (!m_bDamageDealt && m_fAttackTimer >= 0.1f)
+    {
+        DealDamageToTarget();
+        m_bDamageDealt = true;
+    }
+
+    // 공격 지속 시간
+    const _float fAttackDuration = 0.4f;
+
+    if (m_fAttackTimer >= fAttackDuration)
+    {
+        m_eAttackPhase = ATTACK_PHASE::RECOVERY;
+        m_fAttackTimer = 0.f;
+    }
+
+    return BT_RESULT::RUNNING;
+}
+
+BT_RESULT CBT_SkyBoss_Attack::UpdateRecovery(_float fTimeDelta)
+{
+    m_fAttackTimer += fTimeDelta;
+
+    // 애니메이션이 끝났거나 최대 대기 시간 도달
+    if (m_pOwner->Is_Animation_Finished() || m_fAttackTimer >= 1.0f)
+    {
+        m_eAttackPhase = ATTACK_PHASE::COMPLETED;
+
+        // 대기 상태로 복귀
+        m_pOwner->Change_State(MONSTER_IDLE);
+        return BT_RESULT::SUCCESS;
+    }
+
+    return BT_RESULT::RUNNING;
+}
+
+_uint CBT_SkyBoss_Attack::SelectAttackAnimation()
+{
+    // 거리에 따른 공격 선택
+    _float fDistanceToTarget = m_pOwner->Get_Distance_To_Target();
+
+    if (fDistanceToTarget <= 5.f)
+    {
+        // 근거리: 검 공격
+        int index = rand() % 3;
+        return SkyBossAnims::NORMAL_ATTACKS[index];
+    }
+    else
+    {
+        // 중거리: 도끼 공격
+        return SKYBOSS_ANIM_AXE_NORMAL_ATTACK1 + (rand() % 4);
+    }
+}
+
+void CBT_SkyBoss_Attack::DealDamageToTarget()
+{
+    if (!m_pOwner->Get_Target())
+        return;
+
+    _float fDistance = m_pOwner->Get_Distance_To_Target();
+
+    // 공격 범위 내에 있으면 데미지 처리
+    if (fDistance <= m_pOwner->Get_AttackRange())
+    {
+        // 데미지 계산 및 처리
+        _float fDamage = m_pOwner->Get_AttackPower();
+
+        // 플레이어에게 데미지 전달
+        // m_pOwner->Get_Target()->Take_Damage(fDamage, m_pOwner);
+
+        // 공격 이펙트 생성
+        // CreateAttackEffect();
+    }
+}
+
+
+void CBT_SkyBoss_Attack::Reset()
+{
+    m_eAttackPhase = ATTACK_PHASE::NONE;
+    m_fAttackTimer = 0.f;
+    m_bDamageDealt = false;
+    m_iSelectedAttackAnim = 0;
 }
 
 CBT_SkyBoss_Attack* CBT_SkyBoss_Attack::Create(CSkyBoss* pOwner)
 {
-	if (nullptr == pOwner)
-	{
-		CRASH("Failed Create CBT_SkyBoss_Attack");
-		return nullptr;
-	}
+    if (nullptr == pOwner)
+    {
+        CRASH("Failed Create CBT_SkyBoss_Attack");
+        return nullptr;
+    }
 
-	return new CBT_SkyBoss_Attack(pOwner);
+    return new CBT_SkyBoss_Attack(pOwner);
 }
 
 void CBT_SkyBoss_Attack::Free()
 {
-	__super::Free();
-	Safe_Release(m_pGameInstance);
-	Safe_Release(m_pOwner);
+    __super::Free();
+    Safe_Release(m_pGameInstance);
 }

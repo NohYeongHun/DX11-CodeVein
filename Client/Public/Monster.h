@@ -261,7 +261,8 @@ public:
 
     // 애니메이션 관리
     virtual void Update_Animation(_float fTimeDelta);
-    virtual void Play_Animation(_uint iAnimIndex, _bool bLoop = false);
+    virtual void Chanage_Animation(_uint iAnimIndex, _bool bLoop = false);
+    
     virtual _bool Is_Animation_Finished() const;
 
 protected:

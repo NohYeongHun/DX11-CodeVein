@@ -4,7 +4,6 @@ CBT_SkyBoss_CanStrongAttack::CBT_SkyBoss_CanStrongAttack(CSkyBoss* pOwner)
     : m_pOwner(pOwner)
     , m_pGameInstance{ CGameInstance::GetInstance() }
 {
-    Safe_AddRef(m_pOwner);
     Safe_AddRef(m_pGameInstance);
 }
 
@@ -33,6 +32,8 @@ _bool CBT_SkyBoss_CanStrongAttack::Check_Condition()
     //_float fRandomValue = static_cast<_float>(rand()) / RAND_MAX; // 0.0f ~ 1.0f
 
     //return fRandomValue <= fStrongAttackChance;
+
+    return true;
 }
 
 
@@ -51,5 +52,4 @@ void CBT_SkyBoss_CanStrongAttack::Free()
 {
     __super::Free();
     Safe_Release(m_pGameInstance);
-    Safe_Release(m_pOwner);
 }

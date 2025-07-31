@@ -169,7 +169,6 @@
     <ClInclude Include="..\Public\BT_SkyBoss_IsInAttackRange.h" />
     <ClInclude Include="..\Public\BT_SkyBoss_IsStrongHit.h" />
     <ClInclude Include="..\Public\BT_SkyBoss_NormalHitReaction.h" />
-    <ClInclude Include="..\Public\BT_SkyBoss_PlayAnimation.h" />
     <ClInclude Include="..\Public\BT_SkyBoss_StrongHitReaction.h" />
     <ClInclude Include="..\Public\BT_SkyBoss_Wait.h" />
     <ClInclude Include="..\Public\Camera_Free.h" />
@@ -253,7 +252,6 @@
     <ClCompile Include="..\Private\BT_SkyBoss_IsInAttackRange.cpp" />
     <ClCompile Include="..\Private\BT_SkyBoss_IsStrongHit.cpp" />
     <ClCompile Include="..\Private\BT_SkyBoss_NormalHitReaction.cpp" />
-    <ClCompile Include="..\Private\BT_SkyBoss_PlayAnimation.cpp" />
     <ClCompile Include="..\Private\BT_SkyBoss_StrongHitReaction.cpp" />
     <ClCompile Include="..\Private\BT_SkyBoss_Wait.cpp" />
     <ClCompile Include="..\Private\Camera_Free.cpp" />

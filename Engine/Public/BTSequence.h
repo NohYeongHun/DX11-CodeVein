@@ -16,9 +16,6 @@ public:
 
     void Reset() override;
 
-protected:
-    vector<CBTNode*> m_Children;
-    _uint m_iCurrentChild = 0;
 
 public:
     static CBTSequence* Create();

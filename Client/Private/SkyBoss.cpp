@@ -1,17 +1,13 @@
 ﻿#include "SkyBoss.h"
 CSkyBoss::CSkyBoss(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CMonster(pDevice, pContext)
-    , m_eCurLevel { LEVEL::END }
 {
 }
 
 CSkyBoss::CSkyBoss(const CSkyBoss& Prototype)
     : CMonster(Prototype)
-    , m_eCurLevel { Prototype.m_eCurLevel }
 {
 }
-
-
 
 HRESULT CSkyBoss::Initialize_Prototype()
 {
@@ -47,12 +43,10 @@ HRESULT CSkyBoss::Initialize_Clone(void* pArg)
     m_pTransformCom->Set_Quaternion(qInitRot);
 
     static _uint iTest = 0;
-
     _float3 vPos = { 0.f, 5.f, 0.f };
     vPos.x += iTest * -10.f;
     vPos.z += iTest * 3.f;
     m_pTransformCom->Set_State(STATE::POSITION, XMLoadFloat3(&vPos));
-    m_pModelCom->Set_Animation(0, true);
 
     iTest++;
     return S_OK;
@@ -65,8 +59,11 @@ void CSkyBoss::Priority_Update(_float fTimeDelta)
 
 void CSkyBoss::Update(_float fTimeDelta)
 {
-    // 여기서 
 
+    if (m_pTree)
+        m_pTree->Update(fTimeDelta);
+
+    
     if (true == m_pModelCom->Play_Animation(fTimeDelta))
     {
     }
@@ -260,6 +257,4 @@ void CSkyBoss::Free()
 {
     __super::Free();
     Safe_Release(m_pTree);
-    
-        
 }

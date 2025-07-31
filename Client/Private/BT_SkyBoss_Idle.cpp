@@ -5,14 +5,15 @@ CBT_SkyBoss_Idle::CBT_SkyBoss_Idle(CSkyBoss* pOwner)
 	, m_pGameInstance{ CGameInstance::GetInstance() }
 {
 
-	Safe_AddRef(m_pOwner);
 	Safe_AddRef(m_pGameInstance);
 }
 
 
 BT_RESULT CBT_SkyBoss_Idle::Perform_Action(_float fTimeDelta)
 {
-    return BT_RESULT();
+	m_pOwner->Chanage_Animation(SKYBOSS_ANIM_AXE_IDLE, true);
+
+    return BT_RESULT::SUCCESS;
 }
 
 CBT_SkyBoss_Idle* CBT_SkyBoss_Idle::Create(CSkyBoss* pOwner)
@@ -31,5 +32,4 @@ void CBT_SkyBoss_Idle::Free()
 {
 	__super::Free();
 	Safe_Release(m_pGameInstance);
-	Safe_Release(m_pOwner);
 }
