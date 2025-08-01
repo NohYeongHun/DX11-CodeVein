@@ -2,6 +2,11 @@
 #include "BTCondition.h"
 
 NS_BEGIN(Client)
+/*
+* 기본 탐지 거리.
+* => 공격이 가능한가에 대한 탐지거리 노드가 아니라
+* => 몬스터가 플레이어를 `탐색` 했다는 거리.
+*/
 class CBT_IsTargetInRange final : public CBTCondition
 {
 public:

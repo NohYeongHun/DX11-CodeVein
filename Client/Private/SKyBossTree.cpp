@@ -28,8 +28,8 @@ HRESULT CSkyBossTree::Initialize(void* pArg)
 
 	// 생존해 있으면 다음 노드로 움직여야하는데?
 	
-	// 2. 생존 체크 및 체크 (최우선)
-	pRootSelector->Add_Child(Create_SurvivalCheckSequence());
+	// 2. 특수한 상태일때 행동 변경 => 필수.
+	pRootSelector->Add_Child(Create_SpecialStates_ToSelector());
 
 	// 5. 일반 행동 브랜치 (모든 상태가 false일 때만 실행)
 	pRootSelector->Add_Child(Create_NormalBehaviorBranch());
@@ -63,14 +63,24 @@ void CSkyBossTree::Set_Player(CPlayer* pPlayer)
 
 	m_pPlayer = pPlayer;
 }
-CBTNode* CSkyBossTree::Create_SurvivalCheckSequence()
+CBTSelector* CSkyBossTree::Create_SpecialStates_ToSelector()
 {
-	CBTSequence* pSurvivalSequence = CBTSequence::Create();
+	CBTSelector* pSpecialState_Selector = CBTSelector::Create();
 
-	// 1. 생존 체크 - 죽었으면 성공.
-	pSurvivalSequence->Add_Child(CBT_Monster_IsDead::Create(m_pOwner));
+	// 1. Dead Check Sequence 생성
+	pSpecialState_Selector->Add_Child(Create_SurvivalCheck_ToSequence());
 
-	return pSurvivalSequence;
+
+	// 2. Down Check Sequence 생성
+	pSpecialState_Selector->Add_Child(Create_SurvivalCheck_ToSequence());
+
+	//CBTSequence* pDeadCheck_Sequence = CBTSequence::Create();
+	//pDeadCheck_Sequence->Add_Child(Create_SurvivalCheck_ToSequence());
+
+	//pSurvivalSequence->Add_Child(CBT_Monster_IsDead::Create(m_pOwner));
+
+	/*pSpecialState_Selector->Add_Child(pDeadCheck_Sequence);*/
+	return pSpecialState_Selector;
 }
 
 CBTNode* CSkyBossTree::Create_HitBranch()
@@ -97,31 +107,6 @@ CBTNode* CSkyBossTree::Create_HitBranch()
 
 	return pHitSequence;
 }
-
-//CBTNode* CSkyBossTree::Create_StunBranch()
-//{
-//	// 스턴 처리 Sequence: 스턴 상태인지 확인 → 스턴 반응
-//	CBTSequence* pStunSequence = CBTSequence::Create();
-//
-//	// 조건: 현재 스턴 상태인가?
-//	pStunSequence->Add_Child(CBT_Monster_IsStunned::Create(m_pOwner));
-//
-//	// 스턴 상태 처리 선택
-//	CBTSelector* pStunActionSelector = CBTSelector::Create();
-//
-//	// 스턴 시작 처리
-//	CBTSequence* pStunStartSeq = CBTSequence::Create();
-//	pStunStartSeq->Add_Child(CBT_SkyBoss_IsStunStart::Create(m_pOwner));
-//	pStunStartSeq->Add_Child(CBT_SkyBoss_StunStartReaction::Create(m_pOwner));
-//	pStunActionSelector->Add_Child(pStunStartSeq);
-//
-//	// 스턴 루프 처리 (스턴 지속)
-//	pStunActionSelector->Add_Child(CBT_SkyBoss_StunLoop::Create(m_pOwner));
-//
-//	pStunSequence->Add_Child(pStunActionSelector);
-//
-//	return pStunSequence;
-//}
 CBTNode* CSkyBossTree::Create_NormalBehaviorBranch()
 {
 	// 일반 행동 Selector: 모든 특수 상태가 아닐 때 실행
@@ -138,6 +123,51 @@ CBTNode* CSkyBossTree::Create_NormalBehaviorBranch()
 
 	return pNormalSelector;
 }
+
+
+CBTSequence* CSkyBossTree::Create_SurvivalCheck_ToSequence()
+{
+	CBTSequence* pDeadCheck_Sequence = CBTSequence::Create();
+
+	// 1. Condition 체크 => 죽었는가?
+	pDeadCheck_Sequence->Add_Child(CBT_Monster_IsDead::Create(m_pOwner));
+
+	// 2. Action => 죽었다면?
+	pDeadCheck_Sequence->Add_Child(CBT_Monster_DeadAction::Create(m_pOwner));
+
+	return pDeadCheck_Sequence;
+}
+
+
+CBTSequence* CSkyBossTree::Create_DownState_ToSequence()
+{
+	CBTSequence* pDownState_Sequence = CBTSequence::Create();
+
+	// 1. Condition 체크 => 죽었는가?
+	pDownState_Sequence->Add_Child(CBT_Monster_IsDead::Create(m_pOwner));
+
+	// 2. Action => 죽었다면?
+	pDownState_Sequence->Add_Child(CBT_Monster_DeadAction::Create(m_pOwner));
+
+	return pDownState_Sequence;
+}
+
+CBTSequence* CSkyBossTree::Create_HitReaction_ToSequence()
+{
+	CBTSequence* pHitReaction_Sequence = CBTSequence::Create();
+
+	// 1. Condition 체크 => 죽었는가?
+	pHitReaction_Sequence->Add_Child(CBT_Monster_IsDead::Create(m_pOwner));
+
+	// 2. Action => 죽었다면?
+	pHitReaction_Sequence->Add_Child(CBT_Monster_DeadAction::Create(m_pOwner));
+
+	return pHitReaction_Sequence;
+}
+
+
+
+
 
 CBTNode* CSkyBossTree::Create_ComBatBehavior()
 {

@@ -17,6 +17,8 @@ public:
     static CBT_Monster_IsDead* Create(class CMonster* pOwner);
 
     virtual void Free() override;
+
+   
 };
 NS_END
 

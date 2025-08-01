@@ -21,6 +21,8 @@ RAYHIT_DESC CLayer::Get_PickingLocalObject(_float* pOutDist)
 	_float fBestDist = FLT_MAX;
 	_float fHitDist = 0.f;
 
+	_float3 pOutLocalPos = {};
+	_float3 pOutLocalNormal = {};
 	static int iGameObjectID = 0;
 
 	for (auto& pGameObject : m_GameObjects)
@@ -30,7 +32,7 @@ RAYHIT_DESC CLayer::Get_PickingLocalObject(_float* pOutDist)
 		// => 가장 가깝게 Ray Picking된 객체를 반환해야됨.
 
 		iGameObjectID++;
-		if (pGameObject->Is_Ray_LocalHit(pOutDist))
+		if (pGameObject->Is_Ray_LocalHit(&pOutLocalPos, &pOutLocalNormal, pOutDist))
 		{
 			fHitDist = *pOutDist;
 
@@ -40,8 +42,10 @@ RAYHIT_DESC CLayer::Get_PickingLocalObject(_float* pOutDist)
 				CTransform* pTransform = static_cast<CTransform*>(pGameObject->Get_Component(L"Com_Transform"));
 				Desc.fDistance = *pOutDist;
 				Desc.pHitObject = pGameObject;
+				Desc.vHitLocal = pOutLocalPos;
+				Desc.vHitNormal = pOutLocalNormal;
 				XMStoreFloat3(&Desc.vHitPoint, pTransform->Get_State(STATE::POSITION));
-				Desc.vHitNormal = { 0.f, 1.f, 0.f }; // 그냥 무조건 위로 1.f 띄워서 반환.
+				//Desc.vHitNormal = { 0.f, 1.f, 0.f }; // 그냥 무조건 위로 1.f 띄워서 반환.
 			}
 		}
 			

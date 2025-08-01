@@ -173,13 +173,13 @@ void CToolMap_Part::On_Collision_Exit(CGameObject* pOther)
 {
 }
 
-const _bool CToolMap_Part::Is_Ray_LocalHit(_float* pOutDist)
+const _bool CToolMap_Part::Is_Ray_LocalHit(_float3* pOutLocalPos, _float3* pOutLocalNormal, _float* pOutDist)
 {
     // Ray를 Local로 변환.
     m_pGameInstance->Transform_To_LocalSpace(m_pTransformCom->Get_WorldMatrix_Inverse());
 
     if (m_pModelCom->Is_Ray_Hit(m_pGameInstance->Get_Local_RayOrigin()
-        , m_pGameInstance->Get_Local_RayDir(), pOutDist))
+        , m_pGameInstance->Get_Local_RayDir(), pOutLocalPos, pOutLocalNormal, pOutDist))
         return true;
 
     return false;

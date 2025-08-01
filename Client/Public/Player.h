@@ -48,7 +48,6 @@ public:
 #pragma endregion
 
 public:
-	//void Set_Camera(CCamera_Action* pCamera) { m_pPlayerCamera = pCamera; };
 	void Set_Camera(CCamera_Player* pCamera) { m_pPlayerCamera = pCamera; };
 
 

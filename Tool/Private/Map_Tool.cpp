@@ -68,6 +68,9 @@ struct LevelButton {
 
 void CMap_Tool::Render()
 {
+    
+    Default_Render();
+
     if (m_eToolMode == TOOLMODE::CREATE)
         Render_Model_Create();
     else
@@ -156,7 +159,7 @@ void CMap_Tool::Render_Debug_Window()
 
     // 윈도우 하단에서 150 → 200~250 정도 위로
     ImVec2 windowPos = ImVec2(10.f, io.DisplaySize.y - 350.f);
-    ImVec2 windowSize = ImVec2(300.f, 300.f);
+    ImVec2 windowSize = ImVec2(300.f, 500.f);
 
     // Cond_Once: 최초 한 번만 위치 적용 → 이후 드래그 가능
     ImGui::SetNextWindowPos(windowPos, ImGuiCond_Once);
@@ -173,12 +176,30 @@ void CMap_Tool::Render_Debug_Window()
     const char* modeStr = (m_eToolMode == TOOLMODE::CREATE) ? "CREATE" : "EDIT";
     ImGui::Text("Tool Mode: %s", modeStr);
     ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
+
+   
+
+    // Selected 되어있을 때만.
+    if (m_pSelectedObject)
+    {
+        _float3 pickingWorld = {};
+        XMStoreFloat3(&pickingWorld, XMVector3TransformCoord(
+            XMLoadFloat3(&m_RayHitDesc.vHitLocal), m_pSelectedObject->Get_Transform()->Get_WorldMatrix()));
+
+        ImGui::Text("Picking Local: (%.2f, %.2f, %.2f)"
+            , m_RayHitDesc.vHitLocal.x, m_RayHitDesc.vHitLocal.y, m_RayHitDesc.vHitLocal.z);
+        ImGui::Text("Picking World: (%.2f, %.2f, %.2f)"
+            , pickingWorld.x, pickingWorld.y, pickingWorld.z);
+    }
+    
+    
     
     // 체크박스 추가 - 피킹 가능 여부
     ImGui::Checkbox("Enable Picking", &m_IsPossible_Picking);
     // 체크박스 추가 - 파일 Load Save 여부
     ImGui::Checkbox("Enable SaveLoad", &m_IsPossible_SaveLoad);
-    
+
+
 
     if (m_eToolMode == TOOLMODE::CREATE)
         ImGui::Text("Select Model : %s", m_Selected_PrototypeModelTag.c_str());
@@ -618,6 +639,210 @@ void CMap_Tool::SelectObject(CGameObject* pObj)
     }
     m_pSelectedLayer = nullptr; // 못 찾았을 때
 }
+void CMap_Tool::Default_Render()
+{
+    ImGui::Text("Settings");
+    ImGuiStyle& style = ImGui::GetStyle();
+    ImVec4 WindowColor = style.Colors[ImGuiCol_WindowBg];
+    ImGui::SliderFloat("Editor Opacity", &m_fEditorAlpha, 0.0f, 1.0f);
+    const ImVec4 NewColor = ImVec4(WindowColor.x, WindowColor.y, WindowColor.z, m_fEditorAlpha);
+    style.Colors[ImGuiCol_WindowBg] = NewColor;
+    ImGui::NewLine();
+
+    //메뉴바
+    if (ImGui::BeginMenuBar())
+    {
+        // 메뉴
+        if (ImGui::BeginMenu("Files"))
+        {
+            if (ImGui::MenuItem("save"))
+                m_bSave = true;
+            ImGui::Separator();
+            if (ImGui::MenuItem("open"))
+                m_bLoad = true;
+            ImGui::EndMenu();
+        }
+        if (ImGui::BeginMenu("Debug"))
+        {
+            ImGui::MenuItem("Show Mouse Pos", NULL, &m_bShowSimpleMousePos);
+            ImGui::Separator();
+            ImGui::MenuItem("Show Picked Object", NULL, &m_bShowPickedObject);
+            ImGui::EndMenu();
+        }
+        ImGui::EndMenuBar();
+    }
+
+    ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_None;
+    if (ImGui::BeginTabBar("MyTabBar", tab_bar_flags))
+    {
+        if (ImGui::BeginTabItem("Navigation Tool"))
+        {
+            ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "Picking for Navigation"); ImGui::SameLine();
+            ImGui::Checkbox("##Picking for Navigation", &m_bNaviPicking);
+
+            ImGui::SameLine();
+
+            ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "Show Only Navigation"); ImGui::SameLine();
+            ImGui::Checkbox("##Show Only Navigation", &m_bShowOnlyNavi);
+
+            ImGui::Text("This is the navigation tool ");
+            Set_Navigation();
+            ImGui::EndTabItem();
+        }
+    }
+
+    
+}
+
+//void CMap_Tool::Set_Navigation()
+//{
+//    static int selected = 0;
+//    {
+//        ImGui::BeginChild("left pane", ImVec2(150, 0), true);
+//
+//        if ((int)m_pNavigation_Manager->Get_CellsSize() != 0)
+//        {
+//            for (_uint i = 0; i < m_pNavigation_Manager->Get_CellsSize();)
+//            {
+//                //char label[MAX_PATH] = "";
+//                char szLayertag[MAX_PATH] = "Cell";
+//
+//                char label[MAX_PATH] = "Cell ";
+//                char buffer[MAX_PATH];
+//                sprintf(buffer, "%d", i);
+//                strcat(label, buffer);
+//                if (ImGui::Selectable(label, m_iCellIndex == i))
+//                {
+//                    m_iCellIndex = i;
+//
+//                }
+//                i++;
+//            }
+//        }
+//        ImGui::EndChild();
+//    }
+//    ImGui::SameLine();
+//    // ------------------------ Right -----------------------------------
+//    {
+//
+//        ImGui::BeginGroup();
+//        ImGui::BeginChild("Cell view", ImVec2(0, -ImGui::GetFrameHeightWithSpacing())); // Leave room for 1 line below us
+//
+//
+//        ImGui::CollapsingHeader("Show Current Cell");
+//
+//        ImGui::Text("Selected Index : "); ImGui::SameLine();  ImGui::Text("%d", m_iCellIndex);
+//        m_pNavigation_Manager->Set_CilckedCellIndex(m_iCellIndex);
+//        CCell* pCurrentCell = m_pNavigation_Manager->Get_Cell();
+//
+//        static float fPointA[3]{ 0,0,0 };
+//        static float fPointB[3]{ 0,0,0 };
+//        static float fPointC[3]{ 0,0,0 };
+//        static float fClickedPosition[3]{ m_fClickPoint.x, m_fClickPoint.y, m_fClickPoint.z };
+//        fClickedPosition[0] = m_fClickPoint.x;
+//        fClickedPosition[1] = m_fClickPoint.y;
+//        fClickedPosition[2] = m_fClickPoint.z;
+//
+//        if (pCurrentCell != nullptr)
+//        {
+//            fPointA[0] = pCurrentCell->Get_PointValue(CELLPOINT::A).x;
+//            fPointA[1] = pCurrentCell->Get_PointValue(CELLPOINT::A).y;
+//            fPointA[2] = pCurrentCell->Get_PointValue(CELLPOINT::A).z;
+//
+//            fPointB[0] = pCurrentCell->Get_PointValue(CELLPOINT::B).x;
+//            fPointB[1] = pCurrentCell->Get_PointValue(CELLPOINT::B).y;
+//            fPointB[2] = pCurrentCell->Get_PointValue(CELLPOINT::B).z;
+//
+//            fPointC[0] = pCurrentCell->Get_PointValue(CELLPOINT::C).x;
+//            fPointC[1] = pCurrentCell->Get_PointValue(CELLPOINT::C).y;
+//            fPointC[2] = pCurrentCell->Get_PointValue(CELLPOINT::C).z;
+//
+//            //m_iCellType = pCurrentCell->Get_CellType();
+//        }
+//
+//
+//        ImGui::Text("PointA :"); ImGui::SameLine(); ImGui::InputFloat3("##PointA", fPointA);
+//        ImGui::Text("PointB :"); ImGui::SameLine(); ImGui::InputFloat3("##PointB", fPointB);
+//        ImGui::Text("PointC :"); ImGui::SameLine(); ImGui::InputFloat3("##PointC", fPointC);
+//
+//        ImGui::Text("ClickPointXYZ :"); ImGui::SameLine(); ImGui::DragFloat3("##ClickPointXYZ", fClickedPosition, 0.01f);
+//        m_fClickPoint = _float3(fClickedPosition[0], fClickedPosition[1], fClickedPosition[2]);
+//        m_pNavigation_Manager->Update_ClickedPosition(m_fClickPoint);
+//
+//
+//        if (ImGui::Button("Cancle Click Point"))
+//            m_pNavigation_Manager->Clear_ClickedPosition();
+//
+//        if (ImGui::Button("PopBack Cell"))
+//            m_pNavigation_Manager->Cancle_Cell();
+//        if (ImGui::Button("Erase Picked Cell"))
+//            m_pNavigation_Manager->Erase_Cell();
+//        if (ImGui::Button("All_Clear Cell"))
+//            m_pNavigation_Manager->Clear_Cells();
+//
+//
+//
+//        ImGui::CollapsingHeader("Setting Cell Type");
+//        //ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "All Accessible"); ImGui::SameLine();
+//        //if (ImGui::RadioButton("##All Accessible", &m_iCellType, 0))
+//        //    m_pNavigation_Manager->Set_CellType((CCell::CELLTYPE)m_iCellType);
+//        //ImGui::SameLine();
+//      /*  ImGui::TextColored(ImVec4(0.0f, 0.0f, 1.0f, 1.0f), "Only Jump"); ImGui::SameLine();
+//        if (ImGui::RadioButton("##Only Jump", &m_iCellType, 1))
+//            m_pNavigation_Manager->Set_CellType((CCell::CELLTYPE)m_iCellType);
+//        ImGui::TextColored(ImVec4(0.7f, 0.0f, 1.0f, 1.0f), "Drop"); ImGui::SameLine();
+//        if (ImGui::RadioButton("##Drop", &m_iCellType, 2))
+//            m_pNavigation_Manager->Set_CellType((CCell::CELLTYPE)m_iCellType);
+//        ImGui::TextColored(ImVec4(0.0f, 1.0f, 1.0f, 1.0f), "UpDown"); ImGui::SameLine();
+//        if (ImGui::RadioButton("##UpDown", &m_iCellType, 3))
+//            m_pNavigation_Manager->Set_CellType((CCell::CELLTYPE)m_iCellType);*/
+//
+//
+//
+//       /* if (ImGui::Button("Save Navigation"))
+//        {
+//            Save_Navigation();
+//        }
+//        if (ImGui::Button("Load Navigation"))
+//        {
+//            Load_Navigation();
+//        }*/
+//
+//
+//
+//
+//
+//        ImGui::EndChild();
+//        ImGui::EndGroup();
+//    }
+//
+//
+//
+//
+//
+//    if (m_pGameInstance->Get_KeyUp(DIK_X) && m_pSelectedObject)
+//    {
+//        
+//        _float3 fPosition = m_RayHitDesc.vHitLocal;
+//        _vector vPosition = XMLoadFloat3(&fPosition);
+//        vPosition = XMVectorSetW(vPosition, 1.f);
+//        //m_pNavigation_Manager->Click_Position(vPosition);
+//        //m_fClickPoint = m_pNavigation_Manager->Get_ClickedPos();
+//
+//
+//    }
+//    else if (m_pSelectedObject 
+//        && m_bNaviPicking 
+//        && m_pGameInstance->Get_MouseKeyPress(MOUSEKEYSTATE::RB))
+//    {
+//         _float3 fPosition = m_RayHitDesc.vHitLocal;
+//         _vector vPosition = XMLoadFloat3(&fPosition);
+//         vPosition = XMVectorSetW(vPosition, 1.f);
+//        
+//
+//    }
+//
+//}
 #pragma endregion
 
 

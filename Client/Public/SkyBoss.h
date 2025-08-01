@@ -53,8 +53,6 @@ public:
 private:
 	CSkyBossTree* m_pTree = { nullptr };
 
-public:
-	_bool Is_StrongHit();
 #pragma endregion
 
 

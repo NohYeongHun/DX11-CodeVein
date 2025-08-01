@@ -68,7 +68,7 @@ HRESULT CTool_Mesh::Initialize_Clone(void* pArg)
 	return S_OK;
 }
 
-const _bool CTool_Mesh::Is_Ray_Hit(const _float3& rayOrigin, const _float3& rayDir, _float* pOutDist)
+const _bool CTool_Mesh::Is_Ray_Hit(const _float3& rayOrigin, const _float3& rayDir, _float3* pOutLocalPos, _float3* pOutLocalNormal, _float* pOutDist)
 {
 	_bool bHit = false;
 	_float fClosestDist = 1000.f;
@@ -76,11 +76,20 @@ const _bool CTool_Mesh::Is_Ray_Hit(const _float3& rayOrigin, const _float3& rayD
 	_fvector vRayOrigin = XMLoadFloat3(&rayOrigin);
 	_fvector vRayDir = XMLoadFloat3(&rayDir);
 
+	_uint iHitIndex = -1;
+
+
+	
 	for (_uint i = 0; i < m_vecIndices.size(); i += 3)
 	{
-		_fvector v0 = XMLoadFloat3(&m_vecPositions[m_vecIndices[i]]);
-		_gvector v1 = XMLoadFloat3(&m_vecPositions[m_vecIndices[i + 1]]);
-		_hvector v2 = XMLoadFloat3(&m_vecPositions[m_vecIndices[i + 2]]);
+		
+		//_fvector v0 = XMLoadFloat3(&m_vecPositions[m_vecIndices[i]]);
+		//_gvector v1 = XMLoadFloat3(&m_vecPositions[m_vecIndices[i + 1]]);
+		//_hvector v2 = XMLoadFloat3(&m_vecPositions[m_vecIndices[i + 2]]);
+
+		_fvector v0 = XMLoadFloat3(&m_Vertices[m_vecIndices[i]].vPosition);
+		_gvector v1 = XMLoadFloat3(&m_Vertices[m_vecIndices[i + 1]].vPosition);
+		_hvector v2 = XMLoadFloat3(&m_Vertices[m_vecIndices[i + 2]].vPosition);
 
 		_float fDist = 0.f;
 		if (TriangleTests::Intersects(vRayOrigin, vRayDir, v0, v1, v2, fDist))
@@ -88,6 +97,7 @@ const _bool CTool_Mesh::Is_Ray_Hit(const _float3& rayOrigin, const _float3& rayD
 			if (fDist < fClosestDist)
 			{
 				fClosestDist = fDist;
+				iHitIndex = m_vecIndices[i];
 				bHit = true;
 			}
 		}
@@ -95,6 +105,12 @@ const _bool CTool_Mesh::Is_Ray_Hit(const _float3& rayOrigin, const _float3& rayD
 
 	if (bHit && pOutDist)
 		*pOutDist = fClosestDist;
+
+	if (bHit)
+	{
+		*pOutLocalPos = m_Vertices[iHitIndex].vPosition;
+		*pOutLocalNormal = m_Vertices[iHitIndex].vNormal;
+	}
 
 	return bHit;
 }

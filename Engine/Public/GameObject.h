@@ -32,10 +32,18 @@ public:
 
 #pragma region 생존 여부 확인
 public:
-	const _bool Is_Active() { return m_IsActive; }
-	const _bool Is_Dead() { return m_IsDead; }
-	void Set_Active(_bool IsActive) { m_IsActive = IsActive; }
-	void Set_Dead(_bool IsDead) { m_IsDead = IsDead; }
+	const _bool Is_Destroy() { return m_IsDestroy; }
+	void Set_Destroy(_bool IsDestroy) { m_IsDestroy = IsDestroy; }
+	
+	//const _bool Is_Active() { return m_IsActive; }
+	//const _bool Is_Dead() { return m_IsDead; }
+	//void Set_Active(_bool IsActive) { m_IsActive = IsActive; }
+	//void Set_Dead(_bool IsDead) { m_IsDead = IsDead; }
+
+	//const _bool Is_Active() { return m_IsActive; }
+	//const _bool Is_Dead() { return m_IsDead; }
+	//void Set_Active(_bool IsActive) { m_IsActive = IsActive; }
+	//void Set_Dead(_bool IsDead) { m_IsDead = IsDead; }
 
 #pragma endregion
 
@@ -54,7 +62,7 @@ public:
 	virtual void On_Collision_Stay(CGameObject* pOther);
 	virtual void On_Collision_Exit(CGameObject* pOther);
 
-	virtual const _bool Is_Ray_LocalHit(_float* pOutDist);
+	virtual const _bool Is_Ray_LocalHit(_float3* pOutLocalPos, _float3* pOutLocalNormal, _float* pOutDist);
 #pragma endregion
 
 
@@ -68,8 +76,8 @@ protected:
 
 	map<const _wstring, class CComponent*>		m_Components;
 
-	_bool m_IsActive = { true };
-	_bool m_IsDead = { false };
+	//_bool m_IsActive = { true };
+	_bool m_IsDestroy = { false };
 
 
 protected:

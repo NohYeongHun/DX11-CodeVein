@@ -73,6 +73,8 @@ enum MONSTER_BASE_STATE : _int
     MONSTER_DODGE,
     MONSTER_HURT,
     MONSTER_DEATH,
+    MONSTER_CORPSE,
+    MONSTER_DISSOLVING,
     MONSTER_STATE_BASE_END
 };
 
@@ -263,7 +265,7 @@ public:
 
     // 애니메이션 관리
     virtual void Update_Animation(_float fTimeDelta);
-    virtual void Chanage_Animation(_uint iAnimIndex, _bool bLoop = false);
+    virtual void Change_Animation(_uint iAnimIndex, _bool bLoop = false);
     
     virtual _bool Is_Animation_Finished() const;
 

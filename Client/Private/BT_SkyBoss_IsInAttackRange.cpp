@@ -3,7 +3,6 @@
 CBT_SkyBoss_IsInAttackRange::CBT_SkyBoss_IsInAttackRange(CSkyBoss* pOwner, _float fAttackRange)
     : m_pOwner { pOwner}
     , m_pGameInstance { CGameInstance::GetInstance() }
-    , m_fAttackMaxRange {fAttackRange }
 {
     Safe_AddRef(m_pGameInstance);
 }
@@ -15,7 +14,7 @@ _bool CBT_SkyBoss_IsInAttackRange::Check_Condition()
         return false;
 
     _float fDistanceToTarget = m_pOwner->Get_Distance_To_Target();
-    if (fDistanceToTarget < STRONG_ATTACK_MIN_RANGE || fDistanceToTarget > m_fAttackMaxRange)
+    if (fDistanceToTarget < ATTACK_MIN_RANGE || fDistanceToTarget > ATTACK_MAX_RANGE)
         return false;
 
     return true;

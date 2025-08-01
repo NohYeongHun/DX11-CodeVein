@@ -69,6 +69,9 @@ public:
 	string WString_ToString(const wstring& ws);
 	void SelectObject(class CGameObject* pObj);
 	
+
+	void Default_Render();
+	void Set_Navigation();
 #pragma endregion
 
 
@@ -115,6 +118,16 @@ private:
 	_float3 m_vInterval = {};
 
 	SAVEMODE m_eSaveMode = {};
+
+	_float m_fEditorAlpha = { 0.5f};
+	_bool m_bSave = {};
+	_bool m_bLoad = {};
+	_bool m_bShowSimpleMousePos = {};
+	_bool m_bShowPickedObject = {};
+
+	_bool m_bNaviPicking = {};
+	_bool m_bShowOnlyNavi = {};
+
 
 private:
 	class CGameInstance* m_pGameInstance = { nullptr };

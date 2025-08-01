@@ -322,13 +322,13 @@ HRESULT CTool_Model::Save_AnimationInfo(ANIMMODEL_INFO& AnimModelInfo)
 
 
 
-const _bool CTool_Model::Is_Ray_Hit(const _float3& rayOrigin, const _float3& rayDir, _float* pOutDist)
+const _bool CTool_Model::Is_Ray_Hit(const _float3& rayOrigin, const _float3& rayDir, _float3* pOutLocalPos, _float3* pOutLocalNormal, _float* pOutDist)
 {
 	_bool IsHit = false;
 
 	for (_uint i = 0; i < m_iNumMeshes; i++)
 	{
-		IsHit = m_Meshes[i]->Is_Ray_Hit(rayOrigin, rayDir, pOutDist);
+		IsHit = m_Meshes[i]->Is_Ray_Hit(rayOrigin, rayDir, pOutLocalPos, pOutLocalNormal, pOutDist);
 		if (IsHit)
 			return true;
 	}

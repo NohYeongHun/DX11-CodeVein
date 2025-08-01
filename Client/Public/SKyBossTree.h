@@ -37,11 +37,24 @@ public:
 
 
 #pragma region Node 생성 함수들.
+
+#pragma region DEPTH2 Node
+    /* Initialize에서 생성 */
 private:
-    CBTNode* Create_SurvivalCheckSequence();
+    CBTSelector* Create_SpecialStates_ToSelector(); 
     CBTNode* Create_HitBranch();
     //CBTNode* Create_StunBranch();
     CBTNode* Create_NormalBehaviorBranch();
+#pragma endregion
+
+
+#pragma region DEPTH3 Node
+
+    /* 각 상위 노드들에서 생성할 때 생성.. */
+private:
+    CBTSequence* Create_SurvivalCheck_ToSequence();
+    CBTSequence* Create_DownState_ToSequence();
+    CBTSequence* Create_HitReaction_ToSequence();
 
 
 private:
@@ -49,6 +62,9 @@ private:
     CBTNode* Create_ComBatBehavior();
     //CBTNode* Create_PatrolBranch();
     CBTNode* Create_IdleBranch();
+#pragma endregion
+
+
 
 #pragma endregion
 

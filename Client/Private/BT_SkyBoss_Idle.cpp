@@ -11,7 +11,7 @@ CBT_SkyBoss_Idle::CBT_SkyBoss_Idle(CSkyBoss* pOwner)
 
 BT_RESULT CBT_SkyBoss_Idle::Perform_Action(_float fTimeDelta)
 {
-	m_pOwner->Chanage_Animation(SKYBOSS_ANIM_AXE_IDLE, true);
+	m_pOwner->Change_Animation(SKYBOSS_ANIM_AXE_IDLE, true);
 
 	
 
