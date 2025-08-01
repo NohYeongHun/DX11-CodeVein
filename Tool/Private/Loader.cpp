@@ -126,14 +126,14 @@ HRESULT CLoader::Loading_For_Logo_Level()
 // Map Prototype 생성.
 	PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f);
 
-	for (_uint i = 0; i < Model_PrototypeSize; ++i)
+	/*for (_uint i = 0; i < Model_PrototypeSize; ++i)
 	{
 		if (FAILED(m_pGameInstance->Add_Prototype(
 			ENUM_CLASS(LEVEL::LOGO)
 			, Model_Prototypes[i].prototypeName
 			,CTool_Model::Create(m_pDevice, m_pContext, Model_Prototypes[i].eModelType, PreTransformMatrix, Model_Prototypes[i].modelPath, Model_Prototypes[i].texturePath))))
 			return E_FAIL;
-	}
+	}*/
 
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LOGO)
 		, TEXT("Prototype_GameObject_Map_Part")

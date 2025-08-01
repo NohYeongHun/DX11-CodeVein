@@ -62,6 +62,11 @@
 #include "BTInverter.h"
 #include "BehaviourTree.h"
 
+/* Navigation */
+#include "VIBuffer_Cell.h"
+#include "Cell.h"
+#include "Navigation.h"
+
 
 #pragma endregion
 

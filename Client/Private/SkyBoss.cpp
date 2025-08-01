@@ -55,8 +55,16 @@ void CSkyBoss::Priority_Update(_float fTimeDelta)
     __super::Priority_Update(fTimeDelta);
 }
 
+// 루프가 아닌데 애니메이션이 
+// 실행된다.
 void CSkyBoss::Update(_float fTimeDelta)
 {
+    if (m_pGameInstance->Get_KeyPress(DIK_1))
+    {
+        _wstring wstrDebug = TEXT("Dead키 눌렀다. \n");
+        OutputDebugString(wstrDebug.c_str());
+        Set_Dead();
+    }
 
     if (m_pTree)
         m_pTree->Update(fTimeDelta);
@@ -82,7 +90,6 @@ void CSkyBoss::Late_Update(_float fTimeDelta)
 
 HRESULT CSkyBoss::Render()
 {
-
     if (FAILED(Ready_Render_Resources()))
     {
         CRASH("Ready Render Resource Failed");
@@ -98,15 +105,12 @@ HRESULT CSkyBoss::Render()
         if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
             CRASH("Ready Bone Matrices Failed");
 
-
         if (FAILED(m_pShaderCom->Begin(0)))
             CRASH("Ready Shader Begin Failed");
 
         if (FAILED(m_pModelCom->Render(i)))
             CRASH("Ready Render Failed");
     }
-
-
     return S_OK;
 
 }
@@ -133,10 +137,6 @@ void CSkyBoss::On_Collision_Exit(CGameObject* pOther)
 
 #pragma region SkyBoss 상태 함수들
 
-_bool CSkyBoss::Is_StrongHit()
-{
-    return true;
-}
 
 #pragma endregion
 

@@ -121,17 +121,17 @@ void CMap_Part::On_Collision_Exit(CGameObject* pOther)
 {
 }
 
-const _bool CMap_Part::Is_Ray_LocalHit(_float* pOutDist)
-{
-    // Ray를 Local로 변환.
-    m_pGameInstance->Transform_To_LocalSpace(m_pTransformCom->Get_WorldMatrix_Inverse());
-
-    if (m_pModelCom->Is_Ray_Hit(m_pGameInstance->Get_Local_RayOrigin()
-        , m_pGameInstance->Get_Local_RayDir(), pOutDist))
-        return true;
-
-    return false;
-}
+//const _bool CMap_Part::Is_Ray_LocalHit(_float* pOutDist)
+//{
+//    // Ray를 Local로 변환.
+//    m_pGameInstance->Transform_To_LocalSpace(m_pTransformCom->Get_WorldMatrix_Inverse());
+//
+//    /*if (m_pModelCom->Is_Ray_Hit(m_pGameInstance->Get_Local_RayOrigin()
+//        , m_pGameInstance->Get_Local_RayDir(), pOutDist))
+//        return true;*/
+//
+//    return false;
+//}
 
 HRESULT CMap_Part::Ready_Components(MODEL_CREATE_DESC* pDesc)
 {

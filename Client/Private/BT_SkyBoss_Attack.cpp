@@ -54,7 +54,7 @@ BT_RESULT CBT_SkyBoss_Attack::StartAttack()
 
     // 2. 공격 상태로 변경
     m_pOwner->Change_State(MONSTER_ATTACK);
-    m_pOwner->Chanage_Animation(m_iSelectedAttackAnim, false);
+    m_pOwner->Change_Animation(m_iSelectedAttackAnim, false);
 
     // 3. 다음 단계로 진행
     m_eAttackPhase = ATTACK_PHASE::PREPARING;
@@ -122,8 +122,7 @@ BT_RESULT CBT_SkyBoss_Attack::UpdateRecovery(_float fTimeDelta)
 
 _uint CBT_SkyBoss_Attack::SelectAttackAnimation()
 {
-    // 거리에 따른 공격 선택
-    _float fDistanceToTarget = m_pOwner->Get_Distance_To_Target();
+    //return SkyBossAnims::DEATH;
 
     // 애니메이션 초기화가 안되나본데?
     return SKYBOSS_ANIM_SWORD_NORMAL_ATTACK1;

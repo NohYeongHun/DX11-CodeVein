@@ -31,11 +31,24 @@ namespace Engine
 
 	typedef struct tagRayCastHit
 	{
-		_float3 vHitPoint;
+		_float3 vHitPoint; // Transform 데이터
+		_float3 vHitLocal; // Local 정점 위치.
 		_float3 vHitNormal;
 		_float  fDistance;
 		class CGameObject* pHitObject = nullptr;
 	}RAYHIT_DESC;
+
+	typedef struct tagVertexPosition
+	{
+		XMFLOAT3		vPosition;
+
+		const static _uint iNumElements = { 1 };
+		constexpr static D3D11_INPUT_ELEMENT_DESC Elements[iNumElements] = {
+			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		};
+
+	}VTXPOS;
+
 
 	typedef struct tagVertexPositionTexcoord
 	{

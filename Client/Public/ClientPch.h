@@ -93,7 +93,14 @@
 
 
 /* ======================================== BT Object ===================================== */
+
+#pragma region 특수 상태
 #include "BT_Monster_IsDead.h"
+#include "BT_Monster_DeadAction.h"
+
+#include "BT_SkyBoss_IsDown.h"
+#pragma endregion
+
 #include "BT_Monster_CheckHit.h"
 #include "BT_IsTargetInRange.h"
 

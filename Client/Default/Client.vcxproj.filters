@@ -121,20 +121,32 @@
     <Filter Include="02. GameObject\Monster\Boss\SkyBoss">
       <UniqueIdentifier>{c1014850-7100-4288-b376-8ecc6e63f719}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02. GameObject\Monster\Boss\BT">
-      <UniqueIdentifier>{480a8171-4723-4c9e-bd30-f9e554f2deaf}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02. GameObject\Monster\BT">
       <UniqueIdentifier>{706c06fa-0643-4fe1-a3bc-46191722de97}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02. GameObject\Monster\Boss\BT\Hit">
+    <Filter Include="02. GameObject\Monster\Boss\SkyBoss\BT">
+      <UniqueIdentifier>{480a8171-4723-4c9e-bd30-f9e554f2deaf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Monster\Boss\SkyBoss\BT\Hit">
       <UniqueIdentifier>{0437d213-6ece-4994-afc0-fb9ffd1bedef}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02. GameObject\Monster\Boss\BT\Attack">
+    <Filter Include="02. GameObject\Monster\Boss\SkyBoss\BT\Attack">
       <UniqueIdentifier>{697aa69f-c711-42a3-beef-5fe546715af1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02. GameObject\Monster\Boss\BT\Idle">
+    <Filter Include="02. GameObject\Monster\Boss\SkyBoss\BT\Idle">
       <UniqueIdentifier>{31de409e-d0c6-46f2-afac-96eec5370758}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Monster\BT\Dead">
+      <UniqueIdentifier>{527e59e5-aa6c-49f5-9dbc-92067993379b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Monster\Boss\SkyBoss\BT\Special">
+      <UniqueIdentifier>{d4a6595c-7da5-43d0-964c-c2b034c6ea05}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Monster\BT\Down">
+      <UniqueIdentifier>{43a98873-de2f-4cad-b379-30c2887cc5b3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Monster\BT\Hit">
+      <UniqueIdentifier>{cc8949bf-7045-480d-b77a-ad34a854d4dd}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -346,13 +358,7 @@
       <Filter>02. GameObject\Monster</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\BT_SkyBoss_Wait.h">
-      <Filter>02. GameObject\Monster\Boss\BT</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\SkyBossTree.h">
-      <Filter>02. GameObject\Monster\Boss\BT</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\BT_Monster_IsDead.h">
-      <Filter>02. GameObject\Monster\BT</Filter>
+      <Filter>02. GameObject\Monster\Boss\SkyBoss\BT</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\BT_Monster_CheckHit.h">
       <Filter>02. GameObject\Monster\BT</Filter>
@@ -361,25 +367,40 @@
       <Filter>02. GameObject\Monster\BT</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\BT_SkyBoss_CanStrongAttack.h">
-      <Filter>02. GameObject\Monster\Boss\BT\Attack</Filter>
+      <Filter>02. GameObject\Monster\Boss\SkyBoss\BT\Attack</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\BT_SkyBoss_IsStrongHit.h">
-      <Filter>02. GameObject\Monster\Boss\BT\Hit</Filter>
+      <Filter>02. GameObject\Monster\Boss\SkyBoss\BT\Hit</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\BT_SkyBoss_StrongHitReaction.h">
-      <Filter>02. GameObject\Monster\Boss\BT\Hit</Filter>
+      <Filter>02. GameObject\Monster\Boss\SkyBoss\BT\Hit</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\BT_SkyBoss_NormalHitReaction.h">
-      <Filter>02. GameObject\Monster\Boss\BT\Hit</Filter>
+      <Filter>02. GameObject\Monster\Boss\SkyBoss\BT\Hit</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\BT_SkyBoss_IsInAttackRange.h">
-      <Filter>02. GameObject\Monster\Boss\BT\Attack</Filter>
+      <Filter>02. GameObject\Monster\Boss\SkyBoss\BT\Attack</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\BT_SkyBoss_Attack.h">
-      <Filter>02. GameObject\Monster\Boss\BT\Attack</Filter>
+      <Filter>02. GameObject\Monster\Boss\SkyBoss\BT\Attack</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\BT_SkyBoss_Idle.h">
-      <Filter>02. GameObject\Monster\Boss\BT\Idle</Filter>
+      <Filter>02. GameObject\Monster\Boss\SkyBoss\BT\Idle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\SkyBossTree.h">
+      <Filter>02. GameObject\Monster\Boss\SkyBoss\BT</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BT_Monster_DeadAction.h">
+      <Filter>02. GameObject\Monster\BT\Dead</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BT_Monster_IsDead.h">
+      <Filter>02. GameObject\Monster\BT\Dead</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BT_SkyBoss_IsDown.h">
+      <Filter>02. GameObject\Monster\Boss\SkyBoss\BT\Special</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BT_SkyBoss_IsDownStart.h">
+      <Filter>02. GameObject\Monster\Boss\SkyBoss\BT\Special</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -580,13 +601,7 @@
       <Filter>02. GameObject\Monster</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\BT_SkyBoss_Wait.cpp">
-      <Filter>02. GameObject\Monster\Boss\BT</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\SkyBossTree.cpp">
-      <Filter>02. GameObject\Monster\Boss\BT</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\BT_Monster_IsDead.cpp">
-      <Filter>02. GameObject\Monster\BT</Filter>
+      <Filter>02. GameObject\Monster\Boss\SkyBoss\BT</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\BT_Monster_CheckHit.cpp">
       <Filter>02. GameObject\Monster\BT</Filter>
@@ -595,25 +610,40 @@
       <Filter>02. GameObject\Monster\BT</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\BT_SkyBoss_CanStrongAttack.cpp">
-      <Filter>02. GameObject\Monster\Boss\BT\Attack</Filter>
+      <Filter>02. GameObject\Monster\Boss\SkyBoss\BT\Attack</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\BT_SkyBoss_IsStrongHit.cpp">
-      <Filter>02. GameObject\Monster\Boss\BT\Hit</Filter>
+      <Filter>02. GameObject\Monster\Boss\SkyBoss\BT\Hit</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\BT_SkyBoss_StrongHitReaction.cpp">
-      <Filter>02. GameObject\Monster\Boss\BT\Hit</Filter>
+      <Filter>02. GameObject\Monster\Boss\SkyBoss\BT\Hit</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\BT_SkyBoss_NormalHitReaction.cpp">
-      <Filter>02. GameObject\Monster\Boss\BT\Hit</Filter>
+      <Filter>02. GameObject\Monster\Boss\SkyBoss\BT\Hit</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\BT_SkyBoss_IsInAttackRange.cpp">
-      <Filter>02. GameObject\Monster\Boss\BT\Attack</Filter>
+      <Filter>02. GameObject\Monster\Boss\SkyBoss\BT\Attack</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\BT_SkyBoss_Attack.cpp">
-      <Filter>02. GameObject\Monster\Boss\BT\Attack</Filter>
+      <Filter>02. GameObject\Monster\Boss\SkyBoss\BT\Attack</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\BT_SkyBoss_Idle.cpp">
-      <Filter>02. GameObject\Monster\Boss\BT\Idle</Filter>
+      <Filter>02. GameObject\Monster\Boss\SkyBoss\BT\Idle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\SkyBossTree.cpp">
+      <Filter>02. GameObject\Monster\Boss\SkyBoss\BT</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BT_Monster_DeadAction.cpp">
+      <Filter>02. GameObject\Monster\BT\Dead</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BT_Monster_IsDead.cpp">
+      <Filter>02. GameObject\Monster\BT\Dead</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BT_SkyBoss_IsDown.cpp">
+      <Filter>02. GameObject\Monster\Boss\SkyBoss\BT\Special</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BT_SkyBoss_IsDownStart.cpp">
+      <Filter>02. GameObject\Monster\Boss\SkyBoss\BT\Special</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -73,6 +73,9 @@
     <Filter Include="03. Component\Model\Animation\Channel">
       <UniqueIdentifier>{2447b4b4-1db1-4f10-b1bf-b4484aece1af}</UniqueIdentifier>
     </Filter>
+    <Filter Include="03. Component\Navagation">
+      <UniqueIdentifier>{e67f8098-667f-41ba-bef6-14eb483845fd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">

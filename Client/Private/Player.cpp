@@ -389,7 +389,7 @@ _bool CPlayer::Is_Valid_LockOn_Target(CGameObject* pTarget)
         return false;
 
     // 1. 객체가 살아있는지 확인
-    if (pTarget->Is_Dead())
+    if (pTarget->Is_Destroy())
         return false;
 
     // 2. 거리 체크

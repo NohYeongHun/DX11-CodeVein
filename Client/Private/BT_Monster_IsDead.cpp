@@ -1,4 +1,5 @@
-﻿
+﻿#include "BT_Monster_IsDead.h"
+
 CBT_Monster_IsDead::CBT_Monster_IsDead(CMonster* pOwner)
 	: m_pOwner(pOwner)
     , m_pGameInstance{ CGameInstance::GetInstance() }
@@ -31,3 +32,5 @@ void CBT_Monster_IsDead::Free()
     __super::Free();
     Safe_Release(m_pGameInstance);
 }
+
+

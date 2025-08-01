@@ -3,6 +3,9 @@
 
 namespace Engine
 {
+	
+	enum class CELLPOINT { A, B, C, END };
+
 	enum class MODELTYPE : _ubyte { 
 		ANIM = 0
 		, NONANIM = 1

@@ -52,7 +52,7 @@ private:
 #pragma endregion
 
 public:
-	const _bool Is_Ray_Hit(const _float3& rayOrigin, const _float3& rayDir, _float* pOutDist);
+	const _bool Is_Ray_Hit(const _float3& rayOrigin, const _float3& rayDir, _float3* pOutLocalPos, _float3* pOutLocalNormal, _float* pOutDist);
 
 
 

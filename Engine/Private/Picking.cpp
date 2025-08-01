@@ -58,6 +58,7 @@ void CPicking::Update()
  
 }
 
+// 호출 시 Local Ray가 설정됩니다.
 void CPicking::Transform_To_LocalSpace(_matrix WorldInverseMatrix)
 {
     XMStoreFloat3(&m_Local_Ray_Origin, XMVector3TransformCoord(XMLoadFloat3(&m_Ray_Origin), WorldInverseMatrix));
