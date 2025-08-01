@@ -1,31 +1,19 @@
 ﻿#pragma once
-#include "GameObject.h"
+#include "Monster.h"
 
 NS_BEGIN(Client)
-class CSkyBoss final : public CMonster
+class CWolfDevil final : public CMonster
 {
-
-#pragma region SKYBOSS STATE 정의 STATE != ANIMATION
 public:
-	// Add_State 순서대로 넣습니다.
-	enum SKYBOSS_STATE : _int
-	{
-		IDLE = 0, WALK, RUN, DODGE,
-		STRONG_ATTACK, GUARD, ATTACK,
-		STATE_END
-	};
-#pragma endregion
-
-public:
-	typedef struct tagSkyBossDesc : public CMonster::MONSTER_DESC
+	typedef struct tagWolfDevilDesc : public CMonster::MONSTER_DESC
 	{
 
-	}SKYBOSS_DESC;
+	}WOLFDEVIL_DESC;
 
 private:
-	explicit CSkyBoss(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	explicit CSkyBoss(const CSkyBoss& Prototype);
-	virtual ~CSkyBoss() = default;
+	explicit CWolfDevil(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	explicit CWolfDevil(const CWolfDevil& Prototype);
+	virtual ~CWolfDevil() = default;
 
 
 public:
@@ -43,27 +31,28 @@ public:
 	virtual void On_Collision_Exit(CGameObject* pOther);
 #pragma endregion
 
-#pragma region 애니메이션 관리
+#pragma region BUFF FLAG 관리
+public:
+	virtual HRESULT Initialize_BuffDurations();
+#pragma endregion
+
+#pragma region 애니메이션 변경.
+public:
 	virtual HRESULT InitializeAction_ToAnimationMap() override;
 #pragma endregion
 
 
 
-
-#pragma region BOSS 함수 정의.
-
-#pragma endregion
-
 #pragma region BEHAVIOUR TREE
 private:
-	CSkyBossTree* m_pTree = { nullptr };
+	class CMonsterTree* m_pTree = { nullptr };
 
 #pragma endregion
 
 
 #pragma region READY OJBECT, COMPONENT
 private:
-	HRESULT Ready_Components(SKYBOSS_DESC* pDesc);
+	HRESULT Ready_Components(WOLFDEVIL_DESC* pDesc);
 	HRESULT Ready_BehaviourTree();
 	HRESULT Ready_Render_Resources();
 	HRESULT Ready_PartObjects();
@@ -72,11 +61,10 @@ private:
 
 
 public:
-	static CSkyBoss* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CWolfDevil* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;
 	virtual void Destroy();
 	virtual void Free() override;
-
 };
 NS_END
 

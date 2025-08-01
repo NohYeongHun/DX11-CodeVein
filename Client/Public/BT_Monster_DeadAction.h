@@ -15,20 +15,14 @@ public:
     };
 
 private:
-    class CSkyBoss* m_pOwner = { nullptr };
-    CGameInstance* m_pGameInstance = { nullptr };
+    class CMonster* m_pOwner = { nullptr };
+    class CGameInstance* m_pGameInstance = { nullptr };
 
-    // 공격 단계 관리
+    // 죽는 단계 관리?
     DEAD_PHASE m_eDeadPhase = { DEAD_PHASE::NONE };
-    _float m_fDeadTimer = 0.f;
-    _float m_fDissolveTimer = 0.f;
-    _float m_fCorpseLifetime = 3.0f;
-
-    _uint m_iSelectedAnim = 0;
-    _bool m_bAnimationSet = false;
 
 public:
-    explicit CBT_Monster_DeadAction(class CSkyBoss* pOwner);
+    explicit CBT_Monster_DeadAction(class CMonster* pOwner);
     virtual ~CBT_Monster_DeadAction() = default;
 
 public:
@@ -46,7 +40,7 @@ private:
     _uint SelectAnimation();
 
 public:
-    static CBT_Monster_DeadAction* Create(class CSkyBoss* pOwner);
+    static CBT_Monster_DeadAction* Create(class CMonster* pOwner);
     virtual void Free() override;
 
 };

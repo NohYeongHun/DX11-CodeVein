@@ -366,7 +366,7 @@
     <ClCompile Include="..\Private\VIBuffer_Cube.cpp">
       <Filter>01. Utility\03. Component\VIBuffer\Cube</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\BehaviourTree.cpp">
+    <ClCompile Include="..\Private\BehaviorTree.cpp">
       <Filter>01. Utility\03. Component\BehaviourTree</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\BTNode.cpp">
@@ -593,7 +593,7 @@
     <ClInclude Include="..\Public\VIBuffer_Cube.h">
       <Filter>01. Utility\03. Component\VIBuffer\Cube</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\BehaviourTree.h">
+    <ClInclude Include="..\Public\BehaviorTree.h">
       <Filter>01. Utility\03. Component\BehaviourTree</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\BTNode.h">

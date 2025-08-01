@@ -210,6 +210,7 @@
     <ClInclude Include="..\Public\Loading_Slot.h" />
     <ClInclude Include="..\Public\Map.h" />
     <ClInclude Include="..\Public\Monster.h" />
+    <ClInclude Include="..\Public\MonsterTree.h" />
     <ClInclude Include="..\Public\Player.h" />
     <ClInclude Include="..\Public\PlayerDefine.h" />
     <ClInclude Include="..\Public\PlayerState.h" />
@@ -239,6 +240,8 @@
     <ClInclude Include="..\Public\Terrain.h" />
     <ClInclude Include="..\Public\Title.h" />
     <ClInclude Include="..\Public\TitleText.h" />
+    <ClInclude Include="..\Public\WolfDevil.h" />
+    <ClInclude Include="..\Public\WolfDevilDefine.h" />
     <ClInclude Include="Client.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="Resource.h" />
@@ -298,6 +301,7 @@
     <ClCompile Include="..\Private\Loading_Slot.cpp" />
     <ClCompile Include="..\Private\Map.cpp" />
     <ClCompile Include="..\Private\Monster.cpp" />
+    <ClCompile Include="..\Private\MonsterTree.cpp" />
     <ClCompile Include="..\Private\Player.cpp" />
     <ClCompile Include="..\Private\PlayerState.cpp" />
     <ClCompile Include="..\Private\Player_AttackState.cpp" />
@@ -325,6 +329,7 @@
     <ClCompile Include="..\Private\Terrain.cpp" />
     <ClCompile Include="..\Private\Title.cpp" />
     <ClCompile Include="..\Private\TitleText.cpp" />
+    <ClCompile Include="..\Private\WolfDevil.cpp" />
     <ClCompile Include="Client.cpp" />
   </ItemGroup>
   <ItemGroup>

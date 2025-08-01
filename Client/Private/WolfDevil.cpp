@@ -1,15 +1,16 @@
-﻿#include "SkyBoss.h"
-CSkyBoss::CSkyBoss(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-    : CMonster(pDevice, pContext)
+﻿#include "WolfDevil.h"
+
+CWolfDevil::CWolfDevil(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+    : CMonster{pDevice, pContext}
 {
 }
 
-CSkyBoss::CSkyBoss(const CSkyBoss& Prototype)
+CWolfDevil::CWolfDevil(const CWolfDevil& Prototype)
     : CMonster(Prototype)
 {
 }
 
-HRESULT CSkyBoss::Initialize_Prototype()
+HRESULT CWolfDevil::Initialize_Prototype()
 {
     if (FAILED(__super::Initialize_Prototype()))
         return E_FAIL;
@@ -17,19 +18,28 @@ HRESULT CSkyBoss::Initialize_Prototype()
     return S_OK;
 }
 
-HRESULT CSkyBoss::Initialize_Clone(void* pArg)
+HRESULT CWolfDevil::Initialize_Clone(void* pArg)
 {
-    SKYBOSS_DESC* pDesc = static_cast<SKYBOSS_DESC*>(pArg);
-    
+
+    WOLFDEVIL_DESC* pDesc = static_cast<WOLFDEVIL_DESC*>(pArg);
+
     if (FAILED(__super::Initialize_Clone(pDesc)))
+    {
+        CRASH("Failed Clone WolfDevil");
         return E_FAIL;
+    }
+        
 
     if (FAILED(Ready_Components(pDesc)))
+    {
+        CRASH("Failed Ready Components WolfDevil");
         return E_FAIL;
+    }
+        
 
     if (FAILED(Ready_BehaviourTree()))
     {
-        CRASH("Failed Ready BehaviourTree SkyBoss")
+        CRASH("Failed Ready BehaviourTree WolfDevil");
         return E_FAIL;
     }
 
@@ -40,61 +50,63 @@ HRESULT CSkyBoss::Initialize_Clone(void* pArg)
     }
 
     if (FAILED(Ready_PartObjects()))
+    {
+        CRASH("Failed Ready Components WolfDevil");
         return E_FAIL;
+    }
 
+    if (FAILED(Initialize_BuffDurations()))
+    {
+        CRASH("Failed Init BuffDuration WolfDevil");
+        return E_FAIL;
+    }
+    
+
+
+    
 
     _vector qInitRot = XMQuaternionRotationAxis(XMVectorSet(0.f, 1.f, 0.f, 0.f), 0.0f);
     m_pTransformCom->Set_Quaternion(qInitRot);
 
-    static _uint iTest = 0;
-    _float3 vPos = { 0.f, 5.f, 0.f };
-    vPos.x += iTest * -10.f;
-    vPos.z += iTest * 3.f;
+    _float3 vPos = { 5.f, 5.f, 0.f };
+    /*vPos.x += iTest * -10.f;
+    vPos.z += iTest * 3.f;*/
     m_pTransformCom->Set_State(STATE::POSITION, XMLoadFloat3(&vPos));
 
-    iTest++;
+    m_pModelCom->Set_Animation(Get_CurrentAnimation(), false);
+
     return S_OK;
 }
 
-void CSkyBoss::Priority_Update(_float fTimeDelta)
+void CWolfDevil::Priority_Update(_float fTimeDelta)
 {
     __super::Priority_Update(fTimeDelta);
 }
 
-// 루프가 아닌데 애니메이션이 
-// 실행된다.
-void CSkyBoss::Update(_float fTimeDelta)
+void CWolfDevil::Update(_float fTimeDelta)
 {
-    //if (m_pGameInstance->Get_KeyPress(DIK_1))
-    //{
-    //    _wstring wstrDebug = TEXT("Dead키 눌렀다. \n");
-    //    OutputDebugString(wstrDebug.c_str());
-    //   // Set_Dead();
-    //}
 
-    if (m_pTree)
-        m_pTree->Update(fTimeDelta);
+    /*if (m_pTree)
+        m_pTree->Update(fTimeDelta);*/
 
-    
+
     if (true == m_pModelCom->Play_Animation(fTimeDelta))
     {
     }
-   
+
     // 하위 객체들 움직임 제어는 Tree 제어 이후에
     __super::Update(fTimeDelta);
-    
 }
 
-void CSkyBoss::Late_Update(_float fTimeDelta)
+void CWolfDevil::Late_Update(_float fTimeDelta)
 {
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::BLEND, this)))
         return;
 
     __super::Late_Update(fTimeDelta);
-    
 }
 
-HRESULT CSkyBoss::Render()
+HRESULT CWolfDevil::Render()
 {
     if (FAILED(Ready_Render_Resources()))
     {
@@ -118,71 +130,63 @@ HRESULT CSkyBoss::Render()
             CRASH("Ready Render Failed");
     }
     return S_OK;
-
 }
 
-#pragma region 움직임 구현
+#pragma region 충돌
+void CWolfDevil::On_Collision_Enter(CGameObject* pOther)
+{
+}
 
+void CWolfDevil::On_Collision_Stay(CGameObject* pOther)
+{
+}
 
-/* 
-* Animation
-*/
+void CWolfDevil::On_Collision_Exit(CGameObject* pOther)
+{
+}
+
 #pragma endregion
 
-void CSkyBoss::On_Collision_Enter(CGameObject* pOther)
+#pragma region 버프 플래그 관리
+HRESULT CWolfDevil::Initialize_BuffDurations()
 {
-}
+    if (FAILED(__super::Initialize_BuffDurations()))
+    {
+        CRASH("Failed Init BuffDuration");
+        return E_FAIL;
+    }
 
-void CSkyBoss::On_Collision_Stay(CGameObject* pOther)
-{
-}
-
-void CSkyBoss::On_Collision_Exit(CGameObject* pOther)
-{
-}
-
-HRESULT CSkyBoss::InitializeAction_ToAnimationMap()
-{
-    m_Action_AnimMap.emplace(L"IDLE", SKYBOSS_ANIM_SWORD_IDLE_LOOP);
-    m_Action_AnimMap.emplace(L"IDLE_POSE", SKYBOSS_ANIM_SWORD_IDLE_POSE);
-    m_Action_AnimMap.emplace(L"COMBO_ATTACK", SKYBOSS_ANIM_SWORD_COMBO_ATTACK);
-    m_Action_AnimMap.emplace(L"ATTACK_1", SKYBOSS_ANIM_SWORD_NORMAL_ATTACK1);
-    m_Action_AnimMap.emplace(L"ATTACK_2", SKYBOSS_ANIM_SWORD_NORMAL_ATTACK2);
-    m_Action_AnimMap.emplace(L"ATTACK_3", SKYBOSS_ANIM_SWORD_NORMAL_ATTACK3);
-
-    m_Action_AnimMap.emplace(L"DAMAGE_BL", SKYBOSS_ANIM_DAMAGE_BL);
-    m_Action_AnimMap.emplace(L"DAMAGE_BR", SKYBOSS_ANIM_DAMAGE_BR);
-    m_Action_AnimMap.emplace(L"DAMAGE_FL", SKYBOSS_ANIM_DAMAGE_FL);
-    m_Action_AnimMap.emplace(L"DAMAGE_FR", SKYBOSS_ANIM_DAMAGE_FR);
-
-    m_Action_AnimMap.emplace(L"DODGE_B", SKYBOSS_ANIM_DODGE_B);
-    m_Action_AnimMap.emplace(L"DODGE_L", SKYBOSS_ANIM_DODGE_L);
-    m_Action_AnimMap.emplace(L"DODGE_R", SKYBOSS_ANIM_DODGE_R);
-
-    m_Action_AnimMap.emplace(L"DOWN_START", SKYBOSS_ANIM_DOWN_START);
-    m_Action_AnimMap.emplace(L"DOWN_LOOP", SKYBOSS_ANIM_DOWN_LOOP);
-    m_Action_AnimMap.emplace(L"DOWN_END", SKYBOSS_ANIM_DOWN_END);
-
-
-    m_Action_AnimMap.emplace(L"WALK_F", SKYBOSS_ANIM_WALK_F);
-    m_Action_AnimMap.emplace(L"WALK_B", SKYBOSS_ANIM_WALK_B);
-    m_Action_AnimMap.emplace(L"WALK_L", SKYBOSS_ANIM_WALK_L);
-    m_Action_AnimMap.emplace(L"WALK_R", SKYBOSS_ANIM_WALK_R);
-
+    // 추가 버프 있으면 추가.
+    // m_BuffDefaultDurations[BUFF_HIT] = 0.6f;        // 피격: 0.6초
 
     return S_OK;
 }
 
-#pragma region SkyBoss 상태 함수들
+/* STRING Index 형태로 관리.*/
+HRESULT CWolfDevil::InitializeAction_ToAnimationMap()
+{
+    m_Action_AnimMap.emplace(L"IDLE", WOLFDEVIL_IDLE_LOOP);
+    m_Action_AnimMap.emplace(L"ATTACK_NORMAL", WOLFDEVIL_ATTACK_NORMAL);
+    m_Action_AnimMap.emplace(L"ATTACK_JUMP", WOLFDEVIL_ATTACK_JUMP);
+    m_Action_AnimMap.emplace(L"DEATH_BACK", WOLFDEVIL_DEATH_BACK);
+    m_Action_AnimMap.emplace(L"DEATH_NORMAL", WOLFDEVIL_DEATH_NORMAL);
+    m_Action_AnimMap.emplace(L"DODGE_BACK", WOLFDEVIL_DODGE_BACK);
+    m_Action_AnimMap.emplace(L"DOWN_START", WOLFDEVIL_DOWN_P_START);
+    m_Action_AnimMap.emplace(L"DOWN_LOOP", WOLFDEVIL_DOWN_P_LOOP);
+    m_Action_AnimMap.emplace(L"DOWN_END", WOLFDEVIL_DOWN_P_END);
+    m_Action_AnimMap.emplace(L"THREAT", WOLFDEVIL_THREAT_01);
+    m_Action_AnimMap.emplace(L"WALK_F", WOLFDEVIL_WALK_F);
+    m_Action_AnimMap.emplace(L"RUN_F", WOLFDEVIL_RUN);
+    m_Action_AnimMap.emplace(L"STUN", WOLFDEVIL_STUN);
 
-
+    return S_OK;
+}
 #pragma endregion
 
 
-#pragma region READY OBJECT, COMPONENT
 
-/* 필수 컴포넌트 */
-HRESULT CSkyBoss::Ready_Components(SKYBOSS_DESC* pDesc)
+#pragma region COMPONENT 추가
+HRESULT CWolfDevil::Ready_Components(WOLFDEVIL_DESC* pDesc)
 {
     if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxAnimMesh"),
         TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom), nullptr)))
@@ -192,30 +196,29 @@ HRESULT CSkyBoss::Ready_Components(SKYBOSS_DESC* pDesc)
     Desc.pGameObject = this;
 
     if (FAILED(__super::Add_Component(ENUM_CLASS(m_eCurLevel)
-        , TEXT("Prototype_Component_Model_SkyBoss")
+        , TEXT("Prototype_Component_Model_WolfDevil")
         , TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom), &Desc)))
         return E_FAIL;
 
 
-
     return S_OK;
 }
 
-HRESULT CSkyBoss::Ready_BehaviourTree()
+HRESULT CWolfDevil::Ready_BehaviourTree()
 {
-    CSkyBossTree::SKYBOSS_BT_DESC BT{};
+   
+    CMonsterTree::MONSTER_BT_DESC BT{};
     BT.pOwner = this;
 
     // Tree에 대한 초기화는 트리 내부에서하기.
-    m_pTree = CSkyBossTree::Create(m_pDevice, m_pContext, &BT);
+    m_pTree = CMonsterTree::Create(m_pDevice, m_pContext, &BT);
+
 
     return S_OK;
 }
 
-
-HRESULT CSkyBoss::Ready_Render_Resources()
+HRESULT CWolfDevil::Ready_Render_Resources()
 {
-
     if (FAILED(m_pTransformCom->Bind_Shader_Resource(m_pShaderCom, "g_WorldMatrix")))
         return E_FAIL;
 
@@ -247,49 +250,46 @@ HRESULT CSkyBoss::Ready_Render_Resources()
     return S_OK;
 }
 
-HRESULT CSkyBoss::Ready_PartObjects()
+HRESULT CWolfDevil::Ready_PartObjects()
 {
-
-
     return S_OK;
 }
 
+
 #pragma endregion
 
-
-
-CSkyBoss* CSkyBoss::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CWolfDevil* CWolfDevil::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-    CSkyBoss* pInstance = new CSkyBoss(pDevice, pContext);
+    CWolfDevil* pInstance = new CWolfDevil(pDevice, pContext);
 
     if (FAILED(pInstance->Initialize_Prototype()))
     {
-        MSG_BOX(TEXT("Failed to Created : CSkyBoss"));
+        MSG_BOX(TEXT("Failed to Cloned : CWolfDevil"));
         Safe_Release(pInstance);
     }
 
     return pInstance;
 }
 
-CGameObject* CSkyBoss::Clone(void* pArg)
+CGameObject* CWolfDevil::Clone(void* pArg)
 {
-    CSkyBoss* pInstance = new CSkyBoss(*this);
+    CWolfDevil* pInstance = new CWolfDevil(*this);
 
     if (FAILED(pInstance->Initialize_Clone(pArg)))
     {
-        MSG_BOX(TEXT("Failed to Cloned : CModel"));
+        MSG_BOX(TEXT("Failed to Cloned : CWolfDevil"));
         Safe_Release(pInstance);
     }
 
     return pInstance;
 }
 
-void CSkyBoss::Destroy()
+void CWolfDevil::Destroy()
 {
     __super::Destroy();
 }
 
-void CSkyBoss::Free()
+void CWolfDevil::Free()
 {
     __super::Free();
     Safe_Release(m_pTree);

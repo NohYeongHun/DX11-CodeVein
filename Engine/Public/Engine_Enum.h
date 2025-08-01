@@ -13,6 +13,7 @@ namespace Engine
 	};
 	enum class ACTORDIR { U, RU, R, RD, D, LD, L, LU, END};
 
+	enum class MONSTERTYPE { BOSS, ELITE, NORMAL, END };
 	enum class STATE { RIGHT, UP, LOOK, POSITION };
 	enum class PROTOTYPE { GAMEOBJECT, COMPONENT };
 	enum class RENDERGROUP { PRIORITY, NONBLEND, BLEND, UI, STATIC_UI, CAMERA, END };

@@ -1,7 +1,7 @@
-﻿#include "BehaviourTree.h"
+﻿#include "BehaviorTree.h"
 
 
-CBehaviourTree::CBehaviourTree(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CBehaviorTree::CBehaviorTree(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : m_pDevice {pDevice}
     , m_pContext { pContext }
     , m_pGameInstance {CGameInstance::GetInstance()}
@@ -11,25 +11,25 @@ CBehaviourTree::CBehaviourTree(ID3D11Device* pDevice, ID3D11DeviceContext* pCont
     Safe_AddRef(m_pGameInstance);
 }
 
-CBehaviourTree::CBehaviourTree(const CBehaviourTree& Prototype)
+CBehaviorTree::CBehaviorTree(const CBehaviorTree& Prototype)
 {
 }
 
 
 
-HRESULT CBehaviourTree::Initialize(void* pArg)
+HRESULT CBehaviorTree::Initialize(void* pArg)
 {
     BT_DESC* pDesc = static_cast<BT_DESC*>(pArg);
 
     return S_OK;
 }
 
-void CBehaviourTree::Update(_float fTimeDelta)
+void CBehaviorTree::Update(_float fTimeDelta)
 {
    
 }
 
-void CBehaviourTree::Free()
+void CBehaviorTree::Free()
 {
     __super::Free();
     m_pRootNode->Destroy_Recursive(); // 모든 자식 노드까지 해제

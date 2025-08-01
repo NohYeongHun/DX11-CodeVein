@@ -5,6 +5,7 @@
 
 namespace Engine
 {
+
 	typedef struct tagEngineDesc
 	{
 		HINSTANCE		hInst;
@@ -28,6 +29,17 @@ namespace Engine
 		float		fRange;
 
 	}LIGHT_DESC;
+
+	/* 기본 스탯 구조체 */
+	typedef struct tagDefaultMonsterStat
+	{
+		_float fMaxHP;
+		_float fAttackPower;
+		_float fDetectionRange;
+		_float fAttackRange;
+		_float fMoveSpeed;
+		_float fRotationSpeed;
+	}MONSTER_STAT;
 
 	typedef struct tagRayCastHit
 	{

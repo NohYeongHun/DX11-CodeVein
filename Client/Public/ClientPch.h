@@ -106,7 +106,10 @@
 
 /* ======================================== Monster Object ===================================== */
 #include "Monster.h"
-
+#include "MonsterTree.h"
+/* ======================================== WolfDevil Object ===================================== */
+#include "WolfDevilDefine.h"
+#include "WolfDevil.h"
 
 /* ======================================== Sky Boss Object ===================================== */
 #include "SkyBossDefine.h"

@@ -15,7 +15,7 @@ BT_RESULT CBT_SkyBoss_NormalHitReaction::Perform_Action(_float fTimeDelta)
         // 1. 타겟과 나의 Direction을 계산해서 방향을 구한다.
         // 
         // 
-        m_pOwner->Get_Target();
+        //m_pOwner->Get_Target();
         //m_pOwner->Play_Animation(m_iAnimationIndex, false); // 일반 피격 애니메이션 재생
         //m_pOwner->Add_Knockback_Force(5.f);   // 약한 넉백 효과
         m_bAnimationStarted = true;
@@ -30,7 +30,7 @@ BT_RESULT CBT_SkyBoss_NormalHitReaction::Perform_Action(_float fTimeDelta)
     if (m_fReactionTime >= m_fMaxReactionTime)
     {
         // 피격 상태 초기화
-        m_pOwner->Set_Hit();
+        //m_pOwner->Set_Hit();
         return BT_RESULT::SUCCESS;
     }
 

@@ -38,15 +38,23 @@ HRESULT CLoader_GamePlay::Loading_Resource(ID3D11Device* pDevice, ID3D11DeviceCo
 
 	if (FAILED(Add_Prototype_SkyBoss(pDevice, pContext, pGameInstance)))
 	{
-		CRASH("Create SkyBox Failed");
-		MSG_BOX(TEXT("Create Failed Loading : GamePlay Player "));
+		CRASH("Create SkyBoss Failed");
+		MSG_BOX(TEXT("Create Failed Loading : GamePlay SkyBoss "));
 		return E_FAIL;
 	}
+
+	if (FAILED(Add_Prototype_WolfDevil(pDevice, pContext, pGameInstance)))
+	{
+		CRASH("Create WolfDevil Failed");
+		MSG_BOX(TEXT("Create Failed Loading : GamePlay WolfDevil "));
+		return E_FAIL;
+	}
+
 
 	if (FAILED(Add_Prototype_SkyBox(pDevice, pContext, pGameInstance)))
 	{
 		CRASH("Create SkyBox Failed");
-		MSG_BOX(TEXT("Create Failed Loading : GamePlay Player "));
+		MSG_BOX(TEXT("Create Failed Loading : GamePlay SkyBox "));
 		return E_FAIL;
 	}
 
@@ -108,6 +116,25 @@ HRESULT CLoader_GamePlay::Add_Prototype_SkyBoss(ID3D11Device* pDevice, ID3D11Dev
 		, TEXT("Prototype_Component_SkyBossTree")
 		, CSKyBossTree::Create(pDevice, pContext))))
 		return E_FAIL;*/
+
+	return S_OK;
+}
+
+HRESULT CLoader_GamePlay::Add_Prototype_WolfDevil(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
+{
+	_matrix		PreTransformMatrix = XMMatrixIdentity();
+	PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XM_PI);
+
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level)
+		, TEXT("Prototype_Component_Model_WolfDevil")
+		, CLoad_Model::Create(pDevice, pContext, MODELTYPE::ANIM, PreTransformMatrix, "../../SaveFile/Model/Monster/WolfDevil.dat", L""))))
+		return E_FAIL;
+
+
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level)
+		, TEXT("Prototype_GameObject_WolfDevil")
+		, CWolfDevil::Create(pDevice, pContext))))
+		return E_FAIL;
 
 	return S_OK;
 }

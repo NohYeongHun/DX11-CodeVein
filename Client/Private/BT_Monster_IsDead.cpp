@@ -10,7 +10,8 @@ CBT_Monster_IsDead::CBT_Monster_IsDead(CMonster* pOwner)
 /* 몬스터가 살았는가? */
 _bool CBT_Monster_IsDead::Check_Condition()
 {
-    return m_pOwner->Is_Dead();
+    //return m_pOwner->Is_Dead();
+    return true;
 }
 
 

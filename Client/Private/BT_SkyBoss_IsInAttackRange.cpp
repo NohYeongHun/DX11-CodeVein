@@ -10,12 +10,12 @@ CBT_SkyBoss_IsInAttackRange::CBT_SkyBoss_IsInAttackRange(CSkyBoss* pOwner, _floa
 _bool CBT_SkyBoss_IsInAttackRange::Check_Condition()
 {
     // 기본 체크 검사.
-    if (!m_pOwner || !m_pOwner->Get_Target())
-        return false;
-
-    _float fDistanceToTarget = m_pOwner->Get_Distance_To_Target();
-    if (fDistanceToTarget < ATTACK_MIN_RANGE || fDistanceToTarget > ATTACK_MAX_RANGE)
-        return false;
+    //if (!m_pOwner || !m_pOwner->Get_Target())
+    //    return false;
+    //
+    //_float fDistanceToTarget = m_pOwner->Get_Distance_To_Target();
+    //if (fDistanceToTarget < ATTACK_MIN_RANGE || fDistanceToTarget > ATTACK_MAX_RANGE)
+    //    return false;
 
     return true;
 }

@@ -9,7 +9,8 @@
 _bool CBT_Monster_CheckHit::Check_Condition()
 {
     // 맞고 있는게 True
-    return m_pOwner->Is_Hit();
+    return true;
+    //return m_pOwner->Is_Hit();
 }
 
 

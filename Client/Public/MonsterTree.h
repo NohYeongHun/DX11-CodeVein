@@ -1,18 +1,19 @@
 ﻿#pragma once
+#include "BehaviorTree.h"
 
 NS_BEGIN(Client)
-class CSkyBossTree final : public CBehaviorTree
+class CMonsterTree final : public CBehaviorTree
 {
 public:
-    typedef struct tagSkyBossDesc : CBehaviorTree::BT_DESC
+    typedef struct tagMonsterTreeDesc : CBehaviorTree::BT_DESC
     {
-        class CSkyBoss* pOwner = { nullptr };
-    } SKYBOSS_BT_DESC;
+        class CMonster* pOwner = { nullptr };
+    } MONSTER_BT_DESC;
 
 private:
-    explicit CSkyBossTree(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-    explicit CSkyBossTree(const CSkyBossTree& Prototype);
-    virtual ~CSkyBossTree() = default;
+    explicit CMonsterTree(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+    explicit CMonsterTree(const CMonsterTree& Prototype);
+    virtual ~CMonsterTree() = default;
 
 public:
     virtual HRESULT Initialize(void* pArg) override;
@@ -31,7 +32,7 @@ public:
 
 #pragma region 실제 Behaviour Tree에서 실행할 함수들
 public:
-    void Set_Player(class CPlayer* pPlayer);
+    void Set_Target(class CPlayer* pPlayer);
 #pragma endregion
 
 
@@ -40,16 +41,16 @@ public:
 #pragma region DEPTH2 Node
     /* Initialize에서 생성 */
 private:
-    CBTSelector* Create_SpecialStates_ToSelector(); 
-    CBTNode* Create_HitBranch();
+    CBTSelector* Create_SpecialStates_ToSelector();
+    CBTSelector* Create_ActionStates_ToSelector();
+
     //CBTNode* Create_StunBranch();
     CBTNode* Create_NormalBehaviorBranch();
 #pragma endregion
 
 
 #pragma region DEPTH3 Node
-
-    /* 각 상위 노드들에서 생성할 때 생성.. */
+/* 특수 상태 Health 체크, Down, Hit Reaction*/
 private:
     CBTSequence* Create_SurvivalCheck_ToSequence();
     CBTSequence* Create_DownState_ToSequence();
@@ -57,9 +58,13 @@ private:
 
 
 private:
-    // Noraml Behaviour
-    CBTNode* Create_ComBatBehavior();
+    /* 액션 행동 체크 */
+    CBTSequence* Create_AttackAction_ToSequence();
+    CBTSequence* Create_SearchAction_ToSequence();
     //CBTNode* Create_PatrolBranch();
+
+private:
+    /* 모든 상태가 실패하면? */
     CBTNode* Create_IdleBranch();
 #pragma endregion
 
@@ -67,21 +72,14 @@ private:
 
 #pragma endregion
 
-#pragma region 고급 전투
-    CBTNode* Create_MeleeAttackBranch();
-    CBTNode* Create_RangedAttackBranch();
-
-
-#pragma endregion
-
 
 private:
     //CBTNode* m_pRootNode = nullptr;
-    class CSkyBoss* m_pOwner = nullptr;
-    class CPlayer* m_pPlayer = nullptr;
+    class CMonster* m_pOwner = nullptr;
+    class CPlayer*  m_pTarget = nullptr;
 
 public:
-    static CSkyBossTree* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, void* pArg);
+    static CMonsterTree* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, void* pArg);
     virtual void Free() override;
 
 };
