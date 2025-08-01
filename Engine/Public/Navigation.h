@@ -26,6 +26,24 @@ public:
 	_float Compute_Height(_vector vPosition, _float fOffset);
 	_vector Get_CurrentCellCenter();
 
+public:
+	// 툴 지원 함수들
+	HRESULT Add_Cell(_float3 vPointA, _float3 vPointB, _float3 vPointC);
+	void Remove_Cell(_int iCellIndex);
+	_int Get_CellCount() const;
+	_int Find_Cell_By_Position(_float3 vPosition);
+	_float3* Get_Cell_Points(_int iCellIndex);
+
+	// 파일 IO 함수들
+	HRESULT Export_To_File(const _tchar* pFilePath);
+	HRESULT Import_From_File(const _tchar* pFilePath);
+
+	// 셀 간 인접 관계 설정
+	void Setup_Adjacent_Cells(_int iCellA, _int iCellB);
+	void Setup_Cell_Neighbors();
+	_bool Are_Cells_Adjacent(_int iCellA, _int iCellB);
+
+	_wstring Get_Cell_Info(_int iSelectedCellIndex);
 #ifdef _DEBUG
 
 public:

@@ -142,8 +142,10 @@ public:
 
 		_bool Get_KeyPress(_ubyte byKeyID);
 		_bool Get_KeyUp(_ubyte byKeyID);
+		_bool Get_KeyDown(_ubyte byKeyID);
 		_bool Get_MouseKeyPress(MOUSEKEYSTATE eMouse);
 		_bool Get_MouseKeyUp(MOUSEKEYSTATE eMouse);
+		_bool Get_MouseKeyDown(MOUSEKEYSTATE eMouse);
 #pragma endregion
 
 #pragma region LIGHT_MANAGER
