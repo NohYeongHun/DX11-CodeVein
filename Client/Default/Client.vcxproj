@@ -160,15 +160,18 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\public\BackGround.h" />
+    <ClInclude Include="..\Public\BT_Monster_AttackAction.h" />
     <ClInclude Include="..\Public\BT_Monster_DeadAction.h" />
+    <ClInclude Include="..\Public\BT_Monster_DetectAction.h" />
     <ClInclude Include="..\Public\BT_Monster_DownAction.h" />
     <ClInclude Include="..\Public\BT_Monster_HitAction.h" />
+    <ClInclude Include="..\Public\BT_Monster_IsAttackRange.h" />
     <ClInclude Include="..\Public\BT_Monster_IsDead.h" />
     <ClInclude Include="..\Public\BT_Monster_IsDown.h" />
     <ClInclude Include="..\Public\BT_Monster_IsHit.h" />
     <ClInclude Include="..\Public\BT_SkyBoss_Attack.h" />
     <ClInclude Include="..\Public\BT_SkyBoss_CanStrongAttack.h" />
-    <ClInclude Include="..\Public\BT_IsTargetInRange.h" />
+    <ClInclude Include="..\Public\BT_Monster_IsDetectRange.h" />
     <ClInclude Include="..\Public\BT_SkyBoss_IsDown.h" />
     <ClInclude Include="..\Public\BT_SkyBoss_Idle.h" />
     <ClInclude Include="..\Public\BT_SkyBoss_IsDownStart.h" />
@@ -252,15 +255,18 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\BackGround.cpp" />
+    <ClCompile Include="..\Private\BT_Monster_AttackAction.cpp" />
     <ClCompile Include="..\Private\BT_Monster_DeadAction.cpp" />
+    <ClCompile Include="..\Private\BT_Monster_DetectAction.cpp" />
     <ClCompile Include="..\Private\BT_Monster_DownAction.cpp" />
     <ClCompile Include="..\Private\BT_Monster_HitAction.cpp" />
+    <ClCompile Include="..\Private\BT_Monster_IsAttackRange.cpp" />
     <ClCompile Include="..\Private\BT_Monster_IsDead.cpp" />
     <ClCompile Include="..\Private\BT_Monster_IsDown.cpp" />
     <ClCompile Include="..\Private\BT_Monster_IsHit.cpp" />
     <ClCompile Include="..\Private\BT_SkyBoss_Attack.cpp" />
     <ClCompile Include="..\Private\BT_SkyBoss_CanStrongAttack.cpp" />
-    <ClCompile Include="..\Private\BT_IsTargetInRange.cpp" />
+    <ClCompile Include="..\Private\BT_Monster_IsDetectRange.cpp" />
     <ClCompile Include="..\Private\BT_SkyBoss_IsDown.cpp" />
     <ClCompile Include="..\Private\BT_SkyBoss_Idle.cpp" />
     <ClCompile Include="..\Private\BT_SkyBoss_IsDownStart.cpp" />

@@ -147,6 +147,16 @@ void CSkyBoss::Update_AI(_float fTimeDelta)
 #pragma endregion
 
 
+#pragma region 1. 몬스터는 자신에게 필요한 수치값들을 초기화해야한다.
+HRESULT CSkyBoss::Initialize_Stats()
+{
+    return S_OK;
+}
+#pragma endregion
+
+#pragma region 2. 몬스터는 내 애니메이션이 무엇인지 알아야한다.
+
+
 
 HRESULT CSkyBoss::InitializeAction_ToAnimationMap()
 {
@@ -179,6 +189,7 @@ HRESULT CSkyBoss::InitializeAction_ToAnimationMap()
 
     return S_OK;
 }
+#pragma endregion
 
 #pragma region TIMER 관리
 HRESULT CSkyBoss::Initialize_BuffDurations()
@@ -269,6 +280,14 @@ HRESULT CSkyBoss::Ready_PartObjects()
 
 
     return S_OK;
+}
+
+void CSkyBoss::Enable_Collider(_uint iType)
+{
+}
+
+void CSkyBoss::Disable_Collider(_uint iType)
+{
 }
 
 #pragma endregion

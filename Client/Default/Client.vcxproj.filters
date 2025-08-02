@@ -154,6 +154,9 @@
     <Filter Include="02. GameObject\Monster\BT\Detect">
       <UniqueIdentifier>{9a6206d5-b5b3-4d04-9141-77144482979a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. GameObject\Monster\BT\Attack">
+      <UniqueIdentifier>{44452234-4fa5-4305-b5e2-70b64b159fcb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -405,7 +408,7 @@
     <ClInclude Include="..\Public\WolfDevil.h">
       <Filter>02. GameObject\Monster\WolfDevil</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\BT_IsTargetInRange.h">
+    <ClInclude Include="..\Public\BT_Monster_IsDetectRange.h">
       <Filter>02. GameObject\Monster\BT\Detect</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\MonsterTree.h">
@@ -425,6 +428,15 @@
     </ClInclude>
     <ClInclude Include="..\Public\BT_Monster_HitAction.h">
       <Filter>02. GameObject\Monster\BT\Hit</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BT_Monster_IsAttackRange.h">
+      <Filter>02. GameObject\Monster\BT\Attack</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BT_Monster_AttackAction.h">
+      <Filter>02. GameObject\Monster\BT\Attack</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BT_Monster_DetectAction.h">
+      <Filter>02. GameObject\Monster\BT\Detect</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -666,7 +678,7 @@
     <ClCompile Include="..\Private\WolfDevil.cpp">
       <Filter>02. GameObject\Monster\WolfDevil</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\BT_IsTargetInRange.cpp">
+    <ClCompile Include="..\Private\BT_Monster_IsDetectRange.cpp">
       <Filter>02. GameObject\Monster\BT\Detect</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\MonsterTree.cpp">
@@ -683,6 +695,15 @@
     </ClCompile>
     <ClCompile Include="..\Private\BT_Monster_HitAction.cpp">
       <Filter>02. GameObject\Monster\BT\Hit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BT_Monster_IsAttackRange.cpp">
+      <Filter>02. GameObject\Monster\BT\Attack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BT_Monster_AttackAction.cpp">
+      <Filter>02. GameObject\Monster\BT\Attack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BT_Monster_DetectAction.cpp">
+      <Filter>02. GameObject\Monster\BT\Detect</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

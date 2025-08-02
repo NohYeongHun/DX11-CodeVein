@@ -229,19 +229,6 @@ void CTransform::LookAt(const _float3& vTargetPos, const _float3& vUp)
 	m_bIsDirty = true;
 }
 
-void CTransform::LookAt_YawOnly(_vector vTargetDir)
-{
-	// 현재 위치 기준 방향 제거
-	vTargetDir = XMVectorSetY(vTargetDir, 0.f);
-	vTargetDir = XMVector3Normalize(vTargetDir);
-
-	_vector vForward = XMVectorSet(0.f, 0.f, 1.f, 0.f); // 기본 전방
-
-	// 회전 쿼터니언 생성 (Yaw만 반영)
-	_vector qRot = XMQuaternionRotationMatrix(XMMatrixLookToLH(XMVectorZero(), vTargetDir, XMVectorSet(0.f, 1.f, 0.f, 0.f)));
-	m_QuatRotation = qRot;
-	m_bIsDirty = true;
-}
 
 void CTransform::Set_ParentMatrix(const _float4x4* pParentWorldMatrix)
 {

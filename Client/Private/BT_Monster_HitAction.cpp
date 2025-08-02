@@ -35,15 +35,15 @@ BT_RESULT CBT_Monster_HitAction::EnterHit(_float fTimeDelta)
     if (m_pOwner->HasBuff(CMonster::BUFF_INVINCIBLE))
         return BT_RESULT::FAILURE;
 
-    // 0. 회전 시키기
-    m_pOwner->RotateTurn_ToTarget(fTimeDelta);
+    // 0. 즉시 회전 시키기
+    m_pOwner->RotateTurn_ToTarget();
 
     // 1. 죽는 애니메이션 선택
    // 탐색
     _uint iNextAnimationIdx = m_pOwner->Find_AnimationIndex(L"HIT");
 
     // 2. 죽는 상태로 변경
-    m_pOwner->Change_Animation_Blend(iNextAnimationIdx);
+    m_pOwner->Change_Animation_NonBlend(iNextAnimationIdx);
 
     // 3. 맞았으면 무적시간 부여하기.
     m_pOwner->AddBuff(CMonster::BUFF_INVINCIBLE);

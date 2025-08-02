@@ -289,14 +289,14 @@ HRESULT CLevel_GamePlay::Ready_Layer_Monster(const _wstring& strLayerTag)
 			, TEXT("Layer_Player"), 0));
 	Desc.eCurLevel = m_eCurLevel;
 	Desc.eMonsterType = MONSTERTYPE::NORMAL;
+	/* 몬스터 스탯.*/
 	Desc.fMaxHP = 500.f;
 	Desc.fAttackPower = 20.f;
 	Desc.fDetectionRange = 20.f;
 	Desc.fAttackRange = 10.f;
-	Desc.fSpeedPerSec = 10.f;
-	Desc.fMoveSpeed = 10.f;
+	Desc.fMoveSpeed = 50.f;
 	/* Transform 설정.*/
-	Desc.fSpeedPerSec = 10.f;
+	Desc.fSpeedPerSec = 50.f; // Transform 속도 조절.
 	Desc.fRotationPerSec = XMConvertToRadians(90.0f);
 
 	if (nullptr == Desc.pPlayer)

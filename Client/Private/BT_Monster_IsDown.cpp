@@ -8,7 +8,7 @@ CBT_Monster_IsDown::CBT_Monster_IsDown(CMonster* pOwner)
 /* 몬스터가 Down 상태인가? */
 _bool CBT_Monster_IsDown::Check_Condition()
 {
-    // 현재 Down CoolDown이 돌고 있다면?
+    // 현재 Down CoolDown이 돌고 있다면? 다시 못해야됨.
 
 	return m_pOwner->HasBuff(CMonster::BUFF_DOWN);
 }

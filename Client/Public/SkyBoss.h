@@ -5,16 +5,12 @@ NS_BEGIN(Client)
 class CSkyBoss final : public CMonster
 {
 
-#pragma region SKYBOSS STATE 정의 STATE != ANIMATION
 public:
-	// Add_State 순서대로 넣습니다.
-	enum SKYBOSS_STATE : _int
+	// 어떤 타입의 Collider를 제어할것인지 정의.
+	enum PART_TYPE : _uint
 	{
-		IDLE = 0, WALK, RUN, DODGE,
-		STRONG_ATTACK, GUARD, ATTACK,
-		STATE_END
+
 	};
-#pragma endregion
 
 public:
 	typedef struct tagSkyBossDesc : public CMonster::MONSTER_DESC
@@ -49,6 +45,10 @@ public:
 	virtual void Update_AI(_float fTimeDelta) override;
 #pragma endregion
 
+#pragma region 1. 몬스터는 자신에게 필요한 수치값들을 초기화해야한다.
+public:
+	virtual HRESULT Initialize_Stats() override;
+#pragma endregion
 
 #pragma region 애니메이션 관리
 	virtual HRESULT InitializeAction_ToAnimationMap() override;
@@ -80,7 +80,11 @@ private:
 	HRESULT Ready_PartObjects();
 #pragma endregion
 
-
+#pragma region 6. 특수한 상태를 제어하기 위한 함수들
+public:
+	virtual void Enable_Collider(_uint iType) override;
+	virtual void Disable_Collider(_uint iType) override;
+#pragma endregion
 
 public:
 	static CSkyBoss* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

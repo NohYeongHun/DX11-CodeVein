@@ -7,20 +7,18 @@ NS_BEGIN(Client)
 * => 공격이 가능한가에 대한 탐지거리 노드가 아니라
 * => 몬스터가 플레이어를 `탐색` 했다는 거리.
 */
-class CBT_IsTargetInRange final : public CBTCondition
+class CBT_Monster_IsDetectRange final : public CBTCondition
 {
 public:
-    explicit CBT_IsTargetInRange(class CMonster* pOwner, _float fRange);
+    explicit CBT_Monster_IsDetectRange(class CMonster* pOwner);
     _bool Check_Condition();
 
 
 private:
-    class CGameInstance* m_pGameInstance = { nullptr };
     class CMonster* m_pOwner;
-    _float m_fDetectionRange;
 
 public:
-    static CBT_IsTargetInRange* Create(class CMonster* pOwner, _float fRange);
+    static CBT_Monster_IsDetectRange* Create(class CMonster* pOwner);
 
     virtual void Free() override;
 };

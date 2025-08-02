@@ -41,9 +41,6 @@ private:
 private:
     CBTSequence* Create_SearchAction_ToSequence();
 
-    //CBTNode* Create_StunBranch();
-    CBTNode* Create_NormalBehaviorBranch();
-
 #pragma endregion
 
 
@@ -57,7 +54,7 @@ private:
 
 private:
     /* 모든 상태가 실패하면? */
-    CBTNode* Create_IdleBranch();
+    CBTAction* Create_IdleAction();
 
 public:
     virtual void Update(_float fTimeDelta);

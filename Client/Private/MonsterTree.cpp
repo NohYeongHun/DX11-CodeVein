@@ -20,7 +20,6 @@ HRESULT CMonsterTree::Initialize(void* pArg)
     // Owner와 몬스터 타겟 설정. => 플레이어로
     MONSTER_BT_DESC* pDesc = static_cast<MONSTER_BT_DESC*>(pArg);
     m_pOwner = pDesc->pOwner; // Owner 설정.
-
     m_pTarget = m_pOwner->Get_Target(); // 몬스터에 설정되어있는가?
 
     if (nullptr == m_pTarget)
@@ -40,7 +39,7 @@ HRESULT CMonsterTree::Initialize(void* pArg)
     pRootSelector->Add_Child(Create_ActionStates_ToSelector());
 
     // 4. 모두 실패했을 경우.
-
+    pRootSelector->Add_Child(Create_IdleAction());
     Set_Root_Node(pRootSelector);
 
     return S_OK;
@@ -110,17 +109,12 @@ CBTSelector* CMonsterTree::Create_ActionStates_ToSelector()
     return pActionState_Selector;
 }
 
-CBTNode* CMonsterTree::Create_NormalBehaviorBranch()
-{
-    return nullptr;
-}
-
-
 /* Attack Action은 가지고 있는 Resource를 이용해야 확인 가능합니다. */
 CBTSequence* CMonsterTree::Create_AttackAction_ToSequence()
 {
     CBTSequence* pAttack_Sequence = CBTSequence::Create();
-    
+    pAttack_Sequence->Add_Child(CBT_Monster_IsAttackRange::Create(m_pOwner));
+    pAttack_Sequence->Add_Child(CBT_Monster_AttackAction::Create(m_pOwner));
 
     return pAttack_Sequence;
 }
@@ -128,12 +122,14 @@ CBTSequence* CMonsterTree::Create_AttackAction_ToSequence()
 CBTSequence* CMonsterTree::Create_SearchAction_ToSequence()
 {
     CBTSequence* pSearch_Sequence = CBTSequence::Create();
+    pSearch_Sequence->Add_Child(CBT_Monster_IsDetectRange::Create(m_pOwner));
+    pSearch_Sequence->Add_Child(CBT_Monster_DetectAction::Create(m_pOwner,  false));
 
     return pSearch_Sequence;
 }
 
 
-CBTNode* CMonsterTree::Create_IdleBranch()
+CBTAction* CMonsterTree::Create_IdleAction()
 {
     return nullptr;
 }

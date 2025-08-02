@@ -24,7 +24,7 @@ public:
 
 public:
     virtual BT_RESULT Perform_Action(_float fTimeDelta) override;
-    virtual void Reset() override;
+    virtual void Reset() override; 
 
 private:
     BT_RESULT EnterHit(_float fTimeDelta);

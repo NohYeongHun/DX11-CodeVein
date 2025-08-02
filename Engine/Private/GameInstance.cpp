@@ -508,6 +508,10 @@ _bool CGameInstance::Get_KeyUp(_ubyte byKeyID)
 {
 	return m_pInput_Device->Get_KeyUp(byKeyID);
 }
+_bool CGameInstance::Get_KeyDown(_ubyte byKeyID)
+{
+	return m_pInput_Device->Get_KeyDown(byKeyID);
+}
 _bool CGameInstance::Get_MouseKeyPress(MOUSEKEYSTATE eMouse)
 {
 	return m_pInput_Device->Get_MouseKeyPress(eMouse);
@@ -515,6 +519,11 @@ _bool CGameInstance::Get_MouseKeyPress(MOUSEKEYSTATE eMouse)
 _bool CGameInstance::Get_MouseKeyUp(MOUSEKEYSTATE eMouse)
 {
 	return m_pInput_Device->Get_MouseKeyUp(eMouse);
+}
+
+_bool CGameInstance::Get_MouseKeyDown(MOUSEKEYSTATE eMouse)
+{
+	return m_pInput_Device->Get_MouseKeyDown(eMouse);
 }
 
 #pragma endregion
