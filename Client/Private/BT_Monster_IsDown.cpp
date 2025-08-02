@@ -1,0 +1,28 @@
+﻿#include "BT_Monster_IsDown.h"
+
+CBT_Monster_IsDown::CBT_Monster_IsDown(CMonster* pOwner)
+	: m_pOwner(pOwner)
+{
+}
+
+/* 몬스터가 Down 상태인가? */
+_bool CBT_Monster_IsDown::Check_Condition()
+{
+	return m_pOwner->HasBuff(CMonster::BUFF_DOWN);
+}
+
+CBT_Monster_IsDown* CBT_Monster_IsDown::Create(CMonster* pOwner)
+{
+    if (nullptr == pOwner)
+    {
+        CRASH("Failed Create CBT_Monster_IsDown");
+        return nullptr;
+    }
+    return new CBT_Monster_IsDown(pOwner);
+}
+
+void CBT_Monster_IsDown::Free()
+{
+    __super::Free();
+    m_pOwner = nullptr;
+}

@@ -147,6 +147,10 @@ static inline string ReadString(std::ifstream& ifs)
     return out;
 }
 
+static void OutputDebugWstring(wstring wstr)
+{
+    OutputDebugString(wstr.c_str());
+}
 
 static void OutPutDebugInt(int iDebugValue)
 {

@@ -17,10 +17,11 @@ HRESULT CSkyBoss::Initialize_Prototype()
     return S_OK;
 }
 
+#pragma region 기본 함수들 구현
 HRESULT CSkyBoss::Initialize_Clone(void* pArg)
 {
     SKYBOSS_DESC* pDesc = static_cast<SKYBOSS_DESC*>(pArg);
-    
+
     if (FAILED(__super::Initialize_Clone(pDesc)))
         return E_FAIL;
 
@@ -30,7 +31,7 @@ HRESULT CSkyBoss::Initialize_Clone(void* pArg)
     if (FAILED(Ready_BehaviourTree()))
     {
         CRASH("Failed Ready BehaviourTree SkyBoss")
-        return E_FAIL;
+            return E_FAIL;
     }
 
     if (FAILED(InitializeAction_ToAnimationMap()))
@@ -75,14 +76,14 @@ void CSkyBoss::Update(_float fTimeDelta)
     if (m_pTree)
         m_pTree->Update(fTimeDelta);
 
-    
+
     if (true == m_pModelCom->Play_Animation(fTimeDelta))
     {
     }
-   
+
     // 하위 객체들 움직임 제어는 Tree 제어 이후에
     __super::Update(fTimeDelta);
-    
+
 }
 
 void CSkyBoss::Late_Update(_float fTimeDelta)
@@ -91,7 +92,7 @@ void CSkyBoss::Late_Update(_float fTimeDelta)
         return;
 
     __super::Late_Update(fTimeDelta);
-    
+
 }
 
 HRESULT CSkyBoss::Render()
@@ -120,15 +121,10 @@ HRESULT CSkyBoss::Render()
     return S_OK;
 
 }
-
-#pragma region 움직임 구현
-
-
-/* 
-* Animation
-*/
 #pragma endregion
 
+
+#pragma region 충돌 
 void CSkyBoss::On_Collision_Enter(CGameObject* pOther)
 {
 }
@@ -140,6 +136,17 @@ void CSkyBoss::On_Collision_Stay(CGameObject* pOther)
 void CSkyBoss::On_Collision_Exit(CGameObject* pOther)
 {
 }
+#pragma endregion
+
+
+#pragma region AI에 대한 제어 순서 정의
+void CSkyBoss::Update_AI(_float fTimeDelta)
+{
+
+}
+#pragma endregion
+
+
 
 HRESULT CSkyBoss::InitializeAction_ToAnimationMap()
 {
@@ -172,6 +179,20 @@ HRESULT CSkyBoss::InitializeAction_ToAnimationMap()
 
     return S_OK;
 }
+
+#pragma region TIMER 관리
+HRESULT CSkyBoss::Initialize_BuffDurations()
+{
+    return S_OK;
+}
+
+HRESULT CSkyBoss::Initialize_BuffCoolDownDurations()
+{
+    return S_OK;
+}
+#pragma endregion
+
+
 
 #pragma region SkyBoss 상태 함수들
 
@@ -294,3 +315,5 @@ void CSkyBoss::Free()
     __super::Free();
     Safe_Release(m_pTree);
 }
+
+

@@ -16,7 +16,6 @@ public:
 
 private:
     class CMonster* m_pOwner = { nullptr };
-    class CGameInstance* m_pGameInstance = { nullptr };
 
     // 죽는 단계 관리?
     DEAD_PHASE m_eDeadPhase = { DEAD_PHASE::NONE };
@@ -34,10 +33,6 @@ private:
     BT_RESULT UpdateDying(_float fTimeDelta);
     BT_RESULT UpdateCorpse(_float fTimeDelta);
     BT_RESULT UpdateDissolve(_float fTimeDelta);
-
-private:
-    void HandleDeathEvents();
-    _uint SelectAnimation();
 
 public:
     static CBT_Monster_DeadAction* Create(class CMonster* pOwner);

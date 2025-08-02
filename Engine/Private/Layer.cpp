@@ -59,11 +59,28 @@ RAYHIT_DESC CLayer::Get_PickingLocalObject(_float* pOutDist)
 
 void CLayer::Priority_Update(_float fTimeDelta)
 {
+	/* Destroy 객체들만 삭제 처리. */
+	auto iter = m_GameObjects.begin();
+	while (iter != m_GameObjects.end())
+	{
+		if ((*iter)->Is_Destroy())
+		{
+			(*iter)->Destroy();
+			Safe_Release(*iter);
+			iter = m_GameObjects.erase(iter);
+		}
+		else
+			++iter;
+	}
+
 	for (auto& pGameObject : m_GameObjects)
 	{
 		if (nullptr != pGameObject)
+		{
 			pGameObject->Priority_Update(fTimeDelta);
+		}
 	}
+
 }
 
 void CLayer::Update(_float fTimeDelta)

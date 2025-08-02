@@ -10,11 +10,14 @@ CMonsterTree::CMonsterTree(const CMonsterTree& Prototype)
 {
 }
 
+#pragma region 1. Behaviour 트리 초기화
 HRESULT CMonsterTree::Initialize(void* pArg)
 {
+    // 기본 상태들 초기화.
     if (FAILED(__super::Initialize(pArg)))
         return E_FAIL;
 
+    // Owner와 몬스터 타겟 설정. => 플레이어로
     MONSTER_BT_DESC* pDesc = static_cast<MONSTER_BT_DESC*>(pArg);
     m_pOwner = pDesc->pOwner; // Owner 설정.
 
@@ -26,53 +29,30 @@ HRESULT CMonsterTree::Initialize(void* pArg)
         return E_FAIL;
     }
 
-    // 1. Root Node 생성
+
+    // 1. Root Node 생성 무조건 Selector
     CBTSelector* pRootSelector = CBTSelector::Create();
 
     // 2. 특수한 상태일때 행동 변경 => 필수.
     pRootSelector->Add_Child(Create_SpecialStates_ToSelector());
-    
+
     // 3. 일반 행동 
-    pRootSelector->Add_Child(Create_ActionStates_ToSelector());
+    //pRootSelector->Add_Child(Create_ActionStates_ToSelector());
 
     Set_Root_Node(pRootSelector);
 
     return S_OK;
 }
 
-void CMonsterTree::Update(_float fTimeDelta)
-{
-}
-
-void CMonsterTree::Set_Target(CPlayer* pPlayer)
-{
-}
-
-// 특수한 상태를 제어할 Selector 생성.
+#pragma region 특수한 버프/디버프 (죽음, 다운, HIT)를 컨트롤해야 함.
+// 1. 특수 상태를 제어할 Selector 생성. => 1번 우선 순위로 실행됨.
 CBTSelector* CMonsterTree::Create_SpecialStates_ToSelector()
 {
-    
     CBTSelector* pSpecialState_Selector = CBTSelector::Create();
     pSpecialState_Selector->Add_Child(Create_SurvivalCheck_ToSequence());
+    pSpecialState_Selector->Add_Child(Create_DownState_ToSequence());
 
     return pSpecialState_Selector;
-}
-
-// 액션 상태를 제어할 Selector 생성.
-CBTSelector* CMonsterTree::Create_ActionStates_ToSelector()
-{
-    CBTSelector* pActionState_Selector = CBTSelector::Create();
-    
-    // 액션 상태에서는 Sequence를 제어합니다.
-    pActionState_Selector->Add_Child(Create_AttackAction_ToSequence());
-    pActionState_Selector->Add_Child(Create_SearchAction_ToSequence());
-
-    return pActionState_Selector;
-}
-
-CBTNode* CMonsterTree::Create_NormalBehaviorBranch()
-{
-    return nullptr;
 }
 
 CBTSequence* CMonsterTree::Create_SurvivalCheck_ToSequence()
@@ -90,18 +70,50 @@ CBTSequence* CMonsterTree::Create_SurvivalCheck_ToSequence()
 
 CBTSequence* CMonsterTree::Create_DownState_ToSequence()
 {
-    return nullptr;
+
+    CBTSequence* pDownCheck_Sequence = CBTSequence::Create();
+
+
+    // 1. Condition 체크 => Down 상황인가?
+    pDownCheck_Sequence->Add_Child(CBT_Monster_IsDown::Create(m_pOwner));
+
+    // 2. Action => 다운되었다면?
+    pDownCheck_Sequence->Add_Child(CBT_Monster_DownAction::Create(m_pOwner));
+
+    return pDownCheck_Sequence;
 }
 
 CBTSequence* CMonsterTree::Create_HitReaction_ToSequence()
 {
     return nullptr;
 }
+#pragma endregion
+
+
+
+// 액션 상태를 제어할 Selector 생성.
+CBTSelector* CMonsterTree::Create_ActionStates_ToSelector()
+{
+    CBTSelector* pActionState_Selector = CBTSelector::Create();
+
+    // 액션 상태에서는 Sequence를 제어합니다.
+    pActionState_Selector->Add_Child(Create_AttackAction_ToSequence());
+    pActionState_Selector->Add_Child(Create_SearchAction_ToSequence());
+
+    return pActionState_Selector;
+}
+
+CBTNode* CMonsterTree::Create_NormalBehaviorBranch()
+{
+    return nullptr;
+}
+
+
 
 CBTSequence* CMonsterTree::Create_AttackAction_ToSequence()
 {
     CBTSequence* pAttack_Sequence = CBTSequence::Create();
-    
+
     return pAttack_Sequence;
 }
 
@@ -117,6 +129,21 @@ CBTNode* CMonsterTree::Create_IdleBranch()
 {
     return nullptr;
 }
+
+#pragma endregion
+
+
+void CMonsterTree::Update(_float fTimeDelta)
+{
+    if (m_pRootNode)
+        m_pRootNode->Execute(fTimeDelta);
+}
+
+void CMonsterTree::Set_Target(CPlayer* pPlayer)
+{
+}
+
+
 
 CMonsterTree* CMonsterTree::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, void* pArg)
 {

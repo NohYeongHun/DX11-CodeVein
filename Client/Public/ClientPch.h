@@ -97,8 +97,9 @@
 #pragma region 특수 상태
 #include "BT_Monster_IsDead.h"
 #include "BT_Monster_DeadAction.h"
+#include "BT_Monster_IsDown.h"
+#include "BT_Monster_DownAction.h"
 
-#include "BT_SkyBoss_IsDown.h"
 #pragma endregion
 
 #include "BT_Monster_CheckHit.h"
@@ -114,9 +115,12 @@
 /* ======================================== Sky Boss Object ===================================== */
 #include "SkyBossDefine.h"
 /* ======================================== Sky Boss BT ===================================== */
+
 #include "BT_SkyBoss_IsInAttackRange.h"
 #include "BT_SkyBoss_Attack.h"
 #include "BT_SkyBoss_Idle.h"
+#include "BT_SkyBoss_IsDown.h"
+
 
 #include "BT_SkyBoss_IsStrongHit.h"
 

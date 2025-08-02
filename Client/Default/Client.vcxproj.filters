@@ -417,6 +417,12 @@
     <ClInclude Include="..\Public\WolfDevilDefine.h">
       <Filter>02. GameObject\Monster\WolfDevil</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\BT_Monster_IsDown.h">
+      <Filter>02. GameObject\Monster\BT\Down</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BT_Monster_DownAction.h">
+      <Filter>02. GameObject\Monster\BT\Down</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -665,6 +671,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\BT_Monster_CheckHit.cpp">
       <Filter>02. GameObject\Monster\BT\Hit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BT_Monster_IsDown.cpp">
+      <Filter>02. GameObject\Monster\BT\Down</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BT_Monster_DownAction.cpp">
+      <Filter>02. GameObject\Monster\BT\Down</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

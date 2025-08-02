@@ -15,8 +15,49 @@ private:
     explicit CMonsterTree(const CMonsterTree& Prototype);
     virtual ~CMonsterTree() = default;
 
+#pragma region 1. TREE 초기화
 public:
     virtual HRESULT Initialize(void* pArg) override;
+
+    
+#pragma region 특수 상태 제어. Selector -> Buff Sequence
+private:
+    CBTSelector* Create_SpecialStates_ToSelector();
+
+    CBTSequence* Create_SurvivalCheck_ToSequence();
+    CBTSequence* Create_DownState_ToSequence();
+    CBTSequence* Create_HitReaction_ToSequence();
+#pragma endregion
+
+
+#pragma region 기본 상태 제어 Selector -> Action Sequence
+private:
+    CBTSelector* Create_ActionStates_ToSelector();
+
+private:
+    /* 액션 행동 체크 */
+    CBTSequence* Create_AttackAction_ToSequence();
+    CBTSequence* Create_SearchAction_ToSequence();
+
+    //CBTNode* Create_StunBranch();
+    CBTNode* Create_NormalBehaviorBranch();
+
+#pragma endregion
+
+
+
+    /* 특수 상태 Health 체크, Down, Hit Reaction*/
+
+
+
+
+    //CBTNode* Create_PatrolBranch();
+
+private:
+    /* 모든 상태가 실패하면? */
+    CBTNode* Create_IdleBranch();
+
+public:
     virtual void Update(_float fTimeDelta);
 
 
@@ -36,37 +77,7 @@ public:
 #pragma endregion
 
 
-#pragma region Node 생성 함수들.
 
-#pragma region DEPTH2 Node
-    /* Initialize에서 생성 */
-private:
-    CBTSelector* Create_SpecialStates_ToSelector();
-    CBTSelector* Create_ActionStates_ToSelector();
-
-    //CBTNode* Create_StunBranch();
-    CBTNode* Create_NormalBehaviorBranch();
-#pragma endregion
-
-
-#pragma region DEPTH3 Node
-/* 특수 상태 Health 체크, Down, Hit Reaction*/
-private:
-    CBTSequence* Create_SurvivalCheck_ToSequence();
-    CBTSequence* Create_DownState_ToSequence();
-    CBTSequence* Create_HitReaction_ToSequence();
-
-
-private:
-    /* 액션 행동 체크 */
-    CBTSequence* Create_AttackAction_ToSequence();
-    CBTSequence* Create_SearchAction_ToSequence();
-    //CBTNode* Create_PatrolBranch();
-
-private:
-    /* 모든 상태가 실패하면? */
-    CBTNode* Create_IdleBranch();
-#pragma endregion
 
 
 

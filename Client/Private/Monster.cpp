@@ -72,58 +72,98 @@ void CMonster::On_Collision_Exit(CGameObject* pOther)
 {
 }
 
+
 #pragma region 애니메이션 상태 변경.
-void CMonster::Change_Animation_NonBlend(_uint iAnimIdx, _bool IsLoop)
+void CMonster::Change_Animation_NonBlend(_uint iNextAnimIdx, _bool IsLoop)
 {
-    m_pModelCom->Set_Animation(iAnimIdx, IsLoop);
+    m_pModelCom->Set_Animation(iNextAnimIdx, IsLoop);
 }
 
-void CMonster::Change_Animation_Blend(const BLEND_DESC& blendDesc, _bool IsLoop)
+void CMonster::Change_Animation_Blend(_uint iNextAnimIdx, _bool IsLoop, _float fBlendDuration, _bool bScale, _bool bRotate, _bool bTranslate)
 {
     /* 블렌드 정보를 먼저 설정하게 하기.*/
-    m_pModelCom->Set_BlendInfo(blendDesc.iNextAnimIndex
-        , blendDesc.fBlendDuration, blendDesc.bScale, blendDesc.bRotate
-        , blendDesc.bTranslate);
+    m_pModelCom->Set_BlendInfo(iNextAnimIdx
+        , fBlendDuration, bScale, bRotate
+        , bTranslate);
     /* 애니메이션 변경. */
-    m_pModelCom->Set_Animation(blendDesc.iNextAnimIndex, IsLoop);
-    
+    m_pModelCom->Set_Animation(iNextAnimIdx, IsLoop);
 }
+
+/* 애니메이션 인덱스.*/
+_uint CMonster::Find_AnimationIndex(const _wstring& strAnimationTag)
+{
+    auto iter = m_Action_AnimMap.find(strAnimationTag);
+
+    // 찾는 애니메이션이 없는 경우
+    if (iter == m_Action_AnimMap.end())
+    {
+        CRASH("Failed Find Animation"); 
+        return 0;
+    }
+
+    return iter->second;
+}
+
+/* 현재 애니메이션이 끝났냐? */
+const _bool CMonster::Is_Animation_Finished()
+{
+    return m_pModelCom->Is_Finished();
+}
+
 
 
 #pragma endregion
 
 
 #pragma region BUFF Flag 관리
+
+// Timer가 종료되거나 특정 시점에는 BuffFlag를 해제합니다.
 void CMonster::RemoveBuff(uint32_t buffFlag)
 {
     m_ActiveBuffs &= ~buffFlag;
-    m_BuffTimers.erase(buffFlag);
+    //m_BuffTimers.erase(buffFlag);
 }
-void CMonster::AddBuff(_uint buffFlag, _float fCustomDuration)
+const _bool CMonster::AddBuff(_uint buffFlag, _float fCustomDuration)
 {
+    if (IsBuffOnCooldown(buffFlag))
+        return false;
+
     m_ActiveBuffs |= buffFlag;
 
     // 시간을 지정한 경우에만 해당 시간으로 설정해줍니다. 
     m_BuffTimers[buffFlag] = fCustomDuration > 0.f ? fCustomDuration
-        : m_BuffDefaultDurations[buffFlag];
+        : m_BuffDefault_Durations[buffFlag];
+
+    return true;
 }
 
+/* 현재 쿨타임인지 확인해주는 함수. */
+const _bool CMonster::IsBuffOnCooldown(_uint buffFlag)
+{
+    auto iter = m_BuffTimers.find(buffFlag);
+    return (iter != m_BuffTimers.end() && iter->second > 0.f);
+}
+
+// 하나만 확인 가능.
 _bool CMonster::HasBuff(_uint buffFlag) const
 {
     return (m_ActiveBuffs & buffFlag) != 0;
 }
+
+// 이 중에 아무거나 있으면 True | OR
 _bool CMonster::HasAnyBuff(_uint buffFlags) const
 {
     return (m_ActiveBuffs & buffFlags) != 0;
     }
 
+// 다 가지고 있으면 True | And
 _bool CMonster::HasAllBuffs(_uint buffFlags) const
 {
     return (m_ActiveBuffs & buffFlags) == buffFlags;
 }
 
 
-void CMonster::Tick_Timers(_float fTimeDelta)
+void CMonster::Tick_BuffTimers(_float fTimeDelta)
 {
     // 만료된 버프/디버프 들.
     std::vector<_uint> expiredBuffs;
@@ -145,15 +185,6 @@ void CMonster::Tick_Timers(_float fTimeDelta)
 
 }
 
-// 객체마다 달라질 수 있음.
-HRESULT CMonster::Initialize_BuffDurations()
-{
-    m_BuffDefaultDurations[BUFF_HIT] = 0.6f;        // 피격: 0.6초
-    m_BuffDefaultDurations[BUFF_STUN] = 2.0f;       // 기절: 2.0초
-    m_BuffDefaultDurations[BUFF_DOWN] = 1.5f;       // 다운: 1.5초
-
-    return S_OK;
-}
 #pragma endregion
 
 

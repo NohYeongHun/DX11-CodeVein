@@ -16,9 +16,12 @@ public:
     enum BUFF_FLAGS : _uint
     {
         BUFF_NONE = 0,
-        BUFF_DOWN = 1 << 0,
-        BUFF_HIT = 1 << 1, 
+        BUFF_HIT = 1 << 0,
+        BUFF_DOWN = 1 << 1,
         BUFF_STUN = 1 << 2, 
+        BUFF_DEAD = 1 << 3,
+        BUFF_CORPSE = 1 << 4,
+        BUFF_DISSOLVE = 1 << 5,
         BUFF_END
     };
 
@@ -51,26 +54,35 @@ public:
     virtual void Late_Update(_float fTimeDelta) override;
     virtual HRESULT Render() override;
 
-    /* 충돌 처리 */
+#pragma endregion
+
+#pragma region 0. 몬스터는 충돌에 대한 상태제어를 할 수 있어야한다. => 충돌에 따라 상태가 변하기도, 수치값이 바뀌기도한다.
 public:
     virtual void On_Collision_Enter(CGameObject* pOther) override;
     virtual void On_Collision_Stay(CGameObject* pOther) override;
     virtual void On_Collision_Exit(CGameObject* pOther) override;
+
+    /* Update AI*/
+public:
+    virtual void Update_AI(_float fTimeDelta) PURE;
 #pragma endregion
 
-#pragma region 애니메이션 관리.
+#pragma region 1. 애니메이션 관리. => 몬스터는 내 애니메이션이 무엇인지 알아야한다.
 public:
-    virtual void Change_Animation_NonBlend(_uint iAnimIdx, _bool IsLoop = false);
-    virtual void Change_Animation_Blend(const BLEND_DESC& blendDesc, _bool IsLoop);
+    virtual void Change_Animation_NonBlend(_uint iNextAnimIdx, _bool IsLoop = false);
+    virtual void Change_Animation_Blend(_uint iNextAnimIdx, _bool IsLoop = false, _float fBlendDuration = 0.2f, _bool bScale = true, _bool bRotate = true, _bool bTranslate = true);
 
 
 public:
-    virtual HRESULT InitializeAction_ToAnimationMap() PURE;
+    virtual HRESULT InitializeAction_ToAnimationMap() PURE; // 필수적으로 애니메이션 초기화를 진행해야합니다. => 인스턴스화 될거라면.
     
 public:
     void Change_Action(_wstring strAction) { m_CurrentAction = strAction; }
     _wstring Current_Action() { return m_CurrentAction; }
     _uint Get_CurrentAnimation() { return m_Action_AnimMap[m_CurrentAction]; }
+    _uint Find_AnimationIndex(const _wstring& strAnimationTag);
+    const _bool Is_Animation_Finished();
+
 
 protected:
     _wstring m_CurrentAction = { L"IDLE" };
@@ -80,7 +92,7 @@ protected:
 #pragma endregion
 
 
-#pragma region 수치 값 확인하기.
+#pragma region 2. 몬스터는 자신에게 필요한 수치 값이 존재한다. => Stat, 여러 상태(탐지 거리, 수치화값들.)
 public:
     const MONSTER_STAT& Get_MonsterStat() { return m_MonsterStat; }
     const _float Get_DetectionRange() { return m_fDetectionRange; }
@@ -91,37 +103,48 @@ protected:
 #pragma endregion
 
 
-#pragma region BUFF FLAG 관리.
+#pragma region 3. 몬스터는 자신이 어떤 버프를 소유할 수 있는지를 알아야합니다. => 그리고 그에 맞는 쿨타임도 알아야합니다.
 public:
-    void RemoveBuff(uint32_t expiredBuff);
-    void AddBuff(_uint buffFlag, _float fCustomDuration = -1.f);
+    void RemoveBuff(uint32_t buffFlag);
+    const _bool AddBuff(_uint buffFlag, _float fCustomDuration = -1.f); // 적용이 실패할 수도 있음.
+    const _bool IsBuffOnCooldown(_uint buffFlag);
+
+
+    
+public:
+    // 현재 버프 소유 여부 확인
     _bool HasBuff(_uint buffFlag) const;
     _bool HasAnyBuff(_uint buffFlags) const;
-    _bool HasAllBuffs(_uint buffFlags) const;  // ⭐ 필수
+    _bool HasAllBuffs(_uint buffFlags) const;  
 
 public:
-    void Tick_Timers(_float fTimeDelta);
+    void Tick_BuffTimers(_float fTimeDelta);
 
 public:
-    virtual HRESULT Initialize_BuffDurations();
+    virtual HRESULT Initialize_BuffDurations() PURE;
+    virtual HRESULT Initialize_BuffCoolDownDurations() PURE;
 
 protected:
+    /* 고민해봐야 될 점. => 버프의 진행시간은 있지만 해당 버프의 진행시간 보다 쿨타임이 긴 경우가 많음.*/
     uint32_t m_ActiveBuffs = { BUFF_NONE };
-    unordered_map<uint32_t, _float> m_BuffTimers;  // 상태별 남은 시간
-    unordered_map<uint32_t, _float> m_BuffDefaultDurations; // 상태별 기본 시간.
+    unordered_map<uint32_t, _float> m_BuffTimers;           // 상태별 남은 시간
+    unordered_map<uint32_t, _float> m_BuffDefault_Durations; // 상태별 기본 시간.
+
+    unordered_map<uint32_t, _float> m_BuffCoolDownTimers;            // 상태별 남은 쿨타임 시간
+    unordered_map<uint32_t, _float> m_BuffCoolDownDefault_Durations; // 상태별 기본 쿨타임 시간.
 #pragma endregion
 
 
-#pragma region 컴포넌트 준비
+#pragma region 4. 기본적으로 몬스터는 생성하기 위한 컴포넌트 준비가 필요하다.
 protected:
     virtual HRESULT Ready_Components(MONSTER_DESC* pDesc);
     virtual HRESULT Ready_Collider();
     virtual HRESULT Ready_Stats(MONSTER_DESC* pDesc);
 #pragma endregion
 
-#pragma region 공통 Initialize 값
+#pragma region 0. 공통된 Initialize 값 => Monster들은 해당 정보들을 필수적으로 소유해야합니다.
 public:
-    class CPlayer* Get_Target() { return m_pTarget; }
+    class CPlayer* Get_Target() { return m_pTarget; } // 플레이어 포인터를 생성과 동시에 가지고 있고 위치를 탐지합니다.
 
 
 protected:

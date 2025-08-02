@@ -49,8 +49,6 @@ HRESULT CSkyBossTree::Initialize(void* pArg)
 
 void CSkyBossTree::Update(_float fTimeDelta)
 {
-	__super::Update(fTimeDelta);
-
 	if (m_pRootNode)
 		m_pRootNode->Execute(fTimeDelta);
 }
