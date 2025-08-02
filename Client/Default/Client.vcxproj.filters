@@ -148,6 +148,12 @@
     <Filter Include="02. GameObject\Monster\BT\Hit">
       <UniqueIdentifier>{cc8949bf-7045-480d-b77a-ad34a854d4dd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. GameObject\Monster\WolfDevil">
+      <UniqueIdentifier>{6c9f3d9e-7c07-4cd4-bc84-b22abadafb5d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Monster\BT\Detect">
+      <UniqueIdentifier>{9a6206d5-b5b3-4d04-9141-77144482979a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -360,12 +366,6 @@
     <ClInclude Include="..\Public\BT_SkyBoss_Wait.h">
       <Filter>02. GameObject\Monster\Boss\SkyBoss\BT</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\BT_Monster_CheckHit.h">
-      <Filter>02. GameObject\Monster\BT</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Public\BT_IsTargetInRange.h">
-      <Filter>02. GameObject\Monster\BT</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\BT_SkyBoss_CanStrongAttack.h">
       <Filter>02. GameObject\Monster\Boss\SkyBoss\BT\Attack</Filter>
     </ClInclude>
@@ -401,6 +401,30 @@
     </ClInclude>
     <ClInclude Include="..\Public\BT_SkyBoss_IsDownStart.h">
       <Filter>02. GameObject\Monster\Boss\SkyBoss\BT\Special</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\WolfDevil.h">
+      <Filter>02. GameObject\Monster\WolfDevil</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BT_IsTargetInRange.h">
+      <Filter>02. GameObject\Monster\BT\Detect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\MonsterTree.h">
+      <Filter>02. GameObject\Monster\BT</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\WolfDevilDefine.h">
+      <Filter>02. GameObject\Monster\WolfDevil</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BT_Monster_IsDown.h">
+      <Filter>02. GameObject\Monster\BT\Down</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BT_Monster_DownAction.h">
+      <Filter>02. GameObject\Monster\BT\Down</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BT_Monster_IsHit.h">
+      <Filter>02. GameObject\Monster\BT\Hit</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BT_Monster_HitAction.h">
+      <Filter>02. GameObject\Monster\BT\Hit</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -603,12 +627,6 @@
     <ClCompile Include="..\Private\BT_SkyBoss_Wait.cpp">
       <Filter>02. GameObject\Monster\Boss\SkyBoss\BT</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\BT_Monster_CheckHit.cpp">
-      <Filter>02. GameObject\Monster\BT</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Private\BT_IsTargetInRange.cpp">
-      <Filter>02. GameObject\Monster\BT</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\BT_SkyBoss_CanStrongAttack.cpp">
       <Filter>02. GameObject\Monster\Boss\SkyBoss\BT\Attack</Filter>
     </ClCompile>
@@ -644,6 +662,27 @@
     </ClCompile>
     <ClCompile Include="..\Private\BT_SkyBoss_IsDownStart.cpp">
       <Filter>02. GameObject\Monster\Boss\SkyBoss\BT\Special</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\WolfDevil.cpp">
+      <Filter>02. GameObject\Monster\WolfDevil</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BT_IsTargetInRange.cpp">
+      <Filter>02. GameObject\Monster\BT\Detect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\MonsterTree.cpp">
+      <Filter>02. GameObject\Monster\BT</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BT_Monster_IsDown.cpp">
+      <Filter>02. GameObject\Monster\BT\Down</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BT_Monster_DownAction.cpp">
+      <Filter>02. GameObject\Monster\BT\Down</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BT_Monster_IsHit.cpp">
+      <Filter>02. GameObject\Monster\BT\Hit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BT_Monster_HitAction.cpp">
+      <Filter>02. GameObject\Monster\BT\Hit</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

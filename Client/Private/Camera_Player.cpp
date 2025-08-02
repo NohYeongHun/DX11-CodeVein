@@ -22,6 +22,10 @@ HRESULT CCamera_Player::Initialize_Clone(void* pArg)
 	m_fMouseSensor = pDesc->fMouseSensor * 1.5f;
 	m_pTarget = pDesc->pTarget;
 
+	// 화면 크기 가져오기
+	RECT rcClient;
+	GetClientRect(g_hWnd, &rcClient);
+
 	// 타겟 기준 뒤에서 바라보는 오프셋 (플레이어 뒤쪽 5미터, 위쪽 3미터)
 	XMStoreFloat4(&m_vTargetOffset, XMVectorSet(0.f, 2.f, -6.f, 0.f));
 	m_vOriginalOffset = m_vTargetOffset;
@@ -227,6 +231,7 @@ void CCamera_Player::Update_LockOn_Camera(_float fTimeDelta)
 		if (_long MouseMove = m_pGameInstance->Get_DIMouseMove(MOUSEMOVESTATE::X))
 		{
 			_float fAngle = (_float)MouseMove * m_fMouseSensor * 0.3f * fTimeDelta; // 일반보다 느리게
+			//_float fAngle = (_float)MouseMove * m_fScreenBasedSensitivity  * m_fMouseSensor; // 일반보다 느리게
 			m_fLockOnYaw += fAngle;
 		}
 	}
@@ -280,6 +285,7 @@ void CCamera_Player::Update_Chase_Target(_float fTimeDelta)
 		if (_long MouseMove = m_pGameInstance->Get_DIMouseMove(MOUSEMOVESTATE::X))
 		{
 			_float fAngle = (_float)MouseMove * m_fMouseSensor * fTimeDelta;
+			
 			//fTargetYaw += fAngle; // 목표값만 변경
 			m_fYaw += fAngle;
 

@@ -69,7 +69,7 @@ struct LevelButton {
 void CMap_Tool::Render()
 {
     
-    Default_Render();
+    //Default_Render();
 
     if (m_eToolMode == TOOLMODE::CREATE)
         Render_Model_Create();
@@ -686,7 +686,7 @@ void CMap_Tool::Default_Render()
             ImGui::Checkbox("##Show Only Navigation", &m_bShowOnlyNavi);
 
             ImGui::Text("This is the navigation tool ");
-            Set_Navigation();
+            //Set_Navigation();
             ImGui::EndTabItem();
         }
     }

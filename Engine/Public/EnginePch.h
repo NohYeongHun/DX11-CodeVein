@@ -60,7 +60,7 @@
 #include "BTSequence.h"
 #include "BTCondition.h"
 #include "BTInverter.h"
-#include "BehaviourTree.h"
+#include "BehaviorTree.h"
 
 /* Navigation */
 #include "VIBuffer_Cell.h"

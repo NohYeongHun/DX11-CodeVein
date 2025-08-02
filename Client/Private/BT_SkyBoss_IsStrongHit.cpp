@@ -12,7 +12,8 @@ _bool CBT_SkyBoss_IsStrongHit::Check_Condition()
 {
     // SkyBoss에서 강한 피격 상태인지 확인
     // Monster 클래스에 Is_StrongHit() 함수가 있다고 가정
-    return m_pOwner->Is_StrongHit();
+    return true;
+    //return m_pOwner->Is_StrongHit();
 }
 
 CBT_SkyBoss_IsStrongHit* CBT_SkyBoss_IsStrongHit::Create(CSkyBoss* pOwner)

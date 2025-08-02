@@ -1,11 +1,10 @@
 ﻿#pragma once
-#include "BehaviourTree.h"
 
 NS_BEGIN(Client)
-class CSkyBossTree final : public CBehaviourTree
+class CSkyBossTree final : public CBehaviorTree
 {
 public:
-    typedef struct tagSkyBossDesc : CBehaviourTree::BT_DESC
+    typedef struct tagSkyBossDesc : CBehaviorTree::BT_DESC
     {
         class CSkyBoss* pOwner = { nullptr };
     } SKYBOSS_BT_DESC;

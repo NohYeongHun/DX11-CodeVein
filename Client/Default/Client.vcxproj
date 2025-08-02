@@ -161,8 +161,11 @@
   <ItemGroup>
     <ClInclude Include="..\public\BackGround.h" />
     <ClInclude Include="..\Public\BT_Monster_DeadAction.h" />
+    <ClInclude Include="..\Public\BT_Monster_DownAction.h" />
+    <ClInclude Include="..\Public\BT_Monster_HitAction.h" />
     <ClInclude Include="..\Public\BT_Monster_IsDead.h" />
-    <ClInclude Include="..\Public\BT_Monster_CheckHit.h" />
+    <ClInclude Include="..\Public\BT_Monster_IsDown.h" />
+    <ClInclude Include="..\Public\BT_Monster_IsHit.h" />
     <ClInclude Include="..\Public\BT_SkyBoss_Attack.h" />
     <ClInclude Include="..\Public\BT_SkyBoss_CanStrongAttack.h" />
     <ClInclude Include="..\Public\BT_IsTargetInRange.h" />
@@ -210,6 +213,7 @@
     <ClInclude Include="..\Public\Loading_Slot.h" />
     <ClInclude Include="..\Public\Map.h" />
     <ClInclude Include="..\Public\Monster.h" />
+    <ClInclude Include="..\Public\MonsterTree.h" />
     <ClInclude Include="..\Public\Player.h" />
     <ClInclude Include="..\Public\PlayerDefine.h" />
     <ClInclude Include="..\Public\PlayerState.h" />
@@ -239,6 +243,8 @@
     <ClInclude Include="..\Public\Terrain.h" />
     <ClInclude Include="..\Public\Title.h" />
     <ClInclude Include="..\Public\TitleText.h" />
+    <ClInclude Include="..\Public\WolfDevil.h" />
+    <ClInclude Include="..\Public\WolfDevilDefine.h" />
     <ClInclude Include="Client.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="Resource.h" />
@@ -247,8 +253,11 @@
   <ItemGroup>
     <ClCompile Include="..\private\BackGround.cpp" />
     <ClCompile Include="..\Private\BT_Monster_DeadAction.cpp" />
+    <ClCompile Include="..\Private\BT_Monster_DownAction.cpp" />
+    <ClCompile Include="..\Private\BT_Monster_HitAction.cpp" />
     <ClCompile Include="..\Private\BT_Monster_IsDead.cpp" />
-    <ClCompile Include="..\Private\BT_Monster_CheckHit.cpp" />
+    <ClCompile Include="..\Private\BT_Monster_IsDown.cpp" />
+    <ClCompile Include="..\Private\BT_Monster_IsHit.cpp" />
     <ClCompile Include="..\Private\BT_SkyBoss_Attack.cpp" />
     <ClCompile Include="..\Private\BT_SkyBoss_CanStrongAttack.cpp" />
     <ClCompile Include="..\Private\BT_IsTargetInRange.cpp" />
@@ -298,6 +307,7 @@
     <ClCompile Include="..\Private\Loading_Slot.cpp" />
     <ClCompile Include="..\Private\Map.cpp" />
     <ClCompile Include="..\Private\Monster.cpp" />
+    <ClCompile Include="..\Private\MonsterTree.cpp" />
     <ClCompile Include="..\Private\Player.cpp" />
     <ClCompile Include="..\Private\PlayerState.cpp" />
     <ClCompile Include="..\Private\Player_AttackState.cpp" />
@@ -325,6 +335,7 @@
     <ClCompile Include="..\Private\Terrain.cpp" />
     <ClCompile Include="..\Private\Title.cpp" />
     <ClCompile Include="..\Private\TitleText.cpp" />
+    <ClCompile Include="..\Private\WolfDevil.cpp" />
     <ClCompile Include="Client.cpp" />
   </ItemGroup>
   <ItemGroup>

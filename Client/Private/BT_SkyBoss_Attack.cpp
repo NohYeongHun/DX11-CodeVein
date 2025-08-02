@@ -25,10 +25,10 @@ BT_RESULT CBT_SkyBoss_Attack::Perform_Action(_float fTimeDelta)
 
     case ATTACK_PHASE::PREPARING:
         // ✅ PREPARING 단계에서만 회전
-        if (m_pOwner->Get_Target())
+       /* if (m_pOwner->Get_Target())
         {
             m_pOwner->Smooth_Rotate_To_Target(fTimeDelta, m_pOwner->Get_RotationSpeed());
-        }
+        }*/
         return UpdatePreparing(fTimeDelta);
 
     case ATTACK_PHASE::ATTACKING:
@@ -53,8 +53,8 @@ BT_RESULT CBT_SkyBoss_Attack::StartAttack()
     m_iSelectedAttackAnim = SelectAttackAnimation();
 
     // 2. 공격 상태로 변경
-    m_pOwner->Change_State(MONSTER_ATTACK);
-    m_pOwner->Change_Animation(m_iSelectedAttackAnim, false);
+    //m_pOwner->Change_State(MONSTER_ATTACK);
+    //m_pOwner->Change_Animation(m_iSelectedAttackAnim, false);
 
     // 3. 다음 단계로 진행
     m_eAttackPhase = ATTACK_PHASE::PREPARING;
@@ -108,14 +108,14 @@ BT_RESULT CBT_SkyBoss_Attack::UpdateRecovery(_float fTimeDelta)
     m_fAttackTimer += fTimeDelta;
 
     // 애니메이션이 끝났거나 최대 대기 시간 도달
-    if (m_pOwner->Is_Animation_Finished() || m_fAttackTimer >= 1.0f)
-    {
-        m_eAttackPhase = ATTACK_PHASE::COMPLETED;
+    //if (m_pOwner->Is_Animation_Finished() || m_fAttackTimer >= 1.0f)
+    //{
+    //    m_eAttackPhase = ATTACK_PHASE::COMPLETED;
 
-        // 대기 상태로 복귀
-        m_pOwner->Change_State(MONSTER_IDLE);
-        return BT_RESULT::SUCCESS;
-    }
+    //    // 대기 상태로 복귀
+    //    m_pOwner->Change_State(MONSTER_IDLE);
+    //    return BT_RESULT::SUCCESS;
+    //}
 
     return BT_RESULT::RUNNING;
 }
@@ -144,20 +144,20 @@ void CBT_SkyBoss_Attack::DealDamageToTarget()
     if (!m_pOwner->Get_Target())
         return;
 
-    _float fDistance = m_pOwner->Get_Distance_To_Target();
+    //_float fDistance = m_pOwner->Get_Distance_To_Target();
 
-    // 공격 범위 내에 있으면 데미지 처리
-    if (fDistance <= m_pOwner->Get_AttackRange())
-    {
-        // 데미지 계산 및 처리
-        _float fDamage = m_pOwner->Get_AttackPower();
+    //// 공격 범위 내에 있으면 데미지 처리
+    //if (fDistance <= m_pOwner->Get_AttackRange())
+    //{
+    //    // 데미지 계산 및 처리
+    //    _float fDamage = m_pOwner->Get_AttackPower();
 
-        // 플레이어에게 데미지 전달
-        // m_pOwner->Get_Target()->Take_Damage(fDamage, m_pOwner);
+    //    // 플레이어에게 데미지 전달
+    //    // m_pOwner->Get_Target()->Take_Damage(fDamage, m_pOwner);
 
-        // 공격 이펙트 생성
-        // CreateAttackEffect();
-    }
+    //    // 공격 이펙트 생성
+    //    // CreateAttackEffect();
+    //}
 }
 
 

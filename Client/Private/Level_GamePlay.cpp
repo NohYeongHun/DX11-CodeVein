@@ -27,13 +27,21 @@ HRESULT CLevel_GamePlay::Initialize_Clone()
 		CRASH("Failed Layer_Player");
 		return E_FAIL;
 	}
-
+	
 	// 몬스터는 무조건 Player 이후에 만들어야합니다.
-	if (FAILED(Ready_Layer_SkyBoss(TEXT("Layer_Monster"))))
+	//if (FAILED(Ready_Layer_SkyBoss(TEXT("Layer_SkyBoss"))))
+	//{
+	//	CRASH("Failed Layer_SkyBoss");
+	//	return E_FAIL;
+	//}
+
+	if (FAILED(Ready_Layer_Monster(TEXT("Layer_Monster"))))
 	{
 		CRASH("Failed Layer_Monster");
 		return E_FAIL;
 	}
+
+	
 
 
 	if (FAILED(Ready_Layer_Map(TEXT("Layer_Map"))))
@@ -175,8 +183,8 @@ HRESULT CLevel_GamePlay::Ready_Layer_Player(const _wstring& strLayerTag)
 	CameraPlayerDesc.fNear = 0.1f;
 	CameraPlayerDesc.fFar = 500.f;
 	CameraPlayerDesc.fSpeedPerSec = 10.f;
-	CameraPlayerDesc.fRotationPerSec = XMConvertToRadians(9.0f);
-	CameraPlayerDesc.fMouseSensor = 0.3f;
+	CameraPlayerDesc.fRotationPerSec = XMConvertToRadians(90.0f);
+	CameraPlayerDesc.fMouseSensor = 0.5f;
 	
 
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel), strLayerTag,
@@ -230,7 +238,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_SkyBoss(const _wstring& strLayerTag)
 			ENUM_CLASS(m_eCurLevel)
 			, TEXT("Layer_Player"), 0));
 	Desc.eCurLevel = m_eCurLevel;
-	Desc.eMonsterType = MONSTER_TYPE_BOSS;
+	Desc.eMonsterType = MONSTERTYPE::BOSS;
 	Desc.fMaxHP = 3000.f;
 	Desc.fAttackPower = 30.f;
 	Desc.fDetectionRange = 20.f;
@@ -273,6 +281,37 @@ HRESULT CLevel_GamePlay::Ready_Layer_Map(const _wstring& strLayerTag)
 
 HRESULT CLevel_GamePlay::Ready_Layer_Monster(const _wstring& strLayerTag)
 {
+
+	CWolfDevil::WOLFDEVIL_DESC Desc{};
+	Desc.pPlayer = dynamic_cast<CPlayer*>(
+		m_pGameInstance->Get_GameObjcet(
+			ENUM_CLASS(m_eCurLevel)
+			, TEXT("Layer_Player"), 0));
+	Desc.eCurLevel = m_eCurLevel;
+	Desc.eMonsterType = MONSTERTYPE::NORMAL;
+	Desc.fMaxHP = 500.f;
+	Desc.fAttackPower = 20.f;
+	Desc.fDetectionRange = 20.f;
+	Desc.fAttackRange = 10.f;
+	Desc.fSpeedPerSec = 10.f;
+	Desc.fMoveSpeed = 10.f;
+	/* Transform 설정.*/
+	Desc.fSpeedPerSec = 10.f;
+	Desc.fRotationPerSec = XMConvertToRadians(90.0f);
+
+	if (nullptr == Desc.pPlayer)
+	{
+		CRASH("Failed Search Player");
+		return E_FAIL;
+	}
+
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel), strLayerTag,
+		ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_WolfDevil"), &Desc)))
+	{
+		CRASH("Failed Create WolfDevil");
+		return E_FAIL;
+	}
+		
 
 	return S_OK;
 }

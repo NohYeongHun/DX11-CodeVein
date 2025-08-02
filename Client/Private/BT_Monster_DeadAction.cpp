@@ -1,13 +1,8 @@
-﻿#include "BT_Monster_DeadAction.h"
-/*
-* 애니메이션 시간과 동기화 시킬 방법이 있나?
-* 아님 걍 때려맞춰야하나?
-*/
-CBT_Monster_DeadAction::CBT_Monster_DeadAction(CSkyBoss* pOwner)
+﻿
+/* 죽으면 소멸해야 하기 때문에 따로 상태 Reset이 필요해보이진 않음 .*/
+CBT_Monster_DeadAction::CBT_Monster_DeadAction(CMonster* pOwner)
     : m_pOwner{ pOwner }
-    , m_pGameInstance { CGameInstance::GetInstance()}
 {
-    Safe_AddRef(m_pGameInstance);
 }
 
 BT_RESULT CBT_Monster_DeadAction::Perform_Action(_float fTimeDelta)
@@ -15,7 +10,7 @@ BT_RESULT CBT_Monster_DeadAction::Perform_Action(_float fTimeDelta)
     switch (m_eDeadPhase)
     {
     case DEAD_PHASE::NONE:
-        return StartDead();
+        return EnterDead();
     case DEAD_PHASE::DYING:
         return UpdateDying(fTimeDelta);
     case DEAD_PHASE::CORPSE:
@@ -30,116 +25,85 @@ BT_RESULT CBT_Monster_DeadAction::Perform_Action(_float fTimeDelta)
 
 void CBT_Monster_DeadAction::Reset()
 {
-    m_eDeadPhase = DEAD_PHASE::NONE;
-    m_fDeadTimer = 0.f;
-    m_iSelectedAnim = 0;
-    m_bAnimationSet = false;
+
 }
 
-BT_RESULT CBT_Monster_DeadAction::StartDead()
+BT_RESULT CBT_Monster_DeadAction::EnterDead()
 {
     // 안전 코드 추가
     if (m_eDeadPhase != DEAD_PHASE::NONE)
-        return BT_RESULT::RUNNING;
+    {
+        CRASH("Failed Tree Dead Start Logic");
+    }
+        
 
     // 1. 죽는 애니메이션 선택
-    m_iSelectedAnim = SelectAnimation();
-    m_bAnimationSet = true;
+    // 탐색
+    _uint iNextAnimationIdx = m_pOwner->Find_AnimationIndex(L"DEATH_NORMAL");
 
     // 2. 죽는 상태로 변경
-    m_pOwner->Change_State(MONSTER_DEATH);
+    m_pOwner->Change_Animation_Blend(iNextAnimationIdx);
 
-    m_pOwner->Change_Animation(m_iSelectedAnim, false);
-
-    // 3. 콜리전 비활성화 (즉시)
+    // 3. 콜리전 비활성화 (즉시) => 죽었는데 맞으면 안되겠지요
     // m_pOwner->Set_CollisionEnabled(false);
 
     // 4. 죽음 이벤트 처리 (점수, 아이템 드롭 등)
-    HandleDeathEvents();
+    //HandleDeathEvents();
 
     // 5. 다음 단계로 진행
     m_eDeadPhase = DEAD_PHASE::DYING;
-    m_fDeadTimer = 0.f;
 
     return BT_RESULT::RUNNING;
 }
 
 BT_RESULT CBT_Monster_DeadAction::UpdateDying(_float fTimeDelta)
 {
-    m_fDeadTimer += fTimeDelta;
+    _bool bIsAnimationEnd = m_pOwner->Is_Animation_Finished();
+    _bool bIsBuffPossible = m_pOwner->AddBuff(CMonster::BUFF_CORPSE);
 
-    bool bIsAnimationEnd = m_pOwner->Is_Animation_Finished();
-
-    // 애니메이션이 끝났다면 시체 상태로 전환
-    if (bIsAnimationEnd)
+    if (bIsAnimationEnd && bIsBuffPossible)
     {
-        m_pOwner->Change_State(MONSTER_CORPSE);
-        m_eDeadPhase = DEAD_PHASE::CORPSE;
-        m_fDeadTimer = 0.f;
+        m_eDeadPhase = DEAD_PHASE::CORPSE; // 죽었을때 시체 상태로 변경.
     }
+        
 
     return BT_RESULT::RUNNING;
 }
 
 BT_RESULT CBT_Monster_DeadAction::UpdateCorpse(_float fTimeDelta)
 {
-    m_fDeadTimer += fTimeDelta;
-
-    // 시체 상태를 일정 시간 유지
-    if (m_fDeadTimer >= m_fCorpseLifetime)
-    {
-        // 디졸브 효과 시작
-        m_pOwner->Change_State(MONSTER_DISSOLVING);
-        //m_pOwner->Start_Dissolve_Effect();
-        m_eDeadPhase = DEAD_PHASE::DISSOLVING;
-        m_fDissolveTimer = 0.f;
-    }
+    // 시체 상태가 일정시간 유지되어야 합니다. => 이후 삭제. Tick_Timers에서 진행 중
+    if (!m_pOwner->HasBuff(CMonster::BUFF_CORPSE))
+        m_eDeadPhase = DEAD_PHASE::DISSOLVING; // 현재 디졸브 효과가 없으므로 삭제 진행.
+        
+       
 
     return BT_RESULT::RUNNING;
 }
 
 BT_RESULT CBT_Monster_DeadAction::UpdateDissolve(_float fTimeDelta)
 {
-    m_fDissolveTimer += fTimeDelta;
-
+    // 디졸브 효과가 없으므로 삭제로 바꿔봅시다.
+    m_eDeadPhase = DEAD_PHASE::COMPLETED;
+    m_pOwner->Set_Destroy(true);
     // 디졸브 효과 업데이트
-    _float dissolveProgress = m_fDissolveTimer / 2.0f; // 2초간 디졸브
-    //m_pOwner->Update_Dissolve_Effect(dissolveProgress);
+    //_float dissolveProgress = m_fDissolveTimer / 2.0f; // 2초간 디졸브
+    ////m_pOwner->Update_Dissolve_Effect(dissolveProgress);
 
-    // 디졸브 완료
-    if (dissolveProgress >= 1.0f)
-    {
-        m_pOwner->Set_Dead(); // 완전히 제거
-        m_eDeadPhase = DEAD_PHASE::COMPLETED;
-        return BT_RESULT::SUCCESS;
-    }
+    //// 디졸브 완료
+    //if (dissolveProgress >= 1.0f)
+    //{
+    //    //m_pOwner->Set_Dead(); // 완전히 제거
+    //    m_eDeadPhase = DEAD_PHASE::COMPLETED;
+    //    return BT_RESULT::SUCCESS;
+    //}
 
     return BT_RESULT::RUNNING;
 }
 
 
 
-void CBT_Monster_DeadAction::HandleDeathEvents()
-{
-    // 사운드 재생
-    //m_pGameInstance->Play_Sound(L"Monster_Death", 0.7f);
-
-    // 파티클 이펙트
-    //m_pOwner->Play_Death_Effect();
-
-    // AI나 매니저에게 죽음 알림
-    //if (auto pMonsterManager = m_pGameInstance->Get_MonsterManager())
-    //    pMonsterManager->On_Monster_Death(m_pOwner);
-}
-
-_uint CBT_Monster_DeadAction::SelectAnimation()
-{
- 
-    return SkyBossAnims::DEATH;
-}
-
-
-CBT_Monster_DeadAction* CBT_Monster_DeadAction::Create(CSkyBoss* pOwner)
+CBT_Monster_DeadAction* CBT_Monster_DeadAction::Create(CMonster* pOwner)
 {
     if (nullptr == pOwner)
     {
@@ -153,5 +117,4 @@ CBT_Monster_DeadAction* CBT_Monster_DeadAction::Create(CSkyBoss* pOwner)
 void CBT_Monster_DeadAction::Free()
 {
     __super::Free();
-    Safe_Release(m_pGameInstance);
 }

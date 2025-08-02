@@ -71,7 +71,7 @@ public:
 	
 
 	void Default_Render();
-	void Set_Navigation();
+	//void Set_Navigation();
 #pragma endregion
 
 

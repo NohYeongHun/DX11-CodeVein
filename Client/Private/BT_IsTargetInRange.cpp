@@ -9,7 +9,8 @@
 /* 플레이어가 해당 거리에 와있는가? */
 _bool CBT_IsTargetInRange::Check_Condition()
 {
-    return m_pOwner->IsTargetInRange();
+    return true;
+    //return m_pOwner->IsTargetInRange();
 }
 
 

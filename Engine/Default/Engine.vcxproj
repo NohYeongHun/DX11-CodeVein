@@ -173,7 +173,7 @@ call copy.bat</Command>
   <ItemGroup>
     <ClCompile Include="..\Private\Animation.cpp" />
     <ClCompile Include="..\Private\Base.cpp" />
-    <ClCompile Include="..\Private\BehaviourTree.cpp" />
+    <ClCompile Include="..\Private\BehaviorTree.cpp" />
     <ClCompile Include="..\Private\Bone.cpp" />
     <ClCompile Include="..\Private\Bounding_OBB.cpp" />
     <ClCompile Include="..\Private\Bounding.cpp" />
@@ -244,7 +244,7 @@ call copy.bat</Command>
   <ItemGroup>
     <ClInclude Include="..\Public\Animation.h" />
     <ClInclude Include="..\Public\Base.h" />
-    <ClInclude Include="..\Public\BehaviourTree.h" />
+    <ClInclude Include="..\Public\BehaviorTree.h" />
     <ClInclude Include="..\Public\Bone.h" />
     <ClInclude Include="..\Public\Bounding.h" />
     <ClInclude Include="..\Public\Bounding_AABB.h" />

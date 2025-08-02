@@ -1,12 +1,12 @@
 ﻿#include "SKyBossTree.h"
 
 CSkyBossTree::CSkyBossTree(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-	: CBehaviourTree(pDevice, pContext)
+	: CBehaviorTree(pDevice, pContext)
 {
 }
 
 CSkyBossTree::CSkyBossTree(const CSkyBossTree& Prototype)
-	: CBehaviourTree(Prototype)
+	: CBehaviorTree(Prototype)
 {
 }
 
@@ -19,7 +19,7 @@ HRESULT CSkyBossTree::Initialize(void* pArg)
 	SKYBOSS_BT_DESC* pDesc = static_cast<SKYBOSS_BT_DESC*>(pArg);
 	m_pOwner = pDesc->pOwner; // Owner 설정.
 
-	m_pPlayer = m_pOwner->Get_Target(); // 몬스터에 설정되어있는가?
+	//m_pPlayer = m_pOwner->Get_Target(); // 몬스터에 설정되어있는가?
 	if (nullptr == m_pPlayer)
 		CRASH("SkyBoss Tree Target Failed");
 
@@ -49,8 +49,6 @@ HRESULT CSkyBossTree::Initialize(void* pArg)
 
 void CSkyBossTree::Update(_float fTimeDelta)
 {
-	__super::Update(fTimeDelta);
-
 	if (m_pRootNode)
 		m_pRootNode->Execute(fTimeDelta);
 }
@@ -72,7 +70,7 @@ CBTSelector* CSkyBossTree::Create_SpecialStates_ToSelector()
 
 
 	// 2. Down Check Sequence 생성
-	pSpecialState_Selector->Add_Child(Create_SurvivalCheck_ToSequence());
+	//pSpecialState_Selector->Add_Child(Create_SurvivalCheck_ToSequence());
 
 	//CBTSequence* pDeadCheck_Sequence = CBTSequence::Create();
 	//pDeadCheck_Sequence->Add_Child(Create_SurvivalCheck_ToSequence());
@@ -89,7 +87,7 @@ CBTNode* CSkyBossTree::Create_HitBranch()
 	CBTSequence* pHitSequence = CBTSequence::Create();
 
 	// 조건: 현재 피격 상태인가?
-	pHitSequence->Add_Child(CBT_Monster_CheckHit::Create(m_pOwner));
+	pHitSequence->Add_Child(CBT_Monster_IsHit::Create(m_pOwner));
 
 	// 피격 반응 선택 (피격 강도에 따라)
 	CBTSelector* pHitActionSelector = CBTSelector::Create();
@@ -164,9 +162,6 @@ CBTSequence* CSkyBossTree::Create_HitReaction_ToSequence()
 
 	return pHitReaction_Sequence;
 }
-
-
-
 
 
 CBTNode* CSkyBossTree::Create_ComBatBehavior()

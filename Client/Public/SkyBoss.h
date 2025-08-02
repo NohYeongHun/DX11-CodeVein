@@ -28,6 +28,7 @@ private:
 	virtual ~CSkyBoss() = default;
 
 
+#pragma region 기본 함수 관리
 public:
 	virtual HRESULT Initialize_Prototype();
 	virtual HRESULT Initialize_Clone(void* pArg);
@@ -41,6 +42,21 @@ public:
 	virtual void On_Collision_Enter(CGameObject* pOther);
 	virtual void On_Collision_Stay(CGameObject* pOther);
 	virtual void On_Collision_Exit(CGameObject* pOther);
+#pragma endregion
+
+
+public:
+	virtual void Update_AI(_float fTimeDelta) override;
+#pragma endregion
+
+
+#pragma region 애니메이션 관리
+	virtual HRESULT InitializeAction_ToAnimationMap() override;
+#pragma endregion
+
+#pragma region 타이머 관리
+	// CMonster을(를) 통해 상속됨
+	virtual HRESULT Initialize_BuffDurations() override;
 #pragma endregion
 
 
@@ -71,6 +87,9 @@ public:
 	virtual CGameObject* Clone(void* pArg) override;
 	virtual void Destroy();
 	virtual void Free() override;
+
+
+
 
 };
 NS_END

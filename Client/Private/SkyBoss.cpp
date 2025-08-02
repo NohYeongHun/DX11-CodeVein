@@ -17,10 +17,11 @@ HRESULT CSkyBoss::Initialize_Prototype()
     return S_OK;
 }
 
+#pragma region 기본 함수들 구현
 HRESULT CSkyBoss::Initialize_Clone(void* pArg)
 {
     SKYBOSS_DESC* pDesc = static_cast<SKYBOSS_DESC*>(pArg);
-    
+
     if (FAILED(__super::Initialize_Clone(pDesc)))
         return E_FAIL;
 
@@ -30,6 +31,12 @@ HRESULT CSkyBoss::Initialize_Clone(void* pArg)
     if (FAILED(Ready_BehaviourTree()))
     {
         CRASH("Failed Ready BehaviourTree SkyBoss")
+            return E_FAIL;
+    }
+
+    if (FAILED(InitializeAction_ToAnimationMap()))
+    {
+        CRASH("Failed Ready InitializeAction WolfDevil");
         return E_FAIL;
     }
 
@@ -59,24 +66,24 @@ void CSkyBoss::Priority_Update(_float fTimeDelta)
 // 실행된다.
 void CSkyBoss::Update(_float fTimeDelta)
 {
-    if (m_pGameInstance->Get_KeyPress(DIK_1))
-    {
-        _wstring wstrDebug = TEXT("Dead키 눌렀다. \n");
-        OutputDebugString(wstrDebug.c_str());
-        Set_Dead();
-    }
+    //if (m_pGameInstance->Get_KeyPress(DIK_1))
+    //{
+    //    _wstring wstrDebug = TEXT("Dead키 눌렀다. \n");
+    //    OutputDebugString(wstrDebug.c_str());
+    //   // Set_Dead();
+    //}
 
     if (m_pTree)
         m_pTree->Update(fTimeDelta);
 
-    
+
     if (true == m_pModelCom->Play_Animation(fTimeDelta))
     {
     }
-   
+
     // 하위 객체들 움직임 제어는 Tree 제어 이후에
     __super::Update(fTimeDelta);
-    
+
 }
 
 void CSkyBoss::Late_Update(_float fTimeDelta)
@@ -85,7 +92,7 @@ void CSkyBoss::Late_Update(_float fTimeDelta)
         return;
 
     __super::Late_Update(fTimeDelta);
-    
+
 }
 
 HRESULT CSkyBoss::Render()
@@ -114,15 +121,10 @@ HRESULT CSkyBoss::Render()
     return S_OK;
 
 }
-
-#pragma region 움직임 구현
-
-
-/* 
-* Animation
-*/
 #pragma endregion
 
+
+#pragma region 충돌 
 void CSkyBoss::On_Collision_Enter(CGameObject* pOther)
 {
 }
@@ -134,6 +136,59 @@ void CSkyBoss::On_Collision_Stay(CGameObject* pOther)
 void CSkyBoss::On_Collision_Exit(CGameObject* pOther)
 {
 }
+#pragma endregion
+
+
+#pragma region AI에 대한 제어 순서 정의
+void CSkyBoss::Update_AI(_float fTimeDelta)
+{
+
+}
+#pragma endregion
+
+
+
+HRESULT CSkyBoss::InitializeAction_ToAnimationMap()
+{
+    m_Action_AnimMap.emplace(L"IDLE", SKYBOSS_ANIM_SWORD_IDLE_LOOP);
+    m_Action_AnimMap.emplace(L"IDLE_POSE", SKYBOSS_ANIM_SWORD_IDLE_POSE);
+    m_Action_AnimMap.emplace(L"COMBO_ATTACK", SKYBOSS_ANIM_SWORD_COMBO_ATTACK);
+    m_Action_AnimMap.emplace(L"ATTACK_1", SKYBOSS_ANIM_SWORD_NORMAL_ATTACK1);
+    m_Action_AnimMap.emplace(L"ATTACK_2", SKYBOSS_ANIM_SWORD_NORMAL_ATTACK2);
+    m_Action_AnimMap.emplace(L"ATTACK_3", SKYBOSS_ANIM_SWORD_NORMAL_ATTACK3);
+
+    m_Action_AnimMap.emplace(L"DAMAGE_BL", SKYBOSS_ANIM_DAMAGE_BL);
+    m_Action_AnimMap.emplace(L"DAMAGE_BR", SKYBOSS_ANIM_DAMAGE_BR);
+    m_Action_AnimMap.emplace(L"DAMAGE_FL", SKYBOSS_ANIM_DAMAGE_FL);
+    m_Action_AnimMap.emplace(L"DAMAGE_FR", SKYBOSS_ANIM_DAMAGE_FR);
+
+    m_Action_AnimMap.emplace(L"DODGE_B", SKYBOSS_ANIM_DODGE_B);
+    m_Action_AnimMap.emplace(L"DODGE_L", SKYBOSS_ANIM_DODGE_L);
+    m_Action_AnimMap.emplace(L"DODGE_R", SKYBOSS_ANIM_DODGE_R);
+
+    m_Action_AnimMap.emplace(L"DOWN_START", SKYBOSS_ANIM_DOWN_START);
+    m_Action_AnimMap.emplace(L"DOWN_LOOP", SKYBOSS_ANIM_DOWN_LOOP);
+    m_Action_AnimMap.emplace(L"DOWN_END", SKYBOSS_ANIM_DOWN_END);
+
+
+    m_Action_AnimMap.emplace(L"WALK_F", SKYBOSS_ANIM_WALK_F);
+    m_Action_AnimMap.emplace(L"WALK_B", SKYBOSS_ANIM_WALK_B);
+    m_Action_AnimMap.emplace(L"WALK_L", SKYBOSS_ANIM_WALK_L);
+    m_Action_AnimMap.emplace(L"WALK_R", SKYBOSS_ANIM_WALK_R);
+
+
+    return S_OK;
+}
+
+#pragma region TIMER 관리
+HRESULT CSkyBoss::Initialize_BuffDurations()
+{
+    return S_OK;
+}
+
+#pragma endregion
+
+
 
 #pragma region SkyBoss 상태 함수들
 
@@ -256,3 +311,5 @@ void CSkyBoss::Free()
     __super::Free();
     Safe_Release(m_pTree);
 }
+
+
