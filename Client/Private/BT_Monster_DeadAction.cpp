@@ -10,7 +10,7 @@ BT_RESULT CBT_Monster_DeadAction::Perform_Action(_float fTimeDelta)
     switch (m_eDeadPhase)
     {
     case DEAD_PHASE::NONE:
-        return StartDead();
+        return EnterDead();
     case DEAD_PHASE::DYING:
         return UpdateDying(fTimeDelta);
     case DEAD_PHASE::CORPSE:
@@ -28,13 +28,12 @@ void CBT_Monster_DeadAction::Reset()
 
 }
 
-BT_RESULT CBT_Monster_DeadAction::StartDead()
+BT_RESULT CBT_Monster_DeadAction::EnterDead()
 {
     // 안전 코드 추가
     if (m_eDeadPhase != DEAD_PHASE::NONE)
     {
         CRASH("Failed Tree Dead Start Logic");
-        return BT_RESULT::RUNNING;
     }
         
 

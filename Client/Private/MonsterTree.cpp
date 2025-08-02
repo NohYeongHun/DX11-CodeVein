@@ -37,7 +37,9 @@ HRESULT CMonsterTree::Initialize(void* pArg)
     pRootSelector->Add_Child(Create_SpecialStates_ToSelector());
 
     // 3. 일반 행동 
-    //pRootSelector->Add_Child(Create_ActionStates_ToSelector());
+    pRootSelector->Add_Child(Create_ActionStates_ToSelector());
+
+    // 4. 모두 실패했을 경우.
 
     Set_Root_Node(pRootSelector);
 
@@ -51,6 +53,7 @@ CBTSelector* CMonsterTree::Create_SpecialStates_ToSelector()
     CBTSelector* pSpecialState_Selector = CBTSelector::Create();
     pSpecialState_Selector->Add_Child(Create_SurvivalCheck_ToSequence());
     pSpecialState_Selector->Add_Child(Create_DownState_ToSequence());
+    pSpecialState_Selector->Add_Child(Create_HitReaction_ToSequence());
 
     return pSpecialState_Selector;
 }
@@ -70,10 +73,7 @@ CBTSequence* CMonsterTree::Create_SurvivalCheck_ToSequence()
 
 CBTSequence* CMonsterTree::Create_DownState_ToSequence()
 {
-
     CBTSequence* pDownCheck_Sequence = CBTSequence::Create();
-
-
     // 1. Condition 체크 => Down 상황인가?
     pDownCheck_Sequence->Add_Child(CBT_Monster_IsDown::Create(m_pOwner));
 
@@ -85,7 +85,14 @@ CBTSequence* CMonsterTree::Create_DownState_ToSequence()
 
 CBTSequence* CMonsterTree::Create_HitReaction_ToSequence()
 {
-    return nullptr;
+    CBTSequence* pHitCheck_Sequence = CBTSequence::Create();
+    // 1. Condition 체크 => Hit 상황인가?
+    pHitCheck_Sequence->Add_Child(CBT_Monster_IsHit::Create(m_pOwner));
+
+    // 2. Action => Hit 상태라면?
+    pHitCheck_Sequence->Add_Child(CBT_Monster_HitAction::Create(m_pOwner));
+
+    return pHitCheck_Sequence;
 }
 #pragma endregion
 
@@ -109,10 +116,11 @@ CBTNode* CMonsterTree::Create_NormalBehaviorBranch()
 }
 
 
-
+/* Attack Action은 가지고 있는 Resource를 이용해야 확인 가능합니다. */
 CBTSequence* CMonsterTree::Create_AttackAction_ToSequence()
 {
     CBTSequence* pAttack_Sequence = CBTSequence::Create();
+    
 
     return pAttack_Sequence;
 }

@@ -411,9 +411,6 @@
     <ClInclude Include="..\Public\MonsterTree.h">
       <Filter>02. GameObject\Monster\BT</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\BT_Monster_CheckHit.h">
-      <Filter>02. GameObject\Monster\BT\Hit</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\WolfDevilDefine.h">
       <Filter>02. GameObject\Monster\WolfDevil</Filter>
     </ClInclude>
@@ -422,6 +419,12 @@
     </ClInclude>
     <ClInclude Include="..\Public\BT_Monster_DownAction.h">
       <Filter>02. GameObject\Monster\BT\Down</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BT_Monster_IsHit.h">
+      <Filter>02. GameObject\Monster\BT\Hit</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BT_Monster_HitAction.h">
+      <Filter>02. GameObject\Monster\BT\Hit</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -669,14 +672,17 @@
     <ClCompile Include="..\Private\MonsterTree.cpp">
       <Filter>02. GameObject\Monster\BT</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\BT_Monster_CheckHit.cpp">
-      <Filter>02. GameObject\Monster\BT\Hit</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\BT_Monster_IsDown.cpp">
       <Filter>02. GameObject\Monster\BT\Down</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\BT_Monster_DownAction.cpp">
       <Filter>02. GameObject\Monster\BT\Down</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BT_Monster_IsHit.cpp">
+      <Filter>02. GameObject\Monster\BT\Hit</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BT_Monster_HitAction.cpp">
+      <Filter>02. GameObject\Monster\BT\Hit</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

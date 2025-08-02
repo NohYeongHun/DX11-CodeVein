@@ -26,7 +26,6 @@ CBT_Monster_IsDead* CBT_Monster_IsDead::Create(CMonster* pOwner)
 void CBT_Monster_IsDead::Free()
 {
     __super::Free();
-    Safe_Release(m_pGameInstance);
     m_pOwner = nullptr;
 }
 

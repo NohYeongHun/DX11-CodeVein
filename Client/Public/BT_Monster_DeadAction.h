@@ -29,7 +29,7 @@ public:
     virtual void Reset() override;
 
 private:
-    BT_RESULT StartDead();
+    BT_RESULT EnterDead();
     BT_RESULT UpdateDying(_float fTimeDelta);
     BT_RESULT UpdateCorpse(_float fTimeDelta);
     BT_RESULT UpdateDissolve(_float fTimeDelta);

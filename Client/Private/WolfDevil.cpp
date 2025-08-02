@@ -21,7 +21,6 @@ HRESULT CWolfDevil::Initialize_Prototype()
 
 HRESULT CWolfDevil::Initialize_Clone(void* pArg)
 {
-
     WOLFDEVIL_DESC* pDesc = static_cast<WOLFDEVIL_DESC*>(pArg);
 
     if (FAILED(__super::Initialize_Clone(pDesc)))
@@ -99,6 +98,18 @@ void CWolfDevil::Late_Update(_float fTimeDelta)
     else if (m_pGameInstance->Get_KeyPress(DIK_2))
     {
         _bool bIsBuffPossible = AddBuff(CMonster::BUFF_DOWN);
+        if (bIsBuffPossible)
+            OutputDebugWstring(TEXT("Wolf Devill Down 시작."));
+        else
+            OutputDebugWstring(TEXT("Wolf Devill Down 실패."));
+    }
+    else if (m_pGameInstance->Get_KeyPress(DIK_3))
+    {
+        _bool bIsBuffPossible = AddBuff(CMonster::BUFF_HIT);
+        if (bIsBuffPossible)
+            OutputDebugWstring(TEXT("Wolf Devill HIT 시작."));
+        else
+            OutputDebugWstring(TEXT("Wolf Devill HIT 실패"));
     }
         
 
@@ -150,7 +161,7 @@ void CWolfDevil::Update_AI(_float fTimeDelta)
 
 #ifdef _DEBUG
     OutputDebugWstring(TEXT("현재 WolfDevil의 Buff 쿨타임 : "));
-    OutPutDebugFloat(m_BuffTimers[BUFF_DOWN]);
+    OutPutDebugFloat(m_BuffTimers[BUFF_HIT]);
 
     OutputDebugWstring(TEXT("현재 WolfDevil의 Buff Flag : "));
     OutPutDebugInt(m_ActiveBuffs);
@@ -184,6 +195,7 @@ void CWolfDevil::On_Collision_Exit(CGameObject* pOther)
 HRESULT CWolfDevil::InitializeAction_ToAnimationMap()
 {
     m_Action_AnimMap.emplace(L"IDLE", WOLFDEVIL_IDLE_LOOP);
+    m_Action_AnimMap.emplace(L"HIT", WOLFDEVIL_DAMAGE_FRONT);
     m_Action_AnimMap.emplace(L"ATTACK_NORMAL", WOLFDEVIL_ATTACK_NORMAL);
     m_Action_AnimMap.emplace(L"ATTACK_JUMP", WOLFDEVIL_ATTACK_JUMP);
     m_Action_AnimMap.emplace(L"DEATH_BACK", WOLFDEVIL_DEATH_BACK);
@@ -208,31 +220,19 @@ HRESULT CWolfDevil::Initialize_BuffDurations()
 {
     // 어찌보면 이건 그냥 쿨다운의 영역.
     m_BuffDefault_Durations[BUFF_HIT] = 0.6f;        // 피격: 0.6초
-    m_BuffDefault_Durations[BUFF_DOWN] = 20.f;       // 다운: 20초 => 두번 클릭했을 때 다운이 되는가.
-    m_BuffDefault_Durations[BUFF_STUN] = 2.0f;       // 기절: 2.0초
+    m_BuffDefault_Durations[BUFF_DOWN] = 5.f;       // 다운: 20초 => 두번 클릭했을 때 다운이 되는가.
+    //m_BuffDefault_Durations[BUFF_STUN] = 20.f;       // 기절: 2.0초
     m_BuffDefault_Durations[BUFF_CORPSE] = 2.0f;       // 시체 : 2.0초
+    m_BuffDefault_Durations[BUFF_INVINCIBLE] = 0.5f; // 무적 시간.
     // 추가 버프 있으면 추가.
     // m_BuffDefault_Durations[BUFF_HIT] = 0.6f;        // 피격: 0.6초
 
-    if (FAILED(Initialize_BuffCoolDownDurations()))
-    {
-        CRASH("Failed CoolDownDurations")
-        return E_FAIL;
-    }
         
 
     return S_OK;
 }
 
-HRESULT CWolfDevil::Initialize_BuffCoolDownDurations()
-{
 
-    m_BuffCoolDownDefault_Durations[BUFF_HIT] = 0.6f;        // 피격: 0.6초
-    m_BuffCoolDownDefault_Durations[BUFF_DOWN] = 20.f;       // 다운: 20초 => 두번 클릭했을 때 다운이 되는가.
-    m_BuffCoolDownDefault_Durations[BUFF_STUN] = 2.0f;       // 기절: 2.0초
-    m_BuffCoolDownDefault_Durations[BUFF_CORPSE] = 2.0f;       // 시체 : 2.0초
-    return S_OK;
-}
 
 
 #pragma endregion

@@ -183,8 +183,8 @@ HRESULT CLevel_GamePlay::Ready_Layer_Player(const _wstring& strLayerTag)
 	CameraPlayerDesc.fNear = 0.1f;
 	CameraPlayerDesc.fFar = 500.f;
 	CameraPlayerDesc.fSpeedPerSec = 10.f;
-	CameraPlayerDesc.fRotationPerSec = XMConvertToRadians(9.0f);
-	CameraPlayerDesc.fMouseSensor = 0.3f;
+	CameraPlayerDesc.fRotationPerSec = XMConvertToRadians(90.0f);
+	CameraPlayerDesc.fMouseSensor = 0.5f;
 	
 
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel), strLayerTag,

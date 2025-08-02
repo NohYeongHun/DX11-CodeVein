@@ -18,10 +18,13 @@ public:
         BUFF_NONE = 0,
         BUFF_HIT = 1 << 0,
         BUFF_DOWN = 1 << 1,
-        BUFF_STUN = 1 << 2, 
-        BUFF_DEAD = 1 << 3,
-        BUFF_CORPSE = 1 << 4,
-        BUFF_DISSOLVE = 1 << 5,
+        BUFF_STUN = 1 << 2,
+
+        // 3 ~ 18은 커스텀으로 사용이 가능하지않을까.
+        BUFF_INVINCIBLE = 1 << 18, // 무적시간.
+        BUFF_DEAD = 1 << 19,
+        BUFF_CORPSE = 1 << 20, // 거의 마지막에만 사용할듯?
+        BUFF_DISSOLVE = 1 << 21,
         BUFF_END
     };
 
@@ -56,16 +59,21 @@ public:
 
 #pragma endregion
 
+
 #pragma region 0. 몬스터는 충돌에 대한 상태제어를 할 수 있어야한다. => 충돌에 따라 상태가 변하기도, 수치값이 바뀌기도한다.
 public:
     virtual void On_Collision_Enter(CGameObject* pOther) override;
     virtual void On_Collision_Stay(CGameObject* pOther) override;
     virtual void On_Collision_Exit(CGameObject* pOther) override;
 
-    /* Update AI*/
+
+#pragma endregion
+
+#pragma region Update AI
 public:
     virtual void Update_AI(_float fTimeDelta) PURE;
 #pragma endregion
+
 
 #pragma region 1. 애니메이션 관리. => 몬스터는 내 애니메이션이 무엇인지 알아야한다.
 public:
@@ -105,7 +113,7 @@ protected:
 
 #pragma region 3. 몬스터는 자신이 어떤 버프를 소유할 수 있는지를 알아야합니다. => 그리고 그에 맞는 쿨타임도 알아야합니다.
 public:
-    void RemoveBuff(uint32_t buffFlag);
+    void RemoveBuff(uint32_t buffFlag, _bool removeTimer = false);
     const _bool AddBuff(_uint buffFlag, _float fCustomDuration = -1.f); // 적용이 실패할 수도 있음.
     const _bool IsBuffOnCooldown(_uint buffFlag);
 
@@ -122,7 +130,6 @@ public:
 
 public:
     virtual HRESULT Initialize_BuffDurations() PURE;
-    virtual HRESULT Initialize_BuffCoolDownDurations() PURE;
 
 protected:
     /* 고민해봐야 될 점. => 버프의 진행시간은 있지만 해당 버프의 진행시간 보다 쿨타임이 긴 경우가 많음.*/
@@ -130,8 +137,6 @@ protected:
     unordered_map<uint32_t, _float> m_BuffTimers;           // 상태별 남은 시간
     unordered_map<uint32_t, _float> m_BuffDefault_Durations; // 상태별 기본 시간.
 
-    unordered_map<uint32_t, _float> m_BuffCoolDownTimers;            // 상태별 남은 쿨타임 시간
-    unordered_map<uint32_t, _float> m_BuffCoolDownDefault_Durations; // 상태별 기본 쿨타임 시간.
 #pragma endregion
 
 
@@ -140,6 +145,13 @@ protected:
     virtual HRESULT Ready_Components(MONSTER_DESC* pDesc);
     virtual HRESULT Ready_Collider();
     virtual HRESULT Ready_Stats(MONSTER_DESC* pDesc);
+#pragma endregion
+
+
+#pragma region 5. 특수한 상태들을 제어하기 위한 함수들.
+public:
+    virtual void Rotate_ToTarget(_float fTimeDelta); // 플레이어를 보면서 회전한다.
+    virtual void RotateTurn_ToTarget(_float fTimeDelta); // 플레이어를 보면서 회전한다.
 #pragma endregion
 
 #pragma region 0. 공통된 Initialize 값 => Monster들은 해당 정보들을 필수적으로 소유해야합니다.

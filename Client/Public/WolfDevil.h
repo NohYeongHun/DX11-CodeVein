@@ -46,7 +46,6 @@ public:
 #pragma region 2. 몬스터는 자신이 어떤 버프를 소유할 수 있는지를 알아야 한다. => 그리고 그에 맞는 쿨타임도 알아야한다.(몬스터마다 달라질 수 있다.)
 public:
 	virtual HRESULT Initialize_BuffDurations() override;
-	virtual HRESULT Initialize_BuffCoolDownDurations() override;
 #pragma endregion
 
 

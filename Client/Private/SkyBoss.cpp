@@ -186,10 +186,6 @@ HRESULT CSkyBoss::Initialize_BuffDurations()
     return S_OK;
 }
 
-HRESULT CSkyBoss::Initialize_BuffCoolDownDurations()
-{
-    return S_OK;
-}
 #pragma endregion
 
 

@@ -57,7 +57,6 @@ public:
 #pragma region 타이머 관리
 	// CMonster을(를) 통해 상속됨
 	virtual HRESULT Initialize_BuffDurations() override;
-	virtual HRESULT Initialize_BuffCoolDownDurations() override;
 #pragma endregion
 
 

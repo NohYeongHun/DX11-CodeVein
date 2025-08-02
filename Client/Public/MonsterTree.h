@@ -37,6 +37,8 @@ private:
 private:
     /* 액션 행동 체크 */
     CBTSequence* Create_AttackAction_ToSequence();
+
+private:
     CBTSequence* Create_SearchAction_ToSequence();
 
     //CBTNode* Create_StunBranch();

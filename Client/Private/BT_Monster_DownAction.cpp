@@ -25,7 +25,7 @@ BT_RESULT CBT_Monster_DownAction::Perform_Action(_float fTimeDelta)
 
 void CBT_Monster_DownAction::Reset()
 {
-    
+    m_eDownPhase = DOWN_PHASE::NONE;
 }
 
 BT_RESULT CBT_Monster_DownAction::EnterDown()

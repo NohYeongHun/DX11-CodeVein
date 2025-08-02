@@ -99,10 +99,12 @@
 #include "BT_Monster_DeadAction.h"
 #include "BT_Monster_IsDown.h"
 #include "BT_Monster_DownAction.h"
+#include "BT_Monster_IsHit.h"
+#include "BT_Monster_HitAction.h"
 
 #pragma endregion
 
-#include "BT_Monster_CheckHit.h"
+
 #include "BT_IsTargetInRange.h"
 
 /* ======================================== Monster Object ===================================== */

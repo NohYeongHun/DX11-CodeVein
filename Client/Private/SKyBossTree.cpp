@@ -87,7 +87,7 @@ CBTNode* CSkyBossTree::Create_HitBranch()
 	CBTSequence* pHitSequence = CBTSequence::Create();
 
 	// 조건: 현재 피격 상태인가?
-	pHitSequence->Add_Child(CBT_Monster_CheckHit::Create(m_pOwner));
+	pHitSequence->Add_Child(CBT_Monster_IsHit::Create(m_pOwner));
 
 	// 피격 반응 선택 (피격 강도에 따라)
 	CBTSelector* pHitActionSelector = CBTSelector::Create();

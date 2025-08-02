@@ -77,6 +77,7 @@ void CMonster::On_Collision_Exit(CGameObject* pOther)
 void CMonster::Change_Animation_NonBlend(_uint iNextAnimIdx, _bool IsLoop)
 {
     m_pModelCom->Set_Animation(iNextAnimIdx, IsLoop);
+    m_pModelCom->Animation_Reset();
 }
 
 void CMonster::Change_Animation_Blend(_uint iNextAnimIdx, _bool IsLoop, _float fBlendDuration, _bool bScale, _bool bRotate, _bool bTranslate)
@@ -87,6 +88,7 @@ void CMonster::Change_Animation_Blend(_uint iNextAnimIdx, _bool IsLoop, _float f
         , bTranslate);
     /* 애니메이션 변경. */
     m_pModelCom->Set_Animation(iNextAnimIdx, IsLoop);
+    m_pModelCom->Animation_Reset();
 }
 
 /* 애니메이션 인덱스.*/
@@ -118,11 +120,14 @@ const _bool CMonster::Is_Animation_Finished()
 #pragma region BUFF Flag 관리
 
 // Timer가 종료되거나 특정 시점에는 BuffFlag를 해제합니다.
-void CMonster::RemoveBuff(uint32_t buffFlag)
+void CMonster::RemoveBuff(uint32_t buffFlag, _bool removeTimer)
 {
     m_ActiveBuffs &= ~buffFlag;
-    //m_BuffTimers.erase(buffFlag);
+
+    if (removeTimer)
+        m_BuffTimers.erase(buffFlag); 
 }
+
 const _bool CMonster::AddBuff(_uint buffFlag, _float fCustomDuration)
 {
     if (IsBuffOnCooldown(buffFlag))
@@ -181,7 +186,9 @@ void CMonster::Tick_BuffTimers(_float fTimeDelta)
 
     // 만료된 버프들 제거
     for (uint32_t expiredBuff : expiredBuffs)
-        RemoveBuff(expiredBuff);
+        RemoveBuff(expiredBuff, true);
+
+    expiredBuffs.clear();
 
 }
 
@@ -256,6 +263,17 @@ HRESULT CMonster::Ready_Stats(MONSTER_DESC* pDesc)
     m_MonsterStat.fRotationSpeed = pDesc->fRotationSpeed;
 
     return S_OK;
+}
+void CMonster::Rotate_ToTarget(_float fTimeDelta)
+{
+
+}
+
+// 트랜스폼으로 돌려버리기.
+void CMonster::RotateTurn_ToTarget(_float fTimeDelta)
+{
+    m_pTransformCom->LookAt_YawOnly(
+        m_pTarget->Get_Transform()->Get_State(STATE::POSITION));
 }
 #pragma endregion
 
