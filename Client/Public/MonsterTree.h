@@ -54,7 +54,7 @@ private:
 
 private:
     /* 모든 상태가 실패하면? */
-    CBTNode* Create_IdleBranch();
+    CBTAction* Create_IdleAction();
 
 public:
     virtual void Update(_float fTimeDelta);

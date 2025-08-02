@@ -61,9 +61,6 @@ BT_RESULT CBT_Monster_AttackAction::UpdateRotating(_float fTimeDelta)
         m_pOwner->Change_Animation_Blend(iNextAnimationIdx);
 
         // 3. Collider 활성화 필요. => 공격용 콜라이더만 활성화.(Weapon?)
-
-        // 4. 맞았으면 무적시간 부여하기.
-        m_pOwner->AddBuff(CMonster::BUFF_INVINCIBLE);
     }
         
 
@@ -85,11 +82,11 @@ BT_RESULT CBT_Monster_AttackAction::EndAttack(_float fTimeDleta)
         // 1. Animation 탐색 시작
         _uint iNextAnimationIdx = m_pOwner->Find_AnimationIndex(L"IDLE");
 
-        // 2. 현재 애니메이션으로 블렌딩하면서 변경.
-        m_pOwner->Change_Animation_Blend(iNextAnimationIdx);
+        // 2. 현재 애니메이션으로 NON 블렌딩하면서 변경. => Idle은 NonBlend로 변경.
+        m_pOwner->Change_Animation_NonBlend(iNextAnimationIdx);
 
         // 디버그용 함수.
-        m_pOwner->Print_Position();
+        //m_pOwner->Print_Position();
     }
 
     return BT_RESULT::SUCCESS;

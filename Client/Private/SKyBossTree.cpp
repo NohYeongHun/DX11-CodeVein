@@ -171,7 +171,7 @@ CBTNode* CSkyBossTree::Create_ComBatBehavior()
 	CBTSequence* pCombatSequence = CBTSequence::Create();
 
 	// 1. 조건: 타겟이 감지 범위 내에 있는가?
-	pCombatSequence->Add_Child(CBT_IsTargetInRange::Create(m_pOwner, m_pOwner->Get_DetectionRange()));
+	pCombatSequence->Add_Child(CBT_Monster_IsDetectRange::Create(m_pOwner));
 
 	// 2. 전투 행동 선택 (Selector로 우선순위 설정)
 	CBTSelector* pCombatActions = CBTSelector::Create();

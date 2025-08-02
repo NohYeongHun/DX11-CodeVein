@@ -40,8 +40,10 @@ BT_RESULT CBT_Monster_DownAction::EnterDown()
     // 1. Animation 탐색 시작.
     _uint iNextAnimationIdx = m_pOwner->Find_AnimationIndex(L"DOWN_START");
 
+    
+
     // 2. 현재 애니메이션으로 블렌딩하면서 변경.
-    m_pOwner->Change_Animation_Blend(iNextAnimationIdx);
+    m_pOwner->Change_Animation_NonBlend(iNextAnimationIdx);
     m_eDownPhase = DOWN_PHASE::START;
 
     return BT_RESULT::RUNNING;
@@ -57,7 +59,7 @@ BT_RESULT CBT_Monster_DownAction::StartDown(_float fTimeDelta)
         _uint iNextAnimationIdx = m_pOwner->Find_AnimationIndex(L"DOWN_LOOP");
 
         // 2. 현재 애니메이션으로 블렌딩하면서 변경.
-        m_pOwner->Change_Animation_Blend(iNextAnimationIdx);
+        m_pOwner->Change_Animation_NonBlend(iNextAnimationIdx);
     }
 
 
@@ -73,7 +75,7 @@ BT_RESULT CBT_Monster_DownAction::LoopDown(_float fTimeDelta)
         _uint iNextAnimationIdx = m_pOwner->Find_AnimationIndex(L"DOWN_END");
 
         // 2. 현재 애니메이션으로 블렌딩하면서 변경.
-        m_pOwner->Change_Animation_Blend(iNextAnimationIdx);
+        m_pOwner->Change_Animation_NonBlend(iNextAnimationIdx);
     }
 
     return BT_RESULT::RUNNING;

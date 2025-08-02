@@ -39,7 +39,7 @@ HRESULT CMonsterTree::Initialize(void* pArg)
     pRootSelector->Add_Child(Create_ActionStates_ToSelector());
 
     // 4. 모두 실패했을 경우.
-
+    pRootSelector->Add_Child(Create_IdleAction());
     Set_Root_Node(pRootSelector);
 
     return S_OK;
@@ -116,22 +116,20 @@ CBTSequence* CMonsterTree::Create_AttackAction_ToSequence()
     pAttack_Sequence->Add_Child(CBT_Monster_IsAttackRange::Create(m_pOwner));
     pAttack_Sequence->Add_Child(CBT_Monster_AttackAction::Create(m_pOwner));
 
-    // 2. Action => Hit 상태라면?
-    //pAttack_Sequence->Add_Child(CBT_Monster_I::Create(m_pOwner));
-    //pAttack_Sequence->Add_Child();
-
     return pAttack_Sequence;
 }
 
 CBTSequence* CMonsterTree::Create_SearchAction_ToSequence()
 {
     CBTSequence* pSearch_Sequence = CBTSequence::Create();
+    pSearch_Sequence->Add_Child(CBT_Monster_IsDetectRange::Create(m_pOwner));
+    pSearch_Sequence->Add_Child(CBT_Monster_DetectAction::Create(m_pOwner,  false));
 
     return pSearch_Sequence;
 }
 
 
-CBTNode* CMonsterTree::Create_IdleBranch()
+CBTAction* CMonsterTree::Create_IdleAction()
 {
     return nullptr;
 }

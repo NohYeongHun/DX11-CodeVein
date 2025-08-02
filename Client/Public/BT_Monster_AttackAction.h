@@ -15,8 +15,6 @@ public:
 
 private:
     class CMonster* m_pOwner = { nullptr };
-
-    // 죽는 단계 관리?
     ATTACK_PHASE m_eAttackPhase = { ATTACK_PHASE::NONE };
 
 public:

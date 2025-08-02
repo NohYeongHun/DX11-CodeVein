@@ -105,9 +105,8 @@
 
 #include "BT_Monster_IsAttackRange.h"
 #include "BT_Monster_AttackAction.h"
-
-
-#include "BT_IsTargetInRange.h"
+#include "BT_Monster_IsDetectRange.h"
+#include "BT_Monster_DetectAction.h"
 
 /* ======================================== Monster Object ===================================== */
 #include "Monster.h"

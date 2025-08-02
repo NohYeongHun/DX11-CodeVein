@@ -71,10 +71,11 @@ HRESULT CWolfDevil::Initialize_Clone(void* pArg)
     m_pTransformCom->Set_Quaternion(qInitRot);
 
     _float3 vPos = { 5.f, 5.f, 0.f };
-    /*vPos.x += iTest * -10.f;
-    vPos.z += iTest * 3.f;*/
     m_pTransformCom->Set_State(STATE::POSITION, XMLoadFloat3(&vPos));
-    m_pModelCom->Set_Animation(Get_CurrentAnimation(), false);
+
+    m_pModelCom->Set_RootMotionRotation(true);
+    m_pModelCom->Set_RootMotionTranslate(true);
+
 
     return S_OK;
 }
@@ -100,7 +101,7 @@ void CWolfDevil::Late_Update(_float fTimeDelta)
     {
         _bool bIsBuffPossible = AddBuff(CMonster::BUFF_DEAD);
     }
-    else if (m_pGameInstance->Get_KeyPress(DIK_2))
+    if (m_pGameInstance->Get_KeyPress(DIK_2))
     {
         _bool bIsBuffPossible = AddBuff(CMonster::BUFF_DOWN);
         //if (bIsBuffPossible)
@@ -108,7 +109,7 @@ void CWolfDevil::Late_Update(_float fTimeDelta)
         //else
         //    OutputDebugWstring(TEXT("Wolf Devill Down 실패."));
     }
-    else if (m_pGameInstance->Get_KeyPress(DIK_3))
+    if (m_pGameInstance->Get_KeyPress(DIK_3))
     {
         _bool bIsBuffPossible = AddBuff(CMonster::BUFF_HIT);
         //if (bIsBuffPossible)
@@ -219,8 +220,10 @@ HRESULT CWolfDevil::InitializeAction_ToAnimationMap()
     m_Action_AnimMap.emplace(L"DOWN_LOOP", WOLFDEVIL_DOWN_P_LOOP);
     m_Action_AnimMap.emplace(L"DOWN_END", WOLFDEVIL_DOWN_P_END);
     m_Action_AnimMap.emplace(L"THREAT", WOLFDEVIL_THREAT_01);
-    m_Action_AnimMap.emplace(L"WALK_F", WOLFDEVIL_WALK_F);
-    m_Action_AnimMap.emplace(L"RUN_F", WOLFDEVIL_RUN);
+    m_Action_AnimMap.emplace(L"WALK", WOLFDEVIL_WALK_F);
+    m_Action_AnimMap.emplace(L"RUN", WOLFDEVIL_RUN);
+    // 같은 애니메이션이지만 다른 이름으로 설정해서 Node에서 사용할 수 있게함.
+    m_Action_AnimMap.emplace(L"DETECT", WOLFDEVIL_RUN); 
     m_Action_AnimMap.emplace(L"STUN", WOLFDEVIL_STUN);
 
     return S_OK;
@@ -233,10 +236,10 @@ HRESULT CWolfDevil::InitializeAction_ToAnimationMap()
 HRESULT CWolfDevil::Initialize_BuffDurations()
 {
     // 어찌보면 이건 그냥 쿨다운의 영역.
-    m_BuffDefault_Durations[BUFF_HIT] = 0.6f;        // 피격: 0.6초
+    m_BuffDefault_Durations[BUFF_HIT] = 0.5f;        // 피격: 0.6초
     m_BuffDefault_Durations[BUFF_DOWN] = 5.f;       // 다운: 20초 => 두번 클릭했을 때 다운이 되는가.
     m_BuffDefault_Durations[BUFF_CORPSE] = 2.0f;       // 시체 : 2.0초
-    m_BuffDefault_Durations[BUFF_INVINCIBLE] = 0.5f; // 무적 시간.
+    m_BuffDefault_Durations[BUFF_INVINCIBLE] = 0.6f; // 무적 시간.
     // 추가 버프 있으면 추가.
     // m_BuffDefault_Durations[BUFF_HIT] = 0.6f;        // 피격: 0.6초
 
