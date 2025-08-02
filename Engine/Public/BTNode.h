@@ -25,6 +25,7 @@ public:
     }
 
     virtual BT_RESULT Execute(_float fTimeDelta) = 0;
+    // Action Node들의 경우에는 해당 Reset시 Phase를 초기화해줍니다.
     virtual void Reset() {}
 
 protected:

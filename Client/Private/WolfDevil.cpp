@@ -29,13 +29,11 @@ HRESULT CWolfDevil::Initialize_Clone(void* pArg)
         return E_FAIL;
     }
 
-
     if (FAILED(Ready_Components(pDesc)))
     {
         CRASH("Failed Ready Components WolfDevil");
         return E_FAIL;
     }
-
 
     if (FAILED(Ready_BehaviourTree()))
     {
@@ -43,9 +41,16 @@ HRESULT CWolfDevil::Initialize_Clone(void* pArg)
         return E_FAIL;
     }
 
+    if (FAILED(Initialize_Stats()))
+    {
+        CRASH("Failed InitializeStat WolfDevil");
+        return E_FAIL;
+    }
+    
+
     if (FAILED(InitializeAction_ToAnimationMap()))
     {
-        CRASH("Failed Ready InitializeAction WolfDevil");
+        CRASH("Failed InitializeAction WolfDevil");
         return E_FAIL;
     }
 
@@ -98,18 +103,18 @@ void CWolfDevil::Late_Update(_float fTimeDelta)
     else if (m_pGameInstance->Get_KeyPress(DIK_2))
     {
         _bool bIsBuffPossible = AddBuff(CMonster::BUFF_DOWN);
-        if (bIsBuffPossible)
-            OutputDebugWstring(TEXT("Wolf Devill Down 시작."));
-        else
-            OutputDebugWstring(TEXT("Wolf Devill Down 실패."));
+        //if (bIsBuffPossible)
+        //    OutputDebugWstring(TEXT("Wolf Devill Down 시작."));
+        //else
+        //    OutputDebugWstring(TEXT("Wolf Devill Down 실패."));
     }
     else if (m_pGameInstance->Get_KeyPress(DIK_3))
     {
         _bool bIsBuffPossible = AddBuff(CMonster::BUFF_HIT);
-        if (bIsBuffPossible)
-            OutputDebugWstring(TEXT("Wolf Devill HIT 시작."));
-        else
-            OutputDebugWstring(TEXT("Wolf Devill HIT 실패"));
+        //if (bIsBuffPossible)
+        //    OutputDebugWstring(TEXT("Wolf Devill HIT 시작."));
+        //else
+        //    OutputDebugWstring(TEXT("Wolf Devill HIT 실패"));
     }
         
 
@@ -160,14 +165,12 @@ void CWolfDevil::Update_AI(_float fTimeDelta)
     }
 
 #ifdef _DEBUG
-    OutputDebugWstring(TEXT("현재 WolfDevil의 Buff 쿨타임 : "));
-    OutPutDebugFloat(m_BuffTimers[BUFF_HIT]);
-
-    OutputDebugWstring(TEXT("현재 WolfDevil의 Buff Flag : "));
-    OutPutDebugInt(m_ActiveBuffs);
-
-    OutputDebugWstring(TEXT("현재 WolfDevil의 Animation Index : "));
-    OutPutDebugInt(m_pModelCom->Get_CurrentAnimationIndex()); // 현재 모델 인덱스 가져오기.
+    //OutputDebugWstring(TEXT("현재 WolfDevil의 Buff 쿨타임 : "));
+    //OutPutDebugFloat(m_BuffTimers[BUFF_HIT]);
+    //OutputDebugWstring(TEXT("현재 WolfDevil의 Buff Flag : "));
+    //OutPutDebugInt(m_ActiveBuffs);
+    //OutputDebugWstring(TEXT("현재 WolfDevil의 Animation Index : "));
+    //OutPutDebugInt(m_pModelCom->Get_CurrentAnimationIndex()); // 현재 모델 인덱스 가져오기.
 #endif // _DEBUG
 
 }
@@ -190,13 +193,24 @@ void CWolfDevil::On_Collision_Exit(CGameObject* pOther)
 
 #pragma endregion
 
-#pragma region 1. 몬스터는 내 애니메이션이 무엇인지 알아야한다.
+#pragma region 1. 몬스터는 자신에게 필요한 수치값들을 초기화해야한다.
+// 기본적으로 몬스터 생성시 필요한 STAT 값들을 제외하고 더 필요한 경우 정의
+HRESULT CWolfDevil::Initialize_Stats()
+{
+    return S_OK;
+}
+#pragma endregion
+
+#pragma region 2. 몬스터는 내 애니메이션이 무엇인지 알아야한다.
 /* STRING Index 형태로 관리.*/
 HRESULT CWolfDevil::InitializeAction_ToAnimationMap()
 {
+    m_pModelCom->Set_RootMotionRotation(true);
+    m_pModelCom->Set_RootMotionTranslate(true);
+
     m_Action_AnimMap.emplace(L"IDLE", WOLFDEVIL_IDLE_LOOP);
     m_Action_AnimMap.emplace(L"HIT", WOLFDEVIL_DAMAGE_FRONT);
-    m_Action_AnimMap.emplace(L"ATTACK_NORMAL", WOLFDEVIL_ATTACK_NORMAL);
+    m_Action_AnimMap.emplace(L"ATTACK", WOLFDEVIL_ATTACK_NORMAL);
     m_Action_AnimMap.emplace(L"ATTACK_JUMP", WOLFDEVIL_ATTACK_JUMP);
     m_Action_AnimMap.emplace(L"DEATH_BACK", WOLFDEVIL_DEATH_BACK);
     m_Action_AnimMap.emplace(L"DEATH_NORMAL", WOLFDEVIL_DEATH_NORMAL);
@@ -215,19 +229,16 @@ HRESULT CWolfDevil::InitializeAction_ToAnimationMap()
 #pragma endregion
 
 
-#pragma region 2. 몬스터는 자신이 어떤 버프를 소유할 수 있는지를 알아야 한다. => 그리고 그에 맞는 쿨타임도 알아야한다.(몬스터마다 달라질 수 있다.)
+#pragma region 3. 몬스터는 자신이 어떤 버프를 소유할 수 있는지를 알아야 한다. => 그리고 그에 맞는 쿨타임도 알아야한다.(몬스터마다 달라질 수 있다.)
 HRESULT CWolfDevil::Initialize_BuffDurations()
 {
     // 어찌보면 이건 그냥 쿨다운의 영역.
     m_BuffDefault_Durations[BUFF_HIT] = 0.6f;        // 피격: 0.6초
     m_BuffDefault_Durations[BUFF_DOWN] = 5.f;       // 다운: 20초 => 두번 클릭했을 때 다운이 되는가.
-    //m_BuffDefault_Durations[BUFF_STUN] = 20.f;       // 기절: 2.0초
     m_BuffDefault_Durations[BUFF_CORPSE] = 2.0f;       // 시체 : 2.0초
     m_BuffDefault_Durations[BUFF_INVINCIBLE] = 0.5f; // 무적 시간.
     // 추가 버프 있으면 추가.
     // m_BuffDefault_Durations[BUFF_HIT] = 0.6f;        // 피격: 0.6초
-
-        
 
     return S_OK;
 }
@@ -239,7 +250,7 @@ HRESULT CWolfDevil::Initialize_BuffDurations()
 
 
 
-#pragma region 기본적인 WolfDevil이 생성되기 위한 컴포넌트 객체들.
+#pragma region 4. 기본적인 WolfDevil이 생성되기 위한 컴포넌트 객체들.
 HRESULT CWolfDevil::Ready_Components(WOLFDEVIL_DESC* pDesc)
 {
     if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxAnimMesh"),
@@ -307,6 +318,14 @@ HRESULT CWolfDevil::Ready_Render_Resources()
 HRESULT CWolfDevil::Ready_PartObjects()
 {
     return S_OK;
+}
+
+void CWolfDevil::Enable_Collider(_uint iType)
+{
+}
+
+void CWolfDevil::Disable_Collider(_uint iType)
+{
 }
 
 

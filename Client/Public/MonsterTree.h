@@ -41,9 +41,6 @@ private:
 private:
     CBTSequence* Create_SearchAction_ToSequence();
 
-    //CBTNode* Create_StunBranch();
-    CBTNode* Create_NormalBehaviorBranch();
-
 #pragma endregion
 
 

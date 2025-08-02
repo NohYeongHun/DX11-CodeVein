@@ -20,7 +20,7 @@ public:
         BUFF_DOWN = 1 << 1,
         BUFF_STUN = 1 << 2,
 
-        // 3 ~ 18은 커스텀으로 사용이 가능하지않을까.
+        // 3 ~ 17은 커스텀으로 사용이 가능하지않을까.
         BUFF_INVINCIBLE = 1 << 18, // 무적시간.
         BUFF_DEAD = 1 << 19,
         BUFF_CORPSE = 1 << 20, // 거의 마지막에만 사용할듯?
@@ -103,11 +103,19 @@ protected:
 #pragma region 2. 몬스터는 자신에게 필요한 수치 값이 존재한다. => Stat, 여러 상태(탐지 거리, 수치화값들.)
 public:
     const MONSTER_STAT& Get_MonsterStat() { return m_MonsterStat; }
-    const _float Get_DetectionRange() { return m_fDetectionRange; }
+    const _float Get_DetectionRange() { return m_MonsterStat.fDetectionRange; }
+    const _float Get_AttackRange() { return m_MonsterStat.fAttackRange; }
+
+public:
+    virtual HRESULT Initialize_Stats() PURE; // 객체가 사용해야하는 수치값 정의하기.
+    
+public:
+    // 수치값을 이용한 함수들.
+    virtual const _bool Is_TargetAttackRange();
+    virtual const _bool Is_TargetDetectionRange();
 
 protected:
     MONSTER_STAT m_MonsterStat = {};
-    _float m_fDetectionRange = { };
 #pragma endregion
 
 
@@ -116,8 +124,6 @@ public:
     void RemoveBuff(uint32_t buffFlag, _bool removeTimer = false);
     const _bool AddBuff(_uint buffFlag, _float fCustomDuration = -1.f); // 적용이 실패할 수도 있음.
     const _bool IsBuffOnCooldown(_uint buffFlag);
-
-
     
 public:
     // 현재 버프 소유 여부 확인
@@ -151,8 +157,29 @@ protected:
 #pragma region 5. 특수한 상태들을 제어하기 위한 함수들.
 public:
     virtual void Rotate_ToTarget(_float fTimeDelta); // 플레이어를 보면서 회전한다.
-    virtual void RotateTurn_ToTarget(_float fTimeDelta); // 플레이어를 보면서 회전한다.
+    virtual void RotateTurn_ToTarget(); // 플레이어를 보면서 회전한다.
+    virtual const _bool IsRotateFinished(_float fRadian);
+
+public:
+    /* 콜라이더 제어.*/
+    virtual void Enable_Collider(_uint iType) PURE; 
+    virtual void Disable_Collider(_uint iType) PURE;
+    
+
 #pragma endregion
+    
+
+#pragma region 99. DEBUG 용도 함수.
+
+#ifdef _DEBUG
+public:
+    virtual void Print_Position();
+#endif // _DEBUG
+
+
+
+#pragma endregion
+
 
 #pragma region 0. 공통된 Initialize 값 => Monster들은 해당 정보들을 필수적으로 소유해야합니다.
 public:

@@ -35,8 +35,8 @@ BT_RESULT CBT_Monster_HitAction::EnterHit(_float fTimeDelta)
     if (m_pOwner->HasBuff(CMonster::BUFF_INVINCIBLE))
         return BT_RESULT::FAILURE;
 
-    // 0. 회전 시키기
-    m_pOwner->RotateTurn_ToTarget(fTimeDelta);
+    // 0. 즉시 회전 시키기
+    m_pOwner->RotateTurn_ToTarget();
 
     // 1. 죽는 애니메이션 선택
    // 탐색

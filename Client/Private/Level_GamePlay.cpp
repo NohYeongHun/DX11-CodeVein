@@ -289,6 +289,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_Monster(const _wstring& strLayerTag)
 			, TEXT("Layer_Player"), 0));
 	Desc.eCurLevel = m_eCurLevel;
 	Desc.eMonsterType = MONSTERTYPE::NORMAL;
+	/* 몬스터 스탯.*/
 	Desc.fMaxHP = 500.f;
 	Desc.fAttackPower = 20.f;
 	Desc.fDetectionRange = 20.f;

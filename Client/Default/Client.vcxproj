@@ -160,9 +160,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\public\BackGround.h" />
+    <ClInclude Include="..\Public\BT_Monster_AttackAction.h" />
     <ClInclude Include="..\Public\BT_Monster_DeadAction.h" />
     <ClInclude Include="..\Public\BT_Monster_DownAction.h" />
     <ClInclude Include="..\Public\BT_Monster_HitAction.h" />
+    <ClInclude Include="..\Public\BT_Monster_IsAttackRange.h" />
     <ClInclude Include="..\Public\BT_Monster_IsDead.h" />
     <ClInclude Include="..\Public\BT_Monster_IsDown.h" />
     <ClInclude Include="..\Public\BT_Monster_IsHit.h" />
@@ -252,9 +254,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\BackGround.cpp" />
+    <ClCompile Include="..\Private\BT_Monster_AttackAction.cpp" />
     <ClCompile Include="..\Private\BT_Monster_DeadAction.cpp" />
     <ClCompile Include="..\Private\BT_Monster_DownAction.cpp" />
     <ClCompile Include="..\Private\BT_Monster_HitAction.cpp" />
+    <ClCompile Include="..\Private\BT_Monster_IsAttackRange.cpp" />
     <ClCompile Include="..\Private\BT_Monster_IsDead.cpp" />
     <ClCompile Include="..\Private\BT_Monster_IsDown.cpp" />
     <ClCompile Include="..\Private\BT_Monster_IsHit.cpp" />

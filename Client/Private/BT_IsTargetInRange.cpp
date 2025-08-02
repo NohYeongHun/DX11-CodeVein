@@ -1,9 +1,6 @@
 ﻿CBT_IsTargetInRange::CBT_IsTargetInRange(CMonster* pOwner, _float fRange)
 	: m_pOwner(pOwner)
-	, m_fDetectionRange(fRange)
-    , m_pGameInstance{ CGameInstance::GetInstance() }
 {
-     Safe_AddRef(m_pGameInstance);
 }
 
 /* 플레이어가 해당 거리에 와있는가? */
@@ -28,5 +25,4 @@ CBT_IsTargetInRange* CBT_IsTargetInRange::Create(CMonster* pOwner, _float fRange
 void CBT_IsTargetInRange::Free()
 {
     __super::Free();
-    Safe_Release(m_pGameInstance);
 }

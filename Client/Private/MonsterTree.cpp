@@ -20,7 +20,6 @@ HRESULT CMonsterTree::Initialize(void* pArg)
     // Owner와 몬스터 타겟 설정. => 플레이어로
     MONSTER_BT_DESC* pDesc = static_cast<MONSTER_BT_DESC*>(pArg);
     m_pOwner = pDesc->pOwner; // Owner 설정.
-
     m_pTarget = m_pOwner->Get_Target(); // 몬스터에 설정되어있는가?
 
     if (nullptr == m_pTarget)
@@ -110,17 +109,16 @@ CBTSelector* CMonsterTree::Create_ActionStates_ToSelector()
     return pActionState_Selector;
 }
 
-CBTNode* CMonsterTree::Create_NormalBehaviorBranch()
-{
-    return nullptr;
-}
-
-
 /* Attack Action은 가지고 있는 Resource를 이용해야 확인 가능합니다. */
 CBTSequence* CMonsterTree::Create_AttackAction_ToSequence()
 {
     CBTSequence* pAttack_Sequence = CBTSequence::Create();
-    
+    pAttack_Sequence->Add_Child(CBT_Monster_IsAttackRange::Create(m_pOwner));
+    pAttack_Sequence->Add_Child(CBT_Monster_AttackAction::Create(m_pOwner));
+
+    // 2. Action => Hit 상태라면?
+    //pAttack_Sequence->Add_Child(CBT_Monster_I::Create(m_pOwner));
+    //pAttack_Sequence->Add_Child();
 
     return pAttack_Sequence;
 }

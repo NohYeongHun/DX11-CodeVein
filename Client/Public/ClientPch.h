@@ -101,8 +101,10 @@
 #include "BT_Monster_DownAction.h"
 #include "BT_Monster_IsHit.h"
 #include "BT_Monster_HitAction.h"
-
 #pragma endregion
+
+#include "BT_Monster_IsAttackRange.h"
+#include "BT_Monster_AttackAction.h"
 
 
 #include "BT_IsTargetInRange.h"
