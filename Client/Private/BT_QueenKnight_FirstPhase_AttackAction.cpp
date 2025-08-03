@@ -56,16 +56,16 @@ BT_RESULT CBT_QueenKnight_FirstPhase_AttackAction::UpdateRotating(_float fTimeDe
     // 0. 한번에 회전.
     m_pOwner->Rotate_ToTarget(fTimeDelta);
 
-    if (m_pOwner->IsRotateFinished(XMConvertToRadians(10.f))) // 라디안 10도 차이까지만 허용
+    if (m_pOwner->IsRotateFinished(XMConvertToRadians(5.f))) // 라디안 5도 차이까지만 허용
     {
         m_eAttackPhase = ATTACK_PHASE::FIRST_ATTACK;
 
-        m_pOwner->Set_RootMotionTranslate(false);
+        m_pOwner->Set_RootMotionTranslate(true);
         // 1. 공격 애니메이션 선택
         _uint iNextAnimationIdx = m_pOwner->Find_AnimationIndex(L"STRONG_ATTACK1");
 
         // 2. 공격 상태로 변경
-        m_pOwner->Change_Animation_Blend(iNextAnimationIdx);
+        m_pOwner->Change_Animation_Combo(iNextAnimationIdx);
 
         // 3. Collider 활성화 필요. => 공격용 콜라이더만 활성화.(Weapon?)
     }
@@ -79,14 +79,19 @@ BT_RESULT CBT_QueenKnight_FirstPhase_AttackAction::UpdateFirstAttack(_float fTim
     {
         m_eAttackPhase = ATTACK_PHASE::SECOND_ATTACK;
 
-        m_pOwner->Set_RootMotionTranslate(false);
         // 1. 공격 애니메이션 선택
         _uint iNextAnimationIdx = m_pOwner->Find_AnimationIndex(L"STRONG_ATTACK2");
 
+        m_pOwner->Set_RootMotionTranslate(false);
         // 2. 공격 상태로 변경
         m_pOwner->Change_Animation_Blend(iNextAnimationIdx);
 
         m_pOwner->RotateTurn_ToTarget();
+
+        _float4 vPos = {};
+        XMStoreFloat4(&vPos, m_pOwner->Get_Transform()->Get_State(STATE::POSITION));
+        OutputDebugWstring(TEXT("STRONG ATTACK1 -> STRONG ATTACK2"));
+        OutPutDebugFloat4(vPos);
     }
 
     return BT_RESULT::RUNNING;
@@ -94,18 +99,49 @@ BT_RESULT CBT_QueenKnight_FirstPhase_AttackAction::UpdateFirstAttack(_float fTim
 
 BT_RESULT CBT_QueenKnight_FirstPhase_AttackAction::UpdateSecondAttack(_float fTimeDelta)
 {
+    //static _bool bFirstFrame = true;
+    //if (bFirstFrame)
+    //{
+    //    _float4 vPos = {};
+    //    XMStoreFloat4(&vPos, m_pOwner->Get_Transform()->Get_State(STATE::POSITION));
+    //    OutputDebugWstring(TEXT("STRONG ATTACK2 First Frame : "));
+    //    OutPutDebugFloat4(vPos);
+    //    bFirstFrame = false;
+    //}
+
+
+    //if (m_pOwner->Is_Animation_Finished())
+    //{
+    //    m_eAttackPhase = ATTACK_PHASE::COMPLETED;
+
+    //    m_pOwner->Set_RootMotionTranslate(false);
+    //    // 1. 공격 애니메이션 선택
+    //    //_uint iNextAnimationIdx = m_pOwner->Find_AnimationIndex(L"STRONG_ATTACK3");
+    //    _uint iNextAnimationIdx = m_pOwner->Find_AnimationIndex(L"IDLE");
+
+    //    // 2. 공격 상태로 변경
+    //    m_pOwner->Change_Animation_NonBlend(iNextAnimationIdx);
+    //    m_pOwner->RotateTurn_ToTarget();
+    //}
+
     if (m_pOwner->Is_Animation_Finished())
     {
         m_eAttackPhase = ATTACK_PHASE::LAST_ATTACK;
 
-        m_pOwner->Set_RootMotionTranslate(false);
         // 1. 공격 애니메이션 선택
         _uint iNextAnimationIdx = m_pOwner->Find_AnimationIndex(L"STRONG_ATTACK3");
 
+        m_pOwner->Set_RootMotionTranslate(false);
         // 2. 공격 상태로 변경
-        m_pOwner->Change_Animation_Blend(iNextAnimationIdx);
+        m_pOwner->Change_Animation_NonBlend(iNextAnimationIdx);
+
         m_pOwner->RotateTurn_ToTarget();
+        _float4 vPos = {};
+        XMStoreFloat4(&vPos, m_pOwner->Get_Transform()->Get_State(STATE::POSITION));
+        OutputDebugWstring(TEXT("STRONG ATTACK2 -> STRONG ATTACK3"));
+        OutPutDebugFloat4(vPos);
     }
+
     return BT_RESULT::RUNNING;
 }
 
@@ -121,6 +157,11 @@ BT_RESULT CBT_QueenKnight_FirstPhase_AttackAction::UpdateLastAttack(_float fTime
 
         // 2. IDLE 상태로 변경
         m_pOwner->Change_Animation_NonBlend(iNextAnimationIdx);
+
+        _float4 vPos = {};
+        XMStoreFloat4(&vPos, m_pOwner->Get_Transform()->Get_State(STATE::POSITION));
+        OutputDebugWstring(TEXT("STRONG ATTACK3 -> IDLE"));
+        OutPutDebugFloat4(vPos);
     }
 
     return BT_RESULT::RUNNING;

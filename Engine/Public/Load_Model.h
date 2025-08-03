@@ -152,6 +152,7 @@ private:
 
 	_bool m_bRootMotionRotate = { false };
 	_bool m_bRootMotionTranslate = { false };
+	_bool m_bAnimationJustChanged = { false };
 
 private:
 	string m_ModelDir = {};

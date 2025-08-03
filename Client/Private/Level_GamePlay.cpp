@@ -286,13 +286,13 @@ HRESULT CLevel_GamePlay::Ready_Layer_QueenKnight(const _wstring& strLayerTag)
 	Desc.eMonsterType = MONSTERTYPE::BOSS;
 	Desc.fMaxHP = 3000.f;
 	Desc.fAttackPower = 50.f;
-	Desc.fDetectionRange = 20.f;
-	Desc.fAttackRange = 10.f;
+	Desc.fDetectionRange = 30.f;
+	Desc.fAttackRange = 5.f;
 	Desc.fSpeedPerSec = 10.f;
 	Desc.fMoveSpeed = 10.f;
 	/* Transform 설정.*/
-	Desc.fSpeedPerSec = 10.f;
-	Desc.fRotationPerSec = XMConvertToRadians(90.0f);
+	Desc.fSpeedPerSec = 50.f;
+	Desc.fRotationPerSec = XMConvertToRadians(180.f);
 
 	if (nullptr == Desc.pPlayer)
 	{

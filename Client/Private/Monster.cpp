@@ -85,7 +85,7 @@ void CMonster::On_Collision_Exit(CGameObject* pOther)
 void CMonster::Change_Animation_NonBlend(_uint iNextAnimIdx, _bool IsLoop)
 {
     m_pModelCom->Set_Animation(iNextAnimIdx, IsLoop);
-    m_pModelCom->Animation_Reset();
+    //m_pModelCom->Animation_Reset();
 }
 
 void CMonster::Change_Animation_Blend(_uint iNextAnimIdx, _bool IsLoop, _float fBlendDuration, _bool bScale, _bool bRotate, _bool bTranslate)
@@ -97,6 +97,13 @@ void CMonster::Change_Animation_Blend(_uint iNextAnimIdx, _bool IsLoop, _float f
     /* 애니메이션 변경. */
     m_pModelCom->Set_Animation(iNextAnimIdx, IsLoop);
     m_pModelCom->Animation_Reset();
+}
+
+// 연계 공격 전용
+void CMonster::Change_Animation_Combo(_uint iAnimationIndex)
+{
+    // 루트 모션 연속성을 보장하면서 즉시 전환
+    m_pModelCom->Set_Animation(iAnimationIndex, false);
 }
 
 /* 애니메이션 인덱스.*/

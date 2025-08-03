@@ -63,6 +63,16 @@ BT_RESULT CBT_Monster_DetectAction::UpdateRotating(_float fTimeDelta)
 /* 루트모션 없는 이동만 취급. */
 BT_RESULT CBT_Monster_DetectAction::UpdateWalk(_float fTimeDelta)
 {
+    _float fDistanceToTarget = CalculateDistanceToTarget();
+
+    // 너무 멀어지면 탐지 종료
+    // 충분히 가까워지면 다음 단계로
+    if (fDistanceToTarget <= m_pOwner->Get_MinDetectionRange())
+    {
+        m_eDetectPhase = DETECT_PHASE::END;
+        return BT_RESULT::RUNNING;
+    }
+
     if (m_pOwner->Is_Animation_Finished())
         m_eDetectPhase = DETECT_PHASE::END;
     else
@@ -76,18 +86,27 @@ BT_RESULT CBT_Monster_DetectAction::UpdateWalk(_float fTimeDelta)
 
 BT_RESULT CBT_Monster_DetectAction::EndDetect(_float fTimeDleta)
 {
-    if (m_pOwner->Is_Animation_Finished())
-    {
-        m_eDetectPhase = DETECT_PHASE::COMPLETED;
-        // 1. Animation 탐색 시작
-        _uint iNextAnimationIdx = m_pOwner->Find_AnimationIndex(L"IDLE");
+    m_eDetectPhase = DETECT_PHASE::COMPLETED;
+    // 1. Animation 탐색 시작
+    _uint iNextAnimationIdx = m_pOwner->Find_AnimationIndex(L"IDLE");
 
-        // 2. 현재 애니메이션으로 NON 블렌딩하면서 변경. => Idle은 NonBlend로 변경.
-        m_pOwner->Change_Animation_NonBlend(iNextAnimationIdx);
-        m_pOwner->Set_RootMotionTranslate(false);
-    }
+    // 2. 현재 애니메이션으로 NON 블렌딩하면서 변경. => Idle은 NonBlend로 변경.
+    m_pOwner->Change_Animation_NonBlend(iNextAnimationIdx);
+    m_pOwner->Set_RootMotionTranslate(false);
 
     return BT_RESULT::RUNNING;
+}
+
+_float CBT_Monster_DetectAction::CalculateDistanceToTarget()
+{
+    if (!m_pOwner->Get_Target())
+        return FLT_MAX;
+
+    _vector vMyPos = m_pOwner->Get_Transform()->Get_State(STATE::POSITION);
+    _vector vTargetPos = m_pOwner->Get_Target()->Get_Transform()->Get_State(STATE::POSITION);
+    _vector vDistance = vTargetPos - vMyPos;
+
+    return XMVectorGetX(XMVector3Length(vDistance));
 }
 
 
@@ -101,6 +120,8 @@ CBT_Monster_DetectAction* CBT_Monster_DetectAction::Create(CMonster* pOwner)
 
     return new CBT_Monster_DetectAction(pOwner);
 }
+
+
 
 void CBT_Monster_DetectAction::Free()
 {

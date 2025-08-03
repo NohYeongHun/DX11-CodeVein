@@ -194,6 +194,9 @@ HRESULT CQueenKnight::InitializeAction_ToAnimationMap()
     m_Action_AnimMap.emplace(L"ATTACK2", KNIGHT_SWORD_ATTACK_NORMAL_01);
     m_Action_AnimMap.emplace(L"ATTACK3", KNIGHT_SWORD_ATTACK_NORMAL_02);
 
+    // 중간에 사라지게 해서 플레이어 위에서 나타나서 아래로 내다꼽게.
+    m_Action_AnimMap.emplace(L"ATTACK_JUMP", KNIGHT_SWORD_ATTACK_JUMP);
+
     m_Action_AnimMap.emplace(L"RUN", KNIGHT_SHIELD_SWORD_GUARD_RUN_F);
     m_Action_AnimMap.emplace(L"WALK", KNIGHT_SHIELD_SWORD_GUARD_WALK_F);
     // 같은 애니메이션이지만 다른 이름으로 설정해서 Node에서 사용할 수 있게함.
@@ -209,13 +212,13 @@ HRESULT CQueenKnight::InitializeAction_ToAnimationMap()
 
     /* 재생속도 증가. */
     m_pModelCom->Set_CurrentTickPerSecond(KNIGHT_SWORD_ATTACK_STRONG_01, 
-        m_pModelCom->Get_CurrentTickPerSecond(KNIGHT_SWORD_ATTACK_STRONG_01) * 2.f);
+        m_pModelCom->Get_CurrentTickPerSecond(KNIGHT_SWORD_ATTACK_STRONG_01) * 3.f);
 
     m_pModelCom->Set_CurrentTickPerSecond(KNIGHT_SWORD_ATTACK_STRONG_02,
-        m_pModelCom->Get_CurrentTickPerSecond(KNIGHT_SWORD_ATTACK_STRONG_02) * 2.f);
+        m_pModelCom->Get_CurrentTickPerSecond(KNIGHT_SWORD_ATTACK_STRONG_02) * 3.f);
 
     m_pModelCom->Set_CurrentTickPerSecond(KNIGHT_SWORD_ATTACK_STRONG_03,
-        m_pModelCom->Get_CurrentTickPerSecond(KNIGHT_SWORD_ATTACK_STRONG_03) * 2.f);
+        m_pModelCom->Get_CurrentTickPerSecond(KNIGHT_SWORD_ATTACK_STRONG_03) * 3.f);
     //
     ///* 재생속도 증가. */
     //m_pModelCom->Set_CurrentTickPerSecond(WOLFDEVIL_ATTACK_JUMP, m_pModelCom->Get_CurrentTickPerSecond(WOLFDEVIL_ATTACK_JUMP) * 2.f);
@@ -235,7 +238,7 @@ HRESULT CQueenKnight::Initialize_BuffDurations()
     m_BuffDefault_Durations[BUFF_INVINCIBLE] = 0.6f; // 무적 시간.
 
     // 15 초마다 해당 페이즈 시퀀스 공격 반복
-    m_BuffDefault_Durations[QUEEN_BUFF_PHASE_ATTACK_COOLDOWN] = 15.f;
+    m_BuffDefault_Durations[QUEEN_BUFF_PHASE_ATTACK_COOLDOWN] = 1.f;
     return S_OK;
 }
 

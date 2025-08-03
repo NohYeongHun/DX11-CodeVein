@@ -55,14 +55,17 @@ void CPlayer_StrongAttackState::Exit()
 		if (m_iNextState == CPlayer::PLAYER_STATE::IDLE)
 		{
 			m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, false);
+			return;
 		}
-			
-		else if (m_iNextState == CPlayer::PLAYER_STATE::STRONG_ATTACK)
+		
+		// 루트모션은 블렌딩안하기.
+		if (m_iNextState == CPlayer::PLAYER_STATE::STRONG_ATTACK ||
+			m_iNextState == CPlayer::PLAYER_STATE::ATTACK ||
+			m_iNextState == CPlayer::PLAYER_STATE::DODGE ||
+			m_iNextState == CPlayer::PLAYER_STATE::GUARD
+			)
 		{
-			if (m_iNextAnimIdx == PLAYER_ANIM_SPECIAL_LAUNCH)
-			{
-				m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, true);
-			}
+			return;
 		}
 		else 
 			m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, false);	

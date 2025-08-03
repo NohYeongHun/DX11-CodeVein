@@ -23,10 +23,10 @@ void CPlayer_AttackState::Enter(void* pArg)
 	m_iCurAnimIdx = pDesc->iAnimation_Idx;
 	m_eDir = pDesc->eDirection;
 	
-	m_pModelCom->Set_Animation(m_iCurAnimIdx, m_isLoop);
-	m_pModelCom->Set_RootMotionTranslate(true);
+	m_pModelCom->Set_RootMotionTranslate(false);
 	m_pModelCom->Set_RootMotionRotation(true);
-
+	m_pModelCom->Set_Animation(m_iCurAnimIdx, m_isLoop);
+	
 
 	// 방향 제어 관련 초기화
 	m_bCanChangeDirection = true;
@@ -54,17 +54,22 @@ void CPlayer_AttackState::Exit()
 		{
 			m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, false);
 		}
-		else if (m_iNextState == CPlayer::PLAYER_STATE::GUARD)
+		//else if (m_iNextState == CPlayer::PLAYER_STATE::GUARD)
+		//{
+		//	m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, false);
+		//}
+		// 루트모션은 블렌딩안하기.
+		if (m_iNextState == CPlayer::PLAYER_STATE::STRONG_ATTACK || 
+			m_iNextState == CPlayer::PLAYER_STATE::DODGE || 
+			m_iNextState == CPlayer::PLAYER_STATE::GUARD ||
+			m_iNextState == CPlayer::PLAYER_STATE::ATTACK
+		)
 		{
-			m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, false);
-		}
-		else if (m_iNextState == CPlayer::PLAYER_STATE::STRONG_ATTACK)
-		{
-			m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, true);
+			return;
 		}
 		else
 		{
-			m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.1f, true, true, true);
+			m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.1f, true, true, false);
 		}
 		
 	}

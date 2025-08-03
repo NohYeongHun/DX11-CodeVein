@@ -81,6 +81,8 @@ public:
     virtual void Change_Animation_NonBlend(_uint iNextAnimIdx, _bool IsLoop = false);
     virtual void Change_Animation_Blend(_uint iNextAnimIdx, _bool IsLoop = false, _float fBlendDuration = 0.2f, _bool bScale = true, _bool bRotate = true, _bool bTranslate = true);
 
+    void Change_Animation_Combo(_uint iAnimationIndex); // 연계공격 전용
+
 
 public:
     virtual HRESULT InitializeAction_ToAnimationMap() PURE; // 필수적으로 애니메이션 초기화를 진행해야합니다. => 인스턴스화 될거라면.
@@ -108,6 +110,7 @@ protected:
 public:
     const MONSTER_STAT& Get_MonsterStat() { return m_MonsterStat; }
     const _float Get_DetectionRange() { return m_MonsterStat.fDetectionRange; }
+    const _float Get_MinDetectionRange() { return 5.f; }
     const _float Get_AttackRange() { return m_MonsterStat.fAttackRange; }
 
 public:

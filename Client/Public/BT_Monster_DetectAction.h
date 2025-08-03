@@ -33,6 +33,9 @@ private:
     BT_RESULT UpdateWalk(_float fTimeDelta);
     BT_RESULT EndDetect(_float fTimeDleta);
 
+private:
+    _float CalculateDistanceToTarget();
+
 public:
     static CBT_Monster_DetectAction* Create(class CMonster* pOwner);
     virtual void Free() override;

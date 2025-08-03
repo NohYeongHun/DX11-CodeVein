@@ -96,7 +96,7 @@ CBTSelector* CQueenKnightTree::Create_ActionStates_ToSelector()
 
     // 액션 상태에서는 Sequence를 제어합니다.
     pActionState_Selector->Add_Child(Create_FirstPhaseAttack_ToSequence());
-    pActionState_Selector->Add_Child(Create_AttackAction_ToSequence());
+    //pActionState_Selector->Add_Child(Create_AttackAction_ToSequence());
     pActionState_Selector->Add_Child(Create_SearchAction_ToSequence());
 
     return pActionState_Selector;

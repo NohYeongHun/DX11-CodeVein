@@ -26,11 +26,9 @@ void CPlayer_DodgeState::Enter(void* pArg)
 
 	// ⭐ Dodge는 non-loop으로 변경
 	m_isLoop = false;
-	m_pModelCom->Set_Animation(m_iCurAnimIdx, m_isLoop);
 	m_pModelCom->Set_RootMotionRotation(true);
 	m_pModelCom->Set_RootMotionTranslate(true);
-
-
+	m_pModelCom->Set_Animation(m_iCurAnimIdx, m_isLoop);
 }
 
 /* State 실행 */
@@ -66,14 +64,24 @@ void CPlayer_DodgeState::Update(_float fTimeDelta)
 // 종료될 때 실행할 동작.=> 왠만하면 Idle
 void CPlayer_DodgeState::Exit()
 {
+	m_pModelCom->Set_RootMotionRotation(false);
+	m_pModelCom->Set_RootMotionTranslate(false);
 	//여기서 동작해야합니다.
 	if (m_iNextState != -1) // NextIndex가 있는경우 블렌딩 시작.
 	{
-		m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, false);
+		if (m_iNextAnimIdx == PLAYER_ANIM_STRONG_ATTACK || 
+			m_iNextAnimIdx == PLAYER_ANIM_ATTACK1
+			)
+		{
+			return;
+		}
+
+			
+		else
+			m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, false);
 	}
 
-	m_pModelCom->Set_RootMotionRotation(false);
-	m_pModelCom->Set_RootMotionTranslate(false);
+	
 	
 }
 

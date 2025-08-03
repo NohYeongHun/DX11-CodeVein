@@ -114,13 +114,92 @@ HRESULT CLoad_Model::Render(_uint iNumMesh)
 	return S_OK;
 }
 
+//void CLoad_Model::Set_Animation(_uint iAnimIndex, _bool isLoop)
+//{
+//	m_isLoop = isLoop;
+//	m_iCurrentAnimIndex = iAnimIndex;
+//
+//}
+
 void CLoad_Model::Set_Animation(_uint iAnimIndex, _bool isLoop)
 {
-	m_isLoop = isLoop;
-	m_iCurrentAnimIndex = iAnimIndex;
+	if (iAnimIndex >= m_Animations.size())
+		return;
 
+	// 🔥 루트 모션 연속성 처리 - 애니메이션 인덱스 변경 전에 해야 함!
+	_vector vCurrentRootPos = XMVectorZero();
+	if (m_bRootMotionTranslate && m_iCurrentAnimIndex != iAnimIndex && m_iCurrentAnimIndex < m_Animations.size())
+	{
+		// 현재 루트본 위치 저장
+		_matrix rootMatrix = m_Bones[m_iRoot_BoneIndex]->Get_CombinedTransformationMatrix();
+		vCurrentRootPos = rootMatrix.r[3];
+	}
+
+	// 애니메이션 설정 (한 번만!)
+	m_iCurrentAnimIndex = iAnimIndex;
+	m_isLoop = isLoop;
+
+	// 새 애니메이션 리셋
+	m_Animations[m_iCurrentAnimIndex]->Reset();
+	m_isFinished = false;
+	m_isTrackEnd = false;
+
+	// 🔥 핵심: m_vOldPos를 현재 루트본 위치로 설정하여 연속성 보장
+	if (m_bRootMotionTranslate)
+	{
+		XMStoreFloat4(&m_vOldPos, vCurrentRootPos);
+	}
+	else
+	{
+		XMStoreFloat4(&m_vOldPos, XMVectorZero());
+	}
 }
 
+//void CLoad_Model::Set_Animation(_uint iAnimIndex, _bool isLoop)
+//{
+//	if (iAnimIndex >= m_Animations.size())
+//		return;
+//
+//	// 루트 모션 연속성 처리 - 애니메이션 인덱스 변경 전에 해야 함!
+//	_vector vCurrentRootPos = XMVectorZero();
+//	if (m_bRootMotionTranslate && m_iCurrentAnimIndex != iAnimIndex && m_iCurrentAnimIndex < m_Animations.size())
+//	{
+//		// 현재 루트본 위치 저장
+//		_matrix rootMatrix = m_Bones[m_iRoot_BoneIndex]->Get_CombinedTransformationMatrix();
+//		vCurrentRootPos = rootMatrix.r[3];
+//	}
+//
+//	// 애니메이션 설정
+//	m_iCurrentAnimIndex = iAnimIndex;
+//	m_isLoop = isLoop;
+//
+//	// 새 애니메이션 리셋
+//	m_Animations[m_iCurrentAnimIndex]->Reset();
+//	m_isFinished = false;
+//	m_isTrackEnd = false;
+//
+//	// 🔥 핵심: 새 애니메이션의 첫 프레임을 실행하여 루트본 위치를 얻기
+//	if (m_bRootMotionTranslate)
+//	{
+//		// 새 애니메이션의 첫 프레임을 미리 계산
+//		for (_uint i = 0; i < m_Bones.size(); ++i)
+//		{
+//			m_Bones[i]->Update_CombinedTransformationMatrix(m_PreTransformMatrix, m_Bones);
+//		}
+//
+//		// 새 애니메이션의 첫 프레임 루트본 위치
+//		_matrix newRootMatrix = m_Bones[m_iRoot_BoneIndex]->Get_CombinedTransformationMatrix();
+//		_vector vNewFirstFramePos = newRootMatrix.r[3];
+//
+//		// m_vOldPos를 (현재 위치 - 새 애니메이션 첫 프레임 위치)로 설정
+//		// 이렇게 하면 첫 번째 Handle_RootMotion에서 이동량이 0이 됨
+//		XMStoreFloat4(&m_vOldPos, vCurrentRootPos - vNewFirstFramePos + XMLoadFloat4(&m_vOldPos));
+//	}
+//	else
+//	{
+//		XMStoreFloat4(&m_vOldPos, XMVectorZero());
+//	}
+//}
 
 
 _float4x4* CLoad_Model::Get_BoneMatrix(const _char* pBoneName)
@@ -262,13 +341,61 @@ void CLoad_Model::Set_BlendInfo(uint32_t iNextAnimIndex, _float fBlendTime, _boo
 
 
 
+//void CLoad_Model::Handle_RootMotion(_float fTimeDelta)
+//{
+//	_matrix rootMatrix = m_Bones[m_iRoot_BoneIndex]->Get_CombinedTransformationMatrix();
+//	_vector vNewRootPos = rootMatrix.r[3];
+//	
+//	if (!m_isFinished)
+//	{
+//		// 🔥 애니메이션이 방금 전환되었다면 첫 프레임은 루트 모션 적용 안 함
+//		if (m_bAnimationJustChanged)
+//		{
+//			m_bAnimationJustChanged = false;
+//			_vector vNewRootPosNoY = XMVectorSetY(vNewRootPos, 0.f);
+//			XMStoreFloat4(&m_vOldPos, vNewRootPos); // 현재 프레임을 기준점으로 설정
+//			return; // 이번 프레임은 이동하지 않음
+//		}
+//
+//		// 0. 뼈의 이동 구하기.
+//		_vector vLocalTranslate = vNewRootPos - XMLoadFloat4(&m_vOldPos);
+//		vLocalTranslate = XMVectorSetY(vLocalTranslate, 0.f); // Y축 제거
+//
+//		_vector vWorldTranslate = vLocalTranslate; // 기본값
+//
+//		// 1. 플레이어 RotMatrix 추출 => 만약 RootMotionRotate 설정을 할것이라면?
+//		if (m_bRootMotionRotate)
+//		{
+//			_matrix playerWorldMatrix = m_pOwner->Get_Transform()->Get_WorldMatrix();
+//			_vector playerScale, playerRot, playerTrans;
+//			XMMatrixDecompose(&playerScale, &playerRot, &playerTrans, playerWorldMatrix);
+//			_matrix playerRotMatrix = XMMatrixRotationQuaternion(playerRot);
+//			vWorldTranslate = XMVector3TransformNormal(vLocalTranslate, playerRotMatrix);
+//		}
+//
+//		// 2. 이동값을 월드에 적용할 것인지 애니메이션 에서 설정
+//		// 플레이어처럼 몬스터도 설정하려면? 어떻게 해야할까
+//		if (m_bRootMotionTranslate)
+//		{
+//			m_pOwner->Translate(vWorldTranslate);
+//		}
+//
+//		XMStoreFloat4(&m_vOldPos, vNewRootPos);
+//		
+//	}
+//	// 새로운 애니메이션의 루트본을 이전벡터에 넣어둔다.
+//	rootMatrix.r[3] = XMVectorSet(0.f, 0.f, 0.f, 1.f);
+//	m_Bones[m_iRoot_BoneIndex]->Set_CombinedTransformationMatrix(rootMatrix);	
+//}
+
 void CLoad_Model::Handle_RootMotion(_float fTimeDelta)
 {
 	_matrix rootMatrix = m_Bones[m_iRoot_BoneIndex]->Get_CombinedTransformationMatrix();
 	_vector vNewRootPos = rootMatrix.r[3];
-	
+
 	if (!m_isFinished)
 	{
+
 		// 0. 뼈의 이동 구하기.
 		_vector vLocalTranslate = vNewRootPos - XMLoadFloat4(&m_vOldPos);
 		vLocalTranslate = XMVectorSetY(vLocalTranslate, 0.f); // Y축 제거
@@ -286,18 +413,19 @@ void CLoad_Model::Handle_RootMotion(_float fTimeDelta)
 		}
 
 		// 2. 이동값을 월드에 적용할 것인지 애니메이션 에서 설정
-		// 플레이어처럼 몬스터도 설정하려면? 어떻게 해야할까
 		if (m_bRootMotionTranslate)
 		{
 			m_pOwner->Translate(vWorldTranslate);
 		}
 
-		XMStoreFloat4(&m_vOldPos, vNewRootPos);
-		
+		// 🔥 Y축을 제거한 상태로 m_vOldPos 업데이트
+		_vector vNewRootPosNoY = XMVectorSetY(vNewRootPos, 0.f);
+		XMStoreFloat4(&m_vOldPos, vNewRootPosNoY);
 	}
+
 	// 새로운 애니메이션의 루트본을 이전벡터에 넣어둔다.
 	rootMatrix.r[3] = XMVectorSet(0.f, 0.f, 0.f, 1.f);
-	m_Bones[m_iRoot_BoneIndex]->Set_CombinedTransformationMatrix(rootMatrix);	
+	m_Bones[m_iRoot_BoneIndex]->Set_CombinedTransformationMatrix(rootMatrix);
 }
 
 void CLoad_Model::Reset_RootMotion()
