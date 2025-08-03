@@ -480,29 +480,14 @@ _vector CPlayer::Get_LockOn_Attack_Direction() const
 }
 
 
-
-#pragma endregion
-
-#pragma region ANIMATION
-void CPlayer::Change_AnimationNonBlend(_uint iNextAnimIdx, _bool IsLoop)
+/* 
+* Animation
+*/
+void CPlayer::Change_Animation(_uint iAnimIndex, _bool IsLoop, _float fDuration, _uint iStartFrame, _bool bEitherBoundary, _bool bSameChange)
 {
-    m_pModelCom->Animation_Reset();
-    m_pModelCom->Set_Animation(iNextAnimIdx, IsLoop);
-}
 
-void CPlayer::Change_AnimationBlend(_uint iNextAnimIdx, _bool IsLoop, _float fBlendDuration, _bool bScale, _bool bRotate, _bool bTranslate)
-{
-    /* 애니메이션 정보를 리셋하기. */
-    m_pModelCom->Animation_Reset();
-    /* 블렌드 정보를 먼저 설정하게 하기.*/
-    m_pModelCom->Set_BlendInfo(iNextAnimIdx
-        , fBlendDuration, bScale, bRotate
-        , bTranslate);
-    /* 애니메이션 변경. */
-    m_pModelCom->Set_Animation(iNextAnimIdx, IsLoop);
 }
 #pragma endregion
-
 
 void CPlayer::On_Collision_Enter(CGameObject* pOther)
 {
@@ -633,9 +618,6 @@ HRESULT CPlayer::Ready_Components(PLAYER_DESC* pDesc)
 
 HRESULT CPlayer::Ready_Fsm()
 {
-    m_pModelCom->Set_RootMotionRotation(true);
-    m_pModelCom->Set_RootMotionTranslate(true);
-
     CFsm::FSM_DESC Desc{};
     Desc.pOwner = this;
 
@@ -653,9 +635,9 @@ HRESULT CPlayer::Ready_Fsm()
     m_pFsmCom->Add_State(CPlayer_WalkState::Create(PLAYER_STATE::WALK, &PlayerDesc));
     m_pFsmCom->Add_State(CPlayer_RunState::Create(PLAYER_STATE::RUN, &PlayerDesc));
     m_pFsmCom->Add_State(CPlayer_DodgeState::Create(PLAYER_STATE::DODGE, &PlayerDesc));
-    //m_pFsmCom->Add_State(CPlayer_StrongAttackState::Create(PLAYER_STATE::STRONG_ATTACK, &PlayerDesc));
-    //m_pFsmCom->Add_State(CPlayer_GuardState::Create(PLAYER_STATE::GUARD, &PlayerDesc));
-    //m_pFsmCom->Add_State(CPlayer_AttackState::Create(PLAYER_STATE::ATTACK, &PlayerDesc));
+    m_pFsmCom->Add_State(CPlayer_StrongAttackState::Create(PLAYER_STATE::STRONG_ATTACK, &PlayerDesc));
+    m_pFsmCom->Add_State(CPlayer_GuardState::Create(PLAYER_STATE::GUARD, &PlayerDesc));
+    m_pFsmCom->Add_State(CPlayer_AttackState::Create(PLAYER_STATE::ATTACK, &PlayerDesc));
 
 
     Register_CoolTime();

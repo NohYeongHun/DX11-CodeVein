@@ -32,8 +32,7 @@ void CPlayer_IdleState::Enter(void* pArg)
 
 	m_iNextState = -1;
 	m_iCurAnimIdx = pDesc->iAnimation_Idx;
-	
-	//m_pModelCom->Set_Animation(m_iCurAnimIdx, m_isLoop);
+	m_pModelCom->Set_Animation(m_iCurAnimIdx, m_isLoop);
 
 
 }
@@ -51,14 +50,6 @@ void CPlayer_IdleState::Exit()
 {
 	if (m_iNextState != -1)
 	{
-		if (m_iNextState == CPlayer::PLAYER_STATE::RUN)
-			m_pPlayer->Change_AnimationBlend(m_iNextAnimIdx, true, 0.2f, true, true, true);
-		else
-			m_pPlayer->Change_AnimationBlend(m_iNextAnimIdx, false, 0.2f, true, true, true);
-	}
-
-	/*if (m_iNextState != -1)
-	{
 		if (m_iNextState == CPlayer::PLAYER_STATE::STRONG_ATTACK)
 		{
 			m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, true);
@@ -70,15 +61,7 @@ void CPlayer_IdleState::Exit()
 			m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, false);
 		else if (m_iNextState == CPlayer::PLAYER_STATE::ATTACK)
 			m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, true);
-	}*/
-
-	/*if (m_iNextState != -1)
-	{
-		if (m_iNextState == CPlayer::PLAYER_STATE::RUN)
-			m_pPlayer->Change_AnimationBlend(m_iNextAnimIdx, true, 0.2f, true, true, true);
-		else
-			m_pPlayer->Change_AnimationBlend(m_iNextAnimIdx, false, 0.2f, true, true, true);
-	}*/
+	}
 }
 
 // 상태 초기화
@@ -107,13 +90,12 @@ void CPlayer_IdleState::Change_State()
 
 		m_iNextState = CPlayer::PLAYER_STATE::DODGE;
 		Dodge.iAnimation_Idx = PLAYER_ANIM_DODGE_F;
-		m_iNextAnimIdx = Dodge.iAnimation_Idx;
+		m_iNextAnimIdx = PLAYER_ANIM_DODGE_F;
 		m_pFsm->Change_State(m_iNextState, &Dodge);
-
 		return;
 	}
 
-	/*if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::STRONG_ATTACK))
+	if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::STRONG_ATTACK))
 	{
 		if (!m_pFsm->Is_CoolTimeEnd(CPlayer::STRONG_ATTACK))
 			return;
@@ -149,15 +131,13 @@ void CPlayer_IdleState::Change_State()
 		Attack.iAnimation_Idx = PLAYER_ANIM_ATTACK1;
 		m_pFsm->Change_State(m_iNextState, &Attack);
 		return;
-	}*/
+	}
 
 	if (m_pPlayer->Is_MovementKeyPressed())
 	{
 		m_iNextState = CPlayer::PLAYER_STATE::RUN;
 		Run.iAnimation_Idx = PLAYER_ANIM_RUN_F_LOOP;
 		Run.eDirection = m_eDir;
-		m_iNextAnimIdx = Run.iAnimation_Idx;
-		
 		m_pFsm->Change_State(m_iNextState, &Run);
 		return;
 	}

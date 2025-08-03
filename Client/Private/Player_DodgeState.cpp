@@ -26,9 +26,9 @@ void CPlayer_DodgeState::Enter(void* pArg)
 
 	// ⭐ Dodge는 non-loop으로 변경
 	m_isLoop = false;
-	//m_pModelCom->Set_Animation(m_iCurAnimIdx, m_isLoop);
-	//m_pModelCom->Set_RootMotionRotation(true);
-	//m_pModelCom->Set_RootMotionTranslate(true);
+	m_pModelCom->Set_Animation(m_iCurAnimIdx, m_isLoop);
+	m_pModelCom->Set_RootMotionRotation(true);
+	m_pModelCom->Set_RootMotionTranslate(true);
 
 
 }
@@ -67,18 +67,13 @@ void CPlayer_DodgeState::Update(_float fTimeDelta)
 void CPlayer_DodgeState::Exit()
 {
 	//여기서 동작해야합니다.
-	//if (m_iNextState != -1) // NextIndex가 있는경우 블렌딩 시작.
-	//{
-	//	m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, false);
-	//}
+	if (m_iNextState != -1) // NextIndex가 있는경우 블렌딩 시작.
+	{
+		m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, false);
+	}
 
-	if (m_iNextState == CPlayer::PLAYER_STATE::IDLE || m_iNextState == CPlayer::PLAYER_STATE::RUN)
-		m_pPlayer->Change_AnimationBlend(m_iNextAnimIdx, true, 0.2f, true, true, true);
-	else
-		m_pPlayer->Change_AnimationBlend(m_iNextAnimIdx, false, 0.2f, true, true, true);
-
-	//m_pModelCom->Set_RootMotionRotation(false);
-	//m_pModelCom->Set_RootMotionTranslate(false);
+	m_pModelCom->Set_RootMotionRotation(false);
+	m_pModelCom->Set_RootMotionTranslate(false);
 	
 }
 
@@ -88,6 +83,7 @@ void CPlayer_DodgeState::Reset()
 	m_eDir = { ACTORDIR::END };
 	m_iNextAnimIdx = -1;
 	m_iCurAnimIdx = -1;
+	m_pModelCom->Animation_Reset();
 }
 
 /* 상태에 따른 변경을 정의합니다. */
@@ -100,13 +96,13 @@ void CPlayer_DodgeState::Change_State()
 	CPlayer_GuardState::GUARD_ENTER_DESC Guard{};
 
 
+
 	if (m_pModelCom->Is_Finished())
 	{
 		// Idle 상태로 전환
 		m_iNextState = CPlayer::PLAYER_STATE::IDLE;
+		m_iNextAnimIdx = PLAYER_ANIM_IDLE_SWORD;
 		Idle.iAnimation_Idx = PLAYER_ANIM_IDLE_SWORD;
-		m_iNextAnimIdx = Idle.iAnimation_Idx;
-		
 		m_pFsm->Change_State(CPlayer::PLAYER_STATE::IDLE, &Idle);
 		return;
 	}
@@ -115,19 +111,19 @@ void CPlayer_DodgeState::Change_State()
 
 	if (m_pFsm->Is_ExitCoolTimeEnd(m_iStateNum))
 	{
-		//if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::ATTACK))
-		//{
-		//	// 해당 동작은 쿨타임이 있는경우 무시됨.
-		//	if (!m_pFsm->Is_CoolTimeEnd(CPlayer::ATTACK))
-		//		return;
+		if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::ATTACK))
+		{
+			// 해당 동작은 쿨타임이 있는경우 무시됨.
+			if (!m_pFsm->Is_CoolTimeEnd(CPlayer::ATTACK))
+				return;
 
-		//	// 다음 연계공격으로 변경.
-		//	m_iNextAnimIdx = PLAYER_ANIM_ATTACK1;
-		//	m_iNextState = CPlayer::PLAYER_STATE::ATTACK;
-		//	Attack.iAnimation_Idx = m_iNextAnimIdx;
-		//	m_pFsm->Change_State(m_iNextState, &Attack);
-		//	return;
-		//}
+			// 다음 연계공격으로 변경.
+			m_iNextAnimIdx = PLAYER_ANIM_ATTACK1;
+			m_iNextState = CPlayer::PLAYER_STATE::ATTACK;
+			Attack.iAnimation_Idx = m_iNextAnimIdx;
+			m_pFsm->Change_State(m_iNextState, &Attack);
+			return;
+		}
 
 		if (m_pPlayer->Is_MovementKeyPressed())
 		{
@@ -139,31 +135,31 @@ void CPlayer_DodgeState::Change_State()
 		}
 		
 
-		//if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::STRONG_ATTACK))
-		//{
-		//	// 해당 동작은 쿨타임이 있는경우 무시됨.
-		//	if (!m_pFsm->Is_CoolTimeEnd(CPlayer::STRONG_ATTACK))
-		//		return;
+		if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::STRONG_ATTACK))
+		{
+			// 해당 동작은 쿨타임이 있는경우 무시됨.
+			if (!m_pFsm->Is_CoolTimeEnd(CPlayer::STRONG_ATTACK))
+				return;
 
-		//	m_iNextAnimIdx = PLAYER_ANIM_SPECIAL_DOWN3;
-		//	m_iNextState = CPlayer::STRONG_ATTACK;
-		//	StrongAttack.iAnimation_Idx = m_iNextAnimIdx;
-		//	m_pFsm->Change_State(m_iNextState, &StrongAttack);
-		//	return;
-		//}
+			m_iNextAnimIdx = PLAYER_ANIM_SPECIAL_DOWN3;
+			m_iNextState = CPlayer::STRONG_ATTACK;
+			StrongAttack.iAnimation_Idx = m_iNextAnimIdx;
+			m_pFsm->Change_State(m_iNextState, &StrongAttack);
+			return;
+		}
 
-		//if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::GUARD))
-		//{
-		//	// 해당 동작은 쿨타임이 있는경우 무시됨.
-		//	if (!m_pFsm->Is_CoolTimeEnd(CPlayer::GUARD))
-		//		return;
+		if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::GUARD))
+		{
+			// 해당 동작은 쿨타임이 있는경우 무시됨.
+			if (!m_pFsm->Is_CoolTimeEnd(CPlayer::GUARD))
+				return;
 
-		//	m_iNextAnimIdx = PLAYER_ANIM_GUARD_START;
-		//	m_iNextState = CPlayer::GUARD;
-		//	StrongAttack.iAnimation_Idx = m_iNextAnimIdx;
-		//	m_pFsm->Change_State(m_iNextState, &Guard);
-		//	return;
-		//}
+			m_iNextAnimIdx = PLAYER_ANIM_GUARD_START;
+			m_iNextState = CPlayer::GUARD;
+			StrongAttack.iAnimation_Idx = m_iNextAnimIdx;
+			m_pFsm->Change_State(m_iNextState, &Guard);
+			return;
+		}
 
 	}
 
