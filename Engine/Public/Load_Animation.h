@@ -32,7 +32,7 @@ public:
 	_uint Get_CurrentKeyFrame();
 	void Set_TickPerSecond(_float fTickPerSecond) { m_fTickPerSecond = fTickPerSecond;  }
 	_float Get_TickPerSecond() { return m_fTickPerSecond; }
-
+	void Set_RootBoneIndex(_uint iRootBoneIndex) { m_iRootBoneIndex = iRootBoneIndex; }
 
 private:
 	/* 채널 이름 */
@@ -54,6 +54,7 @@ private:
 	// 최근에 재생한 키프레임의 인덱스들.
 	vector<_uint> m_CurrentKeyFrameIndices;
 
+	_uint m_iRootBoneIndex = {};
 private:
 	HRESULT Load_Channels(std::ifstream& ifs);
 	

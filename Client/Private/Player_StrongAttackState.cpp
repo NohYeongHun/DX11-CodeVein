@@ -27,8 +27,8 @@ void CPlayer_StrongAttackState::Enter(void* pArg)
 	m_eDir = pDesc->eDirection;
 	m_pModelCom->Set_Animation(m_iCurAnimIdx, m_isLoop);
 
-	m_pModelCom->Set_RootMotionRotation(true);
-	m_pModelCom->Set_RootMotionTranslate(true);
+	//m_pModelCom->Set_RootMotionRotation(true);
+	//m_pModelCom->Set_RootMotionTranslate(true);
 
 
 	// 이 때 검에 콜라이더 활성화 이런 과정 진행
@@ -47,8 +47,8 @@ void CPlayer_StrongAttackState::Update(_float fTimeDelta)
 void CPlayer_StrongAttackState::Exit()
 {
 	
-	m_pModelCom->Set_RootMotionRotation(false);
-	m_pModelCom->Set_RootMotionTranslate(false);
+	//m_pModelCom->Set_RootMotionRotation(false);
+	//m_pModelCom->Set_RootMotionTranslate(false);
 
 	if (m_iNextState != -1) // NextIndex가 있는경우 블렌딩 시작.
 	{
@@ -77,7 +77,6 @@ void CPlayer_StrongAttackState::Reset()
 	m_eDir = { ACTORDIR::END };
 	m_iCurAnimIdx = -1;
 	m_iNextAnimIdx = -1;
-	m_pModelCom->Animation_Reset();
 }
 
 void CPlayer_StrongAttackState::Change_State()

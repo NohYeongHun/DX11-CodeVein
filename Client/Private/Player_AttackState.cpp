@@ -24,8 +24,8 @@ void CPlayer_AttackState::Enter(void* pArg)
 	m_eDir = pDesc->eDirection;
 	
 	m_pModelCom->Set_Animation(m_iCurAnimIdx, m_isLoop);
-	m_pModelCom->Set_RootMotionTranslate(true);
-	m_pModelCom->Set_RootMotionRotation(true);
+	//m_pModelCom->Set_RootMotionTranslate(true);
+	//m_pModelCom->Set_RootMotionRotation(true);
 
 
 	// 방향 제어 관련 초기화
@@ -80,7 +80,6 @@ void CPlayer_AttackState::Reset()
 	m_iCurAnimIdx = -1;
 	m_iNextAnimIdx = -1;
 
-	m_pModelCom->Animation_Reset();
 }
 
 void CPlayer_AttackState::Change_State(_float fTimeDelta)

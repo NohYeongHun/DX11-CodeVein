@@ -64,7 +64,6 @@ void CPlayer_WalkState::Reset()
 	m_eDir = { ACTORDIR::END };
 	m_iCurAnimIdx = -1;
 	m_iNextAnimIdx = -1;
-	m_pModelCom->Animation_Reset();
 }
 
 // 상태 전환 구현 (키 입력 감지)

@@ -116,8 +116,34 @@ HRESULT CLoad_Model::Render(_uint iNumMesh)
 
 void CLoad_Model::Set_Animation(_uint iAnimIndex, _bool isLoop)
 {
+
+	_vector vCurrentPos = m_pOwner->Get_Transform()->Get_State(STATE::POSITION);
+
+	// 디버그 출력
+	OutputDebugString((L"[Set_Animation] Current Pos: " +
+		std::to_wstring(XMVectorGetX(vCurrentPos)) + L", " +
+		std::to_wstring(XMVectorGetY(vCurrentPos)) + L", " +
+		std::to_wstring(XMVectorGetZ(vCurrentPos)) + L"\n").c_str());
+
 	m_isLoop = isLoop;
+	XMStoreFloat4(&m_vStartWorldPos
+		, m_pOwner->Get_Transform()->Get_State(STATE::POSITION));
+
+	OutputDebugString((L"[Set_Animation] Stored StartWorldPos: " +
+		std::to_wstring(m_vStartWorldPos.x) + L", " +
+		std::to_wstring(m_vStartWorldPos.y) + L", " +
+		std::to_wstring(m_vStartWorldPos.z) + L"\n").c_str());
+
 	m_iCurrentAnimIndex = iAnimIndex;
+
+	/*
+	* 문제 원인
+	* Set_Animation 호출 시점에는 아직 이전 애니메이션의 루트본 위치가 들어있습니다
+	* 새로운 애니메이션의 첫 번째 키프레임이 아직 적용되지 않은 상태입니다
+	*/
+	_matrix matFirstRoot = m_Animations[m_iCurrentAnimIndex]->Get_BoneMatrixAtTime(m_iRoot_BoneIndex, 0.f);
+	XMStoreFloat4(&m_vOldPos, matFirstRoot.r[3]);
+	m_bFirstFrameAfterAnimChange = true;
 
 }
 
@@ -184,11 +210,6 @@ HRESULT CLoad_Model::Bind_BoneMatrices(CShader* pShader, const _char* pConstantN
 }
 
 
-// 내가 한실수는 애니메이션 굴리기전에 Root뼈를 못움직이게 해야함.
-// 애니메이션 굴린다음에 루트뼈를 못움직이게함.
-// 다른 뼈들은 이미 움직여버림.
-// 굴리기전에 이동량 죽이고 
-// => 트랜스폼에 적용하는건 움직인 정보니까.
 _bool CLoad_Model::Play_Animation(_float fTimeDelta)
 {
 	/* 현재 시간에 맞는 뼈의 상태대로 특정 뼈들의 TransformationMatrix를 갱신해준다. */
@@ -201,16 +222,18 @@ _bool CLoad_Model::Play_Animation(_float fTimeDelta)
 		m_Bones, m_isLoop, &m_isFinished, m_BlendDesc, fTimeDelta
 	);
 
+	Handle_RootMotion(fTimeDelta);
+
 	for (_uint i = 0; i < m_Bones.size(); ++i)
 	{
 		m_Bones[i]->Update_CombinedTransformationMatrix(m_PreTransformMatrix, m_Bones);
 
-		if (i == m_iRoot_BoneIndex)
-			Handle_RootMotion(fTimeDelta);
+	/*	if (i == m_iRoot_BoneIndex)
+			Handle_RootMotion(fTimeDelta);*/
 	}
-		
-	if (m_isFinished)
-		XMStoreFloat4(&m_vOldPos, XMVectorSet(0.f, 0.f, 0.f, 1.f));
+
+	//if (m_isFinished)
+	//	XMStoreFloat4(&m_vOldPos, XMVectorSet(0.f, 0.f, 0.f, 1.f));
 
 	return m_isFinished;
 }
@@ -261,40 +284,76 @@ void CLoad_Model::Set_BlendInfo(uint32_t iNextAnimIndex, _float fBlendTime, _boo
 }
 
 
-
 void CLoad_Model::Handle_RootMotion(_float fTimeDelta)
 {
-	_matrix rootMatrix = m_Bones[m_iRoot_BoneIndex]->Get_CombinedTransformationMatrix();
-	_vector vNewRootPos = rootMatrix.r[3];
-	
-	if (!m_isFinished)
+	// Blending일때의 RootMotion 로직은 달라야합니다.
+	// Set_Animation에서 설정한 기준점
+	// 애니메이션 변경 시점의 월드 위치 : m_vStartWorldPos;  
+	// 블렌딩 중에는 이 기준점을 절대 변경하지 않음
+	/*
+	**"기준점을 유지하면서 상대적 이동만 계산"**의 의미는:
+	블렌딩 중에는 이미 변경된 (하지만 잘못된) 본 행렬을 무시하고
+	, 원래 애니메이션의 진행도만 사용해서 이동량을 계산해야 한다는 뜻입니다.
+	*/
+	if (m_BlendDesc.isBlending)
 	{
-		// 0. 뼈의 이동 구하기.
-		_vector vLocalTranslate = vNewRootPos - XMLoadFloat4(&m_vOldPos);
-		vLocalTranslate = XMVectorSetY(vLocalTranslate, 0.f); // Y축 제거
+		// 현재 애니메이션에서의 상대적 진행량만 계산
+		_matrix currentAnimRootMatrix = m_Animations[m_iCurrentAnimIndex]->Get_BoneMatrixAtTime(
+			m_iRoot_BoneIndex, m_Animations[m_iCurrentAnimIndex]->Get_CurrentTrackPosition());
+		_vector vCurrentAnimPos = currentAnimRootMatrix.r[3];
 
-		_vector vWorldTranslate = vLocalTranslate; // 기본값
+		// 새로운 애니메이션의 첫 번째 위치 (이미 m_vOldPos에 저장됨)
+		_vector vStartAnimPos = XMLoadFloat4(&m_vOldPos);
 
-		// 1. 플레이어 RotMatrix 추출 => 만약 RootMotionRotate 설정을 할것이라면?
-		if (m_bRootMotionRotate)
-		{
-			_matrix playerWorldMatrix = m_pOwner->Get_Transform()->Get_WorldMatrix();
-			_vector playerScale, playerRot, playerTrans;
-			XMMatrixDecompose(&playerScale, &playerRot, &playerTrans, playerWorldMatrix);
-			_matrix playerRotMatrix = XMMatrixRotationQuaternion(playerRot);
-			vWorldTranslate = XMVector3TransformNormal(vLocalTranslate, playerRotMatrix);
-		}
+		// 상대적 이동량 = 현재 시점 - 시작 시점
+		_vector vRelativeMove = vCurrentAnimPos - vStartAnimPos;
+		vRelativeMove = XMVectorSetY(vRelativeMove, 0.f);
 
-		// 2. 이동값을 월드에 적용할 것인지 모션에서 설정
-		if (m_bRootMotionTranslate)
-			m_pOwner->Translate(vWorldTranslate);
+		// 기준점에서 상대적 이동량만 더하기.
+		_vector vFinalWorldPos = XMLoadFloat4(&m_vStartWorldPos) + vRelativeMove;
+		m_pOwner->Get_Transform()->Set_State(STATE::POSITION, vFinalWorldPos);
 
-		XMStoreFloat4(&m_vOldPos, vNewRootPos);
+		_matrix rootMatrix = m_Bones[m_iRoot_BoneIndex]->Get_CombinedTransformationMatrix();
+		_vector vNewRootPos = rootMatrix.r[3];
 		
+
 	}
-	// 새로운 애니메이션의 루트본을 이전벡터에 넣어둔다.
-	rootMatrix.r[3] = XMVectorSet(0.f, 0.f, 0.f, 1.f);
-	m_Bones[m_iRoot_BoneIndex]->Set_CombinedTransformationMatrix(rootMatrix);	
+	else 
+	{
+		
+
+		if (!m_isFinished)
+		{
+			_matrix currentAnimRootMatrix = m_Animations[m_iCurrentAnimIndex]->Get_BoneMatrixAtTime(
+				m_iRoot_BoneIndex, m_Animations[m_iCurrentAnimIndex]->Get_CurrentTrackPosition());
+			_vector vCurrentAnimPos = currentAnimRootMatrix.r[3];
+
+			if (m_bFirstFrameAfterAnimChange)
+			{
+				m_bFirstFrameAfterAnimChange = false;
+				XMStoreFloat4(&m_vOldPos, vCurrentAnimPos);
+				return;
+			}
+			else
+			{
+				// 애니메이션 시작 시점의 루트본 위치
+				_vector vStartAnimPos = XMLoadFloat4(&m_vOldPos);
+
+				// 상대적 이동량
+				_vector vRelativeMove = vCurrentAnimPos - vStartAnimPos;
+				vRelativeMove = XMVectorSetY(vRelativeMove, 0.f);
+
+				// 기준점 + 상대 이동량 = 최종 월드 위치
+				_vector vFinalWorldPos = XMLoadFloat4(&m_vStartWorldPos) + vRelativeMove;
+				m_pOwner->Get_Transform()->Set_State(STATE::POSITION, vFinalWorldPos);
+			}
+
+			// ✅ 추가: 루트본 위치 초기화
+			_matrix rootMatrix = m_Bones[m_iRoot_BoneIndex]->Get_CombinedTransformationMatrix();
+			rootMatrix.r[3] = XMVectorSet(0.f, 0.f, 0.f, 1.f);
+			m_Bones[m_iRoot_BoneIndex]->Set_CombinedTransformationMatrix(rootMatrix);
+		}
+	}
 }
 
 void CLoad_Model::Reset_RootMotion()
@@ -403,6 +462,9 @@ HRESULT CLoad_Model::Load_Animations(std::ifstream& ifs)
 		CLoad_Animation* pAnimation = CLoad_Animation::Create(ifs);
 		if (nullptr == pAnimation)
 			CRASH("LOAD ANIMATION FAILED");
+
+		// 블렌딩 중 보간을 위해 RootBoneIndex가 필요함.
+		pAnimation->Set_RootBoneIndex(m_iRoot_BoneIndex);
 
 		m_Animations.emplace_back(pAnimation);
 	}

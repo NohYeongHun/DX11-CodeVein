@@ -96,18 +96,27 @@ void CLoad_Animation::Blend_Update_TransformationMatrices(const vector<class CLo
             _vector vSourRotation, vDestRotation;
             _vector vSourTranslation, vDestTranslation;
 
-            vSourScale = XMLoadFloat3(&prevKeyFrame.vScale);
-            vSourRotation = XMLoadFloat4(&prevKeyFrame.vRotation);
-            vSourTranslation = XMLoadFloat3(&prevKeyFrame.vTranslation);
+            if (m_Channels[i]->Get_BoneIndex() == m_iRootBoneIndex)
+            {
+                // 루트본은 이동하지 않기.
+                vScale = XMLoadFloat3(&curKeyFrame.vScale);
+                vRotation = XMLoadFloat4(&curKeyFrame.vRotation);
+                vTranslation = XMLoadFloat3(&curKeyFrame.vTranslation);  // ← 이전 애니메이션 무시!
+            }
+            else
+            {
+                vSourScale = XMLoadFloat3(&prevKeyFrame.vScale);
+                vSourRotation = XMLoadFloat4(&prevKeyFrame.vRotation);
+                vSourTranslation = XMLoadFloat3(&prevKeyFrame.vTranslation);
 
-            vDestScale = XMLoadFloat3(&curKeyFrame.vScale);
-            vDestRotation = XMLoadFloat4(&curKeyFrame.vRotation);
-            vDestTranslation = XMLoadFloat3(&curKeyFrame.vTranslation);
+                vDestScale = XMLoadFloat3(&curKeyFrame.vScale);
+                vDestRotation = XMLoadFloat4(&curKeyFrame.vRotation);
+                vDestTranslation = XMLoadFloat3(&curKeyFrame.vTranslation);
 
-            vScale = blendDesc.bScale ? XMVectorLerp(vSourScale, vDestScale, fRatio) : vDestScale;
-            vRotation = blendDesc.bRotate ? XMVectorLerp(vSourRotation, vDestRotation, fRatio) : vDestRotation;
-            vTranslation = blendDesc.bTranslate ? XMVectorSetW(XMVectorLerp(vSourTranslation, vDestTranslation, fRatio), 1.f) : vDestTranslation;
-
+                vScale = blendDesc.bScale ? XMVectorLerp(vSourScale, vDestScale, fRatio) : vDestScale;
+                vRotation = blendDesc.bRotate ? XMVectorLerp(vSourRotation, vDestRotation, fRatio) : vDestRotation;
+                vTranslation = blendDesc.bTranslate ? XMVectorSetW(XMVectorLerp(vSourTranslation, vDestTranslation, fRatio), 1.f) : vDestTranslation;
+            }
             _matrix blendedMatrix = XMMatrixAffineTransformation(vScale, XMVectorZero(), vRotation, vTranslation);
             Bones[m_Channels[i]->Get_BoneIndex()]->Set_TransformationMatrix(blendedMatrix);
         }
