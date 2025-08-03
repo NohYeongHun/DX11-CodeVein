@@ -249,7 +249,7 @@ void CLoad_Model::Set_BlendInfo(uint32_t iNextAnimIndex, _float fBlendTime, _boo
 	// 4. Animation Index를 변경
 	// m_iCurrentAnimIndex = iNextAnimIndex;
 
-	m_Animations[iNextAnimIndex]->Reset();
+	//m_Animations[iNextAnimIndex]->Reset();
 
 	// 5. 사용할 Animation Pointer 전달.
 	m_BlendDesc.pLoad_Animation = m_Animations[m_iCurrentAnimIndex];

@@ -85,6 +85,8 @@ BT_RESULT CBT_QueenKnight_FirstPhase_AttackAction::UpdateFirstAttack(_float fTim
 
         // 2. 공격 상태로 변경
         m_pOwner->Change_Animation_Blend(iNextAnimationIdx);
+
+        m_pOwner->RotateTurn_ToTarget();
     }
 
     return BT_RESULT::RUNNING;
@@ -102,6 +104,7 @@ BT_RESULT CBT_QueenKnight_FirstPhase_AttackAction::UpdateSecondAttack(_float fTi
 
         // 2. 공격 상태로 변경
         m_pOwner->Change_Animation_Blend(iNextAnimationIdx);
+        m_pOwner->RotateTurn_ToTarget();
     }
     return BT_RESULT::RUNNING;
 }
