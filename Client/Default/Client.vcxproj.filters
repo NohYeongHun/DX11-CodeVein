@@ -157,6 +157,24 @@
     <Filter Include="02. GameObject\Monster\BT\Attack">
       <UniqueIdentifier>{44452234-4fa5-4305-b5e2-70b64b159fcb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. GameObject\Monster\BT\Idle">
+      <UniqueIdentifier>{b114369a-9669-46bf-8130-dddb460ff2bd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Weapon">
+      <UniqueIdentifier>{58d19775-8714-4fe5-bbab-6391c315c880}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Monster\Boss\QueenKnight">
+      <UniqueIdentifier>{90926b89-566b-4c25-8371-1e3e0ace933f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Monster\Boss\QueenKnight\Weapon">
+      <UniqueIdentifier>{e50c261f-c47b-48cb-9c9d-1b12f13ebc17}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Monster\Boss\QueenKnight\BT">
+      <UniqueIdentifier>{f3e07f2b-4917-48f9-86c9-d85fe673b43b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Monster\Boss\QueenKnight\BT\Attack">
+      <UniqueIdentifier>{ad0d12b4-5e2f-41c3-8e21-2293a3770e0b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -339,7 +357,7 @@
     <ClInclude Include="..\Public\Player.h">
       <Filter>02. GameObject\Player\Body</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Weapon.h">
+    <ClInclude Include="..\Public\PlayerWeapon.h">
       <Filter>02. GameObject\Player\Weapon</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Player_StrongAttackState.h">
@@ -437,6 +455,27 @@
     </ClInclude>
     <ClInclude Include="..\Public\BT_Monster_DetectAction.h">
       <Filter>02. GameObject\Monster\BT\Detect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BT_Monster_IdleAction.h">
+      <Filter>02. GameObject\Monster\BT\Idle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\QueenKnightDefine.h">
+      <Filter>02. GameObject\Monster\Boss\QueenKnight</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\QueenKnight.h">
+      <Filter>02. GameObject\Monster\Boss\QueenKnight</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Weapon.h">
+      <Filter>02. GameObject\Weapon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\KnightLance.h">
+      <Filter>02. GameObject\Monster\Boss\QueenKnight\Weapon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\QueenKnightTree.h">
+      <Filter>02. GameObject\Monster\Boss\QueenKnight\BT</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BT_QueenKnight_FirstPhase_AttackAction.h">
+      <Filter>02. GameObject\Monster\Boss\QueenKnight\BT\Attack</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -615,7 +654,7 @@
     <ClCompile Include="..\Private\Player.cpp">
       <Filter>02. GameObject\Player\Body</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Weapon.cpp">
+    <ClCompile Include="..\Private\PlayerWeapon.cpp">
       <Filter>02. GameObject\Player\Weapon</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Player_GuardState.cpp">
@@ -704,6 +743,24 @@
     </ClCompile>
     <ClCompile Include="..\Private\BT_Monster_DetectAction.cpp">
       <Filter>02. GameObject\Monster\BT\Detect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BT_Monster_IdleAction.cpp">
+      <Filter>02. GameObject\Monster\BT\Idle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\QueenKnight.cpp">
+      <Filter>02. GameObject\Monster\Boss\QueenKnight</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Weapon.cpp">
+      <Filter>02. GameObject\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\KnightLance.cpp">
+      <Filter>02. GameObject\Monster\Boss\QueenKnight\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\QueenKnightTree.cpp">
+      <Filter>02. GameObject\Monster\Boss\QueenKnight\BT</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BT_QueenKnight_FirstPhase_AttackAction.cpp">
+      <Filter>02. GameObject\Monster\Boss\QueenKnight\BT\Attack</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

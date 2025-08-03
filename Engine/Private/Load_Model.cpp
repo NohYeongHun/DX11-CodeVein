@@ -285,9 +285,12 @@ void CLoad_Model::Handle_RootMotion(_float fTimeDelta)
 			vWorldTranslate = XMVector3TransformNormal(vLocalTranslate, playerRotMatrix);
 		}
 
-		// 2. 이동값을 월드에 적용할 것인지 모션에서 설정
+		// 2. 이동값을 월드에 적용할 것인지 애니메이션 에서 설정
+		// 플레이어처럼 몬스터도 설정하려면? 어떻게 해야할까
 		if (m_bRootMotionTranslate)
+		{
 			m_pOwner->Translate(vWorldTranslate);
+		}
 
 		XMStoreFloat4(&m_vOldPos, vNewRootPos);
 		

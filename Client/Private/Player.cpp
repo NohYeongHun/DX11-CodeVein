@@ -724,10 +724,10 @@ HRESULT CPlayer::Ready_Render_Resources()
 
 HRESULT CPlayer::Ready_PartObjects()
 {   
-    CWeapon::WEAPON_DESC Weapon{};
+    CPlayerWeapon::PLAYER_WEAPON_DESC Weapon{};
     Weapon.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
     Weapon.pSocketMatrix = m_pModelCom->Get_BoneMatrix("IKSocket_RightHandAttach");
-    Weapon.eCurLevel = m_eCurLevel;
+    Weapon.eCurLevel = LEVEL::STATIC;
     if (FAILED(__super::Add_PartObject(TEXT("Com_Weapon"),
         ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_Weapon")
         , reinterpret_cast<CPartObject**>(& m_pPlayerWeapon), &Weapon)))

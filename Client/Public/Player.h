@@ -143,7 +143,7 @@ private:
 	// Load Model;
 	class CLoad_Model* m_pModelCom = { nullptr };
 	class CShader* m_pShaderCom = { nullptr };
-	class CWeapon* m_pPlayerWeapon = { nullptr };
+	class CPlayerWeapon* m_pPlayerWeapon = { nullptr };
 	class CFsm* m_pFsmCom = { nullptr };
 	class CCamera_Player* m_pPlayerCamera = { nullptr };
 	LEVEL m_eCurLevel = { LEVEL::END };

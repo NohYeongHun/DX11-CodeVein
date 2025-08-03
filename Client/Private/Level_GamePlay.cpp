@@ -28,6 +28,19 @@ HRESULT CLevel_GamePlay::Initialize_Clone()
 		return E_FAIL;
 	}
 	
+
+	if (FAILED(Ready_Layer_Monster(TEXT("Layer_Monster"))))
+	{
+		CRASH("Failed Layer_Monster");
+		return E_FAIL;
+	}
+
+	//if (FAILED(Ready_Layer_SkyBoss(TEXT("Layer_SkyBoss"))))
+	//{
+	//	CRASH("Failed Layer_SkyBoss");
+	//	return E_FAIL;
+	//}
+
 	// 몬스터는 무조건 Player 이후에 만들어야합니다.
 	//if (FAILED(Ready_Layer_SkyBoss(TEXT("Layer_SkyBoss"))))
 	//{
@@ -35,11 +48,7 @@ HRESULT CLevel_GamePlay::Initialize_Clone()
 	//	return E_FAIL;
 	//}
 
-	if (FAILED(Ready_Layer_Monster(TEXT("Layer_Monster"))))
-	{
-		CRASH("Failed Layer_Monster");
-		return E_FAIL;
-	}
+	
 
 	
 
@@ -256,7 +265,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_SkyBoss(const _wstring& strLayerTag)
 	}
 
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel), strLayerTag,
-		ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_SkyBoss"), &Desc)))
+		ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_QueenKnight"), &Desc)))
 		return E_FAIL;
 
 	//if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel), strLayerTag,
@@ -265,6 +274,47 @@ HRESULT CLevel_GamePlay::Ready_Layer_SkyBoss(const _wstring& strLayerTag)
 
 	return S_OK;
 }
+
+HRESULT CLevel_GamePlay::Ready_Layer_QueenKnight(const _wstring& strLayerTag)
+{
+	CQueenKnight::QUEENKNIGHT_DESC Desc{};
+	Desc.pPlayer = dynamic_cast<CPlayer*>(
+		m_pGameInstance->Get_GameObjcet(
+			ENUM_CLASS(m_eCurLevel)
+			, TEXT("Layer_Player"), 0));
+	Desc.eCurLevel = m_eCurLevel;
+	Desc.eMonsterType = MONSTERTYPE::BOSS;
+	Desc.fMaxHP = 3000.f;
+	Desc.fAttackPower = 50.f;
+	Desc.fDetectionRange = 20.f;
+	Desc.fAttackRange = 10.f;
+	Desc.fSpeedPerSec = 10.f;
+	Desc.fMoveSpeed = 10.f;
+	/* Transform 설정.*/
+	Desc.fSpeedPerSec = 10.f;
+	Desc.fRotationPerSec = XMConvertToRadians(90.0f);
+
+	if (nullptr == Desc.pPlayer)
+	{
+		CRASH("Failed Search Player");
+		return E_FAIL;
+	}
+
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel), strLayerTag,
+		ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_QueenKnight"), &Desc)))
+	{
+		CRASH("Failed Search QueenKnight");
+		return E_FAIL;
+	}
+		
+
+	//if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel), strLayerTag,
+	//	ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_BlackKnight"), &Desc)))
+	//	return E_FAIL;
+
+	return S_OK;
+}
+
 
 HRESULT CLevel_GamePlay::Ready_Layer_Map(const _wstring& strLayerTag)
 {
@@ -292,8 +342,8 @@ HRESULT CLevel_GamePlay::Ready_Layer_Monster(const _wstring& strLayerTag)
 	/* 몬스터 스탯.*/
 	Desc.fMaxHP = 500.f;
 	Desc.fAttackPower = 20.f;
-	Desc.fDetectionRange = 20.f;
-	Desc.fAttackRange = 10.f;
+	Desc.fDetectionRange = 10.f;
+	Desc.fAttackRange = 5.f;
 	Desc.fMoveSpeed = 50.f;
 	/* Transform 설정.*/
 	Desc.fSpeedPerSec = 50.f; // Transform 속도 조절.
@@ -312,6 +362,13 @@ HRESULT CLevel_GamePlay::Ready_Layer_Monster(const _wstring& strLayerTag)
 		return E_FAIL;
 	}
 		
+
+	/* 다 같은 Monster 레이어에 추가하기. */
+	if (FAILED(Ready_Layer_QueenKnight(strLayerTag)))
+	{
+		CRASH("Failed Layer_QueenKnight");
+		return E_FAIL;
+	}
 
 	return S_OK;
 }

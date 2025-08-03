@@ -35,7 +35,7 @@ HRESULT CWolfDevil::Initialize_Clone(void* pArg)
         return E_FAIL;
     }
 
-    if (FAILED(Ready_BehaviourTree()))
+    if (FAILED(Ready_BehaviorTree()))
     {
         CRASH("Failed Ready BehaviourTree WolfDevil");
         return E_FAIL;
@@ -74,7 +74,7 @@ HRESULT CWolfDevil::Initialize_Clone(void* pArg)
     m_pTransformCom->Set_State(STATE::POSITION, XMLoadFloat3(&vPos));
 
     m_pModelCom->Set_RootMotionRotation(true);
-    m_pModelCom->Set_RootMotionTranslate(true);
+    m_pModelCom->Set_RootMotionTranslate(false);
 
 
     return S_OK;
@@ -151,6 +151,28 @@ HRESULT CWolfDevil::Render()
     return S_OK;
 }
 
+
+
+#pragma endregion
+
+
+#pragma region 0.  몬스터는 충돌에 대한 상태제어를 할 수 있어야한다. => 충돌에 따라 상태가 변하기도, 수치값이 바뀌기도한다.
+void CWolfDevil::On_Collision_Enter(CGameObject* pOther)
+{
+}
+
+void CWolfDevil::On_Collision_Stay(CGameObject* pOther)
+{
+}
+
+void CWolfDevil::On_Collision_Exit(CGameObject* pOther)
+{
+}
+
+#pragma endregion
+
+
+#pragma region 1. AI 관리
 /* Update 시 AI가 수행해야 하는 순서들을 함수로 표현. */
 void CWolfDevil::Update_AI(_float fTimeDelta)
 {
@@ -175,26 +197,10 @@ void CWolfDevil::Update_AI(_float fTimeDelta)
 #endif // _DEBUG
 
 }
-
 #pragma endregion
 
 
-#pragma region 충돌
-void CWolfDevil::On_Collision_Enter(CGameObject* pOther)
-{
-}
-
-void CWolfDevil::On_Collision_Stay(CGameObject* pOther)
-{
-}
-
-void CWolfDevil::On_Collision_Exit(CGameObject* pOther)
-{
-}
-
-#pragma endregion
-
-#pragma region 1. 몬스터는 자신에게 필요한 수치값들을 초기화해야한다.
+#pragma region 2. 몬스터는 자신에게 필요한 수치값들을 초기화해야한다.
 // 기본적으로 몬스터 생성시 필요한 STAT 값들을 제외하고 더 필요한 경우 정의
 HRESULT CWolfDevil::Initialize_Stats()
 {
@@ -202,7 +208,7 @@ HRESULT CWolfDevil::Initialize_Stats()
 }
 #pragma endregion
 
-#pragma region 2. 몬스터는 내 애니메이션이 무엇인지 알아야한다.
+#pragma region 3. 몬스터는 내 애니메이션이 무엇인지 알아야한다.
 /* STRING Index 형태로 관리.*/
 HRESULT CWolfDevil::InitializeAction_ToAnimationMap()
 {
@@ -211,8 +217,8 @@ HRESULT CWolfDevil::InitializeAction_ToAnimationMap()
 
     m_Action_AnimMap.emplace(L"IDLE", WOLFDEVIL_IDLE_LOOP);
     m_Action_AnimMap.emplace(L"HIT", WOLFDEVIL_DAMAGE_FRONT);
-    m_Action_AnimMap.emplace(L"ATTACK", WOLFDEVIL_ATTACK_NORMAL);
-    m_Action_AnimMap.emplace(L"ATTACK_JUMP", WOLFDEVIL_ATTACK_JUMP);
+    m_Action_AnimMap.emplace(L"ATTACK_JUMP", WOLFDEVIL_ATTACK_NORMAL);
+    m_Action_AnimMap.emplace(L"ATTACK", WOLFDEVIL_ATTACK_JUMP);
     m_Action_AnimMap.emplace(L"DEATH_BACK", WOLFDEVIL_DEATH_BACK);
     m_Action_AnimMap.emplace(L"DEATH_NORMAL", WOLFDEVIL_DEATH_NORMAL);
     m_Action_AnimMap.emplace(L"DODGE_BACK", WOLFDEVIL_DODGE_BACK);
@@ -225,6 +231,9 @@ HRESULT CWolfDevil::InitializeAction_ToAnimationMap()
     // 같은 애니메이션이지만 다른 이름으로 설정해서 Node에서 사용할 수 있게함.
     m_Action_AnimMap.emplace(L"DETECT", WOLFDEVIL_RUN); 
     m_Action_AnimMap.emplace(L"STUN", WOLFDEVIL_STUN);
+
+    /* 재생속도 증가. */ 
+    m_pModelCom->Set_CurrentTickPerSecond(WOLFDEVIL_ATTACK_JUMP, m_pModelCom->Get_CurrentTickPerSecond(WOLFDEVIL_ATTACK_JUMP) * 2.f);
 
     return S_OK;
 }
@@ -252,8 +261,20 @@ HRESULT CWolfDevil::Initialize_BuffDurations()
 #pragma endregion
 
 
+#pragma region 4. 특수한 상태를 제어하기 위한 함수들
+void CWolfDevil::Enable_Collider(_uint iType)
+{
+}
 
-#pragma region 4. 기본적인 WolfDevil이 생성되기 위한 컴포넌트 객체들.
+void CWolfDevil::Disable_Collider(_uint iType)
+{
+}
+#pragma endregion
+
+
+
+
+#pragma region 5. 기본적인 WolfDevil이 생성되기 위한 컴포넌트 객체들.
 HRESULT CWolfDevil::Ready_Components(WOLFDEVIL_DESC* pDesc)
 {
     if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxAnimMesh"),
@@ -272,7 +293,7 @@ HRESULT CWolfDevil::Ready_Components(WOLFDEVIL_DESC* pDesc)
     return S_OK;
 }
 
-HRESULT CWolfDevil::Ready_BehaviourTree()
+HRESULT CWolfDevil::Ready_BehaviorTree()
 {
    
     CMonsterTree::MONSTER_BT_DESC BT{};
@@ -323,16 +344,6 @@ HRESULT CWolfDevil::Ready_PartObjects()
     return S_OK;
 }
 
-void CWolfDevil::Enable_Collider(_uint iType)
-{
-}
-
-void CWolfDevil::Disable_Collider(_uint iType)
-{
-}
-
-
-#pragma endregion
 
 CWolfDevil* CWolfDevil::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
@@ -370,3 +381,7 @@ void CWolfDevil::Free()
     __super::Free();
     Safe_Release(m_pTree);
 }
+
+
+#pragma endregion
+

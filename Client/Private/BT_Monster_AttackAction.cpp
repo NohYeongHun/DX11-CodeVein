@@ -35,12 +35,13 @@ BT_RESULT CBT_Monster_AttackAction::EnterAttack(_float fTimeDelta)
         CRASH("Failed Tree Attack Enter Logic");
     }
 
-    // 0. 무적 상태라면 맞지 않습니다.
-    if (m_pOwner->HasBuff(CMonster::BUFF_INVINCIBLE))
-        return BT_RESULT::FAILURE;
+
 
     // 1. 다음 단계로 진행
     m_eAttackPhase = ATTACK_PHASE::ROTATING;
+
+    // 2. 루트모션 설정.
+    
 
     return BT_RESULT::RUNNING;
 }
@@ -54,6 +55,7 @@ BT_RESULT CBT_Monster_AttackAction::UpdateRotating(_float fTimeDelta)
     {
         m_eAttackPhase = ATTACK_PHASE::LOOP;
 
+        m_pOwner->Set_RootMotionTranslate(true);
         // 1. 공격 애니메이션 선택
         _uint iNextAnimationIdx = m_pOwner->Find_AnimationIndex(L"ATTACK");
 
@@ -85,6 +87,8 @@ BT_RESULT CBT_Monster_AttackAction::EndAttack(_float fTimeDleta)
         // 2. 현재 애니메이션으로 NON 블렌딩하면서 변경. => Idle은 NonBlend로 변경.
         m_pOwner->Change_Animation_NonBlend(iNextAnimationIdx);
 
+
+        m_pOwner->Set_RootMotionTranslate(false);
         // 디버그용 함수.
         //m_pOwner->Print_Position();
     }
