@@ -49,6 +49,7 @@ void CLoad_Animation::Update_TransformationMatrices(const vector<class CLoad_Bon
         }
         else
         {
+            *pFinished = true;
             m_fCurrentTrackPosition = 0.f;
         }
     }
@@ -69,7 +70,10 @@ void CLoad_Animation::Blend_Update_TransformationMatrices(const vector<class CLo
 
     // Blending 종료. => 한번에 되버리잖아?
     if (m_fBlendTrackPosition >= blendDesc.fBlendDuration)
+    {
         blendDesc.isBlending = false;
+        m_RootMotionTranslate = true;
+    }
     else
     {
         // 1. 일단 블렌딩 이전 애니메이션 Channel들을 가져오자.

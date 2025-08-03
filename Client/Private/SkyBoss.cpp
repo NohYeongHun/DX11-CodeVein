@@ -28,11 +28,11 @@ HRESULT CSkyBoss::Initialize_Clone(void* pArg)
     if (FAILED(Ready_Components(pDesc)))
         return E_FAIL;
 
-    if (FAILED(Ready_BehaviourTree()))
-    {
-        CRASH("Failed Ready BehaviourTree SkyBoss")
-            return E_FAIL;
-    }
+    //if (FAILED(Ready_BehaviourTree()))
+    //{
+    //    CRASH("Failed Ready BehaviourTree SkyBoss")
+    //        return E_FAIL;
+    //}
 
     if (FAILED(InitializeAction_ToAnimationMap()))
     {
@@ -46,6 +46,10 @@ HRESULT CSkyBoss::Initialize_Clone(void* pArg)
 
     _vector qInitRot = XMQuaternionRotationAxis(XMVectorSet(0.f, 1.f, 0.f, 0.f), 0.0f);
     m_pTransformCom->Set_Quaternion(qInitRot);
+
+    _float3 vScale = { 1.5f, 1.5f, 1.5f };
+    m_pTransformCom->Set_Scale(vScale);
+
 
     static _uint iTest = 0;
     _float3 vPos = { 0.f, 5.f, 0.f };
@@ -219,8 +223,13 @@ HRESULT CSkyBoss::Ready_Components(SKYBOSS_DESC* pDesc)
     CLoad_Model::LOADMODEL_DESC Desc{};
     Desc.pGameObject = this;
 
+    //if (FAILED(__super::Add_Component(ENUM_CLASS(m_eCurLevel)
+    //    , TEXT("Prototype_Component_Model_SkyBoss")
+    //    , TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom), &Desc)))
+    //    return E_FAIL;
+
     if (FAILED(__super::Add_Component(ENUM_CLASS(m_eCurLevel)
-        , TEXT("Prototype_Component_Model_SkyBoss")
+        , TEXT("Prototype_Component_Model_QueenKnight")
         , TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom), &Desc)))
         return E_FAIL;
 

@@ -1,17 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="99. Default">
-      <UniqueIdentifier>{2a10b7d1-9908-400c-a492-1995245fa1e0}</UniqueIdentifier>
-    </Filter>
     <Filter Include="00. MainApp">
       <UniqueIdentifier>{1ded90f0-3f1a-446e-8e11-a88fa2656e91}</UniqueIdentifier>
     </Filter>
     <Filter Include="97. Imgui">
       <UniqueIdentifier>{a4acb887-866b-4576-a8bb-a1a613797901}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="98. Define">
-      <UniqueIdentifier>{14cc22d3-918a-4575-ac17-dde4d60aad62}</UniqueIdentifier>
     </Filter>
     <Filter Include="97. Imgui\Manager">
       <UniqueIdentifier>{901ff5b8-d46c-422b-a35f-a6be33759721}</UniqueIdentifier>
@@ -76,28 +70,34 @@
     <Filter Include="03. Component\Navagation">
       <UniqueIdentifier>{e67f8098-667f-41ba-bef6-14eb483845fd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="98. Default">
+      <UniqueIdentifier>{2a10b7d1-9908-400c-a492-1995245fa1e0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="99. Define">
+      <UniqueIdentifier>{14cc22d3-918a-4575-ac17-dde4d60aad62}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
-      <Filter>99. Default</Filter>
+      <Filter>98. Default</Filter>
     </ClInclude>
     <ClInclude Include="Resource.h">
-      <Filter>99. Default</Filter>
+      <Filter>98. Default</Filter>
     </ClInclude>
     <ClInclude Include="targetver.h">
-      <Filter>99. Default</Filter>
+      <Filter>98. Default</Filter>
     </ClInclude>
     <ClInclude Include="Tool.h">
-      <Filter>99. Default</Filter>
+      <Filter>98. Default</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\ToolPch.h">
-      <Filter>98. Define</Filter>
+      <Filter>99. Define</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Tool_Defines.h">
-      <Filter>98. Define</Filter>
+      <Filter>99. Define</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Tool_Struct.h">
-      <Filter>98. Define</Filter>
+      <Filter>99. Define</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Imgui_Manager.h">
       <Filter>97. Imgui\Manager</Filter>
@@ -175,7 +175,7 @@
       <Filter>02. GameObject\Player</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\PrototypeName.h">
-      <Filter>98. Define</Filter>
+      <Filter>99. Define</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Map_Part.h">
       <Filter>02. GameObject\Map\Parts</Filter>
@@ -192,18 +192,18 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="small.ico">
-      <Filter>99. Default</Filter>
+      <Filter>98. Default</Filter>
     </Image>
     <Image Include="Tool.ico">
-      <Filter>99. Default</Filter>
+      <Filter>98. Default</Filter>
     </Image>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Tool.cpp">
-      <Filter>99. Default</Filter>
+      <Filter>98. Default</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\ToolPch.cpp">
-      <Filter>98. Define</Filter>
+      <Filter>99. Define</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Imgui_Manager.cpp">
       <Filter>97. Imgui\Manager</Filter>
@@ -272,7 +272,7 @@
       <Filter>02. GameObject\Player</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\PrototypeName.cpp">
-      <Filter>98. Define</Filter>
+      <Filter>99. Define</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Map_Part.cpp">
       <Filter>02. GameObject\Map\Parts</Filter>
@@ -289,7 +289,7 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Tool.rc">
-      <Filter>99. Default</Filter>
+      <Filter>98. Default</Filter>
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>

@@ -32,8 +32,7 @@ public:
 	virtual void Late_Update(_float fTimeDelta);
 	virtual HRESULT Render();
 
-public:
-	virtual void Update_AI(_float fTimeDelta) override;
+
 #pragma endregion
 
 
@@ -45,43 +44,49 @@ public:
 	virtual void On_Collision_Exit(CGameObject* pOther);
 #pragma endregion
 
-#pragma region 1. 몬스터는 자신에게 필요한 수치값들을 초기화해야한다.
+
+#pragma region 1. AI 관리
 public:
-	virtual HRESULT Initialize_Stats() override;
-#pragma endregion
+	virtual void Update_AI(_float fTimeDelta) override;
 
-
-#pragma region 2. 몬스터는 내 애니메이션이 무엇인지 알아야한다.
-public:
-	virtual HRESULT InitializeAction_ToAnimationMap() override;
-#pragma endregion
-
-#pragma region 3. 몬스터는 자신이 어떤 버프를 소유할 수 있는지를 알아야 한다. => 그리고 그에 맞는 쿨타임도 알아야한다.(몬스터마다 달라질 수 있다.)
-public:
-	virtual HRESULT Initialize_BuffDurations() override;
-#pragma endregion
-
-
-#pragma region 4. BEHAVIOUR TREE
 private:
 	class CMonsterTree* m_pTree = { nullptr };
 
 #pragma endregion
 
-
-#pragma region 5. 기본적으로 몬스터가 필요한 상태들을 정의합니다.
-private:
-	HRESULT Ready_Components(WOLFDEVIL_DESC* pDesc);
-	HRESULT Ready_BehaviourTree();
-	HRESULT Ready_Render_Resources();
-	HRESULT Ready_PartObjects();
+#pragma region 2. 몬스터는 자신에게 필요한 수치값들을 초기화해야한다.
+public:
+	virtual HRESULT Initialize_Stats() override;
 #pragma endregion
 
-#pragma region 6. 특수한 상태를 제어하기 위한 함수들
+
+#pragma region 3. 몬스터는 내 애니메이션이 무엇인지 알아야한다.
+public:
+	virtual HRESULT InitializeAction_ToAnimationMap() override;
+#pragma endregion
+
+#pragma region 4. 몬스터는 자신이 어떤 버프를 소유할 수 있는지를 알아야 한다. => 그리고 그에 맞는 쿨타임도 알아야한다.(몬스터마다 달라질 수 있다.)
+public:
+	virtual HRESULT Initialize_BuffDurations() override;
+#pragma endregion
+
+
+
+#pragma region 5. 특수한 상태를 제어하기 위한 함수들
 public:
 	virtual void Enable_Collider(_uint iType) override;
 	virtual void Disable_Collider(_uint iType) override;
 #pragma endregion
+
+#pragma region 6. 기본적으로 몬스터가 필요한 상태들을 정의합니다.
+private:
+	HRESULT Ready_Components(WOLFDEVIL_DESC* pDesc);
+	HRESULT Ready_BehaviorTree();
+	HRESULT Ready_Render_Resources();
+	HRESULT Ready_PartObjects();
+#pragma endregion
+
+
 
 
 

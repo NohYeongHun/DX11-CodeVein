@@ -13,18 +13,19 @@ public:
     
     // 너 지금 어떤 버프/디버프에 걸려있니?
     // Has 관계 => 가지고 있는지 여부를 판단합니다. (여러 개)
+
+    // 1 ~ 23은 커스텀사용
     enum BUFF_FLAGS : _uint
     {
         BUFF_NONE = 0,
-        BUFF_HIT = 1 << 0,
-        BUFF_DOWN = 1 << 1,
-        BUFF_STUN = 1 << 2,
-
-        // 3 ~ 17은 커스텀으로 사용이 가능하지않을까.
-        BUFF_INVINCIBLE = 1 << 18, // 무적시간.
-        BUFF_DEAD = 1 << 19,
-        BUFF_CORPSE = 1 << 20, // 거의 마지막에만 사용할듯?
-        BUFF_DISSOLVE = 1 << 21,
+        
+        BUFF_HIT = 1 << 24,
+        BUFF_DOWN = 1 << 25,
+        BUFF_STUN = 1 << 26,
+        BUFF_INVINCIBLE = 1 << 27, // 무적시간.
+        BUFF_DEAD = 1 << 28,
+        BUFF_CORPSE = 1 << 29, // 거의 마지막에만 사용할듯?
+        BUFF_DISSOLVE = 1 << 30,
         BUFF_END
     };
 
@@ -92,6 +93,9 @@ public:
     const _bool Is_Animation_Finished();
 
 
+public:
+    void Set_RootMotionRotation(_bool IsRotate);
+    void Set_RootMotionTranslate(_bool IsTranslate);
 protected:
     _wstring m_CurrentAction = { L"IDLE" };
 

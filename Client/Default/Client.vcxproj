@@ -165,10 +165,12 @@
     <ClInclude Include="..\Public\BT_Monster_DetectAction.h" />
     <ClInclude Include="..\Public\BT_Monster_DownAction.h" />
     <ClInclude Include="..\Public\BT_Monster_HitAction.h" />
+    <ClInclude Include="..\Public\BT_Monster_IdleAction.h" />
     <ClInclude Include="..\Public\BT_Monster_IsAttackRange.h" />
     <ClInclude Include="..\Public\BT_Monster_IsDead.h" />
     <ClInclude Include="..\Public\BT_Monster_IsDown.h" />
     <ClInclude Include="..\Public\BT_Monster_IsHit.h" />
+    <ClInclude Include="..\Public\BT_QueenKnight_FirstPhase_AttackAction.h" />
     <ClInclude Include="..\Public\BT_SkyBoss_Attack.h" />
     <ClInclude Include="..\Public\BT_SkyBoss_CanStrongAttack.h" />
     <ClInclude Include="..\Public\BT_Monster_IsDetectRange.h" />
@@ -204,6 +206,7 @@
     <ClInclude Include="..\Public\InventoryStatus_Icon.h" />
     <ClInclude Include="..\Public\InventoryStatus_Info.h" />
     <ClInclude Include="..\Public\Inventory_Panel.h" />
+    <ClInclude Include="..\Public\KnightLance.h" />
     <ClInclude Include="..\Public\Level_GamePlay.h" />
     <ClInclude Include="..\Public\Level_Loading.h" />
     <ClInclude Include="..\Public\Level_Logo.h" />
@@ -227,11 +230,14 @@
     <ClInclude Include="..\Public\Player_RunState.h" />
     <ClInclude Include="..\Public\Player_StrongAttackState.h" />
     <ClInclude Include="..\Public\Player_WalkState.h" />
+    <ClInclude Include="..\Public\QueenKnight.h" />
+    <ClInclude Include="..\Public\QueenKnightDefine.h" />
+    <ClInclude Include="..\Public\QueenKnightTree.h" />
     <ClInclude Include="..\Public\Sky.h" />
     <ClInclude Include="..\Public\SkyBoss.h" />
     <ClInclude Include="..\Public\SkyBossDefine.h" />
     <ClInclude Include="..\Public\SkyBossTree.h" />
-    <ClInclude Include="..\Public\Weapon.h" />
+    <ClInclude Include="..\Public\PlayerWeapon.h" />
     <ClInclude Include="..\Public\SkillUI.h" />
     <ClInclude Include="..\Public\SkillUI_Icon.h" />
     <ClInclude Include="..\Public\SkillUI_Panel.h" />
@@ -246,6 +252,7 @@
     <ClInclude Include="..\Public\Terrain.h" />
     <ClInclude Include="..\Public\Title.h" />
     <ClInclude Include="..\Public\TitleText.h" />
+    <ClInclude Include="..\Public\Weapon.h" />
     <ClInclude Include="..\Public\WolfDevil.h" />
     <ClInclude Include="..\Public\WolfDevilDefine.h" />
     <ClInclude Include="Client.h" />
@@ -260,10 +267,12 @@
     <ClCompile Include="..\Private\BT_Monster_DetectAction.cpp" />
     <ClCompile Include="..\Private\BT_Monster_DownAction.cpp" />
     <ClCompile Include="..\Private\BT_Monster_HitAction.cpp" />
+    <ClCompile Include="..\Private\BT_Monster_IdleAction.cpp" />
     <ClCompile Include="..\Private\BT_Monster_IsAttackRange.cpp" />
     <ClCompile Include="..\Private\BT_Monster_IsDead.cpp" />
     <ClCompile Include="..\Private\BT_Monster_IsDown.cpp" />
     <ClCompile Include="..\Private\BT_Monster_IsHit.cpp" />
+    <ClCompile Include="..\Private\BT_QueenKnight_FirstPhase_AttackAction.cpp" />
     <ClCompile Include="..\Private\BT_SkyBoss_Attack.cpp" />
     <ClCompile Include="..\Private\BT_SkyBoss_CanStrongAttack.cpp" />
     <ClCompile Include="..\Private\BT_Monster_IsDetectRange.cpp" />
@@ -301,6 +310,7 @@
     <ClCompile Include="..\Private\InventoryStatus_Icon.cpp" />
     <ClCompile Include="..\Private\InventoryStatus_Info.cpp" />
     <ClCompile Include="..\Private\Inventory_Panel.cpp" />
+    <ClCompile Include="..\Private\KnightLance.cpp" />
     <ClCompile Include="..\Private\Level_GamePlay.cpp" />
     <ClCompile Include="..\Private\Level_Loading.cpp" />
     <ClCompile Include="..\Private\Level_Logo.cpp" />
@@ -323,10 +333,12 @@
     <ClCompile Include="..\Private\Player_RunState.cpp" />
     <ClCompile Include="..\Private\Player_StrongAttackState.cpp" />
     <ClCompile Include="..\Private\Player_WalkState.cpp" />
+    <ClCompile Include="..\Private\QueenKnight.cpp" />
+    <ClCompile Include="..\Private\QueenKnightTree.cpp" />
     <ClCompile Include="..\Private\Sky.cpp" />
     <ClCompile Include="..\Private\SkyBoss.cpp" />
     <ClCompile Include="..\Private\SkyBossTree.cpp" />
-    <ClCompile Include="..\Private\Weapon.cpp" />
+    <ClCompile Include="..\Private\PlayerWeapon.cpp" />
     <ClCompile Include="..\Private\SkillUI.cpp" />
     <ClCompile Include="..\Private\SkillUI_Icon.cpp" />
     <ClCompile Include="..\Private\SkillUI_Panel.cpp" />
@@ -341,6 +353,7 @@
     <ClCompile Include="..\Private\Terrain.cpp" />
     <ClCompile Include="..\Private\Title.cpp" />
     <ClCompile Include="..\Private\TitleText.cpp" />
+    <ClCompile Include="..\Private\Weapon.cpp" />
     <ClCompile Include="..\Private\WolfDevil.cpp" />
     <ClCompile Include="Client.cpp" />
   </ItemGroup>

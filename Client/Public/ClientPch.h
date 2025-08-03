@@ -77,9 +77,12 @@
 /* ======================================= SkyBox Object =================================== */
 #include "Sky.h"
 
+/* ======================================= Weapon Object =================================== */
+#include "Weapon.h"  // Weapon이 가져야 되는 기능들.
+
 /* ======================================== Player Object ===================================== */
 #include "PlayerDefine.h"
-#include "Weapon.h"
+#include "PlayerWeapon.h"
 #include "Player.h"
 #include "PlayerState.h"
 #include "Player_IdleState.h"
@@ -107,6 +110,7 @@
 #include "BT_Monster_AttackAction.h"
 #include "BT_Monster_IsDetectRange.h"
 #include "BT_Monster_DetectAction.h"
+#include "BT_Monster_IdleAction.h"
 
 /* ======================================== Monster Object ===================================== */
 #include "Monster.h"
@@ -114,6 +118,18 @@
 /* ======================================== WolfDevil Object ===================================== */
 #include "WolfDevilDefine.h"
 #include "WolfDevil.h"
+
+/* ======================================== QueenKnight Boss BT ===================================== */
+#include "BT_QueenKnight_FirstPhase_AttackAction.h"
+
+#include "QueenKnightTree.h"
+/* ======================================== QueenKnight Boss Object ===================================== */
+#include "QueenKnightDefine.h"
+#include "KnightLance.h"
+#include "QueenKnight.h"
+
+
+
 
 /* ======================================== Sky Boss Object ===================================== */
 #include "SkyBossDefine.h"

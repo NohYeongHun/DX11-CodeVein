@@ -120,6 +120,16 @@ const _bool CMonster::Is_Animation_Finished()
     return m_pModelCom->Is_Finished();
 }
 
+void CMonster::Set_RootMotionRotation(_bool IsRotate)
+{
+    m_pModelCom->Set_RootMotionRotation(IsRotate);
+}
+
+void CMonster::Set_RootMotionTranslate(_bool IsTranslate)
+{
+    m_pModelCom->Set_RootMotionTranslate(IsTranslate);
+}
+
 
 
 #pragma endregion
@@ -184,8 +194,14 @@ const _bool CMonster::AddBuff(_uint buffFlag, _float fCustomDuration)
     m_ActiveBuffs |= buffFlag;
 
     // 시간을 지정한 경우에만 해당 시간으로 설정해줍니다. 
-    m_BuffTimers[buffFlag] = fCustomDuration > 0.f ? fCustomDuration
-        : m_BuffDefault_Durations[buffFlag];
+    if (m_BuffDefault_Durations[buffFlag] > 0.f)
+    {
+        m_BuffTimers[buffFlag] = fCustomDuration > 0.f ? fCustomDuration
+            : m_BuffDefault_Durations[buffFlag];
+        // 버프 타이머를 설정하면 자동으로 삭제되므로 상시 유지되는 버프도 삭제될 수도 있음
+        // => Phase 상태.
+    }
+    
 
     return true;
 }

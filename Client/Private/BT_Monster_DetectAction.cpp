@@ -1,6 +1,5 @@
-﻿CBT_Monster_DetectAction::CBT_Monster_DetectAction(CMonster* pOwner, _bool IsRootMotion)
+﻿CBT_Monster_DetectAction::CBT_Monster_DetectAction(CMonster* pOwner)
     : m_pOwner{ pOwner }
-    , m_IsRootMotion{ IsRootMotion }
 {
 }
 
@@ -14,8 +13,10 @@ BT_RESULT CBT_Monster_DetectAction::Perform_Action(_float fTimeDelta)
         return UpdateRotating(fTimeDelta);
     case DETECT_PHASE::LOOP:
         return UpdateWalk(fTimeDelta);
-    case DETECT_PHASE::COMPLETED:
+    case DETECT_PHASE::END:
         return EndDetect(fTimeDelta);
+    case DETECT_PHASE::COMPLETED:
+        return BT_RESULT::SUCCESS;
     }
     return BT_RESULT::FAILURE;
 }
@@ -35,6 +36,8 @@ BT_RESULT CBT_Monster_DetectAction::EnterDetect(_float fTimeDelta)
 
     // 1. 다음 단계로 진행
     m_eDetectPhase = DETECT_PHASE::ROTATING;
+
+    m_pOwner->Set_RootMotionTranslate(true);
 
     return BT_RESULT::RUNNING;
 }
@@ -61,7 +64,7 @@ BT_RESULT CBT_Monster_DetectAction::UpdateRotating(_float fTimeDelta)
 BT_RESULT CBT_Monster_DetectAction::UpdateWalk(_float fTimeDelta)
 {
     if (m_pOwner->Is_Animation_Finished())
-        m_eDetectPhase = DETECT_PHASE::COMPLETED;
+        m_eDetectPhase = DETECT_PHASE::END;
     else
     {
         if (!m_IsRootMotion)
@@ -75,18 +78,20 @@ BT_RESULT CBT_Monster_DetectAction::EndDetect(_float fTimeDleta)
 {
     if (m_pOwner->Is_Animation_Finished())
     {
+        m_eDetectPhase = DETECT_PHASE::COMPLETED;
         // 1. Animation 탐색 시작
         _uint iNextAnimationIdx = m_pOwner->Find_AnimationIndex(L"IDLE");
 
         // 2. 현재 애니메이션으로 NON 블렌딩하면서 변경. => Idle은 NonBlend로 변경.
-        m_pOwner->Change_Animation_Blend(iNextAnimationIdx);
+        m_pOwner->Change_Animation_NonBlend(iNextAnimationIdx);
+        m_pOwner->Set_RootMotionTranslate(false);
     }
 
-    return BT_RESULT::SUCCESS;
+    return BT_RESULT::RUNNING;
 }
 
 
-CBT_Monster_DetectAction* CBT_Monster_DetectAction::Create(CMonster* pOwner, _bool IsRootMotion )
+CBT_Monster_DetectAction* CBT_Monster_DetectAction::Create(CMonster* pOwner)
 {
     if (nullptr == pOwner)
     {
@@ -94,7 +99,7 @@ CBT_Monster_DetectAction* CBT_Monster_DetectAction::Create(CMonster* pOwner, _bo
         return nullptr;
     }
 
-    return new CBT_Monster_DetectAction(pOwner, IsRootMotion);
+    return new CBT_Monster_DetectAction(pOwner);
 }
 
 void CBT_Monster_DetectAction::Free()

@@ -43,6 +43,13 @@ HRESULT CLoader_GamePlay::Loading_Resource(ID3D11Device* pDevice, ID3D11DeviceCo
 		return E_FAIL;
 	}
 
+	if (FAILED(Add_Prototype_QueenKnight(pDevice, pContext, pGameInstance)))
+	{
+		CRASH("Create SkyBoss Failed");
+		MSG_BOX(TEXT("Create Failed Loading : GamePlay QueenKnight "));
+		return E_FAIL;
+	}
+
 	if (FAILED(Add_Prototype_WolfDevil(pDevice, pContext, pGameInstance)))
 	{
 		CRASH("Create WolfDevil Failed");
@@ -83,7 +90,7 @@ HRESULT CLoader_GamePlay::Add_Prototype_Player(ID3D11Device* pDevice, ID3D11Devi
 
 	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level)
 		, TEXT("Prototype_GameObject_Weapon")
-		, CWeapon::Create(pDevice, pContext))))
+		, CPlayerWeapon::Create(pDevice, pContext))))
 		return E_FAIL;
 
 	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level)
@@ -116,6 +123,52 @@ HRESULT CLoader_GamePlay::Add_Prototype_SkyBoss(ID3D11Device* pDevice, ID3D11Dev
 		, TEXT("Prototype_Component_SkyBossTree")
 		, CSKyBossTree::Create(pDevice, pContext))))
 		return E_FAIL;*/
+
+	return S_OK;
+}
+
+HRESULT CLoader_GamePlay::Add_Prototype_QueenKnight(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
+{
+	_matrix		PreTransformMatrix = XMMatrixIdentity();
+	PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XM_PI);
+
+	//if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level)
+	//	, TEXT("Prototype_Component_Model_BlackKnight")
+	//	, CLoad_Model::Create(pDevice, pContext, MODELTYPE::ANIM, PreTransformMatrix, "../../SaveFile/Model/Boss/BlackKnight.dat", L""))))
+	//	return E_FAIL;
+
+	
+
+	// 방패
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level)
+		, TEXT("Prototype_Component_Model_GodChildShield")
+		, CLoad_Model::Create(pDevice, pContext, MODELTYPE::ANIM, PreTransformMatrix, "../../SaveFile/Model/Weapon/GodChildShield.dat", L""))))
+		return E_FAIL;
+
+
+	// 무기
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level)
+		, TEXT("Prototype_Component_Model_GodChildLance")
+		, CLoad_Model::Create(pDevice, pContext, MODELTYPE::ANIM, PreTransformMatrix, "../../SaveFile/Model/Weapon/GodChildLance.dat", L""))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level)
+		, TEXT("Prototype_GameObject_GodChildLance")
+		, CKnightLance::Create(pDevice, pContext))))
+		return E_FAIL;
+
+	// 본체
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level)
+		, TEXT("Prototype_Component_Model_QueenKnight")
+		, CLoad_Model::Create(pDevice, pContext, MODELTYPE::ANIM, PreTransformMatrix, "../../SaveFile/Model/Boss/QueenKnight.dat", L""))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level)
+		, TEXT("Prototype_GameObject_QueenKnight")
+		, CQueenKnight::Create(pDevice, pContext))))
+		return E_FAIL;
+
+
 
 	return S_OK;
 }

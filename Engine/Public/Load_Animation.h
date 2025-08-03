@@ -33,6 +33,16 @@ public:
 	void Set_TickPerSecond(_float fTickPerSecond) { m_fTickPerSecond = fTickPerSecond;  }
 	_float Get_TickPerSecond() { return m_fTickPerSecond; }
 
+public:
+	void Set_RootMotionTranslate(_bool IsTranslate) { m_RootMotionTranslate = IsTranslate; }
+	void Set_RootMotionRotate(_bool IsRotate) { m_RootMotionRotate = IsRotate; }
+
+	const _bool Get_RootMotionTranslate() { return m_RootMotionTranslate; }
+	const _bool Get_RootMotionRotate() { return m_RootMotionRotate;}
+
+private:
+	_bool m_RootMotionTranslate = { true };
+	_bool m_RootMotionRotate = { true };
 
 private:
 	/* 채널 이름 */
@@ -53,6 +63,8 @@ private:
 	vector<class CLoad_Channel*> m_BoneChannelCache; 
 	// 최근에 재생한 키프레임의 인덱스들.
 	vector<_uint> m_CurrentKeyFrameIndices;
+
+
 
 private:
 	HRESULT Load_Channels(std::ifstream& ifs);

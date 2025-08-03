@@ -10,6 +10,7 @@ public:
         NONE,         // 초기 상태
         ROTATING,     // 전환 상태.
         LOOP,         // WALK 상태.
+        END,
         COMPLETED     // IDLE로 변환되어야 함.
     };
 
@@ -19,7 +20,7 @@ private:
     _bool m_IsRootMotion = { false };
 
 public:
-    explicit CBT_Monster_DetectAction(class CMonster* pOwner,  _bool IsRootMotion = false);
+    explicit CBT_Monster_DetectAction(class CMonster* pOwner);
     virtual ~CBT_Monster_DetectAction() = default;
 
 public:
@@ -33,7 +34,7 @@ private:
     BT_RESULT EndDetect(_float fTimeDleta);
 
 public:
-    static CBT_Monster_DetectAction* Create(class CMonster* pOwner, _bool IsRootMotion = false);
+    static CBT_Monster_DetectAction* Create(class CMonster* pOwner);
     virtual void Free() override;
 };
 NS_END

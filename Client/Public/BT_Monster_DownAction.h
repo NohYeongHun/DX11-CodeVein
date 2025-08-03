@@ -26,9 +26,8 @@ public:
 
 private:
     BT_RESULT EnterDown();
-    BT_RESULT StartDown(_float fTimeDelta);
-    BT_RESULT LoopDown(_float fTimeDelta);
     BT_RESULT EndDown(_float fTimeDelta);
+    BT_RESULT Complete(_float fTimeDelta);
 
 private:
     class CMonster* m_pOwner = { nullptr };
