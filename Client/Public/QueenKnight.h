@@ -23,7 +23,7 @@ public:
 		QUEEN_BUFF_PHASE_SECOND = 1 << 5,
 		QUEEN_BUFF_PHASE_LAST = 1 << 6,
 		QUEEN_BUFF_PHASE_ATTACK_COOLDOWN = 1 << 7, // 페이즈 마다 다른 공격 시퀀스 => 쿨타임 존재
-		QUEEN_BUFF_END = 1 << 31
+		QUEEN_BUFF_END = 1 << 30
 	};
 
 public:
