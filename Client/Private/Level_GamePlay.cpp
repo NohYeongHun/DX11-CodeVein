@@ -35,11 +35,11 @@ HRESULT CLevel_GamePlay::Initialize_Clone()
 	//	return E_FAIL;
 	//}
 
-	//if (FAILED(Ready_Layer_Monster(TEXT("Layer_Monster"))))
-	//{
-	//	CRASH("Failed Layer_Monster");
-	//	return E_FAIL;
-	//}
+	if (FAILED(Ready_Layer_Monster(TEXT("Layer_Monster"))))
+	{
+		CRASH("Failed Layer_Monster");
+		return E_FAIL;
+	}
 
 	
 
@@ -217,13 +217,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_Player(const _wstring& strLayerTag)
 	//}
 
 	// 메인 카메라 변경.
-	/*if (FAILED(m_pGameInstance->Change_Camera(TEXT("PlayerCamera"), ENUM_CLASS(LEVEL::GAMEPLAY))))
-	{
-		CRASH("Change Camera Failed");
-		return E_FAIL;
-	}*/
-
-	if (FAILED(m_pGameInstance->Change_Camera(TEXT("FreeCamera"), ENUM_CLASS(LEVEL::GAMEPLAY))))
+	if (FAILED(m_pGameInstance->Change_Camera(TEXT("PlayerCamera"), ENUM_CLASS(LEVEL::GAMEPLAY))))
 	{
 		CRASH("Change Camera Failed");
 		return E_FAIL;

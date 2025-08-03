@@ -21,13 +21,12 @@ public:
 	virtual HRESULT Initialize_Clone(void* pArg);
 	HRESULT Render(_uint iNumMesh);
 
-#pragma region GET_SET
 public:
+#pragma region GET_SET
 	_uint Get_NumMeshes() const {
 		return m_iNumMeshes;
 	}
 
-	// 애니메이션이 변경되기 직전.
 	void Set_Animation(_uint iAnimIndex, _bool isLoop = false);
 
 	void Set_Loop(_bool isLoop)
@@ -61,9 +60,10 @@ public:
 	}
 
 	_float4x4* Get_BoneMatrix(const _char* pBoneName);
+
 	_uint Get_CurrentFrame();
+
 	_float Get_Current_Ratio();
-	_uint Get_RootBoneIndex() { return m_iRoot_BoneIndex; }
 
 #pragma endregion
 
@@ -78,6 +78,7 @@ public:
 	HRESULT Bind_BoneMatrices(class CShader* pShader, const _char* pConstantName, _uint iMeshIndex);
 
 public:
+	/* 보간*/
 	_bool Play_Animation(_float fTimeDelta);
 	void Set_BlendInfo(uint32_t iNextAnimIndex, _float fBlendTime, _bool bScale, _bool bRotation, _bool bTranslation);
 
@@ -91,24 +92,11 @@ public:
 	}
 	_float Get_CurrentTickPerSecond(_uint iAnimIndex) { return m_Animations[iAnimIndex]->Get_TickPerSecond(); }
 
-
-
-#pragma region BLENDING, ROOTMOTION 통합 관리
-
+#pragma region ROOT MOTION
 private:
 	void Handle_RootMotion(_float fTimeDelta);
 	void Reset_RootMotion();
 
-	// 1. 애니메이션 변경 시점에 루트 모션의 기준점을 명확히 관리하는 시스템.
-
-	/*
-	* 애니메이션이 변경되기 직전의 월드 위치를 "기준점"으로 저장 
-	* 새로운 애니메이션의 루트 본 초기 위치를 이 기준점으로 설정
-	* 블렌딩 중에는 이 기준점을 유지하면서 상대적 이동만 계산
-	*/
-
-private:
-	_float4 m_vStartWorldPos = {}; // 변경 시점에 직전의 월드 위치
 #pragma endregion
 
 
@@ -164,11 +152,10 @@ private:
 
 	_bool m_bRootMotionRotate = { false };
 	_bool m_bRootMotionTranslate = { false };
-	_bool m_bFirstFrameAfterAnimChange = { false };
 
 private:
 	string m_ModelDir = {};
-	
+
 	
 
 private:
