@@ -21,13 +21,15 @@ void CPlayer_RunState::Enter(void* pArg)
 	m_iCurAnimIdx = pDesc->iAnimation_Idx;
 	m_eDir = pDesc->eDirection;
 
-	m_pModelCom->Set_Animation(m_iCurAnimIdx, m_isLoop);
+	//m_pPlayer->Change_AnimationBlend(m_iCurAnimIdx, m_isLoop, 0.2f, true, true, true);
+	//m_pModelCom->Set_Animation(m_iCurAnimIdx, m_isLoop);
 }
 
 /* State 실행 */
 void CPlayer_RunState::Update(_float fTimeDelta)
 {
-	Handle_Input();
+	Handle_Unified_Direction_Input(fTimeDelta);
+	//Handle_Input();
 
 	//RockOn_State(fTimeDelta);
 
@@ -42,12 +44,17 @@ void CPlayer_RunState::Exit()
 	{
 		
 
-		if (m_iNextState == CPlayer::GUARD)
+		if (m_iNextState == CPlayer::PLAYER_STATE::IDLE)
+			m_pPlayer->Change_AnimationBlend(m_iNextAnimIdx, true, 0.2f, true, true, true);
+		else
+			m_pPlayer->Change_AnimationBlend(m_iNextAnimIdx, false, 0.2f, true, true, true);
+
+		/*if (m_iNextState == CPlayer::GUARD)
 			m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, false);
 		else if (m_iNextState == CPlayer::PLAYER_STATE::DODGE)
 			m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, true);
 		else
-			m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, true);
+			m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, true);*/
 	}
 		
 }
@@ -59,7 +66,6 @@ void CPlayer_RunState::Reset()
 	m_iCurAnimIdx = -1;
 	m_iNextState = -1;
 	m_iNextAnimIdx = -1;
-	m_pModelCom->Animation_Reset();
 }
 
 /* 상태에 따른 변경을 정의합니다. */
@@ -81,61 +87,64 @@ void CPlayer_RunState::Change_State(_float fTimeDelta)
 
 		m_iNextState = CPlayer::PLAYER_STATE::DODGE;
 		Dodge.iAnimation_Idx = PLAYER_ANIM_DODGE_F;
-		m_iNextAnimIdx = PLAYER_ANIM_DODGE_F;
+		m_iNextAnimIdx = Dodge.iAnimation_Idx;
 		m_pFsm->Change_State(m_iNextState, &Dodge);
 
 		return;
 	}
 
-	if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::STRONG_ATTACK))
-	{
-		if (!m_pFsm->Is_CoolTimeEnd(CPlayer::STRONG_ATTACK))
-			return;
+	//if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::STRONG_ATTACK))
+	//{
+	//	if (!m_pFsm->Is_CoolTimeEnd(CPlayer::STRONG_ATTACK))
+	//		return;
 
-		StrongAttack.iAnimation_Idx = PLAYER_ANIM_SPECIAL_DOWN3;
-		m_iNextState = CPlayer::PLAYER_STATE::STRONG_ATTACK;
-		m_iNextAnimIdx = PLAYER_ANIM_SPECIAL_DOWN3;
-		m_pFsm->Change_State(m_iNextState, &StrongAttack);
-		return;
-	}
+	//	StrongAttack.iAnimation_Idx = PLAYER_ANIM_SPECIAL_DOWN3;
+	//	m_iNextState = CPlayer::PLAYER_STATE::STRONG_ATTACK;
+	//	m_iNextAnimIdx = PLAYER_ANIM_SPECIAL_DOWN3;
+	//	m_pFsm->Change_State(m_iNextState, &StrongAttack);
+	//	return;
+	//}
 
-	if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::ATTACK))
-	{
-		if (!m_pFsm->Is_CoolTimeEnd(CPlayer::ATTACK))
-			return;
+	//if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::ATTACK))
+	//{
+	//	if (!m_pFsm->Is_CoolTimeEnd(CPlayer::ATTACK))
+	//		return;
 
-		m_iNextState = CPlayer::PLAYER_STATE::ATTACK;
-		m_iNextAnimIdx = PLAYER_ANIM_ATTACK1;
-		Attack.iAnimation_Idx = PLAYER_ANIM_ATTACK1;
-		Attack.eDirection = m_eDir;
-		m_pFsm->Change_State(m_iNextState, &Attack);
-		return;
-	}
+	//	m_iNextState = CPlayer::PLAYER_STATE::ATTACK;
+	//	m_iNextAnimIdx = PLAYER_ANIM_ATTACK1;
+	//	Attack.iAnimation_Idx = PLAYER_ANIM_ATTACK1;
+	//	Attack.eDirection = m_eDir;
+	//	m_pFsm->Change_State(m_iNextState, &Attack);
+	//	return;
+	//}
 
-	if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::GUARD))
-	{
-		//달리는 도중에 바꾸면 동작이 어색함.
-		if (!m_pFsm->Is_CoolTimeEnd(CPlayer::GUARD))
-			return;
+	//if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::GUARD))
+	//{
+	//	//달리는 도중에 바꾸면 동작이 어색함.
+	//	if (!m_pFsm->Is_CoolTimeEnd(CPlayer::GUARD))
+	//		return;
 
-		Guard.iAnimation_Idx = PLAYER_ANIM_GUARD_START;
-		m_iNextState = CPlayer::PLAYER_STATE::GUARD;
-		m_iNextAnimIdx = PLAYER_ANIM_GUARD_START;
-		m_pFsm->Change_State(m_iNextState, &Guard);
-		return;
-	}
+	//	Guard.iAnimation_Idx = PLAYER_ANIM_GUARD_START;
+	//	m_iNextState = CPlayer::PLAYER_STATE::GUARD;
+	//	m_iNextAnimIdx = PLAYER_ANIM_GUARD_START;
+	//	m_pFsm->Change_State(m_iNextState, &Guard);
+	//	return;
+	//}
 	
 
 	if (m_pPlayer->Is_MovementKeyPressed()) // 입력키 이용 중이라면.
 	{
 		m_pPlayer->Move_By_Camera_Direction_8Way(m_eDir, fTimeDelta, 1.f);
+
+		
+		//OutPutDebugInt(m_pModelCom->Get_CurrentAnimationIndex());
 		return;
 	}
 	else
 	{
-		Idle.iAnimation_Idx = PLAYER_ANIM_IDLE_SWORD;
 		m_iNextState = CPlayer::PLAYER_STATE::IDLE;
-		m_iNextAnimIdx = PLAYER_ANIM_IDLE_SWORD;
+		Idle.iAnimation_Idx = PLAYER_ANIM_IDLE_SWORD;
+		m_iNextAnimIdx = Idle.iAnimation_Idx;
 		m_pFsm->Change_State(m_iNextState, &Idle);
 		return;
 	}

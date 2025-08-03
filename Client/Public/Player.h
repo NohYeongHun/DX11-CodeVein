@@ -56,7 +56,6 @@ public:
 	void HandleState(_float fTimeDelta);
 	_vector  Calculate_Move_Direction(ACTORDIR eDir);
 
-
 public:
 	// 키 입력 상태 확인 함수들
 	uint16_t Get_KeyInput() { return m_KeyInput; }
@@ -135,8 +134,8 @@ private:
 
 public:
 	// Animation 교체.
-	void Change_Animation(_uint iAnimIndex, _bool IsLoop, _float fDuration, _uint iStartFrame, _bool bEitherBoundary, _bool bSameChange);
-
+	void Change_AnimationNonBlend(_uint iNextAnimIdx, _bool IsLoop);
+	void Change_AnimationBlend(_uint iNextAnimIdx, _bool IsLoop, _float fBlendDuration, _bool bScale, _bool bRotate, _bool bTranslate);
 
 #pragma region Player 기본 상태 값
 private:

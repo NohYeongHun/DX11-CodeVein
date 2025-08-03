@@ -85,18 +85,18 @@ void CMonster::On_Collision_Exit(CGameObject* pOther)
 void CMonster::Change_Animation_NonBlend(_uint iNextAnimIdx, _bool IsLoop)
 {
     m_pModelCom->Set_Animation(iNextAnimIdx, IsLoop);
-    m_pModelCom->Animation_Reset();
 }
 
 void CMonster::Change_Animation_Blend(_uint iNextAnimIdx, _bool IsLoop, _float fBlendDuration, _bool bScale, _bool bRotate, _bool bTranslate)
 {
+    /* 애니메이션 정보를 리셋하기. */
+    m_pModelCom->Animation_Reset();
     /* 블렌드 정보를 먼저 설정하게 하기.*/
     m_pModelCom->Set_BlendInfo(iNextAnimIdx
         , fBlendDuration, bScale, bRotate
         , bTranslate);
     /* 애니메이션 변경. */
     m_pModelCom->Set_Animation(iNextAnimIdx, IsLoop);
-    m_pModelCom->Animation_Reset();
 }
 
 /* 애니메이션 인덱스.*/
