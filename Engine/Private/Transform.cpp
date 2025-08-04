@@ -97,6 +97,54 @@ void CTransform::Move_Direction(_vector vDir, _float fTimeDelta)
 	m_bIsDirty = true;
 }
 
+void CTransform::Move_Direction(_vector vDir, _float fTimeDelta, CNavigation* pNavigation)
+{
+	_float4 vPosition = {};
+	_vector vMovement = vDir * (m_fSpeedPerSec * fTimeDelta);
+
+	XMStoreFloat4(&vPosition, Get_State(STATE::POSITION));
+
+	vPosition.x += XMVectorGetX(vMovement);
+	vPosition.y += XMVectorGetY(vMovement);
+	vPosition.z += XMVectorGetZ(vMovement);
+
+	if (nullptr == pNavigation ||
+		true == pNavigation->isMove(XMLoadFloat4(&vPosition)))
+	{
+		Set_State(STATE::POSITION, XMLoadFloat4(&vPosition));
+		m_bIsDirty = true;
+	}
+
+}
+
+/* Navigation 버전 아님 */
+void CTransform::Translate(_fvector vTranslate)
+{
+	_vector vPos = Get_State(STATE::POSITION);
+	vPos += vTranslate;
+	vPos = XMVectorSetW(vPos, 1.f);
+	Set_State(STATE::POSITION, vPos);
+	m_bIsDirty = true;
+}
+
+/* Navigation 버전 */
+void CTransform::Translate(_fvector vTranslate, CNavigation* pNavigation)
+{
+	_float4 vPosition = {};
+	XMStoreFloat4(&vPosition, Get_State(STATE::POSITION));
+
+	vPosition.x += XMVectorGetX(vTranslate);
+	vPosition.y += XMVectorGetY(vTranslate);
+	vPosition.z += XMVectorGetZ(vTranslate);
+
+	if (nullptr == pNavigation ||
+		true == pNavigation->isMove(XMLoadFloat4(&vPosition)))
+	{
+		Set_State(STATE::POSITION, XMLoadFloat4(&vPosition));
+		m_bIsDirty = true;
+	}
+}
+
 HRESULT CTransform::Initialize_Prototype()
 {
 	XMStoreFloat4x4(&m_WorldMatrix, XMMatrixIdentity());

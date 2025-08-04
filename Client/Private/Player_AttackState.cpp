@@ -163,68 +163,99 @@ void CPlayer_AttackState::Change_State(_float fTimeDelta)
 	}
 }
 
-void CPlayer_AttackState::Handle_DirectionInput(_float fTimeDelta)
-{
-	m_fCurrentLockTime += fTimeDelta;
+//void CPlayer_AttackState::Handle_DirectionInput(_float fTimeDelta)
+//{
+//	m_fCurrentLockTime += fTimeDelta;
+//
+//	if (m_fCurrentLockTime >= m_fDirectionLockTime)
+//	{
+//		m_bIsDirectionLocked = true;
+//		m_bCanChangeDirection = false;
+//	}
+//
+//	if (!m_bIsDirectionLocked)
+//	{
+//		// ⭐ 키 입력이 있으면 그 방향으로 이동하면서 공격
+//		if (m_pPlayer->Is_MovementKeyPressed())
+//		{
+//			ACTORDIR eCurrentDirection = m_pPlayer->Calculate_Direction();
+//			if (eCurrentDirection != ACTORDIR::END)
+//			{
+//				m_eDir = eCurrentDirection;
+//				m_pPlayer->Move_By_Camera_Direction_8Way(m_eDir, fTimeDelta, 0.5f); // 이동 속도 조절
+//			}
+//		}
+//		else
+//		{
+//			// 키 입력이 없으면 플레이어 Look Vector 방향으로 이동
+//			Move_By_Player_LookVector(fTimeDelta, 0.4f);
+//		}
+//	}
+//}
 
-	if (m_fCurrentLockTime >= m_fDirectionLockTime)
-	{
-		m_bIsDirectionLocked = true;
-		m_bCanChangeDirection = false;
-	}
-
-	if (!m_bIsDirectionLocked)
-	{
-		// ⭐ 키 입력이 있으면 그 방향으로 이동하면서 공격
-		if (m_pPlayer->Is_MovementKeyPressed())
-		{
-			ACTORDIR eCurrentDirection = m_pPlayer->Calculate_Direction();
-			if (eCurrentDirection != ACTORDIR::END)
-			{
-				m_eDir = eCurrentDirection;
-				m_pPlayer->Move_By_Camera_Direction_8Way(m_eDir, fTimeDelta, 0.5f); // 이동 속도 조절
-			}
-		}
-		else
-		{
-			// 키 입력이 없으면 플레이어 Look Vector 방향으로 이동
-			Move_By_Player_LookVector(fTimeDelta, 0.4f);
-		}
-	}
-}
-
-
-void CPlayer_AttackState::Move_By_Player_LookVector(_float fTimeDelta, _float fSpeed)
-{
-	// 1. 플레이어의 현재 Look Vector 가져오기
-	_vector vPlayerLook = m_pPlayer->Get_Transform()->Get_State(STATE::LOOK);
-
-	// 2. Y축 제거 (지면에서만 이동)
-	vPlayerLook = XMVectorSetY(vPlayerLook, 0.f);
-	vPlayerLook = XMVector3Normalize(vPlayerLook);
-
-	// 3. 키 입력이 있다면 플레이어를 해당 방향으로 회전시킨 후 이동
-	if (m_pPlayer->Is_MovementKeyPressed())
-	{
-		// 키 입력에 따른 방향 계산 (카메라 기준)
-		_vector vInputDirection = Calculate_Input_Direction_From_Camera();
-
-		if (!XMVector3Equal(vInputDirection, XMVectorZero()))
-		{
-			// 회전된 후의 새로운 Look Vector로 이동
-			vPlayerLook = m_pPlayer->Get_Transform()->Get_State(STATE::LOOK);
-			vPlayerLook = XMVectorSetY(vPlayerLook, 0.f);
-			vPlayerLook = XMVector3Normalize(vPlayerLook);
-		}
-		return;
-	}
-	
-	// 4. 플레이어가 바라보는 방향으로 이동
-	if (!XMVector3Equal(vPlayerLook, XMVectorZero()))
-	{
-		m_pPlayer->Get_Transform()->Move_Direction(vPlayerLook, fTimeDelta * fSpeed);
-	}
-}
+//void CPlayer_AttackState::Handle_DirectionInput(_float fTimeDelta)
+//{
+//	m_fCurrentLockTime += fTimeDelta;
+//
+//	if (m_fCurrentLockTime >= m_fDirectionLockTime)
+//	{
+//		m_bIsDirectionLocked = true;
+//		m_bCanChangeDirection = false;
+//	}
+//
+//	if (!m_bIsDirectionLocked)
+//	{
+//		// ⭐ 키 입력이 있으면 그 방향으로 이동하면서 공격
+//		if (m_pPlayer->Is_MovementKeyPressed())
+//		{
+//			ACTORDIR eCurrentDirection = m_pPlayer->Calculate_Direction();
+//			if (eCurrentDirection != ACTORDIR::END)
+//			{
+//				m_eDir = eCurrentDirection;
+//				m_pPlayer->Move_By_Camera_Direction_8Way(m_eDir, fTimeDelta, 0.5f); // 이동 속도 조절
+//			}
+//		}
+//		else
+//		{
+//			// 키 입력이 없으면 플레이어 Look Vector 방향으로 이동
+//			Move_By_Player_LookVector(fTimeDelta, 0.4f);
+//		}
+//	}
+//}
+//
+//
+//
+//void CPlayer_AttackState::Move_By_Player_LookVector(_float fTimeDelta, _float fSpeed)
+//{
+//	// 1. 플레이어의 현재 Look Vector 가져오기
+//	_vector vPlayerLook = m_pPlayer->Get_Transform()->Get_State(STATE::LOOK);
+//
+//	// 2. Y축 제거 (지면에서만 이동)
+//	vPlayerLook = XMVectorSetY(vPlayerLook, 0.f);
+//	vPlayerLook = XMVector3Normalize(vPlayerLook);
+//
+//	// 3. 키 입력이 있다면 플레이어를 해당 방향으로 회전시킨 후 이동
+//	if (m_pPlayer->Is_MovementKeyPressed())
+//	{
+//		// 키 입력에 따른 방향 계산 (카메라 기준)
+//		_vector vInputDirection = Calculate_Input_Direction_From_Camera();
+//
+//		if (!XMVector3Equal(vInputDirection, XMVectorZero()))
+//		{
+//			// 회전된 후의 새로운 Look Vector로 이동
+//			vPlayerLook = m_pPlayer->Get_Transform()->Get_State(STATE::LOOK);
+//			vPlayerLook = XMVectorSetY(vPlayerLook, 0.f);
+//			vPlayerLook = XMVector3Normalize(vPlayerLook);
+//		}
+//		return;
+//	}
+//	
+//	// 4. 플레이어가 바라보는 방향으로 이동
+//	if (!XMVector3Equal(vPlayerLook, XMVectorZero()))
+//	{
+//		m_pPlayer->Get_Transform()->Move_Direction(vPlayerLook, fTimeDelta * fSpeed);
+//	}
+//}
 
 _vector CPlayer_AttackState::Calculate_Input_Direction_From_Camera()
 {

@@ -77,8 +77,14 @@ BT_RESULT CBT_Monster_DetectAction::UpdateWalk(_float fTimeDelta)
         m_eDetectPhase = DETECT_PHASE::END;
     else
     {
+        // 모든 이동 함수 통일. => 몬스터
         if (!m_IsRootMotion)
-            m_pOwner->Get_Transform()->Go_Straight(fTimeDelta * 0.1f);
+        {
+            _vector vLook = XMVector3Normalize(m_pOwner->Get_Transform()->Get_State(STATE::LOOK));
+            m_pOwner->Move_Direction(vLook, fTimeDelta * 0.1f);
+        }
+            
+            //m_pOwner->Get_Transform()->Go_Straight(fTimeDelta * 0.1f);
     }
 
     return BT_RESULT::RUNNING;

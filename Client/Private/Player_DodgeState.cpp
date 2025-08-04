@@ -39,7 +39,7 @@ void CPlayer_DodgeState::Update(_float fTimeDelta)
 
 	if (m_pModelCom->Get_Current_Ratio() < 0.4f)
 	{
-		m_pPlayer->Get_Transform()->Move_Direction(
+		m_pPlayer->Move_Direction(
 			m_pPlayer->Get_Transform()->Get_LookDirection_NoPitch(), fTimeDelta * 0.5f);
 	}
 

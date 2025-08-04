@@ -39,6 +39,13 @@ HRESULT CMonster::Initialize_Clone(void* pArg)
     m_MonsterStat.fMoveSpeed = pDesc->fMoveSpeed;
     m_MonsterStat.fRotationSpeed = pDesc->fRotationPerSec;
 
+    /* 기본적으로 몬스터는 모두 Navigation 설정. */
+    if (FAILED(Ready_Components(pDesc)))
+    {
+        CRASH("Failed Ready Components");
+        return E_FAIL;
+    }
+
     if (FAILED(__super::Initialize_Clone(pArg)))
     {
         CRASH("Failed Clone");
@@ -61,6 +68,8 @@ void CMonster::Update(_float fTimeDelta)
 void CMonster::Late_Update(_float fTimeDelta)
 {
     __super::Late_Update(fTimeDelta);
+    m_pTransformCom->Set_State(STATE::POSITION,
+        m_pNavigationCom->Compute_OnCell(m_pTransformCom->Get_State(STATE::POSITION)));
 }
 
 HRESULT CMonster::Render()
@@ -104,6 +113,23 @@ void CMonster::Change_Animation_Combo(_uint iAnimationIndex)
 {
     // 루트 모션 연속성을 보장하면서 즉시 전환
     m_pModelCom->Set_Animation(iAnimationIndex, false);
+}
+
+void CMonster::RootMotion_Translate(_fvector vTranslate)
+{
+    if (nullptr == m_pTransformCom)
+    {
+    	CRASH("Transform Component Not Exist");
+    	return;
+    }
+    
+    m_pTransformCom->Translate(vTranslate, m_pNavigationCom);
+}
+
+/* Navigation 진행 함수 */
+void CMonster::Move_Direction(_fvector vDirection, _float fTimeDelta)
+{
+    m_pTransformCom->Move_Direction(vDirection, fTimeDelta, m_pNavigationCom);
 }
 
 /* 애니메이션 인덱스.*/
@@ -316,6 +342,13 @@ void CMonster::Tick_BuffTimers(_float fTimeDelta)
 
 HRESULT CMonster::Ready_Components(MONSTER_DESC* pDesc)
 {
+    CNavigation::NAVIGATION_DESC        NaviDesc{};
+    NaviDesc.iCurrentCellIndex = 0;
+
+    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(m_eCurLevel), TEXT("Prototype_Component_Navigation"),
+        TEXT("Com_Navigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom), &NaviDesc)))
+        return E_FAIL;
+
     return S_OK;
 }
 
@@ -464,6 +497,7 @@ void CMonster::Free()
     Safe_Release(m_pModelCom);
     Safe_Release(m_pShaderCom);
     Safe_Release(m_pColliderCom);
+    Safe_Release(m_pNavigationCom);
 
     m_pTarget = nullptr; // 상호 참조 문제.
 }

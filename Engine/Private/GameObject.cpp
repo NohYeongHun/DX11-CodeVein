@@ -131,19 +131,21 @@ HRESULT CGameObject::Change_Component(const _wstring& strComponentTag, CComponen
 	return S_OK;
 }
 
-/* 이동량 만큼을 더해줍니다. */
-void CGameObject::Translate(_fvector vTranslate)
+/* 이동량 만큼을 더해줍니다. => 루트모션 전용  */
+void CGameObject::RootMotion_Translate(_fvector vTranslate)
 {
-	if (nullptr == m_pTransformCom)
-	{
-		CRASH("Transform Component Not Exist");
-		return;
-	}
+	//if (nullptr == m_pTransformCom)
+	//{
+	//	CRASH("Transform Component Not Exist");
+	//	return;
+	//}
+	//
+	//m_pTransformCom->Translate(vTranslate);
 	
-	_vector vPos = m_pTransformCom->Get_State(STATE::POSITION);
-	vPos += vTranslate;
-	vPos = XMVectorSetW(vPos, 1.f);
-	m_pTransformCom->Set_State(STATE::POSITION, vPos);
+	//_vector vPos = m_pTransformCom->Get_State(STATE::POSITION);
+	//vPos += vTranslate;
+	//vPos = XMVectorSetW(vPos, 1.f);
+	//m_pTransformCom->Set_State(STATE::POSITION, vPos);
 }
 
 const _wstring& CGameObject::Get_ObjectTag()

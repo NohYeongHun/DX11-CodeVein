@@ -415,7 +415,7 @@ void CLoad_Model::Handle_RootMotion(_float fTimeDelta)
 		// 2. 이동값을 월드에 적용할 것인지 애니메이션 에서 설정
 		if (m_bRootMotionTranslate)
 		{
-			m_pOwner->Translate(vWorldTranslate);
+			m_pOwner->RootMotion_Translate(vWorldTranslate);
 		}
 
 		// 🔥 Y축을 제거한 상태로 m_vOldPos 업데이트

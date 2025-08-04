@@ -68,8 +68,7 @@ HRESULT CQueenKnight::Initialize_Clone(void* pArg)
     m_pTransformCom->Set_Scale(vScale);
 
 
-    static _uint iTest = 0;
-    _float3 vPos = { 3.f, 5.f, -10.f };
+    _float3 vPos = { 0.f, 5.f, 0.f };
     m_pTransformCom->Set_State(STATE::POSITION, XMLoadFloat3(&vPos));
 
     m_pModelCom->Set_Animation(KNIGHT_SWORD_IDLE, true);

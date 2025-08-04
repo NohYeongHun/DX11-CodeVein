@@ -78,12 +78,12 @@ void CPlayer::Update(_float fTimeDelta)
     Update_KeyInput();
     HandleState(fTimeDelta);
 
-    if (m_pGameInstance->Get_KeyPress(DIK_W))
-        m_pTransformCom->Go_Straight(fTimeDelta, m_pNavigationCom);
-    if (m_pGameInstance->Get_KeyPress(DIK_A))
-        m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta * -1.f);
-    if (m_pGameInstance->Get_KeyPress(DIK_D))
-        m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta);
+    //if (m_pGameInstance->Get_KeyPress(DIK_W))
+    //    m_pTransformCom->Go_Straight(fTimeDelta, m_pNavigationCom);
+    //if (m_pGameInstance->Get_KeyPress(DIK_A))
+    //    m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta * -1.f);
+    //if (m_pGameInstance->Get_KeyPress(DIK_D))
+    //    m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta);
     
 
 }
@@ -91,9 +91,9 @@ void CPlayer::Update(_float fTimeDelta)
 void CPlayer::Late_Update(_float fTimeDelta)
 {
 
-    _float4 vDefaultPos = {}; 
-    XMStoreFloat4(&vDefaultPos, m_pTransformCom->Get_State(STATE::POSITION));
-    OutPutDebugFloat4(vDefaultPos);
+    //_float4 vDefaultPos = {}; 
+    //XMStoreFloat4(&vDefaultPos, m_pTransformCom->Get_State(STATE::POSITION));
+    //OutPutDebugFloat4(vDefaultPos);
     m_pTransformCom->Set_State(STATE::POSITION,
         m_pNavigationCom->Compute_OnCell(m_pTransformCom->Get_State(STATE::POSITION)));
 
@@ -184,6 +184,17 @@ HRESULT CPlayer::Render()
 
 
 #pragma region 움직임 구현
+/* Navigation 버전*/
+void CPlayer::RootMotion_Translate(_fvector vTranslate)
+{
+    if (nullptr == m_pTransformCom)
+    {
+	    CRASH("Transform Component Not Exist");
+	    return;
+    }
+
+    m_pTransformCom->Translate(vTranslate, m_pNavigationCom);
+}
 void CPlayer::Move_By_Camera_Direction_8Way(ACTORDIR eDir, _float fTimeDelta, _float fSpeed)
 {
     CCamera* pCamera = m_pGameInstance->Get_MainCamera();
@@ -262,7 +273,13 @@ void CPlayer::Move_By_Camera_Direction_8Way(ACTORDIR eDir, _float fTimeDelta, _f
     m_pTransformCom->Set_Quaternion(qNewRot);
 
     // 9. 이동 적용
-    m_pTransformCom->Move_Direction(vMoveDir, fTimeDelta * fSpeed);
+    //m_pTransformCom->Move_Direction(vMoveDir, fTimeDelta * fSpeed);
+    m_pTransformCom->Move_Direction(vMoveDir, fTimeDelta * fSpeed, m_pNavigationCom);
+}
+
+void CPlayer::Move_Direction(_fvector vDirection, _float fTimeDelta)
+{
+    m_pTransformCom->Move_Direction(vDirection, fTimeDelta, m_pNavigationCom);
 }
 
 void CPlayer::Debug_CameraVectors()
@@ -358,7 +375,6 @@ void CPlayer::Search_LockOn_Target()
 
         // === 3. 점수 계산 ===
         _float fDistanceScore = (m_fLockOnRange - fDistance) / m_fLockOnRange;
-        // 화면 중앙으로부터의 거리 (0에 가까울수록 높은 점수)
         _float fScreenDistance = m_pPlayerCamera->Get_Screen_Distance_From_Center(vTargetPos);
         _float fCenterScore = max(0.0f, 1.0f - min(fScreenDistance, 1.0f)); // 정규화
 
@@ -547,8 +563,8 @@ void CPlayer::On_Collision_Exit(CGameObject* pOther)
 void CPlayer::HandleState(_float fTimeDelta)
 {
 
-    //if (nullptr != m_pFsmCom)
-    //    m_pFsmCom->Update(fTimeDelta);
+    if (nullptr != m_pFsmCom)
+        m_pFsmCom->Update(fTimeDelta);
 
     if (true == m_pModelCom->Play_Animation(fTimeDelta))
     {

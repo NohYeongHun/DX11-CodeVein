@@ -25,7 +25,8 @@ public:
 
 	class CTransform* Get_Transform() { return m_pTransformCom; }
 
-	void Translate(_fvector vTranslate);
+	virtual void RootMotion_Translate(_fvector vTranslate);
+	
 
 public:
 	const _wstring& Get_ObjectTag();

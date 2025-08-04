@@ -83,6 +83,9 @@ public:
 
     void Change_Animation_Combo(_uint iAnimationIndex); // 연계공격 전용
 
+    virtual void RootMotion_Translate(_fvector vTranslate);
+
+    void Move_Direction(_fvector vDirection, _float fTimeDelta); // 이동용 함수. 
 
 public:
     virtual HRESULT InitializeAction_ToAnimationMap() PURE; // 필수적으로 애니메이션 초기화를 진행해야합니다. => 인스턴스화 될거라면.
@@ -198,6 +201,7 @@ protected:
     class CShader* m_pShaderCom = { nullptr };
     class CCollider* m_pColliderCom = { nullptr };
     class CPlayer* m_pTarget = { nullptr };
+    class CNavigation* m_pNavigationCom = { nullptr };
     LEVEL m_eCurLevel = { LEVEL::END };
     MONSTERTYPE m_eMonsterType = { MONSTERTYPE::END };
     

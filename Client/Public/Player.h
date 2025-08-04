@@ -92,7 +92,10 @@ public:
 
 #pragma region 이동 관련 함수들
 public:
+	virtual void RootMotion_Translate(_fvector vTranslate);
 	void Move_By_Camera_Direction_8Way(ACTORDIR eDir, _float fTimeDelta, _float fSpeed);
+	void Move_Direction(_fvector vDirection, _float fTimeDelta);
+	
 	void Debug_CameraVectors();
 	void Rotate_Player_To_Camera_Direction();
 	// 현재 프레임 가져오기.
