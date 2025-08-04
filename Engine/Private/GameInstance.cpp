@@ -346,6 +346,11 @@ RAYHIT_DESC CGameInstance::Get_PickingLocalObject(_uint iLayerLevelIndex, const 
 	return m_pObject_Manager->Get_PickingLocalObject(iLayerLevelIndex, strLayerTag, pOutDist);
 }
 
+MODEL_PICKING_INFO CGameInstance::Get_PickingLocalObject(_uint iLayerLevelIndex, const _wstring strLayerTag)
+{
+	return m_pObject_Manager->Get_PickingLocalObject(iLayerLevelIndex, strLayerTag);
+}
+
 ///* Layer 객체들이 Picking 되었는지 확인하기. */
 //CGameObject* CGameInstance::Get_PickingObject(_uint iLayerLevelIndex, const _wstring strLayerTag, const _float3& vRayOrigin, const _float3& vRayDir, _float* pOutDist)
 //{

@@ -29,6 +29,7 @@ public:
 
 	/* 특정 Layer Picking 결과 반환.*/
 	RAYHIT_DESC Get_PickingLocalObject(_uint iLayerLevelIndex, const _wstring strLayerTag, _float* pOutDist);
+	MODEL_PICKING_INFO Get_PickingLocalObject(_uint iLayerLevelIndex, const _wstring strLayerTag);
 #pragma endregion
 
 	

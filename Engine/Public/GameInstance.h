@@ -78,6 +78,7 @@ public:
 
 	HRESULT Add_GameObject_ToLayer(_uint iLayerLevelIndex, const _wstring& strLayerTag, _uint iPrototypeLevelIndex, const _wstring& strPrototypeTag, void* pArg = nullptr);
 	RAYHIT_DESC Get_PickingLocalObject(_uint iLayerLevelIndex, const _wstring strLayerTag, _float* pOutDist);
+	MODEL_PICKING_INFO Get_PickingLocalObject(_uint iLayerLevelIndex, const _wstring strLayerTag);
 #pragma endregion
 
 #pragma region RENDERER

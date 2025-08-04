@@ -149,9 +149,11 @@ private:
 	class CPlayerWeapon* m_pPlayerWeapon = { nullptr };
 	class CFsm* m_pFsmCom = { nullptr };
 	class CCamera_Player* m_pPlayerCamera = { nullptr };
+	class CNavigation* m_pNavigationCom = { nullptr };
 	LEVEL m_eCurLevel = { LEVEL::END };
 
-	class CNavigation* m_pNavigationCom = { nullptr };
+	_float m_fOffsetY = {};
+	
 #pragma endregion
 
 

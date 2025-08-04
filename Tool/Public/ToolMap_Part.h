@@ -50,6 +50,8 @@ public:
 
 	/* Ray에 맞았는지 확인. */
 	virtual const _bool Is_Ray_LocalHit(_float3* pOutLocalPos, _float3* pOutLocalNormal, _float* pOutDist) override;
+	virtual const _bool Is_Ray_LocalHit(MODEL_PICKING_INFO* pPickingInfo, _float* pOutDist) override;
+
 #pragma endregion
 
 

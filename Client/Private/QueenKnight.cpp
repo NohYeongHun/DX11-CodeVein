@@ -102,6 +102,10 @@ void CQueenKnight::Update(_float fTimeDelta)
 
 void CQueenKnight::Late_Update(_float fTimeDelta)
 {
+    m_pTransformCom->Set_State(STATE::POSITION
+        , m_pNavigationCom->Compute_OnCell(
+            m_pTransformCom->Get_State(STATE::POSITION), m_fOffsetY * 0.5f));
+
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::BLEND, this)))
         return;
 
@@ -279,6 +283,9 @@ HRESULT CQueenKnight::Ready_Components(QUEENKNIGHT_DESC* pDesc)
         , TEXT("Prototype_Component_Model_QueenKnight")
         , TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom), &Desc)))
         return E_FAIL;
+
+    // 오프셋 지정.
+    m_fOffsetY = m_pModelCom->Get_BoundingBox().fHeight * 0.5f;
 
     return S_OK;
 }

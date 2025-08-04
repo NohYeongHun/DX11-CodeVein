@@ -24,16 +24,29 @@ HRESULT CTool_MainApp::Initialize()
 	m_pImGui_Manager = CImgui_Manager::Get_Instance(m_pDevice, m_pContext);
 
 	if (FAILED(Ready_Prototype_ForStatic()))
+	{
+		CRASH("Failed Create Static");
 		return E_FAIL;
+	}
+		
 
 	if (FAILED(Ready_Fonts()))
+	{
+		CRASH("Failed Create Fonts");
 		return E_FAIL;
+	}
 
 	if (FAILED(Ready_Console()))
+	{
+		CRASH("Failed Ready Console");
 		return E_FAIL;
+	}
 
 	if (FAILED(Start_Level(LEVEL::LOGO)))
+	{
+		CRASH("Failed Start Level");
 		return E_FAIL;
+	}
 
 	return S_OK;
 }
@@ -85,6 +98,7 @@ HRESULT CTool_MainApp::Ready_Prototype_ForStatic()
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxAnimMesh"),
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxAnimMesh.hlsl"), VTXANIMMESH::Elements, VTXANIMMESH::iNumElements))))
 		return E_FAIL;
+	
 
 	/* ==================================================== Other ====================================================*/
 

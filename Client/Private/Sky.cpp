@@ -3,26 +3,7 @@
 CSky::CSky(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CGameObject{ pDevice, pContext }
 {
-    /*m_pGraphic_Device->SetRenderState(, );*/
-
-    /*ID3D11RasterizerState* pRSState = { nullptr };
-    ID3D11DepthStencilState* pRSState = { nullptr };
-    ID3D11BlendState**/
-    // D3D11_DEPTH_STENCIL_DESC
-  //  D3D11_RASTERIZER_DESC
-
-     /*D3D11_RASTERIZER_DESC   RSDesc{};
-     m_pDevice->CreateRasterizerState(RSDesc, &pRSState);
-
-     m_pContext->RSSetState(pRSState);
-     m_pContext->OMSetBlendState();
-     */
-     // m_pContext->OMSetDepthStencilState();
-
-      //D3D11_BLEND_DESC
-
-      // m_pContext->OMSetBlendState(, , )
-
+   
 }
 
 CSky::CSky(const CSky& Prototype)
@@ -108,7 +89,7 @@ HRESULT CSky::Bind_ShaderResources()
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_Transform_Float4x4(D3DTS::PROJ))))
         return E_FAIL;
 
-    if (FAILED(m_pTextureCom->Bind_Shader_Resource(m_pShaderCom, "g_Texture", 3)))
+    if (FAILED(m_pTextureCom->Bind_Shader_Resource(m_pShaderCom, "g_Texture", 0)))
         return E_FAIL;
 
     return S_OK;

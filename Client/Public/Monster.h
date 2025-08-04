@@ -204,6 +204,8 @@ protected:
     class CNavigation* m_pNavigationCom = { nullptr };
     LEVEL m_eCurLevel = { LEVEL::END };
     MONSTERTYPE m_eMonsterType = { MONSTERTYPE::END };
+
+    _float m_fOffsetY = {};
     
 #pragma endregion
 

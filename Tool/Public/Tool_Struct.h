@@ -40,4 +40,7 @@ typedef struct tagModelCreateDesc
 	_float3 vScale = {};
 }MODEL_CREATE_DESC;
 
+
+
+
 NS_END

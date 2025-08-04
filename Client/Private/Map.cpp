@@ -28,6 +28,8 @@ HRESULT CMap::Initialize_Clone(void* pArg)
     if (FAILED(Ready_Components(pDesc)))
         return E_FAIL;
 
+
+    m_pTransformCom->Set_Scale({ 1.5f, 1.f, 1.5f });
     // Player 정면 바라보게 하기?
     //m_pTransformCom->Rotation(XMVectorSet(1.f, 0.f, 0.f, 0.f), XMConvertToRadians(270.f));
 
@@ -64,26 +66,30 @@ HRESULT CMap::Render()
     m_pNavigationCom->Render();
 #endif
 
-    //_uint iNumMeshes = m_pModelCom->Get_NumMeshes();
-    //for (_uint i = 0; i < iNumMeshes; i++)
-    //{
-    //    m_pModelCom->Bind_Materials(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE, 0);
-    //
-    //    if (FAILED(m_pShaderCom->Begin(0)))
-    //    {
-    //        CRASH("Shader Begin Failed");
-    //        return E_FAIL;
-    //    }
-    //        
-    //
-    //    if (FAILED(m_pModelCom->Render(i)))
-    //    {
-    //        CRASH("Shader Begin Failed");
-    //        return E_FAIL;
-    //    }
-    //        
-    //}
-    
+#pragma region 기본 렌더링
+    _uint iNumMeshes = m_pModelCom->Get_NumMeshes();
+    for (_uint i = 0; i < iNumMeshes; i++)
+    {
+        m_pModelCom->Bind_Materials(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE, 0);
+
+        if (FAILED(m_pShaderCom->Begin(0)))
+        {
+            CRASH("Shader Begin Failed");
+            return E_FAIL;
+        }
+
+
+        if (FAILED(m_pModelCom->Render(i)))
+        {
+            CRASH("Shader Begin Failed");
+            return E_FAIL;
+        }
+
+    }
+
+#pragma endregion
+
+  
 
     return S_OK;
 }

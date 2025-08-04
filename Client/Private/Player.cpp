@@ -42,6 +42,11 @@ HRESULT CPlayer::Initialize_Prototype()
 
 HRESULT CPlayer::Initialize_Clone(void* pArg)
 {
+#ifdef _DEBUG
+    Initialize_Debug();
+#endif // _DEBUG
+
+
     PLAYER_DESC* pDesc = static_cast<PLAYER_DESC*>(pArg);
 
     if (FAILED(__super::Initialize_Clone(pDesc)))
@@ -63,6 +68,7 @@ HRESULT CPlayer::Initialize_Clone(void* pArg)
     _float3 vPos = { 0.f, 5.f, 0.f };
     m_pTransformCom->Set_State(STATE::POSITION, XMLoadFloat3(&vPos));
 
+    
 
     return S_OK;
 }
@@ -78,24 +84,15 @@ void CPlayer::Update(_float fTimeDelta)
     Update_KeyInput();
     HandleState(fTimeDelta);
 
-    //if (m_pGameInstance->Get_KeyPress(DIK_W))
-    //    m_pTransformCom->Go_Straight(fTimeDelta, m_pNavigationCom);
-    //if (m_pGameInstance->Get_KeyPress(DIK_A))
-    //    m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta * -1.f);
-    //if (m_pGameInstance->Get_KeyPress(DIK_D))
-    //    m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta);
-    
 
 }
 
 void CPlayer::Late_Update(_float fTimeDelta)
 {
 
-    //_float4 vDefaultPos = {}; 
-    //XMStoreFloat4(&vDefaultPos, m_pTransformCom->Get_State(STATE::POSITION));
-    //OutPutDebugFloat4(vDefaultPos);
-    m_pTransformCom->Set_State(STATE::POSITION,
-        m_pNavigationCom->Compute_OnCell(m_pTransformCom->Get_State(STATE::POSITION)));
+    m_pTransformCom->Set_State(STATE::POSITION
+        , m_pNavigationCom->Compute_OnCell(
+            m_pTransformCom->Get_State(STATE::POSITION), m_fOffsetY));
 
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::BLEND, this)))
         return;
@@ -149,6 +146,8 @@ HRESULT CPlayer::Render()
     // Navigation 렌더링
     if (m_pNavigationCom)
         m_pNavigationCom->Render();
+
+    BoundingBoxRender(m_pModelCom->Get_BoundingBox(), m_pTransformCom->Get_WorldMatrix());
 
 #endif // _DEBUG
 
@@ -671,13 +670,16 @@ HRESULT CPlayer::Ready_Components(PLAYER_DESC* pDesc)
         , TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom), &Desc)))
         return E_FAIL;
 
+    BOUNDING_BOX box = m_pModelCom->Get_BoundingBox();
+    m_fOffsetY = box.fHeight * 0.5f;
+
     CNavigation::NAVIGATION_DESC        NaviDesc{};
     NaviDesc.iCurrentCellIndex = 0;
 
     if (FAILED(CGameObject::Add_Component(ENUM_CLASS(m_eCurLevel), TEXT("Prototype_Component_Navigation"),
         TEXT("Com_Navigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom), &NaviDesc)))
         return E_FAIL;
-
+    
 
     return S_OK;
 }

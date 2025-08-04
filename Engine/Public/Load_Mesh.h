@@ -24,6 +24,18 @@ public:
 	const _uint Get_MaterialIndex() { return m_iMaterialIndex; }
 	const _bool Is_Ray_Hit(const _float3& rayOrigin, const _float3& rayDir, _float* pOutDist);
 
+#pragma region 모델의 바운딩 박스 계산
+
+public:
+	BOUNDING_BOX Get_MeshBoundingBox() const { return m_MeshBounding; }
+
+private:
+	void Calculate_MeshBoundingBox(const vector<VTXANIMMESH>& vertices);
+
+private:
+	BOUNDING_BOX m_MeshBounding;
+#pragma endregion
+
 
 
 public:

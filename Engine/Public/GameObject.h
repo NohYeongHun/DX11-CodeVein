@@ -64,6 +64,7 @@ public:
 	virtual void On_Collision_Exit(CGameObject* pOther);
 
 	virtual const _bool Is_Ray_LocalHit(_float3* pOutLocalPos, _float3* pOutLocalNormal, _float* pOutDist);
+	virtual const _bool Is_Ray_LocalHit(MODEL_PICKING_INFO* pPickingInfo, _float* pOutDist);
 #pragma endregion
 
 
@@ -84,6 +85,22 @@ protected:
 protected:
 	// 부가된 것들.
 	_wstring m_strObjTag = {};
+
+
+#ifdef _DEBUG
+protected:
+	PrimitiveBatch<VertexPositionColor>* m_pBatch = { nullptr };
+	BasicEffect* m_pEffect = { nullptr };
+	ID3D11InputLayout* m_pInputLayout = { nullptr };
+	_float4 m_vColor = { 0.f, 1.f, 0.f, 1.f }; // 기본 녹색
+
+public:
+	virtual HRESULT  Initialize_Debug();
+
+public:
+	virtual HRESULT  BoundingBoxRender(const BOUNDING_BOX& box, _matrix WorldMatrix);
+	virtual void    Render_AABB(const BOUNDING_BOX& box);
+#endif // _DEBUG
 
 protected:
 	/*원형컴포넌트를 찾아서 복제한다. */

@@ -41,6 +41,13 @@ HRESULT CLevel_GamePlay::Initialize_Clone()
 		return E_FAIL;
 	}
 
+	if (FAILED(Ready_Layer_SkyBox(TEXT("Layer_SkyBox"))))
+	{
+		CRASH("Failed Ready_Layer_SkyBox");
+		return E_FAIL;
+	}
+
+
 	//if (FAILED(Ready_Layer_SkyBoss(TEXT("Layer_SkyBoss"))))
 	//{
 	//	CRASH("Failed Layer_SkyBoss");
@@ -73,12 +80,7 @@ HRESULT CLevel_GamePlay::Initialize_Clone()
 		return E_FAIL;
 	}
 	
-	if (FAILED(Ready_Layer_SkyBox(TEXT("Layer_SkyBox"))))
-	{
-		CRASH("Failed Ready_Layer_SkyBox");
-		return E_FAIL;
-	}
-
+	
 	
 	return S_OK;
 }

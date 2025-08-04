@@ -103,6 +103,7 @@ _bool CNavigation::isMove(_fvector vPosition)
 	}
 }
 
+// Y오프셋만 계산.
 _vector CNavigation::Compute_OnCell(_fvector vPosition)
 {
 	_vector vLocalPos = XMVector3TransformCoord(vPosition, XMMatrixInverse(nullptr, XMLoadFloat4x4(&m_WorldMatrix)));
@@ -114,6 +115,18 @@ _vector CNavigation::Compute_OnCell(_fvector vPosition)
 	return XMVector3TransformCoord(vLocalPos, XMLoadFloat4x4(&m_WorldMatrix));
 
 
+}
+
+_vector CNavigation::Compute_OnCell(_fvector vPosition, _float fOffsetY)
+{
+	_vector vLocalPos = XMVector3TransformCoord(vPosition, XMMatrixInverse(nullptr, XMLoadFloat4x4(&m_WorldMatrix)));
+	
+	_float		fHeight = m_Cells[m_iCurrentCellIndex]->Compute_Height(vLocalPos);
+	fHeight += fOffsetY;
+
+	vLocalPos = XMVectorSetY(vLocalPos, fHeight);
+
+	return XMVector3TransformCoord(vLocalPos, XMLoadFloat4x4(&m_WorldMatrix));
 }
 
 _int CNavigation::Get_CellCount()

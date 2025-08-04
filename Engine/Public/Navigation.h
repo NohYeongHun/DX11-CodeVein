@@ -2,8 +2,11 @@
 
 #include "Component.h"
 
-NS_BEGIN(Engine)
 
+NS_BEGIN(Engine)
+/*
+* 전용 오프셋(Nav Mesh 위를 올라탈?)
+*/
 class ENGINE_DLL CNavigation final : public CComponent
 {
 public:
@@ -23,7 +26,11 @@ public:
 
 public:
 	_bool isMove(_fvector vPosition);
+
+	
 	_vector Compute_OnCell(_fvector vPosition);
+	/* 오프셋 만큼 이동 시킴*/
+	_vector Compute_OnCell(_fvector vPosition, _float fOffsetY);
 
 	_int Get_CellCount();
 	//_float3* Get_Cell_Points(_uint iIndex);

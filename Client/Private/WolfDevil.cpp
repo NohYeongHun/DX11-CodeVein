@@ -119,6 +119,10 @@ void CWolfDevil::Late_Update(_float fTimeDelta)
     }
         
 
+    m_pTransformCom->Set_State(STATE::POSITION
+        , m_pNavigationCom->Compute_OnCell(
+            m_pTransformCom->Get_State(STATE::POSITION), m_fOffsetY * 0.5f));
+
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::BLEND, this)))
         return;
 
@@ -289,6 +293,8 @@ HRESULT CWolfDevil::Ready_Components(WOLFDEVIL_DESC* pDesc)
         , TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom), &Desc)))
         return E_FAIL;
 
+    // 오프셋 지정.
+    m_fOffsetY = m_pModelCom->Get_BoundingBox().fHeight * 0.5f;
 
     return S_OK;
 }

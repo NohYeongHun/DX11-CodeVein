@@ -194,6 +194,29 @@ namespace Engine
 		_float	fChangeTime = 0.f;
 		_float	fChangeDuration = 0.f;
 	}CHANGEANIMATION_DESC;
+
+	typedef struct tagBoundingBox
+	{
+		_float3 vMin = { FLT_MAX, FLT_MAX, FLT_MAX };
+		_float3 vMax = { -FLT_MAX, -FLT_MAX, -FLT_MAX };
+		_float3 vCenter = { 0.f, 0.f, 0.f };
+		_float3 vExtents = { 0.f, 0.f, 0.f };
+		_float fHeight = 0.f;
+	}BOUNDING_BOX;
+
+
+	typedef struct ModelPickingInfo {
+		_bool bHit = false;
+		_float fDistance = FLT_MAX;
+		_float3 vHitPoint;
+		_float3 vHitWorldPoint;
+		_float3 vHitNormal;
+
+		// 모델 계층 정보
+		class CGameObject* pHitObject;  // 히트된 게임오브젝트
+		_float3 vTriangleVertices[3]; // 히트된 삼각형의 3개 정점
+						
+	} MODEL_PICKING_INFO;
 }
 
 #include "Event_Type.h"

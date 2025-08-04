@@ -336,6 +336,21 @@ const _bool CTool_Model::Is_Ray_Hit(const _float3& rayOrigin, const _float3& ray
 	return false;
 }
 
+const _bool CTool_Model::Is_Ray_Hit(const _float3& rayOrigin, const _float3& rayDir, MODEL_PICKING_INFO* pPickingInfo, _float* pOutDist)
+{
+	_bool IsHit = false;
+
+	for (_uint i = 0; i < m_iNumMeshes; i++)
+	{
+		IsHit = m_Meshes[i]->Is_Ray_Hit(rayOrigin, rayDir, pPickingInfo, pOutDist);
+		if (IsHit)
+			return true;
+	}
+
+
+	return false;
+}
+
 
 HRESULT CTool_Model::Bind_Materials(CShader* pShader, const _char* pConstantName, _uint iMeshIndex, aiTextureType eTextureType, _uint iTextureIndex)
 {

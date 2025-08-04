@@ -104,6 +104,15 @@ RAYHIT_DESC CObject_Manager::Get_PickingLocalObject(_uint iLayerLevelIndex, cons
 	return pLayer->Get_PickingLocalObject(pOutDist);
 }
 
+/* 모델 피킹 정보 반환. */
+MODEL_PICKING_INFO CObject_Manager::Get_PickingLocalObject(_uint iLayerLevelIndex, const _wstring strLayerTag)
+{
+	CLayer* pLayer = Find_Layer(iLayerLevelIndex, strLayerTag);
+	if (nullptr == pLayer)
+		return {};
+	return pLayer->Get_PickingLocalObject();
+}
+
 HRESULT CObject_Manager::Initialize(_uint iNumLevels)
 {
 	m_pLayers = new map<const _wstring, CLayer*>[iNumLevels];

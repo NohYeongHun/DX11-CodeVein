@@ -14,6 +14,7 @@ public:
 		// 메시에 클릭 했을 때 해당 메시 옆에 배치되도록.
 		CREATE = 0, 
 		EDIT = 1,
+		NAV_MODE = 2,
 		RENDER_END
 	};
 
@@ -36,7 +37,15 @@ public:
 	void Change_SelectObject(class CGameObject* pSelectedObject);
 	void Update(_float fTimeDelta);
 	
+public:
+#pragma region 기본 렌더
 	void Render();
+	void Render_CheckBox();
+	void SaveLoadMenu();
+	void Render_CreateModelChild();
+#pragma endregion
+
+	
 	void Render_SaveLoad();
 	void Render_Debug_Window();
 	void Handle_SelectedObject();
@@ -45,7 +54,8 @@ public:
 public:
 	void Render_Model_Create();
 	void Render_Prototype_Hierarchy();
-	void Render_Prototype_Inspector(ImVec2 vPos);
+	void Render_Prototype_Inspector();
+	//void Render_Prototype_Inspector(ImVec2 vPos);
 	void Register_Prototype_Hierarchy(_uint iPrototypeLevelIndex, const _wstring& strObjectTag, const _wstring& strModelPrefix);
 	void Handle_CreateMode_SelectedObject();
 	void Picking_Create();
@@ -58,6 +68,13 @@ public:
 	void Render_Edit_Hierarchy();
 	void Render_Edit_Inspector(ImVec2 vPos);
 	void Handle_EditMode_SelectedObject();
+#pragma endregion
+
+#pragma region Nav Mode
+public:
+	void Render_Nav_Mode();
+
+	void Handle_NavMode_SelectedObject();
 #pragma endregion
 
 
@@ -103,13 +120,30 @@ private:
 	int m_iSelectedIndex = { -1 };
 #pragma endregion
 
+#pragma region NAVIGATION 사용 변수
+
+
+private:
+	class CNavigationManager* m_pNavigation_Manager = { nullptr };
+#pragma endregion
+
+#pragma region SAVE_LOAD 시 사용
+	_bool m_IsEditModel = { false };
+	_bool m_IsEditNavigation = { false };
+#pragma endregion
+
+
 #pragma region 공통
 private:
+	MODEL_PICKING_INFO m_ModelPickingDesc = {};
 	RAYHIT_DESC m_RayHitDesc = {};
 	_bool m_IsPossible_Picking = { false };
 	_bool m_IsPossible_SaveLoad = { false };
 	
 	class CGameObject* m_pSelectedObject = { nullptr }; // 선택된 객체
+	class CToolMap_Part* m_pSelectedMapPart = { nullptr };
+	class CTool_Model* m_pSelectedModel = { nullptr };
+
 	class CLayer* m_pSelectedLayer = { nullptr };
 	TOOLMODE m_eToolMode = { TOOLMODE::CREATE }; // 상태 저장.
 
@@ -119,7 +153,7 @@ private:
 
 	SAVEMODE m_eSaveMode = {};
 
-	_float m_fEditorAlpha = { 0.5f};
+	_float m_fEditorAlpha = { 1.f};
 	_bool m_bSave = {};
 	_bool m_bLoad = {};
 	_bool m_bShowSimpleMousePos = {};

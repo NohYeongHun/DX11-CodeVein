@@ -115,6 +115,60 @@ const _bool CTool_Mesh::Is_Ray_Hit(const _float3& rayOrigin, const _float3& rayD
 	return bHit;
 }
 
+const _bool CTool_Mesh::Is_Ray_Hit(const _float3& rayOrigin, const _float3& rayDir, MODEL_PICKING_INFO* pPickingInfo, _float* pOutDist)
+{
+	_bool bHit = false;
+	_float fClosestDist = 1000.f;
+
+	_fvector vRayOrigin = XMLoadFloat3(&rayOrigin);
+	_fvector vRayDir = XMLoadFloat3(&rayDir);
+
+	_uint iHitTriangleIndex = -1;
+	_float3 vHitPoint = {};
+	_float3 vTriangleVertices[3] = {};
+
+	for (_uint i = 0; i < m_vecIndices.size(); i += 3)
+	{
+		_fvector v0 = XMLoadFloat3(&m_Vertices[m_vecIndices[i]].vPosition);
+		_fvector v1 = XMLoadFloat3(&m_Vertices[m_vecIndices[i + 1]].vPosition);
+		_fvector v2 = XMLoadFloat3(&m_Vertices[m_vecIndices[i + 2]].vPosition);
+
+		_float fDist = 0.f;
+		if (TriangleTests::Intersects(vRayOrigin, vRayDir, v0, v1, v2, fDist))
+		{
+			if (fDist < fClosestDist)
+			{
+				fClosestDist = fDist;
+				iHitTriangleIndex = i / 3;  // 삼각형 인덱스
+				bHit = true;
+
+				// 히트 포인트 계산 (레이 원점 + 방향 * 거리)
+				XMStoreFloat3(&vHitPoint, vRayOrigin + vRayDir * fDist);
+
+				// 삼각형 정점들 저장 (로컬 좌표)
+				vTriangleVertices[0] = m_Vertices[m_vecIndices[i]].vPosition;
+				vTriangleVertices[1] = m_Vertices[m_vecIndices[i + 1]].vPosition;
+				vTriangleVertices[2] = m_Vertices[m_vecIndices[i + 2]].vPosition;
+			}
+		}
+	}
+
+	if (bHit && pPickingInfo)
+	{
+		// 삼각형 세 정점 다가져오기.
+		memcpy(&pPickingInfo->vTriangleVertices, vTriangleVertices, sizeof(_float3) * 3);
+		pPickingInfo->vHitPoint = vHitPoint;
+		
+	}
+
+	if (bHit && pOutDist)
+		*pOutDist = fClosestDist;
+
+	return bHit;
+}
+
+
+
 void CTool_Mesh::Set_BondIndexVector(vector<_int>& boneIndicies)
 {
 	for (auto& val : m_BoneIndices)

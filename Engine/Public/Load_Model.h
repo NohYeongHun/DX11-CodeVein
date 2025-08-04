@@ -64,10 +64,36 @@ public:
 	_uint Get_CurrentFrame();
 
 	_float Get_Current_Ratio();
+	
+	// 모델의 위 아래 길이 계산해서 반환.
 
 #pragma endregion
 
 	
+#pragma region 0. 모델의 바운딩박스 구하기.
+	// (x, -x, y, -y, z, -z) 구하기.
+	// 
+public:
+	// 바운딩 박스 관련 함수들
+	BOUNDING_BOX Get_BoundingBox() const { return m_BoundingBox; }
+	_float Get_ModelHeight() const { return m_BoundingBox.fHeight; }
+	_float Get_ModelTopY() const { return m_BoundingBox.vMax.y; }
+	_float Get_ModelBottomY() const { return m_BoundingBox.vMin.y; }
+	_float3 Get_ModelCenter() const { return m_BoundingBox.vCenter; }
+
+private:
+	BOUNDING_BOX m_BoundingBox = {};
+
+
+
+private:
+	void Calculate_Bounding_Box(); // Initialize 시점에 한번만 구합니다.
+	void Rotate_Bounding_Box();
+public:
+
+	
+#pragma endregion
+
 
 public:
 	const _bool Is_Ray_Hit(const _float3& rayOrigin, const _float3& rayDir, _float* pOutDist);

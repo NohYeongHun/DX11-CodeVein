@@ -71,17 +71,106 @@ void CMap_Tool::Render()
     
     //Default_Render();
 
-    if (m_eToolMode == TOOLMODE::CREATE)
+    /*switch (m_eToolMode)
+    {
+    case TOOLMODE::CREATE:
         Render_Model_Create();
-    else
+        break;
+    case TOOLMODE::EDIT:
         Render_Model_Edit();
+        break;
+    case TOOLMODE::NAV_MODE:
+        Render_Nav_Mode();
+    default:
+        break;
+    }*/
+
+    ImGui::Begin(u8"Editor", NULL, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_HorizontalScrollbar
+        | ImGuiWindowFlags_AlwaysVerticalScrollbar);
+
+    // Editor Alpha
+    ImGui::Text("Settings");
+    ImGuiStyle& style = ImGui::GetStyle();
+    ImVec4 WindowColor = style.Colors[ImGuiCol_WindowBg];
+    ImGui::SliderFloat("Editor Opacity", &m_fEditorAlpha, 0.0f, 1.0f);
+    const ImVec4 NewColor = ImVec4(WindowColor.x, WindowColor.y, WindowColor.z, m_fEditorAlpha);
+    style.Colors[ImGuiCol_WindowBg] = NewColor;
+    ImGui::NewLine();
+
+    // 체크박스 추가 - SaveType
+    Render_CheckBox();
+    
+    //메뉴바
+    if (ImGui::BeginMenuBar())
+    {
+        SaveLoadMenu();
+        // 메뉴
+        
+        /*if (ImGui::BeginMenu("Debug"))
+        {
+            ImGui::MenuItem("Show Mouse Pos", NULL, &m_bShowSimpleMousePos);
+            ImGui::Separator();
+            ImGui::MenuItem("Show Picked Object", NULL, &m_bShowPickedObject);
+            ImGui::EndMenu();
+        }*/
+        
+        ImGui::EndMenuBar();
+    }
+
+    ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_None;
+    if (ImGui::BeginTabBar("TabBar", tab_bar_flags))
+    {
+        if (ImGui::BeginTabItem("Model Tool"))
+        {
+            if (ImGui::BeginTabBar("ModelsTabs", ImGuiTabBarFlags_None))
+            {
+                if (ImGui::BeginTabItem("Show Create Model List"))
+                {
+                    Render_CreateModelChild();
+                    ImGui::EndTabItem();
+                }
+                if (ImGui::BeginTabItem("Show Edit Model List"))
+                {
+                    //Show_CurrentModelList();
+                    ImGui::EndTabItem();
+                }
+                if (ImGui::BeginTabItem("TreasureBox Setting"))
+                {
+                    //Set_TrasureBox();
+                    ImGui::EndTabItem();
+                }
+
+
+                ImGui::EndTabBar();
+            }
+
+            ImGui::EndTabItem();
+        }
+
+        ImGui::EndTabBar();
+    }
 
     // Render_SaveLoad 렌더링.
-    Render_SaveLoad();
+    //Render_SaveLoad();
 
     // 디버그 정보는 항상 렌더링
     Render_Debug_Window();
 
+    ImGui::End();
+
+}
+
+void CMap_Tool::Render_CheckBox()
+{
+    if (!m_IsEditNavigation)
+    {
+        ImGui::Checkbox("Save Model", &m_IsEditModel);
+        ImGui::SameLine();
+    }
+    if (!m_IsEditModel)
+    {
+        ImGui::Checkbox("Save Navigation", &m_IsEditNavigation);
+    }
 }
 
 void CMap_Tool::Render_SaveLoad()
@@ -91,10 +180,14 @@ void CMap_Tool::Render_SaveLoad()
 
     ImGui::Begin("Test Window", nullptr, ImGuiWindowFlags_MenuBar);
 
+
+
     if (ImGui::BeginMenuBar())
     {
         if (ImGui::BeginMenu("File"))
         {
+            
+
             if (ImGui::MenuItem("open"))
             {
                 IGFD::FileDialogConfig config;
@@ -126,7 +219,7 @@ void CMap_Tool::Render_SaveLoad()
             /* Save 타입에 따라 저장 방식이 달라집니다. */
             if (m_eSaveMode == SAVEMODE::MAP_OBJECT)
                 m_pSaveFile_Loader->Load_MapFile(load_path, m_eCurLevel);
-            else if (m_eSaveMode == SAVEMODE::MODEL_COMPONENT)
+            if (m_IsEditModel)
                 m_pSaveFile_Loader->Load_ModelFile(load_path, m_eCurLevel);
         }
         ImGuiFileDialog::Instance()->Close();
@@ -139,13 +232,103 @@ void CMap_Tool::Render_SaveLoad()
         {
             std::string save_path = ImGuiFileDialog::Instance()->GetFilePathName();
 
-            if (m_eSaveMode == SAVEMODE::MODEL_COMPONENT)
+            //if (m_eSaveMode == SAVEMODE::MODEL_COMPONENT)
+            if(m_IsEditModel)
                 m_pSaveFile_Loader->Save_ModelFile(save_path, m_wSelected_PrototypeModelTag);
         }
         ImGuiFileDialog::Instance()->Close();
     }
 
     ImGui::End();
+}
+
+void CMap_Tool::SaveLoadMenu()
+{
+    if (ImGui::BeginMenu("File"))
+    {
+        if (ImGui::MenuItem("open"))
+        {
+            IGFD::FileDialogConfig config;
+            config.path = "../../SaveFile/Model/";
+            config.flags = ImGuiFileDialogFlags_ReadOnlyFileNameField;
+
+            // 파일 다이얼로그 열기
+            ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose File", ".dat", config);
+        }
+        if (ImGui::MenuItem("save"))
+        {
+            IGFD::FileDialogConfig config;
+            config.path = "../../SaveFile/Model/";
+            config.flags = ImGuiFileDialogFlags_ConfirmOverwrite;
+
+            ImGuiFileDialog::Instance()->OpenDialog("SaveFileDlgKey", "Choose File", ".dat", config);
+
+        }
+        ImGui::EndMenu();
+    }
+
+    if (ImGuiFileDialog::Instance()->Display("ChooseFileDlgKey")) {
+        if (ImGuiFileDialog::Instance()->IsOk()) {
+            std::string load_path = ImGuiFileDialog::Instance()->GetFilePathName();
+
+            /* Save 타입에 따라 저장 방식이 달라집니다. */
+            //if (m_eSaveMode == SAVEMODE::MAP_OBJECT)
+            //    m_pSaveFile_Loader->Load_MapFile(load_path, m_eCurLevel);
+
+            if (m_IsEditModel)
+                m_pSaveFile_Loader->Load_ModelFile(load_path, m_eCurLevel);
+        }
+        ImGuiFileDialog::Instance()->Close();
+    }
+
+    // 저장용 로직
+    if (ImGuiFileDialog::Instance()->Display("SaveFileDlgKey"))
+    {
+        if (ImGuiFileDialog::Instance()->IsOk())
+        {
+            std::string save_path = ImGuiFileDialog::Instance()->GetFilePathName();
+
+            if (m_IsEditModel)
+                m_pSaveFile_Loader->Save_ModelFile(save_path, m_wSelected_PrototypeModelTag);
+            //if (m_eSaveMode == SAVEMODE::MODEL_COMPONENT)
+            //    m_pSaveFile_Loader->Save_ModelFile(save_path, m_wSelected_PrototypeModelTag);
+        }
+        ImGuiFileDialog::Instance()->Close();
+    }
+
+
+}
+
+void CMap_Tool::Render_CreateModelChild()
+{
+    _wstring objTag = {};
+    _wstring modelTag = {};
+
+    ImGui::BeginChild("left pane", ImVec2(200, 0), true);
+
+
+    static int iSelectedIndex = -1;
+    _uint id = 0;
+
+    for (auto& pair : m_PrototypeNames)
+    {
+        if (ImGui::Selectable(pair.second.c_str(), id == iSelectedIndex))
+        {
+
+            iSelectedIndex = id;
+            m_wSelected_PrototypeObjTag = _wstring(pair.first.begin(), pair.first.end());
+            m_wSelected_PrototypeModelTag = _wstring(pair.second.begin(), pair.second.end());
+
+            m_Selected_PrototypeModelTag = pair.second;
+            m_Selected_PrototypeObjTag = pair.first;
+        }
+
+    }
+
+    if (iSelectedIndex >= 0 && iSelectedIndex < m_PrototypeNames.size())
+        Render_Prototype_Inspector();
+
+    ImGui::EndChild();
 }
 
 
@@ -180,7 +363,7 @@ void CMap_Tool::Render_Debug_Window()
    
 
     // Selected 되어있을 때만.
-    if (m_pSelectedObject)
+    /*if (m_pSelectedObject)
     {
         _float3 pickingWorld = {};
         XMStoreFloat3(&pickingWorld, XMVector3TransformCoord(
@@ -190,6 +373,16 @@ void CMap_Tool::Render_Debug_Window()
             , m_RayHitDesc.vHitLocal.x, m_RayHitDesc.vHitLocal.y, m_RayHitDesc.vHitLocal.z);
         ImGui::Text("Picking World: (%.2f, %.2f, %.2f)"
             , pickingWorld.x, pickingWorld.y, pickingWorld.z);
+    }*/
+
+    if (m_pSelectedObject)
+    {
+        //_float3 pickingWorld = {};
+
+        ImGui::Text("Picking Local: (%.2f, %.2f, %.2f)"
+            , m_ModelPickingDesc.vHitPoint.x, m_ModelPickingDesc.vHitPoint.y, m_ModelPickingDesc.vHitPoint.z);
+        ImGui::Text("Picking World: (%.2f, %.2f, %.2f)"
+            , m_ModelPickingDesc.vHitWorldPoint.x, m_ModelPickingDesc.vHitWorldPoint.y, m_ModelPickingDesc.vHitWorldPoint.z);
     }
     
     
@@ -225,6 +418,11 @@ void CMap_Tool::Render_Debug_Window()
         m_eToolMode = TOOLMODE::CREATE;
     }
 
+    if (ImGui::Button("Nav Mode"))
+    {
+        m_eToolMode = TOOLMODE::NAV_MODE;
+    }
+
 
     ImGui::End();
 }
@@ -238,65 +436,72 @@ void CMap_Tool::Handle_SelectedObject()
         Handle_CreateMode_SelectedObject();
     else if (m_eToolMode == TOOLMODE::EDIT)
         Handle_EditMode_SelectedObject();
+    //else if (m_eToolMode == TOOLMODE::NAV_MODE)
+    //    Handle_NavMode_SelectedObject();
+
 }   
 
 
 
 
 #pragma region CREATE_MODE
-void CMap_Tool::Render_Model_Create()
+//void CMap_Tool::Render_Model_Create()
+//{
+//    if (m_IsPossible_SaveLoad)
+//        return;
+//
+//    Render_Prototype_Hierarchy();
+//}
+//
+//
+//void CMap_Tool::Render_Prototype_Hierarchy()
+//{
+//    ImGui::SetNextWindowPos(ImVec2(g_iWinSizeX - 310.f, 10.f), ImGuiCond_Always);
+//    ImGui::SetNextWindowSize(ImVec2(300, 400), ImGuiCond_Once);
+//    ImGui::Begin("Prototype_Hierarchy", nullptr, ImGuiWindowFlags_NoCollapse);
+//
+//    static int iSelectedIndex = -1;
+//    _uint id = 0;
+//
+//    _wstring objTag = {};
+//    _wstring modelTag = {};
+//    ImVec2 hierarchyPos = ImGui::GetWindowPos();
+//    ImVec2 hierarchySize = ImGui::GetWindowSize();
+//    
+//
+//    for (auto& pair : m_PrototypeNames)
+//    {
+//        if (ImGui::Selectable(pair.second.c_str(), id == iSelectedIndex))
+//        {
+//            m_PrototypeinspectorPos = ImVec2(hierarchyPos.x - 310.f, hierarchyPos.y); // 왼쪽 붙이기
+//
+//            iSelectedIndex = id;
+//            m_wSelected_PrototypeObjTag = _wstring(pair.first.begin(), pair.first.end());
+//            m_wSelected_PrototypeModelTag = _wstring(pair.second.begin(), pair.second.end());
+//
+//            m_Selected_PrototypeModelTag = pair.second;
+//            m_Selected_PrototypeObjTag = pair.first;
+//        }
+//        
+//    }
+//
+//    if (iSelectedIndex >= 0 && iSelectedIndex < m_PrototypeNames.size())
+//        Render_Prototype_Inspector(m_PrototypeinspectorPos);
+//
+//    ImGui::End();
+//}
+
+void CMap_Tool::Render_Prototype_Inspector()
 {
-    if (m_IsPossible_SaveLoad)
-        return;
+    ImGuiIO& io = ImGui::GetIO();
 
-    Render_Prototype_Hierarchy();
-}
-
-
-void CMap_Tool::Render_Prototype_Hierarchy()
-{
-    ImGui::SetNextWindowPos(ImVec2(g_iWinSizeX - 310.f, 10.f), ImGuiCond_Always);
-    ImGui::SetNextWindowSize(ImVec2(300, 400), ImGuiCond_Once);
-    ImGui::Begin("Prototype_Hierarchy", nullptr, ImGuiWindowFlags_NoCollapse);
-
-    static int iSelectedIndex = -1;
-    _uint id = 0;
-
-    _wstring objTag = {};
-    _wstring modelTag = {};
-    ImVec2 hierarchyPos = ImGui::GetWindowPos();
-    ImVec2 hierarchySize = ImGui::GetWindowSize();
-    
-
-    for (auto& pair : m_PrototypeNames)
-    {
-        if (ImGui::Selectable(pair.second.c_str(), id == iSelectedIndex))
-        {
-            m_PrototypeinspectorPos = ImVec2(hierarchyPos.x - 310.f, hierarchyPos.y); // 왼쪽 붙이기
-
-            iSelectedIndex = id;
-            m_wSelected_PrototypeObjTag = _wstring(pair.first.begin(), pair.first.end());
-            m_wSelected_PrototypeModelTag = _wstring(pair.second.begin(), pair.second.end());
-
-            m_Selected_PrototypeModelTag = pair.second;
-            m_Selected_PrototypeObjTag = pair.first;
-        }
-        
-    }
-
-    if (iSelectedIndex >= 0 && iSelectedIndex < m_PrototypeNames.size())
-        Render_Prototype_Inspector(m_PrototypeinspectorPos);
-
-    ImGui::End();
-}
-
-void CMap_Tool::Render_Prototype_Inspector(ImVec2 vPos)
-{
-
+    // 오른쪽 위 위치 계산 (창 크기 300x250 고려)
+    ImVec2 vPos = ImVec2(io.DisplaySize.x - 310.f, 10.f); // 오른쪽에서 310픽셀, 위에서 10픽셀
     ImGui::SetNextWindowPos(vPos, ImGuiCond_Always);
     ImGui::SetNextWindowSize(ImVec2(300, 250), ImGuiCond_Once);
-    ImGui::Begin("Prototype_Transform");
+    
 
+    ImGui::Begin("Prototype_Transform");
     ImGui::Text(m_Selected_PrototypeModelTag.c_str());
 
     if (!m_IsPicking_Create)
@@ -392,7 +597,8 @@ void CMap_Tool::Picking_Create()
 {
     /* 생성할 위치. 월드 좌표 반영이 안됨. */
     _float3 vPos = {};
-    XMStoreFloat3(&vPos, XMLoadFloat3(&m_RayHitDesc.vHitPoint));
+    //XMStoreFloat3(&vPos, XMLoadFloat3(&m_RayHitDesc.vHitPoint));
+    XMStoreFloat3(&vPos, XMLoadFloat3(&m_ModelPickingDesc.vHitWorldPoint));
 
     CToolMap_Part::MAP_PART_DESC Desc{};
     Desc.eArgType = CToolMap_Part::ARG_TYPE::CREATE;
@@ -578,6 +784,39 @@ void CMap_Tool::Handle_EditMode_SelectedObject()
 
 }
 
+void CMap_Tool::Render_Nav_Mode()
+{
+    ImGui::SetNextWindowPos({ g_iWinSizeX - 310.f, 10.f }, ImGuiCond_Always);
+    ImGui::SetNextWindowSize({ 300, 400 }, ImGuiCond_Once);
+    ImGui::Begin("Nav_Hierarchy", nullptr, ImGuiWindowFlags_NoCollapse);
+
+    ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_None;
+    if (ImGui::BeginTabBar("MyTabBar", tab_bar_flags))
+    {
+        if (ImGui::BeginTabItem("Navigation Tool"))
+        {
+            ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "Picking for Navigation"); ImGui::SameLine();
+            ImGui::Checkbox("##Picking for Navigation", &m_bNaviPicking);
+
+            ImGui::SameLine();
+
+            ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "Show Only Navigation"); ImGui::SameLine();
+            ImGui::Checkbox("##Show Only Navigation", &m_bShowOnlyNavi);
+
+            ImGui::Text("This is the navigation tool ");
+            //Set_Navigation();
+            ImGui::EndTabItem();
+        }
+    }
+
+    ImGui::End();
+
+}
+
+void CMap_Tool::Handle_NavMode_SelectedObject()
+{
+}
+
 
 
 
@@ -589,10 +828,13 @@ void CMap_Tool::Handle_EditMode_SelectedObject()
 void CMap_Tool::Update_Picking(_uint iLayerLevelIndex, const _wstring& strLevelLayerTag)
 {
     _float fOutDist = {};
-    m_RayHitDesc = m_pGameInstance->Get_PickingLocalObject(iLayerLevelIndex, strLevelLayerTag,
-        &fOutDist);
+    
+    //m_RayHitDesc = m_pGameInstance->Get_PickingLocalObject(iLayerLevelIndex, strLevelLayerTag,
+    //    &fOutDist);
 
-    SelectObject(m_RayHitDesc.pHitObject);
+    m_ModelPickingDesc = m_pGameInstance->Get_PickingLocalObject(iLayerLevelIndex, strLevelLayerTag);
+
+    SelectObject(m_ModelPickingDesc.pHitObject);
 }
 
 void CMap_Tool::Load_EditObject()
@@ -622,6 +864,18 @@ void CMap_Tool::SelectObject(CGameObject* pObj)
     m_Selected_EditObjTag = WString_ToString(pObj->Get_ObjectTag());
     m_Selected_EditObjID = pObj->Get_ID();
 
+    CToolMap_Part* pMapPart  = dynamic_cast<CToolMap_Part*>(m_pSelectedObject);
+    // 선택된 객체가 ToolMap_Part라면?
+
+    if (nullptr != pMapPart)
+    {
+        m_pSelectedMapPart = pMapPart;
+        m_pSelectedModel = dynamic_cast<CTool_Model*>(pMapPart->Get_Component(L"Com_Model"));
+    }
+        
+
+
+
     // 레이어 찾기 (빠른 맵을 갖고 있거나 선형 탐색)
     for (auto& kv : m_LayerTable)
     {
@@ -639,6 +893,7 @@ void CMap_Tool::SelectObject(CGameObject* pObj)
     }
     m_pSelectedLayer = nullptr; // 못 찾았을 때
 }
+
 void CMap_Tool::Default_Render()
 {
     ImGui::Text("Settings");
@@ -694,155 +949,6 @@ void CMap_Tool::Default_Render()
     
 }
 
-//void CMap_Tool::Set_Navigation()
-//{
-//    static int selected = 0;
-//    {
-//        ImGui::BeginChild("left pane", ImVec2(150, 0), true);
-//
-//        if ((int)m_pNavigation_Manager->Get_CellsSize() != 0)
-//        {
-//            for (_uint i = 0; i < m_pNavigation_Manager->Get_CellsSize();)
-//            {
-//                //char label[MAX_PATH] = "";
-//                char szLayertag[MAX_PATH] = "Cell";
-//
-//                char label[MAX_PATH] = "Cell ";
-//                char buffer[MAX_PATH];
-//                sprintf(buffer, "%d", i);
-//                strcat(label, buffer);
-//                if (ImGui::Selectable(label, m_iCellIndex == i))
-//                {
-//                    m_iCellIndex = i;
-//
-//                }
-//                i++;
-//            }
-//        }
-//        ImGui::EndChild();
-//    }
-//    ImGui::SameLine();
-//    // ------------------------ Right -----------------------------------
-//    {
-//
-//        ImGui::BeginGroup();
-//        ImGui::BeginChild("Cell view", ImVec2(0, -ImGui::GetFrameHeightWithSpacing())); // Leave room for 1 line below us
-//
-//
-//        ImGui::CollapsingHeader("Show Current Cell");
-//
-//        ImGui::Text("Selected Index : "); ImGui::SameLine();  ImGui::Text("%d", m_iCellIndex);
-//        m_pNavigation_Manager->Set_CilckedCellIndex(m_iCellIndex);
-//        CCell* pCurrentCell = m_pNavigation_Manager->Get_Cell();
-//
-//        static float fPointA[3]{ 0,0,0 };
-//        static float fPointB[3]{ 0,0,0 };
-//        static float fPointC[3]{ 0,0,0 };
-//        static float fClickedPosition[3]{ m_fClickPoint.x, m_fClickPoint.y, m_fClickPoint.z };
-//        fClickedPosition[0] = m_fClickPoint.x;
-//        fClickedPosition[1] = m_fClickPoint.y;
-//        fClickedPosition[2] = m_fClickPoint.z;
-//
-//        if (pCurrentCell != nullptr)
-//        {
-//            fPointA[0] = pCurrentCell->Get_PointValue(CELLPOINT::A).x;
-//            fPointA[1] = pCurrentCell->Get_PointValue(CELLPOINT::A).y;
-//            fPointA[2] = pCurrentCell->Get_PointValue(CELLPOINT::A).z;
-//
-//            fPointB[0] = pCurrentCell->Get_PointValue(CELLPOINT::B).x;
-//            fPointB[1] = pCurrentCell->Get_PointValue(CELLPOINT::B).y;
-//            fPointB[2] = pCurrentCell->Get_PointValue(CELLPOINT::B).z;
-//
-//            fPointC[0] = pCurrentCell->Get_PointValue(CELLPOINT::C).x;
-//            fPointC[1] = pCurrentCell->Get_PointValue(CELLPOINT::C).y;
-//            fPointC[2] = pCurrentCell->Get_PointValue(CELLPOINT::C).z;
-//
-//            //m_iCellType = pCurrentCell->Get_CellType();
-//        }
-//
-//
-//        ImGui::Text("PointA :"); ImGui::SameLine(); ImGui::InputFloat3("##PointA", fPointA);
-//        ImGui::Text("PointB :"); ImGui::SameLine(); ImGui::InputFloat3("##PointB", fPointB);
-//        ImGui::Text("PointC :"); ImGui::SameLine(); ImGui::InputFloat3("##PointC", fPointC);
-//
-//        ImGui::Text("ClickPointXYZ :"); ImGui::SameLine(); ImGui::DragFloat3("##ClickPointXYZ", fClickedPosition, 0.01f);
-//        m_fClickPoint = _float3(fClickedPosition[0], fClickedPosition[1], fClickedPosition[2]);
-//        m_pNavigation_Manager->Update_ClickedPosition(m_fClickPoint);
-//
-//
-//        if (ImGui::Button("Cancle Click Point"))
-//            m_pNavigation_Manager->Clear_ClickedPosition();
-//
-//        if (ImGui::Button("PopBack Cell"))
-//            m_pNavigation_Manager->Cancle_Cell();
-//        if (ImGui::Button("Erase Picked Cell"))
-//            m_pNavigation_Manager->Erase_Cell();
-//        if (ImGui::Button("All_Clear Cell"))
-//            m_pNavigation_Manager->Clear_Cells();
-//
-//
-//
-//        ImGui::CollapsingHeader("Setting Cell Type");
-//        //ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "All Accessible"); ImGui::SameLine();
-//        //if (ImGui::RadioButton("##All Accessible", &m_iCellType, 0))
-//        //    m_pNavigation_Manager->Set_CellType((CCell::CELLTYPE)m_iCellType);
-//        //ImGui::SameLine();
-//      /*  ImGui::TextColored(ImVec4(0.0f, 0.0f, 1.0f, 1.0f), "Only Jump"); ImGui::SameLine();
-//        if (ImGui::RadioButton("##Only Jump", &m_iCellType, 1))
-//            m_pNavigation_Manager->Set_CellType((CCell::CELLTYPE)m_iCellType);
-//        ImGui::TextColored(ImVec4(0.7f, 0.0f, 1.0f, 1.0f), "Drop"); ImGui::SameLine();
-//        if (ImGui::RadioButton("##Drop", &m_iCellType, 2))
-//            m_pNavigation_Manager->Set_CellType((CCell::CELLTYPE)m_iCellType);
-//        ImGui::TextColored(ImVec4(0.0f, 1.0f, 1.0f, 1.0f), "UpDown"); ImGui::SameLine();
-//        if (ImGui::RadioButton("##UpDown", &m_iCellType, 3))
-//            m_pNavigation_Manager->Set_CellType((CCell::CELLTYPE)m_iCellType);*/
-//
-//
-//
-//       /* if (ImGui::Button("Save Navigation"))
-//        {
-//            Save_Navigation();
-//        }
-//        if (ImGui::Button("Load Navigation"))
-//        {
-//            Load_Navigation();
-//        }*/
-//
-//
-//
-//
-//
-//        ImGui::EndChild();
-//        ImGui::EndGroup();
-//    }
-//
-//
-//
-//
-//
-//    if (m_pGameInstance->Get_KeyUp(DIK_X) && m_pSelectedObject)
-//    {
-//        
-//        _float3 fPosition = m_RayHitDesc.vHitLocal;
-//        _vector vPosition = XMLoadFloat3(&fPosition);
-//        vPosition = XMVectorSetW(vPosition, 1.f);
-//        //m_pNavigation_Manager->Click_Position(vPosition);
-//        //m_fClickPoint = m_pNavigation_Manager->Get_ClickedPos();
-//
-//
-//    }
-//    else if (m_pSelectedObject 
-//        && m_bNaviPicking 
-//        && m_pGameInstance->Get_MouseKeyPress(MOUSEKEYSTATE::RB))
-//    {
-//         _float3 fPosition = m_RayHitDesc.vHitLocal;
-//         _vector vPosition = XMLoadFloat3(&fPosition);
-//         vPosition = XMVectorSetW(vPosition, 1.f);
-//        
-//
-//    }
-//
-//}
 #pragma endregion
 
 

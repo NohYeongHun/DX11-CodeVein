@@ -18,6 +18,7 @@
 #include "ImGuiFileDialogConfig.h"
 #pragma endregion
 
+#include "NavigationManager.h"
 #include "Tool_MainApp.h"
 #include "Map_Tool.h"
 

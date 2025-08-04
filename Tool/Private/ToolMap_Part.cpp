@@ -55,7 +55,8 @@ HRESULT CToolMap_Part::Initialize_Clone(void* pArg)
     }
     
 
-    //m_pTransformCom->Scaling({ 1.f, 1.f, 1.f });
+    m_pTransformCom->Set_ScaleX(1.5f);
+    m_pTransformCom->Set_ScaleZ(1.5f);
     return S_OK;
 }
 
@@ -175,11 +176,23 @@ void CToolMap_Part::On_Collision_Exit(CGameObject* pOther)
 
 const _bool CToolMap_Part::Is_Ray_LocalHit(_float3* pOutLocalPos, _float3* pOutLocalNormal, _float* pOutDist)
 {
-    // Ray를 Local로 변환.
+    // 현재 Ray를 Local로 변환.
     m_pGameInstance->Transform_To_LocalSpace(m_pTransformCom->Get_WorldMatrix_Inverse());
 
+    // Local로 변환된 시점의 Ray를 이용해서 RayHit 확인.
     if (m_pModelCom->Is_Ray_Hit(m_pGameInstance->Get_Local_RayOrigin()
         , m_pGameInstance->Get_Local_RayDir(), pOutLocalPos, pOutLocalNormal, pOutDist))
+        return true;
+
+    return false;
+}
+
+const _bool CToolMap_Part::Is_Ray_LocalHit(MODEL_PICKING_INFO* pPickingInfo, _float* pOutDist)
+{
+    m_pGameInstance->Transform_To_LocalSpace(m_pTransformCom->Get_WorldMatrix_Inverse());
+    // Local로 변환된 시점의 Ray를 이용해서 RayHit 확인.
+    if (m_pModelCom->Is_Ray_Hit(m_pGameInstance->Get_Local_RayOrigin()
+        , m_pGameInstance->Get_Local_RayDir(), pPickingInfo, pOutDist))
         return true;
 
     return false;

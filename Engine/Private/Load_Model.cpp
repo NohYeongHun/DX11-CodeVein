@@ -17,6 +17,7 @@ CLoad_Model::CLoad_Model(const CLoad_Model& Prototype)
 	, m_iRoot_BoneIndex {Prototype.m_iRoot_BoneIndex }
 	, m_ModelDir{ Prototype.m_ModelDir }
 	, m_vOldPos { Prototype.m_vOldPos }
+	, m_BoundingBox { Prototype.m_BoundingBox }
 {
 
 	for (auto& pPrototypeAnimation : Prototype.m_Animations)
@@ -86,7 +87,7 @@ HRESULT CLoad_Model::Initialize_Prototype(MODELTYPE eModelType, _fmatrix PreTran
 	// Load가 끝났다면 삭제.
 	ifs.close();
 
-	
+	Calculate_Bounding_Box();
 	XMStoreFloat4(&m_vOldPos, m_Bones[m_iRoot_BoneIndex]->Get_TransformationMatrix().r[3]);
 
 
@@ -155,52 +156,6 @@ void CLoad_Model::Set_Animation(_uint iAnimIndex, _bool isLoop)
 	}
 }
 
-//void CLoad_Model::Set_Animation(_uint iAnimIndex, _bool isLoop)
-//{
-//	if (iAnimIndex >= m_Animations.size())
-//		return;
-//
-//	// 루트 모션 연속성 처리 - 애니메이션 인덱스 변경 전에 해야 함!
-//	_vector vCurrentRootPos = XMVectorZero();
-//	if (m_bRootMotionTranslate && m_iCurrentAnimIndex != iAnimIndex && m_iCurrentAnimIndex < m_Animations.size())
-//	{
-//		// 현재 루트본 위치 저장
-//		_matrix rootMatrix = m_Bones[m_iRoot_BoneIndex]->Get_CombinedTransformationMatrix();
-//		vCurrentRootPos = rootMatrix.r[3];
-//	}
-//
-//	// 애니메이션 설정
-//	m_iCurrentAnimIndex = iAnimIndex;
-//	m_isLoop = isLoop;
-//
-//	// 새 애니메이션 리셋
-//	m_Animations[m_iCurrentAnimIndex]->Reset();
-//	m_isFinished = false;
-//	m_isTrackEnd = false;
-//
-//	// 🔥 핵심: 새 애니메이션의 첫 프레임을 실행하여 루트본 위치를 얻기
-//	if (m_bRootMotionTranslate)
-//	{
-//		// 새 애니메이션의 첫 프레임을 미리 계산
-//		for (_uint i = 0; i < m_Bones.size(); ++i)
-//		{
-//			m_Bones[i]->Update_CombinedTransformationMatrix(m_PreTransformMatrix, m_Bones);
-//		}
-//
-//		// 새 애니메이션의 첫 프레임 루트본 위치
-//		_matrix newRootMatrix = m_Bones[m_iRoot_BoneIndex]->Get_CombinedTransformationMatrix();
-//		_vector vNewFirstFramePos = newRootMatrix.r[3];
-//
-//		// m_vOldPos를 (현재 위치 - 새 애니메이션 첫 프레임 위치)로 설정
-//		// 이렇게 하면 첫 번째 Handle_RootMotion에서 이동량이 0이 됨
-//		XMStoreFloat4(&m_vOldPos, vCurrentRootPos - vNewFirstFramePos + XMLoadFloat4(&m_vOldPos));
-//	}
-//	else
-//	{
-//		XMStoreFloat4(&m_vOldPos, XMVectorZero());
-//	}
-//}
-
 
 _float4x4* CLoad_Model::Get_BoneMatrix(const _char* pBoneName)
 {
@@ -225,6 +180,132 @@ _float CLoad_Model::Get_Current_Ratio()
 {
 	return m_Animations[m_iCurrentAnimIndex]->Get_CurrentTrackPosition() / m_Animations[m_iCurrentAnimIndex]->Get_Duration();
 }
+
+#pragma region 바운딩박스 구하기.
+void CLoad_Model::Calculate_Bounding_Box()
+{
+	// 모든 메시의 정점들을 순회
+	for (auto& pMesh : m_Meshes)
+	{
+		if (!pMesh)
+			continue;
+
+		// 각 메시의 바운딩 정보 가져오기 (Load_Mesh에 함수 추가 필요)
+		BOUNDING_BOX meshBounding = pMesh->Get_MeshBoundingBox();
+
+		// 전체 모델의 바운딩 박스 업데이트
+		m_BoundingBox.vMin.x = min(m_BoundingBox.vMin.x, meshBounding.vMin.x);
+		m_BoundingBox.vMin.y = min(m_BoundingBox.vMin.y, meshBounding.vMin.y);
+		m_BoundingBox.vMin.z = min(m_BoundingBox.vMin.z, meshBounding.vMin.z);
+
+		m_BoundingBox.vMax.x = max(m_BoundingBox.vMax.x, meshBounding.vMax.x);
+		m_BoundingBox.vMax.y = max(m_BoundingBox.vMax.y, meshBounding.vMax.y);
+		m_BoundingBox.vMax.z = max(m_BoundingBox.vMax.z, meshBounding.vMax.z);
+	}
+
+	// 중심점과 크기 계산
+	m_BoundingBox.vCenter.x = (m_BoundingBox.vMin.x + m_BoundingBox.vMax.x) * 0.5f;
+	m_BoundingBox.vCenter.y = (m_BoundingBox.vMin.y + m_BoundingBox.vMax.y) * 0.5f;
+	m_BoundingBox.vCenter.z = (m_BoundingBox.vMin.z + m_BoundingBox.vMax.z) * 0.5f;
+
+	m_BoundingBox.vExtents.x = (m_BoundingBox.vMax.x - m_BoundingBox.vMin.x) * 0.5f;
+	m_BoundingBox.vExtents.y = (m_BoundingBox.vMax.y - m_BoundingBox.vMin.y) * 0.5f;
+	m_BoundingBox.vExtents.z = (m_BoundingBox.vMax.z - m_BoundingBox.vMin.z) * 0.5f;
+
+	// 모델 전체 높이
+	m_BoundingBox.fHeight = m_BoundingBox.vMax.y - m_BoundingBox.vMin.y;
+
+	Rotate_Bounding_Box();
+
+//#ifdef _DEBUG
+//	char debugMsg[256];
+//	sprintf_s(debugMsg, "Model Bounding Box:\nMin: (%.2f, %.2f, %.2f)\nMax: (%.2f, %.2f, %.2f)\nHeight: %.2f\n",
+//		m_BoundingBox.vMin.x, m_BoundingBox.vMin.y, m_BoundingBox.vMin.z,
+//		m_BoundingBox.vMax.x, m_BoundingBox.vMax.y, m_BoundingBox.vMax.z,
+//		m_BoundingBox.fHeight);
+//	OutputDebugStringA(debugMsg);
+//#endif
+}
+
+void CLoad_Model::Rotate_Bounding_Box()
+{
+	_matrix preTransform = XMLoadFloat4x4(&m_PreTransformMatrix);
+
+	//_vector vScale, vRotate, vTranslate;
+	//XMMatrixDecompose(&vScale, &vRotate, &vTranslate, preTransform);
+
+
+	_matrix rotationMatrix = XMMatrixRotationX(XM_PI * 0.5f);
+
+	// 로컬 바운딩박스의 8개 꼭짓점 계산
+	_float3 corners[8] = {
+		// 하단 4개 점
+		_float3(m_BoundingBox.vMin.x, m_BoundingBox.vMin.y, m_BoundingBox.vMin.z),
+		_float3(m_BoundingBox.vMax.x, m_BoundingBox.vMin.y, m_BoundingBox.vMin.z),
+		_float3(m_BoundingBox.vMax.x, m_BoundingBox.vMin.y, m_BoundingBox.vMax.z),
+		_float3(m_BoundingBox.vMin.x, m_BoundingBox.vMin.y, m_BoundingBox.vMax.z),
+		// 상단 4개 점
+		_float3(m_BoundingBox.vMin.x, m_BoundingBox.vMax.y, m_BoundingBox.vMin.z),
+		_float3(m_BoundingBox.vMax.x, m_BoundingBox.vMax.y, m_BoundingBox.vMin.z),
+		_float3(m_BoundingBox.vMax.x, m_BoundingBox.vMax.y, m_BoundingBox.vMax.z),
+		_float3(m_BoundingBox.vMin.x, m_BoundingBox.vMax.y, m_BoundingBox.vMax.z)
+	};
+	// 회전된 바운딩박스 계산을 위한 새로운 Min/Max
+	_float3 rotatedMin = _float3(FLT_MAX, FLT_MAX, FLT_MAX);
+	_float3 rotatedMax = _float3(-FLT_MAX, -FLT_MAX, -FLT_MAX);
+
+	// 8개 꼭짓점에 회전만 적용
+	for (int i = 0; i < 8; ++i)
+	{
+		_vector localCorner = XMLoadFloat3(&corners[i]);
+
+		// 회전만 적용 (XMVector3TransformNormal 사용 - 이동 적용 안됨)
+		_vector rotatedCorner = XMVector3TransformNormal(localCorner, rotationMatrix);
+
+		_float3 rotatedCornerFloat3;
+		XMStoreFloat3(&rotatedCornerFloat3, rotatedCorner);
+
+		// 회전된 바운딩박스 업데이트
+		rotatedMin.x = min(rotatedMin.x, rotatedCornerFloat3.x);
+		rotatedMin.y = min(rotatedMin.y, rotatedCornerFloat3.y);
+		rotatedMin.z = min(rotatedMin.z, rotatedCornerFloat3.z);
+
+		rotatedMax.x = max(rotatedMax.x, rotatedCornerFloat3.x);
+		rotatedMax.y = max(rotatedMax.y, rotatedCornerFloat3.y);
+		rotatedMax.z = max(rotatedMax.z, rotatedCornerFloat3.z);
+	}
+
+	m_BoundingBox.fHeight = rotatedMax.y - rotatedMin.y;
+
+	// 회전된 바운딩박스 정보 업데이트
+	m_BoundingBox.vMin = rotatedMin;
+	m_BoundingBox.vMax = rotatedMax;
+
+	// 중심점과 크기 다시 계산
+	m_BoundingBox.vCenter.x = (rotatedMin.x + rotatedMax.x) * 0.5f;
+	m_BoundingBox.vCenter.y = (rotatedMin.y + rotatedMax.y) * 0.5f - m_BoundingBox.fHeight * 0.5f;
+	m_BoundingBox.vCenter.z = (rotatedMin.z + rotatedMax.z) * 0.5f;
+
+	m_BoundingBox.vExtents.x = (rotatedMax.x - rotatedMin.x) * 0.5f;
+	m_BoundingBox.vExtents.y = (rotatedMax.y - rotatedMin.y) * 0.5f;
+	m_BoundingBox.vExtents.z = (rotatedMax.z - rotatedMin.z) * 0.5f;
+
+ 	
+
+#ifdef _DEBUG
+	char debugMsg[256];
+	sprintf_s(debugMsg, "Rotated Bounding Box:\nMin: (%.2f, %.2f, %.2f)\nMax: (%.2f, %.2f, %.2f)\nHeight: %.2f\n",
+		rotatedMin.x, rotatedMin.y, rotatedMin.z,
+		rotatedMax.x, rotatedMax.y, rotatedMax.z,
+		m_BoundingBox.fHeight);
+	OutputDebugStringA(debugMsg);
+#endif
+
+
+}
+#pragma endregion
+
+
 
 const _bool CLoad_Model::Is_Ray_Hit(const _float3& rayOrigin, const _float3& rayDir, _float* pOutDist)
 {
@@ -338,55 +419,6 @@ void CLoad_Model::Set_BlendInfo(uint32_t iNextAnimIndex, _float fBlendTime, _boo
 	m_isFinished = false;
 
 }
-
-
-
-//void CLoad_Model::Handle_RootMotion(_float fTimeDelta)
-//{
-//	_matrix rootMatrix = m_Bones[m_iRoot_BoneIndex]->Get_CombinedTransformationMatrix();
-//	_vector vNewRootPos = rootMatrix.r[3];
-//	
-//	if (!m_isFinished)
-//	{
-//		// 🔥 애니메이션이 방금 전환되었다면 첫 프레임은 루트 모션 적용 안 함
-//		if (m_bAnimationJustChanged)
-//		{
-//			m_bAnimationJustChanged = false;
-//			_vector vNewRootPosNoY = XMVectorSetY(vNewRootPos, 0.f);
-//			XMStoreFloat4(&m_vOldPos, vNewRootPos); // 현재 프레임을 기준점으로 설정
-//			return; // 이번 프레임은 이동하지 않음
-//		}
-//
-//		// 0. 뼈의 이동 구하기.
-//		_vector vLocalTranslate = vNewRootPos - XMLoadFloat4(&m_vOldPos);
-//		vLocalTranslate = XMVectorSetY(vLocalTranslate, 0.f); // Y축 제거
-//
-//		_vector vWorldTranslate = vLocalTranslate; // 기본값
-//
-//		// 1. 플레이어 RotMatrix 추출 => 만약 RootMotionRotate 설정을 할것이라면?
-//		if (m_bRootMotionRotate)
-//		{
-//			_matrix playerWorldMatrix = m_pOwner->Get_Transform()->Get_WorldMatrix();
-//			_vector playerScale, playerRot, playerTrans;
-//			XMMatrixDecompose(&playerScale, &playerRot, &playerTrans, playerWorldMatrix);
-//			_matrix playerRotMatrix = XMMatrixRotationQuaternion(playerRot);
-//			vWorldTranslate = XMVector3TransformNormal(vLocalTranslate, playerRotMatrix);
-//		}
-//
-//		// 2. 이동값을 월드에 적용할 것인지 애니메이션 에서 설정
-//		// 플레이어처럼 몬스터도 설정하려면? 어떻게 해야할까
-//		if (m_bRootMotionTranslate)
-//		{
-//			m_pOwner->Translate(vWorldTranslate);
-//		}
-//
-//		XMStoreFloat4(&m_vOldPos, vNewRootPos);
-//		
-//	}
-//	// 새로운 애니메이션의 루트본을 이전벡터에 넣어둔다.
-//	rootMatrix.r[3] = XMVectorSet(0.f, 0.f, 0.f, 1.f);
-//	m_Bones[m_iRoot_BoneIndex]->Set_CombinedTransformationMatrix(rootMatrix);	
-//}
 
 void CLoad_Model::Handle_RootMotion(_float fTimeDelta)
 {

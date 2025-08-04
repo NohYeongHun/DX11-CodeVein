@@ -56,6 +56,48 @@ RAYHIT_DESC CLayer::Get_PickingLocalObject(_float* pOutDist)
 	return Desc;
 }
 
+MODEL_PICKING_INFO CLayer::Get_PickingLocalObject()
+{
+	MODEL_PICKING_INFO Info{};
+
+	_float fBestDist = FLT_MAX;
+	_float fHitDist = 0.f;
+
+	_float3 pOutLocalPos = {};
+	_float3 pOutLocalNormal = {};
+	static int iGameObjectID = 0;
+
+	for (auto& pGameObject : m_GameObjects)
+	{
+
+		// 가장 먼저 Ray에 맞은 객체를 반환. => 이렇게 하면 안됨..
+		// => 가장 가깝게 Ray Picking된 객체를 반환해야됨.
+
+		iGameObjectID++;
+		if (pGameObject->Is_Ray_LocalHit(&Info, &fHitDist))
+		{
+			if (fHitDist < fBestDist)
+			{
+				fBestDist = fHitDist;
+
+				CTransform* pTransform = pGameObject->Get_Transform();
+				Info.bHit = true;
+				Info.fDistance = fHitDist;
+				Info.pHitObject = pGameObject;
+
+				// World 좌표로 지점 저장.
+				XMStoreFloat3(&Info.vHitWorldPoint
+					, XMVector3TransformCoord(
+						XMLoadFloat3(&Info.vHitPoint), pTransform->Get_WorldMatrix()));
+			}
+		}
+
+	}
+
+	iGameObjectID = 0;
+	return Info;
+}
+
 
 void CLayer::Priority_Update(_float fTimeDelta)
 {

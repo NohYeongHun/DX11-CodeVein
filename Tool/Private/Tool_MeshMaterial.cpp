@@ -134,10 +134,14 @@ HRESULT CTool_MeshMaterial::Initialize_FBX(const _char* pModelFilePath, const ai
 
 			string ext = ".dds";
 			
+			if (false == strcmp(strTexturePath.data, "."))
+				continue;
+
 			strcpy_s(szFullPath, szDrive);
 			strcat_s(szFullPath, szDir);
 			strcat_s(szFullPath, strDirPath.c_str()); // Add texture folder path
 			strcat_s(szFullPath, szFileName);
+			
 			strcat_s(szFullPath, ext.c_str());
 			//strcat_s(szFullPath, szExt);
 

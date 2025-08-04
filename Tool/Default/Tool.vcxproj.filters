@@ -76,6 +76,9 @@
     <Filter Include="99. Define">
       <UniqueIdentifier>{14cc22d3-918a-4575-ac17-dde4d60aad62}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01. Level\01. Logo\00. Tool\Navigation">
+      <UniqueIdentifier>{b52e6c12-14d1-460b-85d3-bba981debe62}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -189,6 +192,9 @@
     <ClInclude Include="..\Public\Tool_Channel.h">
       <Filter>03. Component\Model\Animation\Channel</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\NavigationManager.h">
+      <Filter>01. Level\01. Logo\00. Tool\Navigation</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="small.ico">
@@ -285,6 +291,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Tool_Channel.cpp">
       <Filter>03. Component\Model\Animation\Channel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\NavigationManager.cpp">
+      <Filter>01. Level\01. Logo\00. Tool\Navigation</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

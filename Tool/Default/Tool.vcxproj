@@ -159,6 +159,7 @@
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\Public\NavigationManager.h" />
     <ClInclude Include="..\Public\Tool_Animation.h" />
     <ClInclude Include="..\Public\Camera_Free.h" />
     <ClInclude Include="..\Public\Tool_Channel.h" />
@@ -198,6 +199,7 @@
     <ClInclude Include="Tool.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\Private\NavigationManager.cpp" />
     <ClCompile Include="..\Private\Tool_Animation.cpp" />
     <ClCompile Include="..\Private\Camera_Free.cpp" />
     <ClCompile Include="..\Private\Tool_Channel.cpp" />
