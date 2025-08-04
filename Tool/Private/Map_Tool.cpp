@@ -163,17 +163,17 @@ void CMap_Tool::Render()
 
 void CMap_Tool::Render_CheckBox()
 {
-    if (!m_IsEditNavigation)
+    if (!m_IsEditNavigation && !m_IsEditMap)
     {
         ImGui::Checkbox("Edit Model", &m_IsEditModel);
         ImGui::SameLine();
     }
-    if (!m_IsEditModel)
+    if (!m_IsEditModel && !m_IsEditMap)
     {
         ImGui::Checkbox("Edit Navigation", &m_IsEditNavigation);
         ImGui::SameLine();
     }
-    if (!m_IsEditMap)
+    if (!m_IsEditModel && !m_IsEditNavigation)
     {
         ImGui::Checkbox("Edit Map", &m_IsEditMap);
     }
@@ -335,6 +335,69 @@ void CMap_Tool::Render_CreateModelChild()
     ImGui::EndChild();
 }
 
+void CMap_Tool::Render_Prototype_Inspector()
+{
+    ImGuiIO& io = ImGui::GetIO();
+
+    // 오른쪽 위 위치 계산 (창 크기 300x250 고려)
+    ImVec2 vPos = ImVec2(io.DisplaySize.x - 310.f, 10.f); // 오른쪽에서 310픽셀, 위에서 10픽셀
+    ImGui::SetNextWindowPos(vPos, ImGuiCond_Always);
+    ImGui::SetNextWindowSize(ImVec2(300, 250), ImGuiCond_Once);
+
+
+    ImGui::Begin("Prototype_Transform");
+    ImGui::Text(m_Selected_PrototypeModelTag.c_str());
+
+    if (!m_IsPicking_Create)
+    {
+        static float fPosition[3] = { 0.f, 0.f, 0.f };
+        ImGui::InputFloat3("Position", fPosition);
+
+        static float fRotation[3] = { 0.f, 0.f, 0.f };
+        ImGui::InputFloat3("Rotation", fRotation);
+
+        static float fScale[3] = { 1.f, 1.f, 1.f };
+        ImGui::InputFloat3("Scale", fScale);
+
+        if (ImGui::Button("Create Instance"))
+        {
+            CToolMap_Part::MAP_PART_DESC Desc{};
+            Desc.eArgType = CToolMap_Part::ARG_TYPE::CREATE;
+
+            MODEL_CREATE_DESC CreateDesc{};
+            CreateDesc.pModelTag = m_wSelected_PrototypeModelTag.c_str();
+            CreateDesc.vPosition = _float4(fPosition[0], fPosition[1], fPosition[2], 1.f);
+            CreateDesc.vRotate = _float3(fRotation[0], fRotation[1], fRotation[2]);
+            CreateDesc.vScale = _float3(fScale[0], fScale[1], fScale[2]);
+
+            /* 구조체 데이터 넣기. */
+            Desc.pData = reinterpret_cast<void*>(&CreateDesc);
+
+            if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel)
+                , TEXT("Layer_Map_Parts")
+                , ENUM_CLASS(m_eCurLevel)
+                , m_wSelected_PrototypeObjTag, &Desc)))
+            {
+                MSG_BOX(TEXT("Add GameObject_To_Layer Failed"));
+                return;
+            }
+        }
+
+
+    }
+    else if (m_IsPicking_Create)
+    {
+        static float fInterval[3] = { 0.f, 0.f, 0.f };
+        ImGui::InputFloat3("Interval", fInterval);
+        m_vInterval = _float3(fInterval[0], fInterval[1], fInterval[2]);
+    }
+
+    /* 인스턴스 생성. */
+    ImGui::Checkbox("Picking Create", &m_IsPicking_Create);
+
+    ImGui::End();
+}
+
 void CMap_Tool::Redner_EditModelChild()
 {
     ImGui::BeginChild("Middle pane", ImVec2(500, 0), true);
@@ -378,13 +441,101 @@ void CMap_Tool::Redner_EditModelChild()
     if (m_pSelectedObject)
     {
         ImVec2 pos(ImGui::GetWindowPos().x - 310.f, ImGui::GetWindowPos().y);
-        Render_Edit_Inspector(pos);
+        Render_Edit_Inspector();
     }
     ImGui::EndChild();
 }
 
 
+/* Load Layer */
+void CMap_Tool::Load_Layer()
+{
+    m_LayerTable = m_pGameInstance->Export_EditLayer(ENUM_CLASS(m_eCurLevel));
+}
 
+void CMap_Tool::Render_Edit_Inspector()
+{
+    ImGuiIO& io = ImGui::GetIO();
+
+    // 오른쪽 위 위치 계산 (창 크기 300x250 고려)
+    ImVec2 vPos = ImVec2(io.DisplaySize.x - 310.f, 10.f); // 오른쪽에서 310픽셀, 위에서 10픽셀
+    ImGui::SetNextWindowPos(vPos, ImGuiCond_Always);
+    ImGui::SetNextWindowSize(ImVec2(300, 250), ImGuiCond_Once);
+
+    if (!ImGui::Begin("Edit_Inspector"))
+    {
+        ImGui::End(); return;
+    }
+
+    ImGui::Text(m_Selected_EditObjTag.c_str());
+
+
+    /* ----- 선택 객체 없으면 나간다.  ----- */
+    if (m_pSelectedObject == nullptr)
+    {
+        ImGui::End(); return;
+    }
+
+    CTransform* pTransformCom = static_cast<CTransform*>(m_pSelectedObject->Get_Component(L"Com_Transform"));
+
+    /* ----- 편집 버퍼 (static) ----- */
+    static uint32_t cachedObjID = UINT32_MAX;
+    static float fPos[3] = {};
+    static float fRot[3] = {};
+    static float fScl[3] = { 1.f,1.f,1.f };
+
+    /* 선택이 바뀌면 초기화 */
+    if (cachedObjID != m_Selected_EditObjID)
+    {
+        _float3 pos; XMStoreFloat3(&pos, pTransformCom->Get_State(STATE::POSITION));
+        _float3 scl = pTransformCom->Get_Scaled();
+        _float3 rot = { 0.f, 0.f, 0.f };
+
+        memcpy(fPos, &pos, sizeof(_float3));
+        memcpy(fRot, &rot, sizeof(_float3));
+        memcpy(fScl, &scl, sizeof(_float3));
+
+        cachedObjID = m_Selected_EditObjID;
+    }
+
+    /* ----- ImGui 위젯 ----- */
+    ImGui::InputFloat3("Position", fPos);
+    ImGui::InputFloat3("Rotation", fRot);
+    ImGui::InputFloat3("Scale", fScl);
+
+    if (ImGui::Button("Apply"))
+    {
+        TransformData data{};
+        memcpy(&data.pos, fPos, sizeof(_float3)); data.pos.w = 1.f;
+        memcpy(&data.rot, fRot, sizeof(_float3));
+        memcpy(&data.scale, fScl, sizeof(_float3));
+
+        EditPayload payload;
+        payload.type = EEditType::Transform;
+        payload.data = data;
+
+        m_pGameInstance->Request_EditObject(
+            ENUM_CLASS(m_eCurLevel),
+            m_Selected_EditLayerTag,
+            m_Selected_EditObjID,
+            payload);
+    }
+
+    ImGui::SameLine();
+    // 오른쪽에 못붙이나?
+    if (ImGui::Button("Delete"))
+    {
+        m_pGameInstance->Request_DeleteObject(
+            ENUM_CLASS(m_eCurLevel),
+            m_Selected_EditLayerTag,
+            m_Selected_EditObjID
+        );
+
+        m_pSelectedObject = { nullptr };
+    }
+
+    ImGui::End();
+}
 
 
 /* Debug 모드에서 현재 상태값에 대한 지정을 수행합니다. */
@@ -542,68 +693,7 @@ void CMap_Tool::Handle_SelectedObject()
 //    ImGui::End();
 //}
 
-void CMap_Tool::Render_Prototype_Inspector()
-{
-    ImGuiIO& io = ImGui::GetIO();
 
-    // 오른쪽 위 위치 계산 (창 크기 300x250 고려)
-    ImVec2 vPos = ImVec2(io.DisplaySize.x - 310.f, 10.f); // 오른쪽에서 310픽셀, 위에서 10픽셀
-    ImGui::SetNextWindowPos(vPos, ImGuiCond_Always);
-    ImGui::SetNextWindowSize(ImVec2(300, 250), ImGuiCond_Once);
-    
-
-    ImGui::Begin("Prototype_Transform");
-    ImGui::Text(m_Selected_PrototypeModelTag.c_str());
-
-    if (!m_IsPicking_Create)
-    {
-        static float fPosition[3] = { 0.f, 0.f, 0.f };
-        ImGui::InputFloat3("Position", fPosition);
-
-        static float fRotation[3] = { 0.f, 0.f, 0.f };
-        ImGui::InputFloat3("Rotation", fRotation);
-
-        static float fScale[3] = { 1.f, 1.f, 1.f };
-        ImGui::InputFloat3("Scale", fScale);
-
-        if (ImGui::Button("Create Instance"))
-        {
-            CToolMap_Part::MAP_PART_DESC Desc{};
-            Desc.eArgType = CToolMap_Part::ARG_TYPE::CREATE;
-
-            MODEL_CREATE_DESC CreateDesc{};
-            CreateDesc.pModelTag = m_wSelected_PrototypeModelTag.c_str();
-            CreateDesc.vPosition = _float4(fPosition[0], fPosition[1], fPosition[2], 1.f);
-            CreateDesc.vRotate = _float3(fRotation[0], fRotation[1], fRotation[2]);
-            CreateDesc.vScale = _float3(fScale[0], fScale[1], fScale[2]);
-
-            /* 구조체 데이터 넣기. */
-            Desc.pData = reinterpret_cast<void*>(&CreateDesc);
-
-            if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel)
-                , TEXT("Layer_Map_Parts")
-                , ENUM_CLASS(m_eCurLevel)
-                , m_wSelected_PrototypeObjTag, &Desc)))
-            {
-                MSG_BOX(TEXT("Add GameObject_To_Layer Failed"));
-                return;
-            }
-        }
-
-
-    }
-    else if (m_IsPicking_Create)
-    {
-        static float fInterval[3] = { 0.f, 0.f, 0.f };
-        ImGui::InputFloat3("Interval", fInterval);
-        m_vInterval = _float3(fInterval[0], fInterval[1], fInterval[2]);
-    }
-
-    /* 인스턴스 생성. */
-    ImGui::Checkbox("Picking Create", &m_IsPicking_Create);
-
-    ImGui::End();
-}
 
 
 /* 프로토타입 인덱스, 객체 이름, 모델 컴포넌트 이름.*/
@@ -680,19 +770,7 @@ void CMap_Tool::Picking_Create()
 
 #pragma region EDIT MODE
 
-void CMap_Tool::Render_Model_Edit()
-{
-    if (m_IsPossible_SaveLoad)
-        return;
-    
-    Render_Edit_Hierarchy();
-}
 
-/* Load Layer */
-void CMap_Tool::Load_Layer()
-{
-    m_LayerTable = m_pGameInstance->Export_EditLayer(ENUM_CLASS(m_eCurLevel));
-}
 
 
 /*
@@ -700,135 +778,58 @@ void CMap_Tool::Load_Layer()
 *  객체들이 생성되고 삭제될 수 있으므로 해당 상황마다 동적으로 불러와야 합니다.
 *  Layer에 변동사항이 있을때마다 호출합니다.
 */
-void CMap_Tool::Render_Edit_Hierarchy()
-{
-    ImGui::SetNextWindowPos({ g_iWinSizeX - 310.f, 10.f }, ImGuiCond_Always);
-    ImGui::SetNextWindowSize({ 300, 400 }, ImGuiCond_Once);
-    ImGui::Begin("Edit_Hierarchy", nullptr, ImGuiWindowFlags_NoCollapse);
-
-    /* ---------- 레이어 루프 ---------- */
-    for (auto itLayer = m_LayerTable.begin(); itLayer != m_LayerTable.end(); ++itLayer)
-    {
-        const std::wstring& tagW = itLayer->first;
-        CLayer* pLayer = itLayer->second;
-        std::string tag = WString_ToString(tagW);
-
-        bool layerSelected = (pLayer == m_pSelectedLayer);
-        ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_SpanFullWidth
-            | ImGuiTreeNodeFlags_DefaultOpen
-            | (layerSelected ? ImGuiTreeNodeFlags_Selected : 0);
-
-        bool open = ImGui::TreeNodeEx(tag.c_str(), flags);
-        if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
-            SelectObject(nullptr);              // 레이어만 클릭 → 오브젝트 선택 해제
-
-        /* ---------- 오브젝트 루프 ---------- */
-        if (open && pLayer)
-        {
-            for (CGameObject* pObj : pLayer->Get_GameObjects())
-            {
-                if (!pObj) continue;
-                std::string objTag = WString_ToString(pObj->Get_ObjectTag());
-
-                ImGui::PushID(pObj);           // 포인터로 ID 충돌 방지
-                bool objSel = (pObj == m_pSelectedObject);
-                if (ImGui::Selectable(objTag.c_str(), objSel))
-                    SelectObject(pObj);        // 트리 클릭 → 선택 동기화
-                ImGui::PopID();
-            }
-            ImGui::TreePop();
-        }
-    }
-
-    /* ---------- Inspector 창 ---------- */
-    if (m_pSelectedObject)
-    {
-        ImVec2 pos(ImGui::GetWindowPos().x - 310.f, ImGui::GetWindowPos().y);
-        Render_Edit_Inspector(pos);
-    }
-
-    ImGui::End();
-}
-
-
-void CMap_Tool::Render_Edit_Inspector(ImVec2 vPos)
-{
-    ImGui::SetNextWindowPos(vPos, ImGuiCond_Always);
-    ImGui::SetNextWindowSize(ImVec2(300, 250), ImGuiCond_Once);
-    if (!ImGui::Begin("Edit_Inspector"))
-    {
-        ImGui::End(); return;
-    }
-
-    ImGui::Text(m_Selected_EditObjTag.c_str());
+//void CMap_Tool::Render_Edit_Hierarchy()
+//{
+//    ImGui::SetNextWindowPos({ g_iWinSizeX - 310.f, 10.f }, ImGuiCond_Always);
+//    ImGui::SetNextWindowSize({ 300, 400 }, ImGuiCond_Once);
+//    ImGui::Begin("Edit_Hierarchy", nullptr, ImGuiWindowFlags_NoCollapse);
+//
+//    /* ---------- 레이어 루프 ---------- */
+//    for (auto itLayer = m_LayerTable.begin(); itLayer != m_LayerTable.end(); ++itLayer)
+//    {
+//        const std::wstring& tagW = itLayer->first;
+//        CLayer* pLayer = itLayer->second;
+//        std::string tag = WString_ToString(tagW);
+//
+//        bool layerSelected = (pLayer == m_pSelectedLayer);
+//        ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_SpanFullWidth
+//            | ImGuiTreeNodeFlags_DefaultOpen
+//            | (layerSelected ? ImGuiTreeNodeFlags_Selected : 0);
+//
+//        bool open = ImGui::TreeNodeEx(tag.c_str(), flags);
+//        if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
+//            SelectObject(nullptr);              // 레이어만 클릭 → 오브젝트 선택 해제
+//
+//        /* ---------- 오브젝트 루프 ---------- */
+//        if (open && pLayer)
+//        {
+//            for (CGameObject* pObj : pLayer->Get_GameObjects())
+//            {
+//                if (!pObj) continue;
+//                std::string objTag = WString_ToString(pObj->Get_ObjectTag());
+//
+//                ImGui::PushID(pObj);           // 포인터로 ID 충돌 방지
+//                bool objSel = (pObj == m_pSelectedObject);
+//                if (ImGui::Selectable(objTag.c_str(), objSel))
+//                    SelectObject(pObj);        // 트리 클릭 → 선택 동기화
+//                ImGui::PopID();
+//            }
+//            ImGui::TreePop();
+//        }
+//    }
+//
+//    /* ---------- Inspector 창 ---------- */
+//    if (m_pSelectedObject)
+//    {
+//        //ImVec2 pos(ImGui::GetWindowPos().x - 310.f, ImGui::GetWindowPos().y);
+//        Render_Edit_Inspector();
+//    }
+//
+//    ImGui::End();
+//}
 
 
-    /* ----- 선택 객체 없으면 나간다.  ----- */
-    if (m_pSelectedObject == nullptr)
-    {
-        ImGui::End(); return;
-    }
 
-    CTransform* pTransformCom = static_cast<CTransform*>(m_pSelectedObject->Get_Component(L"Com_Transform"));
-
-    /* ----- 편집 버퍼 (static) ----- */
-    static uint32_t cachedObjID = UINT32_MAX;
-    static float fPos[3] = {};
-    static float fRot[3] = {};
-    static float fScl[3] = { 1.f,1.f,1.f };
-    
-    /* 선택이 바뀌면 초기화 */
-    if (cachedObjID != m_Selected_EditObjID)
-    {
-        _float3 pos; XMStoreFloat3(&pos, pTransformCom->Get_State(STATE::POSITION));
-        _float3 scl = pTransformCom->Get_Scaled();
-        _float3 rot = { 0.f, 0.f, 0.f };
-
-        memcpy(fPos, &pos, sizeof(_float3));
-        memcpy(fRot, &rot, sizeof(_float3));
-        memcpy(fScl, &scl, sizeof(_float3));
-
-        cachedObjID = m_Selected_EditObjID;
-    }
-    
-    /* ----- ImGui 위젯 ----- */
-    ImGui::InputFloat3("Position", fPos);
-    ImGui::InputFloat3("Rotation", fRot);
-    ImGui::InputFloat3("Scale", fScl);
-
-    if (ImGui::Button("Apply"))
-    {
-        TransformData data{};
-        memcpy(&data.pos, fPos, sizeof(_float3)); data.pos.w = 1.f;
-        memcpy(&data.rot, fRot, sizeof(_float3));
-        memcpy(&data.scale, fScl, sizeof(_float3));
-
-        EditPayload payload;
-        payload.type = EEditType::Transform;
-        payload.data = data;
-
-        m_pGameInstance->Request_EditObject(
-            ENUM_CLASS(m_eCurLevel),
-            m_Selected_EditLayerTag,
-            m_Selected_EditObjID,
-            payload);
-    }
-
-    ImGui::SameLine();
-    // 오른쪽에 못붙이나?
-    if (ImGui::Button("Delete"))
-    {
-        m_pGameInstance->Request_DeleteObject(
-            ENUM_CLASS(m_eCurLevel),
-            m_Selected_EditLayerTag,
-            m_Selected_EditObjID
-        );
-
-        m_pSelectedObject = { nullptr };
-    }
-
-    ImGui::End();
-}
 
 void CMap_Tool::Handle_EditMode_SelectedObject()
 {

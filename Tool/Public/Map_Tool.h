@@ -42,8 +42,14 @@ public:
 	void Render();
 	void Render_CheckBox();
 	void SaveLoadMenu();
+
+	/* Create Child */
 	void Render_CreateModelChild();
+	void Render_Prototype_Inspector();
+	/* Edit Child */
 	void Redner_EditModelChild();
+	void Load_Layer();
+	void Render_Edit_Inspector();
 #pragma endregion
 
 	
@@ -55,7 +61,7 @@ public:
 public:
 	//void Render_Model_Create();
 	//void Render_Prototype_Hierarchy();
-	void Render_Prototype_Inspector();
+	
 	//void Render_Prototype_Inspector(ImVec2 vPos);
 	void Register_Prototype_Hierarchy(_uint iPrototypeLevelIndex, const _wstring& strObjectTag, const _wstring& strModelPrefix);
 	void Handle_CreateMode_SelectedObject();
@@ -65,9 +71,10 @@ public:
 #pragma region Edit Mode
 public:
 	void Render_Model_Edit();
-	void Load_Layer();
-	void Render_Edit_Hierarchy();
-	void Render_Edit_Inspector(ImVec2 vPos);
+
+	
+	//void Render_Edit_Inspector(ImVec2 vPos);
+	
 	void Handle_EditMode_SelectedObject();
 #pragma endregion
 
