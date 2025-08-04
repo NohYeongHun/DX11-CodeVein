@@ -1,116 +1,130 @@
 ﻿#include "Cell.h"
-
 CCell::CCell(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-    : m_pDevice { pDevice}
-    , m_pContext { pContext }
+	: m_pDevice{ pDevice }
+	, m_pContext{ pContext }
 {
-    Safe_AddRef(m_pDevice);
-    Safe_AddRef(m_pContext);
+	Safe_AddRef(m_pDevice);
+	Safe_AddRef(m_pContext);
 }
 
-HRESULT CCell::Initialize(const _float3* pPoints)
+HRESULT CCell::Initialize(const _float3* pPoints, _int iIndex)
 {
-    memcpy(m_vPoints, pPoints, sizeof(_float3) * ENUM_CLASS(CELLPOINT::END));
+	m_iIndex = iIndex;
+
+	memcpy(m_vPoints, pPoints, sizeof(_float3) * ENUM_CLASS(CELLPOINT::END));
+
+	_vector		vLine = {};
+
+	vLine = XMLoadFloat3(&m_vPoints[ENUM_CLASS(CELLPOINT::B)]) - XMLoadFloat3(&m_vPoints[ENUM_CLASS(CELLPOINT::A)]);
+	m_vNormals[ENUM_CLASS(LINE::AB)] = _float3(XMVectorGetZ(vLine) * -1.f, 0.f, XMVectorGetX(vLine));
+
+	vLine = XMLoadFloat3(&m_vPoints[ENUM_CLASS(CELLPOINT::C)]) - XMLoadFloat3(&m_vPoints[ENUM_CLASS(CELLPOINT::B)]);
+	m_vNormals[ENUM_CLASS(LINE::BC)] = _float3(XMVectorGetZ(vLine) * -1.f, 0.f, XMVectorGetX(vLine));
+
+	vLine = XMLoadFloat3(&m_vPoints[ENUM_CLASS(CELLPOINT::A)]) - XMLoadFloat3(&m_vPoints[ENUM_CLASS(CELLPOINT::C)]);
+	m_vNormals[ENUM_CLASS(LINE::CA)] = _float3(XMVectorGetZ(vLine) * -1.f, 0.f, XMVectorGetX(vLine));
+
 
 #ifdef _DEBUG
-    m_pVIBuffer = CVIBuffer_Cell::Create(m_pDevice, m_pContext, pPoints);
-    if (nullptr == m_pVIBuffer)
-        return E_FAIL;
+	m_pVIBuffer = CVIBuffer_Cell::Create(m_pDevice, m_pContext, pPoints);
+	if (nullptr == m_pVIBuffer)
+		return E_FAIL;
 #endif
 
-    return S_OK;
+	return S_OK;
 }
 
-_bool CCell::isIn(_fvector vPosition, _int* pNeighborIndex, _float3* vLastNormal)
+_bool CCell::isIn(_fvector vPosition, _int* pNeighborIndex)
 {
-    for (_uint i = 0; i < LINE_END; ++i)
-    {
-        _vector		vDir = XMVector3Normalize(vPosition - XMLoadFloat3(&m_vPoints[i]));
-        if (0 < XMVectorGetX(XMVector3Dot(vDir, XMVector3Normalize(XMLoadFloat3(&m_vNormals[i])))))
-        {
-            *pNeighborIndex = m_iNeighborIndices[i];
-            if (vLastNormal != nullptr)
-                *vLastNormal = m_vNormals[i];
-            return false;
-        }
-        if (vLastNormal != nullptr)
-            *vLastNormal = m_vNormals[i];
-    }
-    return true;
+	for (_uint i = 0; i < ENUM_CLASS(LINE::END); ++i)
+	{
+		_vector	vDir = XMVector3Normalize(vPosition - XMVectorSetW(XMLoadFloat3(&m_vPoints[i]), 1.f));
+		_vector vNormal = XMVector3Normalize(XMLoadFloat3(&m_vNormals[i]));
+
+		if (0 < XMVectorGetX(XMVector3Dot(vDir, vNormal)))
+		{
+			*pNeighborIndex = m_iNeighborIndices[i];
+
+			return false;
+		}
+	}
+
+	return true;
 }
 
-_bool CCell::Compare_Points(const _float3* pSourPoint, const _float3* pDestPoint)
+_bool CCell::Compare_Points(_fvector vSourPoint, _fvector vDestPoint)
 {
-    if (XMVector3Equal(XMLoadFloat3(&m_vPoints[ENUM_CLASS(CELLPOINT::A)]), XMLoadFloat3(pSourPoint)))
-    {
-        if (XMVector3Equal(XMLoadFloat3(&m_vPoints[ENUM_CLASS(CELLPOINT::B)]), XMLoadFloat3(pDestPoint)))
-            return true;
+	if (true == XMVector3Equal(XMLoadFloat3(&m_vPoints[ENUM_CLASS(CELLPOINT::A)]), vSourPoint))
+	{
+		if (true == XMVector3Equal(XMLoadFloat3(&m_vPoints[ENUM_CLASS(CELLPOINT::B)]), vDestPoint))
+			return true;
+		if (true == XMVector3Equal(XMLoadFloat3(&m_vPoints[ENUM_CLASS(CELLPOINT::C)]), vDestPoint))
+			return true;
+	}
 
-        if (XMVector3Equal(XMLoadFloat3(&m_vPoints[ENUM_CLASS(CELLPOINT::C)]), XMLoadFloat3(pDestPoint)))
-            return true;
-    }
+	if (true == XMVector3Equal(XMLoadFloat3(&m_vPoints[ENUM_CLASS(CELLPOINT::B)]), vSourPoint))
+	{
+		if (true == XMVector3Equal(XMLoadFloat3(&m_vPoints[ENUM_CLASS(CELLPOINT::C)]), vDestPoint))
+			return true;
+		if (true == XMVector3Equal(XMLoadFloat3(&m_vPoints[ENUM_CLASS(CELLPOINT::A)]), vDestPoint))
+			return true;
+	}
 
-    if (XMVector3Equal(XMLoadFloat3(&m_vPoints[ENUM_CLASS(CELLPOINT::B)]), XMLoadFloat3(pSourPoint)))
-    {
-        if (XMVector3Equal(XMLoadFloat3(&m_vPoints[ENUM_CLASS(CELLPOINT::C)]), XMLoadFloat3(pDestPoint)))
-            return true;
+	if (true == XMVector3Equal(XMLoadFloat3(&m_vPoints[ENUM_CLASS(CELLPOINT::C)]), vSourPoint))
+	{
+		if (true == XMVector3Equal(XMLoadFloat3(&m_vPoints[ENUM_CLASS(CELLPOINT::A)]), vDestPoint))
+			return true;
+		if (true == XMVector3Equal(XMLoadFloat3(&m_vPoints[ENUM_CLASS(CELLPOINT::B)]), vDestPoint))
+			return true;
+	}
 
-        if (XMVector3Equal(XMLoadFloat3(&m_vPoints[ENUM_CLASS(CELLPOINT::A)]), XMLoadFloat3(pDestPoint)))
-            return true;
-    }
-
-    if (XMVector3Equal(XMLoadFloat3(&m_vPoints[ENUM_CLASS(CELLPOINT::C)]), XMLoadFloat3(pSourPoint)))
-    {
-        if (XMVector3Equal(XMLoadFloat3(&m_vPoints[ENUM_CLASS(CELLPOINT::A)]), XMLoadFloat3(pDestPoint)))
-            return true;
-
-        if (XMVector3Equal(XMLoadFloat3(&m_vPoints[ENUM_CLASS(CELLPOINT::B)]), XMLoadFloat3(pDestPoint)))
-            return true;
-    }
-
-    return false;
+	return false;
 }
 
-_vector CCell::Get_Center()
+_float CCell::Compute_Height(_fvector vLocalPos)
 {
-    _float PositionX = (m_vPoints[ENUM_CLASS(CELLPOINT::A)].x + m_vPoints[ENUM_CLASS(CELLPOINT::B)].x + m_vPoints[ENUM_CLASS(CELLPOINT::C)].x) / 3.f;
-    _float PositionY = (m_vPoints[ENUM_CLASS(CELLPOINT::A)].y + m_vPoints[ENUM_CLASS(CELLPOINT::B)].y + m_vPoints[ENUM_CLASS(CELLPOINT::C)].y) / 3.f;
-    _float PositionZ = (m_vPoints[ENUM_CLASS(CELLPOINT::A)].z + m_vPoints[ENUM_CLASS(CELLPOINT::B)].z + m_vPoints[ENUM_CLASS(CELLPOINT::C)].z) / 3.f;
-    return XMVectorSet(PositionX, PositionY, PositionZ, 1.f);
+	// y = (-ax - cz - d) / b;
+
+	_vector		vPlane = XMPlaneFromPoints(
+		XMVectorSetW(XMLoadFloat3(&m_vPoints[ENUM_CLASS(CELLPOINT::A)]), 1.f),
+		XMVectorSetW(XMLoadFloat3(&m_vPoints[ENUM_CLASS(CELLPOINT::B)]), 1.f),
+		XMVectorSetW(XMLoadFloat3(&m_vPoints[ENUM_CLASS(CELLPOINT::C)]), 1.f)
+	);
+
+	return (XMVectorGetX(vPlane) * -1.f * XMVectorGetX(vLocalPos) - vPlane.m128_f32[2] * vLocalPos.m128_f32[2] - vPlane.m128_f32[3]) / vPlane.m128_f32[1];
 }
 
 #ifdef _DEBUG
 HRESULT CCell::Render()
 {
-    m_pVIBuffer->Bind_Resources();
-    m_pVIBuffer->Render();
+	m_pVIBuffer->Bind_Resources();
+	m_pVIBuffer->Render();
 
-    return S_OK;
+	return S_OK;
 }
 #endif
 
-
-CCell* CCell::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _float3* pPoints)
+CCell* CCell::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _float3* pPoints, _int iIndex)
 {
-    CCell* pInstance = new CCell(pDevice, pContext);
+	CCell* pInstance = new CCell(pDevice, pContext);
 
-    if (FAILED(pInstance->Initialize(pPoints)))
-    {
-        MSG_BOX(TEXT("Failed to Created : CCell"));
-        Safe_Release(pInstance);
-    }
+	if (FAILED(pInstance->Initialize(pPoints, iIndex)))
+	{
+		MSG_BOX(TEXT("Failed to Created : CCell"));
+		Safe_Release(pInstance);
+	}
 
-    return pInstance;
+	return pInstance;
 }
 
 void CCell::Free()
 {
-    __super::Free();
+	__super::Free();
 
 #ifdef _DEBUG
-    Safe_Release(m_pVIBuffer);
+	Safe_Release(m_pVIBuffer);
 #endif
 
-    Safe_Release(m_pDevice);
-    Safe_Release(m_pContext);
+	Safe_Release(m_pDevice);
+	Safe_Release(m_pContext);
 }

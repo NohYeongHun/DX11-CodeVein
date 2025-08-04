@@ -42,6 +42,9 @@ void CMap::Priority_Update(_float fTimeDelta)
 void CMap::Update(_float fTimeDelta)
 {
     __super::Update(fTimeDelta);
+
+    if (m_pNavigationCom)
+        m_pNavigationCom->Update(m_pTransformCom->Get_WorldMatrix());
 }
 
 void CMap::Late_Update(_float fTimeDelta)
@@ -57,25 +60,29 @@ HRESULT CMap::Render()
     if (FAILED(Ready_Render_Resources()))
         return E_FAIL;
 
-    _uint iNumMeshes = m_pModelCom->Get_NumMeshes();
-    for (_uint i = 0; i < iNumMeshes; i++)
-    {
-        m_pModelCom->Bind_Materials(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE, 0);
+#ifdef _DEBUG
+    m_pNavigationCom->Render();
+#endif
 
-        if (FAILED(m_pShaderCom->Begin(0)))
-        {
-            CRASH("Shader Begin Failed");
-            return E_FAIL;
-        }
-            
-
-        if (FAILED(m_pModelCom->Render(i)))
-        {
-            CRASH("Shader Begin Failed");
-            return E_FAIL;
-        }
-            
-    }
+    //_uint iNumMeshes = m_pModelCom->Get_NumMeshes();
+    //for (_uint i = 0; i < iNumMeshes; i++)
+    //{
+    //    m_pModelCom->Bind_Materials(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE, 0);
+    //
+    //    if (FAILED(m_pShaderCom->Begin(0)))
+    //    {
+    //        CRASH("Shader Begin Failed");
+    //        return E_FAIL;
+    //    }
+    //        
+    //
+    //    if (FAILED(m_pModelCom->Render(i)))
+    //    {
+    //        CRASH("Shader Begin Failed");
+    //        return E_FAIL;
+    //    }
+    //        
+    //}
     
 
     return S_OK;
@@ -112,7 +119,14 @@ HRESULT CMap::Ready_Components(MAP_DESC* pDesc)
         , TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom), &Desc)))
         return E_FAIL;
 
-    
+    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Navigation"),
+        TEXT("Com_Navigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom), nullptr)))
+    {
+
+        CRASH("Failed Initialize Navigation Com");
+        return E_FAIL;
+    }
+        
 
     return S_OK;
 }
@@ -168,4 +182,5 @@ void CMap::Free()
     __super::Free();
     Safe_Release(m_pModelCom);
     Safe_Release(m_pShaderCom);
+    Safe_Release(m_pNavigationCom);
 }

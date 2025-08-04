@@ -76,13 +76,27 @@ void CPlayer::Update(_float fTimeDelta)
 {
     __super::Update(fTimeDelta);
     Update_KeyInput();
-
     HandleState(fTimeDelta);
+
+    if (m_pGameInstance->Get_KeyPress(DIK_W))
+        m_pTransformCom->Go_Straight(fTimeDelta, m_pNavigationCom);
+    if (m_pGameInstance->Get_KeyPress(DIK_A))
+        m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta * -1.f);
+    if (m_pGameInstance->Get_KeyPress(DIK_D))
+        m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTimeDelta);
+    
 
 }
 
 void CPlayer::Late_Update(_float fTimeDelta)
 {
+
+    _float4 vDefaultPos = {}; 
+    XMStoreFloat4(&vDefaultPos, m_pTransformCom->Get_State(STATE::POSITION));
+    OutPutDebugFloat4(vDefaultPos);
+    m_pTransformCom->Set_State(STATE::POSITION,
+        m_pNavigationCom->Compute_OnCell(m_pTransformCom->Get_State(STATE::POSITION)));
+
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::BLEND, this)))
         return;
 
@@ -94,20 +108,48 @@ HRESULT CPlayer::Render()
 {
 #ifdef _DEBUG
     ImGuiIO& io = ImGui::GetIO();
+
+    // 기존 Player Debug Window
     ImVec2 windowPos = ImVec2(10.f, io.DisplaySize.y - 350.f);
     ImVec2 windowSize = ImVec2(300.f, 300.f);
 
-    // Cond_Once: 최초 한 번만 위치 적용 → 이후 드래그 가능
     ImGui::SetNextWindowPos(windowPos, ImGuiCond_Once);
     ImGui::SetNextWindowSize(windowSize, ImGuiCond_Once);
 
-    ImGui::Begin("Debug", nullptr, ImGuiWindowFlags_NoCollapse);
+    ImGui::Begin("Player Debug", nullptr, ImGuiWindowFlags_NoCollapse);
+
     _float3 vPos = {};
-    _float3 vAngle = {};
     XMStoreFloat3(&vPos, m_pTransformCom->Get_State(STATE::POSITION));
     ImGui::Text("Player Pos: (%.2f, %.2f, %.2f)", vPos.x, vPos.y, vPos.z);
-    //ImGui::Text("Player Rotation : (%.2f, %.2f, %.2f)", vPos.x, vPos.y, vPos.z);
+
+    // === Navigation Debug UI 추가 ===
+    ImGui::Separator();
+    ImGui::Text("=== Navigation Debug ===");
+
+    if (m_pNavigationCom)
+    {
+        _int cellCount = m_pNavigationCom->Get_CellCount();
+        ImGui::Text("Total Cells: %d", cellCount);
+
+        // 현재 플레이어가 어떤 Cell에 있는지 확인
+        _int currentCell = m_pNavigationCom->Find_Cell_By_Position(vPos);
+        ImGui::Text("Current Cell: %d", currentCell);
+
+        // Cell별 정보 표시
+        //static bool showAllCells = false;
+        //ImGui::Checkbox("Show All Cells Info", &showAllCells);
+    }
+    else
+    {
+        ImGui::Text("Navigation Component: NULL");
+    }
+
     ImGui::End();
+
+    // Navigation 렌더링
+    if (m_pNavigationCom)
+        m_pNavigationCom->Render();
+
 #endif // _DEBUG
 
     if (FAILED(Ready_Render_Resources()))
@@ -505,8 +547,8 @@ void CPlayer::On_Collision_Exit(CGameObject* pOther)
 void CPlayer::HandleState(_float fTimeDelta)
 {
 
-    if (nullptr != m_pFsmCom)
-        m_pFsmCom->Update(fTimeDelta);
+    //if (nullptr != m_pFsmCom)
+    //    m_pFsmCom->Update(fTimeDelta);
 
     if (true == m_pModelCom->Play_Animation(fTimeDelta))
     {
@@ -612,6 +654,14 @@ HRESULT CPlayer::Ready_Components(PLAYER_DESC* pDesc)
         , TEXT("Prototype_Component_Model_Player")
         , TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom), &Desc)))
         return E_FAIL;
+
+    CNavigation::NAVIGATION_DESC        NaviDesc{};
+    NaviDesc.iCurrentCellIndex = 0;
+
+    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(m_eCurLevel), TEXT("Prototype_Component_Navigation"),
+        TEXT("Com_Navigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom), &NaviDesc)))
+        return E_FAIL;
+
 
     return S_OK;
 }
@@ -779,6 +829,7 @@ void CPlayer::Free()
     Safe_Release(m_pShaderCom);
     Safe_Release(m_pModelCom);
     Safe_Release(m_pPlayerWeapon);
+    Safe_Release(m_pNavigationCom);
     
         
 }

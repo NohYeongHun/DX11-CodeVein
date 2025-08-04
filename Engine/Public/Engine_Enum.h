@@ -5,7 +5,7 @@ namespace Engine
 {
 	
 	enum class CELLPOINT { A, B, C, END };
-
+	enum class LINE { AB, BC, CA, END };
 	enum class MODELTYPE : _ubyte { 
 		ANIM = 0
 		, NONANIM = 1

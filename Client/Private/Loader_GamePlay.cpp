@@ -65,6 +65,13 @@ HRESULT CLoader_GamePlay::Loading_Resource(ID3D11Device* pDevice, ID3D11DeviceCo
 		return E_FAIL;
 	}
 
+	if (FAILED(Add_Prototype_Navigation(pDevice, pContext, pGameInstance)))
+	{
+		CRASH("Create Navigation Failed");
+		MSG_BOX(TEXT("Create Failed Loading : GamePlay Navigation"));
+		return E_FAIL;
+	}
+
 	return S_OK;
 }
 
@@ -282,5 +289,19 @@ HRESULT CLoader_GamePlay::Add_Prototype_SkyBox(ID3D11Device* pDevice, ID3D11Devi
 		
 
 	return S_OK;
+}
+
+HRESULT CLoader_GamePlay::Add_Prototype_Navigation(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
+{
+	/* Prototype_Component_Navigation */
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level), TEXT("Prototype_Component_Navigation"),
+		CNavigation::Create(pDevice, pContext, TEXT("../Bin/DataFiles/Navigation.dat")))))
+	{
+		CRASH("Failed Load Navigation File");
+		return E_FAIL;
+	}
+
+	return S_OK;
+		
 }
 

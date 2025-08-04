@@ -34,7 +34,7 @@ public:
 private:
 	class CLoad_Model* m_pModelCom = { nullptr };
 	class CShader* m_pShaderCom = { nullptr };
-
+	class CNavigation* m_pNavigationCom = { nullptr };
 
 private:
 	HRESULT Ready_Components(MAP_DESC* pDesc);

@@ -35,6 +35,12 @@ HRESULT CLevel_GamePlay::Initialize_Clone()
 		return E_FAIL;
 	}
 
+	if (FAILED(Ready_Layer_Map(TEXT("Layer_Map"))))
+	{
+		CRASH("Failed Ready_Layer_Map");
+		return E_FAIL;
+	}
+
 	//if (FAILED(Ready_Layer_SkyBoss(TEXT("Layer_SkyBoss"))))
 	//{
 	//	CRASH("Failed Layer_SkyBoss");
@@ -48,29 +54,17 @@ HRESULT CLevel_GamePlay::Initialize_Clone()
 	//	return E_FAIL;
 	//}
 
-	
-
-	
-
-
-	if (FAILED(Ready_Layer_Map(TEXT("Layer_Map"))))
-	{
-		CRASH("Failed Ready_Layer_Map");
-		return E_FAIL;
-	}
-
 	if (FAILED(Ready_Lights()))
 	{
 		CRASH("Failed Light");
 		return E_FAIL;
 	}
-	
 
-	if (FAILED(Ready_Layer_BackGround(TEXT("Layer_BackGround"))))
+	/*if (FAILED(Ready_Layer_BackGround(TEXT("Layer_BackGround"))))
 	{
 		CRASH("Failed Ready_Layer_BackGround");
 		return E_FAIL;
-	}
+	}*/
 
 
 	if (FAILED(Ready_Layer_Effect(TEXT("Layer_Effect"))))
@@ -81,7 +75,7 @@ HRESULT CLevel_GamePlay::Initialize_Clone()
 	
 	if (FAILED(Ready_Layer_SkyBox(TEXT("Layer_SkyBox"))))
 	{
-		CRASH("Failed Ready_Layer_");
+		CRASH("Failed Ready_Layer_SkyBox");
 		return E_FAIL;
 	}
 
@@ -224,6 +218,12 @@ HRESULT CLevel_GamePlay::Ready_Layer_Player(const _wstring& strLayerTag)
 	//	CRASH("Change Camera Failed");
 	//	return E_FAIL;
 	//}
+
+	/*if (FAILED(m_pGameInstance->Change_Camera(TEXT("FreeCamera"), ENUM_CLASS(m_eCurLevel))))
+	{
+		CRASH("Change Camera Failed");
+		return E_FAIL;
+	}*/
 
 	// 메인 카메라 변경.
 	if (FAILED(m_pGameInstance->Change_Camera(TEXT("PlayerCamera"), ENUM_CLASS(LEVEL::GAMEPLAY))))

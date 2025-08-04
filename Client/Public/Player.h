@@ -147,6 +147,8 @@ private:
 	class CFsm* m_pFsmCom = { nullptr };
 	class CCamera_Player* m_pPlayerCamera = { nullptr };
 	LEVEL m_eCurLevel = { LEVEL::END };
+
+	class CNavigation* m_pNavigationCom = { nullptr };
 #pragma endregion
 
 
