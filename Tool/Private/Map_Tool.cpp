@@ -131,6 +131,7 @@ void CMap_Tool::Render()
                 }
                 if (ImGui::BeginTabItem("Show Edit Model List"))
                 {
+                    Redner_EditModelChild();
                     //Show_CurrentModelList();
                     ImGui::EndTabItem();
                 }
@@ -164,12 +165,17 @@ void CMap_Tool::Render_CheckBox()
 {
     if (!m_IsEditNavigation)
     {
-        ImGui::Checkbox("Save Model", &m_IsEditModel);
+        ImGui::Checkbox("Edit Model", &m_IsEditModel);
         ImGui::SameLine();
     }
     if (!m_IsEditModel)
     {
-        ImGui::Checkbox("Save Navigation", &m_IsEditNavigation);
+        ImGui::Checkbox("Edit Navigation", &m_IsEditNavigation);
+        ImGui::SameLine();
+    }
+    if (!m_IsEditMap)
+    {
+        ImGui::Checkbox("Edit Map", &m_IsEditMap);
     }
 }
 
@@ -186,8 +192,6 @@ void CMap_Tool::Render_SaveLoad()
     {
         if (ImGui::BeginMenu("File"))
         {
-            
-
             if (ImGui::MenuItem("open"))
             {
                 IGFD::FileDialogConfig config;
@@ -304,7 +308,7 @@ void CMap_Tool::Render_CreateModelChild()
     _wstring objTag = {};
     _wstring modelTag = {};
 
-    ImGui::BeginChild("left pane", ImVec2(200, 0), true);
+    ImGui::BeginChild("left pane", ImVec2(500, 0), true);
 
 
     static int iSelectedIndex = -1;
@@ -328,6 +332,54 @@ void CMap_Tool::Render_CreateModelChild()
     if (iSelectedIndex >= 0 && iSelectedIndex < m_PrototypeNames.size())
         Render_Prototype_Inspector();
 
+    ImGui::EndChild();
+}
+
+void CMap_Tool::Redner_EditModelChild()
+{
+    ImGui::BeginChild("Middle pane", ImVec2(500, 0), true);
+
+    Load_Layer();
+    /* ---------- 레이어 루프 ---------- */
+    for (auto itLayer = m_LayerTable.begin(); itLayer != m_LayerTable.end(); ++itLayer)
+    {
+        const std::wstring& tagW = itLayer->first;
+        CLayer* pLayer = itLayer->second;
+        std::string tag = WString_ToString(tagW);
+
+        bool layerSelected = (pLayer == m_pSelectedLayer);
+        ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_SpanFullWidth
+            | ImGuiTreeNodeFlags_DefaultOpen
+            | (layerSelected ? ImGuiTreeNodeFlags_Selected : 0);
+
+        bool open = ImGui::TreeNodeEx(tag.c_str(), flags);
+        if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
+            SelectObject(nullptr);              // 레이어만 클릭 → 오브젝트 선택 해제
+
+        /* ---------- 오브젝트 루프 ---------- */
+        if (open && pLayer)
+        {
+            for (CGameObject* pObj : pLayer->Get_GameObjects())
+            {
+                if (!pObj) continue;
+                std::string objTag = WString_ToString(pObj->Get_ObjectTag());
+
+                ImGui::PushID(pObj);           // 포인터로 ID 충돌 방지
+                bool objSel = (pObj == m_pSelectedObject);
+                if (ImGui::Selectable(objTag.c_str(), objSel))
+                    SelectObject(pObj);        // 트리 클릭 → 선택 동기화
+                ImGui::PopID();
+            }
+            ImGui::TreePop();
+        }
+    }
+
+    /* ---------- Inspector 창 ---------- */
+    if (m_pSelectedObject)
+    {
+        ImVec2 pos(ImGui::GetWindowPos().x - 310.f, ImGui::GetWindowPos().y);
+        Render_Edit_Inspector(pos);
+    }
     ImGui::EndChild();
 }
 
@@ -355,11 +407,9 @@ void CMap_Tool::Render_Debug_Window()
     _float3 camPos = {};
     XMStoreFloat3(&camPos,m_pCameraTransformCom->Get_State(STATE::POSITION));
     ImGui::Text("Camera Pos: (%.2f, %.2f, %.2f)", camPos.x, camPos.y, camPos.z);
-
-    const char* modeStr = (m_eToolMode == TOOLMODE::CREATE) ? "CREATE" : "EDIT";
-    ImGui::Text("Tool Mode: %s", modeStr);
     ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
-
+    //const char* modeStr = (m_eToolMode == TOOLMODE::CREATE) ? "CREATE" : "EDIT";
+    //ImGui::Text("Tool Mode: %s", modeStr);
    
 
     // Selected 되어있을 때만.
@@ -377,10 +427,11 @@ void CMap_Tool::Render_Debug_Window()
 
     if (m_pSelectedObject)
     {
-        //_float3 pickingWorld = {};
-
+        // Local 좌표계
         ImGui::Text("Picking Local: (%.2f, %.2f, %.2f)"
             , m_ModelPickingDesc.vHitPoint.x, m_ModelPickingDesc.vHitPoint.y, m_ModelPickingDesc.vHitPoint.z);
+
+        // World 좌표계 => World 좌표계로 Navigation 설치?
         ImGui::Text("Picking World: (%.2f, %.2f, %.2f)"
             , m_ModelPickingDesc.vHitWorldPoint.x, m_ModelPickingDesc.vHitWorldPoint.y, m_ModelPickingDesc.vHitWorldPoint.z);
     }
@@ -390,38 +441,38 @@ void CMap_Tool::Render_Debug_Window()
     // 체크박스 추가 - 피킹 가능 여부
     ImGui::Checkbox("Enable Picking", &m_IsPossible_Picking);
     // 체크박스 추가 - 파일 Load Save 여부
-    ImGui::Checkbox("Enable SaveLoad", &m_IsPossible_SaveLoad);
+    //ImGui::Checkbox("Enable SaveLoad", &m_IsPossible_SaveLoad);
 
 
 
-    if (m_eToolMode == TOOLMODE::CREATE)
-        ImGui::Text("Select Model : %s", m_Selected_PrototypeModelTag.c_str());
-    else if(m_eToolMode == TOOLMODE::EDIT)
-        ImGui::Text("Select Object : %s", m_Selected_EditObjTag.c_str());
+    //if (m_eToolMode == TOOLMODE::CREATE)
+    //    ImGui::Text("Select Model : %s", m_Selected_PrototypeModelTag.c_str());
+    //else if(m_eToolMode == TOOLMODE::EDIT)
+    //    ImGui::Text("Select Object : %s", m_Selected_EditObjTag.c_str());
 
-    const char* items[] = { "Map", "Model" };
-
-    // enum -> int
-    int iCurMode = static_cast<int>(m_eSaveMode);
-    ImGui::Combo("Save Type", static_cast<int*>(&iCurMode), items, IM_ARRAYSIZE(items));
-        m_eSaveMode = static_cast<SAVEMODE>(iCurMode); // int → enum
+    //const char* items[] = { "Map", "Model" };
+    //
+    //// enum -> int
+    //int iCurMode = static_cast<int>(m_eSaveMode);
+    //ImGui::Combo("Save Type", static_cast<int*>(&iCurMode), items, IM_ARRAYSIZE(items));
+    //    m_eSaveMode = static_cast<SAVEMODE>(iCurMode); // int → enum
     
-    if (ImGui::Button("Edit Mode"))
-    {
-        m_eToolMode = TOOLMODE::EDIT;
-        // 현재 생성된 Layer 정보를 Load합니다.
-        Load_Layer();
-    }
+    //if (ImGui::Button("Edit Mode"))
+    //{
+    //    m_eToolMode = TOOLMODE::EDIT;
+    //    // 현재 생성된 Layer 정보를 Load합니다.
+    //    Load_Layer();
+    //}
     
-    if (ImGui::Button("Create Mode"))
-    {
-        m_eToolMode = TOOLMODE::CREATE;
-    }
-
-    if (ImGui::Button("Nav Mode"))
-    {
-        m_eToolMode = TOOLMODE::NAV_MODE;
-    }
+    //if (ImGui::Button("Create Mode"))
+    //{
+    //    m_eToolMode = TOOLMODE::CREATE;
+    //}
+    //
+    //if (ImGui::Button("Nav Mode"))
+    //{
+    //    m_eToolMode = TOOLMODE::NAV_MODE;
+    //}
 
 
     ImGui::End();
@@ -894,60 +945,6 @@ void CMap_Tool::SelectObject(CGameObject* pObj)
     m_pSelectedLayer = nullptr; // 못 찾았을 때
 }
 
-void CMap_Tool::Default_Render()
-{
-    ImGui::Text("Settings");
-    ImGuiStyle& style = ImGui::GetStyle();
-    ImVec4 WindowColor = style.Colors[ImGuiCol_WindowBg];
-    ImGui::SliderFloat("Editor Opacity", &m_fEditorAlpha, 0.0f, 1.0f);
-    const ImVec4 NewColor = ImVec4(WindowColor.x, WindowColor.y, WindowColor.z, m_fEditorAlpha);
-    style.Colors[ImGuiCol_WindowBg] = NewColor;
-    ImGui::NewLine();
-
-    //메뉴바
-    if (ImGui::BeginMenuBar())
-    {
-        // 메뉴
-        if (ImGui::BeginMenu("Files"))
-        {
-            if (ImGui::MenuItem("save"))
-                m_bSave = true;
-            ImGui::Separator();
-            if (ImGui::MenuItem("open"))
-                m_bLoad = true;
-            ImGui::EndMenu();
-        }
-        if (ImGui::BeginMenu("Debug"))
-        {
-            ImGui::MenuItem("Show Mouse Pos", NULL, &m_bShowSimpleMousePos);
-            ImGui::Separator();
-            ImGui::MenuItem("Show Picked Object", NULL, &m_bShowPickedObject);
-            ImGui::EndMenu();
-        }
-        ImGui::EndMenuBar();
-    }
-
-    ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_None;
-    if (ImGui::BeginTabBar("MyTabBar", tab_bar_flags))
-    {
-        if (ImGui::BeginTabItem("Navigation Tool"))
-        {
-            ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "Picking for Navigation"); ImGui::SameLine();
-            ImGui::Checkbox("##Picking for Navigation", &m_bNaviPicking);
-
-            ImGui::SameLine();
-
-            ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "Show Only Navigation"); ImGui::SameLine();
-            ImGui::Checkbox("##Show Only Navigation", &m_bShowOnlyNavi);
-
-            ImGui::Text("This is the navigation tool ");
-            //Set_Navigation();
-            ImGui::EndTabItem();
-        }
-    }
-
-    
-}
 
 #pragma endregion
 

@@ -43,6 +43,7 @@ public:
 	void Render_CheckBox();
 	void SaveLoadMenu();
 	void Render_CreateModelChild();
+	void Redner_EditModelChild();
 #pragma endregion
 
 	
@@ -52,8 +53,8 @@ public:
 
 #pragma region Create Mode
 public:
-	void Render_Model_Create();
-	void Render_Prototype_Hierarchy();
+	//void Render_Model_Create();
+	//void Render_Prototype_Hierarchy();
 	void Render_Prototype_Inspector();
 	//void Render_Prototype_Inspector(ImVec2 vPos);
 	void Register_Prototype_Hierarchy(_uint iPrototypeLevelIndex, const _wstring& strObjectTag, const _wstring& strModelPrefix);
@@ -130,6 +131,7 @@ private:
 #pragma region SAVE_LOAD 시 사용
 	_bool m_IsEditModel = { false };
 	_bool m_IsEditNavigation = { false };
+	_bool m_IsEditMap = { false };
 #pragma endregion
 
 
