@@ -770,16 +770,6 @@ void CMap_Tool::Render_NavigationChild()
             m_pNavigation_Manager->Clear_Cells();
 
 
-
-        //if (ImGui::Button("Save Navigation"))
-        //{
-        //    Save_Navigation();
-        //}
-        //if (ImGui::Button("Load Navigation"))
-        //{
-        //    Load_Navigation();
-        //}
-
         ImGui::EndChild();
         ImGui::EndGroup();
     }

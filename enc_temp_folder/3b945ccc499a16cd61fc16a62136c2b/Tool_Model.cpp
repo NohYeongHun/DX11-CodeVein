@@ -242,7 +242,7 @@ _bool CTool_Model::Picking(_float3* PickingPoint)
 		{
 			bAnyHit = true;
 
-			// 가장 가까운 충돌만 결과로 저장
+			// 🔥 핵심: 가장 가까운 충돌만 결과로 저장
 			if (fTempDist < fMinDist)
 			{
 				fMinDist = fTempDist;

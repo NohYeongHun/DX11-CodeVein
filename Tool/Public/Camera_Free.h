@@ -27,6 +27,10 @@ public:
 
 private:
 	_float m_fMouseSensor = {};
+	_float m_fTargetYaw = {};
+	_float m_fCurrentPitch = {};
+private:
+	void Handle_Mouse_Rotation(_float fTimeDelta);
 
 public:
 	static CCamera_Free* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

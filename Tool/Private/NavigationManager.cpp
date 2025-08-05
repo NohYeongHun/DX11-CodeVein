@@ -292,7 +292,7 @@ void CNavigationManager::Click_Position(_vector vPosition)
     vClickPosition = Find_MinDistance(vPosition);
 
     //만약 순회해서 찾은 셀의 점이 거리가 멀다면 그냥 기존에 찍은 점을 pushback하게 한다.
-    if (m_fMinDistance > 0.7f)
+    if (m_fMinDistance > 1.f)
         XMStoreFloat3(&vClickPosition, vPosition);
 
     m_fMinDistance = FLT_MAX;

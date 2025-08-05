@@ -17,8 +17,6 @@ public:
 	
 	void  Add_PickingGroup(CGameObject* pGameObject);
 	void  Out_PickingGroup(CGameObject* pGameObject);
-	void  Set_PickedObj(CGameObject* pGameObject);
-	void  Mouse_Intersect_UI(_bool Data) { m_bMouseInUI = Data; }
 
 
 public: /*Get*/
