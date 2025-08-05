@@ -21,6 +21,10 @@ HRESULT CWolfDevil::Initialize_Prototype()
 
 HRESULT CWolfDevil::Initialize_Clone(void* pArg)
 {
+#ifdef _DEBUG
+    Initialize_Debug();
+#endif // _DEBUG
+
     WOLFDEVIL_DESC* pDesc = static_cast<WOLFDEVIL_DESC*>(pArg);
 
     if (FAILED(__super::Initialize_Clone(pDesc)))
@@ -127,7 +131,7 @@ void CWolfDevil::Late_Update(_float fTimeDelta)
 
     m_pTransformCom->Set_State(STATE::POSITION
         , m_pNavigationCom->Compute_OnCell(
-            m_pTransformCom->Get_State(STATE::POSITION), m_fOffsetY * 0.5f));
+            m_pTransformCom->Get_State(STATE::POSITION), m_fOffsetY + 0.2f));
 
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::BLEND, this)))
         return;
@@ -137,6 +141,11 @@ void CWolfDevil::Late_Update(_float fTimeDelta)
 
 HRESULT CWolfDevil::Render()
 {
+#ifdef _DEBUG
+    BoundingBoxRender(m_pModelCom->Get_BoundingBox(), m_pTransformCom->Get_WorldMatrix());
+#endif // _DEBUG
+
+
     if (FAILED(Ready_Render_Resources()))
     {
         CRASH("Ready Render Resource Failed");

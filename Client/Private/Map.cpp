@@ -29,7 +29,8 @@ HRESULT CMap::Initialize_Clone(void* pArg)
         return E_FAIL;
 
 
-    m_pTransformCom->Set_Scale({ 1.5f, 1.f, 1.5f });
+    /* 2배 기준으로 NaviMesh 깔았음. */
+    m_pTransformCom->Set_Scale(pDesc->vScale);
     // Player 정면 바라보게 하기?
     //m_pTransformCom->Rotation(XMVectorSet(1.f, 0.f, 0.f, 0.f), XMConvertToRadians(270.f));
 
@@ -46,7 +47,17 @@ void CMap::Update(_float fTimeDelta)
     __super::Update(fTimeDelta);
 
     if (m_pNavigationCom)
-        m_pNavigationCom->Update(m_pTransformCom->Get_WorldMatrix());
+    {
+        _matrix WorldMatrix = m_pTransformCom->Get_WorldMatrix();
+        _vector vScale, vRotation, vTranslate;
+        XMMatrixDecompose(&vScale, &vRotation, &vTranslate, WorldMatrix);
+
+        _vector vUnitScale = XMVectorSet(1.f, 1.f, 1.f, 0.f);
+        _matrix ModifiedWorldMatrix = XMMatrixAffineTransformation(vUnitScale, XMVectorZero(), vRotation, vTranslate);
+
+        m_pNavigationCom->Update(ModifiedWorldMatrix);
+    }
+        
 }
 
 void CMap::Late_Update(_float fTimeDelta)

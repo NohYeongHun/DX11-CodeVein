@@ -109,8 +109,9 @@ HRESULT CLevel_GamePlay::Ready_Layer_Map(const _wstring& strLayerTag)
 {
 	CMap::MAP_DESC Desc = {};
 
+	// X, Z 2배로 깔았음.
 	Desc.PrototypeTag = L"Prototype_Component_Model_BossStage";
-
+	Desc.vScale = { 2.f, 1.f, 2.f };
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel), strLayerTag,
 		ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_Map"), &Desc)))
 		return E_FAIL;

@@ -70,8 +70,6 @@ void CMonster::Update(_float fTimeDelta)
 void CMonster::Late_Update(_float fTimeDelta)
 {
     __super::Late_Update(fTimeDelta);
-    m_pTransformCom->Set_State(STATE::POSITION,
-        m_pNavigationCom->Compute_OnCell(m_pTransformCom->Get_State(STATE::POSITION)));
 }
 
 HRESULT CMonster::Render()

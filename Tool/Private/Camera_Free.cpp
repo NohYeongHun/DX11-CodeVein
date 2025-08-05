@@ -23,7 +23,12 @@ HRESULT CCamera_Free::Initialize_Clone(void* pArg)
 
 	if (FAILED(__super::Initialize_Clone(pArg)))
 		return E_FAIL;
-
+	
+	m_fYaw = {};
+	m_fPitch = {};
+	_vector qFinalRotation = XMQuaternionRotationRollPitchYaw(m_fPitch, m_fYaw, 0.f);
+	// 4. Transform에 설정
+	m_pTransformCom->Set_Quaternion(qFinalRotation);
 
 	return S_OK;
 }
@@ -58,6 +63,16 @@ void CCamera_Free::Update(_float fTimeDelta)
 	{
 		m_pTransformCom->Go_Right(fTimeDelta);
 	}
+	if (m_pGameInstance->Get_KeyPress(DIK_UPARROW))
+	{
+		_vector vDir = XMVectorSet(0.f, 1.f, 0.f, 0.f);
+		m_pTransformCom->Move_Direction(vDir, fTimeDelta);
+	}
+	if (m_pGameInstance->Get_KeyPress(DIK_DOWNARROW))
+	{
+		_vector vDir = XMVectorSet(0.f, 1.f, 0.f, 0.f);
+		m_pTransformCom->Move_Direction(vDir, fTimeDelta * -1.f);
+	}
 
 	//Handle_Mouse_Rotation(fTimeDelta);
 
@@ -66,25 +81,28 @@ void CCamera_Free::Update(_float fTimeDelta)
 	{
 		_long MouseMoveX = m_pGameInstance->Get_DIMouseMove(MOUSEMOVESTATE::X);
 		_long MouseMoveY = m_pGameInstance->Get_DIMouseMove(MOUSEMOVESTATE::Y);
-
-
-		if (MouseMoveY != 0)
+		if (MouseMoveX != 0 || MouseMoveY != 0)
 		{
-			// 카메라 기준 Pitch 회전 (자기 기준 오른쪽 축)
-			_float fAngle = fTimeDelta * MouseMoveY * m_fMouseSensor;
-			_vector vRight = m_pTransformCom->Get_State(STATE::RIGHT);
-			m_pTransformCom->Turn(vRight, fAngle);
-		}
-		if (MouseMoveX != 0)
-		{
+			// 1. 마우스 움직임을 각도로 변환하여 누적
+			m_fYaw += (_float)MouseMoveX * fTimeDelta * m_fMouseSensor;
+			m_fPitch += (_float)MouseMoveY * fTimeDelta * m_fMouseSensor;
 
-			// Y축(Yaw 회전)
-			_float fAngle = fTimeDelta * MouseMoveX * m_fMouseSensor;
-			m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fAngle);
+			// 2. Pitch 제한
+			m_fPitch = max(-XM_PIDIV2 * 0.9f, min(XM_PIDIV2 * 0.9f, m_fPitch));
+
+			// 3. 올바른 함수 사용 - XMQuaternionRotationRollPitchYaw
+			_vector qFinalRotation = XMQuaternionRotationRollPitchYaw(m_fPitch, m_fYaw, 0.f);
+
+			// 4. Transform에 설정
+			m_pTransformCom->Set_Quaternion(qFinalRotation);
 		}
-		
 	}
 
+	/* 값이 일정이상 튀지 않게 관리. */
+	while (m_fYaw > XM_PI) m_fYaw -= XM_PI;
+	while (m_fPitch > XM_PI * 0.5f) m_fPitch -= XM_PI * 0.5f;
+	while (m_fYaw < -XM_PI) m_fYaw += XM_PI;
+	while (m_fPitch < XM_PI * -0.5f) m_fPitch += XM_PI * 0.5f;
 
 	__super::Update_PipeLines();
 }
@@ -101,52 +119,7 @@ HRESULT CCamera_Free::Render()
 	return S_OK;
 }
 
-void CCamera_Free::Handle_Mouse_Rotation(_float fTimeDelta)
-{
-	// 마우스 우클릭 또는 Q키로 회전 모드 활성화
-	if (m_pGameInstance->Get_MouseKeyPress(MOUSEKEYSTATE::RB) ||
-		m_pGameInstance->Get_KeyPress(DIK_Q))
-	{
-		// 마우스 이동량 가져오기 (구문 오류 수정)
-		_long MouseMoveX = m_pGameInstance->Get_DIMouseMove(MOUSEMOVESTATE::X);
-		_long MouseMoveY = m_pGameInstance->Get_DIMouseMove(MOUSEMOVESTATE::Y);
 
-		// 클라이언트 영역 내에서만 회전 처리 (선택사항)
-		POINT ptMouse = m_pGameInstance->Get_Mouse_Cursor(g_hWnd);
-		RECT rcClient;
-		GetClientRect(g_hWnd, &rcClient);
-
-		if (PtInRect(&rcClient, ptMouse))
-		{
-			// Y축 마우스 이동 → X축 회전 (Pitch)
-			if (MouseMoveY != 0)
-			{
-				_float fPitchAngle = (_float)MouseMoveY * m_fMouseSensor * fTimeDelta;
-
-				// Pitch 제한 (상하 90도 제한)
-				m_fCurrentPitch += fPitchAngle;
-				m_fCurrentPitch = max(-XM_PIDIV2 + 0.1f, min(XM_PIDIV2 - 0.1f, m_fCurrentPitch));
-
-				_vector vRight = m_pTransformCom->Get_State(STATE::RIGHT);
-				m_pTransformCom->Turn(vRight, fPitchAngle);
-			}
-
-			// X축 마우스 이동 → Y축 회전 (Yaw)
-			if (MouseMoveX != 0)
-			{
-				_float fYawAngle = (_float)MouseMoveX * m_fMouseSensor * fTimeDelta;
-
-				// 부드러운 회전을 위한 보간 (선택사항)
-				m_fTargetYaw += fYawAngle;
-
-				// 즉시 회전 (기본)
-				m_pTransformCom->Turn(XMVectorSet(0.f, 1.f, 0.f, 0.f), fYawAngle);
-			}
-
-			
-		}
-	}
-}
 
 CCamera_Free* CCamera_Free::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {

@@ -8,6 +8,7 @@ public:
 	typedef struct tagMapDesc : public CGameObject::GAMEOBJECT_DESC
 	{
 		const _tchar* PrototypeTag;
+		_float3 vScale;
 	}MAP_DESC;
 
 private:

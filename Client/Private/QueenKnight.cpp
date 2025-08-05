@@ -110,7 +110,7 @@ void CQueenKnight::Late_Update(_float fTimeDelta)
 {
     m_pTransformCom->Set_State(STATE::POSITION
         , m_pNavigationCom->Compute_OnCell(
-            m_pTransformCom->Get_State(STATE::POSITION), m_fOffsetY * 0.5f));
+            m_pTransformCom->Get_State(STATE::POSITION), m_fOffsetY + 0.2f));
 
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::BLEND, this)))
         return;

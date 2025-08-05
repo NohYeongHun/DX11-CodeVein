@@ -27,8 +27,8 @@ public:
 
 private:
 	_float m_fMouseSensor = {};
-	_float m_fTargetYaw = {};
-	_float m_fCurrentPitch = {};
+	_float m_fYaw = {};
+	_float m_fPitch = {};
 private:
 	void Handle_Mouse_Rotation(_float fTimeDelta);
 

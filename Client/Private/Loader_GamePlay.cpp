@@ -97,7 +97,7 @@ HRESULT CLoader_GamePlay::Add_Prototype_Map(ID3D11Device* pDevice, ID3D11DeviceC
 
 	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level)
 		, TEXT("Prototype_Component_Model_BossStage")
-		, CLoad_Model::Create(pDevice, pContext, MODELTYPE::NONANIM, PreTransformMatrix, "../../SaveFile/Model/Map/BossStage.dat", L"BossStage\\"))))
+		, CLoad_Model::Create(pDevice, pContext, MODELTYPE::NONANIM, PreTransformMatrix, "../../SaveFile/Model/Map/BossStageType1.dat", L"BossStage\\"))))
 		return E_FAIL;
 
 	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level)
@@ -119,7 +119,7 @@ HRESULT CLoader_GamePlay::Add_Prototype_Navigation(ID3D11Device* pDevice, ID3D11
 	}*/
 
 	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level), TEXT("Prototype_Component_Navigation"),
-		CNavigation::Create(pDevice, pContext, "../../SaveFile/Navigation/Navigation.nav"))))
+		CNavigation::Create(pDevice, pContext, "../../SaveFile/Navigation/BossStage.nav"))))
 	{
 		CRASH("Failed Load Navigation File");
 		return E_FAIL;
