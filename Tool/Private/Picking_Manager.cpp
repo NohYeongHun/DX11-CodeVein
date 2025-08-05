@@ -43,23 +43,6 @@ void CPicking_Manager::Out_PickingGroup(CGameObject* pGameObject)
 	}
 }
 
-void CPicking_Manager::Set_PickedObj(CGameObject* pGameObject)
-{
-	//if (pGameObject == nullptr)
-	//{
-	//	if (m_pPickedObj != nullptr)
-	//		dynamic_cast<CBaseObj*>(m_pPickedObj)->Set_Picked(false);
-	//	m_pPickedObj = nullptr;
-	//	return;
-	//}
-	//
-	//m_pPickedObj = pGameObject;
-	//
-	//for (auto& pGameObject : m_GameObjects)
-	//	dynamic_cast<CBaseObj*>(pGameObject)->Set_Picked(false);
-	//
-	//dynamic_cast<CBaseObj*>(m_pPickedObj)->Set_Picked(true);
-}
 
 // 내코드로 고치자.
 _bool CPicking_Manager::Picking()
@@ -75,7 +58,10 @@ _bool CPicking_Manager::Picking()
 		{
 			vecPicked.push_back(pGameObject);
 			vecPos.push_back(vPosition);
+
+			vPosition.y += 0.2f;
 			m_vPickingPos = vPosition; // 여기가 메시 피킹된 위치?
+			
 		}
 	}
 

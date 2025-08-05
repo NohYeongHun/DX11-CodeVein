@@ -55,8 +55,8 @@ HRESULT CToolMap_Part::Initialize_Clone(void* pArg)
     }
     
 
-    m_pTransformCom->Set_ScaleX(1.5f);
-    m_pTransformCom->Set_ScaleZ(1.5f);
+    //m_pTransformCom->Set_ScaleX(1.5f);
+    //m_pTransformCom->Set_ScaleZ(1.5f);
     return S_OK;
 }
 

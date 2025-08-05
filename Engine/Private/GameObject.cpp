@@ -269,7 +269,6 @@ void CGameObject::RootMotion_Translate(_fvector vTranslate)
 
 void CGameObject::Compute_CamDistance(_fvector vWorldPos)
 {
-	_float4x4 ViewMatrix;
 	m_fCamDistance = XMVectorGetX(XMVector3Length(XMLoadFloat4(m_pGameInstance->Get_CamPosition()) - vWorldPos));
 }
 
