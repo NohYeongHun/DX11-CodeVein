@@ -198,7 +198,9 @@
     <ClInclude Include="..\Public\NavigationManager.h">
       <Filter>01. Level\01. Logo\00. Tool\Navigation</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Picking_Manager.h" />
+    <ClInclude Include="..\Public\Picking_Manager.h">
+      <Filter>01. Level\01. Logo\00. Tool\Picking</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="small.ico">
@@ -299,7 +301,9 @@
     <ClCompile Include="..\Private\NavigationManager.cpp">
       <Filter>01. Level\01. Logo\00. Tool\Navigation</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Picking_Manager.cpp" />
+    <ClCompile Include="..\Private\Picking_Manager.cpp">
+      <Filter>01. Level\01. Logo\00. Tool\Picking</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Tool.rc">

@@ -163,9 +163,9 @@ HRESULT CLevel_Logo::Ready_Layer_Camera(const _wstring& strLayerTag)
 	CameraDesc.fFovy = XMConvertToRadians(60.0f);
 	CameraDesc.fNear = 0.1f;
 	CameraDesc.fFar = 500.f;
-	CameraDesc.fSpeedPerSec = 10.f;
-	CameraDesc.fRotationPerSec = XMConvertToRadians(90.0f);
-	CameraDesc.fMouseSensor = 0.1f;
+	CameraDesc.fSpeedPerSec = 30.f;
+	CameraDesc.fRotationPerSec = XMConvertToRadians(180.0f);
+	CameraDesc.fMouseSensor = 0.5f;
 
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel), strLayerTag,
 		ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_Camera_Free"), &CameraDesc)))

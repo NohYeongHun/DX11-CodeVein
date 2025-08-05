@@ -824,7 +824,6 @@ void CMap_Tool::Save_Navigation(string filePath)
     }
     m_pSaveFile_Loader->Save_NavigationFile(filePath, m_pNavigation_Manager->Get_CellContainers());
 
-    //m_pSaveFile_Loader->Save_NavigationFile();
 }
 
 void CMap_Tool::Load_Navigation(string filePath)
