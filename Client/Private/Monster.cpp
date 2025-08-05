@@ -344,13 +344,6 @@ void CMonster::Tick_BuffTimers(_float fTimeDelta)
 
 HRESULT CMonster::Ready_Components(MONSTER_DESC* pDesc)
 {
-    CNavigation::NAVIGATION_DESC        NaviDesc{};
-    NaviDesc.iCurrentCellIndex = 0;
-
-    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(m_eCurLevel), TEXT("Prototype_Component_Navigation"),
-        TEXT("Com_Navigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom), &NaviDesc)))
-        return E_FAIL;
-
     return S_OK;
 }
 

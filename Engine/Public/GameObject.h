@@ -20,6 +20,9 @@ protected:
 	virtual ~CGameObject() = default;
 
 public:
+	virtual _bool Picking(_float3* PickingPoint) { return false; }
+
+public:
 	class CComponent* Get_Component(const _wstring& strComponentTag);
 	HRESULT Change_Component(const _wstring& strComponentTag, CComponent** ppOut, CComponent* pChangeComponent);
 
@@ -27,6 +30,13 @@ public:
 
 	virtual void RootMotion_Translate(_fvector vTranslate);
 	
+
+public:
+	virtual void Compute_CamDistance(_fvector vWorldPos);
+	_float Get_CamDistance() const { return m_fCamDistance; }
+
+private:
+	_float m_fCamDistance = {};
 
 public:
 	const _wstring& Get_ObjectTag();

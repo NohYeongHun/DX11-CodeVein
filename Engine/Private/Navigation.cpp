@@ -23,24 +23,72 @@ CNavigation::CNavigation(const CNavigation& Prototype)
 #endif
 }
 
-HRESULT CNavigation::Initialize_Prototype(const _tchar* pNavigationFilePath)
+//HRESULT CNavigation::Initialize_Prototype(const _tchar* pNavigationFilePath)
+//{
+//	_ulong			dwByte = { };
+//	HANDLE			hFile = CreateFile(pNavigationFilePath, GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+//
+//	while (true)
+//	{
+//		_float3		vPoints[3];
+//
+//		ReadFile(hFile, vPoints, sizeof(_float3) * 3, &dwByte, nullptr);
+//		if (0 == dwByte)
+//			break;
+//
+//		CCell* pCell = CCell::Create(m_pDevice, m_pContext, vPoints, m_Cells.size());
+//		if (nullptr == pCell)
+//			return E_FAIL;
+//
+//		m_Cells.push_back(pCell);
+//	}
+//
+//	SetUp_Neighbors();
+//
+//#ifdef _DEBUG
+//	m_pShader = CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Engine_Shader_Cell.hlsl"), VTXPOS::Elements, VTXPOS::iNumElements);
+//	if (nullptr == m_pShader)
+//		return E_FAIL;
+//#endif
+//
+//	return S_OK;
+//}
+
+HRESULT CNavigation::Initialize_Prototype(const _char* pNavigationFilePath)
 {
-	_ulong			dwByte = { };
-	HANDLE			hFile = CreateFile(pNavigationFilePath, GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+	std::ifstream ifs(pNavigationFilePath, std::ios::binary);
+	if (!ifs.is_open())
+		CRASH("Load Navigation File Failed");
 
-	while (true)
+	NAVIGATIONSAVE_DESC NaviDesc = {};
+
+
+	// 1. Cell 개수 세오기.
+	ifs.read(reinterpret_cast<char*>(&NaviDesc.iCellCount), sizeof(uint32_t));
+
+	// 2. Vector에 값 채우기.
+	// 벡터 초기화
+	NaviDesc.Cells.resize(NaviDesc.iCellCount);
+	ifs.read(reinterpret_cast<char*>(NaviDesc.Cells.data()), NaviDesc.iCellCount * sizeof(CELLSAVE_DESC));
+	ifs.close();
+
+	vector<CELLSAVE_DESC>& cellVector = NaviDesc.Cells;
+
+	for (_uint i = 0; i < NaviDesc.iCellCount; ++i)
 	{
-		_float3		vPoints[3];
+		_float3 vPointArray[ENUM_CLASS(CELLPOINT::END)] = {
+		  cellVector[i].vPointA,
+		  cellVector[i].vPointB,
+		  cellVector[i].vPointC,
+		};
 
-		ReadFile(hFile, vPoints, sizeof(_float3) * 3, &dwByte, nullptr);
-		if (0 == dwByte)
-			break;
-
-		CCell* pCell = CCell::Create(m_pDevice, m_pContext, vPoints, m_Cells.size());
+		CCell* pCell = CCell::Create(m_pDevice, m_pContext, vPointArray, i);
 		if (nullptr == pCell)
-			return E_FAIL;
+		{
+			CRASH("Failed Load Cell Info");
+		}
 
-		m_Cells.push_back(pCell);
+		m_Cells.emplace_back(pCell);
 	}
 
 	SetUp_Neighbors();
@@ -149,6 +197,48 @@ _int CNavigation::Find_Cell_By_Position(_float3 vPosition)
 	return index;
 }
 
+#pragma region 시작 시 위치 초기화를 위한 값들.
+// w값이 -1이면 오류, w 값이 -2면 널포인터
+_vector CNavigation::Get_CellPos(_int iIndex)
+{
+	if (iIndex >= m_Cells.size() || m_Cells.empty() || iIndex < 0)
+		return XMVectorSet(-1.f, -1.f, -1.f, -1.f);
+
+	if (nullptr == m_Cells[iIndex])
+		return XMVectorSet(-2.f, -2.f, -2.f, -2.f);
+
+	return m_Cells[iIndex]->Get_Center();
+}
+
+// Center 기준 비교.
+_int CNavigation::Find_NearCellIndex(_float3 vPos)
+{
+
+	_vector vOutPos = XMLoadFloat3(&vPos);
+	_uint nearIndex = -1;
+
+	_float fMinDist = FLT_MAX;
+	_float fDist = { 0.f };
+	for (_uint i = 0; i < m_Cells.size(); ++i)
+	{
+		// 빈 셀벡터는 넘어갑니다.
+		if (nullptr == m_Cells[i])
+			continue;
+		_vector vCenter = m_Cells[i]->Get_Center();
+
+		fDist = XMVectorGetX(XMVector3Length(vCenter - vOutPos));
+		if (fDist < fMinDist)
+		{
+			fMinDist = fDist;
+			nearIndex = i;
+		}
+	}
+
+	return nearIndex;
+}
+#pragma endregion
+
+
 #ifdef _DEBUG
 
 HRESULT CNavigation::Render()
@@ -227,7 +317,21 @@ void CNavigation::SetUp_Neighbors()
 	}
 }
 
-CNavigation* CNavigation::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _tchar* pNavigationFilePath)
+//CNavigation* CNavigation::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _tchar* pNavigationFilePath)
+//{
+//	CNavigation* pInstance = new CNavigation(pDevice, pContext);
+//
+//	if (FAILED(pInstance->Initialize_Prototype(pNavigationFilePath)))
+//	{
+//		MSG_BOX(TEXT("Failed to Created : CNavigation"));
+//		Safe_Release(pInstance);
+//	}
+//
+//	return pInstance;
+//}
+
+
+CNavigation* CNavigation::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _char* pNavigationFilePath)
 {
 	CNavigation* pInstance = new CNavigation(pDevice, pContext);
 

@@ -70,7 +70,7 @@ HRESULT CLoad_MeshMaterial::Initialize(std::ifstream& ifs, _wstring textureFolde
 		// dds로만 읽어오게 변경.
 		wcscat_s(szFinalPath, wExt.c_str());
 
-		hr = CreateDDSTextureFromFile(m_pDevice, szFinalPath, nullptr, &pSRV);
+  		hr = CreateDDSTextureFromFile(m_pDevice, szFinalPath, nullptr, &pSRV);
 
 		//if (L".dds" == szExt)
 		//	hr = CreateDDSTextureFromFile(m_pDevice, szFinalPath, nullptr, &pSRV);

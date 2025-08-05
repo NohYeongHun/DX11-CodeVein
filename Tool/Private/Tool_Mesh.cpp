@@ -73,8 +73,9 @@ const _bool CTool_Mesh::Is_Ray_Hit(const _float3& rayOrigin, const _float3& rayD
 	_bool bHit = false;
 	_float fClosestDist = 1000.f;
 
-	_fvector vRayOrigin = XMLoadFloat3(&rayOrigin);
-	_fvector vRayDir = XMLoadFloat3(&rayDir);
+	_vector vRayOrigin = XMLoadFloat3(&rayOrigin);
+	_vector vRayDir = XMLoadFloat3(&rayDir);
+	vRayDir = XMVector3Normalize(vRayDir);
 
 	_uint iHitIndex = -1;
 
@@ -87,9 +88,9 @@ const _bool CTool_Mesh::Is_Ray_Hit(const _float3& rayOrigin, const _float3& rayD
 		//_gvector v1 = XMLoadFloat3(&m_vecPositions[m_vecIndices[i + 1]]);
 		//_hvector v2 = XMLoadFloat3(&m_vecPositions[m_vecIndices[i + 2]]);
 
-		_fvector v0 = XMLoadFloat3(&m_Vertices[m_vecIndices[i]].vPosition);
-		_gvector v1 = XMLoadFloat3(&m_Vertices[m_vecIndices[i + 1]].vPosition);
-		_hvector v2 = XMLoadFloat3(&m_Vertices[m_vecIndices[i + 2]].vPosition);
+		_fvector v0 = XMLoadFloat3(&m_vecPositions[m_vecIndices[i]]);
+		_gvector v1 = XMLoadFloat3(&m_vecPositions[m_vecIndices[i + 1]]);
+		_hvector v2 = XMLoadFloat3(&m_vecPositions[m_vecIndices[i + 2]]);
 
 		_float fDist = 0.f;
 		if (TriangleTests::Intersects(vRayOrigin, vRayDir, v0, v1, v2, fDist))
@@ -120,8 +121,9 @@ const _bool CTool_Mesh::Is_Ray_Hit(const _float3& rayOrigin, const _float3& rayD
 	_bool bHit = false;
 	_float fClosestDist = 1000.f;
 
-	_fvector vRayOrigin = XMLoadFloat3(&rayOrigin);
-	_fvector vRayDir = XMLoadFloat3(&rayDir);
+	_vector vRayOrigin = XMLoadFloat3(&rayOrigin);
+	_vector vRayDir = XMLoadFloat3(&rayDir);
+	vRayDir = XMVector3Normalize(vRayDir);
 
 	_uint iHitTriangleIndex = -1;
 	_float3 vHitPoint = {};
@@ -129,9 +131,9 @@ const _bool CTool_Mesh::Is_Ray_Hit(const _float3& rayOrigin, const _float3& rayD
 
 	for (_uint i = 0; i < m_vecIndices.size(); i += 3)
 	{
-		_fvector v0 = XMLoadFloat3(&m_Vertices[m_vecIndices[i]].vPosition);
-		_fvector v1 = XMLoadFloat3(&m_Vertices[m_vecIndices[i + 1]].vPosition);
-		_fvector v2 = XMLoadFloat3(&m_Vertices[m_vecIndices[i + 2]].vPosition);
+		_fvector v0 = XMLoadFloat3(&m_vecPositions[m_vecIndices[i]]);
+		_fvector v1 = XMLoadFloat3(&m_vecPositions[m_vecIndices[i + 1]]);
+		_fvector v2 = XMLoadFloat3(&m_vecPositions[m_vecIndices[i + 2]]);
 
 		_float fDist = 0.f;
 		if (TriangleTests::Intersects(vRayOrigin, vRayDir, v0, v1, v2, fDist))
@@ -146,9 +148,9 @@ const _bool CTool_Mesh::Is_Ray_Hit(const _float3& rayOrigin, const _float3& rayD
 				XMStoreFloat3(&vHitPoint, vRayOrigin + vRayDir * fDist);
 
 				// 삼각형 정점들 저장 (로컬 좌표)
-				vTriangleVertices[0] = m_Vertices[m_vecIndices[i]].vPosition;
-				vTriangleVertices[1] = m_Vertices[m_vecIndices[i + 1]].vPosition;
-				vTriangleVertices[2] = m_Vertices[m_vecIndices[i + 2]].vPosition;
+				vTriangleVertices[0] = m_vecPositions[m_vecIndices[i]];
+				vTriangleVertices[1] = m_vecPositions[m_vecIndices[i + 1]];
+				vTriangleVertices[2] = m_vecPositions[m_vecIndices[i + 2]];
 			}
 		}
 	}
@@ -163,6 +165,68 @@ const _bool CTool_Mesh::Is_Ray_Hit(const _float3& rayOrigin, const _float3& rayD
 
 	if (bHit && pOutDist)
 		*pOutDist = fClosestDist;
+
+	return bHit;
+}
+
+const _bool CTool_Mesh::Picking(const _float3& rayOrigin, const _float3& rayDir, _float3* pPickingPoint, _float3* pPickingNormal, _float* pOutDist)
+{
+	_bool bHit = false;
+	_float fClosestDist = FLT_MAX;
+
+	_vector vRayOrigin = XMLoadFloat3(&rayOrigin);
+	_vector vRayDir = XMLoadFloat3(&rayDir);
+	vRayDir = XMVector3Normalize(vRayDir);
+
+	_float3 vClosestHitPoint = {};
+	_float3 vClosestHitNormal = {};
+
+
+	// 모든 삼각형을 순회하며 Ray-Triangle 교차 검사
+	for (_uint i = 0; i < m_vecIndices.size(); i += 3)
+	{
+		// 삼각형의 세 정점 가져오기
+		_fvector v0 = XMLoadFloat3(&m_Vertices[m_vecIndices[i]].vPosition);
+		_fvector v1 = XMLoadFloat3(&m_Vertices[m_vecIndices[i + 1]].vPosition);
+		_fvector v2 = XMLoadFloat3(&m_Vertices[m_vecIndices[i + 2]].vPosition);
+
+		_float fDist = 0.f;
+
+		// DirectX TriangleTests를 사용한 Ray-Triangle 교차 검사
+		if (TriangleTests::Intersects(vRayOrigin, vRayDir, v0, v1, v2, fDist))
+		{
+			// 뒤쪽 충돌 방지 및 가장 가까운 충돌점 찾기
+			if (fDist > 0.f && fDist < fClosestDist)
+			{
+				fClosestDist = fDist;
+				bHit = true;
+
+				// 충돌 지점 계산: Ray Origin + Ray Direction * Distance
+				_fvector vHitPoint = vRayOrigin + vRayDir * fDist;
+				XMStoreFloat3(&vClosestHitPoint, vHitPoint);
+
+				// 삼각형 법선 벡터 계산
+				_fvector vEdge1 = v1 - v0;  // 첫 번째 모서리
+				_fvector vEdge2 = v2 - v0;  // 두 번째 모서리
+
+				// 외적을 사용하여 법선 벡터 계산 (오른손 좌표계 기준)
+				_fvector vTriangleNormal = XMVector3Normalize(XMVector3Cross(vEdge1, vEdge2));
+				XMStoreFloat3(&vClosestHitNormal, vTriangleNormal);
+			}
+		}
+	}
+
+	if (bHit)
+	{
+		if (pPickingPoint)
+			*pPickingPoint = vClosestHitPoint;
+
+		if (pPickingNormal)
+			*pPickingNormal = vClosestHitNormal;
+
+		if (pOutDist)
+			*pOutDist = fClosestDist;
+	}
 
 	return bHit;
 }

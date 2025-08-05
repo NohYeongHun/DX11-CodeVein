@@ -213,6 +213,33 @@ HRESULT CTool_Model::Initialize_Clone(void* pArg)
 
 #pragma region ANIM_MODEL
 
+_bool CTool_Model::Picking(_float3* PickingPoint)
+{
+
+	// 1. Ray 방향, Ray 시작 위치 필요. RayOrigin은 화면 마우스 좌표가 변환된것
+	_float3 vLocalRayDir = m_pGameInstance->Get_Local_RayDir();
+	_float3 vLocalRayOrigin = m_pGameInstance->Get_Local_RayOrigin();
+	_float3 vNormal = {};
+	_float fDist = {};
+	_float fMinDist = { FLT_MAX };
+
+	_bool IsHit = false;
+
+	// Mesh 순회 할때도 가장 가까운 것을 골라야합니다.
+	for (_uint i = 0; i < m_iNumMeshes; i++)
+	{
+		IsHit = m_Meshes[i]->Picking(vLocalRayOrigin, vLocalRayDir, PickingPoint, &vNormal, &fDist);
+		if (IsHit && (fDist < fMinDist))
+			fMinDist = fDist;
+	}
+
+	if (IsHit)
+		return true;
+
+	return false;
+	
+}
+
 void CTool_Model::Save_AnimModel(ANIMMODEL_INFO& AnimModelInfo, _fmatrix PreTransformMatrix)
 {
 	

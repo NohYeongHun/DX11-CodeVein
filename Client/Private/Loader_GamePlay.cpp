@@ -15,6 +15,14 @@ HRESULT CLoader_GamePlay::Loading_Resource(ID3D11Device* pDevice, ID3D11DeviceCo
 	}
 
 
+	if (FAILED(Add_Prototype_Navigation(pDevice, pContext, pGameInstance)))
+	{
+		CRASH("Create Navigation Failed");
+		MSG_BOX(TEXT("Create Failed Loading : GamePlay Navigation"));
+		return E_FAIL;
+	}
+
+
 	if (FAILED(Add_Prototype_Camera_Free(pDevice, pContext, pGameInstance)))
 	{
 		CRASH("Create Camera Free Failed");
@@ -65,13 +73,7 @@ HRESULT CLoader_GamePlay::Loading_Resource(ID3D11Device* pDevice, ID3D11DeviceCo
 		return E_FAIL;
 	}
 
-	if (FAILED(Add_Prototype_Navigation(pDevice, pContext, pGameInstance)))
-	{
-		CRASH("Create Navigation Failed");
-		MSG_BOX(TEXT("Create Failed Loading : GamePlay Navigation"));
-		return E_FAIL;
-	}
-
+	
 	return S_OK;
 }
 
@@ -83,6 +85,48 @@ HRESULT CLoader_GamePlay::Add_Prototype_Component(ID3D11Device* pDevice, ID3D11D
 HRESULT CLoader_GamePlay::Add_Prototype_GameObject(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
 {
 	return S_OK;
+}
+
+
+// 1. Game 에서 사용할 Model.
+HRESULT CLoader_GamePlay::Add_Prototype_Map(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
+{
+	_matrix		PreTransformMatrix = XMMatrixIdentity();
+
+	PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f);
+
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level)
+		, TEXT("Prototype_Component_Model_BossStage")
+		, CLoad_Model::Create(pDevice, pContext, MODELTYPE::NONANIM, PreTransformMatrix, "../../SaveFile/Model/Map/BossStage.dat", L"BossStage\\"))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level)
+		, TEXT("Prototype_GameObject_Map")
+		, CMap::Create(pDevice, pContext))))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CLoader_GamePlay::Add_Prototype_Navigation(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
+{
+	/* Prototype_Component_Navigation */
+	/*if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level), TEXT("Prototype_Component_Navigation"),
+		CNavigation::Create(pDevice, pContext, TEXT("../Bin/DataFiles/Navigation.dat")))))
+	{
+		CRASH("Failed Load Navigation File");
+		return E_FAIL;
+	}*/
+
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level), TEXT("Prototype_Component_Navigation"),
+		CNavigation::Create(pDevice, pContext, "../../SaveFile/Navigation/Navigation.nav"))))
+	{
+		CRASH("Failed Load Navigation File");
+		return E_FAIL;
+	}
+
+	return S_OK;
+
 }
 
 
@@ -199,34 +243,7 @@ HRESULT CLoader_GamePlay::Add_Prototype_WolfDevil(ID3D11Device* pDevice, ID3D11D
 	return S_OK;
 }
 
-// 1. Game 에서 사용할 Model.
-HRESULT CLoader_GamePlay::Add_Prototype_Map(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
-{
-	_matrix		PreTransformMatrix = XMMatrixIdentity();
 
-	PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f);
- 	/*if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level)
-		, TEXT("Prototype_Component_Model_CircleFloor")
-		, CLoad_Model::Create(pDevice, pContext, MODELTYPE::NONANIM, PreTransformMatrix, "../../SaveFile/Model/Map/CircleFloor.dat", L"CircleFloor\\"))))
-		return E_FAIL;*/
-
-	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level)
-		, TEXT("Prototype_Component_Model_BossStage")
-		, CLoad_Model::Create(pDevice, pContext, MODELTYPE::NONANIM, PreTransformMatrix, "../../SaveFile/Model/Map/BossStage2.dat", L"BossStage\\"))))
-		return E_FAIL;
-
-	/*if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level)
-		, TEXT("Prototype_Component_Model_BossStage")
-		, CModel::Create(pDevice, pContext, MODELTYPE::NONANIM, PreTransformMatrix, "../Bin/Resources/Models/Map/BossMap/BossMap.fbx"))))
-		return E_FAIL;*/
-	
-	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level)
-		, TEXT("Prototype_GameObject_Map")
-		, CMap::Create(pDevice, pContext))))
-		return E_FAIL;
-
-	return S_OK;
-}
 
 HRESULT CLoader_GamePlay::Add_Prototype_Terrain(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
 {
@@ -291,17 +308,4 @@ HRESULT CLoader_GamePlay::Add_Prototype_SkyBox(ID3D11Device* pDevice, ID3D11Devi
 	return S_OK;
 }
 
-HRESULT CLoader_GamePlay::Add_Prototype_Navigation(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
-{
-	/* Prototype_Component_Navigation */
-	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level), TEXT("Prototype_Component_Navigation"),
-		CNavigation::Create(pDevice, pContext, TEXT("../Bin/DataFiles/Navigation.dat")))))
-	{
-		CRASH("Failed Load Navigation File");
-		return E_FAIL;
-	}
-
-	return S_OK;
-		
-}
 

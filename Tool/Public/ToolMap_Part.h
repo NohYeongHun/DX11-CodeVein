@@ -42,6 +42,8 @@ public:
 	virtual void Late_Update(_float fTimeDelta);
 	virtual HRESULT Render();
 
+	virtual _bool Picking(_float3* PickingPoint);
+
 #pragma region 충돌 함수 정의
 public:
 	virtual void On_Collision_Enter(CGameObject* pOther);

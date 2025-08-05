@@ -61,8 +61,11 @@ void CGameObject::Update(_float fTimeDelta)
 	m_pTransformCom->Update_WorldMatrix();
 }
 
+
 void CGameObject::Late_Update(_float fTimeDelta)
 {
+	/* Trasnform이 없는 객체는 존재하지 않기 때문에 GameObject에서 실행해도 무방. */
+	Compute_CamDistance(m_pTransformCom->Get_State(STATE::POSITION));
 }
 
 HRESULT CGameObject::Render()
@@ -262,6 +265,12 @@ void CGameObject::RootMotion_Translate(_fvector vTranslate)
 	//vPos += vTranslate;
 	//vPos = XMVectorSetW(vPos, 1.f);
 	//m_pTransformCom->Set_State(STATE::POSITION, vPos);
+}
+
+void CGameObject::Compute_CamDistance(_fvector vWorldPos)
+{
+	_float4x4 ViewMatrix;
+	m_fCamDistance = XMVectorGetX(XMVector3Length(XMLoadFloat4(m_pGameInstance->Get_CamPosition()) - vWorldPos));
 }
 
 const _wstring& CGameObject::Get_ObjectTag()

@@ -7,6 +7,8 @@ CCell::CCell(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	Safe_AddRef(m_pContext);
 }
 
+
+
 HRESULT CCell::Initialize(const _float3* pPoints, _int iIndex)
 {
 	m_iIndex = iIndex;
@@ -92,6 +94,14 @@ _float CCell::Compute_Height(_fvector vLocalPos)
 	);
 
 	return (XMVectorGetX(vPlane) * -1.f * XMVectorGetX(vLocalPos) - vPlane.m128_f32[2] * vLocalPos.m128_f32[2] - vPlane.m128_f32[3]) / vPlane.m128_f32[1];
+}
+
+_vector CCell::Get_Center()
+{
+	_float PositionX = (m_vPoints[ENUM_CLASS(CELLPOINT::A)].x + m_vPoints[ENUM_CLASS(CELLPOINT::B)].x + m_vPoints[ENUM_CLASS(CELLPOINT::C)].x) / 3.f;
+	_float PositionY = (m_vPoints[ENUM_CLASS(CELLPOINT::A)].y + m_vPoints[ENUM_CLASS(CELLPOINT::B)].y + m_vPoints[ENUM_CLASS(CELLPOINT::C)].y) / 3.f;
+	_float PositionZ = (m_vPoints[ENUM_CLASS(CELLPOINT::A)].z + m_vPoints[ENUM_CLASS(CELLPOINT::B)].z + m_vPoints[ENUM_CLASS(CELLPOINT::C)].z) / 3.f;
+	return XMVectorSet(PositionX, PositionY, PositionZ, 1.f);
 }
 
 #ifdef _DEBUG

@@ -81,6 +81,7 @@ public:
 #pragma region 6. 기본적으로 몬스터가 필요한 상태들을 정의합니다.
 private:
 	HRESULT Ready_Components(WOLFDEVIL_DESC* pDesc);
+	HRESULT Ready_Navigations();
 	HRESULT Ready_BehaviorTree();
 	HRESULT Ready_Render_Resources();
 	HRESULT Ready_PartObjects();

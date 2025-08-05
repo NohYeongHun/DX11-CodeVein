@@ -95,6 +95,7 @@ private:
 
 private:
 	HRESULT Ready_Components(QUEENKNIGHT_DESC* pDesc);
+	HRESULT Ready_Navigations();
 	HRESULT Ready_BehaviorTree();
 	HRESULT Ready_Render_Resources();
 	HRESULT Ready_PartObjects();

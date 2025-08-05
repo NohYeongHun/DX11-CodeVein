@@ -160,6 +160,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\Public\NavigationManager.h" />
+    <ClInclude Include="..\Public\Picking_Manager.h" />
     <ClInclude Include="..\Public\Tool_Animation.h" />
     <ClInclude Include="..\Public\Camera_Free.h" />
     <ClInclude Include="..\Public\Tool_Channel.h" />
@@ -200,6 +201,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\NavigationManager.cpp" />
+    <ClCompile Include="..\Private\Picking_Manager.cpp" />
     <ClCompile Include="..\Private\Tool_Animation.cpp" />
     <ClCompile Include="..\Private\Camera_Free.cpp" />
     <ClCompile Include="..\Private\Tool_Channel.cpp" />

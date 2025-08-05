@@ -54,7 +54,18 @@ HRESULT CPlayer::Initialize_Clone(void* pArg)
 
     m_eCurLevel = pDesc->eCurLevel;
     if (FAILED(Ready_Components(pDesc)))
+    {
+        CRASH("Failed Ready_Components");
         return E_FAIL;
+    }
+        
+
+    if (FAILED(Ready_Navigations()))
+    {
+        CRASH("Failed Ready_Navigations");
+        return E_FAIL;
+    }
+     
 
     if (FAILED(Ready_PartObjects()))
         return E_FAIL;
@@ -62,11 +73,13 @@ HRESULT CPlayer::Initialize_Clone(void* pArg)
     if (FAILED(Ready_Fsm()))
         return E_FAIL;
 
-    _vector qInitRot = XMQuaternionRotationAxis(XMVectorSet(0.f, 1.f, 0.f, 0.f), 0.0f);
+
+    // 위치 초기화를 이제 Navigations 에서.
+    /*_vector qInitRot = XMQuaternionRotationAxis(XMVectorSet(0.f, 1.f, 0.f, 0.f), 0.0f);
     m_pTransformCom->Set_Quaternion(qInitRot);
 
     _float3 vPos = { 0.f, 5.f, 0.f };
-    m_pTransformCom->Set_State(STATE::POSITION, XMLoadFloat3(&vPos));
+    m_pTransformCom->Set_State(STATE::POSITION, XMLoadFloat3(&vPos));*/
 
     
 
@@ -673,13 +686,44 @@ HRESULT CPlayer::Ready_Components(PLAYER_DESC* pDesc)
     BOUNDING_BOX box = m_pModelCom->Get_BoundingBox();
     m_fOffsetY = box.fHeight * 0.5f;
 
+    
+    
+
+    return S_OK;
+}
+
+HRESULT CPlayer::Ready_Navigations()
+{
+    /* Navigation 추가 */
     CNavigation::NAVIGATION_DESC        NaviDesc{};
     NaviDesc.iCurrentCellIndex = 0;
 
     if (FAILED(CGameObject::Add_Component(ENUM_CLASS(m_eCurLevel), TEXT("Prototype_Component_Navigation"),
         TEXT("Com_Navigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom), &NaviDesc)))
+    {
+        CRASH("Failed Clone Navigation");
         return E_FAIL;
+    }
+        
+    _vector qInitRot = XMQuaternionRotationAxis(XMVectorSet(0.f, 1.f, 0.f, 0.f), 0.0f);
+    m_pTransformCom->Set_Quaternion(qInitRot);
+
+    // Navigation을 이용해서 내 초기화 위치와 가까운 실제 셀을 찾습니다. 
+    // => 그리고 해당 Cell의 Center로 보내버립니다.
+
+    _float3 vPos = { 0.f, 5.f, 0.f };
+    _float3 vFinalPos = {};
+    _int iNearCell = m_pNavigationCom->Find_NearCellIndex(vPos);
     
+    if (iNearCell == -1)
+    {
+        CRASH("Failed Search Navigation Cell");
+        return E_FAIL;
+    }
+    
+    m_pNavigationCom->Set_CurrentCellIndex(iNearCell);
+    XMStoreFloat3(&vFinalPos, m_pNavigationCom->Get_CellPos(iNearCell));
+    m_pTransformCom->Set_State(STATE::POSITION, XMLoadFloat3(&vFinalPos));
 
     return S_OK;
 }

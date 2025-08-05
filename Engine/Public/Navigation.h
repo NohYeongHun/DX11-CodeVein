@@ -20,7 +20,8 @@ private:
 	virtual ~CNavigation() = default;
 
 public:
-	virtual HRESULT Initialize_Prototype(const _tchar* pNavigationFilePath);
+	//virtual HRESULT Initialize_Prototype(const _tchar* pNavigationFilePath);
+	virtual HRESULT Initialize_Prototype(const _char* pNavigationFilePath);
 	virtual HRESULT Initialize(void* pArg);
 	virtual void Update(_fmatrix WorldMatrix);
 
@@ -35,6 +36,14 @@ public:
 	_int Get_CellCount();
 	//_float3* Get_Cell_Points(_uint iIndex);
 	_int Find_Cell_By_Position(_float3 vPosition);
+
+
+public:
+	_vector Get_CellPos(_int iIndex);
+	// 받은 위치에서 가장 가까운 셀의 위치를 반환.
+	_int Find_NearCellIndex(_float3 vPos);
+	void Set_CurrentCellIndex(_int iCellIndex) { m_iCurrentCellIndex = iCellIndex; }
+
 
 #ifdef _DEBUG
 
@@ -59,7 +68,8 @@ private:
 	void SetUp_Neighbors();
 
 public:
-	static CNavigation* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _tchar* pNavigationFilePath);
+	//static CNavigation* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _tchar* pNavigationFilePath);
+	static CNavigation* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _char* pNavigationFilePath);
 	virtual CComponent* Clone(void* pArg) override;
 	virtual void Free() override;
 };

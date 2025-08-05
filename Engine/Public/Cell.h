@@ -19,12 +19,22 @@ public:
 		m_iNeighborIndices[ENUM_CLASS(eLine)] = pNeighborCell->m_iIndex;
 	}
 
+	_float3	Get_PointPos(CELLPOINT ePoint) const {
+		return m_vPoints[ENUM_CLASS(ePoint)]; 
+	}
+
+	
+
 public:
 	HRESULT Initialize(const _float3* pPoints, _int iIndex);
+
 	_bool isIn(_fvector vPosition, _int* pNeighborIndex);
 
 	_bool Compare_Points(_fvector vSourPoint, _fvector vDestPoint);
 	_float Compute_Height(_fvector vLocalPos);
+
+public:
+	_vector Get_Center();
 
 #ifdef _DEBUG
 public:

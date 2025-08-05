@@ -25,6 +25,13 @@ public:
 		SAVE_END
 	};
 
+	enum class SAVE_TYPE
+	{
+		MODEL = 0,
+		NAVIGATION,
+		MAP_OBJECT,
+		END
+	};
 
 private:
 	explicit CMap_Tool(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -37,8 +44,9 @@ public:
 	void Change_SelectObject(class CGameObject* pSelectedObject);
 	void Update(_float fTimeDelta);
 	
-public:
+
 #pragma region 기본 렌더
+public:
 	void Render();
 	void Render_CheckBox();
 	void SaveLoadMenu();
@@ -46,44 +54,62 @@ public:
 	/* Create Child */
 	void Render_CreateModelChild();
 	void Render_Prototype_Inspector();
+
+
 	/* Edit Child */
 	void Redner_EditModelChild();
 	void Load_Layer();
 	void Render_Edit_Inspector();
+	
+	
 #pragma endregion
+
+#pragma region SAVE_LOAD 시 사용
+
+private:
+	_bool m_IsEditModel = { false };
+	_bool m_IsEditNavigation = { false };
+	_bool m_IsEditMap = { false };
+
+	SAVE_TYPE m_eSaveType = { SAVE_TYPE::MODEL };
+
+public:
+	void Open_FileDialog();
+	void Save_FileDialog();
+	void Handle_FileDialogs(); // 열기 다이얼로그 처리
+#pragma endregion
+
+#pragma region PICKING Manager 관리
+
+private:
+	class CPicking_Manager* m_pPicking_Manager = { nullptr };
+#pragma endregion
+
+#pragma region Navigation 사용
+public:
+	void Render_NavigationChild();
+	void Save_Navigation(string filePath);
+	void Load_Navigation(string filePath);
+
+private:
+	class CNavigationManager* m_pNavigation_Manager = { nullptr };
+	_bool m_bNaviPicking = { false }; // Navigation Picking 여부.
+	_float3 m_fClickPoint = {};
+
+private:
+	_int m_iCellIndex = { 0 };
+#pragma endregion
+
 
 	
 	void Render_SaveLoad();
 	void Render_Debug_Window();
-	void Handle_SelectedObject();
-
 #pragma region Create Mode
 public:
-	//void Render_Model_Create();
-	//void Render_Prototype_Hierarchy();
-	
-	//void Render_Prototype_Inspector(ImVec2 vPos);
 	void Register_Prototype_Hierarchy(_uint iPrototypeLevelIndex, const _wstring& strObjectTag, const _wstring& strModelPrefix);
-	void Handle_CreateMode_SelectedObject();
-	void Picking_Create();
 #pragma endregion
 
-#pragma region Edit Mode
-public:
-	void Render_Model_Edit();
 
-	
-	//void Render_Edit_Inspector(ImVec2 vPos);
-	
-	void Handle_EditMode_SelectedObject();
-#pragma endregion
-
-#pragma region Nav Mode
-public:
-	void Render_Nav_Mode();
-
-	void Handle_NavMode_SelectedObject();
-#pragma endregion
 
 
 #pragma region Map Tool의 기능들
@@ -93,10 +119,6 @@ public:
 
 	string WString_ToString(const wstring& ws);
 	void SelectObject(class CGameObject* pObj);
-	
-
-	void Default_Render();
-	//void Set_Navigation();
 #pragma endregion
 
 
@@ -112,7 +134,7 @@ private:
 	list<pair<string, string>> m_PrototypeNames = {};
 
 	/* Prototype Hierarchy Pos 저장 */
-	ImVec2 m_PrototypeinspectorPos = {};
+	//ImVec2 m_PrototypeinspectorPos = {};
 	_bool m_IsPicking_Create = {};
 #pragma endregion
 
@@ -124,22 +146,13 @@ private:
 	_wstring m_Selected_EditLayerTag = {};
 
 	/* Edit Hierarchy Pos 저장 */
-	ImVec2 m_EditinspectorPos = {};
+	//ImVec2 m_EditinspectorPos = {};
 	int m_iSelectedIndex = { -1 };
 #pragma endregion
 
-#pragma region NAVIGATION 사용 변수
 
 
-private:
-	class CNavigationManager* m_pNavigation_Manager = { nullptr };
-#pragma endregion
 
-#pragma region SAVE_LOAD 시 사용
-	_bool m_IsEditModel = { false };
-	_bool m_IsEditNavigation = { false };
-	_bool m_IsEditMap = { false };
-#pragma endregion
 
 
 #pragma region 공통
@@ -168,7 +181,6 @@ private:
 	_bool m_bShowSimpleMousePos = {};
 	_bool m_bShowPickedObject = {};
 
-	_bool m_bNaviPicking = {};
 	_bool m_bShowOnlyNavi = {};
 
 
@@ -191,11 +203,6 @@ private:
 	HRESULT Ready_Imgui();
 	HRESULT Ready_Events();
 	
-
-
-
-//private:
-//	void ImGui_MenuBar_Render();
 
 
 public:

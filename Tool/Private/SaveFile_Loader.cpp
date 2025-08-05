@@ -95,17 +95,6 @@ void CSaveFile_Loader::Save_ModelFile(string filePath, const _wstring& strProtot
 	}
 
 	Save_AnimModel(ofs, pModel, strPrototypeTag);
-
-	/*switch (pModel->Get_ModelType())
-	{
-	case MODELTYPE::ANIM:
-		Save_AnimModel(ofs, pModel, strPrototypeTag);
-		break;
-
-	case MODELTYPE::NONANIM:
-		Save_NonAnimModel(ofs, pModel, strPrototypeTag);
-		break;
-	}*/
 	
 	
 
@@ -254,6 +243,63 @@ void CSaveFile_Loader::Load_ModelFile(string filePath, LEVEL eLevel)
 void CSaveFile_Loader::Load_AnimModel(std::ifstream& ifs, CTool_Model* pModel, const _wstring& strModelTag)
 {
 
+}
+
+void CSaveFile_Loader::Save_NavigationFile(string filePath, const vector<class CCell*>& Cells)
+{
+
+	// 1. 파일 경로 열기.
+	std::ofstream ofs(filePath, std::ios::binary);
+
+
+	NAVIGATIONSAVE_DESC naviDesc = {};
+
+	// 2. 구조체에 정보 채우기.
+	Save_NaviDesc(naviDesc, Cells);
+
+	/* 3. 채워준 정보를 바탕으로 Save하기. */
+	ofs.write(reinterpret_cast<const char*>(&naviDesc.iCellCount), sizeof(uint32_t));
+	ofs.write(reinterpret_cast<const char*>(naviDesc.Cells.data()), naviDesc.iCellCount * sizeof(CELLSAVE_DESC));
+
+
+	ofs.close();
+}
+
+void CSaveFile_Loader::Save_NaviDesc(NAVIGATIONSAVE_DESC& naviDesc, const vector<class CCell*>& Cells)
+{
+	naviDesc.iCellCount = Cells.size(); // Vector 크기.
+
+	for (auto& pCell : Cells)
+	{
+		CELLSAVE_DESC Desc{};
+		Desc.vPointA = pCell->Get_PointPos(CELLPOINT::A);
+		Desc.vPointB = pCell->Get_PointPos(CELLPOINT::B);
+		Desc.vPointC = pCell->Get_PointPos(CELLPOINT::C);
+		naviDesc.Cells.emplace_back(Desc);
+	}
+}
+
+NAVIGATIONSAVE_DESC CSaveFile_Loader::Load_NavigationFile(string filePath)
+{
+	std::ifstream ifs(filePath, std::ios::binary);
+	if (!ifs.is_open())
+		CRASH("Load Navigation File Failed");
+
+	NAVIGATIONSAVE_DESC NaviDesc = {};
+
+
+	// 1. Cell 개수 세오기.
+	ifs.read(reinterpret_cast<char*>(&NaviDesc.iCellCount), sizeof(uint32_t));
+
+	// 2. Vector에 값 채우기.
+	// 벡터 초기화
+	NaviDesc.Cells.resize(NaviDesc.iCellCount); 
+	ifs.read(reinterpret_cast<char*>(NaviDesc.Cells.data()), NaviDesc.iCellCount * sizeof(CELLSAVE_DESC));
+
+
+	ifs.close();
+		
+	return NaviDesc;
 }
 
 

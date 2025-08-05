@@ -110,6 +110,8 @@ void CToolMap_Part::Priority_Update(_float fTimeDelta)
 
 void CToolMap_Part::Update(_float fTimeDelta)
 {
+    
+
     __super::Update(fTimeDelta);
     _float fDist = {};
 
@@ -127,6 +129,7 @@ void CToolMap_Part::Update(_float fTimeDelta)
 
 void CToolMap_Part::Late_Update(_float fTimeDelta)
 {
+    
     __super::Late_Update(fTimeDelta);
 
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::BLEND, this)))
@@ -160,6 +163,23 @@ HRESULT CToolMap_Part::Render()
     m_pTransformCom->Set_State(STATE::POSITION, XMLoadFloat4(&vPos));*/
 
     return S_OK;
+}
+
+/* 메시 피킹용 반환 위치를 PickingPoint에 담아줍니다.  */
+_bool CToolMap_Part::Picking(_float3* PickingPoint)
+{
+    // 현재 RayDir을 Local Pos로 변환
+    m_pGameInstance->Transform_To_LocalSpace(m_pTransformCom->Get_WorldMatrix_Inverse());
+
+    // 반환시 PickingPoint에 월드로 전달.
+    if (m_pModelCom->Picking(PickingPoint))
+    {
+        _vector vWorldPickPoint = XMVector3TransformCoord(XMLoadFloat3(PickingPoint), m_pTransformCom->Get_WorldMatrix());
+        XMStoreFloat3(PickingPoint, vWorldPickPoint);
+        return true;
+    }
+
+    return false;
 }
 
 void CToolMap_Part::On_Collision_Enter(CGameObject* pOther)

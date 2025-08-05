@@ -21,6 +21,7 @@ public:
 	const _uint Get_MaterialIndex() { return m_iMaterialIndex; }
 	const _bool Is_Ray_Hit(const _float3& rayOrigin, const _float3& rayDir, _float3* pOutLocalPos, _float3* pOutLocalNormal, _float* pOutDist);
 	const _bool Is_Ray_Hit(const _float3& rayOrigin, const _float3& rayDir, MODEL_PICKING_INFO* pPickingInfo, _float* pOutDist);
+	const _bool Picking(const _float3& rayOrigin, const _float3& rayDir, _float3* pPickingPoint, _float3* pPickingNormal, _float* pOutDist);
 	void Set_BondIndexVector(vector<_int>& boneIndicies);
 
 #pragma region Tool 에서 추출할 Mesh 정보들

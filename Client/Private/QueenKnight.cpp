@@ -34,6 +34,12 @@ HRESULT CQueenKnight::Initialize_Clone(void* pArg)
         CRASH("Ready Components Failed");
         return E_FAIL;
     }
+
+    if (FAILED(Ready_Navigations()))
+    {
+        CRASH("Ready Navigations Failed");
+        return E_FAIL;
+    }
         
 
     if (FAILED(InitializeAction_ToAnimationMap()))
@@ -286,6 +292,36 @@ HRESULT CQueenKnight::Ready_Components(QUEENKNIGHT_DESC* pDesc)
 
     // 오프셋 지정.
     m_fOffsetY = m_pModelCom->Get_BoundingBox().fHeight * 0.5f;
+
+    return S_OK;
+}
+
+HRESULT CQueenKnight::Ready_Navigations()
+{
+    CNavigation::NAVIGATION_DESC        NaviDesc{};
+    NaviDesc.iCurrentCellIndex = 0;
+
+    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(m_eCurLevel), TEXT("Prototype_Component_Navigation"),
+        TEXT("Com_Navigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom), &NaviDesc)))
+    {
+        CRASH("Failed Clone Navigation");
+        return E_FAIL;
+    }
+
+    _float3 vPos = { 0.f, 5.f, 0.f };
+    _float3 vFinalPos = {};
+    _int iNearCell = m_pNavigationCom->Find_NearCellIndex(vPos);
+
+    if (iNearCell == -1)
+    {
+        CRASH("Failed Search Navigation Cell");
+        return E_FAIL;
+    }
+
+    m_pNavigationCom->Set_CurrentCellIndex(iNearCell);
+    XMStoreFloat3(&vFinalPos, m_pNavigationCom->Get_CellPos(iNearCell));
+    m_pTransformCom->Set_State(STATE::POSITION, XMLoadFloat3(&vFinalPos));
+
 
     return S_OK;
 }

@@ -79,6 +79,9 @@
     <Filter Include="01. Level\01. Logo\00. Tool\Navigation">
       <UniqueIdentifier>{b52e6c12-14d1-460b-85d3-bba981debe62}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01. Level\01. Logo\00. Tool\Picking">
+      <UniqueIdentifier>{b084554d-d4ef-486d-bc83-abf136926670}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -195,6 +198,7 @@
     <ClInclude Include="..\Public\NavigationManager.h">
       <Filter>01. Level\01. Logo\00. Tool\Navigation</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Picking_Manager.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="small.ico">
@@ -295,6 +299,7 @@
     <ClCompile Include="..\Private\NavigationManager.cpp">
       <Filter>01. Level\01. Logo\00. Tool\Navigation</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Picking_Manager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Tool.rc">

@@ -50,6 +50,22 @@ namespace Engine
 		class CGameObject* pHitObject = nullptr;
 	}RAYHIT_DESC;
 
+#pragma region NAVIGATION 저장용 구조체
+	typedef struct tagCellSaveDesc
+	{
+		_float3 vPointA;
+		_float3 vPointB;
+		_float3 vPointC;
+	}CELLSAVE_DESC;
+
+	typedef struct tagNavigationSaveDesc
+	{
+		uint32_t iCellCount;
+		vector<CELLSAVE_DESC> Cells;
+	}NAVIGATIONSAVE_DESC;
+#pragma endregion
+
+
 	typedef struct tagVertexPosition
 	{
 		XMFLOAT3		vPosition;

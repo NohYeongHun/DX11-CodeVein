@@ -28,6 +28,7 @@ public:
 		m_isLoop = isLoop;
 	}
 
+	_bool Picking(_float3* PickingPoint);
 	
 #pragma region 저장용 함수.
 //public:
