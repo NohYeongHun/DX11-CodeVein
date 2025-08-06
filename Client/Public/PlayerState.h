@@ -31,8 +31,9 @@ protected:
 
 
 protected:
+	virtual void Handle_Collider_State();
 	virtual void Reset_ColliderActiveInfo();
-	void Update_Collider_State();
+	virtual void Update_Collider_State();
 
 #pragma endregion
 

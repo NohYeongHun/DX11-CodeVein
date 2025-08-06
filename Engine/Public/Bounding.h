@@ -28,9 +28,12 @@ public:
 	virtual HRESULT Render(PrimitiveBatch<VertexPositionColor>* pBatch, _fvector vColor = DirectX::Colors::White) { return S_OK; }
 #endif
 
-
+#pragma region 충돌 감시
 public:
 	virtual _bool Intersect(COLLIDER eColliderType, CBounding* pBounding) PURE;
+#pragma endregion
+
+public:
 	virtual void Change_BoundingDesc(BOUNDING_DESC* pBoundingDesc) PURE;
 	virtual void Reset_Bounding() PURE;
 

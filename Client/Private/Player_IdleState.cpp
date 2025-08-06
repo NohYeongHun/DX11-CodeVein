@@ -42,7 +42,7 @@ void CPlayer_IdleState::Update(_float fTimeDelta)
 {
 	Handle_Input();
 	Change_State();
-		
+	CPlayerState::Handle_Collider_State();
 }
 
 // 종료될 때 실행할 동작..

@@ -118,11 +118,17 @@ HRESULT CCollider::Initialize_Clone(void* pArg)
 void CCollider::Update(_fmatrix WorldMatrix)
 {
     m_pBounding->Update(WorldMatrix);
+
+    //if (m_pOwner->Get_ObjectTag() == TEXT("PlayerWeapon"))
+    //{
+    //    if (m_IsActive)
+    //        OutputDebugWstring(TEXT("현재 bool 값은 true 입니다."));
+    //}
 }
 
 _bool CCollider::Intersect(const CCollider* pTargetCollider)
 {
-    return _bool();
+    return m_pBounding->Intersect(pTargetCollider->m_eType, pTargetCollider->m_pBounding);
 }
 
 #ifdef _DEBUG

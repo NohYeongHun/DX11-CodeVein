@@ -39,13 +39,16 @@ public:
 	// 시작 초기화
 	virtual HRESULT Initialize(_uint iStateNum, void* pArg) override;
 
-#pragma region 충돌 관리
-private:
-	virtual void Reset_ColliderActiveInfo();
-#pragma endregion
 
 	// State 시작 시.
 	virtual void Enter(void* pArg) override;
+
+#pragma region 충돌 관리
+//private:
+//	virtual void Reset_ColliderActiveInfo();
+//	virtual void Update_Collider_State();
+#pragma endregion
+
 
 	// State 실행 로직
 	virtual void Update(_float fTimeDelta) override;

@@ -37,11 +37,13 @@ void CPlayer_GuardState::Enter(void* pArg)
 /* State 실행 */
 void CPlayer_GuardState::Update(_float fTimeDelta)
 {
-	// 다시 누르면 해제.
 	Handle_Input();
 	// 상황에 맞게 Direction을 지정. if LockOn
 	Handle_Unified_Direction_Input(fTimeDelta);
 	Change_State(fTimeDelta);
+
+	CPlayerState::Handle_Collider_State();
+
 }
 
 /*

@@ -7,8 +7,10 @@ class CWeapon abstract : public CPartObject
 public:
 	typedef struct tagWeaponDesc : public CPartObject::PARTOBJECT_DESC
 	{
+		CGameObject* pOwner = { nullptr };
 		const _float4x4* pSocketMatrix = { nullptr }; // 장착할 뼈
 		LEVEL eCurLevel = {}; // 현재 레벨
+
 	}WEAPON_DESC;
 
 #pragma region 0. 기본 함수들
@@ -60,7 +62,7 @@ protected:
 protected:
 	CShader* m_pShaderCom = { nullptr };
 	CLoad_Model* m_pModelCom = { nullptr };
-
+	CGameObject* m_pOwner = { nullptr };
 
 protected:
 	const _float4x4* m_pSocketMatrix = { nullptr };

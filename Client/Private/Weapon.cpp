@@ -21,6 +21,7 @@ HRESULT CWeapon::Initialize_Clone(void* pArg)
     WEAPON_DESC* pDesc = static_cast<WEAPON_DESC*>(pArg);
     m_pSocketMatrix = pDesc->pSocketMatrix;
     m_eCurLevel = pDesc->eCurLevel;
+    m_pOwner = pDesc->pOwner;
 
     if (FAILED(__super::Initialize_Clone(pDesc)))
     {
@@ -81,6 +82,7 @@ void CWeapon::Update_Timer(_float fTimeDelta)
 #pragma region 1. 무기는 충돌에 대한 상태제어를 할 수 있어야한다.=> 충돌에 따라 상태가 변하기도, 수치값이 바뀌기도한다.
 void CWeapon::On_Collision_Enter(CGameObject* pOther)
 {
+        
 }
 
 void CWeapon::On_Collision_Stay(CGameObject* pOther)

@@ -37,6 +37,8 @@ HRESULT CPlayer::Initialize_Prototype()
     if (FAILED(__super::Initialize_Prototype()))
         return E_FAIL;
 
+    m_strObjTag = TEXT("Player");
+
     return S_OK;
 }
 
@@ -1050,6 +1052,8 @@ HRESULT CPlayer::Ready_PartObjects()
     Weapon.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
     Weapon.pSocketMatrix = m_pModelCom->Get_BoneMatrix("IKSocket_RightHandAttach");
     Weapon.eCurLevel = LEVEL::STATIC;
+    Weapon.pOwner = this;
+
     if (FAILED(__super::Add_PartObject(TEXT("Com_Weapon"),
         ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_Weapon")
         , reinterpret_cast<CPartObject**>(& m_pPlayerWeapon), &Weapon)))

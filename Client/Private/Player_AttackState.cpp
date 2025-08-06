@@ -1,4 +1,5 @@
 ﻿#include "Player_StrongAttackState.h"
+#include "Player_AttackState.h"
 
 CPlayer_AttackState::CPlayer_AttackState()
 {
@@ -25,12 +26,7 @@ HRESULT CPlayer_AttackState::Initialize(_uint iStateNum, void* pArg)
 	return S_OK;
 }
 
-#pragma region 충돌 설정 초기화
-void CPlayer_AttackState::Reset_ColliderActiveInfo()
-{
-	CPlayerState::Reset_ColliderActiveInfo();
-}
-#pragma endregion
+
 
 /* State 시작 시*/
 void CPlayer_AttackState::Enter(void* pArg)
@@ -48,7 +44,7 @@ void CPlayer_AttackState::Enter(void* pArg)
 	m_pModelCom->Set_Animation(m_iCurAnimIdx, m_isLoop);
 	
 	// 콜라이더 활성화 정보 초기화
-	Reset_ColliderActiveInfo();
+	CPlayerState::Reset_ColliderActiveInfo();
 
 
 	// 방향 제어 관련 초기화
@@ -64,11 +60,11 @@ void CPlayer_AttackState::Enter(void* pArg)
 /* State 실행 */
 void CPlayer_AttackState::Update(_float fTimeDelta)
 {
-	CPlayerState::Update_Collider_State();
-
 	Handle_Input();
 	Handle_Unified_Direction_Input(fTimeDelta);
 	Change_State(fTimeDelta);
+
+	CPlayerState::Handle_Collider_State();
 	
 }
 

@@ -36,6 +36,7 @@ void CPlayer_RunState::Update(_float fTimeDelta)
 	//RockOn_State(fTimeDelta);
 
 	Change_State(fTimeDelta);
+	CPlayerState::Handle_Collider_State();
 }
 
 // 종료될 때 실행할 동작..

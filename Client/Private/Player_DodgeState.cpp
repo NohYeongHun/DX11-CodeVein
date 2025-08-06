@@ -43,6 +43,7 @@ void CPlayer_DodgeState::Update(_float fTimeDelta)
 		m_pPlayer->Move_Direction( m_pPlayer->Get_Transform()->Get_LookDirection_NoPitch(), fTimeDelta * 0.5f);
 	}
 
+	CPlayerState::Handle_Collider_State();
 }
 
 // 종료될 때 실행할 동작.=> 왠만하면 Idle
