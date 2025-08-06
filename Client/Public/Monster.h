@@ -115,7 +115,7 @@ protected:
 public:
     const MONSTER_STAT& Get_MonsterStat() { return m_MonsterStat; }
     const _float Get_DetectionRange() { return m_MonsterStat.fDetectionRange; }
-    const _float Get_MinDetectionRange() { return 5.f; }
+    const _float Get_MinDetectionRange() { return m_fMinDetectionDistance; }
     const _float Get_AttackRange() { return m_MonsterStat.fAttackRange; }
 
 public:
@@ -128,6 +128,7 @@ public:
 
 protected:
     MONSTER_STAT m_MonsterStat = {};
+    _float m_fMinDetectionDistance = 5.f;
 #pragma endregion
 
 

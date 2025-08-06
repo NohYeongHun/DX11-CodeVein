@@ -296,7 +296,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_QueenKnight(const _wstring& strLayerTag)
 	Desc.fMaxHP = 3000.f;
 	Desc.fAttackPower = 50.f;
 	Desc.fDetectionRange = 30.f;
-	Desc.fAttackRange = 5.f;
+	Desc.fAttackRange = 10.f; // 최소 감지거리보단 길어야됌.
 	Desc.fSpeedPerSec = 10.f;
 	Desc.fMoveSpeed = 10.f;
 	/* Transform 설정.*/
@@ -353,12 +353,12 @@ HRESULT CLevel_GamePlay::Ready_Layer_Monster(const _wstring& strLayerTag)
 		return E_FAIL;
 	}
 
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel), strLayerTag,
+	/*if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel), strLayerTag,
 		ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_WolfDevil"), &Desc)))
 	{
 		CRASH("Failed Create WolfDevil");
 		return E_FAIL;
-	}
+	}*/
 		
 
 	/* 다 같은 Monster 레이어에 추가하기. */

@@ -1,22 +1,23 @@
-﻿
-CKnightLance::CKnightLance(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿#include "KnightShield.h"
+
+CKnightShield::CKnightShield(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CWeapon(pDevice, pContext)
 {
 }
 
-CKnightLance::CKnightLance(const CKnightLance& Prototype)
+CKnightShield::CKnightShield(const CKnightShield& Prototype)
     : CWeapon(Prototype)
 {
 }
 
-HRESULT CKnightLance::Initialize_Prototype()
+HRESULT CKnightShield::Initialize_Prototype()
 {
     return S_OK;
 }
 
-HRESULT CKnightLance::Initialize(void* pArg)
+HRESULT CKnightShield::Initialize(void* pArg)
 {
-    KNIGHT_LANCE_DESC* pDesc = static_cast<KNIGHT_LANCE_DESC*>(pArg);
+    KNIGHT_SHIELD_DESC* pDesc = static_cast<KNIGHT_SHIELD_DESC*>(pArg);
 
 
     if (FAILED(__super::Initialize_Clone(pDesc)))
@@ -25,19 +26,15 @@ HRESULT CKnightLance::Initialize(void* pArg)
     if (FAILED(Ready_Components()))
         return E_FAIL;
 
-    /*m_pTransformCom->Scaling(_float3(0.1f, 0.1f, 0.1f));
-    m_pTransformCom->Rotation(XMVectorSet(0.f, 1.f, 0.f, 0.f), XMConvertToRadians(90.0f));
-    m_pTransformCom->Set_State(STATE::POSITION, XMVectorSet(0.8f, 0.f, 0.f, 1.f));*/
-
     return S_OK;
 }
 
-void CKnightLance::Priority_Update(_float fTimeDelta)
+void CKnightShield::Priority_Update(_float fTimeDelta)
 {
     __super::Priority_Update(fTimeDelta);
 }
 
-void CKnightLance::Update(_float fTimeDelta)
+void CKnightShield::Update(_float fTimeDelta)
 {
     __super::Update(fTimeDelta);
 
@@ -47,21 +44,20 @@ void CKnightLance::Update(_float fTimeDelta)
         XMLoadFloat4x4(m_pParentMatrix));
 }
 
-void CKnightLance::Late_Update(_float fTimeDelta)
+void CKnightShield::Late_Update(_float fTimeDelta)
 {
     __super::Late_Update(fTimeDelta);
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::BLEND, this)))
         return;
 }
 
-HRESULT CKnightLance::Render()
+HRESULT CKnightShield::Render()
 {
     if (FAILED(Bind_ShaderResources()))
     {
         CRASH("Ready Render Resource Failed");
         return E_FAIL;
     }
-
 
     _uint           iNumMeshes = m_pModelCom->Get_NumMeshes();
 
@@ -75,40 +71,45 @@ HRESULT CKnightLance::Render()
         m_pModelCom->Render(i);
     }
 
-
     return S_OK;
-
 }
 
-void CKnightLance::On_Collision_Enter(CGameObject* pOther)
+void CKnightShield::On_Collision_Enter(CGameObject* pOther)
 {
 }
 
-void CKnightLance::On_Collision_Stay(CGameObject* pOther)
+void CKnightShield::On_Collision_Stay(CGameObject* pOther)
 {
 }
 
-void CKnightLance::On_Collision_Exit(CGameObject* pOther)
+void CKnightShield::On_Collision_Exit(CGameObject* pOther)
 {
 }
 
-HRESULT CKnightLance::Ready_Components()
+HRESULT CKnightShield::Ready_Components()
 {
     if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxMesh"),
         TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom), nullptr)))
+    {
+        CRASH("Failed Load Shader");
         return E_FAIL;
+    }
+        
 
     CLoad_Model::LOADMODEL_DESC Desc{};
     Desc.pGameObject = this;
 
-    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(m_eCurLevel), TEXT("Prototype_Component_Model_GodChildLance"),
+    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(m_eCurLevel), TEXT("Prototype_Component_Model_GodChildShield"),
         TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom), &Desc)))
+    {
+        CRASH("Failed Load Model")
         return E_FAIL;
+    }
 
     return S_OK;
 }
 
-HRESULT CKnightLance::Bind_ShaderResources()
+HRESULT CKnightShield::Bind_ShaderResources()
 {
     if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &m_CombinedWorldMatrix)))
         return E_FAIL;
@@ -137,33 +138,33 @@ HRESULT CKnightLance::Bind_ShaderResources()
     return S_OK;
 }
 
-CKnightLance* CKnightLance::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CKnightShield* CKnightShield::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-    CKnightLance* pInstance = new CKnightLance(pDevice, pContext);
+    CKnightShield* pInstance = new CKnightShield(pDevice, pContext);
 
     if (FAILED(pInstance->Initialize_Prototype()))
     {
-        MSG_BOX(TEXT("Failed to Created : CKnightSword"));
+        MSG_BOX(TEXT("Failed to Created : CKnightShield"));
         Safe_Release(pInstance);
     }
 
     return pInstance;
 }
 
-CGameObject* CKnightLance::Clone(void* pArg)
+CGameObject* CKnightShield::Clone(void* pArg)
 {
-    CKnightLance* pInstance = new CKnightLance(*this);
+    CKnightShield* pInstance = new CKnightShield(*this);
 
     if (FAILED(pInstance->Initialize(pArg)))
     {
-        MSG_BOX(TEXT("Failed to Created : CKnightSword"));
+        MSG_BOX(TEXT("Failed to Created : CKnightShield"));
         Safe_Release(pInstance);
     }
 
     return pInstance;
 }
 
-void CKnightLance::Free()
+void CKnightShield::Free()
 {
     __super::Free();
 }

@@ -125,6 +125,8 @@
 #include "QueenKnightTree.h"
 /* ======================================== QueenKnight Boss Object ===================================== */
 #include "QueenKnightDefine.h"
+
+#include "KnightShield.h"
 #include "KnightLance.h"
 #include "QueenKnight.h"
 

@@ -182,20 +182,21 @@ HRESULT CLoader_GamePlay::Add_Prototype_QueenKnight(ID3D11Device* pDevice, ID3D1
 {
 	_matrix		PreTransformMatrix = XMMatrixIdentity();
 	PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XM_PI);
-
-	//if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level)
-	//	, TEXT("Prototype_Component_Model_BlackKnight")
-	//	, CLoad_Model::Create(pDevice, pContext, MODELTYPE::ANIM, PreTransformMatrix, "../../SaveFile/Model/Boss/BlackKnight.dat", L""))))
-	//	return E_FAIL;
-
 	
-
 	// 방패
 	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level)
 		, TEXT("Prototype_Component_Model_GodChildShield")
 		, CLoad_Model::Create(pDevice, pContext, MODELTYPE::ANIM, PreTransformMatrix, "../../SaveFile/Model/Weapon/GodChildShield.dat", L""))))
 		return E_FAIL;
 
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level)
+		, TEXT("Prototype_GameObject_GodChildShield")
+		, CKnightShield::Create(pDevice, pContext))))
+	{
+		CRASH("Failed Create QueenKnight Shield")
+		return E_FAIL;
+	}
+		
 
 	// 무기
 	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level)

@@ -21,9 +21,6 @@ HRESULT CWolfDevil::Initialize_Prototype()
 
 HRESULT CWolfDevil::Initialize_Clone(void* pArg)
 {
-//#ifdef _DEBUG
-//    Initialize_Debug();
-//#endif // _DEBUG
 
     WOLFDEVIL_DESC* pDesc = static_cast<WOLFDEVIL_DESC*>(pArg);
 
@@ -36,6 +33,12 @@ HRESULT CWolfDevil::Initialize_Clone(void* pArg)
     if (FAILED(Ready_Components(pDesc)))
     {
         CRASH("Failed Ready Components WolfDevil");
+        return E_FAIL;
+    }
+
+    if (FAILED(Initialize_Stats()))
+    {
+        CRASH("Init Stats Failed");
         return E_FAIL;
     }
 
@@ -219,6 +222,7 @@ void CWolfDevil::Update_AI(_float fTimeDelta)
 // 기본적으로 몬스터 생성시 필요한 STAT 값들을 제외하고 더 필요한 경우 정의
 HRESULT CWolfDevil::Initialize_Stats()
 {
+    m_fMinDetectionDistance = 4.f;
     return S_OK;
 }
 #pragma endregion

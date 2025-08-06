@@ -477,6 +477,9 @@
     <ClInclude Include="..\Public\BT_QueenKnight_FirstPhase_AttackAction.h">
       <Filter>02. GameObject\Monster\Boss\QueenKnight\BT\Attack</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\KnightShield.h">
+      <Filter>02. GameObject\Monster\Boss\QueenKnight\Weapon</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -761,6 +764,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\BT_QueenKnight_FirstPhase_AttackAction.cpp">
       <Filter>02. GameObject\Monster\Boss\QueenKnight\BT\Attack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\KnightShield.cpp">
+      <Filter>02. GameObject\Monster\Boss\QueenKnight\Weapon</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

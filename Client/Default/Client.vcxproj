@@ -207,6 +207,7 @@
     <ClInclude Include="..\Public\InventoryStatus_Info.h" />
     <ClInclude Include="..\Public\Inventory_Panel.h" />
     <ClInclude Include="..\Public\KnightLance.h" />
+    <ClInclude Include="..\Public\KnightShield.h" />
     <ClInclude Include="..\Public\Level_GamePlay.h" />
     <ClInclude Include="..\Public\Level_Loading.h" />
     <ClInclude Include="..\Public\Level_Logo.h" />
@@ -311,6 +312,7 @@
     <ClCompile Include="..\Private\InventoryStatus_Info.cpp" />
     <ClCompile Include="..\Private\Inventory_Panel.cpp" />
     <ClCompile Include="..\Private\KnightLance.cpp" />
+    <ClCompile Include="..\Private\KnightShield.cpp" />
     <ClCompile Include="..\Private\Level_GamePlay.cpp" />
     <ClCompile Include="..\Private\Level_Loading.cpp" />
     <ClCompile Include="..\Private\Level_Logo.cpp" />

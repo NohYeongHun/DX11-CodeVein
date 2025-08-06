@@ -64,9 +64,10 @@ void CMonster::Priority_Update(_float fTimeDelta)
 
 void CMonster::Update(_float fTimeDelta)
 { 
+    __super::Update(fTimeDelta);
+
     if (m_pColliderCom)
         m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
-    __super::Update(fTimeDelta);
 }
 
 void CMonster::Late_Update(_float fTimeDelta)
@@ -187,6 +188,7 @@ const _bool CMonster::Is_TargetAttackRange()
     return fDistance <= m_MonsterStat.fAttackRange;
 }
 
+// 현재 문제점 => 최소 탐지거리일때도 계속 탐지됨 => 그떄는 탐지 상태로 빠지면 안된다.
 const _bool CMonster::Is_TargetDetectionRange()
 {
     if (nullptr == m_pTarget)
@@ -201,7 +203,7 @@ const _bool CMonster::Is_TargetDetectionRange()
     // 거리 계산
     _float fDistance = XMVectorGetX(XMVector3Length(vDirection));
 
-    return fDistance <= m_MonsterStat.fDetectionRange;
+    return (fDistance <= m_MonsterStat.fDetectionRange) && (fDistance >= m_fMinDetectionDistance);
 }
 
 #pragma endregion
