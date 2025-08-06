@@ -27,14 +27,14 @@ public:
 	//virtual HRESULT Render(PrimitiveBatch)
 
 public:
-	virtual _bool Intersect(CCollider::TYPE eColliderType, CBounding* pBounding) override;
+	virtual _bool Intersect(COLLIDER eColliderType, CBounding* pBounding) override;
 	virtual void Change_BoundingDesc(BOUNDING_DESC* pBoundingDesc) override;
 	virtual void Reset_Bounding() override;
 
 
 
 private:
-	BoundingSphere* m_pLocalDesc = { nullptr };
+	BoundingSphere* m_pOriginalDesc = { nullptr };
 	BoundingSphere* m_pDesc = { nullptr };
 
 public:

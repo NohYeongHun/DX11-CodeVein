@@ -283,64 +283,6 @@ void CMap_Tool::SaveLoadMenu()
     Handle_FileDialogs();
 }
 
-//void CMap_Tool::SaveLoadMenu()
-//{
-//    if (ImGui::BeginMenu("File"))
-//    {
-//     
-//        if (ImGui::MenuItem("open"))
-//        {
-//            IGFD::FileDialogConfig config;
-//            config.path = "../../SaveFile/Model/";
-//            config.flags = ImGuiFileDialogFlags_ReadOnlyFileNameField;
-//
-//            // 파일 다이얼로그 열기
-//            ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose File", ".dat", config);
-//        }
-//        if (ImGui::MenuItem("save"))
-//        {
-//            IGFD::FileDialogConfig config;
-//            config.path = "../../SaveFile/Model/";
-//            config.flags = ImGuiFileDialogFlags_ConfirmOverwrite;
-//
-//            ImGuiFileDialog::Instance()->OpenDialog("SaveFileDlgKey", "Choose File", ".dat", config);
-//
-//        }
-//        ImGui::EndMenu();
-//    }
-//
-//    if (ImGuiFileDialog::Instance()->Display("ChooseFileDlgKey")) {
-//        if (ImGuiFileDialog::Instance()->IsOk()) {
-//            std::string load_path = ImGuiFileDialog::Instance()->GetFilePathName();
-//
-//            /* Save 타입에 따라 저장 방식이 달라집니다. */
-//            //if (m_eSaveMode == SAVEMODE::MAP_OBJECT)
-//            //    m_pSaveFile_Loader->Load_MapFile(load_path, m_eCurLevel);
-//
-//            if (m_IsEditModel)
-//                m_pSaveFile_Loader->Load_ModelFile(load_path, m_eCurLevel);
-//        }
-//        ImGuiFileDialog::Instance()->Close();
-//    }
-//
-//    // 저장용 로직
-//    if (ImGuiFileDialog::Instance()->Display("SaveFileDlgKey"))
-//    {
-//        if (ImGuiFileDialog::Instance()->IsOk())
-//        {
-//            std::string save_path = ImGuiFileDialog::Instance()->GetFilePathName();
-//
-//            if (m_IsEditModel)
-//                m_pSaveFile_Loader->Save_ModelFile(save_path, m_wSelected_PrototypeModelTag);
-//            //if (m_eSaveMode == SAVEMODE::MODEL_COMPONENT)
-//            //    m_pSaveFile_Loader->Save_ModelFile(save_path, m_wSelected_PrototypeModelTag);
-//        }
-//        ImGuiFileDialog::Instance()->Close();
-//    }
-//
-//
-//}
-
 void CMap_Tool::Render_CreateModelChild()
 {
     _wstring objTag = {};
@@ -750,23 +692,23 @@ void CMap_Tool::Render_NavigationChild()
         }
 
 
-        ImGui::Text("PointA :"); ImGui::SameLine(); ImGui::InputFloat3("##PointA", fPointA);
-        ImGui::Text("PointB :"); ImGui::SameLine(); ImGui::InputFloat3("##PointB", fPointB);
-        ImGui::Text("PointC :"); ImGui::SameLine(); ImGui::InputFloat3("##PointC", fPointC);
+        ImGui::Text("A :"); ImGui::SameLine(); ImGui::InputFloat3("PointA", fPointA);
+        ImGui::Text("B :"); ImGui::SameLine(); ImGui::InputFloat3("PointB", fPointB);
+        ImGui::Text("C :"); ImGui::SameLine(); ImGui::InputFloat3("PointC", fPointC);
 
-        ImGui::Text("ClickPointXYZ :"); ImGui::SameLine(); ImGui::DragFloat3("##ClickPointXYZ", fClickedPosition, 0.01f);
+        ImGui::Text("X Y Z :"); ImGui::SameLine(); ImGui::DragFloat3("X Y Z", fClickedPosition, 0.01f);
         m_fClickPoint = _float3(fClickedPosition[0], fClickedPosition[1], fClickedPosition[2]);
         m_pNavigation_Manager->Update_ClickedPosition(m_fClickPoint);
 
 
-        if (ImGui::Button("Cancle Click Point"))
+        if (ImGui::Button("Cancel Pick Point"))
             m_pNavigation_Manager->Clear_ClickedPosition();
 
-        if (ImGui::Button("PopBack Cell"))
+        if (ImGui::Button("Delete Back Cell"))
             m_pNavigation_Manager->Cancle_Cell();
         if (ImGui::Button("Erase Picked Cell"))
             m_pNavigation_Manager->Erase_Cell();
-        if (ImGui::Button("All_Clear Cell"))
+        if (ImGui::Button("All Clear Cell"))
             m_pNavigation_Manager->Clear_Cells();
 
 
@@ -848,8 +790,7 @@ void CMap_Tool::Render_Debug_Window()
     // 현재 선택된 파일 타입 표시
     const char* typeNames[] = { "Model", "Navigation", "Map Object" };
     ImGui::Text("Current Type: %s", typeNames[(int)m_eSaveType]);
-    //const char* modeStr = (m_eToolMode == TOOLMODE::CREATE) ? "CREATE" : "EDIT";
-    //ImGui::Text("Tool Mode: %s", modeStr);
+
    
     if (m_pSelectedObject)
     {
@@ -863,43 +804,7 @@ void CMap_Tool::Render_Debug_Window()
     }
     
     
-    
-    // 체크박스 추가 - 피킹 가능 여부
-    //ImGui::Checkbox("Enable Picking", &m_IsPossible_Picking);
-    // 체크박스 추가 - 파일 Load Save 여부
-    //ImGui::Checkbox("Enable SaveLoad", &m_IsPossible_SaveLoad);
-
-
-
-    //if (m_eToolMode == TOOLMODE::CREATE)
-    //    ImGui::Text("Select Model : %s", m_Selected_PrototypeModelTag.c_str());
-    //else if(m_eToolMode == TOOLMODE::EDIT)
-    //    ImGui::Text("Select Object : %s", m_Selected_EditObjTag.c_str());
-
-    //const char* items[] = { "Map", "Model" };
-    //
-    //// enum -> int
-    //int iCurMode = static_cast<int>(m_eSaveMode);
-    //ImGui::Combo("Save Type", static_cast<int*>(&iCurMode), items, IM_ARRAYSIZE(items));
-    //    m_eSaveMode = static_cast<SAVEMODE>(iCurMode); // int → enum
-    
-    //if (ImGui::Button("Edit Mode"))
-    //{
-    //    m_eToolMode = TOOLMODE::EDIT;
-    //    // 현재 생성된 Layer 정보를 Load합니다.
-    //    Load_Layer();
-    //}
-    
-    //if (ImGui::Button("Create Mode"))
-    //{
-    //    m_eToolMode = TOOLMODE::CREATE;
-    //}
-    //
-    //if (ImGui::Button("Nav Mode"))
-    //{
-    //    m_eToolMode = TOOLMODE::NAV_MODE;
-    //}
-
+   
 
     ImGui::End();
 }
@@ -909,13 +814,7 @@ void CMap_Tool::Render_Debug_Window()
 
 
 #pragma region CREATE_MODE
-//void CMap_Tool::Render_Model_Create()
-//{
-//    if (m_IsPossible_SaveLoad)
-//        return;
-//
-//    Render_Prototype_Hierarchy();
-//}
+
 
 
 /* 프로토타입 인덱스, 객체 이름, 모델 컴포넌트 이름.*/
@@ -952,17 +851,6 @@ void CMap_Tool::Register_Prototype_Hierarchy(_uint iPrototypeLevelIndex, const _
 
 
 
-
-/*
-*  Object Layer에서 Hierarchy에 불러옵니다.
-*  객체들이 생성되고 삭제될 수 있으므로 해당 상황마다 동적으로 불러와야 합니다.
-*  Layer에 변동사항이 있을때마다 호출합니다.
-*/
-
-
-
-
-
 #pragma endregion
 
 #pragma region Helper 함수.
@@ -972,9 +860,6 @@ void CMap_Tool::Update_Picking(_uint iLayerLevelIndex, const _wstring& strLevelL
 {
     _float fOutDist = {};
     
-    //m_RayHitDesc = m_pGameInstance->Get_PickingLocalObject(iLayerLevelIndex, strLevelLayerTag,
-    //    &fOutDist);
-
     m_ModelPickingDesc = m_pGameInstance->Get_PickingLocalObject(iLayerLevelIndex, strLevelLayerTag);
     SelectObject(m_ModelPickingDesc.pHitObject);
         
@@ -1071,11 +956,6 @@ HRESULT CMap_Tool::Ready_Events()
 
 #pragma endregion
 
-
-    /*m_pGameInstance->Subscribe(EventType::MAPTOOL_LOAD_LAYER, Get_ID(), [this](void* pData) {
-        TOOL_LOAD_LAYER* desc = static_cast<TOOL_LOAD_LAYER>
-        });*/
-    // m_pGameInstance->Publish()
     return S_OK;
 }
 

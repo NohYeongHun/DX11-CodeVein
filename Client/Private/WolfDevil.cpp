@@ -21,6 +21,7 @@ HRESULT CWolfDevil::Initialize_Prototype()
 
 HRESULT CWolfDevil::Initialize_Clone(void* pArg)
 {
+
     WOLFDEVIL_DESC* pDesc = static_cast<WOLFDEVIL_DESC*>(pArg);
 
     if (FAILED(__super::Initialize_Clone(pDesc)))
@@ -32,6 +33,12 @@ HRESULT CWolfDevil::Initialize_Clone(void* pArg)
     if (FAILED(Ready_Components(pDesc)))
     {
         CRASH("Failed Ready Components WolfDevil");
+        return E_FAIL;
+    }
+
+    if (FAILED(Initialize_Stats()))
+    {
+        CRASH("Init Stats Failed");
         return E_FAIL;
     }
 
@@ -127,7 +134,7 @@ void CWolfDevil::Late_Update(_float fTimeDelta)
 
     m_pTransformCom->Set_State(STATE::POSITION
         , m_pNavigationCom->Compute_OnCell(
-            m_pTransformCom->Get_State(STATE::POSITION), m_fOffsetY * 0.5f));
+            m_pTransformCom->Get_State(STATE::POSITION), m_fOffsetY + 0.2f));
 
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::BLEND, this)))
         return;
@@ -137,6 +144,16 @@ void CWolfDevil::Late_Update(_float fTimeDelta)
 
 HRESULT CWolfDevil::Render()
 {
+//#ifdef _DEBUG
+//    BoundingBoxRender(m_pModelCom->Get_BoundingBox(), m_pTransformCom->Get_WorldMatrix());
+//#endif // _DEBUG
+
+#ifdef _DEBUG
+    m_pColliderCom->Render();
+#endif // _DEBUG
+
+
+
     if (FAILED(Ready_Render_Resources()))
     {
         CRASH("Ready Render Resource Failed");
@@ -197,15 +214,6 @@ void CWolfDevil::Update_AI(_float fTimeDelta)
     {
     }
 
-#ifdef _DEBUG
-    //OutputDebugWstring(TEXT("현재 WolfDevil의 Buff 쿨타임 : "));
-    //OutPutDebugFloat(m_BuffTimers[BUFF_HIT]);
-    //OutputDebugWstring(TEXT("현재 WolfDevil의 Buff Flag : "));
-    //OutPutDebugInt(m_ActiveBuffs);
-    //OutputDebugWstring(TEXT("현재 WolfDevil의 Animation Index : "));
-    //OutPutDebugInt(m_pModelCom->Get_CurrentAnimationIndex()); // 현재 모델 인덱스 가져오기.
-#endif // _DEBUG
-
 }
 #pragma endregion
 
@@ -214,6 +222,7 @@ void CWolfDevil::Update_AI(_float fTimeDelta)
 // 기본적으로 몬스터 생성시 필요한 STAT 값들을 제외하고 더 필요한 경우 정의
 HRESULT CWolfDevil::Initialize_Stats()
 {
+    m_fMinDetectionDistance = 4.f;
     return S_OK;
 }
 #pragma endregion
@@ -300,7 +309,21 @@ HRESULT CWolfDevil::Ready_Components(WOLFDEVIL_DESC* pDesc)
         return E_FAIL;
 
     // 오프셋 지정.
-    m_fOffsetY = m_pModelCom->Get_BoundingBox().fHeight * 0.5f;
+
+    BOUNDING_BOX box = m_pModelCom->Get_BoundingBox();
+    m_fOffsetY = box.fHeight * 0.5f;
+
+    CBounding_AABB::BOUNDING_AABB_DESC  AABBDesc{};
+    AABBDesc.vExtents = _float3(box.vExtents.x, box.vExtents.y, box.vExtents.z);
+    AABBDesc.vCenter = _float3(0.f, 0.f, 0.f); // 중점.
+
+    if (FAILED(__super::Add_Component(ENUM_CLASS(LEVEL::STATIC)
+        , TEXT("Prototype_Component_Collider_AABB")
+        , TEXT("Com_Collider"), reinterpret_cast<CComponent**>(&m_pColliderCom), &AABBDesc)))
+    {
+        CRASH("Failed Clone Collider AABB");
+        return E_FAIL;
+    }
 
     return S_OK;
 }

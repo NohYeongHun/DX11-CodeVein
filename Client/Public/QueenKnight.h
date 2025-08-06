@@ -60,8 +60,6 @@ public:
 	// AI에 대한 호출 순서를 정의합니다.
 	virtual void Update_AI(_float fTimeDelta) override;
 
-public:
-
 private:
 	class CQueenKnightTree* m_pTree = { nullptr };
 #pragma endregion
@@ -92,6 +90,7 @@ public:
 #pragma region 0. 기본 함수들 정의
 private:
 	class CKnightLance* m_pWeapon = { nullptr };
+	class CKnightShield* m_pShield = { nullptr };
 
 private:
 	HRESULT Ready_Components(QUEENKNIGHT_DESC* pDesc);

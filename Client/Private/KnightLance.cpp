@@ -50,7 +50,7 @@ void CKnightLance::Update(_float fTimeDelta)
 void CKnightLance::Late_Update(_float fTimeDelta)
 {
     __super::Late_Update(fTimeDelta);
-    if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::NONBLEND, this)))
+    if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::BLEND, this)))
         return;
 }
 

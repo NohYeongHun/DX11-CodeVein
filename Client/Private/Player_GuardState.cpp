@@ -25,7 +25,7 @@ void CPlayer_GuardState::Enter(void* pArg)
 	// ⭐ Dodge는 non-loop으로 변경
 	m_isLoop = false;
 	m_pModelCom->Set_Animation(m_iCurAnimIdx, m_isLoop);
-	m_pModelCom->Set_RootMotionTranslate(true);
+	m_pModelCom->Set_RootMotionTranslate(false);
 	m_pModelCom->Set_RootMotionRotation(true);
 
 	// 방향 제어 관련 초기화
@@ -55,13 +55,15 @@ void CPlayer_GuardState::Update(_float fTimeDelta)
 // 종료될 때 실행할 동작.=> 왠만하면 Idle
 void CPlayer_GuardState::Exit()
 {
-	_wstring wstr = L" Guard Current Anim Index : " + to_wstring(m_iNextAnimIdx) + L" ";
-	OutputDebugString(wstr.c_str());
+	/*_wstring wstr = L" Guard Current Anim Index : " + to_wstring(m_iNextAnimIdx) + L" ";
+	OutputDebugString(wstr.c_str());*/
 	// 보간 안해도 됨.
 
-	if (m_iNextState == CPlayer::PLAYER_STATE::IDLE)
-		m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, false);
+	//if (m_iNextState == CPlayer::PLAYER_STATE::IDLE)
+	//	m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, false);
 		
+	//if (m_iNextState == CPlayer::PLAYER_STATE::GUARD)
+	//	m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.05f, true, true, false);
 }
 
 // 상태 초기화
@@ -89,11 +91,11 @@ void CPlayer_GuardState::Change_State(_float fTimeDelta)
 		if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::GUARD))
 		{
 			// 현재 상태가 시작 상태일때만 End로 변경.
-			if (m_iCurAnimIdx == PLAYER_ANIM_GUARD_START)
+			if (m_iCurAnimIdx == m_pPlayer->Find_AnimationIndex(TEXT("GUARD_START")))
 			{
 				m_iNextState = CPlayer::PLAYER_STATE::GUARD;
-				m_iNextAnimIdx = PLAYER_ANIM_GUARD_END;
-				Guard.iAnimation_Idx = PLAYER_ANIM_GUARD_END;
+				m_iNextAnimIdx = m_pPlayer->Find_AnimationIndex(TEXT("GUARD_END"));
+				Guard.iAnimation_Idx = m_iNextAnimIdx;
 				m_pFsm->Change_State(m_iNextState, &Guard);
 				return;
 			}
@@ -102,11 +104,11 @@ void CPlayer_GuardState::Change_State(_float fTimeDelta)
 	// 모델 재생시간이 끝났는데 End 상태였다면 Idle로 변환
 	if (m_pModelCom->Is_Finished())
 	{
-		if (m_iCurAnimIdx == PLAYER_ANIM_GUARD_END)
+		if (m_iCurAnimIdx == m_pPlayer->Find_AnimationIndex(TEXT("GUARD_END")))
 		{
 			m_iNextState = CPlayer::PLAYER_STATE::IDLE;
-			m_iNextAnimIdx = PLAYER_ANIM_IDLE_SWORD;
-			Idle.iAnimation_Idx = PLAYER_ANIM_IDLE_SWORD;	
+			m_iNextAnimIdx = m_pPlayer->Find_AnimationIndex(TEXT("IDLE"));
+			Idle.iAnimation_Idx = m_iNextAnimIdx;
 			m_pFsm->Change_State(m_iNextState, &Idle);
 			return;
 		}

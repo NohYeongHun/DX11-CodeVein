@@ -47,28 +47,20 @@ void CPlayer_StrongAttackState::Update(_float fTimeDelta)
 void CPlayer_StrongAttackState::Exit()
 {
 	
-	m_pModelCom->Set_RootMotionRotation(false);
-	m_pModelCom->Set_RootMotionTranslate(false);
 
 	if (m_iNextState != -1) // NextIndex가 있는경우 블렌딩 시작.
 	{
-		if (m_iNextState == CPlayer::PLAYER_STATE::IDLE)
-		{
-			m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, false);
-			return;
-		}
-		
-		// 루트모션은 블렌딩안하기.
-		if (m_iNextState == CPlayer::PLAYER_STATE::STRONG_ATTACK ||
-			m_iNextState == CPlayer::PLAYER_STATE::ATTACK ||
-			m_iNextState == CPlayer::PLAYER_STATE::DODGE ||
-			m_iNextState == CPlayer::PLAYER_STATE::GUARD
-			)
-		{
-			return;
-		}
-		else 
-			m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, false);	
+		//// 루트모션은 블렌딩안하기.
+		//if (m_iNextState == CPlayer::PLAYER_STATE::STRONG_ATTACK ||
+		//	m_iNextState == CPlayer::PLAYER_STATE::ATTACK ||
+		//	m_iNextState == CPlayer::PLAYER_STATE::DODGE ||
+		//	m_iNextState == CPlayer::PLAYER_STATE::GUARD
+		//	)
+		//{
+		//	return;
+		//}
+		//else 
+		m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, true);	
 	}
 
 	
@@ -94,37 +86,52 @@ void CPlayer_StrongAttackState::Change_State()
 	
 	if (m_pModelCom->Is_Finished())
 	{
-		m_iNextAnimIdx = PLAYER_ANIM_IDLE_SWORD;
+		/*m_iNextAnimIdx = PLAYER_ANIM_IDLE_SWORD;
 		Idle.iAnimation_Idx = PLAYER_ANIM_IDLE_SWORD;
-		m_pFsm->Change_State(CPlayer::PLAYER_STATE::IDLE, &Idle);
+		m_pFsm->Change_State(CPlayer::PLAYER_STATE::IDLE, &Idle);*/
+
+		m_iNextAnimIdx = m_pPlayer->Find_AnimationIndex(TEXT("ATTACK1"));
+		Attack.iAnimation_Idx = m_iNextAnimIdx;
+		m_pFsm->Change_State(CPlayer::PLAYER_STATE::ATTACK, &Attack);
 		return;
 	}
 
 	if (m_pFsm->Is_ExitCoolTimeEnd(m_iStateNum))
 	{
-		if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::STRONG_ATTACK))
-		{
-			if (m_iCurAnimIdx != PLAYER_ANIM_SPECIAL_DOWN3)
-				return;
 
-			/*if (m_iCurAnimIdx != PLAYER_ANIM_SPECIAL_LAUNCH)
-				return;*/
 
-			m_iNextAnimIdx = PLAYER_ANIM_SPECIAL_LAUNCH;
-			m_iNextState = CPlayer::STRONG_ATTACK;
-			StrongAttack.iAnimation_Idx = m_iNextAnimIdx;
-			m_pFsm->Change_State(m_iNextState, &StrongAttack);
-			return;
-		}
+		//if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::STRONG_ATTACK))
+		//{
+		//	if (m_iCurAnimIdx != m_pPlayer->Find_AnimationIndex(TEXT("STRONG_ATTACK1")))
+		//		return;
+
+		//	/*if (m_iCurAnimIdx != PLAYER_ANIM_SPECIAL_LAUNCH)
+		//		return;*/
+
+		//	m_iNextAnimIdx = m_pPlayer->Find_AnimationIndex(TEXT("STRONG_ATTACK2"));
+		//	m_iNextState = CPlayer::STRONG_ATTACK;
+		//	StrongAttack.iAnimation_Idx = m_iNextAnimIdx;
+		//	m_pFsm->Change_State(m_iNextState, &StrongAttack);
+		//	return;
+		//}
 
 		if (m_pPlayer->Is_MovementKeyPressed())
 		{
-			m_iNextAnimIdx = PLAYER_ANIM_RUN_F_LOOP;
+			m_iNextAnimIdx = m_pPlayer->Find_AnimationIndex(TEXT("RUN"));
 			m_iNextState = CPlayer::PLAYER_STATE::RUN;
 			Run.iAnimation_Idx = m_iNextAnimIdx;
 			m_pFsm->Change_State(m_iNextState, &Run);
 			return;
 		}
+		
+		/*if (m_iCurAnimIdx == m_pPlayer->Find_AnimationIndex(TEXT("STRONG_ATTACK1")) &&
+			m_pModelCom->Get_Current_Ratio() > 0.55f)
+		{
+			m_iNextAnimIdx = m_pPlayer->Find_AnimationIndex(TEXT("ATTACK1"));
+			Attack.iAnimation_Idx = m_iNextAnimIdx;
+			m_pFsm->Change_State(CPlayer::PLAYER_STATE::ATTACK, &Attack);
+			return;
+		}*/
 
 		
 	}

@@ -14,6 +14,17 @@ public:
 		STRONG_ATTACK, GUARD, ATTACK,
 		STATE_END
 	};
+
+	// 플레이어 버프 정의
+	enum BUFF_FLAGTS : _uint
+	{
+		BUFF_NONE = 0,
+		BUFF_HIT = 1  << 24,
+		BUFF_DOWN = 1 << 25,
+		BUFF_STUN = 1 << 26,
+		BUFF_INVINCIBLE = 1 << 27, // 무적시간.
+		BUFF_END
+	};
 #pragma endregion
 
 public:
@@ -40,11 +51,14 @@ public:
 
 
 
-#pragma region 충돌 함수 정의
+#pragma region 충돌 관리 
 public:
 	virtual void On_Collision_Enter(CGameObject* pOther);
 	virtual void On_Collision_Stay(CGameObject* pOther);
 	virtual void On_Collision_Exit(CGameObject* pOther);
+
+private:
+	class CCollider* m_pColliderCom = { nullptr };
 #pragma endregion
 
 public:
@@ -90,7 +104,7 @@ public:
 
 
 
-#pragma region 이동 관련 함수들
+#pragma region 0. 이동 관련 함수들
 public:
 	virtual void RootMotion_Translate(_fvector vTranslate);
 	void Move_By_Camera_Direction_8Way(ACTORDIR eDir, _float fTimeDelta, _float fSpeed);
@@ -101,7 +115,7 @@ public:
 	// 현재 프레임 가져오기.
 #pragma endregion
 
-#pragma region 락온
+#pragma region 1. 락온
 public:
 	void Toggle_LockOn();                               // LockOn 토글
 	void Search_LockOn_Target();                        // 타겟 검색
@@ -136,9 +150,49 @@ private:
 #pragma endregion
 
 
+#pragma region 3. Animation 관리.
+private:
+	HRESULT InitializeAction_ToAnimationMap();
+
+public:
+	_uint Find_AnimationIndex(const _wstring& strAnimationTag);
+
+private:
+	unordered_map<_wstring, _uint> m_Action_AnimMap;
+
 public:
 	// Animation 교체.
 	void Change_Animation(_uint iAnimIndex, _bool IsLoop, _float fDuration, _uint iStartFrame, _bool bEitherBoundary, _bool bSameChange);
+#pragma endregion
+
+
+
+
+#pragma region 4. 플레이어 버프 관리
+public:
+	void RemoveBuff(uint32_t buffFlag, _bool removeTimer = false);
+	const _bool AddBuff(_uint buffFlag, _float fCustomDuration = -1.f); // 적용이 실패할 수도 있음.
+	const _bool IsBuffOnCooldown(_uint buffFlag);
+
+public:
+	// 현재 버프 소유 여부 확인
+	_bool HasBuff(_uint buffFlag) const;
+	_bool HasAnyBuff(_uint buffFlags) const;
+	_bool HasAllBuffs(_uint buffFlags) const;
+
+public:
+	void Tick_BuffTimers(_float fTimeDelta);
+
+
+private:
+	HRESULT Initialize_BuffDurations();
+
+private:
+	uint32_t m_ActiveBuffs = { BUFF_NONE };
+	unordered_map<uint32_t, _float> m_BuffTimers;           // 상태별 남은 시간
+	unordered_map<uint32_t, _float> m_BuffDefault_Durations; // 상태별 기본 시간.
+
+#pragma endregion
 
 
 #pragma region Player 기본 상태 값

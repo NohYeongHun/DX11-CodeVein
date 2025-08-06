@@ -14,8 +14,8 @@ HRESULT CBounding_AABB::Initialize(BOUNDING_DESC* pBoundingDesc)
 {
 	BOUNDING_AABB_DESC* pDesc = static_cast<BOUNDING_AABB_DESC*>(pBoundingDesc);
 	
-	m_pLocalDesc = new BoundingBox(pDesc->vCenter, pDesc->vExtents);
-	m_pDesc = new BoundingBox(*m_pLocalDesc);
+	m_pOriginalDesc = new BoundingBox(pDesc->vCenter, pDesc->vExtents);
+	m_pDesc = new BoundingBox(*m_pOriginalDesc);
 
 	return S_OK;
 }
@@ -28,24 +28,33 @@ void CBounding_AABB::Update(_fmatrix WorldMatrix)
 	TransformMatrix.r[1] = XMVectorSet(0.f, 1.f, 0.f, 0.f) * XMVector3Length(TransformMatrix.r[1]);
 	TransformMatrix.r[2] = XMVectorSet(0.f, 0.f, 1.f, 0.f) * XMVector3Length(TransformMatrix.r[2]);
 
-	m_pLocalDesc->Transform(*m_pDesc, TransformMatrix);
+	m_pOriginalDesc->Transform(*m_pDesc, TransformMatrix);
 
 }
-_bool CBounding_AABB::Intersect(CCollider::TYPE eColliderType, CBounding* pBounding)
+
+#ifdef _DEBUG
+HRESULT CBounding_AABB::Render(PrimitiveBatch<VertexPositionColor>* pBatch)
+{
+	DX::Draw(pBatch, *m_pDesc);
+	return S_OK;
+}
+#endif 
+
+_bool CBounding_AABB::Intersect(COLLIDER eColliderType, CBounding* pBounding)
 {
 	_bool		isColl = { false };
 
 	switch (eColliderType)
 	{
-	case CCollider::TYPE_AABB:
+	case COLLIDER::AABB:
 		isColl = m_pDesc->Intersects(*(dynamic_cast<CBounding_AABB*>(pBounding)->Get_Desc()));
 		break;
 
-	case CCollider::TYPE_OBB:
+	case COLLIDER::OBB:
 		isColl = m_pDesc->Intersects(*(dynamic_cast<CBounding_OBB*>(pBounding)->Get_Desc()));
 		break;
 
-	case CCollider::TYPE_SPHERE:
+	case COLLIDER::SPHERE:
 		isColl = m_pDesc->Intersects(*(dynamic_cast<CBounding_Sphere*>(pBounding)->Get_Desc()));
 		break;
 	}
@@ -53,6 +62,7 @@ _bool CBounding_AABB::Intersect(CCollider::TYPE eColliderType, CBounding* pBound
 	return isColl;
 
 }
+
 
 void CBounding_AABB::Change_BoundingDesc(BOUNDING_DESC* pBoundingDesc)
 {
@@ -67,8 +77,8 @@ void CBounding_AABB::Change_BoundingDesc(BOUNDING_DESC* pBoundingDesc)
 
 void CBounding_AABB::Reset_Bounding()
 {
-	m_pDesc->Center = m_pLocalDesc->Center;
-	m_pDesc->Extents = m_pLocalDesc->Extents;
+	m_pDesc->Center = m_pOriginalDesc->Center;
+	m_pDesc->Extents = m_pOriginalDesc->Extents;
 }
 
 CBounding_AABB* CBounding_AABB::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CBounding::BOUNDING_DESC* pBoundingDesc)
@@ -87,6 +97,6 @@ void CBounding_AABB::Free()
 {
 	__super::Free();
 	Safe_Delete(m_pDesc);
-	Safe_Delete(m_pLocalDesc);
+	Safe_Delete(m_pOriginalDesc);
 
 }

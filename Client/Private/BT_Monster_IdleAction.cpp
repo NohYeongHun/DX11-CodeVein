@@ -16,6 +16,7 @@ void CBT_Monster_IdleAction::Reset()
 
 BT_RESULT CBT_Monster_IdleAction::LoopIdle(_float fTimeDelta)
 {
+	m_pOwner->Set_RootMotionTranslate(false);
     m_pOwner->RotateTurn_ToTarget();
     _uint iNextAnimationIdx = m_pOwner->Find_AnimationIndex(L"IDLE");
 	m_pOwner->Change_Animation_NonBlend(iNextAnimationIdx);

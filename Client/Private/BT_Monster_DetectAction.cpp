@@ -73,23 +73,22 @@ BT_RESULT CBT_Monster_DetectAction::UpdateWalk(_float fTimeDelta)
         return BT_RESULT::RUNNING;
     }
 
+  
+
     if (m_pOwner->Is_Animation_Finished())
+    {
         m_eDetectPhase = DETECT_PHASE::END;
+    }
     else
     {
-        // 모든 이동 함수 통일. => 몬스터
-        if (!m_IsRootMotion)
-        {
-            _vector vLook = XMVector3Normalize(m_pOwner->Get_Transform()->Get_State(STATE::LOOK));
-            m_pOwner->Move_Direction(vLook, fTimeDelta * 0.1f);
-        }
-            
-            //m_pOwner->Get_Transform()->Go_Straight(fTimeDelta * 0.1f);
+        _vector vLook = XMVector3Normalize(m_pOwner->Get_Transform()->Get_State(STATE::LOOK));
+        m_pOwner->Move_Direction(vLook, fTimeDelta * 0.1f);
     }
 
     return BT_RESULT::RUNNING;
 }
 
+// 왜이게 반복돼?
 BT_RESULT CBT_Monster_DetectAction::EndDetect(_float fTimeDleta)
 {
     m_eDetectPhase = DETECT_PHASE::COMPLETED;
@@ -98,7 +97,6 @@ BT_RESULT CBT_Monster_DetectAction::EndDetect(_float fTimeDleta)
 
     // 2. 현재 애니메이션으로 NON 블렌딩하면서 변경. => Idle은 NonBlend로 변경.
     m_pOwner->Change_Animation_NonBlend(iNextAnimationIdx);
-    m_pOwner->Set_RootMotionTranslate(false);
 
     return BT_RESULT::RUNNING;
 }

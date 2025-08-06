@@ -216,15 +216,6 @@ void CLoad_Model::Calculate_Bounding_Box()
 	m_BoundingBox.fHeight = m_BoundingBox.vMax.y - m_BoundingBox.vMin.y;
 
 	Rotate_Bounding_Box();
-
-//#ifdef _DEBUG
-//	char debugMsg[256];
-//	sprintf_s(debugMsg, "Model Bounding Box:\nMin: (%.2f, %.2f, %.2f)\nMax: (%.2f, %.2f, %.2f)\nHeight: %.2f\n",
-//		m_BoundingBox.vMin.x, m_BoundingBox.vMin.y, m_BoundingBox.vMin.z,
-//		m_BoundingBox.vMax.x, m_BoundingBox.vMax.y, m_BoundingBox.vMax.z,
-//		m_BoundingBox.fHeight);
-//	OutputDebugStringA(debugMsg);
-//#endif
 }
 
 void CLoad_Model::Rotate_Bounding_Box()
@@ -361,6 +352,10 @@ _bool CLoad_Model::Play_Animation(_float fTimeDelta)
 		m_Bones, m_isLoop, &m_isFinished, m_BlendDesc, fTimeDelta
 	);
 
+	_matrix mat = m_Bones[m_iRoot_BoneIndex]->Get_TransformationMatrix();
+	mat.r[3] = XMVectorSet(0.f, 0.f, 0.f, 1.f);
+	m_Bones[m_iRoot_BoneIndex]->Set_TransformationMatrix(mat);
+
 	for (_uint i = 0; i < m_Bones.size(); ++i)
 	{
 		m_Bones[i]->Update_CombinedTransformationMatrix(m_PreTransformMatrix, m_Bones);
@@ -430,7 +425,7 @@ void CLoad_Model::Handle_RootMotion(_float fTimeDelta)
 
 		// 0. 뼈의 이동 구하기.
 		_vector vLocalTranslate = vNewRootPos - XMLoadFloat4(&m_vOldPos);
-		vLocalTranslate = XMVectorSetY(vLocalTranslate, 0.f); // Y축 제거
+		//vLocalTranslate = XMVectorSetY(vLocalTranslate, 0.f); // Y축 제거
 
 		_vector vWorldTranslate = vLocalTranslate; // 기본값
 
@@ -450,9 +445,10 @@ void CLoad_Model::Handle_RootMotion(_float fTimeDelta)
 			m_pOwner->RootMotion_Translate(vWorldTranslate);
 		}
 
-		// 🔥 Y축을 제거한 상태로 m_vOldPos 업데이트
-		_vector vNewRootPosNoY = XMVectorSetY(vNewRootPos, 0.f);
-		XMStoreFloat4(&m_vOldPos, vNewRootPosNoY);
+		//_vector vNewRootPosNoY = XMVectorSetY(vNewRootPos, 0.f);
+		//XMStoreFloat4(&m_vOldPos, vNewRootPosNoY);
+
+		XMStoreFloat4(&m_vOldPos, vNewRootPos);
 	}
 
 	// 새로운 애니메이션의 루트본을 이전벡터에 넣어둔다.

@@ -256,7 +256,6 @@ void CCamera_Player::Update_LockOn_Camera(_float fTimeDelta)
 	_vector vLookAtPos = (vPlayerPos + vTargetPos_Enemy) * 0.5f;
 
 	// 살짝 위쪽을 바라보도록 Y 좌표 조정
-	//vLookAtPos = XMVectorSetY(vLookAtPos, XMVectorGetY(vLookAtPos) + 2.0f);
 	vLookAtPos = XMVectorSetY(vLookAtPos, XMVectorGetY(vLookAtPos));
 
 	_float3 vLookAtFloat3;

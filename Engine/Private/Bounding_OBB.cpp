@@ -18,8 +18,8 @@ HRESULT CBounding_OBB::Initialize(BOUNDING_DESC* pBoundingDesc)
 	_float4		vQuaternion = {};
 	XMStoreFloat4(&vQuaternion, XMQuaternionRotationRollPitchYaw(pDesc->vRotation.x, pDesc->vRotation.y, pDesc->vRotation.z));
 
-	m_pLocalDesc = new BoundingOrientedBox(pDesc->vCenter, pDesc->vExtents, vQuaternion);
-	m_pDesc = new BoundingOrientedBox(*m_pLocalDesc);
+	m_pOriginalDesc = new BoundingOrientedBox(pDesc->vCenter, pDesc->vExtents, vQuaternion);
+	m_pDesc = new BoundingOrientedBox(*m_pOriginalDesc);
 
 	return S_OK;
 }
@@ -27,24 +27,24 @@ HRESULT CBounding_OBB::Initialize(BOUNDING_DESC* pBoundingDesc)
 void CBounding_OBB::Update(_fmatrix WorldMatrix)
 {
 	// Local 기준으로 World 행렬 변환을 m_pDesc에 적용.
-	m_pLocalDesc->Transform(*m_pDesc, WorldMatrix);
+	m_pOriginalDesc->Transform(*m_pDesc, WorldMatrix);
 }
-_bool CBounding_OBB::Intersect(CCollider::TYPE eColliderType, CBounding* pBounding)
+_bool CBounding_OBB::Intersect(COLLIDER eColliderType, CBounding* pBounding)
 {
 	_bool		isColl = { false };
 	_float		fPenetrationDepth = 0.0f; // 침투 깊이를 담을 변수
 
 	switch (eColliderType)
 	{
-	case CCollider::TYPE_AABB:
+	case COLLIDER::AABB:
 		isColl = m_pDesc->Intersects(*(dynamic_cast<CBounding_AABB*>(pBounding)->Get_Desc()));
 		break;
 
-	case CCollider::TYPE_OBB:
+	case COLLIDER::OBB:
 		isColl = m_pDesc->Intersects(*(dynamic_cast<CBounding_OBB*>(pBounding)->Get_Desc()));
 		break;
 
-	case CCollider::TYPE_SPHERE:
+	case COLLIDER::SPHERE:
 		isColl = m_pDesc->Intersects(*(dynamic_cast<CBounding_Sphere*>(pBounding)->Get_Desc()));
 		break;
 	}
@@ -76,5 +76,5 @@ void CBounding_OBB::Free()
 {
 	__super::Free();
 	Safe_Delete(m_pDesc);
-	Safe_Delete(m_pLocalDesc);
+	Safe_Delete(m_pOriginalDesc);
 }

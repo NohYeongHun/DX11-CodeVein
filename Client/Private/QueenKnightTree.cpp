@@ -37,7 +37,7 @@ HRESULT CQueenKnightTree::Initialize(void* pArg)
     pRootSelector->Add_Child(Create_ActionStates_ToSelector());
     //
     //// 4. 모두 실패했을 경우.
-    //pRootSelector->Add_Child(Create_IdleAction());
+    pRootSelector->Add_Child(Create_IdleAction());
     Set_Root_Node(pRootSelector);
 
     return S_OK;
@@ -147,7 +147,11 @@ CBTAction* CQueenKnightTree::Create_IdleAction()
 void CQueenKnightTree::Update(_float fTimeDelta)
 {
     if (m_pRootNode)
+    {
         m_pRootNode->Execute(fTimeDelta);
+
+    }
+        
 }
 
 void CQueenKnightTree::Set_Target(CPlayer* pPlayer)

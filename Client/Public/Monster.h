@@ -67,6 +67,8 @@ public:
     virtual void On_Collision_Stay(CGameObject* pOther) override;
     virtual void On_Collision_Exit(CGameObject* pOther) override;
 
+protected:
+    class CCollider* m_pColliderCom = { nullptr };
 
 #pragma endregion
 
@@ -113,7 +115,7 @@ protected:
 public:
     const MONSTER_STAT& Get_MonsterStat() { return m_MonsterStat; }
     const _float Get_DetectionRange() { return m_MonsterStat.fDetectionRange; }
-    const _float Get_MinDetectionRange() { return 5.f; }
+    const _float Get_MinDetectionRange() { return m_fMinDetectionDistance; }
     const _float Get_AttackRange() { return m_MonsterStat.fAttackRange; }
 
 public:
@@ -126,6 +128,7 @@ public:
 
 protected:
     MONSTER_STAT m_MonsterStat = {};
+    _float m_fMinDetectionDistance = 5.f;
 #pragma endregion
 
 
@@ -168,6 +171,8 @@ protected:
 public:
     virtual void Rotate_ToTarget(_float fTimeDelta); // 플레이어를 보면서 회전한다.
     virtual void RotateTurn_ToTarget(); // 플레이어를 보면서 회전한다.
+    virtual void RotateTurn_ToTargetYaw(); // 플레이어를 보면서 회전하는데 Yaw로만 회전.
+
     virtual const _bool IsRotateFinished(_float fRadian);
 
 public:
@@ -199,7 +204,6 @@ public:
 protected:
     class CLoad_Model* m_pModelCom = { nullptr };
     class CShader* m_pShaderCom = { nullptr };
-    class CCollider* m_pColliderCom = { nullptr };
     class CPlayer* m_pTarget = { nullptr };
     class CNavigation* m_pNavigationCom = { nullptr };
     LEVEL m_eCurLevel = { LEVEL::END };

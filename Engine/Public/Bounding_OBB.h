@@ -35,13 +35,13 @@ public:
 	//virtual HRESULT Render(PrimitiveBatch)
 
 public:
-	virtual _bool Intersect(CCollider::TYPE eColliderType, CBounding* pBounding) override;
+	virtual _bool Intersect(COLLIDER eColliderType, CBounding* pBounding) override;
 	virtual void Change_BoundingDesc(BOUNDING_DESC* pBoundingDesc) override;
 	virtual void Reset_Bounding() override;
 
 
 private:
-	BoundingOrientedBox* m_pLocalDesc = { nullptr };
+	BoundingOrientedBox* m_pOriginalDesc = { nullptr };
 	BoundingOrientedBox* m_pDesc = { nullptr };
 
 public:

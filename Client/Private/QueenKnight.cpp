@@ -35,6 +35,12 @@ HRESULT CQueenKnight::Initialize_Clone(void* pArg)
         return E_FAIL;
     }
 
+    if (FAILED(Initialize_Stats()))
+    {
+        CRASH("Init Stats Failed");
+        return E_FAIL;
+    }
+
     if (FAILED(Ready_Navigations()))
     {
         CRASH("Ready Navigations Failed");
@@ -66,7 +72,7 @@ HRESULT CQueenKnight::Initialize_Clone(void* pArg)
         return E_FAIL;
     }
 
-        
+
     _vector qInitRot = XMQuaternionRotationAxis(XMVectorSet(0.f, 1.f, 0.f, 0.f), 0.0f);
     m_pTransformCom->Set_Quaternion(qInitRot);
 
@@ -110,7 +116,7 @@ void CQueenKnight::Late_Update(_float fTimeDelta)
 {
     m_pTransformCom->Set_State(STATE::POSITION
         , m_pNavigationCom->Compute_OnCell(
-            m_pTransformCom->Get_State(STATE::POSITION), m_fOffsetY * 0.5f));
+            m_pTransformCom->Get_State(STATE::POSITION), m_fOffsetY));
 
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::BLEND, this)))
         return;
@@ -120,6 +126,11 @@ void CQueenKnight::Late_Update(_float fTimeDelta)
 
 HRESULT CQueenKnight::Render()
 {
+#ifdef _DEBUG
+    if (m_pColliderCom)
+        m_pColliderCom->Render();
+#endif // _DEBUG
+
     if (FAILED(Ready_Render_Resources()))
     {
         CRASH("Ready Render Resource Failed");
@@ -184,6 +195,7 @@ void CQueenKnight::Update_AI(_float fTimeDelta)
 #pragma region 3. 몬스터는 자신에게 필요한 수치값들을 초기화해야 합니다.
 HRESULT CQueenKnight::Initialize_Stats()
 {
+    m_fMinDetectionDistance = 6.f;
     return S_OK;
 }
 #pragma endregion
@@ -221,13 +233,13 @@ HRESULT CQueenKnight::InitializeAction_ToAnimationMap()
 
     /* 재생속도 증가. */
     m_pModelCom->Set_CurrentTickPerSecond(KNIGHT_SWORD_ATTACK_STRONG_01, 
-        m_pModelCom->Get_CurrentTickPerSecond(KNIGHT_SWORD_ATTACK_STRONG_01) * 3.f);
+        m_pModelCom->Get_CurrentTickPerSecond(KNIGHT_SWORD_ATTACK_STRONG_01) * 4.f);
 
     m_pModelCom->Set_CurrentTickPerSecond(KNIGHT_SWORD_ATTACK_STRONG_02,
-        m_pModelCom->Get_CurrentTickPerSecond(KNIGHT_SWORD_ATTACK_STRONG_02) * 3.f);
+        m_pModelCom->Get_CurrentTickPerSecond(KNIGHT_SWORD_ATTACK_STRONG_02) * 4.f);
 
     m_pModelCom->Set_CurrentTickPerSecond(KNIGHT_SWORD_ATTACK_STRONG_03,
-        m_pModelCom->Get_CurrentTickPerSecond(KNIGHT_SWORD_ATTACK_STRONG_03) * 3.f);
+        m_pModelCom->Get_CurrentTickPerSecond(KNIGHT_SWORD_ATTACK_STRONG_03) * 4.f);
     //
     ///* 재생속도 증가. */
     //m_pModelCom->Set_CurrentTickPerSecond(WOLFDEVIL_ATTACK_JUMP, m_pModelCom->Get_CurrentTickPerSecond(WOLFDEVIL_ATTACK_JUMP) * 2.f);
@@ -275,7 +287,7 @@ void CQueenKnight::Disable_Collider(_uint iType)
 
 
 
-#pragma region 0. 기본 함수들 정의
+#pragma region 0. 기본 함수들 정의 => 콜라이더도 정의
 HRESULT CQueenKnight::Ready_Components(QUEENKNIGHT_DESC* pDesc)
 {
     if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxAnimMesh"),
@@ -291,7 +303,23 @@ HRESULT CQueenKnight::Ready_Components(QUEENKNIGHT_DESC* pDesc)
         return E_FAIL;
 
     // 오프셋 지정.
-    m_fOffsetY = m_pModelCom->Get_BoundingBox().fHeight * 0.5f;
+
+    BOUNDING_BOX box = m_pModelCom->Get_BoundingBox();
+    m_fOffsetY = box.fHeight * 0.5f;
+
+
+    CBounding_AABB::BOUNDING_AABB_DESC  AABBDesc{};
+    AABBDesc.vExtents = _float3(box.vExtents.x, box.vExtents.y, box.vExtents.z);
+    AABBDesc.vCenter = _float3(0.f, AABBDesc.vExtents.y * 0.5f, 0.f); // 중점.
+
+    if (FAILED(__super::Add_Component(ENUM_CLASS(LEVEL::STATIC)
+        , TEXT("Prototype_Component_Collider_AABB")
+        , TEXT("Com_Collider"), reinterpret_cast<CComponent**>(&m_pColliderCom), &AABBDesc)))
+    {
+        CRASH("Failed Clone Collider AABB");
+        return E_FAIL;
+    }
+
 
     return S_OK;
 }
@@ -388,7 +416,20 @@ HRESULT CQueenKnight::Ready_PartObjects()
         return E_FAIL;
     }
 
-    m_PartObjects[L"Com_Weapon"];
+    CKnightShield::KNIGHT_SHIELD_DESC Shield{};
+    Shield.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
+    Shield.pSocketMatrix = m_pModelCom->Get_BoneMatrix("IKSocket_LeftHandAttach");
+    Shield.eCurLevel = m_eCurLevel;
+
+    if (FAILED(__super::Add_PartObject(TEXT("Com_Shield"),
+        ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_GodChildShield")
+        , reinterpret_cast<CPartObject**>(&m_pShield), &Shield)))
+    {
+        CRASH("Failed Create Queen Shield");
+        return E_FAIL;
+    }
+
+    //m_PartObjects[L"Com_Weapon"];
 
     return S_OK;
 }
@@ -428,6 +469,7 @@ void CQueenKnight::Free()
 {
     __super::Free();
     Safe_Release(m_pWeapon);
+    Safe_Release(m_pShield);
     Safe_Release(m_pTree);
 }
 #pragma endregion

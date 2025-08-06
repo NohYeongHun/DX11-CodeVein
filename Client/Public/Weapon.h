@@ -33,6 +33,8 @@ public:
 	virtual void On_Collision_Stay(CGameObject* pOther);
 	virtual void On_Collision_Exit(CGameObject* pOther);
 
+protected:
+	class CCollider* m_pColliderCom = { nullptr };
 #pragma endregion
 
 

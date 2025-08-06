@@ -40,9 +40,11 @@ void CPlayerWeapon::Priority_Update(_float fTimeDelta)
 
 }
 
+/* Weapon은 CombinedWorldMatrix를 Collider에 전달 해주어야합니다. => 부모 트랜스폼이 있으므로 */
 void CPlayerWeapon::Update(_float fTimeDelta)
 {
     __super::Update(fTimeDelta);
+
 
     //_matrix     BoneMatrix = XMLoadFloat4x4(m_pSocketMatrix);
     //
@@ -55,6 +57,8 @@ void CPlayerWeapon::Update(_float fTimeDelta)
         XMLoadFloat4x4(m_pSocketMatrix) *
         XMLoadFloat4x4(m_pParentMatrix));
 
+
+    m_pColliderCom->Update(XMLoadFloat4x4(&m_CombinedWorldMatrix));
 }
 
 void CPlayerWeapon::Late_Update(_float fTimeDelta)
@@ -66,6 +70,12 @@ void CPlayerWeapon::Late_Update(_float fTimeDelta)
 
 HRESULT CPlayerWeapon::Render()
 {
+
+#ifdef _DEBUG
+if (m_pColliderCom)
+    m_pColliderCom->Render();
+#endif // _DEBUG
+
     if (FAILED(Bind_ShaderResources()))
     {
         CRASH("Ready Render Resource Failed");
@@ -114,6 +124,19 @@ HRESULT CPlayerWeapon::Ready_Components()
     if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Model_Sword"),
         TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom), &Desc)))
         return E_FAIL;
+
+    BOUNDING_BOX box = m_pModelCom->Get_BoundingBox();
+    CBounding_AABB::BOUNDING_AABB_DESC  AABBDesc{};
+    AABBDesc.vExtents = _float3(box.vExtents.x, box.vExtents.y, box.vExtents.z);
+    AABBDesc.vCenter = _float3(0.f, 0.f, 0.f); // 중점.
+
+    if (FAILED(__super::Add_Component(ENUM_CLASS(LEVEL::STATIC)
+        , TEXT("Prototype_Component_Collider_AABB")
+        , TEXT("Com_Collider"), reinterpret_cast<CComponent**>(&m_pColliderCom), &AABBDesc)))
+    {
+        CRASH("Failed Clone Collider AABB");
+        return E_FAIL;
+    }
 
     return S_OK;
 }

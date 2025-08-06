@@ -86,7 +86,7 @@ BT_RESULT CBT_QueenKnight_FirstPhase_AttackAction::UpdateFirstAttack(_float fTim
         // 2. 공격 상태로 변경
         m_pOwner->Change_Animation_Blend(iNextAnimationIdx);
 
-        m_pOwner->RotateTurn_ToTarget();
+        m_pOwner->RotateTurn_ToTargetYaw();
 
         _float4 vPos = {};
         XMStoreFloat4(&vPos, m_pOwner->Get_Transform()->Get_State(STATE::POSITION));
@@ -135,7 +135,7 @@ BT_RESULT CBT_QueenKnight_FirstPhase_AttackAction::UpdateSecondAttack(_float fTi
         // 2. 공격 상태로 변경
         m_pOwner->Change_Animation_NonBlend(iNextAnimationIdx);
 
-        m_pOwner->RotateTurn_ToTarget();
+        m_pOwner->RotateTurn_ToTargetYaw();
         _float4 vPos = {};
         XMStoreFloat4(&vPos, m_pOwner->Get_Transform()->Get_State(STATE::POSITION));
         OutputDebugWstring(TEXT("STRONG ATTACK2 -> STRONG ATTACK3"));
