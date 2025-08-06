@@ -13,6 +13,7 @@ CPlayerWeapon::CPlayerWeapon(const CPlayerWeapon& Prototype)
 
 HRESULT CPlayerWeapon::Initialize_Prototype()
 {
+    m_strObjTag = TEXT("PlayerWeapon");
     return S_OK;
 }
 
@@ -50,8 +51,6 @@ void CPlayerWeapon::Update(_float fTimeDelta)
         XMLoadFloat4x4(m_pSocketMatrix) *
         XMLoadFloat4x4(m_pParentMatrix));
 
-    // 2. Timer 관련 작업들 진행. 
-    Update_Timer(fTimeDelta);
     // 가장 마지막 부근에 Collider Push
     Finalize_Update(fTimeDelta);
 }
@@ -103,14 +102,20 @@ if (m_pColliderCom)
 #pragma region 1. 무기는 충돌에 대한 상태제어를 할 수 있어야한다.=> 충돌에 따라 상태가 변하기도, 수치값이 바뀌기도한다.
 void CPlayerWeapon::On_Collision_Enter(CGameObject* pOther)
 {
+    CWeapon::On_Collision_Enter(pOther);
+
+    OutputDebugWstring(pOther->Get_ObjectTag() + TEXT("충돌"));
+    //CWeapon::Deactivate_Collider();
 }
 
 void CPlayerWeapon::On_Collision_Stay(CGameObject* pOther)
 {
+
 }
 
 void CPlayerWeapon::On_Collision_Exit(CGameObject* pOther)
 {
+    CWeapon::On_Collision_Exit(pOther);
 }
 
 void CPlayerWeapon::Activate_ColliderFrame(_float fDuration)

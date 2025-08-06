@@ -41,6 +41,7 @@ void CPlayer_StrongAttackState::Update(_float fTimeDelta)
 	Handle_Unified_Direction_Input(fTimeDelta);
 	Change_State();
 
+	CPlayerState::Handle_Collider_State();
 }
 
 // 종료될 때 실행할 동작..

@@ -88,10 +88,10 @@ BT_RESULT CBT_QueenKnight_FirstPhase_AttackAction::UpdateFirstAttack(_float fTim
 
         m_pOwner->RotateTurn_ToTargetYaw();
 
-        _float4 vPos = {};
-        XMStoreFloat4(&vPos, m_pOwner->Get_Transform()->Get_State(STATE::POSITION));
-        OutputDebugWstring(TEXT("STRONG ATTACK1 -> STRONG ATTACK2"));
-        OutPutDebugFloat4(vPos);
+        //_float4 vPos = {};
+        //XMStoreFloat4(&vPos, m_pOwner->Get_Transform()->Get_State(STATE::POSITION));
+        //OutputDebugWstring(TEXT("STRONG ATTACK1 -> STRONG ATTACK2"));
+        //OutPutDebugFloat4(vPos);
     }
 
     return BT_RESULT::RUNNING;
@@ -136,10 +136,10 @@ BT_RESULT CBT_QueenKnight_FirstPhase_AttackAction::UpdateSecondAttack(_float fTi
         m_pOwner->Change_Animation_NonBlend(iNextAnimationIdx);
 
         m_pOwner->RotateTurn_ToTargetYaw();
-        _float4 vPos = {};
-        XMStoreFloat4(&vPos, m_pOwner->Get_Transform()->Get_State(STATE::POSITION));
-        OutputDebugWstring(TEXT("STRONG ATTACK2 -> STRONG ATTACK3"));
-        OutPutDebugFloat4(vPos);
+        //_float4 vPos = {};
+        //XMStoreFloat4(&vPos, m_pOwner->Get_Transform()->Get_State(STATE::POSITION));
+        //OutputDebugWstring(TEXT("STRONG ATTACK2 -> STRONG ATTACK3"));
+        //OutPutDebugFloat4(vPos);
     }
 
     return BT_RESULT::RUNNING;
@@ -158,10 +158,10 @@ BT_RESULT CBT_QueenKnight_FirstPhase_AttackAction::UpdateLastAttack(_float fTime
         // 2. IDLE 상태로 변경
         m_pOwner->Change_Animation_NonBlend(iNextAnimationIdx);
 
-        _float4 vPos = {};
-        XMStoreFloat4(&vPos, m_pOwner->Get_Transform()->Get_State(STATE::POSITION));
-        OutputDebugWstring(TEXT("STRONG ATTACK3 -> IDLE"));
-        OutPutDebugFloat4(vPos);
+        //_float4 vPos = {};
+        //XMStoreFloat4(&vPos, m_pOwner->Get_Transform()->Get_State(STATE::POSITION));
+        //OutputDebugWstring(TEXT("STRONG ATTACK3 -> IDLE"));
+        //OutPutDebugFloat4(vPos);
     }
 
     return BT_RESULT::RUNNING;

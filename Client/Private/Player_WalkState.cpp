@@ -48,6 +48,8 @@ void CPlayer_WalkState::Update(_float fTimeDelta)
 		m_pFsm->Change_State(CPlayer::PLAYER_STATE::IDLE, &Desc);
 		
 	}		
+
+	CPlayerState::Handle_Collider_State();
 }
 
 // 종료될 때 실행할 동작..

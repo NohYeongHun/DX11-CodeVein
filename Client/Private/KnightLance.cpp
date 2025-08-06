@@ -105,6 +105,21 @@ HRESULT CKnightLance::Ready_Components()
         TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom), &Desc)))
         return E_FAIL;
 
+
+    BOUNDING_BOX box = m_pModelCom->Get_BoundingBox();
+    CBounding_AABB::BOUNDING_AABB_DESC  AABBDesc{};
+    AABBDesc.vExtents = _float3(box.vExtents.x, box.vExtents.y, box.vExtents.z);
+    AABBDesc.vCenter = _float3(0.f, AABBDesc.vExtents.y * 0.5f, 0.f); // 중점.
+    AABBDesc.pOwner = this;
+
+    if (FAILED(__super::Add_Component(ENUM_CLASS(LEVEL::STATIC)
+        , TEXT("Prototype_Component_Collider_AABB")
+        , TEXT("Com_Collider"), reinterpret_cast<CComponent**>(&m_pColliderCom), &AABBDesc)))
+    {
+        CRASH("Failed Clone Collider AABB");
+        return E_FAIL;
+    }
+
     return S_OK;
 }
 

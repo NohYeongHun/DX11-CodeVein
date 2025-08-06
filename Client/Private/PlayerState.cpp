@@ -41,6 +41,10 @@ void CPlayerState::Enter(void* pArg)
 }
 
 #pragma region 콜라이더 활성화 관련 함수
+void CPlayerState::Handle_Collider_State()
+{
+    Update_Collider_State();
+}
 void CPlayerState::Reset_ColliderActiveInfo()
 {
     for (auto& pair : m_ColliderActiveMap)

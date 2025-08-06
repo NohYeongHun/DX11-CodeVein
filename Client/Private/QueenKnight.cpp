@@ -15,6 +15,8 @@ HRESULT CQueenKnight::Initialize_Prototype()
     if (FAILED(__super::Initialize_Prototype()))
         return E_FAIL;
 
+    m_strObjTag = TEXT("QueenKnight");
+
     return S_OK;
 }
 
@@ -412,6 +414,7 @@ HRESULT CQueenKnight::Ready_PartObjects()
     Weapon.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
     Weapon.pSocketMatrix = m_pModelCom->Get_BoneMatrix("IKSocket_RightHandAttach");
     Weapon.eCurLevel = m_eCurLevel;
+    Weapon.pOwner = this;
 
     if (FAILED(__super::Add_PartObject(TEXT("Com_Weapon"),
         ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_GodChildLance")
@@ -425,6 +428,7 @@ HRESULT CQueenKnight::Ready_PartObjects()
     Shield.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
     Shield.pSocketMatrix = m_pModelCom->Get_BoneMatrix("IKSocket_LeftHandAttach");
     Shield.eCurLevel = m_eCurLevel;
+    Shield.pOwner = this;
 
     if (FAILED(__super::Add_PartObject(TEXT("Com_Shield"),
         ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_GodChildShield")

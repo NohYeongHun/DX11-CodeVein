@@ -43,6 +43,10 @@ public:
 
 public:
 	virtual void Update_ColliderFrame(_float fTimeDelta);
+
+	// 충돌하면 안되는 객체들?
+private:
+
 #pragma endregion
 
 
