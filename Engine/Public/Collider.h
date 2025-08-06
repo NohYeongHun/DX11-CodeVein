@@ -8,25 +8,6 @@ NS_BEGIN(Engine)
 
 class ENGINE_DLL CCollider final : public CComponent
 {
-public:
-	enum BOUNDING { BOUNDING_ORIGINAL, BOUNDING_WORLD, BOUNDING_END };  // 충돌체 안에 Bounding Box가 존재.
-
-public:
-	typedef struct tagColliderDesc
-	{
-		class CGameObject* pOwner = { nullptr };
-		_float3		vScale;
-		_float3		vRotation;
-		_float3		vPosition;
-	}COLLIDERDESC;
-
-	typedef struct tagOBB
-	{
-		_float3		vCenter;
-		_float3		vAlignAxis[3];
-		_float3		vCenterAxis[3];
-	}OBBDESC;
-
 protected:
 	CCollider(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CCollider(const CCollider& Prototype);
@@ -35,6 +16,7 @@ protected:
 public:
 	class CGameObject* Get_Owner();
 	const _bool Is_Active();
+	void Set_Active(_bool IsActive);
 	const _bool Find_ColliderObject(CGameObject* pColliderObject);
 	void Erase_ColliderObject(CGameObject* pColliderObject);
 	void Insert_ColliderObject(CGameObject* pColliderObject);
@@ -71,6 +53,8 @@ private:
 	_bool	m_IsActive = { true }; // 활성화 상태
 	COLLIDER m_eType = {};
 	unordered_set<CGameObject*> m_ColliderObjects = {}; // 콜라이더 저장 용도
+
+	DirectX::XMVECTORF32 m_vColor = { DirectX::Colors::Black };
 
 
 

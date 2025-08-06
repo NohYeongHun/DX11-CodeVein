@@ -11,8 +11,14 @@ CCollider::CCollider(const CCollider& Prototype)
 #ifdef _DEBUG
     , m_pBatch{ Prototype.m_pBatch }
     , m_pEffect{ Prototype.m_pEffect }
+    , m_pInputLayout { Prototype.m_pInputLayout }
 #endif
 {
+
+#ifdef _DEBUG
+    Safe_AddRef(m_pInputLayout);
+#endif // _DEBUG
+
 }
 
 CGameObject* CCollider::Get_Owner()
@@ -23,6 +29,14 @@ CGameObject* CCollider::Get_Owner()
 const _bool CCollider::Is_Active()
 {
     return m_IsActive;
+}
+
+/* 활성화 상태 변경. */
+void CCollider::Set_Active(_bool IsActive)
+{
+    m_IsActive = IsActive;
+
+    m_vColor = !m_IsActive ? DirectX::Colors::Aqua : DirectX::Colors::Black;
 }
 
 const _bool CCollider::Find_ColliderObject(CGameObject* pColliderObject)
@@ -82,6 +96,7 @@ HRESULT CCollider::Initialize_Prototype(COLLIDER eType)
 HRESULT CCollider::Initialize_Clone(void* pArg)
 {
     CBounding::BOUNDING_DESC* pBoundingDesc = static_cast<CBounding::BOUNDING_DESC*>(pArg);
+    m_pOwner = pBoundingDesc->pOwner;
 
     switch (m_eType)
     {
@@ -122,7 +137,7 @@ HRESULT CCollider::Render()
 
     m_pBatch->Begin();
 
-    m_pBounding->Render(m_pBatch);
+    m_pBounding->Render(m_pBatch, m_vColor);
 
     m_pBatch->End();
 
@@ -166,6 +181,11 @@ void CCollider::Free()
         Safe_Delete(m_pEffect);
         Safe_Delete(m_pBatch);
     }
+    
+#ifdef _DEBUG
+    Safe_Release(m_pInputLayout);
+#endif // _DEBUG
+
 
     Safe_Release(m_pBounding);
 }

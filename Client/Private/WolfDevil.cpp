@@ -105,6 +105,14 @@ void CWolfDevil::Update(_float fTimeDelta)
 
     // 하위 객체들 움직임 제어는 Tree 제어 이후에
     __super::Update(fTimeDelta);
+
+    // 가장 마지막에 수행되어야 하는 업데이트. 함수들 => 콜라이더 추가 등등.
+    Finalize_Update(fTimeDelta);
+}
+
+void CWolfDevil::Finalize_Update(_float fTimeDelta)
+{
+    __super::Finalize_Update(fTimeDelta);
 }
 
 void CWolfDevil::Late_Update(_float fTimeDelta)
@@ -316,6 +324,7 @@ HRESULT CWolfDevil::Ready_Components(WOLFDEVIL_DESC* pDesc)
     CBounding_AABB::BOUNDING_AABB_DESC  AABBDesc{};
     AABBDesc.vExtents = _float3(box.vExtents.x, box.vExtents.y, box.vExtents.z);
     AABBDesc.vCenter = _float3(0.f, 0.f, 0.f); // 중점.
+    AABBDesc.pOwner = this;
 
     if (FAILED(__super::Add_Component(ENUM_CLASS(LEVEL::STATIC)
         , TEXT("Prototype_Component_Collider_AABB")

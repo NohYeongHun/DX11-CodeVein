@@ -84,11 +84,13 @@ void CCollider_Manager::Update()
 			}
 
 
-			for (auto& pCollider : m_ColliderList)
-				Safe_Release(pCollider);
-			m_ColliderList.clear();
+			
 		}
 	}
+
+	for (auto& pCollider : m_ColliderList)
+		Safe_Release(pCollider);
+	m_ColliderList.clear();
 }
 
 #pragma endregion

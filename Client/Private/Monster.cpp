@@ -65,9 +65,17 @@ void CMonster::Priority_Update(_float fTimeDelta)
 void CMonster::Update(_float fTimeDelta)
 { 
     __super::Update(fTimeDelta);
+}
+
+void CMonster::Finalize_Update(_float fTimeDelta)
+{
+    __super::Finalize_Update(fTimeDelta);
 
     if (m_pColliderCom)
+    {
         m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
+        m_pGameInstance->Add_Collider_To_Manager(m_pColliderCom);
+    }
 }
 
 void CMonster::Late_Update(_float fTimeDelta)

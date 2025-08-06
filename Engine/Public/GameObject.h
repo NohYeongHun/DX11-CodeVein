@@ -63,9 +63,16 @@ public:
 	virtual HRESULT Initialize_Prototype();
 	virtual HRESULT Initialize_Clone(void* pArg);
 	virtual void Priority_Update(_float fTimeDelta);
+	virtual void Finalize_PreUpdate(_float fTimeDelta) {}; // Update의 마지막 부근에 사용되는 함수
+
 	virtual void Update(_float fTimeDelta);
+	virtual void Finalize_Update(_float fTimeDelta) {} ; // Update의 마지막 부근에 사용되는 함수
+
 	virtual void Late_Update(_float fTimeDelta);
+	virtual void Finalize_LateUpdate(_float fTimeDelta) {}; // Update의 마지막 부근에 사용되는 함수
 	virtual HRESULT Render();
+
+
 
 #pragma region 충돌 함수 정의
 public:

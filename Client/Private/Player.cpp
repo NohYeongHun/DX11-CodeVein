@@ -116,8 +116,15 @@ void CPlayer::Update(_float fTimeDelta)
     __super::Update(fTimeDelta);
     Update_KeyInput();
     HandleState(fTimeDelta);
-    m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
+    
+    // Update 분기의 마지막 시점에 실행되어야 하는 함수 모음..
+    Finalize_Update(fTimeDelta);
+}
 
+void CPlayer::Finalize_Update(_float fTimeDelta)
+{
+    m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
+    m_pGameInstance->Add_Collider_To_Manager(m_pColliderCom);
 }
 
 void CPlayer::Late_Update(_float fTimeDelta)
@@ -702,9 +709,7 @@ HRESULT CPlayer::Initialize_BuffDurations()
 #pragma endregion
 
 
-
-
-
+#pragma region 충돌 관리
 void CPlayer::On_Collision_Enter(CGameObject* pOther)
 {
 }
@@ -716,6 +721,36 @@ void CPlayer::On_Collision_Stay(CGameObject* pOther)
 void CPlayer::On_Collision_Exit(CGameObject* pOther)
 {
 }
+
+
+void CPlayer::Enable_Collider(COLLIDER_PARTS eColliderParts)
+{
+    switch (eColliderParts)
+    {
+    case PART_WEAPON:
+        m_pPlayerWeapon->Activate_Collider();
+        break;
+    default:
+        break;
+    }
+}
+
+void CPlayer::Disable_Collider(COLLIDER_PARTS eColliderParts)
+{
+    switch (eColliderParts)
+    {
+    case PART_WEAPON:
+        m_pPlayerWeapon->Deactivate_Collider();
+        break;
+    default:
+        break;
+    }
+}
+
+#pragma endregion
+
+
+
 
 #pragma region 플레이어 상태 함수들
 void CPlayer::HandleState(_float fTimeDelta)
@@ -839,6 +874,7 @@ HRESULT CPlayer::Ready_Components(PLAYER_DESC* pDesc)
     CBounding_AABB::BOUNDING_AABB_DESC  AABBDesc{};
     AABBDesc.vExtents = _float3(box.vExtents.x, box.vExtents.y, box.vExtents.z);
     AABBDesc.vCenter = _float3(0.f, 0.f, 0.f); // 중점.
+    AABBDesc.pOwner = this;
 
     if (FAILED(__super::Add_Component(ENUM_CLASS(LEVEL::STATIC)
         , TEXT("Prototype_Component_Collider_AABB")
@@ -914,15 +950,6 @@ HRESULT CPlayer::Ready_Fsm()
 
     Register_CoolTime();
 
-    // DODGE TickPerseoncd 증가.
-    //for (_uint i = PLAYER_ANIM_ATTACK1; i < PLAYER_ANIM_ATTACK16; ++i)
-    //{
-    //    // 모델 재생속도 증가.
-    //    m_pModelCom->Set_CurrentTickPerSecond(i
-    //        , m_pModelCom->Get_CurrentTickPerSecond(i) * 2.f);
-    //}
-   
-
     CPlayer_IdleState::IDLE_ENTER_DESC enter{};
     enter.iAnimation_Idx = m_Action_AnimMap[TEXT("IDLE")];
 
@@ -974,6 +1001,7 @@ void CPlayer::Register_CoolTime()
     m_pFsmCom->Register_StateExitCoolTime(PLAYER_STATE::RUN, 0.f);
     m_pFsmCom->Register_StateExitCoolTime(PLAYER_STATE::DODGE, 0.7f);
 
+    // 총 재생 시간.
     fCalcDuration = m_pModelCom->Get_AnimationDuration(m_Action_AnimMap[TEXT("STRONG_ATTACK1")]) /
         m_pModelCom->Get_AnimationTickPersecond(m_Action_AnimMap[TEXT("STRONG_ATTACK1")]);
     m_pFsmCom->Register_StateExitCoolTime(PLAYER_STATE::STRONG_ATTACK, fCalcDuration * 0.6f);

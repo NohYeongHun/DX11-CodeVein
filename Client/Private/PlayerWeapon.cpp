@@ -44,21 +44,21 @@ void CPlayerWeapon::Priority_Update(_float fTimeDelta)
 void CPlayerWeapon::Update(_float fTimeDelta)
 {
     __super::Update(fTimeDelta);
-
-
-    //_matrix     BoneMatrix = XMLoadFloat4x4(m_pSocketMatrix);
-    //
-    //for (size_t i = 0; i < 3; i++)
-    //    BoneMatrix.r[i] = XMVector3Normalize(BoneMatrix.r[i]);
-
-
+    // 1. 가장 먼저 Combined 행렬 초기화
     XMStoreFloat4x4(&m_CombinedWorldMatrix,
         m_pTransformCom->Get_WorldMatrix() *
         XMLoadFloat4x4(m_pSocketMatrix) *
         XMLoadFloat4x4(m_pParentMatrix));
 
+    // 2. Timer 관련 작업들 진행. 
+    Update_Timer(fTimeDelta);
+    // 가장 마지막 부근에 Collider Push
+    Finalize_Update(fTimeDelta);
+}
 
-    m_pColliderCom->Update(XMLoadFloat4x4(&m_CombinedWorldMatrix));
+void CPlayerWeapon::Finalize_Update(_float fTimeDelta)
+{
+    __super::Finalize_Update(fTimeDelta);
 }
 
 void CPlayerWeapon::Late_Update(_float fTimeDelta)
@@ -91,7 +91,6 @@ if (m_pColliderCom)
             return E_FAIL;
 
         m_pShaderCom->Begin(0);
-
         m_pModelCom->Render(i);
     }
 
@@ -100,6 +99,8 @@ if (m_pColliderCom)
     return S_OK;
 }
 
+
+#pragma region 1. 무기는 충돌에 대한 상태제어를 할 수 있어야한다.=> 충돌에 따라 상태가 변하기도, 수치값이 바뀌기도한다.
 void CPlayerWeapon::On_Collision_Enter(CGameObject* pOther)
 {
 }
@@ -111,6 +112,29 @@ void CPlayerWeapon::On_Collision_Stay(CGameObject* pOther)
 void CPlayerWeapon::On_Collision_Exit(CGameObject* pOther)
 {
 }
+
+void CPlayerWeapon::Activate_ColliderFrame(_float fDuration)
+{
+    CWeapon::Activate_ColliderFrame(fDuration);
+}
+
+void CPlayerWeapon::Activate_Collider()
+{
+    CWeapon::Activate_Collider();
+}
+
+void CPlayerWeapon::Deactivate_Collider()
+{
+    CWeapon::Deactivate_Collider();
+}
+
+void CPlayerWeapon::Update_ColliderFrame(_float fTimeDelta)
+{
+    CWeapon::Update_ColliderFrame(fTimeDelta);
+}
+
+
+#pragma endregion
 
 HRESULT CPlayerWeapon::Ready_Components()
 {
@@ -129,6 +153,7 @@ HRESULT CPlayerWeapon::Ready_Components()
     CBounding_AABB::BOUNDING_AABB_DESC  AABBDesc{};
     AABBDesc.vExtents = _float3(box.vExtents.x, box.vExtents.y, box.vExtents.z);
     AABBDesc.vCenter = _float3(0.f, 0.f, 0.f); // 중점.
+    AABBDesc.pOwner = this;
 
     if (FAILED(__super::Add_Component(ENUM_CLASS(LEVEL::STATIC)
         , TEXT("Prototype_Component_Collider_AABB")
@@ -137,6 +162,8 @@ HRESULT CPlayerWeapon::Ready_Components()
         CRASH("Failed Clone Collider AABB");
         return E_FAIL;
     }
+
+    m_pColliderCom->Set_Active(false);
 
     return S_OK;
 }

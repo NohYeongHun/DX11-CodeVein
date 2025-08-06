@@ -33,9 +33,9 @@ void CBounding_AABB::Update(_fmatrix WorldMatrix)
 }
 
 #ifdef _DEBUG
-HRESULT CBounding_AABB::Render(PrimitiveBatch<VertexPositionColor>* pBatch)
+HRESULT CBounding_AABB::Render(PrimitiveBatch<VertexPositionColor>* pBatch, _fvector vColor)
 {
-	DX::Draw(pBatch, *m_pDesc);
+	DX::Draw(pBatch, *m_pDesc, vColor);
 	return S_OK;
 }
 #endif 

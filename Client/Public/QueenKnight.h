@@ -44,6 +44,7 @@ public:
 	virtual HRESULT Initialize_Clone(void* pArg);
 	virtual void Priority_Update(_float fTimeDelta);
 	virtual void Update(_float fTimeDelta);
+	virtual void Finalize_Update(_float fTimeDelta);
 	virtual void Late_Update(_float fTimeDelta);
 	virtual HRESULT Render();
 
