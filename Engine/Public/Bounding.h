@@ -21,10 +21,15 @@ public:
 public:
 	virtual HRESULT Initialize(BOUNDING_DESC* pBoundingDesc);
 	virtual void Update(_fmatrix WorldMatrix);
-	//virtual HRESULT Render(PrimitiveBatch)
+
+#ifdef _DEBUG
+public:
+	virtual HRESULT Render(PrimitiveBatch<VertexPositionColor>* pBatch) { return S_OK; }
+#endif
+
 
 public:
-	virtual _bool Intersect(CCollider::TYPE eColliderType, CBounding* pBounding) PURE;
+	virtual _bool Intersect(COLLIDER eColliderType, CBounding* pBounding) PURE;
 	virtual void Change_BoundingDesc(BOUNDING_DESC* pBoundingDesc) PURE;
 	virtual void Reset_Bounding() PURE;
 

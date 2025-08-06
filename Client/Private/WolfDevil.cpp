@@ -21,9 +21,9 @@ HRESULT CWolfDevil::Initialize_Prototype()
 
 HRESULT CWolfDevil::Initialize_Clone(void* pArg)
 {
-#ifdef _DEBUG
-    Initialize_Debug();
-#endif // _DEBUG
+//#ifdef _DEBUG
+//    Initialize_Debug();
+//#endif // _DEBUG
 
     WOLFDEVIL_DESC* pDesc = static_cast<WOLFDEVIL_DESC*>(pArg);
 
@@ -141,9 +141,14 @@ void CWolfDevil::Late_Update(_float fTimeDelta)
 
 HRESULT CWolfDevil::Render()
 {
+//#ifdef _DEBUG
+//    BoundingBoxRender(m_pModelCom->Get_BoundingBox(), m_pTransformCom->Get_WorldMatrix());
+//#endif // _DEBUG
+
 #ifdef _DEBUG
-    BoundingBoxRender(m_pModelCom->Get_BoundingBox(), m_pTransformCom->Get_WorldMatrix());
+    m_pColliderCom->Render();
 #endif // _DEBUG
+
 
 
     if (FAILED(Ready_Render_Resources()))
@@ -205,15 +210,6 @@ void CWolfDevil::Update_AI(_float fTimeDelta)
     if (true == m_pModelCom->Play_Animation(fTimeDelta))
     {
     }
-
-#ifdef _DEBUG
-    //OutputDebugWstring(TEXT("현재 WolfDevil의 Buff 쿨타임 : "));
-    //OutPutDebugFloat(m_BuffTimers[BUFF_HIT]);
-    //OutputDebugWstring(TEXT("현재 WolfDevil의 Buff Flag : "));
-    //OutPutDebugInt(m_ActiveBuffs);
-    //OutputDebugWstring(TEXT("현재 WolfDevil의 Animation Index : "));
-    //OutPutDebugInt(m_pModelCom->Get_CurrentAnimationIndex()); // 현재 모델 인덱스 가져오기.
-#endif // _DEBUG
 
 }
 #pragma endregion
@@ -309,7 +305,21 @@ HRESULT CWolfDevil::Ready_Components(WOLFDEVIL_DESC* pDesc)
         return E_FAIL;
 
     // 오프셋 지정.
-    m_fOffsetY = m_pModelCom->Get_BoundingBox().fHeight * 0.5f;
+
+    BOUNDING_BOX box = m_pModelCom->Get_BoundingBox();
+    m_fOffsetY = box.fHeight * 0.5f;
+
+    CBounding_AABB::BOUNDING_AABB_DESC  AABBDesc{};
+    AABBDesc.vExtents = _float3(box.vExtents.x, box.vExtents.y, box.vExtents.z);
+    AABBDesc.vCenter = _float3(0.f, 0.f, 0.f); // 중점.
+
+    if (FAILED(__super::Add_Component(ENUM_CLASS(LEVEL::STATIC)
+        , TEXT("Prototype_Component_Collider_AABB")
+        , TEXT("Com_Collider"), reinterpret_cast<CComponent**>(&m_pColliderCom), &AABBDesc)))
+    {
+        CRASH("Failed Clone Collider AABB");
+        return E_FAIL;
+    }
 
     return S_OK;
 }

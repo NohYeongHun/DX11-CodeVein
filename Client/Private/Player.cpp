@@ -14,7 +14,7 @@ const std::pair<PLAYER_KEY, _ubyte> CPlayer::m_KeyboardMappings[] = {
     { PLAYER_KEY::SKILL_2,       DIK_X },
     { PLAYER_KEY::SKILL_3,       DIK_C },
     { PLAYER_KEY::SKILL_4,       DIK_V },
-    { PLAYER_KEY::GUARD,        DIK_LSHIFT }
+    { PLAYER_KEY::GUARD,        DIK_LCONTROL }
 };
 #pragma endregion
 
@@ -42,9 +42,9 @@ HRESULT CPlayer::Initialize_Prototype()
 
 HRESULT CPlayer::Initialize_Clone(void* pArg)
 {
-#ifdef _DEBUG
-    Initialize_Debug();
-#endif // _DEBUG
+//#ifdef _DEBUG
+//    Initialize_Debug();
+//#endif // _DEBUG
 
 
     PLAYER_DESC* pDesc = static_cast<PLAYER_DESC*>(pArg);
@@ -58,7 +58,6 @@ HRESULT CPlayer::Initialize_Clone(void* pArg)
         CRASH("Failed Ready_Components");
         return E_FAIL;
     }
-        
 
     if (FAILED(Ready_Navigations()))
     {
@@ -68,10 +67,31 @@ HRESULT CPlayer::Initialize_Clone(void* pArg)
      
 
     if (FAILED(Ready_PartObjects()))
+    {
+        CRASH("Failed Ready_PartObjects");
         return E_FAIL;
+    }
+        
+    if (FAILED(Initialize_BuffDurations()))
+    {
+        CRASH("Failed Init BuffDurations");
+        return E_FAIL;
+    }
+
+    if (FAILED(InitializeAction_ToAnimationMap()))
+    {
+        CRASH("Failed InitAction AnimMap");
+        return E_FAIL;
+    }
 
     if (FAILED(Ready_Fsm()))
+    {
+        CRASH("Failed Ready FSM");
         return E_FAIL;
+    }
+
+    
+        
 
 
     // 위치 초기화를 이제 Navigations 에서.
@@ -96,7 +116,7 @@ void CPlayer::Update(_float fTimeDelta)
     __super::Update(fTimeDelta);
     Update_KeyInput();
     HandleState(fTimeDelta);
-
+    m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
 
 }
 
@@ -105,7 +125,7 @@ void CPlayer::Late_Update(_float fTimeDelta)
 
     m_pTransformCom->Set_State(STATE::POSITION
         , m_pNavigationCom->Compute_OnCell(
-            m_pTransformCom->Get_State(STATE::POSITION), m_fOffsetY + 0.2f));
+            m_pTransformCom->Get_State(STATE::POSITION), m_fOffsetY + 0.1f));
 
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::BLEND, this)))
         return;
@@ -160,8 +180,7 @@ HRESULT CPlayer::Render()
     if (m_pNavigationCom)
         m_pNavigationCom->Render();
 
-    BoundingBoxRender(m_pModelCom->Get_BoundingBox(), m_pTransformCom->Get_WorldMatrix());
-
+    m_pColliderCom->Render();
 #endif // _DEBUG
 
     if (FAILED(Ready_Render_Resources()))
@@ -550,14 +569,141 @@ _vector CPlayer::Get_LockOn_Attack_Direction() const
 }
 
 
-/* 
-* Animation
-*/
+
+
+#pragma region 3. Animation 관리.
+/* 사용하는 모든 Animation Map을 저장해둡니다. */
+HRESULT CPlayer::InitializeAction_ToAnimationMap()
+{
+
+    m_Action_AnimMap.emplace(L"IDLE", PLAYER_ANIM_IDLE_LSWORD);
+    m_Action_AnimMap.emplace(L"RUN", PLAYER_ANIM_RUN_F_LOOP);
+    m_Action_AnimMap.emplace(L"DODGE", PLAYER_ANIM_LS_DODGE_300_F);
+
+    m_Action_AnimMap.emplace(L"GUARD_START", PLAYER_ANIM_LS_GUARD_START);
+    m_Action_AnimMap.emplace(L"GUARD_LOOP", PLAYER_ANIM_LS_GUARD_LOOP);
+    m_Action_AnimMap.emplace(L"GUARD_END", PLAYER_ANIM_LS_GUARD_END);
+    m_Action_AnimMap.emplace(L"ATTACK1", PLAYER_ANIM_S_ATK_NORMAL1);
+    m_Action_AnimMap.emplace(L"ATTACK2", PLAYER_ANIM_S_ATK_NORMAL2);
+    m_Action_AnimMap.emplace(L"ATTACK3", PLAYER_ANIM_S_ATK_NORMAL3);
+    m_Action_AnimMap.emplace(L"ATTACK4", PLAYER_ANIM_S_ATK_NORMAL4);
+    m_Action_AnimMap.emplace(L"ATTACK5", PLAYER_ANIM_S_ATK_NORMAL5);
+    m_Action_AnimMap.emplace(L"STRONG_ATTACK1", PLAYER_ANIM_LS_ATK_STRONG1B);
+    
+
+
+    /* 재생속도 증가. */
+    return S_OK;
+}
+
+_uint CPlayer::Find_AnimationIndex(const _wstring& strAnimationTag)
+{
+    auto iter = m_Action_AnimMap.find(strAnimationTag);
+
+    // 찾는 애니메이션이 없는 경우
+    if (iter == m_Action_AnimMap.end())
+    {
+        CRASH("Failed Find Animation");
+        return 0;
+    }
+
+    return iter->second;
+}
+
+
 void CPlayer::Change_Animation(_uint iAnimIndex, _bool IsLoop, _float fDuration, _uint iStartFrame, _bool bEitherBoundary, _bool bSameChange)
 {
 
 }
 #pragma endregion
+
+
+#pragma region 버프 관리.
+
+void CPlayer::RemoveBuff(uint32_t buffFlag, _bool removeTimer)
+{
+    m_ActiveBuffs &= ~buffFlag;
+
+    if (removeTimer)
+        m_BuffTimers.erase(buffFlag);
+}
+const _bool CPlayer::AddBuff(_uint buffFlag, _float fCustomDuration)
+{
+    if (IsBuffOnCooldown(buffFlag))
+        return false;
+
+    m_ActiveBuffs |= buffFlag;
+
+    // 시간을 지정한 경우에만 해당 시간으로 설정해줍니다. 
+    if (m_BuffDefault_Durations[buffFlag] > 0.f)
+    {
+        m_BuffTimers[buffFlag] = fCustomDuration > 0.f ? fCustomDuration
+            : m_BuffDefault_Durations[buffFlag];
+        // 버프 타이머를 설정하면 자동으로 삭제되므로 상시 유지되는 버프도 삭제될 수도 있음
+        // => Phase 상태.
+    }
+
+
+    return true;
+}
+const _bool CPlayer::IsBuffOnCooldown(_uint buffFlag)
+{
+    auto iter = m_BuffTimers.find(buffFlag);
+    return (iter != m_BuffTimers.end() && iter->second > 0.f);
+}
+// 하나만 확인 가능.
+_bool CPlayer::HasBuff(_uint buffFlag) const
+{
+    return (m_ActiveBuffs & buffFlag) != 0;
+}
+
+// 이 중에 아무거나 있으면 True | OR
+_bool CPlayer::HasAnyBuff(_uint buffFlags) const
+{
+    return (m_ActiveBuffs & buffFlags) != 0;
+}
+
+// 다 가지고 있으면 True | And
+_bool CPlayer::HasAllBuffs(_uint buffFlags) const
+{
+    return (m_ActiveBuffs & buffFlags) == buffFlags;
+}
+
+
+void CPlayer::Tick_BuffTimers(_float fTimeDelta)
+{
+    // 만료된 버프/디버프 들.
+    std::vector<_uint> expiredBuffs;
+
+    // 모든 타이머를 틱(감소)시킴
+    for (auto& pair : m_BuffTimers)
+    {
+        uint32_t buffFlag = pair.first;
+        _float& timer = pair.second;
+        timer -= fTimeDelta;
+
+        if (timer <= 0.0f)
+            expiredBuffs.push_back(buffFlag);
+    }
+
+    // 만료된 버프들 제거
+    for (uint32_t expiredBuff : expiredBuffs)
+        RemoveBuff(expiredBuff, true);
+
+    expiredBuffs.clear();
+
+}
+
+
+HRESULT CPlayer::Initialize_BuffDurations()
+{
+    return S_OK;
+}
+#pragma endregion
+
+
+
+
 
 void CPlayer::On_Collision_Enter(CGameObject* pOther)
 {
@@ -577,6 +723,9 @@ void CPlayer::HandleState(_float fTimeDelta)
 
     if (nullptr != m_pFsmCom)
         m_pFsmCom->Update(fTimeDelta);
+
+    // Fsm 작동 이후에 상태 값에 대한 초기화를 담당하는 Tick_BuffTimer 실행.
+    Tick_BuffTimers(fTimeDelta);
 
     if (true == m_pModelCom->Play_Animation(fTimeDelta))
     {
@@ -687,6 +836,17 @@ HRESULT CPlayer::Ready_Components(PLAYER_DESC* pDesc)
     m_fOffsetY = box.fHeight * 0.5f;
 
     
+    CBounding_AABB::BOUNDING_AABB_DESC  AABBDesc{};
+    AABBDesc.vExtents = _float3(box.vExtents.x, box.vExtents.y, box.vExtents.z);
+    AABBDesc.vCenter = _float3(0.f, 0.f, 0.f); // 중점.
+
+    if (FAILED(__super::Add_Component(ENUM_CLASS(LEVEL::STATIC)
+        , TEXT("Prototype_Component_Collider_AABB")
+        , TEXT("Com_Collider"), reinterpret_cast<CComponent**>(&m_pColliderCom), &AABBDesc)))
+    {
+        CRASH("Failed Clone Collider AABB");
+        return E_FAIL;
+    }
     
 
     return S_OK;
@@ -755,19 +915,16 @@ HRESULT CPlayer::Ready_Fsm()
     Register_CoolTime();
 
     // DODGE TickPerseoncd 증가.
-    for (_uint i = PLAYER_ANIM_ATTACK1; i < PLAYER_ANIM_ATTACK16; ++i)
-    {
-        // 모델 재생속도 증가.
-        m_pModelCom->Set_CurrentTickPerSecond(i
-            , m_pModelCom->Get_CurrentTickPerSecond(i) * 2.f);
-    }
-    
-    m_pModelCom->Set_CurrentTickPerSecond(PLAYER_ANIM_RUN_F_LOOP, m_pModelCom->Get_CurrentTickPerSecond(PLAYER_ANIM_RUN_F_LOOP) * 1.5f);
-    m_pModelCom->Set_CurrentTickPerSecond(PLAYER_ANIM_DODGE_F, m_pModelCom->Get_CurrentTickPerSecond(PLAYER_ANIM_DODGE_F) * 2.f);
-    m_pModelCom->Set_CurrentTickPerSecond(PLAYER_ANIM_STRONG_ATTACK, m_pModelCom->Get_CurrentTickPerSecond(PLAYER_ANIM_DODGE_F) * 2.f);
+    //for (_uint i = PLAYER_ANIM_ATTACK1; i < PLAYER_ANIM_ATTACK16; ++i)
+    //{
+    //    // 모델 재생속도 증가.
+    //    m_pModelCom->Set_CurrentTickPerSecond(i
+    //        , m_pModelCom->Get_CurrentTickPerSecond(i) * 2.f);
+    //}
+   
 
     CPlayer_IdleState::IDLE_ENTER_DESC enter{};
-    enter.iAnimation_Idx = PLAYER_ANIM_IDLE_SWORD;
+    enter.iAnimation_Idx = m_Action_AnimMap[TEXT("IDLE")];
 
     CPlayer_RunState::RUN_ENTER_DESC Run{};
     Run.iAnimation_Idx = PLAYER_ANIM_RUN_F_LOOP;
@@ -779,13 +936,34 @@ HRESULT CPlayer::Ready_Fsm()
 
 void CPlayer::Register_CoolTime()
 {
-    _float fTimeDelta = m_pGameInstance->Get_TimeDelta();
-    
+    /* 재생 속도 증가*/
+    m_pModelCom->Set_CurrentTickPerSecond(m_Action_AnimMap[TEXT("RUN")]
+        , m_pModelCom->Get_CurrentTickPerSecond(m_Action_AnimMap[TEXT("RUN")]) * 2.f);
 
+    m_pModelCom->Set_CurrentTickPerSecond(m_Action_AnimMap[TEXT("ATTACK1")]
+        , m_pModelCom->Get_CurrentTickPerSecond(m_Action_AnimMap[TEXT("ATTACK1")]) * 2.f);
+    m_pModelCom->Set_CurrentTickPerSecond(m_Action_AnimMap[TEXT("ATTACK2")]
+        , m_pModelCom->Get_CurrentTickPerSecond(m_Action_AnimMap[TEXT("ATTACK2")]) * 2.f);
+    m_pModelCom->Set_CurrentTickPerSecond(m_Action_AnimMap[TEXT("ATTACK3")]
+        , m_pModelCom->Get_CurrentTickPerSecond(m_Action_AnimMap[TEXT("ATTACK3")]) * 2.f);
+    m_pModelCom->Set_CurrentTickPerSecond(m_Action_AnimMap[TEXT("ATTACK4")]
+        , m_pModelCom->Get_CurrentTickPerSecond(m_Action_AnimMap[TEXT("ATTACK4")]) * 2.f);
+
+    m_pModelCom->Set_CurrentTickPerSecond(m_Action_AnimMap[TEXT("DODGE")]
+        , m_pModelCom->Get_CurrentTickPerSecond(m_Action_AnimMap[TEXT("DODGE")]) * 2.f);
+
+
+    _float fCalcDuration = m_pModelCom->Get_AnimationDuration(m_Action_AnimMap[TEXT("STRONG_ATTACK1")]) /
+        m_pModelCom->Get_AnimationTickPersecond(m_Action_AnimMap[TEXT("STRONG_ATTACK1")]);
+    m_pModelCom->Set_CurrentTickPerSecond(m_Action_AnimMap[TEXT("STRONG_ATTACK1")]
+        , m_pModelCom->Get_CurrentTickPerSecond(m_Action_AnimMap[TEXT("STRONG_ATTACK1")]) * 2.f);
+   
+
+    _float fTimeDelta = m_pGameInstance->Get_TimeDelta();
     m_pFsmCom->Register_StateCoolTime(PLAYER_STATE::IDLE, 0.f);
     m_pFsmCom->Register_StateCoolTime(PLAYER_STATE::WALK, 0.f);
     m_pFsmCom->Register_StateCoolTime(PLAYER_STATE::RUN, 0.f);
-    m_pFsmCom->Register_StateCoolTime(PLAYER_STATE::DODGE, 1.f);
+    m_pFsmCom->Register_StateCoolTime(PLAYER_STATE::DODGE, 0.4f);
     m_pFsmCom->Register_StateCoolTime(PLAYER_STATE::STRONG_ATTACK, 2.f);
     m_pFsmCom->Register_StateCoolTime(PLAYER_STATE::ATTACK, 1.f);
     m_pFsmCom->Register_StateCoolTime(PLAYER_STATE::GUARD, 0.5f);
@@ -794,8 +972,12 @@ void CPlayer::Register_CoolTime()
     m_pFsmCom->Register_StateExitCoolTime(PLAYER_STATE::IDLE, 0.f);
     m_pFsmCom->Register_StateExitCoolTime(PLAYER_STATE::WALK, 0.f);
     m_pFsmCom->Register_StateExitCoolTime(PLAYER_STATE::RUN, 0.f);
-    m_pFsmCom->Register_StateExitCoolTime(PLAYER_STATE::DODGE, 1.5f);
-    m_pFsmCom->Register_StateExitCoolTime(PLAYER_STATE::STRONG_ATTACK, 2.f);
+    m_pFsmCom->Register_StateExitCoolTime(PLAYER_STATE::DODGE, 0.7f);
+
+    fCalcDuration = m_pModelCom->Get_AnimationDuration(m_Action_AnimMap[TEXT("STRONG_ATTACK1")]) /
+        m_pModelCom->Get_AnimationTickPersecond(m_Action_AnimMap[TEXT("STRONG_ATTACK1")]);
+    m_pFsmCom->Register_StateExitCoolTime(PLAYER_STATE::STRONG_ATTACK, fCalcDuration * 0.6f);
+
     m_pFsmCom->Register_StateExitCoolTime(PLAYER_STATE::ATTACK, 0.7f);
     m_pFsmCom->Register_StateExitCoolTime(PLAYER_STATE::GUARD, 0.4f);
 }
@@ -892,6 +1074,6 @@ void CPlayer::Free()
     Safe_Release(m_pModelCom);
     Safe_Release(m_pPlayerWeapon);
     Safe_Release(m_pNavigationCom);
-    
+    Safe_Release(m_pColliderCom);
         
 }

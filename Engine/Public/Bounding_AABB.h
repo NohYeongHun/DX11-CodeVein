@@ -25,15 +25,19 @@ public:
 public:
 	virtual HRESULT Initialize(BOUNDING_DESC* pBoundingDesc);
 	virtual void Update(_fmatrix WorldMatrix);
-	//virtual HRESULT Render(PrimitiveBatch)
+
+#ifdef _DEBUG
+public:
+	virtual HRESULT Render(PrimitiveBatch<VertexPositionColor>* pBatch) override;
+#endif
 
 public:
-	virtual _bool Intersect(CCollider::TYPE eColliderType, CBounding* pBounding) override;
+	virtual _bool Intersect(COLLIDER eColliderType, CBounding* pBounding) override;
 	virtual void Change_BoundingDesc(BOUNDING_DESC* pBoundingDesc) override;
 	virtual void Reset_Bounding() override;
 
 private:
-	BoundingBox* m_pLocalDesc = { nullptr };
+	BoundingBox* m_pOriginalDesc = { nullptr };
 	BoundingBox* m_pDesc = { nullptr };
 
 public:

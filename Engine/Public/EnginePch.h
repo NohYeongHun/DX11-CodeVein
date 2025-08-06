@@ -18,6 +18,7 @@
 #pragma region COMPONENT
 #include "Component.h"
 
+#include "DebugDraw.h"
 #include "Collider.h"
 #include "Bounding.h"
 #include "Bounding_AABB.h"

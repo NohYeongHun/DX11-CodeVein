@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "State.h"
 
+/* 루트모션 있는 상태들은 Enter와 동시에 RootMotion을 Set해주자. */
 NS_BEGIN(Client)
 class CPlayerState abstract : public CState
 {

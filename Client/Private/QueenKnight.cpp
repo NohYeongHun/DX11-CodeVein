@@ -20,6 +20,8 @@ HRESULT CQueenKnight::Initialize_Prototype()
 
 HRESULT CQueenKnight::Initialize_Clone(void* pArg)
 {
+
+
     QUEENKNIGHT_DESC* pDesc = static_cast<QUEENKNIGHT_DESC*>(pArg);
 
     if (FAILED(__super::Initialize_Clone(pDesc)))
@@ -120,6 +122,11 @@ void CQueenKnight::Late_Update(_float fTimeDelta)
 
 HRESULT CQueenKnight::Render()
 {
+#ifdef _DEBUG
+    if (m_pColliderCom)
+        m_pColliderCom->Render();
+#endif // _DEBUG
+
     if (FAILED(Ready_Render_Resources()))
     {
         CRASH("Ready Render Resource Failed");
@@ -275,7 +282,7 @@ void CQueenKnight::Disable_Collider(_uint iType)
 
 
 
-#pragma region 0. 기본 함수들 정의
+#pragma region 0. 기본 함수들 정의 => 콜라이더도 정의
 HRESULT CQueenKnight::Ready_Components(QUEENKNIGHT_DESC* pDesc)
 {
     if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxAnimMesh"),
@@ -291,7 +298,23 @@ HRESULT CQueenKnight::Ready_Components(QUEENKNIGHT_DESC* pDesc)
         return E_FAIL;
 
     // 오프셋 지정.
-    m_fOffsetY = m_pModelCom->Get_BoundingBox().fHeight * 0.5f;
+
+    BOUNDING_BOX box = m_pModelCom->Get_BoundingBox();
+    m_fOffsetY = box.fHeight * 0.5f - 0.2f;
+
+
+    CBounding_AABB::BOUNDING_AABB_DESC  AABBDesc{};
+    AABBDesc.vExtents = _float3(box.vExtents.x, box.vExtents.y, box.vExtents.z);
+    AABBDesc.vCenter = _float3(0.f, 0.f, 0.f); // 중점.
+
+    if (FAILED(__super::Add_Component(ENUM_CLASS(LEVEL::STATIC)
+        , TEXT("Prototype_Component_Collider_AABB")
+        , TEXT("Com_Collider"), reinterpret_cast<CComponent**>(&m_pColliderCom), &AABBDesc)))
+    {
+        CRASH("Failed Clone Collider AABB");
+        return E_FAIL;
+    }
+
 
     return S_OK;
 }

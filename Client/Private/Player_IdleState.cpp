@@ -50,17 +50,17 @@ void CPlayer_IdleState::Exit()
 {
 	if (m_iNextState != -1)
 	{
-		if (m_iNextState == CPlayer::PLAYER_STATE::STRONG_ATTACK)
-		{
-			m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, true);
-		}
-			
-		else if (m_iNextState == CPlayer::PLAYER_STATE::DODGE)
-			m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, false);
-		else if (m_iNextState == CPlayer::GUARD)
-			m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, false);
-		else if (m_iNextState == CPlayer::PLAYER_STATE::ATTACK)
-			m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, true);
+
+		m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, true);
+		//if (m_iNextState == CPlayer::PLAYER_STATE::STRONG_ATTACK)
+		//{
+		//	m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, true);
+		//}
+		//	
+		//else if (m_iNextState == CPlayer::PLAYER_STATE::DODGE)
+		//	m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, true);
+		//else if (m_iNextState == CPlayer::PLAYER_STATE::ATTACK)
+		//	m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, true);
 	}
 }
 
@@ -89,8 +89,8 @@ void CPlayer_IdleState::Change_State()
 			return;
 
 		m_iNextState = CPlayer::PLAYER_STATE::DODGE;
-		Dodge.iAnimation_Idx = PLAYER_ANIM_DODGE_F;
-		m_iNextAnimIdx = PLAYER_ANIM_DODGE_F;
+		m_iNextAnimIdx = m_pPlayer->Find_AnimationIndex(TEXT("DODGE"));
+		Dodge.iAnimation_Idx = m_iNextAnimIdx;
 		m_pFsm->Change_State(m_iNextState, &Dodge);
 		return;
 	}
@@ -101,7 +101,7 @@ void CPlayer_IdleState::Change_State()
 			return;
 
 		m_iNextState = CPlayer::PLAYER_STATE::STRONG_ATTACK;
-		m_iNextAnimIdx = PLAYER_ANIM_SPECIAL_DOWN3;
+		m_iNextAnimIdx = m_pPlayer->Find_AnimationIndex(TEXT("STRONG_ATTACK1"));
 		StrongAttack.iAnimation_Idx = m_iNextAnimIdx;
 		StrongAttack.eDirection = m_eDir;
 		m_pFsm->Change_State(m_iNextState, &StrongAttack);
@@ -114,8 +114,8 @@ void CPlayer_IdleState::Change_State()
 			return;
 
 		m_iNextState = CPlayer::PLAYER_STATE::GUARD;
-		m_iNextAnimIdx = PLAYER_ANIM_GUARD_START;
-		Guard.iAnimation_Idx = PLAYER_ANIM_GUARD_START;
+		m_iNextAnimIdx = m_pPlayer->Find_AnimationIndex(TEXT("GUARD_START"));
+		Guard.iAnimation_Idx = m_iNextAnimIdx;
 		m_pFsm->Change_State(m_iNextState, &Guard);
 		return;
 
@@ -127,8 +127,8 @@ void CPlayer_IdleState::Change_State()
 			return;
 
 		m_iNextState = CPlayer::PLAYER_STATE::ATTACK;
-		m_iNextAnimIdx = PLAYER_ANIM_ATTACK1;
-		Attack.iAnimation_Idx = PLAYER_ANIM_ATTACK1;
+		m_iNextAnimIdx = m_pPlayer->Find_AnimationIndex(TEXT("ATTACK1"));
+		Attack.iAnimation_Idx = m_iNextAnimIdx;
 		m_pFsm->Change_State(m_iNextState, &Attack);
 		return;
 	}
@@ -136,7 +136,7 @@ void CPlayer_IdleState::Change_State()
 	if (m_pPlayer->Is_MovementKeyPressed())
 	{
 		m_iNextState = CPlayer::PLAYER_STATE::RUN;
-		Run.iAnimation_Idx = PLAYER_ANIM_RUN_F_LOOP;
+		Run.iAnimation_Idx = m_pPlayer->Find_AnimationIndex(TEXT("RUN"));
 		Run.eDirection = m_eDir;
 		m_pFsm->Change_State(m_iNextState, &Run);
 		return;

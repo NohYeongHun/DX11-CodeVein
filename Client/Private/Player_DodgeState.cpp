@@ -37,48 +37,37 @@ void CPlayer_DodgeState::Update(_float fTimeDelta)
 	Handle_Input();
 	Change_State();
 
-	if (m_pModelCom->Get_Current_Ratio() < 0.4f)
+	
+	if (m_pModelCom->Get_Current_Ratio() < 0.7f)
 	{
-		m_pPlayer->Move_Direction(
-			m_pPlayer->Get_Transform()->Get_LookDirection_NoPitch(), fTimeDelta * 0.5f);
+		m_pPlayer->Move_Direction( m_pPlayer->Get_Transform()->Get_LookDirection_NoPitch(), fTimeDelta * 0.5f);
 	}
 
-	//if (!m_pModelCom->Is_Finished())
-	//{
-	//	//m_eDir = m_pPlayer->Calculate_Direction();
-	//	// 이동량이 Zero라서 이동이 안된다.
-	//	m_pPlayer->Get_Transform()->Move_Direction(
-	//		m_pPlayer->Get_Transform()->Get_LookDirection_NoPitch(), fTimeDelta
-	//	);
-	//}
 }
 
-/*
-* 이 문제는 애니메이션 제작 시점의 좌표 기준과 런타임 블렌딩 시점의 좌표 기준이 다르기 때문에 
-발생하는 근본적인 좌표계 불일치 문제입니다. 
-구르기 같은 이동 애니메이션과 Idle 같은 제자리 애니메이션 간의 
-공간적 연속성을 보장하는 추가적인 처리가 필요한 상황입니다.
-
-=> 로컬좌표가 다른 루트 모션간에 블렌딩하는 방법?
-*/
 // 종료될 때 실행할 동작.=> 왠만하면 Idle
 void CPlayer_DodgeState::Exit()
 {
-	m_pModelCom->Set_RootMotionRotation(false);
-	m_pModelCom->Set_RootMotionTranslate(false);
+	
+	//m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, true);
+	
 	//여기서 동작해야합니다.
 	if (m_iNextState != -1) // NextIndex가 있는경우 블렌딩 시작.
 	{
-		if (m_iNextAnimIdx == PLAYER_ANIM_STRONG_ATTACK || 
-			m_iNextAnimIdx == PLAYER_ANIM_ATTACK1
-			)
-		{
-			return;
-		}
-
-			
-		else
-			m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, false);
+		m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, true);
+		//if (m_iNextState == CPlayer::PLAYER_STATE::DODGE ||
+		//	m_iNextState == CPlayer::PLAYER_STATE::STRONG_ATTACK || 
+		//	m_iNextState == CPlayer::PLAYER_STATE::ATTACK ||
+		//	m_iNextState == CPlayer::PLAYER_STATE::GUARD
+		//	)
+		//{
+		//	return;
+		//}
+		//else if (m_iNextState == CPlayer::PLAYER_STATE::IDLE)
+		//	m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.05f, true, true, false);
+		//else
+		//d	m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, true);
+		
 	}
 
 	
@@ -102,6 +91,7 @@ void CPlayer_DodgeState::Change_State()
 	CPlayer_AttackState::ATTACK_ENTER_DESC Attack{};
 	CPlayer_StrongAttackState::STRONG_ENTER_DESC StrongAttack{};
 	CPlayer_GuardState::GUARD_ENTER_DESC Guard{};
+	CPlayer_DodgeState::DODGE_ENTER_DESC Dodge{};
 
 
 
@@ -109,8 +99,8 @@ void CPlayer_DodgeState::Change_State()
 	{
 		// Idle 상태로 전환
 		m_iNextState = CPlayer::PLAYER_STATE::IDLE;
-		m_iNextAnimIdx = PLAYER_ANIM_IDLE_SWORD;
-		Idle.iAnimation_Idx = PLAYER_ANIM_IDLE_SWORD;
+		m_iNextAnimIdx = m_pPlayer->Find_AnimationIndex(TEXT("IDLE"));
+		Idle.iAnimation_Idx = m_iNextAnimIdx;
 		m_pFsm->Change_State(CPlayer::PLAYER_STATE::IDLE, &Idle);
 		return;
 	}
@@ -126,7 +116,7 @@ void CPlayer_DodgeState::Change_State()
 				return;
 
 			// 다음 연계공격으로 변경.
-			m_iNextAnimIdx = PLAYER_ANIM_ATTACK1;
+			m_iNextAnimIdx = m_pPlayer->Find_AnimationIndex(TEXT("ATTACK1"));
 			m_iNextState = CPlayer::PLAYER_STATE::ATTACK;
 			Attack.iAnimation_Idx = m_iNextAnimIdx;
 			m_pFsm->Change_State(m_iNextState, &Attack);
@@ -135,13 +125,12 @@ void CPlayer_DodgeState::Change_State()
 
 		if (m_pPlayer->Is_MovementKeyPressed())
 		{
-			m_iNextAnimIdx = PLAYER_ANIM_RUN_F_LOOP;
+			m_iNextAnimIdx = m_pPlayer->Find_AnimationIndex(TEXT("RUN"));
 			m_iNextState = CPlayer::PLAYER_STATE::RUN;
 			Run.iAnimation_Idx = m_iNextAnimIdx;
 			m_pFsm->Change_State(m_iNextState, &Run);
 			return;
 		}
-		
 
 		if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::STRONG_ATTACK))
 		{
@@ -149,7 +138,7 @@ void CPlayer_DodgeState::Change_State()
 			if (!m_pFsm->Is_CoolTimeEnd(CPlayer::STRONG_ATTACK))
 				return;
 
-			m_iNextAnimIdx = PLAYER_ANIM_SPECIAL_DOWN3;
+			m_iNextAnimIdx = m_pPlayer->Find_AnimationIndex(TEXT("STRONG_ATTACK1"));
 			m_iNextState = CPlayer::STRONG_ATTACK;
 			StrongAttack.iAnimation_Idx = m_iNextAnimIdx;
 			m_pFsm->Change_State(m_iNextState, &StrongAttack);
@@ -162,13 +151,23 @@ void CPlayer_DodgeState::Change_State()
 			if (!m_pFsm->Is_CoolTimeEnd(CPlayer::GUARD))
 				return;
 
-			m_iNextAnimIdx = PLAYER_ANIM_GUARD_START;
+			m_iNextAnimIdx = m_pPlayer->Find_AnimationIndex(TEXT("GUARD_START"));
 			m_iNextState = CPlayer::GUARD;
 			StrongAttack.iAnimation_Idx = m_iNextAnimIdx;
 			m_pFsm->Change_State(m_iNextState, &Guard);
 			return;
 		}
 
+		//if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::DODGE))
+		//{
+		//	/*if (!m_pFsm->Is_CoolTimeEnd(CPlayer::DODGE))
+		//		return;*/
+		//	m_iNextAnimIdx = m_pPlayer->Find_AnimationIndex(TEXT("DODGE"));
+		//	m_iNextState = CPlayer::PLAYER_STATE::DODGE;
+		//	Dodge.iAnimation_Idx = m_iNextAnimIdx;
+		//	m_pFsm->Change_State(m_iNextState, &Dodge);
+		//	return;
+		//}
 	}
 
 

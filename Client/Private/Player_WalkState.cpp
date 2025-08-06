@@ -43,9 +43,10 @@ void CPlayer_WalkState::Update(_float fTimeDelta)
 	else
 	{
 		CPlayer_IdleState::IDLE_ENTER_DESC Desc{};
-		Desc.iAnimation_Idx = PLAYER_ANIM_IDLE_SWORD;
+		m_iNextAnimIdx = m_pPlayer->Find_AnimationIndex(TEXT("IDLE"));
+		Desc.iAnimation_Idx = m_iNextAnimIdx;
 		m_pFsm->Change_State(CPlayer::PLAYER_STATE::IDLE, &Desc);
-		m_iNextAnimIdx = CPlayer::PLAYER_STATE::IDLE;
+		
 	}		
 }
 

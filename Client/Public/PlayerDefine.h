@@ -1,104 +1,100 @@
-﻿/*
-0. Animation Name : SK_HumanFemale_LOD0.ao | AS_TStdFemale_TCmn_Damage01_B
-1. Animation Name : SK_HumanFemale_LOD0.ao | AS_TStdFemale_TCmn_Damage01_F
-2. Animation Name : SK_HumanFemale_LOD0.ao | AS_TStdFemale_TCmn_Damage01_L
-3. Animation Name : SK_HumanFemale_LOD0.ao | AS_TStdFemale_TCmn_Damage01_R
-4. Animation Name : SK_HumanFemale_LOD0.ao | AS_TStdFemale_TCmn_Run_B_Loop
-5. Animation Name : SK_HumanFemale_LOD0.ao | AS_TStdFemale_TCmn_Run_B_RightFoot_End
-6. Animation Name : SK_HumanFemale_LOD0.ao | AS_TStdFemale_TCmn_Run_F_Loop
-7. Animation Name : SK_HumanFemale_LOD0.ao | AS_TStdFemale_TCmn_Run_F_RightFoot_End
-8. Animation Name : SK_HumanFemale_LOD0.ao | AS_TStdFemale_TCmn_Run_L_Loop
-9. Animation Name : SK_HumanFemale_LOD0.ao | AS_TStdFemale_TCmn_Run_L_RightFoot_End
-10. Animation Name : SK_HumanFemale_LOD0.ao | AS_TStdFemale_TCmn_Run_R_Loop
-11. Animation Name : SK_HumanFemale_LOD0.ao | AS_TStdFemale_TCmn_Run_R_RightFoot_End
-12. Animation Name : SK_HumanFemale_LOD0.ao | AS_TStdFemale_TCmn_Walk_B_Loop
-13. Animation Name : SK_HumanFemale_LOD0.ao | AS_TStdFemale_TCmn_Walk_F_Loop
-14. Animation Name : SK_HumanFemale_LOD0.ao | AS_TStdFemale_TCmn_Walk_L_Loop
-15. Animation Name : SK_HumanFemale_LOD0.ao | AS_TStdFemale_TCmn_Walk_R_Loop
-16. Animation Name : SK_HumanFemale_LOD0.ao | AS_TStdFemale_TLSword_Idle_N_Loop
-17. Animation Name : SK_HumanFemale_LOD0.ao | AS_TStdFemale_TSpa_Idle_N_Loop
-18. Animation Name : SK_HumanFemale_LOD0.ao | AS_TStdUnisex_TCmn_Renketsu_Barrier_01
-19. Animation Name : SK_HumanFemale_LOD0.ao | AS_TStdUnisex_TCmn_Renketsu_BuffSelf_01
-20. Animation Name : SK_HumanFemale_LOD0.ao | AS_TStdUnisex_TCmn_Renketsu_Enchant_01
-21. Animation Name : SK_HumanFemale_LOD0.ao | AS_TStdUnisex_TCmn_Renketsu_Ground_01
-22. Animation Name : SK_HumanFemale_LOD0.ao | AS_TStdUnisex_TCmn_Renketsu_Search_02
-23. Animation Name : SK_HumanFemale_LOD0.ao | AS_TStdUnisex_TLSword_AttackStrong01A_N
-24. Animation Name : SK_HumanFemale_LOD0.ao | AS_TStdUnisex_TLSword_Dodge300_B
-25. Animation Name : SK_HumanFemale_LOD0.ao | AS_TStdUnisex_TLSword_Dodge300_F
-26. Animation Name : SK_HumanFemale_LOD0.ao | AS_TStdUnisex_TLSword_Dodge300_L
-27. Animation Name : SK_HumanFemale_LOD0.ao | AS_TStdUnisex_TLSword_Dodge300_R
-28. Animation Name : SK_HumanFemale_LOD0.ao | AS_TStdUnisex_TLSword_Guard_N_End
-29. Animation Name : SK_HumanFemale_LOD0.ao | AS_TStdUnisex_TLSword_Guard_N_Loop
-30. Animation Name : SK_HumanFemale_LOD0.ao | AS_TStdUnisex_TLSword_Guard_N_Start
-31. Animation Name : SK_HumanFemale_LOD0.ao | AS_TStdUnisex_TLSword_GuardHit_N
-32. Animation Name : SK_HumanFemale_LOD0.ao | AS_TStdUnisex_TSword_AttackNormal01_N
-33. Animation Name : SK_HumanFemale_LOD0.ao | AS_TStdUnisex_TSword_AttackNormal02_N
-34. Animation Name : SK_HumanFemale_LOD0.ao | AS_TStdUnisex_TSword_AttackNormal03_N
-35. Animation Name : SK_HumanFemale_LOD0.ao | AS_TStdUnisex_TSword_AttackNormal04_N
-36. Animation Name : SK_HumanFemale_LOD0.ao | AS_TStdUnisex_TSword_AttackNormal05_N
-37. Animation Name : SK_HumanFemale_LOD0.ao | AS_TStdUnisex_TSword_AttackNormal06_N
-38. Animation Name : SK_HumanFemale_LOD0.ao | AS_TStdUnisex_TSword_AttackNormal07_N
-39. Animation Name : SK_HumanFemale_LOD0.ao | AS_TStdUnisex_TSword_AttackNormal08_N
-40. Animation Name : SK_HumanFemale_LOD0.ao | AS_TStdUnisex_TSword_AttackNormal09_N
-41. Animation Name : SK_HumanFemale_LOD0.ao | AS_TStdUnisex_TSword_AttackNormal10_N
-42. Animation Name : SK_HumanFemale_LOD0.ao | AS_TStdUnisex_TSword_AttackNormal11_N
-43. Animation Name : SK_HumanFemale_LOD0.ao | AS_TStdUnisex_TSword_AttackNormal12_N
-44. Animation Name : SK_HumanFemale_LOD0.ao | AS_TStdUnisex_TSword_AttackNormal13_N
-45. Animation Name : SK_HumanFemale_LOD0.ao | AS_TStdUnisex_TSword_AttackNormal14_N
-46. Animation Name : SK_HumanFemale_LOD0.ao | AS_TStdUnisex_TSword_AttackNormal15_N
-47. Animation Name : SK_HumanFemale_LOD0.ao | AS_TStdUnisex_TSword_AttackNormal16_N
-48. Animation Name : SK_HumanFemale_LOD0.ao | AS_TStdUnisex_TSword_AttackSpecialDown02_N
-49. Animation Name : SK_HumanFemale_LOD0.ao | AS_TStdUnisex_TSword_AttackSpecialDown03_N
-50. Animation Name : SK_HumanFemale_LOD0.ao | AS_TStdUnisex_TSword_AttackSpecialDown04_N
-51. Animation Name : SK_HumanFemale_LOD0.ao | AS_TStdUnisex_TSword_AttackSpecialDown_N
-52. Animation Name : SK_HumanFemale_LOD0.ao | AS_TStdUnisex_TSword_AttackSpecialLaunch_N
-53. Animation Name : SK_HumanFemale_LOD0.ao | AS_TStdUnisex_TSword_AttackStrong01A_N
-*/
-
-NS_BEGIN(Client)
+﻿NS_BEGIN(Client)
 enum PLAYER_ANIMATION_KEY
 {
-	// DAMAGE 애니메이션 (0-3)
-	PLAYER_ANIM_DAMAGE_B = 0, PLAYER_ANIM_DAMAGE_F = 1, PLAYER_ANIM_DAMAGE_L = 2,
-	PLAYER_ANIM_DAMAGE_R = 3,
+    // ===== 피해 애니메이션 (0-3) =====
+    PLAYER_ANIM_DAMAGE_B = 0, PLAYER_ANIM_DAMAGE_F = 1, PLAYER_ANIM_DAMAGE_L = 2,
+    PLAYER_ANIM_DAMAGE_R = 3,
 
-	// RUN 애니메이션 (4-11)  
-	PLAYER_ANIM_RUN_B_LOOP = 4, PLAYER_ANIM_RUN_B_END = 5, PLAYER_ANIM_RUN_F_LOOP = 6,
-	PLAYER_ANIM_RUN_F_END = 7, PLAYER_ANIM_RUN_L_LOOP = 8, PLAYER_ANIM_RUN_L_END = 9,
-	PLAYER_ANIM_RUN_R_LOOP = 10, PLAYER_ANIM_RUN_R_END = 11,
+    // ===== 달리기 애니메이션 (4-11) =====
+    PLAYER_ANIM_RUN_B_LOOP = 4, PLAYER_ANIM_RUN_B_END = 5, PLAYER_ANIM_RUN_F_LOOP = 6,
+    PLAYER_ANIM_RUN_F_END = 7, PLAYER_ANIM_RUN_L_LOOP = 8, PLAYER_ANIM_RUN_L_END = 9,
+    PLAYER_ANIM_RUN_R_LOOP = 10, PLAYER_ANIM_RUN_R_END = 11,
 
-	// WALK 애니메이션 (12-15)
-	PLAYER_ANIM_WALK_B_LOOP = 12, PLAYER_ANIM_WALK_F_LOOP = 13, PLAYER_ANIM_WALK_L_LOOP = 14,
-	PLAYER_ANIM_WALK_R_LOOP = 15,
+    // ===== 걷기 애니메이션 (12-15) =====
+    PLAYER_ANIM_WALK_B_LOOP = 12, PLAYER_ANIM_WALK_F_LOOP = 13, PLAYER_ANIM_WALK_L_LOOP = 14,
+    PLAYER_ANIM_WALK_R_LOOP = 15,
 
-	// IDLE 애니메이션 (16-17)
-	PLAYER_ANIM_IDLE_SWORD = 16, PLAYER_ANIM_IDLE_SPA = 17,
+    // ===== 대기 애니메이션 (16-17) =====
+    PLAYER_ANIM_IDLE_LSWORD = 16, PLAYER_ANIM_IDLE_SPA = 17,
 
-	// SKILL 애니메이션 (18-22)
-	PLAYER_ANIM_SKILL_BARRIER = 18, PLAYER_ANIM_SKILL_BUFF = 19, PLAYER_ANIM_SKILL_ENCHANT = 20,
-	PLAYER_ANIM_SKILL_GROUND = 21, PLAYER_ANIM_SKILL_SEARCH = 22,
+    // ===== 스킬 애니메이션 (18-22) =====
+    PLAYER_ANIM_SKILL_BARRIER = 18, PLAYER_ANIM_SKILL_BUFF = 19, PLAYER_ANIM_SKILL_ENCHANT = 20,
+    PLAYER_ANIM_SKILL_GROUND = 21, PLAYER_ANIM_SKILL_SEARCH = 22,
 
-	// EXT 애니메이션 (23)
-	PLAYER_ANIM_EXT_STRONG = 23,
+    // ===== 대검(TLSword) 회피 공격 (23-25) =====
+    PLAYER_ANIM_LS_ATK_DODGE_B = 23, PLAYER_ANIM_LS_ATK_DODGE_F = 24, PLAYER_ANIM_LS_ATK_DODGE_R = 25,
 
-	// DODGE 애니메이션 (24-27)
-	PLAYER_ANIM_DODGE_B = 24, PLAYER_ANIM_DODGE_F = 25, PLAYER_ANIM_DODGE_L = 26,
-	PLAYER_ANIM_DODGE_R = 27,
+    // ===== 대검 낙하 공격 (26-27) =====
+    PLAYER_ANIM_LS_ATK_FALL_END = 26, PLAYER_ANIM_LS_ATK_FALL_START = 27,
 
-	// Guard 애니메이션 (28-31)
-	PLAYER_ANIM_GUARD_END = 28, PLAYER_ANIM_GUARD_LOOP = 29, PLAYER_ANIM_GUARD_START = 30,
-	PLAYER_ANIM_GUARD_HIT = 31,
+    // ===== 대검 일반 공격 (28-36) =====
+    PLAYER_ANIM_LS_ATK_NORMAL1 = 28, PLAYER_ANIM_LS_ATK_NORMAL2 = 29, PLAYER_ANIM_LS_ATK_NORMAL3 = 30,
+    PLAYER_ANIM_LS_ATK_NORMAL4 = 31, PLAYER_ANIM_LS_ATK_NORMAL5 = 32, PLAYER_ANIM_LS_ATK_NORMAL6 = 33,
+    PLAYER_ANIM_LS_ATK_NORMAL7 = 34, PLAYER_ANIM_LS_ATK_NORMAL8 = 35, PLAYER_ANIM_LS_ATK_NORMAL9 = 36,
 
-	// Attack 애니메이션 (32-47)
-	PLAYER_ANIM_ATTACK1 = 32, PLAYER_ANIM_ATTACK2 = 33, PLAYER_ANIM_ATTACK3 = 34,
-	PLAYER_ANIM_ATTACK4 = 35, PLAYER_ANIM_ATTACK5 = 36, PLAYER_ANIM_ATTACK6 = 37,
-	PLAYER_ANIM_ATTACK7 = 38, PLAYER_ANIM_ATTACK8 = 39, PLAYER_ANIM_ATTACK9 = 40,
-	PLAYER_ANIM_ATTACK10 = 41, PLAYER_ANIM_ATTACK11 = 42, PLAYER_ANIM_ATTACK12 = 43,
-	PLAYER_ANIM_ATTACK13 = 44, PLAYER_ANIM_ATTACK14 = 45, PLAYER_ANIM_ATTACK15 = 46,
-	PLAYER_ANIM_ATTACK16 = 47,
+    // ===== 대검 특수 공격 (37-40) =====
+    PLAYER_ANIM_LS_ATK_SP_DOWN2 = 37, PLAYER_ANIM_LS_ATK_SP_DOWN3 = 38, PLAYER_ANIM_LS_ATK_SP_DOWN = 39,
+    PLAYER_ANIM_LS_ATK_SP_LAUNCH = 40,
 
-	// Special Attack 애니메이션 (48-53)
-	PLAYER_ANIM_SPECIAL_DOWN2 = 48, PLAYER_ANIM_SPECIAL_DOWN3 = 49, PLAYER_ANIM_SPECIAL_DOWN4 = 50,
-	PLAYER_ANIM_SPECIAL_DOWN = 51, PLAYER_ANIM_SPECIAL_LAUNCH = 52, PLAYER_ANIM_STRONG_ATTACK = 53,
+    // ===== 대검 강공격 A타입 (41-56) =====
+    PLAYER_ANIM_LS_ATK_STRONG1A = 41, PLAYER_ANIM_LS_ATK_STRONG1B = 42, PLAYER_ANIM_LS_ATK_STRONG3A = 43,
+    PLAYER_ANIM_LS_ATK_STRONG4B = 44, PLAYER_ANIM_LS_ATK_STRONG5A = 45, PLAYER_ANIM_LS_ATK_STRONG6B = 46,
+    PLAYER_ANIM_LS_ATK_STRONG7A = 47, PLAYER_ANIM_LS_ATK_STRONG8B = 48, PLAYER_ANIM_LS_ATK_STRONG9A = 49,
+    PLAYER_ANIM_LS_ATK_STRONG10B = 50, PLAYER_ANIM_LS_ATK_STRONG11A = 51, PLAYER_ANIM_LS_ATK_STRONG12B = 52,
+    PLAYER_ANIM_LS_ATK_STRONG13A = 53, PLAYER_ANIM_LS_ATK_STRONG14B = 54, PLAYER_ANIM_LS_ATK_STRONG16B = 55,
+    PLAYER_ANIM_LS_ATK_STRONG18B = 56,
+
+    // ===== 대검 회피 (57-80) =====
+    PLAYER_ANIM_LS_DODGE_300_B = 57, PLAYER_ANIM_LS_DODGE_300_BL = 58, PLAYER_ANIM_LS_DODGE_300_BR = 59,
+    PLAYER_ANIM_LS_DODGE_300_F = 60, PLAYER_ANIM_LS_DODGE_300_FL = 61, PLAYER_ANIM_LS_DODGE_300_FR = 62,
+    PLAYER_ANIM_LS_DODGE_300_L = 63, PLAYER_ANIM_LS_DODGE_300_R = 64,
+
+    PLAYER_ANIM_LS_DODGE_PLUS_B = 65, PLAYER_ANIM_LS_DODGE_PLUS_BL = 66, PLAYER_ANIM_LS_DODGE_PLUS_BR = 67,
+    PLAYER_ANIM_LS_DODGE_PLUS_F = 68, PLAYER_ANIM_LS_DODGE_PLUS_FL = 69, PLAYER_ANIM_LS_DODGE_PLUS_FR = 70,
+    PLAYER_ANIM_LS_DODGE_PLUS_L = 71, PLAYER_ANIM_LS_DODGE_PLUS_R = 72,
+
+    PLAYER_ANIM_LS_DODGE_ROLL_B = 73, PLAYER_ANIM_LS_DODGE_ROLL_BL = 74, PLAYER_ANIM_LS_DODGE_ROLL_BR = 75,
+    PLAYER_ANIM_LS_DODGE_ROLL_F = 76, PLAYER_ANIM_LS_DODGE_ROLL_FL = 77, PLAYER_ANIM_LS_DODGE_ROLL_FR = 78,
+    PLAYER_ANIM_LS_DODGE_ROLL_L = 79, PLAYER_ANIM_LS_DODGE_ROLL_R = 80,
+
+    // ===== 대검 특수 회피 (81-88) =====
+    PLAYER_ANIM_LS_DODGE_SP_B = 81, PLAYER_ANIM_LS_DODGE_SP_BL = 82, PLAYER_ANIM_LS_DODGE_SP_BR = 83,
+    PLAYER_ANIM_LS_DODGE_SP_F = 84, PLAYER_ANIM_LS_DODGE_SP_FL = 85, PLAYER_ANIM_LS_DODGE_SP_FR = 86,
+    PLAYER_ANIM_LS_DODGE_SP_L = 87, PLAYER_ANIM_LS_DODGE_SP_R = 88,
+
+    // ===== 대검 가드 (89-93) =====
+    PLAYER_ANIM_LS_GUARD_END = 89, PLAYER_ANIM_LS_GUARD_LOOP = 90, PLAYER_ANIM_LS_GUARD_START = 91,
+    PLAYER_ANIM_LS_GUARD_BREAK = 92, PLAYER_ANIM_LS_GUARD_HIT = 93,
+
+    // ===== 검(TSword) 회피 공격 (94-96) =====
+    PLAYER_ANIM_S_ATK_DODGE_B = 94, PLAYER_ANIM_S_ATK_DODGE_F = 95, PLAYER_ANIM_S_ATK_DODGE_R = 96,
+
+    // ===== 검 낙하 공격 (97-98) =====
+    PLAYER_ANIM_S_ATK_FALL_END = 97, PLAYER_ANIM_S_ATK_FALL_START = 98,
+
+    // ===== 검 일반 공격 (99-114) =====
+    PLAYER_ANIM_S_ATK_NORMAL1 = 99, PLAYER_ANIM_S_ATK_NORMAL2 = 100, PLAYER_ANIM_S_ATK_NORMAL3 = 101,
+    PLAYER_ANIM_S_ATK_NORMAL4 = 102, PLAYER_ANIM_S_ATK_NORMAL5 = 103, PLAYER_ANIM_S_ATK_NORMAL6 = 104,
+    PLAYER_ANIM_S_ATK_NORMAL7 = 105, PLAYER_ANIM_S_ATK_NORMAL8 = 106, PLAYER_ANIM_S_ATK_NORMAL9 = 107,
+    PLAYER_ANIM_S_ATK_NORMAL10 = 108, PLAYER_ANIM_S_ATK_NORMAL11 = 109, PLAYER_ANIM_S_ATK_NORMAL12 = 110,
+    PLAYER_ANIM_S_ATK_NORMAL13 = 111, PLAYER_ANIM_S_ATK_NORMAL14 = 112, PLAYER_ANIM_S_ATK_NORMAL15 = 113,
+    PLAYER_ANIM_S_ATK_NORMAL16 = 114,
+
+    // ===== 검 기타 공격 (115-120) =====
+    PLAYER_ANIM_S_ATK_REPEL = 115, PLAYER_ANIM_S_ATK_SP_DOWN2 = 116, PLAYER_ANIM_S_ATK_SP_DOWN3 = 117,
+    PLAYER_ANIM_S_ATK_SP_DOWN4 = 118, PLAYER_ANIM_S_ATK_SP_DOWN = 119, PLAYER_ANIM_S_ATK_SP_LAUNCH = 120,
+
+    // ===== 검 강공격 (121-135) =====
+    PLAYER_ANIM_S_ATK_STRONG1A = 121, PLAYER_ANIM_S_ATK_STRONG1B = 122, PLAYER_ANIM_S_ATK_STRONG3A = 123,
+    PLAYER_ANIM_S_ATK_STRONG4B = 124, PLAYER_ANIM_S_ATK_STRONG6A = 125, PLAYER_ANIM_S_ATK_STRONG6B = 126,
+    PLAYER_ANIM_S_ATK_STRONG7A = 127, PLAYER_ANIM_S_ATK_STRONG7B = 128, PLAYER_ANIM_S_ATK_STRONG8B = 129,
+    PLAYER_ANIM_S_ATK_STRONG9A = 130, PLAYER_ANIM_S_ATK_STRONG10B = 131, PLAYER_ANIM_S_ATK_STRONG12B = 132,
+    PLAYER_ANIM_S_ATK_STRONG14A = 133, PLAYER_ANIM_S_ATK_STRONG14B = 134, PLAYER_ANIM_S_ATK_STRONG16A = 135,
+
+    // ===== 검 가드 (136-140) =====
+    PLAYER_ANIM_S_GUARD_END = 136, PLAYER_ANIM_S_GUARD_LOOP = 137, PLAYER_ANIM_S_GUARD_START = 138,
+    PLAYER_ANIM_S_GUARD_BREAK = 139, PLAYER_ANIM_S_GUARD_HIT = 140,
+
+    PLAYER_ANIM_END
 };
 NS_END

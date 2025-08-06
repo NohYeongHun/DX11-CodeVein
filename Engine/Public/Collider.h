@@ -9,7 +9,6 @@ NS_BEGIN(Engine)
 class ENGINE_DLL CCollider final : public CComponent
 {
 public:
-	enum TYPE { TYPE_AABB, TYPE_OBB, TYPE_SPHERE, TYPE_END };			// 충돌체 타입
 	enum BOUNDING { BOUNDING_ORIGINAL, BOUNDING_WORLD, BOUNDING_END };  // 충돌체 안에 Bounding Box가 존재.
 
 public:
@@ -34,7 +33,7 @@ protected:
 	virtual ~CCollider() = default;
 
 public:
-	CGameObject* Get_Owner();
+	class CGameObject* Get_Owner();
 	const _bool Is_Active();
 	const _bool Find_ColliderObject(CGameObject* pColliderObject);
 	void Erase_ColliderObject(CGameObject* pColliderObject);
@@ -45,28 +44,18 @@ public:
 	void Reset_Bounding();
 
 public:
-	virtual HRESULT Initialize_Prototype(TYPE eType);
+	virtual HRESULT Initialize_Prototype(COLLIDER eType);
 	virtual HRESULT Initialize_Clone(void* pArg);
 
 public:
-	void Update(const _float4x4* pMatrix); // 현재 콜라이더의 주인 객체로부터 Update를 받는다.?
+	void Update(_fmatrix WorldMatrix); // 현재 콜라이더의 주인 객체로부터 Update를 받는다.?
 
 public:
 	_bool Intersect(const CCollider* pTargetCollider); // 충돌 확인.
 
 #ifdef _DEBUG
-	// 디버깅 시 렌더링.
-public:
-	virtual HRESULT Render();
-#endif // _DEBUG
-
-private:
-	class CBounding* m_pBounding = { nullptr };
-	class CGameObject* m_pOwner = { nullptr };
-	TYPE m_eType = {};
-	OBBDESC	m_OBBDesc = {}; // OBB Bounding Box 만들기.
-	_bool	m_IsActive = { true }; // 활성화 상태
-	unordered_set<CGameObject*> m_ColliderObjects = {}; // 콜라이더 저장 용도
+	HRESULT Render();
+#endif
 
 #ifdef _DEBUG
 private:
@@ -76,10 +65,17 @@ private:
 
 #endif
 
+private:
+	class CBounding* m_pBounding = { nullptr };
+	class CGameObject* m_pOwner = { nullptr };
+	_bool	m_IsActive = { true }; // 활성화 상태
+	COLLIDER m_eType = {};
+	unordered_set<CGameObject*> m_ColliderObjects = {}; // 콜라이더 저장 용도
+
 
 
 public:
-	static CCollider* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, TYPE eColliderType);
+	static CCollider* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, COLLIDER eColliderType);
 	virtual CComponent* Clone(void* pArg) override;
 	virtual void Free();
 };

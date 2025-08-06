@@ -64,6 +64,8 @@ void CMonster::Priority_Update(_float fTimeDelta)
 
 void CMonster::Update(_float fTimeDelta)
 { 
+    if (m_pColliderCom)
+        m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
     __super::Update(fTimeDelta);
 }
 
@@ -292,52 +294,6 @@ void CMonster::Tick_BuffTimers(_float fTimeDelta)
 #pragma endregion
 
 
-
-
-
-//void CMonster::Smooth_Rotate_To_Target(_float fTimeDelta, _float fRotationSpeed)
-//{
-//    if (!m_pTarget)
-//        return;
-//
-//    _vector vTargetPos = m_pTarget->Get_Transform()->Get_State(STATE::POSITION);
-//    _vector vPos = m_pTransformCom->Get_State(STATE::POSITION);
-//    _vector vDirection = XMVector3Normalize(vTargetPos - vPos);
-//
-//    // Y축 제거 (지면에서의 회전만)
-//    vDirection = XMVectorSetY(vDirection, 0.f);
-//    if (XMVector3Length(vDirection).m128_f32[0] < 1e-6f) return; // 너무 가까우면 회전하지 않음
-//
-//    vDirection = XMVector3Normalize(vDirection);
-//
-//    // 목표 각도 계산
-//    _float fTargetYaw = atan2f(XMVectorGetX(vDirection), XMVectorGetZ(vDirection));
-//    _float fCurrentYaw = m_pTransformCom->GetYawFromQuaternion();
-//
-//    // 각도 차이 (최단 경로)
-//    _float fYawDiff = fTargetYaw - fCurrentYaw;
-//    while (fYawDiff > XM_PI) fYawDiff -= XM_2PI;
-//    while (fYawDiff < -XM_PI) fYawDiff += XM_2PI;
-//
-//    // 부드러운 회전 적용
-//    _float fRotationAmount = fRotationSpeed * fTimeDelta;
-//
-//    // 남은 각도가 작으면 더 천천히
-//    if (fabsf(fYawDiff) < 0.5f) // 30도 이하일 때
-//        fRotationAmount *= 0.1f; // 50% 감속
-//
-//    if (fabsf(fYawDiff) > fRotationAmount)
-//    {
-//        fYawDiff = (fYawDiff > 0) ? fRotationAmount : -fRotationAmount;
-//    }
-//
-//    // 새로운 회전 적용
-//    _float fNewYaw = fCurrentYaw + fYawDiff;
-//    _vector qNewRot = XMQuaternionRotationAxis(XMVectorSet(0.f, 1.f, 0.f, 0.f), fNewYaw);
-//    m_pTransformCom->Set_Quaternion(qNewRot);
-//}
-
-
 #pragma region 필수 컴포넌트 준비
 
 HRESULT CMonster::Ready_Components(MONSTER_DESC* pDesc)
@@ -429,6 +385,31 @@ void CMonster::RotateTurn_ToTarget()
     m_pTransformCom->LookAt(vResult);
 }
 
+
+void CMonster::RotateTurn_ToTargetYaw()
+{
+    _vector vMyPos = m_pTransformCom->Get_State(STATE::POSITION);
+    _vector vTargetPos = m_pTarget->Get_Transform()->Get_State(STATE::POSITION);
+
+    // 방향 벡터 계산 (Y축 제거)
+    _vector vDirection = vTargetPos - vMyPos;
+    vDirection = XMVectorSetY(vDirection, 0.f);
+
+    if (XMVectorGetX(XMVector3Length(vDirection)) < 0.001f)
+        return;
+
+    vDirection = XMVector3Normalize(vDirection);
+
+    // Yaw 각도 계산
+    _float x = XMVectorGetX(vDirection);
+    _float z = XMVectorGetZ(vDirection);
+    _float fTargetYaw = atan2f(x, z);
+
+    // 즉시 회전 적용
+    _vector qNewRot = XMQuaternionRotationAxis(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTargetYaw);
+    m_pTransformCom->Set_Quaternion(qNewRot);
+}
+
 const _bool CMonster::IsRotateFinished(_float fRadian)
 {
     if (nullptr == m_pTarget)
@@ -491,6 +472,7 @@ void CMonster::Free()
     Safe_Release(m_pShaderCom);
     Safe_Release(m_pColliderCom);
     Safe_Release(m_pNavigationCom);
+    Safe_Release(m_pColliderCom);
 
     m_pTarget = nullptr; // 상호 참조 문제.
 }

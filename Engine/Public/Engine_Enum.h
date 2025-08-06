@@ -4,6 +4,7 @@
 namespace Engine
 {
 	
+	enum class COLLIDER { AABB, OBB, SPHERE, END};
 	enum class CELLPOINT { A, B, C, END };
 	enum class LINE { AB, BC, CA, END };
 	enum class MODELTYPE : _ubyte { 
