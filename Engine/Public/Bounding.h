@@ -2,11 +2,12 @@
 #include "Base.h"
 
 NS_BEGIN(Engine)
-class CBounding abstract : public CBase
+class ENGINE_DLL CBounding abstract : public CBase
 {
 public:
 	typedef struct tagBoundingDesc
 	{
+		class CGameObject* pOwner = { nullptr };
 		_float3		vCenter;
 	}BOUNDING_DESC;
 
@@ -24,7 +25,7 @@ public:
 
 #ifdef _DEBUG
 public:
-	virtual HRESULT Render(PrimitiveBatch<VertexPositionColor>* pBatch) { return S_OK; }
+	virtual HRESULT Render(PrimitiveBatch<VertexPositionColor>* pBatch, _fvector vColor = DirectX::Colors::White) { return S_OK; }
 #endif
 
 

@@ -5,6 +5,13 @@
 NS_BEGIN(Client)
 class CPlayerState abstract : public CState
 {
+public:
+	typedef struct tagColliderActiveInfo
+	{
+		_float fStartRatio;     
+		_float fEndRatio;       
+		_bool bIsActive;        
+	}COLLIDER_ACTIVE_INFO;
 
 public:
 	typedef struct tagPlayerStateDesc : public CState::STATE_DESC
@@ -16,6 +23,19 @@ protected:
 	void Handle_Input();
 
 	virtual void Enter(void* pArg) override;
+
+#pragma region COLLIDER 활성화 관련 변수
+protected:
+	unordered_map<_uint, COLLIDER_ACTIVE_INFO> m_ColliderActiveMap;
+	_bool m_bPrevColliderState = false;
+
+
+protected:
+	virtual void Reset_ColliderActiveInfo();
+	void Update_Collider_State();
+
+#pragma endregion
+
 
 #pragma region LOCK ON
 protected:

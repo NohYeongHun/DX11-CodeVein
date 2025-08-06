@@ -16,7 +16,7 @@ public:
 	};
 
 	// 플레이어 버프 정의
-	enum BUFF_FLAGTS : _uint
+	enum BUFF_FLAGS : _uint
 	{
 		BUFF_NONE = 0,
 		BUFF_HIT = 1  << 24,
@@ -24,6 +24,12 @@ public:
 		BUFF_STUN = 1 << 26,
 		BUFF_INVINCIBLE = 1 << 27, // 무적시간.
 		BUFF_END
+	};
+
+	enum COLLIDER_PARTS : _uint
+	{
+		PART_WEAPON = 0,
+		PART_END
 	};
 #pragma endregion
 
@@ -44,7 +50,10 @@ public:
 	virtual HRESULT Initialize_Prototype();
 	virtual HRESULT Initialize_Clone(void* pArg);
 	virtual void Priority_Update(_float fTimeDelta);
+	
 	virtual void Update(_float fTimeDelta);
+	virtual void Finalize_Update(_float fTimeDelta);
+
 	virtual void Late_Update(_float fTimeDelta);
 	virtual HRESULT Render();
 #pragma endregion
@@ -56,6 +65,10 @@ public:
 	virtual void On_Collision_Enter(CGameObject* pOther);
 	virtual void On_Collision_Stay(CGameObject* pOther);
 	virtual void On_Collision_Exit(CGameObject* pOther);
+
+public:
+	void Enable_Collider(COLLIDER_PARTS eColliderParts);
+	void Disable_Collider(COLLIDER_PARTS eColliderParts);
 
 private:
 	class CCollider* m_pColliderCom = { nullptr };

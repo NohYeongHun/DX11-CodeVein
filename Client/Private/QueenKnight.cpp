@@ -83,7 +83,7 @@ HRESULT CQueenKnight::Initialize_Clone(void* pArg)
     _float3 vPos = { 0.f, 5.f, 0.f };
     m_pTransformCom->Set_State(STATE::POSITION, XMLoadFloat3(&vPos));
 
-    m_pModelCom->Set_Animation(KNIGHT_SWORD_IDLE, true);
+    //m_pModelCom->Set_Animation(KNIGHT_SWORD_IDLE, true);
 
     return S_OK;
 }
@@ -106,10 +106,15 @@ void CQueenKnight::Update(_float fTimeDelta)
 
     Update_AI(fTimeDelta);
 
-    
-
     // 하위 객체들 움직임 제어는 Tree 제어 이후에
     __super::Update(fTimeDelta);
+
+    Finalize_Update(fTimeDelta);
+}
+
+void CQueenKnight::Finalize_Update(_float fTimeDelta)
+{
+    __super::Finalize_Update(fTimeDelta);
 }
 
 void CQueenKnight::Late_Update(_float fTimeDelta)
@@ -127,8 +132,7 @@ void CQueenKnight::Late_Update(_float fTimeDelta)
 HRESULT CQueenKnight::Render()
 {
 #ifdef _DEBUG
-    if (m_pColliderCom)
-        m_pColliderCom->Render();
+     m_pColliderCom->Render();
 #endif // _DEBUG
 
     if (FAILED(Ready_Render_Resources()))
@@ -311,6 +315,7 @@ HRESULT CQueenKnight::Ready_Components(QUEENKNIGHT_DESC* pDesc)
     CBounding_AABB::BOUNDING_AABB_DESC  AABBDesc{};
     AABBDesc.vExtents = _float3(box.vExtents.x, box.vExtents.y, box.vExtents.z);
     AABBDesc.vCenter = _float3(0.f, AABBDesc.vExtents.y * 0.5f, 0.f); // 중점.
+    AABBDesc.pOwner = this;
 
     if (FAILED(__super::Add_Component(ENUM_CLASS(LEVEL::STATIC)
         , TEXT("Prototype_Component_Collider_AABB")

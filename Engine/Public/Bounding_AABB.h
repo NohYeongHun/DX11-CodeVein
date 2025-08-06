@@ -2,7 +2,7 @@
 #include "Bounding.h"
 
 NS_BEGIN(Engine)
-class CBounding_AABB final : public CBounding
+class ENGINE_DLL CBounding_AABB final : public CBounding
 {
 public:
 	typedef struct tagBoundingAABBDesc : public CBounding::BOUNDING_DESC
@@ -28,7 +28,7 @@ public:
 
 #ifdef _DEBUG
 public:
-	virtual HRESULT Render(PrimitiveBatch<VertexPositionColor>* pBatch) override;
+	virtual HRESULT Render(PrimitiveBatch<VertexPositionColor>* pBatch, _fvector vColor = DirectX::Colors::White) override;
 #endif
 
 public:

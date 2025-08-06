@@ -22,7 +22,6 @@ public:
 	{
 		_uint iAnimation_Idx = {};
 		ACTORDIR eDirection = {};
-		
 		_float fCurrentTrackPosition = { 0.f };
 	}ATTACK_ENTER_DESC;
 
@@ -40,6 +39,11 @@ public:
 	// 시작 초기화
 	virtual HRESULT Initialize(_uint iStateNum, void* pArg) override;
 
+#pragma region 충돌 관리
+private:
+	virtual void Reset_ColliderActiveInfo();
+#pragma endregion
+
 	// State 시작 시.
 	virtual void Enter(void* pArg) override;
 
@@ -54,9 +58,10 @@ public:
 
 private:
 	void Change_State(_float fTimeDelta);
-	void Handle_DirectionInput(_float fTimeDelta);
-	void Move_By_Player_LookVector(_float fTimeDelta, _float fSpeed);
+	
 	_vector Calculate_Input_Direction_From_Camera();
+
+
 
 
 private:

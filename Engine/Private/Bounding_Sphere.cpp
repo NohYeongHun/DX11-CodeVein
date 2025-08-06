@@ -24,6 +24,10 @@ void CBounding_Sphere::Update(_fmatrix WorldMatrix)
 {
 	m_pOriginalDesc->Transform(*m_pDesc, WorldMatrix);
 }
+HRESULT CBounding_Sphere::Render(PrimitiveBatch<VertexPositionColor>* pBatch, _fvector vColor)
+{
+	return E_NOTIMPL;
+}
 _bool CBounding_Sphere::Intersect(COLLIDER eColliderType, CBounding* pBounding)
 {
 	_bool		isColl = { false };

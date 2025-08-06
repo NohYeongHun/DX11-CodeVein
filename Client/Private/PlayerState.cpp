@@ -40,6 +40,50 @@ void CPlayerState::Enter(void* pArg)
     m_pFsm->Set_StateExitCoolTime(m_iStateNum);
 }
 
+#pragma region 콜라이더 활성화 관련 함수
+void CPlayerState::Reset_ColliderActiveInfo()
+{
+    for (auto& pair : m_ColliderActiveMap)
+        pair.second.bIsActive = false;
+
+    m_bPrevColliderState = false;
+}
+
+
+void CPlayerState::Update_Collider_State()
+{
+    // 현재 애니메이션의 재생 비율 가져오기
+    _float fCurrentRatio = m_pModelCom->Get_Current_Ratio();
+
+    auto iter = m_ColliderActiveMap.find(m_iCurAnimIdx);
+    if (iter == m_ColliderActiveMap.end())
+        return;
+
+    COLLIDER_ACTIVE_INFO& colliderInfo = iter->second;
+
+    _bool bShouldActive = (fCurrentRatio >= colliderInfo.fStartRatio &&
+        fCurrentRatio <= colliderInfo.fEndRatio);
+
+    if (bShouldActive != m_bPrevColliderState)
+    {
+        if (bShouldActive)
+        {
+            m_pPlayer->Enable_Collider(CPlayer::PART_WEAPON);
+            colliderInfo.bIsActive = true;
+        }
+        else
+        {
+            m_pPlayer->Disable_Collider(CPlayer::PART_WEAPON);
+            colliderInfo.bIsActive = false;
+        }
+
+        m_bPrevColliderState = bShouldActive;
+    }
+}
+#pragma endregion
+
+
+
 _vector CPlayerState::Calculate_Unified_Attack_Direction()
 {
     // 1. 키 입력 방향 계산 (카메라 기준)

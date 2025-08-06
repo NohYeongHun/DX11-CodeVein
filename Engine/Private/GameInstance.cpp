@@ -105,9 +105,12 @@ void CGameInstance::Update_Engine(_float fTimeDelta)
 
 
 	// 3. 게임 오브젝트 일반 업데이트 (플레이어 움직임 완료)
-	m_pObject_Manager->Update(fTimeDelta);
+	m_pObject_Manager->Update(fTimeDelta); 
 
-	
+	// ObjectManager Update에서 Collider Manager에 충돌체 추가.
+
+	// 4. 충돌 처리.
+	m_pCollider_Manager->Update();
 
 	// 5. 게임 오브젝트 Late 업데이트
 	m_pObject_Manager->Late_Update(fTimeDelta);
@@ -120,7 +123,7 @@ void CGameInstance::Update_Engine(_float fTimeDelta)
 	m_pPicking->Update();
 
 	// 8. 충돌 처리
-	m_pCollider_Manager->Update();
+	//m_pCollider_Manager->Update();
 
 	// 9. 레벨 업데이트
 	m_pLevel_Manager->Update(fTimeDelta);

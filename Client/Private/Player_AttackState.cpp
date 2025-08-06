@@ -9,8 +9,28 @@ HRESULT CPlayer_AttackState::Initialize(_uint iStateNum, void* pArg)
 	if (FAILED(__super::Initialize(iStateNum, pArg)))
 		return E_FAIL;
 
+	m_ColliderActiveMap.emplace(m_pPlayer->Find_AnimationIndex(TEXT("ATTACK1"))
+		, COLLIDER_ACTIVE_INFO{0.f, 0.3f, false});
+
+	m_ColliderActiveMap.emplace(m_pPlayer->Find_AnimationIndex(TEXT("ATTACK2"))
+		, COLLIDER_ACTIVE_INFO{ 0.f, 0.28f, false });
+
+	m_ColliderActiveMap.emplace(m_pPlayer->Find_AnimationIndex(TEXT("ATTACK3"))
+		, COLLIDER_ACTIVE_INFO{ 0.f, 0.25f, false });
+
+	m_ColliderActiveMap.emplace(m_pPlayer->Find_AnimationIndex(TEXT("ATTACK4"))
+		, COLLIDER_ACTIVE_INFO{ 0.f, 0.27f, false });
+	
+
 	return S_OK;
 }
+
+#pragma region 충돌 설정 초기화
+void CPlayer_AttackState::Reset_ColliderActiveInfo()
+{
+	CPlayerState::Reset_ColliderActiveInfo();
+}
+#pragma endregion
 
 /* State 시작 시*/
 void CPlayer_AttackState::Enter(void* pArg)
@@ -27,21 +47,29 @@ void CPlayer_AttackState::Enter(void* pArg)
 	m_pModelCom->Set_RootMotionRotation(true);
 	m_pModelCom->Set_Animation(m_iCurAnimIdx, m_isLoop);
 	
+	// 콜라이더 활성화 정보 초기화
+	Reset_ColliderActiveInfo();
+
 
 	// 방향 제어 관련 초기화
 	m_bCanChangeDirection = true;
 	m_fCurrentLockTime = 0.0f;
 	m_bIsDirectionLocked = false;
+
+
 	
+	// 애니메이션이 존재할때 언제부터 활성화되어야 하는가에 대한 결정을 애니메이션이?
 }
 
 /* State 실행 */
 void CPlayer_AttackState::Update(_float fTimeDelta)
 {
+	CPlayerState::Update_Collider_State();
+
 	Handle_Input();
 	Handle_Unified_Direction_Input(fTimeDelta);
 	Change_State(fTimeDelta);
-
+	
 }
 
 // 종료될 때 실행할 동작..
@@ -49,7 +77,6 @@ void CPlayer_AttackState::Exit()
 {
 	if (m_iNextState != -1)
 	{
-		
 		m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, false);
 		//if (m_iNextState == CPlayer::PLAYER_STATE::IDLE)
 		//{
@@ -75,7 +102,7 @@ void CPlayer_AttackState::Exit()
 		
 	}
 
-	m_pFsm->Set_StateCoolTime(CPlayer::DODGE, 0.1f);
+	//m_pFsm->Set_StateCoolTime(CPlayer::DODGE, 0.1f);
 	
 }
 
@@ -180,6 +207,10 @@ _vector CPlayer_AttackState::Calculate_Input_Direction_From_Camera()
 	ACTORDIR eInputDir = m_pPlayer->Calculate_Direction();
 	return m_pPlayer->Calculate_Move_Direction(eInputDir);
 }
+
+
+
+
 
 
 CPlayer_AttackState* CPlayer_AttackState::Create(_uint iStateNum, void* pArg)

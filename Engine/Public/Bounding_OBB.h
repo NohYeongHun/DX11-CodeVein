@@ -2,7 +2,7 @@
 #include "Bounding.h"
 
 NS_BEGIN(Engine)
-class CBounding_OBB final : public CBounding
+class ENGINE_DLL CBounding_OBB final : public CBounding
 {
 public:
 	typedef struct tagBoundingOBBDesc : public CBounding::BOUNDING_DESC
@@ -32,7 +32,7 @@ public:
 public:
 	virtual HRESULT Initialize(BOUNDING_DESC* pBoundingDesc);
 	virtual void Update(_fmatrix WorldMatrix);
-	//virtual HRESULT Render(PrimitiveBatch)
+	virtual HRESULT Render(PrimitiveBatch<VertexPositionColor>* pBatch, _fvector vColor = DirectX::Colors::White) override;
 
 public:
 	virtual _bool Intersect(COLLIDER eColliderType, CBounding* pBounding) override;
