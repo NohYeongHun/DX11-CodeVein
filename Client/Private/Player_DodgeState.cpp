@@ -28,21 +28,31 @@ void CPlayer_DodgeState::Enter(void* pArg)
 	m_isLoop = false;
 	m_pModelCom->Set_RootMotionRotation(true);
 	m_pModelCom->Set_RootMotionTranslate(true);
+
 	m_pModelCom->Set_Animation(m_iCurAnimIdx, m_isLoop);
+
+
 }
 
 /* State 실행 */
 void CPlayer_DodgeState::Update(_float fTimeDelta)
 {
 	Handle_Input();
-	Change_State();
 
 	if (m_pModelCom->Get_Current_Ratio() < 0.4f)
 	{
-		m_pPlayer->Move_Direction( m_pPlayer->Get_Transform()->Get_LookDirection_NoPitch(), fTimeDelta * 0.5f);
+		m_pPlayer->Move_Direction(m_pPlayer->Get_Transform()->Get_LookDirection_NoPitch(), fTimeDelta * 0.5f);
+	}
+	else
+	{
+		Change_State();
 	}
 
-	CPlayerState::Handle_Collider_State();
+
+
+
+
+	//CPlayerState::Handle_Collider_State();
 }
 
 // 종료될 때 실행할 동작.=> 왠만하면 Idle
@@ -54,13 +64,13 @@ void CPlayer_DodgeState::Exit()
 	//여기서 동작해야합니다.
 	if (m_iNextState != -1) // NextIndex가 있는경우 블렌딩 시작.
 	{
-		
 		if (m_iNextState == CPlayer::PLAYER_STATE::DODGE ||
 			m_iNextState == CPlayer::PLAYER_STATE::STRONG_ATTACK || 
 			m_iNextState == CPlayer::PLAYER_STATE::ATTACK ||
 			m_iNextState == CPlayer::PLAYER_STATE::GUARD
 			)
 		{
+			//m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, true);
 			return;
 		}
 
@@ -77,7 +87,7 @@ void CPlayer_DodgeState::Reset()
 	m_eDir = { ACTORDIR::END };
 	m_iNextAnimIdx = -1;
 	m_iCurAnimIdx = -1;
-	m_pModelCom->Animation_Reset();
+	//m_pModelCom->Animation_Reset();
 }
 
 /* 상태에 따른 변경을 정의합니다. */
@@ -102,7 +112,8 @@ void CPlayer_DodgeState::Change_State()
 		return;
 	}
 
-
+	if (m_pModelCom->Get_Current_Ratio() < 0.6f) // 60% 진행 전까지는 상태 변경 불가
+		return;
 
 	if (m_pFsm->Is_ExitCoolTimeEnd(m_iStateNum))
 	{
@@ -119,6 +130,15 @@ void CPlayer_DodgeState::Change_State()
 			m_pFsm->Change_State(m_iNextState, &Attack);
 			return;
 		}
+
+	/*	if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::DODGE))
+		{
+			m_iNextAnimIdx = m_pPlayer->Find_AnimationIndex(TEXT("DODGE"));
+			m_iNextState = CPlayer::PLAYER_STATE::DODGE;
+			Dodge.iAnimation_Idx = m_iNextAnimIdx;
+			m_pFsm->Change_State(m_iNextState, &Dodge);
+			return;
+		}*/
 
 		if (m_pPlayer->Is_MovementKeyPressed())
 		{

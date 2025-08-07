@@ -60,7 +60,7 @@ BT_RESULT CBT_QueenKnight_FirstPhase_AttackAction::UpdateRotating(_float fTimeDe
     {
         m_eAttackPhase = ATTACK_PHASE::FIRST_ATTACK;
 
-        m_pOwner->Set_RootMotionTranslate(false);
+        m_pOwner->Set_RootMotionTranslate(true);
         
         // 1. 공격 애니메이션 선택
         _uint iNextAnimationIdx = m_pOwner->Find_AnimationIndex(L"STRONG_ATTACK1");
@@ -90,9 +90,9 @@ BT_RESULT CBT_QueenKnight_FirstPhase_AttackAction::UpdateFirstAttack(_float fTim
 
         //m_pOwner->Set_RootMotionTranslate(false);
         // 2. 공격 상태로 변경
-        m_pOwner->Change_Animation_Blend(iNextAnimationIdx, false, 0.2f, true, true, false);
         //m_pOwner->Change_Animation_Blend(iNextAnimationIdx, false, 0.2f, true, true, false);
-        //m_pOwner->Change_Animation_NonBlend(iNextAnimationIdx);
+        //m_pOwner->Change_Animation_Blend(iNextAnimationIdx, false, 0.2f, true, true, false);
+        m_pOwner->Change_Animation_Blend(iNextAnimationIdx, false, 0.2f, true, true, false);
         //m_pOwner->Change_Animation_Blend(iNextAnimationIdx, false, 0.2f, true, true, false);
 
         m_pOwner->RotateTurn_ToTargetYaw();
@@ -117,18 +117,10 @@ BT_RESULT CBT_QueenKnight_FirstPhase_AttackAction::UpdateSecondAttack(_float fTi
         // 1. 공격 애니메이션 선택
         _uint iNextAnimationIdx = m_pOwner->Find_AnimationIndex(L"STRONG_ATTACK3");
 
-        //m_pOwner->Set_RootMotionTranslate(false);
         // 2. 공격 상태로 변경
         m_pOwner->Change_Animation_Blend(iNextAnimationIdx, false ,0.2f, true, true, false);
-        //m_pOwner->Change_Animation_Blend(iNextAnimationIdx, false, 0.2f, true, true, false);
-        //m_pOwner->Change_Animation_Blend(iNextAnimationIdx, false, 0.2f, true, true, false);
-        //m_pOwner->Change_Animation_NonBlend(iNextAnimationIdx);
-
         m_pOwner->RotateTurn_ToTargetYaw();
-        //_float4 vPos = {};
-        //XMStoreFloat4(&vPos, m_pOwner->Get_Transform()->Get_State(STATE::POSITION));
-        //OutputDebugWstring(TEXT("STRONG ATTACK2 -> STRONG ATTACK3"));
-        //OutPutDebugFloat4(vPos);
+
     }
 
     return BT_RESULT::RUNNING;

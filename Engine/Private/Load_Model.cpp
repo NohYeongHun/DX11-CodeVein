@@ -118,15 +118,11 @@ void CLoad_Model::Set_Animation(_uint iAnimIndex, _bool isLoop)
 	if (iAnimIndex >= m_Animations.size())
 		return;
 
-	// 루트 모션 연속성 처리 - 애니메이션 인덱스 변경 전에 해야 함!
-	_vector vCurrentRootPos = XMVectorZero();
-	XMVectorSetW(vCurrentRootPos, 1.f);
-	if (m_bRootMotionTranslate && m_iCurrentAnimIndex != iAnimIndex && m_iCurrentAnimIndex < m_Animations.size())
-	{
-		// 현재 루트본 위치 저장
-		_matrix rootMatrix = m_Bones[m_iRoot_BoneIndex]->Get_CombinedTransformationMatrix();
-		vCurrentRootPos = rootMatrix.r[3];
-	}
+	_vector vCurrentRootPos = XMVectorSet(0.f, 0.f, 0.f, 1.f); 
+	// 현재 루트본 위치 저장
+	_matrix rootMatrix = m_Bones[m_iRoot_BoneIndex]->Get_CombinedTransformationMatrix();
+	vCurrentRootPos = rootMatrix.r[3];
+
 
 	// 애니메이션 설정 (한 번만!)
 	m_iCurrentAnimIndex = iAnimIndex;
@@ -134,6 +130,8 @@ void CLoad_Model::Set_Animation(_uint iAnimIndex, _bool isLoop)
 
 	// 새 애니메이션 리셋
 	m_Animations[m_iCurrentAnimIndex]->Reset();
+
+
 	m_isFinished = false;
 	m_isTrackEnd = false;
 
@@ -332,15 +330,12 @@ _bool CLoad_Model::Play_Animation(_float fTimeDelta)
 	m_isFinished = false;
 	m_isTrackEnd = false;
 
+
 	// 2. 애니메이션을 실행합니다. => 실행하기전에 루트 움직이지마라.
-	// 여기서 블렌딩 진행.
+	// 여기서 블렌딩 진행. => 블렌딩 문제인건 알았어 어케해야됨 그럼?
 	m_Animations[m_iCurrentAnimIndex]->Update_TransformationMatrices(
 		m_Bones, m_isLoop, &m_isFinished, m_BlendDesc, fTimeDelta
 	);
-
-	//_matrix mat = m_Bones[m_iRoot_BoneIndex]->Get_TransformationMatrix();
-	//mat.r[3] = XMVectorSet(0.f, 0.f, 0.f, 1.f);
-	//m_Bones[m_iRoot_BoneIndex]->Set_TransformationMatrix(mat);
 
 	for (_uint i = 0; i < m_Bones.size(); ++i)
 	{
@@ -349,7 +344,10 @@ _bool CLoad_Model::Play_Animation(_float fTimeDelta)
 		if (i == m_iRoot_BoneIndex)
 			Handle_RootMotion(fTimeDelta);
 	}
-		
+	
+	
+	
+
 	if (m_isFinished)
 		XMStoreFloat4(&m_vOldPos, XMVectorSet(0.f, 0.f, 0.f, 1.f));
 
@@ -403,6 +401,7 @@ void CLoad_Model::Set_BlendInfo(uint32_t iNextAnimIndex, _float fBlendTime, _boo
 
 void CLoad_Model::Handle_RootMotion(_float fTimeDelta)
 {
+
 	_matrix rootMatrix = m_Bones[m_iRoot_BoneIndex]->Get_CombinedTransformationMatrix();
 	_vector vNewRootPos = rootMatrix.r[3];
 
@@ -411,7 +410,16 @@ void CLoad_Model::Handle_RootMotion(_float fTimeDelta)
 
 		// 0. 뼈의 이동 구하기.
 		_vector vLocalTranslate = vNewRootPos - XMLoadFloat4(&m_vOldPos);
-		//vLocalTranslate = XMVectorSetY(vLocalTranslate, 0.f); // Y축 제거
+		vLocalTranslate = XMVectorSetY(vLocalTranslate, 0.f); // Y축 제거
+
+		if (m_BlendDesc.isBlending)
+		{
+			_float fBlendRatio = m_BlendDesc.fElapsed / m_BlendDesc.fBlendDuration;
+			
+			// 루트모션이 ON인 상태로 전환 중이면 점진적 증가, 루트모션이 OFF인 상태로 전환 중이면 점진적 감소
+			_float fRootMotionScale = m_bRootMotionTranslate ? fBlendRatio : (1.0f - fBlendRatio);
+			vLocalTranslate *= fRootMotionScale;
+		}
 
 
 		_vector vWorldTranslate = vLocalTranslate; // 기본값
@@ -437,8 +445,6 @@ void CLoad_Model::Handle_RootMotion(_float fTimeDelta)
 
 		XMStoreFloat4(&m_vOldPos, vNewRootPos);
 	}
-
-	
 
 	// 새로운 애니메이션의 루트본을 이전벡터에 넣어둔다.
 	rootMatrix.r[3] = XMVectorSet(0.f, 0.f, 0.f, 1.f);
