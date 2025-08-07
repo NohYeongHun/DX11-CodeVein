@@ -400,6 +400,55 @@ void CMonster::RotateTurn_ToTarget()
     m_pTransformCom->LookAt(vResult);
 }
 
+void CMonster::RotateTurn_ToTargetYaw(_float fTimeDelta)
+{
+    // 현재 몬스터 위치와 타겟 위치
+    _vector vMyPos = m_pTransformCom->Get_State(STATE::POSITION);
+    _vector vTargetPos = m_pTarget->Get_Transform()->Get_State(STATE::POSITION);
+
+    // 방향 벡터 계산 (Y축 제거하여 지면에서만 회전)
+    _vector vDirection = vTargetPos - vMyPos;
+    vDirection = XMVectorSetY(vDirection, 0.f);
+    vDirection = XMVector3Normalize(vDirection);
+
+    // 방향이 0벡터인 경우 처리
+    if (XMVector3Equal(vDirection, XMVectorZero()))
+        return;
+
+    // 목표 Yaw 각도 계산
+    _float x = XMVectorGetX(vDirection);
+    _float z = XMVectorGetZ(vDirection);
+    _float fTargetYaw = atan2f(x, z);
+
+    // 각도 정규화 (-π ~ π)
+    while (fTargetYaw > XM_PI) fTargetYaw -= XM_2PI;
+    while (fTargetYaw < -XM_PI) fTargetYaw += XM_2PI;
+
+    // 현재 회전 각도 가져오기
+    _float fCurrentYaw = m_pTransformCom->GetYawFromQuaternion();
+
+    // 회전 차이 계산
+    _float fYawDiff = fTargetYaw - fCurrentYaw;
+
+    // 최단 경로로 회전하도록 각도 조정
+    while (fYawDiff > XM_PI) fYawDiff -= XM_2PI;
+    while (fYawDiff < -XM_PI) fYawDiff += XM_2PI;
+
+    // 프레임 기반 회전 속도 적용 (몬스터 스탯의 회전 속도 사용)
+    _float fMaxRotation = m_MonsterStat.fRotationSpeed * fTimeDelta;
+
+    // 회전 속도 제한
+    if (fabsf(fYawDiff) > fMaxRotation)
+    {
+        fYawDiff = (fYawDiff > 0) ? fMaxRotation : -fMaxRotation;
+    }
+
+    // 새로운 회전 적용
+    _float fNewYaw = fCurrentYaw + fYawDiff;
+    _vector qNewRot = XMQuaternionRotationAxis(XMVectorSet(0.f, 1.f, 0.f, 0.f), fNewYaw);
+    m_pTransformCom->Set_Quaternion(qNewRot);
+}
+
 
 void CMonster::RotateTurn_ToTargetYaw()
 {

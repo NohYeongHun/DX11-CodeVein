@@ -440,9 +440,6 @@ void CLoad_Model::Handle_RootMotion(_float fTimeDelta)
 			m_pOwner->RootMotion_Translate(vWorldTranslate);
 		}
 
-		//_vector vNewRootPosNoY = XMVectorSetY(vNewRootPos, 0.f);
-		//XMStoreFloat4(&m_vOldPos, vNewRootPosNoY);
-
 		XMStoreFloat4(&m_vOldPos, vNewRootPos);
 	}
 

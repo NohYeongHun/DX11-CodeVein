@@ -59,8 +59,6 @@ void CPlayer_DodgeState::Update(_float fTimeDelta)
 void CPlayer_DodgeState::Exit()
 {
 	
-	//m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, true);
-	
 	//여기서 동작해야합니다.
 	if (m_iNextState != -1) // NextIndex가 있는경우 블렌딩 시작.
 	{

@@ -34,7 +34,7 @@ HRESULT CCamera_Player::Initialize_Clone(void* pArg)
 	m_fYaw = 0.f;
 
 	// 줌인 시 오프셋 (더 가까이, 살짝 위에서)
-	XMStoreFloat4(&m_vZoomTargetOffset, XMVectorSet(0.f, 2.2f, -4.f, 0.f));
+	XMStoreFloat4(&m_vZoomTargetOffset, XMVectorSet(0.f, 2.2f, -5.f, 0.f));
 
 	if (FAILED(__super::Initialize_Clone(pArg)))
 		return E_FAIL;
@@ -143,7 +143,7 @@ void CCamera_Player::Update_Zoom(_float fTimeDelta)
 	}
 
 	// 부드러운 보간을 위한 easing 함수 적용 (선택사항)
-	fLerpRatio = fLerpRatio * fLerpRatio * (3.f - 2.f * fLerpRatio); // smoothstep
+	fLerpRatio = fLerpRatio * fLerpRatio * (3.f - 2.f * fLerpRatio); 
 
 	_vector vCurrentOffset, vTargetOffset;
 

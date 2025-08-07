@@ -53,20 +53,21 @@ BT_RESULT CBT_QueenKnight_FirstPhase_AttackAction::EnterAttack(_float fTimeDelta
 
 BT_RESULT CBT_QueenKnight_FirstPhase_AttackAction::UpdateRotating(_float fTimeDelta)
 {
-    // 0. 한번에 회전.
-    m_pOwner->Rotate_ToTarget(fTimeDelta);
+    
+    m_pOwner->RotateTurn_ToTargetYaw(fTimeDelta);
 
     if (m_pOwner->IsRotateFinished(XMConvertToRadians(5.f))) // 라디안 5도 차이까지만 허용
     {
         m_eAttackPhase = ATTACK_PHASE::FIRST_ATTACK;
+        //m_eAttackPhase = ATTACK_PHASE::SECOND_ATTACK;
 
         m_pOwner->Set_RootMotionTranslate(true);
         
         // 1. 공격 애니메이션 선택
-        _uint iNextAnimationIdx = m_pOwner->Find_AnimationIndex(L"STRONG_ATTACK1");
+        _uint iNextAnimationIdx = m_pOwner->Find_AnimationIndex(L"PHASE_ATTACK1");
 
         //m_pOwner->Change_Animation_Blend(iNextAnimationIdx, false, 0.2f, true, true, false);
-        m_pOwner->Change_Animation_NonBlend(iNextAnimationIdx);
+        m_pOwner->Change_Animation_Blend(iNextAnimationIdx, false, 0.2f, true, true, true);
 
         // 2. 공격 상태로 변경
         //m_pOwner->Change_Animation_Combo(iNextAnimationIdx);
@@ -79,28 +80,19 @@ BT_RESULT CBT_QueenKnight_FirstPhase_AttackAction::UpdateRotating(_float fTimeDe
 
 BT_RESULT CBT_QueenKnight_FirstPhase_AttackAction::UpdateFirstAttack(_float fTimeDelta)
 {
-    //m_pOwner->RotateTurn_ToTargetYaw();
-
+    // 0. 바로 바뀐다.
+    m_pOwner->RotateTurn_ToTargetYaw();
     if (m_pOwner->Is_Animation_Finished())
     {
         m_eAttackPhase = ATTACK_PHASE::SECOND_ATTACK;
 
         // 1. 공격 애니메이션 선택
-        _uint iNextAnimationIdx = m_pOwner->Find_AnimationIndex(L"STRONG_ATTACK2");
+        _uint iNextAnimationIdx = m_pOwner->Find_AnimationIndex(L"PHASE_ATTACK2");
 
-        //m_pOwner->Set_RootMotionTranslate(false);
         // 2. 공격 상태로 변경
-        //m_pOwner->Change_Animation_Blend(iNextAnimationIdx, false, 0.2f, true, true, false);
-        //m_pOwner->Change_Animation_Blend(iNextAnimationIdx, false, 0.2f, true, true, false);
-        m_pOwner->Change_Animation_Blend(iNextAnimationIdx, false, 0.2f, true, true, false);
-        //m_pOwner->Change_Animation_Blend(iNextAnimationIdx, false, 0.2f, true, true, false);
+        m_pOwner->Change_Animation_Blend(iNextAnimationIdx, false, 0.2f, true, true, true);
+       
 
-        m_pOwner->RotateTurn_ToTargetYaw();
-
-        //_float4 vPos = {};
-        //XMStoreFloat4(&vPos, m_pOwner->Get_Transform()->Get_State(STATE::POSITION));
-        //OutputDebugWstring(TEXT("STRONG ATTACK1 -> STRONG ATTACK2"));
-        //OutPutDebugFloat4(vPos);
     }
 
     return BT_RESULT::RUNNING;
@@ -108,19 +100,17 @@ BT_RESULT CBT_QueenKnight_FirstPhase_AttackAction::UpdateFirstAttack(_float fTim
 
 BT_RESULT CBT_QueenKnight_FirstPhase_AttackAction::UpdateSecondAttack(_float fTimeDelta)
 {
-    //m_pOwner->RotateTurn_ToTargetYaw();
-
+    m_pOwner->RotateTurn_ToTargetYaw();
     if (m_pOwner->Is_Animation_Finished())
     {
         m_eAttackPhase = ATTACK_PHASE::LAST_ATTACK;
 
         // 1. 공격 애니메이션 선택
-        _uint iNextAnimationIdx = m_pOwner->Find_AnimationIndex(L"STRONG_ATTACK3");
+        _uint iNextAnimationIdx = m_pOwner->Find_AnimationIndex(L"PHASE_ATTACK3");
 
         // 2. 공격 상태로 변경
-        m_pOwner->Change_Animation_Blend(iNextAnimationIdx, false ,0.2f, true, true, false);
-        m_pOwner->RotateTurn_ToTargetYaw();
-
+        m_pOwner->Change_Animation_Blend(iNextAnimationIdx, false ,0.2f, true, true, true);
+        
     }
 
     return BT_RESULT::RUNNING;
@@ -138,11 +128,6 @@ BT_RESULT CBT_QueenKnight_FirstPhase_AttackAction::UpdateLastAttack(_float fTime
 
         // 2. IDLE 상태로 변경
         m_pOwner->Change_Animation_NonBlend(iNextAnimationIdx);
-
-        //_float4 vPos = {};
-        //XMStoreFloat4(&vPos, m_pOwner->Get_Transform()->Get_State(STATE::POSITION));
-        //OutputDebugWstring(TEXT("STRONG ATTACK3 -> IDLE"));
-        //OutPutDebugFloat4(vPos);
     }
 
     return BT_RESULT::RUNNING;
