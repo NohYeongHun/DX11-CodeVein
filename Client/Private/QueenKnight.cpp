@@ -237,20 +237,24 @@ HRESULT CQueenKnight::InitializeAction_ToAnimationMap()
     m_Action_AnimMap.emplace(L"DEATH", KNIGHT_DEATH_F);
     
 
-    m_Action_AnimMap.emplace(L"STRONG_ATTACK1", KNIGHT_SWORD_ATTACK_STRONG_01);
-    m_Action_AnimMap.emplace(L"STRONG_ATTACK2", KNIGHT_SWORD_ATTACK_STRONG_02);
-    m_Action_AnimMap.emplace(L"STRONG_ATTACK3", KNIGHT_SWORD_ATTACK_STRONG_03);
+    m_Action_AnimMap.emplace(L"PHASE_ATTACK1", KNIGHT_SHIELD_SWORD_ATTACK_02B);
+    m_Action_AnimMap.emplace(L"PHASE_ATTACK2", KNIGHT_SHIELD_SWORD_ATTACK_02C);
+    m_Action_AnimMap.emplace(L"PHASE_ATTACK3", KNIGHT_SHIELD_SWORD_ATTACK_02A);
 
     /* 재생속도 증가. */
     
-    m_pModelCom->Set_CurrentTickPerSecond(KNIGHT_SWORD_ATTACK_STRONG_01, 
-        m_pModelCom->Get_CurrentTickPerSecond(KNIGHT_SWORD_ATTACK_STRONG_01) * 4.f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"PHASE_ATTACK1"], 3.f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"PHASE_ATTACK2"], 3.f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"PHASE_ATTACK3"], 3.f);
 
-    m_pModelCom->Set_CurrentTickPerSecond(KNIGHT_SWORD_ATTACK_STRONG_02,
-        m_pModelCom->Get_CurrentTickPerSecond(KNIGHT_SWORD_ATTACK_STRONG_02) * 4.f);
-
-    m_pModelCom->Set_CurrentTickPerSecond(KNIGHT_SWORD_ATTACK_STRONG_03,
-        m_pModelCom->Get_CurrentTickPerSecond(KNIGHT_SWORD_ATTACK_STRONG_03) * 4.f);
+    //m_pModelCom->Set_CurrentTickPerSecond(KNIGHT_SWORD_ATTACK_STRONG_01, 
+    //    m_pModelCom->Get_CurrentTickPerSecond(KNIGHT_SWORD_ATTACK_STRONG_01) * 2.f);
+    //
+    //m_pModelCom->Set_CurrentTickPerSecond(KNIGHT_SWORD_ATTACK_STRONG_02,
+    //    m_pModelCom->Get_CurrentTickPerSecond(KNIGHT_SWORD_ATTACK_STRONG_02) * 2.f);
+    //
+    //m_pModelCom->Set_CurrentTickPerSecond(KNIGHT_SWORD_ATTACK_STRONG_03,
+    //    m_pModelCom->Get_CurrentTickPerSecond(KNIGHT_SWORD_ATTACK_STRONG_03) * 2.f);
     //
     ///* 재생속도 증가. */
     //m_pModelCom->Set_CurrentTickPerSecond(WOLFDEVIL_ATTACK_JUMP, m_pModelCom->Get_CurrentTickPerSecond(WOLFDEVIL_ATTACK_JUMP) * 2.f);
@@ -417,7 +421,7 @@ HRESULT CQueenKnight::Ready_PartObjects()
 {
     CKnightLance::KNIGHT_LANCE_DESC Weapon{};
     Weapon.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
-    Weapon.pSocketMatrix = m_pModelCom->Get_BoneMatrix("IKSocket_RightHandAttach");
+    Weapon.pSocketMatrix = m_pModelCom->Get_BoneMatrix("RightHandAttachSocket");
     Weapon.eCurLevel = m_eCurLevel;
     Weapon.pOwner = this;
 
@@ -429,9 +433,9 @@ HRESULT CQueenKnight::Ready_PartObjects()
         return E_FAIL;
     }
 
-    CKnightShield::KNIGHT_SHIELD_DESC Shield{};
+  /*  CKnightShield::KNIGHT_SHIELD_DESC Shield{};
     Shield.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
-    Shield.pSocketMatrix = m_pModelCom->Get_BoneMatrix("IKSocket_LeftHandAttach");
+    Shield.pSocketMatrix = m_pModelCom->Get_BoneMatrix("LeftHandAttachSocket");
     Shield.eCurLevel = m_eCurLevel;
     Shield.pOwner = this;
 
@@ -441,7 +445,7 @@ HRESULT CQueenKnight::Ready_PartObjects()
     {
         CRASH("Failed Create Queen Shield");
         return E_FAIL;
-    }
+    }*/
 
     //m_PartObjects[L"Com_Weapon"];
 

@@ -23,7 +23,11 @@ void CPlayer_RunState::Enter(void* pArg)
 
 	m_pModelCom->Set_RootMotionRotation(true);
 	m_pModelCom->Set_RootMotionTranslate(false);
+
+	_float4 vPos = {};
+
 	m_pModelCom->Set_Animation(m_iCurAnimIdx, m_isLoop);
+
 
 	
 }
@@ -65,7 +69,7 @@ void CPlayer_RunState::Reset()
 	m_iCurAnimIdx = -1;
 	m_iNextState = -1;
 	m_iNextAnimIdx = -1;
-	m_pModelCom->Animation_Reset();
+	//m_pModelCom->Animation_Reset();
 }
 
 /* 상태에 따른 변경을 정의합니다. */

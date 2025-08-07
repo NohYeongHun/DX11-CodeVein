@@ -790,5 +790,8 @@
     <Text Include="..\Public\PlayerAnimation.txt">
       <Filter>02. GameObject\Player</Filter>
     </Text>
+    <Text Include="QueenKnightDefine.txt">
+      <Filter>02. GameObject\Monster\Boss\QueenKnight</Filter>
+    </Text>
   </ItemGroup>
 </Project>

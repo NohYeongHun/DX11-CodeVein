@@ -172,7 +172,9 @@ protected:
 public:
     virtual void Rotate_ToTarget(_float fTimeDelta); // 플레이어를 보면서 회전한다.
     virtual void RotateTurn_ToTarget(); // 플레이어를 보면서 회전한다.
+    virtual void RotateTurn_ToTargetYaw(_float fTimeDelta); // 플레이어를 보면서 회전하는데 Yaw로만 회전.
     virtual void RotateTurn_ToTargetYaw(); // 플레이어를 보면서 회전하는데 Yaw로만 회전.
+    
 
     virtual const _bool IsRotateFinished(_float fRadian);
 

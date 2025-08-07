@@ -72,7 +72,6 @@ BT_RESULT CBT_Monster_DetectAction::UpdateWalk(_float fTimeDelta)
         m_eDetectPhase = DETECT_PHASE::END;
         return BT_RESULT::RUNNING;
     }
-
   
 
     if (m_pOwner->Is_Animation_Finished())
@@ -96,7 +95,7 @@ BT_RESULT CBT_Monster_DetectAction::EndDetect(_float fTimeDleta)
     _uint iNextAnimationIdx = m_pOwner->Find_AnimationIndex(L"IDLE");
 
     // 2. 현재 애니메이션으로 NON 블렌딩하면서 변경. => Idle은 NonBlend로 변경.
-    m_pOwner->Change_Animation_NonBlend(iNextAnimationIdx);
+    m_pOwner->Change_Animation_Blend(iNextAnimationIdx, false, 0.2f, true, true, false);
 
     return BT_RESULT::RUNNING;
 }

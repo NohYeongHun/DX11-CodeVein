@@ -44,9 +44,6 @@ HRESULT CPlayer::Initialize_Prototype()
 
 HRESULT CPlayer::Initialize_Clone(void* pArg)
 {
-//#ifdef _DEBUG
-//    Initialize_Debug();
-//#endif // _DEBUG
 
 
     PLAYER_DESC* pDesc = static_cast<PLAYER_DESC*>(pArg);
@@ -959,13 +956,13 @@ HRESULT CPlayer::Ready_Fsm()
 
 
     /* 재생 속도 증가*/
-    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("RUN")], 2.f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("RUN")], 1.5f);
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("ATTACK1")], 2.f);
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("ATTACK2")], 2.f);
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("ATTACK3")], 2.f);
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("ATTACK4")], 2.f);
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("DODGE")], 2.f);
-    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("STRONG_ATTACK")], 1.5f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("STRONG_ATTACK1")], 2.f);
         //, m_pModelCom->Get_CurrentTickPerSecond(m_Action_AnimMap[TEXT("RUN")]) * 2.f);
 
     Register_CoolTime();
@@ -992,7 +989,7 @@ void CPlayer::Register_CoolTime()
     m_pFsmCom->Register_StateCoolTime(PLAYER_STATE::WALK, 0.f);
     m_pFsmCom->Register_StateCoolTime(PLAYER_STATE::RUN, 0.f);
     m_pFsmCom->Register_StateCoolTime(PLAYER_STATE::DODGE, 0.7f);
-    m_pFsmCom->Register_StateCoolTime(PLAYER_STATE::STRONG_ATTACK, 2.f);
+    m_pFsmCom->Register_StateCoolTime(PLAYER_STATE::STRONG_ATTACK, 1.5f);
     m_pFsmCom->Register_StateCoolTime(PLAYER_STATE::ATTACK, 1.f);
     m_pFsmCom->Register_StateCoolTime(PLAYER_STATE::GUARD, 0.5f);
 
@@ -1005,7 +1002,8 @@ void CPlayer::Register_CoolTime()
     // 총 재생 시간.
     _float fCalcDuration = m_pModelCom->Get_AnimationDuration(m_Action_AnimMap[TEXT("STRONG_ATTACK1")]) /
         m_pModelCom->Get_AnimationTickPersecond(m_Action_AnimMap[TEXT("STRONG_ATTACK1")]);
-    m_pFsmCom->Register_StateExitCoolTime(PLAYER_STATE::STRONG_ATTACK, fCalcDuration * 0.6f);
+    m_pFsmCom->Register_StateExitCoolTime(PLAYER_STATE::STRONG_ATTACK
+        , fCalcDuration * 0.6f / m_pModelCom->Get_AnimSpeed(m_Action_AnimMap[TEXT("STRONG_ATTACK1")]));
 
     m_pFsmCom->Register_StateExitCoolTime(PLAYER_STATE::ATTACK, 0.7f);
     m_pFsmCom->Register_StateExitCoolTime(PLAYER_STATE::GUARD, 0.4f);

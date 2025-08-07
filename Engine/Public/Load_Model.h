@@ -190,6 +190,11 @@ private:
 	string m_ModelDir = {};
 
 	
+private:
+	// 디버깅용 임시변수
+	_float4 m_fCurDodgePos = {};
+	_float4 m_fNextDodgePos = {};
+
 
 private:
 	HRESULT Load_Meshes(_fmatrix PreTransformMatrix, std::ifstream& ifs);
