@@ -872,17 +872,21 @@ HRESULT CPlayer::Ready_Components(PLAYER_DESC* pDesc)
     BOUNDING_BOX box = m_pModelCom->Get_BoundingBox();
     m_fOffsetY = box.fHeight * 0.5f;
 
-    
-    CBounding_AABB::BOUNDING_AABB_DESC  AABBDesc{};
-    AABBDesc.vExtents = _float3(box.vExtents.x, box.vExtents.y, box.vExtents.z);
-    AABBDesc.vCenter = _float3(0.f, 0.f, 0.f); // 중점.
-    AABBDesc.pOwner = this;
+   
+
+    CBounding_OBB::BOUNDING_OBB_DESC  OBBDesc{};
+    OBBDesc.vExtents = _float3(box.vExtents.x, box.vExtents.y, box.vExtents.z);
+    OBBDesc.vCenter = _float3(0.f, 0.f, 0.f); // 중점.
+    OBBDesc.vRotation = { m_pTransformCom->GetPitchFromQuaternion(),
+        m_pTransformCom->GetYawFromQuaternion(),
+        m_pTransformCom->GetRollFromQuaternion() };
+    OBBDesc.pOwner = this;
 
     if (FAILED(__super::Add_Component(ENUM_CLASS(LEVEL::STATIC)
-        , TEXT("Prototype_Component_Collider_AABB")
-        , TEXT("Com_Collider"), reinterpret_cast<CComponent**>(&m_pColliderCom), &AABBDesc)))
+        , TEXT("Prototype_Component_Collider_OBB")
+        , TEXT("Com_Collider"), reinterpret_cast<CComponent**>(&m_pColliderCom), &OBBDesc)))
     {
-        CRASH("Failed Clone Collider AABB");
+        CRASH("Failed Clone Collider OBB");
         return E_FAIL;
     }
     

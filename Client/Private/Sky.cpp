@@ -34,6 +34,7 @@ void CSky::Priority_Update(_float fTimeDelta)
 
 void CSky::Update(_float fTimeDelta)
 {
+    // 이게 한프레임 이전의 CamPosition을 가지고 와서.
     m_pTransformCom->Set_State(STATE::POSITION, XMLoadFloat4(m_pGameInstance->Get_CamPosition()));
 
 }

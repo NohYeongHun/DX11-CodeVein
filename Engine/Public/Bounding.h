@@ -5,7 +5,7 @@ NS_BEGIN(Engine)
 class ENGINE_DLL CBounding abstract : public CBase
 {
 public:
-	typedef struct tagBoundingDesc
+	typedef struct tagBoundingDesc : public CCollider::COLLIDER_DESC
 	{
 		class CGameObject* pOwner = { nullptr };
 		_float3		vCenter;

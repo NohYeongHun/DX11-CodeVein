@@ -59,7 +59,6 @@ HRESULT CLoad_Model::Initialize_Prototype(MODELTYPE eModelType, _fmatrix PreTran
 
 	// 소멸자 호출되면서 시간 출력.
 	ScopedTimer allTimer(filePath.c_str());   // 전체 시간
-
 	{
 		ScopedTimer LoadMesh("Load_Meshes");
 		if (FAILED(Load_Meshes(PreTransformMatrix, ifs)))
@@ -127,7 +126,7 @@ void CLoad_Model::Set_Animation(_uint iAnimIndex, _bool isLoop)
 	if (iAnimIndex >= m_Animations.size())
 		return;
 
-	// 🔥 루트 모션 연속성 처리 - 애니메이션 인덱스 변경 전에 해야 함!
+	// 루트 모션 연속성 처리 - 애니메이션 인덱스 변경 전에 해야 함!
 	_vector vCurrentRootPos = XMVectorZero();
 	if (m_bRootMotionTranslate && m_iCurrentAnimIndex != iAnimIndex && m_iCurrentAnimIndex < m_Animations.size())
 	{
@@ -145,15 +144,16 @@ void CLoad_Model::Set_Animation(_uint iAnimIndex, _bool isLoop)
 	m_isFinished = false;
 	m_isTrackEnd = false;
 
-	// 🔥 핵심: m_vOldPos를 현재 루트본 위치로 설정하여 연속성 보장
-	if (m_bRootMotionTranslate)
-	{
-		XMStoreFloat4(&m_vOldPos, vCurrentRootPos);
-	}
-	else
-	{
-		XMStoreFloat4(&m_vOldPos, XMVectorZero());
-	}
+	XMStoreFloat4(&m_vOldPos, vCurrentRootPos);
+	//// 🔥 핵심: m_vOldPos를 현재 루트본 위치로 설정하여 연속성 보장
+	//if (m_bRootMotionTranslate)
+	//{
+	//	XMStoreFloat4(&m_vOldPos, vCurrentRootPos);
+	//}
+	//else
+	//{
+	//	XMStoreFloat4(&m_vOldPos, XMVectorZero());
+	//}
 }
 
 

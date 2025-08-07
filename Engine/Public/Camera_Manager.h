@@ -20,7 +20,8 @@ public:
 	HRESULT Add_Camera(const _wstring& strCameraTag, _uint iLevelIndex, const _wstring& strPrototypeTag, void* pArg = nullptr);
 	class CCamera* Find_Camera(const _wstring& strCameraTag, _uint iLevelIndex);
 	HRESULT Change_Camera(const _wstring& strCameraTag, _uint iLevelIndex);
-	
+	_bool Is_In_Camera_Frustum(_vector vWorldPos) const;
+
 #pragma endregion
 public:
 	

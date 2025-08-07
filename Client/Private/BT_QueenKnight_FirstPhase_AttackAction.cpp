@@ -82,7 +82,7 @@ BT_RESULT CBT_QueenKnight_FirstPhase_AttackAction::UpdateFirstAttack(_float fTim
         // 1. 공격 애니메이션 선택
         _uint iNextAnimationIdx = m_pOwner->Find_AnimationIndex(L"STRONG_ATTACK2");
 
-        m_pOwner->Set_RootMotionTranslate(false);
+        //m_pOwner->Set_RootMotionTranslate(false);
         // 2. 공격 상태로 변경
         m_pOwner->Change_Animation_Blend(iNextAnimationIdx);
 
@@ -131,7 +131,7 @@ BT_RESULT CBT_QueenKnight_FirstPhase_AttackAction::UpdateSecondAttack(_float fTi
         // 1. 공격 애니메이션 선택
         _uint iNextAnimationIdx = m_pOwner->Find_AnimationIndex(L"STRONG_ATTACK3");
 
-        m_pOwner->Set_RootMotionTranslate(false);
+        //m_pOwner->Set_RootMotionTranslate(false);
         // 2. 공격 상태로 변경
         m_pOwner->Change_Animation_NonBlend(iNextAnimationIdx);
 
@@ -151,7 +151,7 @@ BT_RESULT CBT_QueenKnight_FirstPhase_AttackAction::UpdateLastAttack(_float fTime
     {
         m_eAttackPhase = ATTACK_PHASE::COMPLETED;
 
-        m_pOwner->Set_RootMotionTranslate(false);
+        //m_pOwner->Set_RootMotionTranslate(false);
         // 1. IDLE 애니메이션 선택
         _uint iNextAnimationIdx = m_pOwner->Find_AnimationIndex(L"IDLE");
 

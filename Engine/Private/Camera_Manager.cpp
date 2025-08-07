@@ -94,6 +94,12 @@ HRESULT CCamera_Manager::Change_Camera(const _wstring& strCameraTag, _uint iLeve
 	return S_OK;
 }
 
+/* 현재 Pos가 Camera Frustum 내부에 들어와있는가? => 안들어와 있으면 콜라이더 매니저에 미등록..*/
+_bool CCamera_Manager::Is_In_Camera_Frustum(_vector vWorldPos) const
+{
+	return m_pCurrentCamera->Is_In_Camera_Frustum(vWorldPos);
+}
+
 
 
 #pragma endregion

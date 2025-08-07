@@ -71,10 +71,15 @@ void CMonster::Finalize_Update(_float fTimeDelta)
 {
     __super::Finalize_Update(fTimeDelta);
 
+
     if (m_pColliderCom)
     {
+        /* 콜라이더의 위치는 계속 업데이트 해주어야함. => 이상한 위치에 존재할 수도 있으므로.*/
         m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
-        m_pGameInstance->Add_Collider_To_Manager(m_pColliderCom);
+
+        /* 콜라이더 매니저에서 상태비교 하는거는 카메라 프러스텀을 이용해서 제어. */
+        if (m_pGameInstance->Is_In_Camera_Frustum(m_pTransformCom->Get_State(STATE::POSITION)))
+            m_pGameInstance->Add_Collider_To_Manager(m_pColliderCom);
     }
 }
 
