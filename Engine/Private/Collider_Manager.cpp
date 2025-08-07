@@ -27,6 +27,10 @@ HRESULT CCollider_Manager::Add_Collider_To_Manager(CCollider* pCollider)
 // 매 프레임 추가하고 => 충돌 검사 후에 => 매 프레임 제거합니다.
 void CCollider_Manager::Update()
 {
+
+	OutputDebugWstring(TEXT("콜라이더 등록 개수 : "));
+	OutPutDebugInt(m_ColliderList.size());
+
 	for (auto& pLeft : m_ColliderList)
 	{
 		for (auto& pRight : m_ColliderList)

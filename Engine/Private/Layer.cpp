@@ -101,7 +101,7 @@ MODEL_PICKING_INFO CLayer::Get_PickingLocalObject()
 
 void CLayer::Priority_Update(_float fTimeDelta)
 {
-	/* Destroy 객체들만 삭제 처리. */
+	/* Destroy 객체들을 오브젝트 매니저 풀에 넣을라면? */
 	auto iter = m_GameObjects.begin();
 	while (iter != m_GameObjects.end())
 	{

@@ -29,10 +29,17 @@ void CBounding_OBB::Update(_fmatrix WorldMatrix)
 	// Local 기준으로 World 행렬 변환을 m_pDesc에 적용.
 	m_pOriginalDesc->Transform(*m_pDesc, WorldMatrix);
 }
+
+#ifdef _DEBUG
 HRESULT CBounding_OBB::Render(PrimitiveBatch<VertexPositionColor>* pBatch, _fvector vColor)
 {
-	return E_NOTIMPL;
+	DX::Draw(pBatch, *m_pDesc, vColor);
+
+	return S_OK;
 }
+#endif // _DEBUG
+
+
 _bool CBounding_OBB::Intersect(COLLIDER eColliderType, CBounding* pBounding)
 {
 	_bool		isColl = { false };

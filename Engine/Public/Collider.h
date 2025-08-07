@@ -8,6 +8,12 @@ NS_BEGIN(Engine)
 
 class ENGINE_DLL CCollider final : public CComponent
 {
+public:
+	typedef struct tagColliderDesc
+	{
+		_bool IsTrigger = { false };
+	}COLLIDER_DESC;
+
 protected:
 	CCollider(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CCollider(const CCollider& Prototype);
@@ -51,9 +57,9 @@ private:
 	class CBounding* m_pBounding = { nullptr };
 	class CGameObject* m_pOwner = { nullptr };
 	_bool	m_IsActive = { true }; // 활성화 상태
+	_bool	m_IsTrigger = { false }; // 충돌 Trigger냐? 아니냐?
 	COLLIDER m_eType = {};
 	unordered_set<CGameObject*> m_ColliderObjects = {}; // 콜라이더 저장 용도
-
 	DirectX::XMVECTORF32 m_vColor = { DirectX::Colors::Black };
 
 

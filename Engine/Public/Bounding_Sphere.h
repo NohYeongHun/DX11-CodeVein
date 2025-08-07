@@ -24,7 +24,10 @@ public:
 public:
 	virtual HRESULT Initialize(BOUNDING_DESC* pBoundingDesc);
 	virtual void Update(_fmatrix WorldMatrix);
+
+#ifdef _DEBUG
 	virtual HRESULT Render(PrimitiveBatch<VertexPositionColor>* pBatch, _fvector vColor = DirectX::Colors::White) override;
+#endif
 
 #pragma region 충돌 감시
 public:

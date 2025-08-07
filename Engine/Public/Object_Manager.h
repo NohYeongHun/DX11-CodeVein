@@ -47,6 +47,13 @@ private:
 	_uint				 m_iNumLevels = {};
 	LayerTable*		m_pLayers = {};
 	
+#pragma region 삭제 처리할 객체들을 Layer에서 빼서 모아둡니다. => IsDestroy 객체들.
+private:
+
+#pragma endregion
+
+
+
 
 private:
 	class CLayer* Find_Layer(_uint iLayerLevelIndex, const _wstring& strLayerTag);

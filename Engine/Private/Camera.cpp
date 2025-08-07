@@ -24,6 +24,7 @@ const _vector CCamera::Get_RightVector()
     return m_pTransformCom->Get_RightDirection_NoPitch();
 }
 
+/* 카메라 절두채 내에 존재하는가? */
 _bool CCamera::Is_In_Camera_Frustum(_vector vWorldPos) const
 {
     // View Matrix와 Projection Matrix를 사용한 Frustum 체크
