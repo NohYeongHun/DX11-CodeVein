@@ -21,8 +21,9 @@ public:
 	virtual HRESULT Initialize_Clone(void* pArg);
 	HRESULT Render(_uint iNumMesh);
 
-public:
+
 #pragma region GET_SET
+public:
 	_uint Get_NumMeshes() const {
 		return m_iNumMeshes;
 	}
@@ -68,6 +69,9 @@ public:
 	_float Get_Current_Ratio();
 	
 	// 모델의 위 아래 길이 계산해서 반환.
+
+	_float Get_AnimSpeed(_uint iAnimIndex) { return m_Animations[iAnimIndex]->Get_AnimSpeed(); }
+	void Set_AnimSpeed(_uint iAnimIndex, _float fSpeed) { m_Animations[iAnimIndex]->Set_AnimSpeed(fSpeed); }
 
 #pragma endregion
 
@@ -178,8 +182,8 @@ private:
 	_float4 m_vSameOldPos = {};
 	
 
-	_bool m_bRootMotionRotate = { false };
-	_bool m_bRootMotionTranslate = { false };
+	_bool m_bRootMotionRotate = { true };
+	_bool m_bRootMotionTranslate = { true };
 	_bool m_bAnimationJustChanged = { false };
 
 private:

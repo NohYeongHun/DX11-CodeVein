@@ -25,8 +25,8 @@ void CPlayer_GuardState::Enter(void* pArg)
 	// ⭐ Dodge는 non-loop으로 변경
 	m_isLoop = false;
 	m_pModelCom->Set_Animation(m_iCurAnimIdx, m_isLoop);
-	m_pModelCom->Set_RootMotionTranslate(false);
 	m_pModelCom->Set_RootMotionRotation(true);
+	m_pModelCom->Set_RootMotionTranslate(false);
 
 	// 방향 제어 관련 초기화
 	m_bCanChangeDirection = true;
@@ -66,6 +66,8 @@ void CPlayer_GuardState::Exit()
 		
 	//if (m_iNextState == CPlayer::PLAYER_STATE::GUARD)
 	//	m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.05f, true, true, false);
+
+	m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, true);
 }
 
 // 상태 초기화

@@ -132,9 +132,13 @@ void CPlayer::Finalize_Update(_float fTimeDelta)
 void CPlayer::Late_Update(_float fTimeDelta)
 {
 
+    //m_pTransformCom->Set_State(STATE::POSITION
+    //    , m_pNavigationCom->Compute_OnCell(
+    //        m_pTransformCom->Get_State(STATE::POSITION), m_fOffsetY + 0.1f));
+
     m_pTransformCom->Set_State(STATE::POSITION
         , m_pNavigationCom->Compute_OnCell(
-            m_pTransformCom->Get_State(STATE::POSITION), m_fOffsetY + 0.1f));
+            m_pTransformCom->Get_State(STATE::POSITION)));
 
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::BLEND, this)))
         return;
@@ -587,7 +591,7 @@ HRESULT CPlayer::InitializeAction_ToAnimationMap()
 
     m_Action_AnimMap.emplace(L"IDLE", PLAYER_ANIM_IDLE_LSWORD);
     m_Action_AnimMap.emplace(L"RUN", PLAYER_ANIM_RUN_F_LOOP);
-    m_Action_AnimMap.emplace(L"DODGE", PLAYER_ANIM_LS_DODGE_300_F);
+    m_Action_AnimMap.emplace(L"DODGE", PLAYER_ANIM_LS_DODGE_ROLL_F);
 
     m_Action_AnimMap.emplace(L"GUARD_START", PLAYER_ANIM_LS_GUARD_START);
     m_Action_AnimMap.emplace(L"GUARD_LOOP", PLAYER_ANIM_LS_GUARD_LOOP);
@@ -876,7 +880,7 @@ HRESULT CPlayer::Ready_Components(PLAYER_DESC* pDesc)
 
     CBounding_OBB::BOUNDING_OBB_DESC  OBBDesc{};
     OBBDesc.vExtents = _float3(box.vExtents.x, box.vExtents.y, box.vExtents.z);
-    OBBDesc.vCenter = _float3(0.f, 0.f, 0.f); // 중점.
+    OBBDesc.vCenter = _float3(0.f, box.vExtents.y, 0.f); // 중점.
     OBBDesc.vRotation = { m_pTransformCom->GetPitchFromQuaternion(),
         m_pTransformCom->GetYawFromQuaternion(),
         m_pTransformCom->GetRollFromQuaternion() };
@@ -954,6 +958,16 @@ HRESULT CPlayer::Ready_Fsm()
     m_pFsmCom->Add_State(CPlayer_AttackState::Create(PLAYER_STATE::ATTACK, &PlayerDesc));
 
 
+    /* 재생 속도 증가*/
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("RUN")], 2.f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("ATTACK1")], 2.f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("ATTACK2")], 2.f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("ATTACK3")], 2.f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("ATTACK4")], 2.f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("DODGE")], 2.f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("STRONG_ATTACK")], 1.5f);
+        //, m_pModelCom->Get_CurrentTickPerSecond(m_Action_AnimMap[TEXT("RUN")]) * 2.f);
+
     Register_CoolTime();
 
     CPlayer_IdleState::IDLE_ENTER_DESC enter{};
@@ -969,34 +983,15 @@ HRESULT CPlayer::Ready_Fsm()
 
 void CPlayer::Register_CoolTime()
 {
-    /* 재생 속도 증가*/
-    m_pModelCom->Set_CurrentTickPerSecond(m_Action_AnimMap[TEXT("RUN")]
-        , m_pModelCom->Get_CurrentTickPerSecond(m_Action_AnimMap[TEXT("RUN")]) * 2.f);
+   
 
-    m_pModelCom->Set_CurrentTickPerSecond(m_Action_AnimMap[TEXT("ATTACK1")]
-        , m_pModelCom->Get_CurrentTickPerSecond(m_Action_AnimMap[TEXT("ATTACK1")]) * 2.f);
-    m_pModelCom->Set_CurrentTickPerSecond(m_Action_AnimMap[TEXT("ATTACK2")]
-        , m_pModelCom->Get_CurrentTickPerSecond(m_Action_AnimMap[TEXT("ATTACK2")]) * 2.f);
-    m_pModelCom->Set_CurrentTickPerSecond(m_Action_AnimMap[TEXT("ATTACK3")]
-        , m_pModelCom->Get_CurrentTickPerSecond(m_Action_AnimMap[TEXT("ATTACK3")]) * 2.f);
-    m_pModelCom->Set_CurrentTickPerSecond(m_Action_AnimMap[TEXT("ATTACK4")]
-        , m_pModelCom->Get_CurrentTickPerSecond(m_Action_AnimMap[TEXT("ATTACK4")]) * 2.f);
-
-    m_pModelCom->Set_CurrentTickPerSecond(m_Action_AnimMap[TEXT("DODGE")]
-        , m_pModelCom->Get_CurrentTickPerSecond(m_Action_AnimMap[TEXT("DODGE")]) * 2.f);
-
-
-    _float fCalcDuration = m_pModelCom->Get_AnimationDuration(m_Action_AnimMap[TEXT("STRONG_ATTACK1")]) /
-        m_pModelCom->Get_AnimationTickPersecond(m_Action_AnimMap[TEXT("STRONG_ATTACK1")]);
-    m_pModelCom->Set_CurrentTickPerSecond(m_Action_AnimMap[TEXT("STRONG_ATTACK1")]
-        , m_pModelCom->Get_CurrentTickPerSecond(m_Action_AnimMap[TEXT("STRONG_ATTACK1")]) * 2.f);
    
 
     _float fTimeDelta = m_pGameInstance->Get_TimeDelta();
     m_pFsmCom->Register_StateCoolTime(PLAYER_STATE::IDLE, 0.f);
     m_pFsmCom->Register_StateCoolTime(PLAYER_STATE::WALK, 0.f);
     m_pFsmCom->Register_StateCoolTime(PLAYER_STATE::RUN, 0.f);
-    m_pFsmCom->Register_StateCoolTime(PLAYER_STATE::DODGE, 0.4f);
+    m_pFsmCom->Register_StateCoolTime(PLAYER_STATE::DODGE, 0.7f);
     m_pFsmCom->Register_StateCoolTime(PLAYER_STATE::STRONG_ATTACK, 2.f);
     m_pFsmCom->Register_StateCoolTime(PLAYER_STATE::ATTACK, 1.f);
     m_pFsmCom->Register_StateCoolTime(PLAYER_STATE::GUARD, 0.5f);
@@ -1008,7 +1003,7 @@ void CPlayer::Register_CoolTime()
     m_pFsmCom->Register_StateExitCoolTime(PLAYER_STATE::DODGE, 0.7f);
 
     // 총 재생 시간.
-    fCalcDuration = m_pModelCom->Get_AnimationDuration(m_Action_AnimMap[TEXT("STRONG_ATTACK1")]) /
+    _float fCalcDuration = m_pModelCom->Get_AnimationDuration(m_Action_AnimMap[TEXT("STRONG_ATTACK1")]) /
         m_pModelCom->Get_AnimationTickPersecond(m_Action_AnimMap[TEXT("STRONG_ATTACK1")]);
     m_pFsmCom->Register_StateExitCoolTime(PLAYER_STATE::STRONG_ATTACK, fCalcDuration * 0.6f);
 

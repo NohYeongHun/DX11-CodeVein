@@ -121,9 +121,13 @@ void CQueenKnight::Finalize_Update(_float fTimeDelta)
 
 void CQueenKnight::Late_Update(_float fTimeDelta)
 {
+    //m_pTransformCom->Set_State(STATE::POSITION
+    //    , m_pNavigationCom->Compute_OnCell(
+    //        m_pTransformCom->Get_State(STATE::POSITION), m_fOffsetY));
+
     m_pTransformCom->Set_State(STATE::POSITION
         , m_pNavigationCom->Compute_OnCell(
-            m_pTransformCom->Get_State(STATE::POSITION), m_fOffsetY));
+            m_pTransformCom->Get_State(STATE::POSITION)));
 
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::BLEND, this)))
         return;
@@ -238,6 +242,7 @@ HRESULT CQueenKnight::InitializeAction_ToAnimationMap()
     m_Action_AnimMap.emplace(L"STRONG_ATTACK3", KNIGHT_SWORD_ATTACK_STRONG_03);
 
     /* 재생속도 증가. */
+    
     m_pModelCom->Set_CurrentTickPerSecond(KNIGHT_SWORD_ATTACK_STRONG_01, 
         m_pModelCom->Get_CurrentTickPerSecond(KNIGHT_SWORD_ATTACK_STRONG_01) * 4.f);
 
@@ -316,7 +321,7 @@ HRESULT CQueenKnight::Ready_Components(QUEENKNIGHT_DESC* pDesc)
 
     CBounding_AABB::BOUNDING_AABB_DESC  AABBDesc{};
     AABBDesc.vExtents = _float3(box.vExtents.x, box.vExtents.y, box.vExtents.z);
-    AABBDesc.vCenter = _float3(0.f, AABBDesc.vExtents.y * 0.5f, 0.f); // 중점.
+    AABBDesc.vCenter = _float3(0.f, box.vExtents.y, 0.f); // 중점.
     AABBDesc.pOwner = this;
 
     if (FAILED(__super::Add_Component(ENUM_CLASS(LEVEL::STATIC)

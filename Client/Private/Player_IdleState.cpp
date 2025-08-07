@@ -19,16 +19,13 @@ HRESULT CPlayer_IdleState::Initialize(_uint iStateNum, void* pArg)
 /* State 시작 시*/
 void CPlayer_IdleState::Enter(void* pArg)
 {
-	// ✅ 구문 수정
-	//_vector vPos = m_pPlayer->Get_Transform()->Get_State(STATE::POSITION);
-	//OutputDebugString((L"[IDLE ENTER] Position: " +
-	//	std::to_wstring(XMVectorGetX(vPos)) + L", " +
-	//	std::to_wstring(XMVectorGetZ(vPos)) + L"\n").c_str());
 
 	IDLE_ENTER_DESC* pDesc = static_cast<IDLE_ENTER_DESC*>(pArg);
 	__super::Enter(pDesc); // 기본 쿨타임 설정.
 
 	// Idle 시에는 RootMotion 비활성화
+	m_pModelCom->Set_RootMotionRotation(true);
+	m_pModelCom->Set_RootMotionTranslate(false);
 
 	m_iNextState = -1;
 	m_iCurAnimIdx = pDesc->iAnimation_Idx;
