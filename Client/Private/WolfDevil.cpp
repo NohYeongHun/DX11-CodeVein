@@ -125,24 +125,16 @@ void CWolfDevil::Late_Update(_float fTimeDelta)
     if (m_pGameInstance->Get_KeyPress(DIK_2))
     {
         _bool bIsBuffPossible = AddBuff(CMonster::BUFF_DOWN);
-        //if (bIsBuffPossible)
-        //    OutputDebugWstring(TEXT("Wolf Devill Down 시작."));
-        //else
-        //    OutputDebugWstring(TEXT("Wolf Devill Down 실패."));
     }
     if (m_pGameInstance->Get_KeyPress(DIK_3))
     {
         _bool bIsBuffPossible = AddBuff(CMonster::BUFF_HIT);
-        //if (bIsBuffPossible)
-        //    OutputDebugWstring(TEXT("Wolf Devill HIT 시작."));
-        //else
-        //    OutputDebugWstring(TEXT("Wolf Devill HIT 실패"));
     }
         
 
     m_pTransformCom->Set_State(STATE::POSITION
         , m_pNavigationCom->Compute_OnCell(
-            m_pTransformCom->Get_State(STATE::POSITION), m_fOffsetY + 0.2f));
+            m_pTransformCom->Get_State(STATE::POSITION)));
 
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::BLEND, this)))
         return;
@@ -152,10 +144,6 @@ void CWolfDevil::Late_Update(_float fTimeDelta)
 
 HRESULT CWolfDevil::Render()
 {
-//#ifdef _DEBUG
-//    BoundingBoxRender(m_pModelCom->Get_BoundingBox(), m_pTransformCom->Get_WorldMatrix());
-//#endif // _DEBUG
-
 #ifdef _DEBUG
     m_pColliderCom->Render();
 #endif // _DEBUG
@@ -323,7 +311,7 @@ HRESULT CWolfDevil::Ready_Components(WOLFDEVIL_DESC* pDesc)
 
     CBounding_AABB::BOUNDING_AABB_DESC  AABBDesc{};
     AABBDesc.vExtents = _float3(box.vExtents.x, box.vExtents.y, box.vExtents.z);
-    AABBDesc.vCenter = _float3(0.f, 0.f, 0.f); // 중점.
+    AABBDesc.vCenter = _float3(0.f, box.vExtents.y, 0.f); // 중점.
     AABBDesc.pOwner = this;
 
     if (FAILED(__super::Add_Component(ENUM_CLASS(LEVEL::STATIC)

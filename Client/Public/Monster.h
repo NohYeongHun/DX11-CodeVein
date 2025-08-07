@@ -130,6 +130,7 @@ public:
 protected:
     MONSTER_STAT m_MonsterStat = {};
     _float m_fMinDetectionDistance = 5.f;
+    _float m_fMinRotationDistance = 2.f;
 #pragma endregion
 
 

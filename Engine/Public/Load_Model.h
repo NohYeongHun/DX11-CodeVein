@@ -127,7 +127,6 @@ public:
 #pragma region ROOT MOTION
 private:
 	void Handle_RootMotion(_float fTimeDelta);
-	void Reset_RootMotion();
 
 #pragma endregion
 

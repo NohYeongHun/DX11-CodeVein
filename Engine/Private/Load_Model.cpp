@@ -206,10 +206,6 @@ void CLoad_Model::Rotate_Bounding_Box()
 {
 	_matrix preTransform = XMLoadFloat4x4(&m_PreTransformMatrix);
 
-	//_vector vScale, vRotate, vTranslate;
-	//XMMatrixDecompose(&vScale, &vRotate, &vTranslate, preTransform);
-
-
 	_matrix rotationMatrix = XMMatrixRotationX(XM_PI * 0.5f);
 
 	// 로컬 바운딩박스의 8개 꼭짓점 계산
@@ -267,14 +263,14 @@ void CLoad_Model::Rotate_Bounding_Box()
 
  	
 
-#ifdef _DEBUG
-	char debugMsg[256];
-	sprintf_s(debugMsg, "Rotated Bounding Box:\nMin: (%.2f, %.2f, %.2f)\nMax: (%.2f, %.2f, %.2f)\nHeight: %.2f\n",
-		rotatedMin.x, rotatedMin.y, rotatedMin.z,
-		rotatedMax.x, rotatedMax.y, rotatedMax.z,
-		m_BoundingBox.fHeight);
-	OutputDebugStringA(debugMsg);
-#endif
+//#ifdef _DEBUG
+//	char debugMsg[256];
+//	sprintf_s(debugMsg, "Rotated Bounding Box:\nMin: (%.2f, %.2f, %.2f)\nMax: (%.2f, %.2f, %.2f)\nHeight: %.2f\n",
+//		rotatedMin.x, rotatedMin.y, rotatedMin.z,
+//		rotatedMax.x, rotatedMax.y, rotatedMax.z,
+//		m_BoundingBox.fHeight);
+//	OutputDebugStringA(debugMsg);
+//#endif
 
 
 }
@@ -319,11 +315,6 @@ HRESULT CLoad_Model::Bind_BoneMatrices(CShader* pShader, const _char* pConstantN
 }
 
 
-// 내가 한실수는 애니메이션 굴리기전에 Root뼈를 못움직이게 해야함.
-// 애니메이션 굴린다음에 루트뼈를 못움직이게함.
-// 다른 뼈들은 이미 움직여버림.
-// 굴리기전에 이동량 죽이고 
-// => 트랜스폼에 적용하는건 움직인 정보니까.
 _bool CLoad_Model::Play_Animation(_float fTimeDelta)
 {
 	/* 현재 시간에 맞는 뼈의 상태대로 특정 뼈들의 TransformationMatrix를 갱신해준다. */
@@ -332,7 +323,6 @@ _bool CLoad_Model::Play_Animation(_float fTimeDelta)
 
 
 	// 2. 애니메이션을 실행합니다. => 실행하기전에 루트 움직이지마라.
-	// 여기서 블렌딩 진행. => 블렌딩 문제인건 알았어 어케해야됨 그럼?
 	m_Animations[m_iCurrentAnimIndex]->Update_TransformationMatrices(
 		m_Bones, m_isLoop, &m_isFinished, m_BlendDesc, fTimeDelta
 	);
@@ -447,14 +437,6 @@ void CLoad_Model::Handle_RootMotion(_float fTimeDelta)
 	rootMatrix.r[3] = XMVectorSet(0.f, 0.f, 0.f, 1.f);
 	m_Bones[m_iRoot_BoneIndex]->Set_CombinedTransformationMatrix(rootMatrix);
 }
-
-void CLoad_Model::Reset_RootMotion()
-{
-	_matrix rootMatrix = m_Bones[m_iRoot_BoneIndex]->Get_CombinedTransformationMatrix();
-	XMStoreFloat4(&m_vOldPos, rootMatrix.r[3]);
-}
-
-
 
 
 void CLoad_Model::Animation_Reset()

@@ -110,7 +110,6 @@ void CMonster::On_Collision_Exit(CGameObject* pOther)
 void CMonster::Change_Animation_NonBlend(_uint iNextAnimIdx, _bool IsLoop)
 {
     m_pModelCom->Set_Animation(iNextAnimIdx, IsLoop);
-    //m_pModelCom->Animation_Reset();
 }
 
 void CMonster::Change_Animation_Blend(_uint iNextAnimIdx, _bool IsLoop, _float fBlendDuration, _bool bScale, _bool bRotate, _bool bTranslate)
@@ -120,8 +119,7 @@ void CMonster::Change_Animation_Blend(_uint iNextAnimIdx, _bool IsLoop, _float f
         , fBlendDuration, bScale, bRotate
         , bTranslate);
     /* 애니메이션 변경. */
-    m_pModelCom->Set_Animation(iNextAnimIdx, IsLoop);
-    m_pModelCom->Animation_Reset();
+    m_pModelCom->Set_Animation(iNextAnimIdx, IsLoop); 
 }
 
 // 연계 공격 전용
@@ -402,12 +400,18 @@ void CMonster::RotateTurn_ToTarget()
 
 void CMonster::RotateTurn_ToTargetYaw(_float fTimeDelta)
 {
+
     // 현재 몬스터 위치와 타겟 위치
     _vector vMyPos = m_pTransformCom->Get_State(STATE::POSITION);
     _vector vTargetPos = m_pTarget->Get_Transform()->Get_State(STATE::POSITION);
 
     // 방향 벡터 계산 (Y축 제거하여 지면에서만 회전)
     _vector vDirection = vTargetPos - vMyPos;
+    
+    // 너무 가까이에 있으면 회전을 자제한다. => 
+    if (XMVectorGetX(XMVector4Length(vDirection)) < m_fMinRotationDistance)
+        return;
+
     vDirection = XMVectorSetY(vDirection, 0.f);
     vDirection = XMVector3Normalize(vDirection);
 
@@ -455,8 +459,13 @@ void CMonster::RotateTurn_ToTargetYaw()
     _vector vMyPos = m_pTransformCom->Get_State(STATE::POSITION);
     _vector vTargetPos = m_pTarget->Get_Transform()->Get_State(STATE::POSITION);
 
-    // 방향 벡터 계산 (Y축 제거)
+    
     _vector vDirection = vTargetPos - vMyPos;
+
+    if (XMVectorGetX(XMVector4Length(vDirection)) < m_fMinRotationDistance)
+        return;
+
+    // 방향 벡터 계산 (Y축 제거)
     vDirection = XMVectorSetY(vDirection, 0.f);
 
     if (XMVectorGetX(XMVector3Length(vDirection)) < 0.001f)

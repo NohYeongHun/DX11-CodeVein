@@ -87,7 +87,7 @@ void CPlayer_AttackState::Reset()
 	m_iCurAnimIdx = -1;
 	m_iNextAnimIdx = -1;
 
-	m_pModelCom->Animation_Reset();
+	//m_pModelCom->Animation_Reset(); => Set_Animation에서 수행 중.
 }
 
 void CPlayer_AttackState::Change_State(_float fTimeDelta)

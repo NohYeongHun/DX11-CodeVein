@@ -216,30 +216,29 @@ HRESULT CQueenKnight::InitializeAction_ToAnimationMap()
     m_pModelCom->Set_RootMotionRotation(true);
     m_pModelCom->Set_RootMotionTranslate(true);
 
-    m_Action_AnimMap.emplace(L"IDLE", KNIGHT_SWORD_IDLE);
-    m_Action_AnimMap.emplace(L"GUARDHIT", KNIGHT_SHIELD_SWORD_GUARD_HIT_01);
-    m_Action_AnimMap.emplace(L"DAMAGE", KNIGHT_DAMAGE_BACKSTAB);
-    m_Action_AnimMap.emplace(L"HIT", KNIGHT_DAMAGE_BACKSTAB);
-    m_Action_AnimMap.emplace(L"ATTACK", KNIGHT_SWORD_ATTACK_NORMAL_00);
-    m_Action_AnimMap.emplace(L"ATTACK1", KNIGHT_SWORD_ATTACK_NORMAL_00);
-    m_Action_AnimMap.emplace(L"ATTACK2", KNIGHT_SWORD_ATTACK_NORMAL_01);
-    m_Action_AnimMap.emplace(L"ATTACK3", KNIGHT_SWORD_ATTACK_NORMAL_02);
+    m_Action_AnimMap.emplace(L"IDLE", AS_TStdKnight_TLSword_Idle_N_Loop);
+    m_Action_AnimMap.emplace(L"GUARDHIT", AS_TStdKnight_TShieldSword_GuardHit01_N);
+    m_Action_AnimMap.emplace(L"DAMAGE", AS_TStdKnight_TCmn_Damage01_BR);
+    m_Action_AnimMap.emplace(L"HIT", AS_TStdKnight_TCmn_Damage01_BR);
+    m_Action_AnimMap.emplace(L"ATTACK1", AS_TStdKnight_TLSword_AttackNormal01_N);
+    m_Action_AnimMap.emplace(L"ATTACK2", AS_TStdKnight_TLSword_AttackNormal02_N);
+    m_Action_AnimMap.emplace(L"ATTACK3", AS_TStdKnight_TLSword_AttackNormal03_N);
 
     // 중간에 사라지게 해서 플레이어 위에서 나타나서 아래로 내다꼽게.
-    m_Action_AnimMap.emplace(L"ATTACK_JUMP", KNIGHT_SWORD_ATTACK_JUMP);
+    m_Action_AnimMap.emplace(L"ATTACK_JUMP", AS_TStdKnight_TSword_AttackJump01_N);
 
-    m_Action_AnimMap.emplace(L"RUN", KNIGHT_SHIELD_SWORD_GUARD_RUN_F);
-    m_Action_AnimMap.emplace(L"WALK", KNIGHT_SHIELD_SWORD_GUARD_WALK_F);
+    m_Action_AnimMap.emplace(L"RUN", AS_TStdKnight_TShieldSword_Guard_Run_F_Loop);
+    m_Action_AnimMap.emplace(L"WALK", AS_TStdKnight_TShieldSword_Guard_Walk_F_Loop);
     // 같은 애니메이션이지만 다른 이름으로 설정해서 Node에서 사용할 수 있게함.
-    m_Action_AnimMap.emplace(L"DETECT", KNIGHT_SHIELD_SWORD_GUARD_RUN_F);
-    m_Action_AnimMap.emplace(L"DOWN_START", KNIGHT_DOWN_P_LOOP);
-    m_Action_AnimMap.emplace(L"DOWN_END", KNIGHT_DOWN_P_END);
-    m_Action_AnimMap.emplace(L"DEATH", KNIGHT_DEATH_F);
+    m_Action_AnimMap.emplace(L"DETECT", AS_TStdKnight_TShieldSword_Guard_Run_F_Loop);
+    m_Action_AnimMap.emplace(L"DOWN_START", AS_TStdKnight_TCmn_Down_P_Loop);
+    m_Action_AnimMap.emplace(L"DOWN_END", AS_TStdKnight_TCmn_Down_P_End);
+    m_Action_AnimMap.emplace(L"DEATH", AS_TStdKnight_TCmn_Death_F);
     
 
-    m_Action_AnimMap.emplace(L"PHASE_ATTACK1", KNIGHT_SHIELD_SWORD_ATTACK_02B);
-    m_Action_AnimMap.emplace(L"PHASE_ATTACK2", KNIGHT_SHIELD_SWORD_ATTACK_02C);
-    m_Action_AnimMap.emplace(L"PHASE_ATTACK3", KNIGHT_SHIELD_SWORD_ATTACK_02A);
+    m_Action_AnimMap.emplace(L"PHASE_ATTACK1", AS_TStdKnight_TShieldSword_AttackShield02B_N);
+    m_Action_AnimMap.emplace(L"PHASE_ATTACK2", AS_TStdKnight_TShieldSword_AttackShield02C_N);
+    m_Action_AnimMap.emplace(L"PHASE_ATTACK3", AS_TStdKnight_TShieldSword_AttackShield02A_N);
 
     /* 재생속도 증가. */
     
@@ -247,17 +246,6 @@ HRESULT CQueenKnight::InitializeAction_ToAnimationMap()
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"PHASE_ATTACK2"], 3.f);
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"PHASE_ATTACK3"], 3.f);
 
-    //m_pModelCom->Set_CurrentTickPerSecond(KNIGHT_SWORD_ATTACK_STRONG_01, 
-    //    m_pModelCom->Get_CurrentTickPerSecond(KNIGHT_SWORD_ATTACK_STRONG_01) * 2.f);
-    //
-    //m_pModelCom->Set_CurrentTickPerSecond(KNIGHT_SWORD_ATTACK_STRONG_02,
-    //    m_pModelCom->Get_CurrentTickPerSecond(KNIGHT_SWORD_ATTACK_STRONG_02) * 2.f);
-    //
-    //m_pModelCom->Set_CurrentTickPerSecond(KNIGHT_SWORD_ATTACK_STRONG_03,
-    //    m_pModelCom->Get_CurrentTickPerSecond(KNIGHT_SWORD_ATTACK_STRONG_03) * 2.f);
-    //
-    ///* 재생속도 증가. */
-    //m_pModelCom->Set_CurrentTickPerSecond(WOLFDEVIL_ATTACK_JUMP, m_pModelCom->Get_CurrentTickPerSecond(WOLFDEVIL_ATTACK_JUMP) * 2.f);
 
     return S_OK;
 }
@@ -433,7 +421,7 @@ HRESULT CQueenKnight::Ready_PartObjects()
         return E_FAIL;
     }
 
-  /*  CKnightShield::KNIGHT_SHIELD_DESC Shield{};
+    CKnightShield::KNIGHT_SHIELD_DESC Shield{};
     Shield.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
     Shield.pSocketMatrix = m_pModelCom->Get_BoneMatrix("LeftHandAttachSocket");
     Shield.eCurLevel = m_eCurLevel;
@@ -445,7 +433,7 @@ HRESULT CQueenKnight::Ready_PartObjects()
     {
         CRASH("Failed Create Queen Shield");
         return E_FAIL;
-    }*/
+    }
 
     //m_PartObjects[L"Com_Weapon"];
 

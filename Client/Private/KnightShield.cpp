@@ -26,6 +26,8 @@ HRESULT CKnightShield::Initialize(void* pArg)
     if (FAILED(Ready_Components()))
         return E_FAIL;
 
+    m_pTransformCom->Add_Rotation(XMConvertToRadians(180.f), 0.f, -90.f);
+
     return S_OK;
 }
 
