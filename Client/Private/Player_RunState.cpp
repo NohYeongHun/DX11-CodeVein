@@ -45,15 +45,15 @@ void CPlayer_RunState::Exit()
 	// 보간 정보를 Model에 전달한다.
 	if (m_iNextState != -1)
 	{
-		/*if (m_iNextState == CPlayer::PLAYER_STATE::DODGE ||
+		if (m_iNextState == CPlayer::PLAYER_STATE::DODGE ||
 			m_iNextState == CPlayer::PLAYER_STATE::ATTACK ||
 			m_iNextState == CPlayer::PLAYER_STATE::STRONG_ATTACK ||
 			m_iNextState == CPlayer::PLAYER_STATE::GUARD)
 		{
 			return;
-		}*/
+		}
 
-		m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, true);
+		m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, false);
 	}
 		
 }
@@ -149,32 +149,6 @@ void CPlayer_RunState::Change_State(_float fTimeDelta)
 	}
 	
 }
-
-//void CPlayer_RunState::RockOn_State(_float fTimeDelta)
-//{
-//	if (m_pPlayer->Is_MovementKeyPressed())
-//	{
-//		if (Should_Use_LockOn_Logic())
-//		{
-//			// LockOn 상태에서는 스트레이핑 이동
-//			Apply_LockOn_Movement(fTimeDelta, 0.3f);
-//		}
-//		else
-//		{
-//			// 일반 이동 처리
-//			m_eDir = m_pPlayer->Calculate_Direction();
-//			m_pPlayer->Move_By_Camera_Direction_8Way(m_eDir, fTimeDelta, 0.3f);
-//		}
-//	}
-//	else
-//	{
-//		// 정지 상태로 전환
-//		CPlayer_IdleState::IDLE_ENTER_DESC Desc{};
-//		Desc.iAnimation_Idx = PLAYER_ANIM_IDLE_SWORD;
-//		m_pFsm->Change_State(CPlayer::PLAYER_STATE::IDLE, &Desc);
-//	}
-//}
-
 
 CPlayer_RunState* CPlayer_RunState::Create(_uint iStateNum, void* pArg)
 {

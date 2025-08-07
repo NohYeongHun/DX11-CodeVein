@@ -40,6 +40,17 @@ public:
 	const _bool Get_RootMotionTranslate() { return m_RootMotionTranslate; }
 	const _bool Get_RootMotionRotate() { return m_RootMotionRotate;}
 
+#pragma region 스피드 관리
+
+public:
+	void Set_AnimSpeed(_float fSpeed) { m_fAnimSpeed = fSpeed; }
+	_float Get_AnimSpeed() { return m_fAnimSpeed; }
+
+private:
+	_float m_fAnimSpeed = { 1.f };
+#pragma endregion
+
+
 private:
 	_bool m_RootMotionTranslate = { true };
 	_bool m_RootMotionRotate = { true };

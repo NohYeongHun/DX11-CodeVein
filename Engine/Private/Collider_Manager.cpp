@@ -28,8 +28,8 @@ HRESULT CCollider_Manager::Add_Collider_To_Manager(CCollider* pCollider)
 void CCollider_Manager::Update()
 {
 
-	OutputDebugWstring(TEXT("콜라이더 등록 개수 : "));
-	OutPutDebugInt(m_ColliderList.size());
+	//OutputDebugWstring(TEXT("콜라이더 등록 개수 : "));
+	//OutPutDebugInt(m_ColliderList.size());
 
 	for (auto& pLeft : m_ColliderList)
 	{

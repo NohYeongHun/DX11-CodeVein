@@ -39,8 +39,8 @@ void CPlayer_AttackState::Enter(void* pArg)
 	m_iCurAnimIdx = pDesc->iAnimation_Idx;
 	m_eDir = pDesc->eDirection;
 	
-	m_pModelCom->Set_RootMotionTranslate(true);
 	m_pModelCom->Set_RootMotionRotation(true);
+	m_pModelCom->Set_RootMotionTranslate(true);
 	m_pModelCom->Set_Animation(m_iCurAnimIdx, m_isLoop);
 	
 	// 콜라이더 활성화 정보 초기화
@@ -74,28 +74,6 @@ void CPlayer_AttackState::Exit()
 	if (m_iNextState != -1)
 	{
 		m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, false);
-		//if (m_iNextState == CPlayer::PLAYER_STATE::IDLE)
-		//{
-		//	
-		//}
-		////else if (m_iNextState == CPlayer::PLAYER_STATE::GUARD)
-		////{
-		////	m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, false);
-		////}
-		//// 루트모션은 블렌딩안하기.
-	/*	//if (
-		//	m_iNextState == CPlayer::PLAYER_STATE::DODGE || 
-		//	m_iNextState == CPlayer::PLAYER_STATE::GUARD ||
-		//	m_iNextState == CPlayer::PLAYER_STATE::ATTACK
-		//)
-		//{
-		//	return;
-		//}*/
-		//else
-		//{
-		//	m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.1f, true, true, false);
-		//}
-		
 	}
 
 	//m_pFsm->Set_StateCoolTime(CPlayer::DODGE, 0.1f);
@@ -152,8 +130,8 @@ void CPlayer_AttackState::Change_State(_float fTimeDelta)
 
 		if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::STRONG_ATTACK))
 		{
-			/*if (m_iCurAnimIdx != m_pPlayer->Find_AnimationIndex(TEXT("ATTACK2")))
-				return;*/
+			if (m_iCurAnimIdx != m_pPlayer->Find_AnimationIndex(TEXT("ATTACK1")))
+				return;
 
 			if (!m_pFsm->Is_CoolTimeEnd(CPlayer::STRONG_ATTACK))
 				return;

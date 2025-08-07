@@ -37,7 +37,6 @@ void CPlayer_DodgeState::Update(_float fTimeDelta)
 	Handle_Input();
 	Change_State();
 
-	
 	if (m_pModelCom->Get_Current_Ratio() < 0.4f)
 	{
 		m_pPlayer->Move_Direction( m_pPlayer->Get_Transform()->Get_LookDirection_NoPitch(), fTimeDelta * 0.5f);
@@ -65,12 +64,7 @@ void CPlayer_DodgeState::Exit()
 			return;
 		}
 
-		m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, false);
-		//else if (m_iNextState == CPlayer::PLAYER_STATE::IDLE)
-		//	m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.05f, true, true, false);
-		//else
-		//d	m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, true);
-		
+		m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, true);
 	}
 
 	
@@ -135,19 +129,6 @@ void CPlayer_DodgeState::Change_State()
 			return;
 		}
 
-		//if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::STRONG_ATTACK))
-		//{
-		//	// 해당 동작은 쿨타임이 있는경우 무시됨.
-		//	if (!m_pFsm->Is_CoolTimeEnd(CPlayer::STRONG_ATTACK))
-		//		return;
-
-		//	m_iNextAnimIdx = m_pPlayer->Find_AnimationIndex(TEXT("STRONG_ATTACK1"));
-		//	m_iNextState = CPlayer::STRONG_ATTACK;
-		//	StrongAttack.iAnimation_Idx = m_iNextAnimIdx;
-		//	m_pFsm->Change_State(m_iNextState, &StrongAttack);
-		//	return;
-		//}
-
 		if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::GUARD))
 		{
 			// 해당 동작은 쿨타임이 있는경우 무시됨.
@@ -160,17 +141,6 @@ void CPlayer_DodgeState::Change_State()
 			m_pFsm->Change_State(m_iNextState, &Guard);
 			return;
 		}
-
-		//if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::DODGE))
-		//{
-		//	/*if (!m_pFsm->Is_CoolTimeEnd(CPlayer::DODGE))
-		//		return;*/
-		//	m_iNextAnimIdx = m_pPlayer->Find_AnimationIndex(TEXT("DODGE"));
-		//	m_iNextState = CPlayer::PLAYER_STATE::DODGE;
-		//	Dodge.iAnimation_Idx = m_iNextAnimIdx;
-		//	m_pFsm->Change_State(m_iNextState, &Dodge);
-		//	return;
-		//}
 	}
 
 

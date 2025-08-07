@@ -31,7 +31,7 @@ HRESULT CLoad_Animation::Initialize(std::ifstream& ifs)
 
 void CLoad_Animation::Update_TransformationMatrices(const vector<class CLoad_Bone*>& Bones, _bool isLoop, _bool* pFinished, BLEND_DESC& blendDesc, _float fTimeDelta)
 {
-    m_fCurrentTrackPosition += m_fTickPerSecond * fTimeDelta;
+    m_fCurrentTrackPosition += m_fTickPerSecond * m_fAnimSpeed * fTimeDelta;
 
     if (blendDesc.isBlending)
     {

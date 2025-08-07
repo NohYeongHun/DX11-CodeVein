@@ -55,6 +55,15 @@ public:
 		return !strcmp(pName, m_szName);
 	}
 
+#pragma region ROOT BONE 표시
+public:
+	void Set_Root() { m_isRoot = true; };
+	_bool Is_Root() { return m_isRoot; }
+
+private:
+	_bool m_isRoot = { false };
+#pragma endregion
+
 
 private:
 	_char m_szName[MAX_PATH] = {};

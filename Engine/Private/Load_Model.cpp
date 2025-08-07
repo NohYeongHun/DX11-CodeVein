@@ -34,8 +34,6 @@ CLoad_Model::CLoad_Model(const CLoad_Model& Prototype)
 		Safe_AddRef(material);
 
 	
-
-	
 }
 
 HRESULT CLoad_Model::Initialize_Prototype(MODELTYPE eModelType, _fmatrix PreTransformMatrix, string filePath, _wstring textureFolderPath)
@@ -114,12 +112,6 @@ HRESULT CLoad_Model::Render(_uint iNumMesh)
 	return S_OK;
 }
 
-//void CLoad_Model::Set_Animation(_uint iAnimIndex, _bool isLoop)
-//{
-//	m_isLoop = isLoop;
-//	m_iCurrentAnimIndex = iAnimIndex;
-//
-//}
 
 void CLoad_Model::Set_Animation(_uint iAnimIndex, _bool isLoop)
 {
@@ -128,6 +120,7 @@ void CLoad_Model::Set_Animation(_uint iAnimIndex, _bool isLoop)
 
 	// 루트 모션 연속성 처리 - 애니메이션 인덱스 변경 전에 해야 함!
 	_vector vCurrentRootPos = XMVectorZero();
+	XMVectorSetW(vCurrentRootPos, 1.f);
 	if (m_bRootMotionTranslate && m_iCurrentAnimIndex != iAnimIndex && m_iCurrentAnimIndex < m_Animations.size())
 	{
 		// 현재 루트본 위치 저장
@@ -144,16 +137,9 @@ void CLoad_Model::Set_Animation(_uint iAnimIndex, _bool isLoop)
 	m_isFinished = false;
 	m_isTrackEnd = false;
 
+	
+
 	XMStoreFloat4(&m_vOldPos, vCurrentRootPos);
-	//// 🔥 핵심: m_vOldPos를 현재 루트본 위치로 설정하여 연속성 보장
-	//if (m_bRootMotionTranslate)
-	//{
-	//	XMStoreFloat4(&m_vOldPos, vCurrentRootPos);
-	//}
-	//else
-	//{
-	//	XMStoreFloat4(&m_vOldPos, XMVectorZero());
-	//}
 }
 
 
@@ -352,9 +338,9 @@ _bool CLoad_Model::Play_Animation(_float fTimeDelta)
 		m_Bones, m_isLoop, &m_isFinished, m_BlendDesc, fTimeDelta
 	);
 
-	_matrix mat = m_Bones[m_iRoot_BoneIndex]->Get_TransformationMatrix();
-	mat.r[3] = XMVectorSet(0.f, 0.f, 0.f, 1.f);
-	m_Bones[m_iRoot_BoneIndex]->Set_TransformationMatrix(mat);
+	//_matrix mat = m_Bones[m_iRoot_BoneIndex]->Get_TransformationMatrix();
+	//mat.r[3] = XMVectorSet(0.f, 0.f, 0.f, 1.f);
+	//m_Bones[m_iRoot_BoneIndex]->Set_TransformationMatrix(mat);
 
 	for (_uint i = 0; i < m_Bones.size(); ++i)
 	{
@@ -404,7 +390,7 @@ void CLoad_Model::Set_BlendInfo(uint32_t iNextAnimIndex, _float fBlendTime, _boo
 	// 4. Animation Index를 변경
 	// m_iCurrentAnimIndex = iNextAnimIndex;
 
-	//m_Animations[iNextAnimIndex]->Reset();
+	m_Animations[iNextAnimIndex]->Reset();
 
 	// 5. 사용할 Animation Pointer 전달.
 	m_BlendDesc.pLoad_Animation = m_Animations[m_iCurrentAnimIndex];
@@ -426,6 +412,7 @@ void CLoad_Model::Handle_RootMotion(_float fTimeDelta)
 		// 0. 뼈의 이동 구하기.
 		_vector vLocalTranslate = vNewRootPos - XMLoadFloat4(&m_vOldPos);
 		//vLocalTranslate = XMVectorSetY(vLocalTranslate, 0.f); // Y축 제거
+
 
 		_vector vWorldTranslate = vLocalTranslate; // 기본값
 
@@ -450,6 +437,8 @@ void CLoad_Model::Handle_RootMotion(_float fTimeDelta)
 
 		XMStoreFloat4(&m_vOldPos, vNewRootPos);
 	}
+
+	
 
 	// 새로운 애니메이션의 루트본을 이전벡터에 넣어둔다.
 	rootMatrix.r[3] = XMVectorSet(0.f, 0.f, 0.f, 1.f);
@@ -532,7 +521,9 @@ HRESULT CLoad_Model::Load_Bones(std::ifstream& ifs)
 		// 5. 순회하면서 값채워넣기.
 		CLoad_Bone* pLoadBone = CLoad_Bone::Create(ifs);
 
-		if (pLoadBone->Compare_Name("Hips")) 
+		/*if (pLoadBone->Compare_Name("Hips")) 
+			m_iRoot_BoneIndex = i;*/
+		if (pLoadBone->Compare_Name("CHARA_OFFSET")) 
 			m_iRoot_BoneIndex = i;
 		
 
@@ -543,6 +534,7 @@ HRESULT CLoad_Model::Load_Bones(std::ifstream& ifs)
 		m_Bones.emplace_back(pLoadBone);
 	}
 
+	m_Bones[m_iRoot_BoneIndex]->Set_Root();
 	m_iNumBones = m_Bones.size();
 	return S_OK;
 }

@@ -61,7 +61,7 @@ void CPlayer_StrongAttackState::Exit()
 		//	return;
 		//}
 		//else 
-		m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, true);	
+		m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, false);	
 	}
 
 	
