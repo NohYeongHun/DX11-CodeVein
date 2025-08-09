@@ -9,6 +9,8 @@ CBounding::CBounding(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 }
 
 
+
+
 HRESULT CBounding::Initialize(BOUNDING_DESC* pBoundingDesc)
 {
     return S_OK;

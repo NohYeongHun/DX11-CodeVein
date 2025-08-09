@@ -49,7 +49,7 @@ private:
 	
 #pragma region 삭제 처리할 객체들을 Layer에서 빼서 모아둡니다. => IsDestroy 객체들.
 private:
-
+	list<class CGameObject*> m_DestroyObjects = {};
 #pragma endregion
 
 

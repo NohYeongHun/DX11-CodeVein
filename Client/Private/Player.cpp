@@ -58,6 +58,12 @@ HRESULT CPlayer::Initialize_Clone(void* pArg)
         return E_FAIL;
     }
 
+    if (FAILED(Ready_Colliders(pDesc)))
+    {
+        CRASH("Failed Ready_Colliders");
+        return E_FAIL;
+    }
+
     if (FAILED(Ready_Navigations()))
     {
         CRASH("Failed Ready_Navigations");
@@ -90,6 +96,7 @@ HRESULT CPlayer::Initialize_Clone(void* pArg)
     }
 
     
+    //m_pModelCom->Set_Animation(PLAYER_ANIM_IDLE_LSWORD, true);
         
 
 
@@ -107,15 +114,20 @@ HRESULT CPlayer::Initialize_Clone(void* pArg)
 
 void CPlayer::Priority_Update(_float fTimeDelta)
 {
-    __super::Priority_Update(fTimeDelta);
+    CContainerObject::Priority_Update(fTimeDelta);
 }
 
 void CPlayer::Update(_float fTimeDelta)
 {
-    __super::Update(fTimeDelta);
+    CContainerObject::Update(fTimeDelta);
     Update_KeyInput();
     HandleState(fTimeDelta);
     
+#ifdef _DEBUG
+    //m_pModelCom->Play_Animation(fTimeDelta);
+#endif // _DEBUG
+
+
     // Update 분기의 마지막 시점에 실행되어야 하는 함수 모음..
     Finalize_Update(fTimeDelta);
 }
@@ -123,15 +135,11 @@ void CPlayer::Update(_float fTimeDelta)
 void CPlayer::Finalize_Update(_float fTimeDelta)
 {
     m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
-    m_pGameInstance->Add_Collider_To_Manager(m_pColliderCom);
+    //m_pGameInstance->Add_Collider_To_Manager(m_pColliderCom);
 }
 
 void CPlayer::Late_Update(_float fTimeDelta)
 {
-
-    //m_pTransformCom->Set_State(STATE::POSITION
-    //    , m_pNavigationCom->Compute_OnCell(
-    //        m_pTransformCom->Get_State(STATE::POSITION), m_fOffsetY + 0.1f));
 
     m_pTransformCom->Set_State(STATE::POSITION
         , m_pNavigationCom->Compute_OnCell(
@@ -140,7 +148,7 @@ void CPlayer::Late_Update(_float fTimeDelta)
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::BLEND, this)))
         return;
 
-    __super::Late_Update(fTimeDelta);
+    CContainerObject::Late_Update(fTimeDelta);
 
 }
 
@@ -870,18 +878,27 @@ HRESULT CPlayer::Ready_Components(PLAYER_DESC* pDesc)
         , TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom), &Desc)))
         return E_FAIL;
 
+    return S_OK;
+}
+
+HRESULT CPlayer::Ready_Colliders(PLAYER_DESC* pDesc)
+{
     BOUNDING_BOX box = m_pModelCom->Get_BoundingBox();
     m_fOffsetY = box.fHeight * 0.5f;
 
-   
-
     CBounding_OBB::BOUNDING_OBB_DESC  OBBDesc{};
+    
     OBBDesc.vExtents = _float3(box.vExtents.x, box.vExtents.y, box.vExtents.z);
     OBBDesc.vCenter = _float3(0.f, box.vExtents.y, 0.f); // 중점.
     OBBDesc.vRotation = { m_pTransformCom->GetPitchFromQuaternion(),
         m_pTransformCom->GetYawFromQuaternion(),
         m_pTransformCom->GetRollFromQuaternion() };
     OBBDesc.pOwner = this;
+    OBBDesc.eCollisionType = CCollider::COLLISION_BODY;
+    OBBDesc.eMyLayer = CCollider::PLAYER;
+    OBBDesc.eTargetLayer = CCollider::MONSTER | CCollider::MONSTER_WEAPON
+        | CCollider::MONSTER_SKILL | CCollider::STATIC_OBJECT;
+    
 
     if (FAILED(__super::Add_Component(ENUM_CLASS(LEVEL::STATIC)
         , TEXT("Prototype_Component_Collider_OBB")
@@ -890,7 +907,9 @@ HRESULT CPlayer::Ready_Components(PLAYER_DESC* pDesc)
         CRASH("Failed Clone Collider OBB");
         return E_FAIL;
     }
-    
+
+    /* 생성과 동시에 등록 */
+    m_pGameInstance->Add_Collider_To_Manager(m_pColliderCom);
 
     return S_OK;
 }

@@ -108,7 +108,9 @@ void CLayer::Priority_Update(_float fTimeDelta)
 		if ((*iter)->Is_Destroy())
 		{
 			(*iter)->Destroy();
-			Safe_Release(*iter);
+			m_Destroyed.emplace_back(*iter);
+
+			//Safe_Release(*iter); // 이걸 안하는 건데..
 			iter = m_GameObjects.erase(iter);
 		}
 		else
@@ -141,6 +143,16 @@ void CLayer::Late_Update(_float fTimeDelta)
 		if (nullptr != pGameObject)
 			pGameObject->Late_Update(fTimeDelta);
 	}
+}
+
+/* 추가된 size만 반환. */
+size_t CLayer::PopDestroyedTo(std::list<CGameObject*>& out)
+{
+	size_t n = m_Destroyed.size();
+	if (n) {
+		out.splice(out.end(), m_Destroyed); // m_Destroyed -> out (move)
+	}
+	return n;
 }
 
 CLayer* CLayer::Create()

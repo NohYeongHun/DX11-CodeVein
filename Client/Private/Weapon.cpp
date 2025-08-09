@@ -42,30 +42,30 @@ HRESULT CWeapon::Initialize_Clone(void* pArg)
 
 void CWeapon::Priority_Update(_float fTimeDelta)
 {
-    __super::Priority_Update(fTimeDelta);
+    CGameObject::Priority_Update(fTimeDelta);
 }
 
 void CWeapon::Update(_float fTimeDelta)
 {
-    __super::Update(fTimeDelta);
+    CGameObject::Update(fTimeDelta);
 }
+
 
 void CWeapon::Finalize_Update(_float fTimeDelta)
 {
-    __super::Finalize_Update(fTimeDelta);
+    CGameObject::Finalize_Update(fTimeDelta);
 
     /* Collider의 Set Active는 Finalize_Update 이전에 호출됩니다. */
     if (m_pColliderCom)
     {
         _matrix WorldMatrix = XMLoadFloat4x4(&m_CombinedWorldMatrix);
         m_pColliderCom->Update(WorldMatrix);
-        m_pGameInstance->Add_Collider_To_Manager(m_pColliderCom);
     }
 }
 
 void CWeapon::Late_Update(_float fTimeDelta)
 {
-    __super::Late_Update(fTimeDelta);
+    CGameObject::Late_Update(fTimeDelta);
 }
 
 HRESULT CWeapon::Render()
@@ -79,10 +79,20 @@ void CWeapon::Update_Timer(_float fTimeDelta)
     Update_ColliderFrame(fTimeDelta);
 }
 
+
+
+#ifdef _DEBUG
+
+
+#endif // _DEBUG
+
+
+
 #pragma region 1. 무기는 충돌에 대한 상태제어를 할 수 있어야한다.=> 충돌에 따라 상태가 변하기도, 수치값이 바뀌기도한다.
+
+// 기본적으로 Owner랑은 충돌 처리 자체를 안한다.
 void CWeapon::On_Collision_Enter(CGameObject* pOther)
 {
-        
 }
 
 void CWeapon::On_Collision_Stay(CGameObject* pOther)
@@ -104,7 +114,7 @@ void CWeapon::Activate_ColliderFrame(_float fDuration)
 
 void CWeapon::Activate_Collider()
 {
-    OutputDebugWstring(TEXT("Collider Activate 호출 "));
+    //OutputDebugWstring(TEXT("Collider Activate 호출 "));
     m_pColliderCom->Set_Active(true);
     m_IsColliderActive = true;
 }

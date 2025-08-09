@@ -480,6 +480,9 @@
     <ClInclude Include="..\Public\KnightShield.h">
       <Filter>02. GameObject\Monster\Boss\QueenKnight\Weapon</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Client_Debug.h">
+      <Filter>99. Defines</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">

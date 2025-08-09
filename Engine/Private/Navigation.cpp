@@ -23,37 +23,6 @@ CNavigation::CNavigation(const CNavigation& Prototype)
 #endif
 }
 
-//HRESULT CNavigation::Initialize_Prototype(const _tchar* pNavigationFilePath)
-//{
-//	_ulong			dwByte = { };
-//	HANDLE			hFile = CreateFile(pNavigationFilePath, GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
-//
-//	while (true)
-//	{
-//		_float3		vPoints[3];
-//
-//		ReadFile(hFile, vPoints, sizeof(_float3) * 3, &dwByte, nullptr);
-//		if (0 == dwByte)
-//			break;
-//
-//		CCell* pCell = CCell::Create(m_pDevice, m_pContext, vPoints, m_Cells.size());
-//		if (nullptr == pCell)
-//			return E_FAIL;
-//
-//		m_Cells.push_back(pCell);
-//	}
-//
-//	SetUp_Neighbors();
-//
-//#ifdef _DEBUG
-//	m_pShader = CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Engine_Shader_Cell.hlsl"), VTXPOS::Elements, VTXPOS::iNumElements);
-//	if (nullptr == m_pShader)
-//		return E_FAIL;
-//#endif
-//
-//	return S_OK;
-//}
-
 HRESULT CNavigation::Initialize_Prototype(const _char* pNavigationFilePath)
 {
 	std::ifstream ifs(pNavigationFilePath, std::ios::binary);

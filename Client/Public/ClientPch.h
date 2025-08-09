@@ -153,6 +153,14 @@
 #include "SkyBossTree.h"
 /* ======================================== Sky Boss ===================================== */
 #include "SkyBoss.h"
+
+
+
+/* ======================================== DEBUG 용도 ===================================== */
+
+#ifdef _DEBUG
+#include "Client_Debug.h"
+#endif
 #pragma endregion
 
 

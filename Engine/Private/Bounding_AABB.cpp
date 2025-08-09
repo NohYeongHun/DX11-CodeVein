@@ -5,6 +5,7 @@ CBounding_AABB::CBounding_AABB(ID3D11Device* pDevice, ID3D11DeviceContext* pCont
 {
 }
 
+
 const _float3 CBounding_AABB::Get_WorldCenter()
 {
 	return m_pDesc->Center;
@@ -13,6 +14,11 @@ const _float3 CBounding_AABB::Get_WorldCenter()
 HRESULT CBounding_AABB::Initialize(BOUNDING_DESC* pBoundingDesc)
 {
 	BOUNDING_AABB_DESC* pDesc = static_cast<BOUNDING_AABB_DESC*>(pBoundingDesc);
+	
+#ifdef _DEBUG
+	m_DebugDesc = *pDesc;
+#endif // _DEBUG
+
 	
 	m_pOriginalDesc = new BoundingBox(pDesc->vCenter, pDesc->vExtents);
 	m_pDesc = new BoundingBox(*m_pOriginalDesc);
@@ -30,6 +36,23 @@ void CBounding_AABB::Update(_fmatrix WorldMatrix)
 
 	m_pOriginalDesc->Transform(*m_pDesc, TransformMatrix);
 
+}
+
+void CBounding_AABB::Change_BoundingDesc(BOUNDING_DESC* pBoundingDesc)
+{
+	if (nullptr == pBoundingDesc)
+		return;
+
+	BOUNDING_AABB_DESC* pDesc = static_cast<BOUNDING_AABB_DESC*>(pBoundingDesc);
+
+	m_pOriginalDesc->Center = pDesc->vCenter;
+	m_pOriginalDesc->Extents = pDesc->vExtents;
+}
+
+void CBounding_AABB::Reset_Bounding()
+{
+	m_pDesc->Center = m_pOriginalDesc->Center;
+	m_pDesc->Extents = m_pOriginalDesc->Extents;
 }
 
 #ifdef _DEBUG
@@ -64,22 +87,7 @@ _bool CBounding_AABB::Intersect(COLLIDER eColliderType, CBounding* pBounding)
 }
 
 
-void CBounding_AABB::Change_BoundingDesc(BOUNDING_DESC* pBoundingDesc)
-{
-	if (nullptr == pBoundingDesc)
-		return;
 
-	BOUNDING_AABB_DESC* pDesc = static_cast<BOUNDING_AABB_DESC*>(pBoundingDesc);
-
-	m_pDesc->Center = pDesc->vCenter;
-	m_pDesc->Extents = pDesc->vExtents;
-}
-
-void CBounding_AABB::Reset_Bounding()
-{
-	m_pDesc->Center = m_pOriginalDesc->Center;
-	m_pDesc->Extents = m_pOriginalDesc->Extents;
-}
 
 CBounding_AABB* CBounding_AABB::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CBounding::BOUNDING_DESC* pBoundingDesc)
 {

@@ -68,7 +68,6 @@ void CLoad_Animation::Blend_Update_TransformationMatrices(const vector<class CLo
     _float fRatio = m_fBlendTrackPosition / blendDesc.fBlendDuration;
     fRatio = min(fRatio, 1.f);
 
-    // Blending 종료. => 한번에 되버리잖아?
     if (m_fBlendTrackPosition >= blendDesc.fBlendDuration)
     {
         blendDesc.isBlending = false;

@@ -38,8 +38,10 @@ HRESULT CMonster::Initialize_Clone(void* pArg)
     m_MonsterStat.fAttackRange = pDesc->fAttackRange;
     m_MonsterStat.fDetectionRange = pDesc->fDetectionRange;
     m_MonsterStat.fMaxHP = pDesc->fMaxHP;
+    m_MonsterStat.fHP = pDesc->fMaxHP;
     m_MonsterStat.fMoveSpeed = pDesc->fMoveSpeed;
     m_MonsterStat.fRotationSpeed = pDesc->fRotationPerSec;
+    
 
     /* 기본적으로 몬스터는 모두 Navigation 설정. */
     if (FAILED(Ready_Components(pDesc)))
@@ -59,12 +61,12 @@ HRESULT CMonster::Initialize_Clone(void* pArg)
 
 void CMonster::Priority_Update(_float fTimeDelta)
 {
-    __super::Priority_Update(fTimeDelta);
+    CContainerObject::Priority_Update(fTimeDelta);
 }
 
 void CMonster::Update(_float fTimeDelta)
 { 
-    __super::Update(fTimeDelta);
+    CContainerObject::Update(fTimeDelta);
 }
 
 void CMonster::Finalize_Update(_float fTimeDelta)
@@ -78,14 +80,15 @@ void CMonster::Finalize_Update(_float fTimeDelta)
         m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
 
         /* 콜라이더 매니저에서 상태비교 하는거는 카메라 프러스텀을 이용해서 제어. */
-        if (m_pGameInstance->Is_In_Camera_Frustum(m_pTransformCom->Get_State(STATE::POSITION)))
-            m_pGameInstance->Add_Collider_To_Manager(m_pColliderCom);
+        //if (m_pGameInstance->Is_In_Camera_Frustum(m_pTransformCom->Get_State(STATE::POSITION)))
+        //    m_pGameInstance->Add_Collider_To_Manager(m_pColliderCom);
     }
 }
 
 void CMonster::Late_Update(_float fTimeDelta)
 {
-    __super::Late_Update(fTimeDelta);
+    CContainerObject::Late_Update(fTimeDelta);
+
 }
 
 HRESULT CMonster::Render()
@@ -110,7 +113,6 @@ void CMonster::On_Collision_Exit(CGameObject* pOther)
 void CMonster::Change_Animation_NonBlend(_uint iNextAnimIdx, _bool IsLoop)
 {
     m_pModelCom->Set_Animation(iNextAnimIdx, IsLoop);
-    //m_pModelCom->Animation_Reset();
 }
 
 void CMonster::Change_Animation_Blend(_uint iNextAnimIdx, _bool IsLoop, _float fBlendDuration, _bool bScale, _bool bRotate, _bool bTranslate)
@@ -120,8 +122,7 @@ void CMonster::Change_Animation_Blend(_uint iNextAnimIdx, _bool IsLoop, _float f
         , fBlendDuration, bScale, bRotate
         , bTranslate);
     /* 애니메이션 변경. */
-    m_pModelCom->Set_Animation(iNextAnimIdx, IsLoop);
-    m_pModelCom->Animation_Reset();
+    m_pModelCom->Set_Animation(iNextAnimIdx, IsLoop); 
 }
 
 // 연계 공격 전용
@@ -402,12 +403,18 @@ void CMonster::RotateTurn_ToTarget()
 
 void CMonster::RotateTurn_ToTargetYaw(_float fTimeDelta)
 {
+
     // 현재 몬스터 위치와 타겟 위치
     _vector vMyPos = m_pTransformCom->Get_State(STATE::POSITION);
     _vector vTargetPos = m_pTarget->Get_Transform()->Get_State(STATE::POSITION);
 
     // 방향 벡터 계산 (Y축 제거하여 지면에서만 회전)
     _vector vDirection = vTargetPos - vMyPos;
+    
+    // 너무 가까이에 있으면 회전을 자제한다. => 
+    if (XMVectorGetX(XMVector4Length(vDirection)) < m_fMinRotationDistance)
+        return;
+
     vDirection = XMVectorSetY(vDirection, 0.f);
     vDirection = XMVector3Normalize(vDirection);
 
@@ -455,8 +462,13 @@ void CMonster::RotateTurn_ToTargetYaw()
     _vector vMyPos = m_pTransformCom->Get_State(STATE::POSITION);
     _vector vTargetPos = m_pTarget->Get_Transform()->Get_State(STATE::POSITION);
 
-    // 방향 벡터 계산 (Y축 제거)
+    
     _vector vDirection = vTargetPos - vMyPos;
+
+    if (XMVectorGetX(XMVector4Length(vDirection)) < m_fMinRotationDistance)
+        return;
+
+    // 방향 벡터 계산 (Y축 제거)
     vDirection = XMVectorSetY(vDirection, 0.f);
 
     if (XMVectorGetX(XMVector3Length(vDirection)) < 0.001f)
@@ -510,8 +522,19 @@ const _bool CMonster::IsRotateFinished(_float fRadian)
 #pragma endregion
 
 
+#pragma region 6. 몬스터 삭제 처리.
+_bool CMonster::Monster_Dead()
+{
+    // 피가 0이면서 Dead 상태이면서.
+    return m_MonsterStat.fHP <= 0.f && HasBuff(BUFF_DEAD) 
+        && m_BuffTimers[BUFF_DEAD] <= 0.f;
+}
+
+#pragma endregion
+
 #pragma region 99. DEBUG용도 함수.
 #ifdef _DEBUG
+
 void CMonster::Print_Position()
 {
     _float3 vDebugPos = {};

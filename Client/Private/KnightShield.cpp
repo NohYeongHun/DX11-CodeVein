@@ -24,35 +24,54 @@ HRESULT CKnightShield::Initialize(void* pArg)
         return E_FAIL;
 
     if (FAILED(Ready_Components()))
+    {
+        CRASH("Failed Ready_Components");
         return E_FAIL;
+    }
+
+    if (FAILED(Ready_Colliders()))
+    {
+        CRASH("Failed Ready_Components");
+        return E_FAIL;
+    }
+        
+
+    m_pTransformCom->Add_Rotation(XMConvertToRadians(180.f), 0.f, -90.f);
 
     return S_OK;
 }
 
 void CKnightShield::Priority_Update(_float fTimeDelta)
 {
-    __super::Priority_Update(fTimeDelta);
+    CWeapon::Priority_Update(fTimeDelta);
 }
 
 void CKnightShield::Update(_float fTimeDelta)
 {
-    __super::Update(fTimeDelta);
+    CWeapon::Update(fTimeDelta);
 
     XMStoreFloat4x4(&m_CombinedWorldMatrix,
         m_pTransformCom->Get_WorldMatrix() *
         XMLoadFloat4x4(m_pSocketMatrix) *
         XMLoadFloat4x4(m_pParentMatrix));
+
+    CWeapon::Finalize_Update(fTimeDelta);
 }
 
 void CKnightShield::Late_Update(_float fTimeDelta)
 {
-    __super::Late_Update(fTimeDelta);
+    CWeapon::Late_Update(fTimeDelta);
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::BLEND, this)))
         return;
 }
 
 HRESULT CKnightShield::Render()
 {
+#ifdef _DEBUG
+    //Edit_Collider(m_pColliderCom, "QueenKnight Shield");
+    m_pColliderCom->Render();
+#endif // _DEBUG
+
     if (FAILED(Bind_ShaderResources()))
     {
         CRASH("Ready Render Resource Failed");
@@ -105,6 +124,34 @@ HRESULT CKnightShield::Ready_Components()
         CRASH("Failed Load Model")
         return E_FAIL;
     }
+
+    return S_OK;
+}
+
+HRESULT CKnightShield::Ready_Colliders()
+{
+    BOUNDING_BOX box = m_pModelCom->Get_BoundingBox();
+
+    CBounding_OBB::BOUNDING_OBB_DESC  OBBDesc{};
+    OBBDesc.vExtents = _float3(box.vExtents.x, box.vExtents.y, box.vExtents.z);
+    OBBDesc.vCenter = _float3(0.f, box.vExtents.y, 0.f); // 중점.
+    OBBDesc.vRotation = _float3(1.5f, 0.f, 0.f); // 중점.
+    OBBDesc.pOwner = this;
+    OBBDesc.eCollisionType = CCollider::COLLISION_TRIGGER;
+    OBBDesc.eMyLayer = CCollider::MONSTER_WEAPON;
+    OBBDesc.eTargetLayer = CCollider::PLAYER | CCollider::PLAYER_WEAPON |
+        CCollider::PLAYER_SKILL | CCollider::STATIC_OBJECT;
+
+    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC)
+        , TEXT("Prototype_Component_Collider_OBB")
+        , TEXT("Com_Collider"), reinterpret_cast<CComponent**>(&m_pColliderCom), &OBBDesc)))
+    {
+        CRASH("Failed Clone Collider OBB");
+        return E_FAIL;
+    }
+
+    /* 생성과 동시에 등록 */
+    m_pGameInstance->Add_Collider_To_Manager(m_pColliderCom);
 
     return S_OK;
 }

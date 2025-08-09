@@ -7,13 +7,22 @@ class ENGINE_DLL CBounding abstract : public CBase
 public:
 	typedef struct tagBoundingDesc : public CCollider::COLLIDER_DESC
 	{
-		class CGameObject* pOwner = { nullptr };
 		_float3		vCenter;
 	}BOUNDING_DESC;
 
 protected:
 	CBounding(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual ~CBounding() = default;
+
+#pragma region 디버깅 용도
+
+#ifdef _DEBUG
+	
+#endif // _DEBUG
+
+
+#pragma endregion
+
 
 
 public:

@@ -28,9 +28,11 @@ public:
 	void Update(_float fTimeDelta);
 	void Late_Update(_float fTimeDelta);
 
+	size_t PopDestroyedTo(std::list<CGameObject*>& out);
 
 private:
-	list<class CGameObject*>			m_GameObjects;
+	list<class CGameObject*> m_GameObjects;
+	list<class CGameObject*> m_Destroyed;
 
 public:
 	static CLayer* Create();

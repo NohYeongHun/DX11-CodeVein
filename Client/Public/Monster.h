@@ -130,6 +130,7 @@ public:
 protected:
     MONSTER_STAT m_MonsterStat = {};
     _float m_fMinDetectionDistance = 5.f;
+    _float m_fMinRotationDistance = 2.f;
 #pragma endregion
 
 
@@ -186,6 +187,13 @@ public:
 
 #pragma endregion
     
+
+#pragma region 6. 몬스터 삭제 처리.
+public:
+    virtual _bool Monster_Dead();
+
+#pragma endregion
+
 
 #pragma region 99. DEBUG 용도 함수.
 

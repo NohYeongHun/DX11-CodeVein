@@ -15,6 +15,21 @@ private:
 	virtual ~CBounding_AABB() = default;
 
 
+#pragma region DEBUG 용도
+
+#ifdef _DEBUG
+public:
+	CBounding_AABB::BOUNDING_AABB_DESC* Get_DebugDesc() { return &m_DebugDesc; }
+
+private:
+	CBounding_AABB::BOUNDING_AABB_DESC m_DebugDesc = {};
+#endif // DEBUG
+	
+#pragma endregion
+public:
+	virtual void Change_BoundingDesc(BOUNDING_DESC* pBoundingDesc) override;
+	virtual void Reset_Bounding() override;
+
 public:
 	const BoundingBox* Get_Desc() const {
 		return m_pDesc;
@@ -36,13 +51,13 @@ public:
 	virtual _bool Intersect(COLLIDER eColliderType, CBounding* pBounding) override;
 #pragma endregion
 
-public:
-	virtual void Change_BoundingDesc(BOUNDING_DESC* pBoundingDesc) override;
-	virtual void Reset_Bounding() override;
+
 
 private:
 	BoundingBox* m_pOriginalDesc = { nullptr };
 	BoundingBox* m_pDesc = { nullptr };
+
+
 
 public:
 	static CBounding_AABB* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CBounding::BOUNDING_DESC* pBoundingDesc);

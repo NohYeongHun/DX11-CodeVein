@@ -6,6 +6,9 @@ CBT_QueenKnight_FirstPhase_AttackAction::CBT_QueenKnight_FirstPhase_AttackAction
 
 BT_RESULT CBT_QueenKnight_FirstPhase_AttackAction::Perform_Action(_float fTimeDelta)
 {
+    if (m_pOwner->HasBuff(CMonster::BUFF_DEAD))
+        return BT_RESULT::FAILURE;
+
     switch (m_eAttackPhase)
     {
     case ATTACK_PHASE::NONE:

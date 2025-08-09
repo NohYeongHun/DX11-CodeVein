@@ -76,7 +76,7 @@ void CPlayer_GuardState::Reset()
 	m_eDir = { ACTORDIR::END };
 	m_iNextAnimIdx = -1;
 	m_iCurAnimIdx = -1;
-	m_pModelCom->Animation_Reset();
+	//m_pModelCom->Animation_Reset();
 
 }
 

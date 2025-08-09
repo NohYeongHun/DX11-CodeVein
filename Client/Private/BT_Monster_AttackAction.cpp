@@ -7,6 +7,9 @@ CBT_Monster_AttackAction::CBT_Monster_AttackAction(CMonster* pOwner)
 
 BT_RESULT CBT_Monster_AttackAction::Perform_Action(_float fTimeDelta)
 {
+    if (m_pOwner->HasBuff(CMonster::BUFF_DEAD))
+        return BT_RESULT::FAILURE;
+
     switch (m_eAttackPhase)
     {
     case ATTACK_PHASE::NONE:

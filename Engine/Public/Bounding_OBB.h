@@ -22,6 +22,11 @@ private:
 	explicit CBounding_OBB(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual ~CBounding_OBB() = default;
 
+
+public:
+	virtual HRESULT Initialize(BOUNDING_DESC* pBoundingDesc);
+	virtual void Update(_fmatrix WorldMatrix);
+
 public:
 	const BoundingOrientedBox* Get_Desc() const {
 		return m_pDesc;
@@ -29,9 +34,25 @@ public:
 
 	virtual const _float3 Get_WorldCenter() override;
 
+#pragma region DEBUG 용도
+
+
+
+#ifdef _DEBUG
 public:
-	virtual HRESULT Initialize(BOUNDING_DESC* pBoundingDesc);
-	virtual void Update(_fmatrix WorldMatrix);
+	CBounding_OBB::BOUNDING_OBB_DESC* Get_DebugDesc() { return &m_DebugDesc; }
+
+private:
+	CBounding_OBB::BOUNDING_OBB_DESC m_DebugDesc = {};
+
+#endif // DEBUG
+
+#pragma endregion
+
+
+public:
+	virtual void Change_BoundingDesc(BOUNDING_DESC* pBoundingDesc) override;
+	virtual void Reset_Bounding() override;
 
 #ifdef _DEBUG
 	virtual HRESULT Render(PrimitiveBatch<VertexPositionColor>* pBatch, _fvector vColor = DirectX::Colors::White) override;
@@ -42,13 +63,12 @@ public:
 	virtual _bool Intersect(COLLIDER eColliderType, CBounding* pBounding) override;
 #pragma endregion
 
-	virtual void Change_BoundingDesc(BOUNDING_DESC* pBoundingDesc) override;
-	virtual void Reset_Bounding() override;
 
 
 private:
 	BoundingOrientedBox* m_pOriginalDesc = { nullptr };
 	BoundingOrientedBox* m_pDesc = { nullptr };
+	_float3 m_vRotation = {};
 
 public:
 	static CBounding_OBB* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CBounding::BOUNDING_DESC* pBoundingDesc);

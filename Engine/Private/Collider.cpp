@@ -7,7 +7,7 @@ CCollider::CCollider(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 
 CCollider::CCollider(const CCollider& Prototype)
     : CComponent(Prototype)
-    , m_eType{ Prototype.m_eType }
+    , m_eColliderShape{ Prototype.m_eColliderShape }
 #ifdef _DEBUG
     , m_pBatch{ Prototype.m_pBatch }
     , m_pEffect{ Prototype.m_pEffect }
@@ -21,11 +21,74 @@ CCollider::CCollider(const CCollider& Prototype)
 
 }
 
+#pragma region 0. 초기화 함수.
+HRESULT CCollider::Initialize_Prototype(COLLIDER eType)
+{
+    m_eColliderShape = eType;
+
+    /* Render용 추가 .*/
+#ifdef _DEBUG
+    m_pBatch = new PrimitiveBatch<VertexPositionColor>(m_pContext);
+    m_pEffect = new BasicEffect(m_pDevice);
+
+    m_pEffect->SetVertexColorEnabled(true);
+
+    const void* pShaderByteCode = { nullptr };
+    size_t		iShaderByteCodeLength = {};
+
+    m_pEffect->GetVertexShaderBytecode(&pShaderByteCode, &iShaderByteCodeLength);
+
+    if (FAILED(m_pDevice->CreateInputLayout(VertexPositionColor::InputElements, VertexPositionColor::InputElementCount,
+        pShaderByteCode, iShaderByteCodeLength, &m_pInputLayout)))
+        return E_FAIL;
+#endif
+    return S_OK;
+}
+
+HRESULT CCollider::Initialize_Clone(void* pArg)
+{
+    CBounding::BOUNDING_DESC* pBoundingDesc = static_cast<CBounding::BOUNDING_DESC*>(pArg);
+    m_pOwner = pBoundingDesc->pOwner;
+    m_eCollisionType = pBoundingDesc->eCollisionType;
+    m_eMyLayer = pBoundingDesc->eMyLayer;
+    m_TargetLayers = pBoundingDesc->eTargetLayer;
+
+    switch (m_eColliderShape)
+    {
+    case COLLIDER::AABB:
+        m_pBounding = CBounding_AABB::Create(m_pDevice, m_pContext, pBoundingDesc);
+        break;
+    case COLLIDER::OBB:
+        m_pBounding = CBounding_OBB::Create(m_pDevice, m_pContext, pBoundingDesc);
+        break;
+    case COLLIDER::SPHERE:
+        m_pBounding = CBounding_Sphere::Create(m_pDevice, m_pContext, pBoundingDesc);
+        break;
+    }
+
+    CBounding_AABB::BOUNDING_AABB_DESC Desc{};
+    Desc.vCenter = pBoundingDesc->vCenter;
+    Desc.vExtents = { 10.f, 10.f, 10.f };
+    m_pWorldBounding = CBounding_AABB::Create(m_pDevice, m_pContext, &Desc);
+
+
+    m_IsActive = true;
+    return S_OK;
+}
+
+
+
+#pragma endregion
+
+
+#pragma region  0. 충돌체가 가져야 하는 식별 정보와 관련 함수들.
+// 1. 주인 체크
 CGameObject* CCollider::Get_Owner()
 {
     return m_pOwner;
 }
 
+//2. 활성화 상태 체크
 const _bool CCollider::Is_Active()
 {
     return m_IsActive;
@@ -35,8 +98,26 @@ const _bool CCollider::Is_Active()
 void CCollider::Set_Active(_bool IsActive)
 {
     m_IsActive = IsActive;
-
     m_vColor = !m_IsActive ? DirectX::Colors::Aqua : DirectX::Colors::Black;
+}
+
+// 3. Layer 체크 => 해당 안되면 바로 무시.
+_bool CCollider::Has_TargetLayer(CCollider* pRight)
+{
+    // 비트 연산해서 비트가 하나라도 0이 아니라면. True 반환.
+    return (m_TargetLayers & pRight->m_eMyLayer) != 0;
+}
+
+
+#pragma endregion
+
+
+
+#pragma region 3. Collider Manager에서 호출하는 충돌 관리용 함수.
+
+_bool CCollider::Has_TargetLayerCheck(CCollider* pRight)
+{
+    return Has_TargetLayer(pRight);
 }
 
 const _bool CCollider::Find_ColliderObject(CGameObject* pColliderObject)
@@ -56,6 +137,35 @@ void CCollider::Insert_ColliderObject(CGameObject* pColliderObject)
     m_ColliderObjects.insert(pColliderObject);
 }
 
+#ifdef _DEBUG
+
+void* CCollider::Get_BoundingDesc()
+{
+    switch (m_eColliderShape)
+    {
+        case COLLIDER::AABB:
+        {
+            CBounding_AABB* pAABB = static_cast<CBounding_AABB*>(m_pBounding);
+            return static_cast<void*>(pAABB->Get_DebugDesc());
+        }
+
+        case COLLIDER::OBB:
+        {
+            CBounding_OBB* pOBB = static_cast<CBounding_OBB*>(m_pBounding);
+            return static_cast<void*>(pOBB->Get_DebugDesc());
+        }
+
+        case COLLIDER::SPHERE:
+        {
+            CBounding_Sphere* pOBB = static_cast<CBounding_Sphere*>(m_pBounding);
+            return static_cast<void*>(pOBB->Get_DebugDesc());
+        }
+    }
+    return nullptr;
+}
+
+
+
 void CCollider::Change_BoundingDesc(void* pBoundingDesc)
 {
     m_pBounding->Change_BoundingDesc(static_cast<CBounding::BOUNDING_DESC*>(pBoundingDesc));
@@ -65,71 +175,31 @@ void CCollider::Reset_Bounding()
 {
     m_pBounding->Reset_Bounding();
 }
+#endif // _DEBUG
 
-HRESULT CCollider::Initialize_Prototype(COLLIDER eType)
-{
-    m_eType = eType;
 
-    /* Render용 추가 .*/
-#ifdef _DEBUG
-    m_pBatch = new PrimitiveBatch<VertexPositionColor>(m_pContext);
-    m_pEffect = new BasicEffect(m_pDevice);
 
-    m_pEffect->SetVertexColorEnabled(true);
+#pragma endregion
 
-    const void* pShaderByteCode = { nullptr };
-    size_t		iShaderByteCodeLength = {};
 
-    m_pEffect->GetVertexShaderBytecode(&pShaderByteCode, &iShaderByteCodeLength);
 
-    if (FAILED(m_pDevice->CreateInputLayout(VertexPositionColor::InputElements, VertexPositionColor::InputElementCount,
-        pShaderByteCode, iShaderByteCodeLength, &m_pInputLayout)))
-        return E_FAIL;
-
-#endif
-
-   
-
-    return S_OK;
-}
-
-HRESULT CCollider::Initialize_Clone(void* pArg)
-{
-    CBounding::BOUNDING_DESC* pBoundingDesc = static_cast<CBounding::BOUNDING_DESC*>(pArg);
-    m_pOwner = pBoundingDesc->pOwner;
-
-    switch (m_eType)
-    {
-    case COLLIDER::AABB:
-        m_pBounding = CBounding_AABB::Create(m_pDevice, m_pContext, pBoundingDesc);
-        break;
-    case COLLIDER::OBB:
-        m_pBounding = CBounding_OBB::Create(m_pDevice, m_pContext, pBoundingDesc);
-        break;
-    case COLLIDER::SPHERE:
-        m_pBounding = CBounding_Sphere::Create(m_pDevice, m_pContext, pBoundingDesc);
-        break;
-    }
-
-    m_IsActive = true;
-    return S_OK;
-}
-
+#pragma region 5. 매프레임 업데이트 되는 함수
 void CCollider::Update(_fmatrix WorldMatrix)
 {
     m_pBounding->Update(WorldMatrix);
-
-    //if (m_pOwner->Get_ObjectTag() == TEXT("PlayerWeapon"))
-    //{
-    //    if (m_IsActive)
-    //        OutputDebugWstring(TEXT("현재 bool 값은 true 입니다."));
-    //}
+    m_pWorldBounding->Update(WorldMatrix);
 }
 
 _bool CCollider::Intersect(const CCollider* pTargetCollider)
 {
-    return m_pBounding->Intersect(pTargetCollider->m_eType, pTargetCollider->m_pBounding);
+    return m_pBounding->Intersect(pTargetCollider->m_eColliderShape, pTargetCollider->m_pBounding);
 }
+_bool CCollider::BroadIntersect(const CCollider* pTargetCollider)
+{
+    return m_pWorldBounding->Intersect(pTargetCollider->m_eColliderShape, pTargetCollider->m_pWorldBounding);
+}
+#pragma endregion
+
 
 #ifdef _DEBUG
 HRESULT CCollider::Render()
@@ -144,6 +214,8 @@ HRESULT CCollider::Render()
     m_pBatch->Begin();
 
     m_pBounding->Render(m_pBatch, m_vColor);
+
+    //m_pWorldBounding->Render(m_pBatch, m_vColor);
 
     m_pBatch->End();
 
@@ -194,4 +266,5 @@ void CCollider::Free()
 
 
     Safe_Release(m_pBounding);
+    Safe_Release(m_pWorldBounding);
 }
