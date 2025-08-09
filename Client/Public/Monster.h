@@ -188,6 +188,13 @@ public:
 #pragma endregion
     
 
+#pragma region 6. 몬스터 삭제 처리.
+public:
+    virtual _bool Monster_Dead();
+
+#pragma endregion
+
+
 #pragma region 99. DEBUG 용도 함수.
 
 #ifdef _DEBUG

@@ -35,24 +35,32 @@ HRESULT CContainerObject::Initialize_Clone(void* pArg)
 
 void CContainerObject::Priority_Update(_float fTimeDelta)
 {
-    __super::Priority_Update(fTimeDelta);
+    CGameObject::Priority_Update(fTimeDelta);
     for (auto& pPartObject : m_PartObjects)
         pPartObject.second->Priority_Update(fTimeDelta);
 }
 
 void CContainerObject::Update(_float fTimeDelta)
 {
-    __super::Update(fTimeDelta);
+    CGameObject::Update(fTimeDelta);
     for (auto& pPartObject : m_PartObjects)
         pPartObject.second->Update(fTimeDelta);
 
 }
 
+/* 주인 객체가 Destroy면? 파츠들도 다 Destroy */
 void CContainerObject::Late_Update(_float fTimeDelta)
 {
-    __super::Late_Update(fTimeDelta);
+    CGameObject::Late_Update(fTimeDelta);
+
     for (auto& pPartObject : m_PartObjects)
+    {
         pPartObject.second->Late_Update(fTimeDelta);
+
+        if (m_IsDestroy)
+            pPartObject.second->Set_Destroy(true);
+    }
+        
 
 }
 

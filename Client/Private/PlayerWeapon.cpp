@@ -26,7 +26,17 @@ HRESULT CPlayerWeapon::Initialize(void* pArg)
         return E_FAIL;
 
     if (FAILED(Ready_Components()))
+    {
+        CRASH("Failed Ready_Components");
         return E_FAIL;
+    }
+
+    if (FAILED(Ready_Colliders()))
+    {
+        CRASH("Failed Ready_Colliders");
+        return E_FAIL;
+    }
+        
 
     /*m_pTransformCom->Scaling(_float3(0.1f, 0.1f, 0.1f));
     m_pTransformCom->Rotation(XMVectorSet(0.f, 1.f, 0.f, 0.f), XMConvertToRadians(90.0f));
@@ -44,7 +54,7 @@ void CPlayerWeapon::Priority_Update(_float fTimeDelta)
 /* Weapon은 CombinedWorldMatrix를 Collider에 전달 해주어야합니다. => 부모 트랜스폼이 있으므로 */
 void CPlayerWeapon::Update(_float fTimeDelta)
 {
-    __super::Update(fTimeDelta);
+    CWeapon::Update(fTimeDelta);
     // 1. 가장 먼저 Combined 행렬 초기화
     XMStoreFloat4x4(&m_CombinedWorldMatrix,
         m_pTransformCom->Get_WorldMatrix() *
@@ -57,12 +67,12 @@ void CPlayerWeapon::Update(_float fTimeDelta)
 
 void CPlayerWeapon::Finalize_Update(_float fTimeDelta)
 {
-    __super::Finalize_Update(fTimeDelta);
+    CWeapon::Finalize_Update(fTimeDelta);
 }
 
 void CPlayerWeapon::Late_Update(_float fTimeDelta)
 {
-    __super::Late_Update(fTimeDelta);
+    CWeapon::Late_Update(fTimeDelta);
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::NONBLEND, this)))
         return;
 }
@@ -71,7 +81,7 @@ HRESULT CPlayerWeapon::Render()
 {
 
 #ifdef _DEBUG
-if (m_pColliderCom)
+    //Edit_Collider(m_pColliderCom, "Player Weapon");
     m_pColliderCom->Render();
 #endif // _DEBUG
 
@@ -103,8 +113,8 @@ if (m_pColliderCom)
 void CPlayerWeapon::On_Collision_Enter(CGameObject* pOther)
 {
     CWeapon::On_Collision_Enter(pOther);
-
-    OutputDebugWstring(pOther->Get_ObjectTag() + TEXT("충돌"));
+        
+    //OutputDebugWstring(pOther->Get_ObjectTag() + TEXT("충돌"));
     //CWeapon::Deactivate_Collider();
 }
 
@@ -154,21 +164,45 @@ HRESULT CPlayerWeapon::Ready_Components()
         TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom), &Desc)))
         return E_FAIL;
 
-    BOUNDING_BOX box = m_pModelCom->Get_BoundingBox();
-    CBounding_AABB::BOUNDING_AABB_DESC  AABBDesc{};
-    AABBDesc.vExtents = _float3(box.vExtents.x, box.vExtents.y, box.vExtents.z);
-    AABBDesc.vCenter = _float3(0.f, 0.f, 0.f); // 중점.
-    AABBDesc.pOwner = this;
+    
 
-    if (FAILED(__super::Add_Component(ENUM_CLASS(LEVEL::STATIC)
-        , TEXT("Prototype_Component_Collider_AABB")
-        , TEXT("Com_Collider"), reinterpret_cast<CComponent**>(&m_pColliderCom), &AABBDesc)))
+    return S_OK;
+}
+
+HRESULT CPlayerWeapon::Ready_Colliders()
+{
+
+    BOUNDING_BOX box = m_pModelCom->Get_BoundingBox();
+
+    CBounding_OBB::BOUNDING_OBB_DESC  OBBDesc{};
+    OBBDesc.vExtents = _float3(box.vExtents.x, box.vExtents.y, box.vExtents.z);
+    OBBDesc.vRotation = _float3(1.5f, 0.f, 0.f);
+    OBBDesc.vCenter = _float3(0.f, 0.f, -0.7f); // 중점.
+
+    OBBDesc.pOwner = this;
+    OBBDesc.eCollisionType = CCollider::COLLISION_TRIGGER;
+    OBBDesc.eMyLayer = CCollider::PLAYER_WEAPON;
+    OBBDesc.eTargetLayer = CCollider::MONSTER | CCollider::MONSTER_WEAPON |
+        CCollider::MONSTER_SKILL | CCollider::STATIC_OBJECT;
+
+    //BOUNDING_BOX box = m_pModelCom->Get_BoundingBox();
+    //CBounding_AABB::BOUNDING_AABB_DESC  AABBDesc{};
+    //AABBDesc.vExtents = _float3(box.vExtents.x, box.vExtents.y, box.vExtents.z);
+    //AABBDesc.vCenter = _float3(0.f, 0.f, 0.f); // 중점.
+    //AABBDesc.pOwner = this;
+
+    if (FAILED(CWeapon::Add_Component(ENUM_CLASS(LEVEL::STATIC)
+        , TEXT("Prototype_Component_Collider_OBB")
+        , TEXT("Com_Collider"), reinterpret_cast<CComponent**>(&m_pColliderCom), &OBBDesc)))
     {
-        CRASH("Failed Clone Collider AABB");
+        CRASH("Failed Clone Collider OBB");
         return E_FAIL;
     }
 
     m_pColliderCom->Set_Active(false);
+
+    /* 생성과 동시에 등록 */
+    m_pGameInstance->Add_Collider_To_Manager(m_pColliderCom);
 
     return S_OK;
 }

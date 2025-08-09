@@ -353,12 +353,12 @@ HRESULT CLevel_GamePlay::Ready_Layer_Monster(const _wstring& strLayerTag)
 		return E_FAIL;
 	}
 
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel), strLayerTag,
-		ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_WolfDevil"), &Desc)))
-	{
-		CRASH("Failed Create WolfDevil");
-		return E_FAIL;
-	}
+	//if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel), strLayerTag,
+	//	ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_WolfDevil"), &Desc)))
+	//{
+	//	CRASH("Failed Create WolfDevil");
+	//	return E_FAIL;
+	//}
 		
 
 	/* 다 같은 Monster 레이어에 추가하기. */

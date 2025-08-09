@@ -58,6 +58,7 @@ private:
 
 private:
 	HRESULT Ready_Components();
+	HRESULT Ready_Colliders();
 	HRESULT Bind_ShaderResources();
 
 public:

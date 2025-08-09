@@ -48,7 +48,17 @@ namespace Client
 		PLAYER_ANIM_Z = 52,				PLAYER_ANIM_ATTACK6 = 37,
 	};*/
 
-	
+	/* 기본 스탯 구조체 */
+	typedef struct tagDefaultMonsterStat
+	{
+		_float fMaxHP;
+		_float fHP;
+		_float fAttackPower;
+		_float fDetectionRange;
+		_float fAttackRange;
+		_float fMoveSpeed;
+		_float fRotationSpeed;
+	}MONSTER_STAT;
 }
 
 extern HWND g_hWnd;

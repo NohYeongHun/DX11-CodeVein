@@ -81,12 +81,18 @@ public:
 	_float  GetRollFromQuaternion() const;
 	
 
-	
-
+#pragma region 이동 함수
+public:
 	void Move_Direction(_vector vDir, _float fTimeDelta);
 	void Move_Direction(_vector vDir, _float fTimeDelta, class CNavigation* pNavigation);
 	void Translate(_fvector vTranslate);
 	void Translate(_fvector vTranslate, class CNavigation* pNavigation);
+
+
+
+#pragma endregion
+
+	
 
 public:
 	virtual HRESULT Initialize_Prototype();

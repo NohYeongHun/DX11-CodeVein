@@ -37,6 +37,12 @@ HRESULT CQueenKnight::Initialize_Clone(void* pArg)
         return E_FAIL;
     }
 
+    if (FAILED(Ready_Colliders(pDesc)))
+    {
+        CRASH("Ready Colliders Failed");
+        return E_FAIL;
+    }
+
     if (FAILED(Initialize_Stats()))
     {
         CRASH("Init Stats Failed");
@@ -48,7 +54,6 @@ HRESULT CQueenKnight::Initialize_Clone(void* pArg)
         CRASH("Ready Navigations Failed");
         return E_FAIL;
     }
-        
 
     if (FAILED(InitializeAction_ToAnimationMap()))
     {
@@ -85,7 +90,13 @@ HRESULT CQueenKnight::Initialize_Clone(void* pArg)
     _float3 vPos = { 0.f, 0.f, 0.f };
     m_pTransformCom->Set_State(STATE::POSITION, XMLoadFloat3(&vPos));
 
-    //m_pModelCom->Set_Animation(KNIGHT_SWORD_IDLE, true);
+
+
+#pragma region 창 위치 확인용
+    m_pModelCom->Set_Animation(AS_TStdKnight_TSword_Idle_N_Loop, true);
+#pragma endregion
+
+    
 
     return S_OK;
 }
@@ -97,26 +108,37 @@ void CQueenKnight::Priority_Update(_float fTimeDelta)
 
 void CQueenKnight::Update(_float fTimeDelta)
 {
+
+#pragma region 테스트
+
     if (m_pGameInstance->Get_KeyPress(DIK_3))
-    {
         AddBuff(CMonster::BUFF_HIT);
-    }
     if (m_pGameInstance->Get_KeyPress(DIK_5))
-    {
         AddBuff(CMonster::BUFF_DOWN);
+    if (m_pGameInstance->Get_KeyPress(DIK_6))
+    {
+        m_MonsterStat.fHP = 0;
+        AddBuff(CMonster::BUFF_DEAD);
     }
+        
+
+    //m_pModelCom->Play_Animation(fTimeDelta);
+#pragma endregion
 
     Update_AI(fTimeDelta);
 
+
     // 하위 객체들 움직임 제어는 Tree 제어 이후에
-    __super::Update(fTimeDelta);
+    CMonster::Update(fTimeDelta);
+
+
 
     Finalize_Update(fTimeDelta);
 }
 
 void CQueenKnight::Finalize_Update(_float fTimeDelta)
 {
-    __super::Finalize_Update(fTimeDelta);
+    CMonster::Finalize_Update(fTimeDelta);
 }
 
 void CQueenKnight::Late_Update(_float fTimeDelta)
@@ -132,7 +154,7 @@ void CQueenKnight::Late_Update(_float fTimeDelta)
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::BLEND, this)))
         return;
 
-    __super::Late_Update(fTimeDelta);
+    CMonster::Late_Update(fTimeDelta);
 }
 
 HRESULT CQueenKnight::Render()
@@ -233,7 +255,8 @@ HRESULT CQueenKnight::InitializeAction_ToAnimationMap()
     m_Action_AnimMap.emplace(L"DETECT", AS_TStdKnight_TShieldSword_Guard_Run_F_Loop);
     m_Action_AnimMap.emplace(L"DOWN_START", AS_TStdKnight_TCmn_Down_P_Loop);
     m_Action_AnimMap.emplace(L"DOWN_END", AS_TStdKnight_TCmn_Down_P_End);
-    m_Action_AnimMap.emplace(L"DEATH", AS_TStdKnight_TCmn_Death_F);
+    m_Action_AnimMap.emplace(L"DEATH_NORMAL", AS_TStdKnight_TCmn_Death_N);
+    m_Action_AnimMap.emplace(L"DEATH", AS_TStdKnight_TCmn_Death_N);
     
 
     m_Action_AnimMap.emplace(L"PHASE_ATTACK1", AS_TStdKnight_TShieldSword_AttackShield02B_N);
@@ -260,6 +283,8 @@ HRESULT CQueenKnight::Initialize_BuffDurations()
     m_BuffDefault_Durations[BUFF_DOWN] = 5.f;       // 다운: 20초 => 두번 클릭했을 때 다운이 되는가.
     m_BuffDefault_Durations[BUFF_CORPSE] = 2.0f;       // 시체 : 2.0초
     m_BuffDefault_Durations[BUFF_INVINCIBLE] = 0.6f; // 무적 시간.
+
+    m_BuffDefault_Durations[BUFF_DEAD] = 10.f; // 사망 시간.
 
     // 15 초마다 해당 페이즈 시퀀스 공격 반복
     m_BuffDefault_Durations[QUEEN_BUFF_PHASE_ATTACK_COOLDOWN] = 1.f;
@@ -305,25 +330,37 @@ HRESULT CQueenKnight::Ready_Components(QUEENKNIGHT_DESC* pDesc)
         , TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom), &Desc)))
         return E_FAIL;
 
+   
+
+
+    return S_OK;
+}
+
+HRESULT CQueenKnight::Ready_Colliders(QUEENKNIGHT_DESC* pDesc)
+{
     // 오프셋 지정.
 
     BOUNDING_BOX box = m_pModelCom->Get_BoundingBox();
-    m_fOffsetY = box.fHeight * 0.5f;
 
+    CBounding_OBB::BOUNDING_OBB_DESC  OBBDesc{};
+    OBBDesc.vExtents = _float3(box.vExtents.x, box.vExtents.y, box.vExtents.z);
+    OBBDesc.vCenter = _float3(0.f, box.vExtents.y, 0.f); // 중점.
+    OBBDesc.pOwner = this;
+    OBBDesc.eCollisionType = CCollider::COLLISION_BODY;
+    OBBDesc.eMyLayer = CCollider::MONSTER;
+    OBBDesc.eTargetLayer = CCollider::PLAYER | CCollider::PLAYER_WEAPON
+        | CCollider::MONSTER | CCollider::PLAYER_SKILL | CCollider::STATIC_OBJECT;
 
-    CBounding_AABB::BOUNDING_AABB_DESC  AABBDesc{};
-    AABBDesc.vExtents = _float3(box.vExtents.x, box.vExtents.y, box.vExtents.z);
-    AABBDesc.vCenter = _float3(0.f, box.vExtents.y, 0.f); // 중점.
-    AABBDesc.pOwner = this;
-
-    if (FAILED(__super::Add_Component(ENUM_CLASS(LEVEL::STATIC)
-        , TEXT("Prototype_Component_Collider_AABB")
-        , TEXT("Com_Collider"), reinterpret_cast<CComponent**>(&m_pColliderCom), &AABBDesc)))
+    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC)
+        , TEXT("Prototype_Component_Collider_OBB")
+        , TEXT("Com_Collider"), reinterpret_cast<CComponent**>(&m_pColliderCom), &OBBDesc)))
     {
-        CRASH("Failed Clone Collider AABB");
+        CRASH("Failed Clone Collider OBB");
         return E_FAIL;
     }
 
+    /* 생성과 동시에 등록 */
+    m_pGameInstance->Add_Collider_To_Manager(m_pColliderCom);
 
     return S_OK;
 }
@@ -413,7 +450,7 @@ HRESULT CQueenKnight::Ready_PartObjects()
     Weapon.eCurLevel = m_eCurLevel;
     Weapon.pOwner = this;
 
-    if (FAILED(__super::Add_PartObject(TEXT("Com_Weapon"),
+    if (FAILED(CContainerObject::Add_PartObject(TEXT("Com_Weapon"),
         ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_GodChildLance")
         , reinterpret_cast<CPartObject**>(&m_pWeapon), &Weapon)))
     {
@@ -427,7 +464,7 @@ HRESULT CQueenKnight::Ready_PartObjects()
     Shield.eCurLevel = m_eCurLevel;
     Shield.pOwner = this;
 
-    if (FAILED(__super::Add_PartObject(TEXT("Com_Shield"),
+    if (FAILED(CContainerObject::Add_PartObject(TEXT("Com_Shield"),
         ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_GodChildShield")
         , reinterpret_cast<CPartObject**>(&m_pShield), &Shield)))
     {

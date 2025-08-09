@@ -38,8 +38,10 @@ HRESULT CMonster::Initialize_Clone(void* pArg)
     m_MonsterStat.fAttackRange = pDesc->fAttackRange;
     m_MonsterStat.fDetectionRange = pDesc->fDetectionRange;
     m_MonsterStat.fMaxHP = pDesc->fMaxHP;
+    m_MonsterStat.fHP = pDesc->fMaxHP;
     m_MonsterStat.fMoveSpeed = pDesc->fMoveSpeed;
     m_MonsterStat.fRotationSpeed = pDesc->fRotationPerSec;
+    
 
     /* 기본적으로 몬스터는 모두 Navigation 설정. */
     if (FAILED(Ready_Components(pDesc)))
@@ -59,12 +61,12 @@ HRESULT CMonster::Initialize_Clone(void* pArg)
 
 void CMonster::Priority_Update(_float fTimeDelta)
 {
-    __super::Priority_Update(fTimeDelta);
+    CContainerObject::Priority_Update(fTimeDelta);
 }
 
 void CMonster::Update(_float fTimeDelta)
 { 
-    __super::Update(fTimeDelta);
+    CContainerObject::Update(fTimeDelta);
 }
 
 void CMonster::Finalize_Update(_float fTimeDelta)
@@ -78,14 +80,15 @@ void CMonster::Finalize_Update(_float fTimeDelta)
         m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
 
         /* 콜라이더 매니저에서 상태비교 하는거는 카메라 프러스텀을 이용해서 제어. */
-        if (m_pGameInstance->Is_In_Camera_Frustum(m_pTransformCom->Get_State(STATE::POSITION)))
-            m_pGameInstance->Add_Collider_To_Manager(m_pColliderCom);
+        //if (m_pGameInstance->Is_In_Camera_Frustum(m_pTransformCom->Get_State(STATE::POSITION)))
+        //    m_pGameInstance->Add_Collider_To_Manager(m_pColliderCom);
     }
 }
 
 void CMonster::Late_Update(_float fTimeDelta)
 {
-    __super::Late_Update(fTimeDelta);
+    CContainerObject::Late_Update(fTimeDelta);
+
 }
 
 HRESULT CMonster::Render()
@@ -519,8 +522,19 @@ const _bool CMonster::IsRotateFinished(_float fRadian)
 #pragma endregion
 
 
+#pragma region 6. 몬스터 삭제 처리.
+_bool CMonster::Monster_Dead()
+{
+    // 피가 0이면서 Dead 상태이면서.
+    return m_MonsterStat.fHP <= 0.f && HasBuff(BUFF_DEAD) 
+        && m_BuffTimers[BUFF_DEAD] <= 0.f;
+}
+
+#pragma endregion
+
 #pragma region 99. DEBUG용도 함수.
 #ifdef _DEBUG
+
 void CMonster::Print_Position()
 {
     _float3 vDebugPos = {};

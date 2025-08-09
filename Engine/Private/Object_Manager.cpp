@@ -147,8 +147,11 @@ void CObject_Manager::Priority_Update(_float fTimeDelta)
 	{
 		for (auto& Pair : m_pLayers[i])
 		{
-			if(nullptr != Pair.second)
+			if (nullptr != Pair.second)
+			{
 				Pair.second->Priority_Update(fTimeDelta);
+				Pair.second->PopDestroyedTo(m_DestroyObjects);
+			}
 		}
 	}
 }
@@ -186,6 +189,12 @@ void CObject_Manager::Clear(_uint iLevelIndex)
 	{		
 		Safe_Release(Pair.second);
 	}
+
+	/* 삭제 컨테이너에 넣어둔 GameObject들을 모두 제거. */
+	for (auto& pGaemObject : m_DestroyObjects)
+		Safe_Release(pGaemObject);
+	m_DestroyObjects.clear();
+
 	m_pLayers[iLevelIndex].clear();
 }
 
@@ -264,6 +273,10 @@ void CObject_Manager::Free()
 		m_pLayers[i].clear();	
 	}
 
+	for (auto& pGameObject : m_DestroyObjects)
+		Safe_Release(pGameObject);
+
+	m_DestroyObjects.clear();
 
 	Safe_Release(m_pGameInstance);
 

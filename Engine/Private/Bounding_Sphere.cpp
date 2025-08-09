@@ -5,15 +5,17 @@ CBounding_Sphere::CBounding_Sphere(ID3D11Device* pDevice, ID3D11DeviceContext* p
 {
 }
 
-const _float3 CBounding_Sphere::Get_WorldCenter()
-{
-	return m_pDesc->Center;
-}
+
 
 HRESULT CBounding_Sphere::Initialize(BOUNDING_DESC* pBoundingDesc)
 {
 	BOUNDING_SPHERE_DESC* pDesc = static_cast<BOUNDING_SPHERE_DESC*>(pBoundingDesc);
 	
+#ifdef _DEBUG
+	m_DebugDesc = *pDesc;
+#endif // _DEBUG
+
+
 	m_pOriginalDesc = new BoundingSphere(pDesc->vCenter, pDesc->fRadius);
 	m_pDesc = new BoundingSphere(*m_pOriginalDesc);
 
@@ -23,6 +25,29 @@ HRESULT CBounding_Sphere::Initialize(BOUNDING_DESC* pBoundingDesc)
 void CBounding_Sphere::Update(_fmatrix WorldMatrix)
 {
 	m_pOriginalDesc->Transform(*m_pDesc, WorldMatrix);
+}
+
+const _float3 CBounding_Sphere::Get_WorldCenter()
+{
+	return m_pDesc->Center;
+}
+
+void CBounding_Sphere::Change_BoundingDesc(BOUNDING_DESC* pBoundingDesc)
+{
+	if (nullptr == pBoundingDesc)
+		return;
+
+	BOUNDING_SPHERE_DESC* pDesc = static_cast<BOUNDING_SPHERE_DESC*>(pBoundingDesc);
+
+	m_pOriginalDesc->Center = pDesc->vCenter;
+	m_pOriginalDesc->Radius = pDesc->fRadius;
+
+}
+
+void CBounding_Sphere::Reset_Bounding()
+{
+	m_pDesc->Center = m_pOriginalDesc->Center;
+	m_pDesc->Radius = m_pOriginalDesc->Radius;
 }
 
 #ifdef _DEBUG
@@ -58,22 +83,7 @@ _bool CBounding_Sphere::Intersect(COLLIDER eColliderType, CBounding* pBounding)
 
 }
 
-void CBounding_Sphere::Change_BoundingDesc(BOUNDING_DESC* pBoundingDesc)
-{
-	if (nullptr == pBoundingDesc)
-		return;
 
-	BOUNDING_SPHERE_DESC* pDesc = static_cast<BOUNDING_SPHERE_DESC*>(pBoundingDesc);
-
-	m_pDesc->Center = pDesc->vCenter;
-	m_pDesc->Radius = pDesc->fRadius;
-}
-
-void CBounding_Sphere::Reset_Bounding()
-{
-	m_pDesc->Center = m_pOriginalDesc->Center;
-	m_pDesc->Radius = m_pOriginalDesc->Radius;
-}
 
 CBounding_Sphere* CBounding_Sphere::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CBounding::BOUNDING_DESC* pBoundingDesc)
 {

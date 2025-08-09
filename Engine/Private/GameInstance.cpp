@@ -110,13 +110,16 @@ void CGameInstance::Update_Engine(_float fTimeDelta)
 	// 6. 충돌 처리.
 	m_pCollider_Manager->Update();
 
-	// 7. 게임 오브젝트 Late 업데이트
+	// 7. 게임 오브젝트 Late 업데이트 => 객체 Destroy 설정
 	m_pObject_Manager->Late_Update(fTimeDelta);
 
-	// 8. 피킹 업데이트
+	// 8. Object Manager Late Update에서 Destroy 객체들의 Collider를 제거
+	m_pCollider_Manager->Collision_CleanUp();
+
+	// 9. 피킹 업데이트
 	m_pPicking->Update();
 
-	// 9. 레벨 업데이트
+	// 10. 레벨 업데이트
 	m_pLevel_Manager->Update(fTimeDelta);
 
 }

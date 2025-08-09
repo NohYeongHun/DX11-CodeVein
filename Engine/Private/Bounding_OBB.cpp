@@ -5,15 +5,16 @@ CBounding_OBB::CBounding_OBB(ID3D11Device* pDevice, ID3D11DeviceContext* pContex
 {
 }
 
-const _float3 CBounding_OBB::Get_WorldCenter()
-{
-	return _float3();
-}
+
 
 // OBB 이므로 이미 회전한 상태로 받아와야합니다. (Collider를)
 HRESULT CBounding_OBB::Initialize(BOUNDING_DESC* pBoundingDesc)
 {
 	const BOUNDING_OBB_DESC* pDesc = static_cast<const BOUNDING_OBB_DESC*>(pBoundingDesc);
+
+#ifdef _DEBUG
+	m_DebugDesc = *pDesc;
+#endif // _DEBUG
 
 	_float4		vQuaternion = {};
 	XMStoreFloat4(&vQuaternion, XMQuaternionRotationRollPitchYaw(pDesc->vRotation.x, pDesc->vRotation.y, pDesc->vRotation.z));
@@ -29,6 +30,37 @@ void CBounding_OBB::Update(_fmatrix WorldMatrix)
 	// Local 기준으로 World 행렬 변환을 m_pDesc에 적용.
 	m_pOriginalDesc->Transform(*m_pDesc, WorldMatrix);
 }
+
+
+const _float3 CBounding_OBB::Get_WorldCenter()
+{
+	return _float3();
+}
+
+/* 디버그 용도로 필수. */
+void CBounding_OBB::Change_BoundingDesc(BOUNDING_DESC* pBoundingDesc)
+{
+	if (nullptr == pBoundingDesc)
+		return;
+
+	BOUNDING_OBB_DESC* pDesc = static_cast<BOUNDING_OBB_DESC*>(pBoundingDesc);
+
+	_float4			vQuaternion = {};
+	XMStoreFloat4(&vQuaternion, XMQuaternionRotationRollPitchYaw(pDesc->vRotation.x, pDesc->vRotation.y, pDesc->vRotation.z));
+
+	m_pOriginalDesc->Center = pDesc->vCenter;
+	m_pOriginalDesc->Orientation = vQuaternion;
+	m_pOriginalDesc->Extents = pDesc->vExtents;
+}
+
+void CBounding_OBB::Reset_Bounding()
+{
+	m_pDesc->Center = m_pOriginalDesc->Center;
+	m_pDesc->Orientation = m_pOriginalDesc->Orientation;
+	m_pDesc->Extents = m_pOriginalDesc->Extents;
+}
+
+
 
 #ifdef _DEBUG
 HRESULT CBounding_OBB::Render(PrimitiveBatch<VertexPositionColor>* pBatch, _fvector vColor)
@@ -64,13 +96,7 @@ _bool CBounding_OBB::Intersect(COLLIDER eColliderType, CBounding* pBounding)
 
 }
 
-void CBounding_OBB::Change_BoundingDesc(BOUNDING_DESC* pBoundingDesc)
-{
-}
 
-void CBounding_OBB::Reset_Bounding()
-{
-}
 
 CBounding_OBB* CBounding_OBB::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CBounding::BOUNDING_DESC* pBoundingDesc)
 {

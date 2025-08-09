@@ -31,17 +31,18 @@ HRESULT CPartObject::Initialize_Clone(void* pArg)
 
 void CPartObject::Priority_Update(_float fTimeDelta)
 {
-	__super::Priority_Update(fTimeDelta);
+	CGameObject::Priority_Update(fTimeDelta);
 }
 
 void CPartObject::Update(_float fTimeDelta)
 {
-	__super::Update(fTimeDelta);
+	CGameObject::Update(fTimeDelta);
 }
 
 void CPartObject::Late_Update(_float fTimeDelta)
 {
-	__super::Late_Update(fTimeDelta);
+	CGameObject::Late_Update(fTimeDelta);
+
 }
 
 HRESULT CPartObject::Render()

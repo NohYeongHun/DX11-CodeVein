@@ -255,6 +255,7 @@ private:
 
 private:
 	HRESULT Ready_Components(PLAYER_DESC* pDesc);
+	HRESULT Ready_Colliders(PLAYER_DESC* pDesc);
 	HRESULT Ready_Navigations();
 	HRESULT Ready_Fsm();
 	void Register_CoolTime();
