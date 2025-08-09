@@ -187,6 +187,9 @@ HRESULT CLevel_GamePlay::Ready_Layer_Player(const _wstring& strLayerTag)
 	Desc.fSpeedPerSec = 10.f;
 	Desc.fRotationPerSec = XMConvertToRadians(90.0f);
 	Desc.eCurLevel = m_eCurLevel;
+	Desc.fMaxHP = 1672;
+	Desc.fHP = 1672;
+	Desc.fAttackPower = 90;
 
 	CCamera_Player::CAMERA_PLAYER_DESC CameraPlayerDesc{};
 	CameraPlayerDesc.vEye = _float4(0.f, 10.f, -20.f, 1.f);
@@ -293,7 +296,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_QueenKnight(const _wstring& strLayerTag)
 			, TEXT("Layer_Player"), 0));
 	Desc.eCurLevel = m_eCurLevel;
 	Desc.eMonsterType = MONSTERTYPE::BOSS;
-	Desc.fMaxHP = 3000.f;
+	Desc.fMaxHP = 2000.f;
 	Desc.fAttackPower = 50.f;
 	Desc.fDetectionRange = 30.f;
 	Desc.fAttackRange = 10.f; // 최소 감지거리보단 길어야됌.
@@ -410,8 +413,5 @@ CLevel_GamePlay* CLevel_GamePlay::Create(ID3D11Device* pDevice, ID3D11DeviceCont
 
 void CLevel_GamePlay::Free()
 {
-	__super::Free();
-
-
-
+	CLevel::Free();
 }

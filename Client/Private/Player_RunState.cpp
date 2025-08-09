@@ -6,7 +6,7 @@ CPlayer_RunState::CPlayer_RunState()
 
 HRESULT CPlayer_RunState::Initialize(_uint iStateNum, void* pArg)
 {
-	if (FAILED(__super::Initialize(iStateNum, pArg)))
+	if (FAILED(CPlayerState::Initialize(iStateNum, pArg)))
 		return E_FAIL;
 	return S_OK;
 }
@@ -15,7 +15,7 @@ HRESULT CPlayer_RunState::Initialize(_uint iStateNum, void* pArg)
 void CPlayer_RunState::Enter(void* pArg)
 {
 	RUN_ENTER_DESC* pDesc = static_cast<RUN_ENTER_DESC*>(pArg);
-	__super::Enter(pDesc); // 기본 쿨타임 설정.
+	CPlayerState::Enter(pDesc); // 기본 쿨타임 설정.
 
 	m_iNextState = -1;
 	m_iCurAnimIdx = pDesc->iAnimation_Idx;
@@ -167,5 +167,5 @@ CPlayer_RunState* CPlayer_RunState::Create(_uint iStateNum, void* pArg)
 
 void CPlayer_RunState::Free()
 {
-	__super::Free();
+	CPlayerState::Free();
 }

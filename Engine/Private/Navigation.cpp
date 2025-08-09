@@ -114,9 +114,15 @@ _bool CNavigation::isMove(_fvector vPosition)
 
 			return true;
 		}
-		else
+		else /* 경계에 도달. */
+		{
 			/* 이웃이 없으면 */
+
+
+
 			return false;
+		}
+			
 	}
 }
 
@@ -328,7 +334,7 @@ CComponent* CNavigation::Clone(void* pArg)
 
 void CNavigation::Free()
 {
-	__super::Free();
+	CComponent::Free();
 
 	for (auto& pCell : m_Cells)
 		Safe_Release(pCell);

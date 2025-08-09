@@ -19,7 +19,7 @@ BT_RESULT CBTInverter::Execute(_float fTimeDelta)
 
 void CBTInverter::Free()
 {
-    __super::Free();
+    CBTNode::Free();
 
     for (auto& pNode : m_Children)
         Safe_Release(pNode);

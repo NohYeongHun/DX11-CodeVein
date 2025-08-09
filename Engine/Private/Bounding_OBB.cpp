@@ -34,7 +34,7 @@ void CBounding_OBB::Update(_fmatrix WorldMatrix)
 
 const _float3 CBounding_OBB::Get_WorldCenter()
 {
-	return _float3();
+	return m_pDesc->Center;
 }
 
 /* 디버그 용도로 필수. */
@@ -111,7 +111,7 @@ CBounding_OBB* CBounding_OBB::Create(ID3D11Device* pDevice, ID3D11DeviceContext*
 
 void CBounding_OBB::Free()
 {
-	__super::Free();
+	CBounding::Free();
 	Safe_Delete(m_pDesc);
 	Safe_Delete(m_pOriginalDesc);
 }

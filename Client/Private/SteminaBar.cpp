@@ -49,7 +49,7 @@ HRESULT CSteminaBar::Initialize_Prototype()
 
 HRESULT CSteminaBar::Initialize_Clone(void* pArg)
 {
-    if (FAILED(__super::Initialize_Clone(pArg)))
+    if (FAILED(CUIObject::Initialize_Clone(pArg)))
         return E_FAIL;
 
     m_iTextureIndex = 0;
@@ -68,18 +68,18 @@ HRESULT CSteminaBar::Initialize_Clone(void* pArg)
 void CSteminaBar::Priority_Update(_float fTimeDelta)
 {
     Ratio_Calc(fTimeDelta);
-    __super::Priority_Update(fTimeDelta);
+    CUIObject::Priority_Update(fTimeDelta);
 }
 
 
 void CSteminaBar::Update(_float fTimeDelta)
 {
-    __super::Update(fTimeDelta);
+    CUIObject::Update(fTimeDelta);
 }
 
 void CSteminaBar::Late_Update(_float fTimeDelta)
 {
-    __super::Late_Update(fTimeDelta);
+    CUIObject::Late_Update(fTimeDelta);
 
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::STATIC_UI, this)))
         return;
@@ -87,7 +87,7 @@ void CSteminaBar::Late_Update(_float fTimeDelta)
 
 HRESULT CSteminaBar::Render()
 {
-    __super::Begin();
+    CUIObject::Begin();
 
   
     if (FAILED(Ready_Render_Resources()))
@@ -99,7 +99,7 @@ HRESULT CSteminaBar::Render()
 
     m_pVIBufferCom->Render();
 
-    __super::End();
+    CUIObject::End();
 
     return S_OK;
 }
@@ -220,7 +220,7 @@ CGameObject* CSteminaBar::Clone(void* pArg)
 
 void CSteminaBar::Destroy()
 {
-    __super::Destroy();
+    CUIObject::Destroy();
 
     for (auto& val : m_Events)
         m_pGameInstance->UnSubscribe(val, Get_ID());
@@ -230,7 +230,7 @@ void CSteminaBar::Destroy()
 
 void CSteminaBar::Free()
 {
-    __super::Free();
+    CUIObject::Free();
     Safe_Release(m_pVIBufferCom);
     Safe_Release(m_pShaderCom);
     

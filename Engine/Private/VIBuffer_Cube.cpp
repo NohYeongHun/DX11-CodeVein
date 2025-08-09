@@ -140,7 +140,7 @@ CComponent* CVIBuffer_Cube::Clone(void* pArg)
 
 void CVIBuffer_Cube::Free()
 {
-	__super::Free();
+	CVIBuffer::Free();
 
 
 }

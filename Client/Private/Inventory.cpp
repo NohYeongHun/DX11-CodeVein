@@ -64,7 +64,7 @@ void CInventory::Change_Skill(_uint iSkillPanel, _uint iSkillSlot, CSkillUI_Icon
 
 HRESULT CInventory::Initialize_Prototype()
 {
-    __super::Initialize_Prototype();
+    CUIObject::Initialize_Prototype();
     m_IsVisibility = false;
 
     return S_OK;
@@ -80,7 +80,7 @@ HRESULT CInventory::Initialize_Clone(void* pArg)
     Desc.fSizeX = 600;
     Desc.fSizeY = 300;
 
-    if (FAILED(__super::Initialize_Clone(&Desc)))
+    if (FAILED(CUIObject::Initialize_Clone(&Desc)))
         return E_FAIL;
 
     if (FAILED(Ready_Components()))
@@ -104,7 +104,7 @@ void CInventory::Priority_Update(_float fTimeDelta)
 {
     if (!m_IsVisibility)
         return;
-    __super::Priority_Update(fTimeDelta);
+    CUIObject::Priority_Update(fTimeDelta);
 }
 
 void CInventory::Update(_float fTimeDelta)
@@ -119,7 +119,7 @@ void CInventory::Update(_float fTimeDelta)
         m_pGameInstance->Publish(EventType::SKILLINFO_DISPLAY, &Desc);
     }
 
-    __super::Update(fTimeDelta);
+    CUIObject::Update(fTimeDelta);
 }
 
 void CInventory::Late_Update(_float fTimeDelta)
@@ -127,7 +127,7 @@ void CInventory::Late_Update(_float fTimeDelta)
     if (!m_IsVisibility)
         return;
 
-    __super::Late_Update(fTimeDelta);
+    CUIObject::Late_Update(fTimeDelta);
 
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::STATIC_UI, this)))
         return;
@@ -136,7 +136,7 @@ void CInventory::Late_Update(_float fTimeDelta)
 HRESULT CInventory::Render()
 {
 
-    __super::Begin();
+    CUIObject::Begin();
 
     // Middle 이미지는 Inventory 자체에서 출력해도 무방.?
     if (FAILED(Ready_Render_Resources()))
@@ -148,7 +148,7 @@ HRESULT CInventory::Render()
 
     m_pVIBufferCom->Render();
 
-    __super::End();
+    CUIObject::End();
 
 
     return S_OK;
@@ -426,7 +426,7 @@ CGameObject* CInventory::Clone(void* pArg)
 
 void CInventory::Destroy()
 {
-    __super::Destroy();
+    CUIObject::Destroy();
 
     for (auto& val : m_Events)
         m_pGameInstance->UnSubscribe(val, Get_ID());
@@ -436,7 +436,7 @@ void CInventory::Destroy()
 
 void CInventory::Free()
 {
-    __super::Free();
+    CUIObject::Free();
 
     m_InventoryItem_Panels.clear();
     m_InventorySkill_Panels.clear();

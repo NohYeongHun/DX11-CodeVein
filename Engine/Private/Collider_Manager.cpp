@@ -39,46 +39,46 @@ void CCollider_Manager::Update()
 	Narrow_Phase();
 
 
-	for (auto& pLeft : m_ColliderList)
-	{
-		for (auto& pRight : m_ColliderList)
-		{
-			// 1. 예외처리. => 같은 경우 무시하기.
-			if (pLeft == pRight || nullptr == pLeft || nullptr == pRight)
-				continue;
+	//for (auto& pLeft : m_ColliderList)
+	//{
+	//	for (auto& pRight : m_ColliderList)
+	//	{
+	//		// 1. 예외처리. => 같은 경우 무시하기.
+	//		if (pLeft == pRight || nullptr == pLeft || nullptr == pRight)
+	//			continue;
 
-			CGameObject* pLeftOwner = pLeft->Get_Owner();
-			CGameObject* pRightOwner = pRight->Get_Owner();
+	//		CGameObject* pLeftOwner = pLeft->Get_Owner();
+	//		CGameObject* pRightOwner = pRight->Get_Owner();
 
-			// 2. Owner가 없는 경우
-			if (nullptr == pLeftOwner || nullptr == pRightOwner)
-				continue;
+	//		// 2. Owner가 없는 경우
+	//		if (nullptr == pLeftOwner || nullptr == pRightOwner)
+	//			continue;
 
-			// 3. 타겟 Layer가 아닌 경우
-			if (!pLeft->Has_TargetLayer(pRight))
-				continue;
+	//		// 3. 타겟 Layer가 아닌 경우
+	//		if (!pLeft->Has_TargetLayer(pRight))
+	//			continue;
 
 
-			// 1. 만약 Active 되어 있지 않은 Collider 라면?
-			if (!pLeft->Is_Active() || !pRight->Is_Active())
-			{
-				Handle_Collision_Exit(pLeft, pRight, pLeftOwner, pRightOwner);
-				continue;
-			}
+	//		// 1. 만약 Active 되어 있지 않은 Collider 라면?
+	//		if (!pLeft->Is_Active() || !pRight->Is_Active())
+	//		{
+	//			Handle_Collision_Exit(pLeft, pRight, pLeftOwner, pRightOwner);
+	//			continue;
+	//		}
 
-			// 2. 둘다 충돌이 성공했다면?
-			if (pLeft->Intersect(pRight) && pRight->Intersect(pLeft))
-			{
-				Handle_Collision_By_Type(pLeft, pRight, pLeftOwner, pRightOwner);
-			}
-			// 3. 둘중 하나라도 충돌 실패했다면?
-			else
-			{
-				Handle_Collision_Exit(pLeft, pRight, pLeftOwner, pRightOwner);
-			}
-			
-		}
-	}
+	//		// 2. 둘다 충돌이 성공했다면?
+	//		if (pLeft->Intersect(pRight) && pRight->Intersect(pLeft))
+	//		{
+	//			Handle_Collision_By_Type(pLeft, pRight, pLeftOwner, pRightOwner);
+	//		}
+	//		// 3. 둘중 하나라도 충돌 실패했다면?
+	//		else
+	//		{
+	//			Handle_Collision_Exit(pLeft, pRight, pLeftOwner, pRightOwner);
+	//		}
+	//		
+	//	}
+	//}
 
 	m_ActiveColliders.clear();
 	/*for (auto& pCollider : m_ColliderList)
@@ -139,11 +139,19 @@ void CCollider_Manager::Build_BroadPhase()
 			pLeftOwner = pLeft->Get_Owner();
 			pRightOwner = pRight->Get_Owner();
 
-			// 2. Target Layer가 아닌 경우 무시.
+			//2. 같은 객체인지 체크 (동일 GameObject의 Collider끼리 충돌 방지)
+			if (pLeftOwner == pRightOwner)
+				continue;
+
+			// 3. 같은 Collider인지 체크 (혹시 모를 상황 대비)
+			if (pLeft == pRight)
+				continue;
+
+			// 4. Target Layer가 아닌 경우 무시.
 			if (!pLeft->Has_TargetLayer(pRight))
 				continue;
 
-			// 3. World AABB Bounding과 Collider를 충돌 비교해서 담을 객체인지 확인. 
+			// 5. World AABB Bounding과 Collider를 충돌 비교해서 담을 객체인지 확인. 
 			if (pLeft->BroadIntersect(pRight))
 			{
 				m_ActiveColliders.emplace(pLeft, pRight);
@@ -165,7 +173,11 @@ void CCollider_Manager::Narrow_Phase()
 		pRight = pair.second;
 
 		pLeftOwner = pLeft->Get_Owner();
-		pRightOwner = pLeft->Get_Owner();
+		pRightOwner = pRight->Get_Owner();
+
+		if (pLeftOwner == pRightOwner || pLeft == pRight)
+			continue;
+
 		if (!pLeft->Is_Active() || !pRight->Is_Active())
 		{
 			Handle_Collision_Exit(pLeft, pRight, pLeftOwner, pRightOwner);
@@ -247,9 +259,74 @@ void CCollider_Manager::Handle_Collision_By_Type(CCollider* pLeft, CCollider* pR
 	if (pLeft->Get_Collision_Type() == CCollider::COLLISION_BODY &&
 		pRight->Get_Collision_Type() == CCollider::COLLISION_BODY)
 	{
-
+		Handle_SlidingVector(pLeft, pRight, pLeftOwner, pRightOwner);
 	}
 
+}
+
+// 충돌 했을때 BODY 타입인것들 끼리 Sliding Vector 계산
+void CCollider_Manager::Handle_SlidingVector(CCollider* pLeft, CCollider* pRight, CGameObject* pLeftOwner, CGameObject* pRightOwner)
+{
+	// 1. 충돌 방향 벡터 계산
+	_vector vCollisionNormal = Calculate_ColliderNormal(pLeft, pRight);
+
+	// 2. 각 객체의 이동 벡터 계산 => 이전 프레임 위치를 Transform에서 계산해서 가지고 있습니다.
+	_vector vRightVelocity = pRightOwner->Get_Transform()->Get_Velocity();
+	_vector vLeftVelocity = pLeftOwner->Get_Transform()->Get_Velocity();
+
+	// 3. 관통 깊이 계산 => 구 고정. Body 타입은 무조건 구로만 생성.
+	_float fPenetrationValue = Calculate_PenetrationDepthSpehre(pLeft, pRight);
+
+	// 4. 분리 벡터 계산
+	_vector vSeparationVector = vCollisionNormal * fPenetrationValue;
+	_vector vLeftSepartation = vSeparationVector * (- 1.f);
+	_vector vRightSepartation = vSeparationVector * 0.f;
+
+	// 5. 위치 보정 적용 => 적용시 Naviagtion 고려.
+	pLeftOwner->Get_Transform()->Translate(vLeftSepartation
+		, pLeftOwner->Get_Navigation());
+	pRightOwner->Get_Transform()->Translate(vRightSepartation
+		, pRightOwner->Get_Navigation());
+
+	// 6. 슬라이딩 벡터 계산.
+	_vector vSlidingVector = Calculate_SlidingVector(vLeftVelocity, vCollisionNormal);
+
+	_float fSlidingSpeed = XMVectorGetX(XMVector3Length(vLeftVelocity)) * 0.4f; // 원래 속도의 40%
+	_vector vSlidingMovement = vSlidingVector * fSlidingSpeed;
+
+	// 7. 슬라이딩 이동 적용 (벽을 따라 미끄러지기)
+	pLeftOwner->Get_Transform()->Translate(vSlidingMovement, pLeftOwner->Get_Navigation());
+	
+}
+
+// 1. 충돌 방향 벡터 계산 => vLeft -> vRight 방향.
+_vector CCollider_Manager::Calculate_ColliderNormal(CCollider* pLeft, CCollider* pRight)
+{
+	_float3 vLeftPos = pLeft->Get_Center();
+	_float3 vRightPos = pRight->Get_Center();
+
+	// 1. pLeft -> pRight 방향을 구합니다.
+	_vector vDirection = XMLoadFloat3(&vRightPos) - XMLoadFloat3(&vLeftPos);
+
+	return XMVector3Normalize(vDirection);
+}
+
+_vector CCollider_Manager::Calculate_SlidingVector(_vector vInputDirection, _vector vCollisionNormal)
+{
+	// 입력 방향에서 충돌 법선 성분을 제거 == 슬라이딩 벡터
+	// 플레이어 입력 방향에서 벽에 박히는 벡터를 빼주면 그것이 벽을 타고 가는 Sliding Vector이다.
+	_float fDotProduct = XMVectorGetX(XMVector3Dot(vInputDirection, vCollisionNormal));
+	_vector vNormalComponent = vCollisionNormal * fDotProduct;
+	_vector vSlidingVector = vInputDirection - vNormalComponent;
+
+	return XMVector3Normalize(vSlidingVector);
+}
+
+
+// 3. 콜라이더 간 관통 깊이 계산.
+_float CCollider_Manager::Calculate_PenetrationDepthSpehre(CCollider* pLeft, CCollider* pRight)
+{
+	return pLeft->Calculate_PenetrationDepthSpehre(pRight);
 }
 #pragma endregion
 
@@ -271,7 +348,7 @@ CCollider_Manager* CCollider_Manager::Create(_uint iNumLevels)
 
 void CCollider_Manager::Free()
 {
-	__super::Free();
+	CBase::Free();
 	Safe_Release(m_pGameInstance);
 
 	for (auto& pCollider : m_RegisterPool)

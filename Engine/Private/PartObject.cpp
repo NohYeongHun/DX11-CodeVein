@@ -12,7 +12,7 @@ CPartObject::CPartObject(const CPartObject& Prototype)
 
 HRESULT CPartObject::Initialize_Prototype()
 {
-	if (FAILED(__super::Initialize_Prototype()))
+	if (FAILED(CGameObject::Initialize_Prototype()))
 		return E_FAIL;
 
 	return S_OK;
@@ -20,7 +20,7 @@ HRESULT CPartObject::Initialize_Prototype()
 
 HRESULT CPartObject::Initialize_Clone(void* pArg)
 {
-	if (FAILED(__super::Initialize_Clone(pArg)))
+	if (FAILED(CGameObject::Initialize_Clone(pArg)))
 		return E_FAIL;
 
 	PARTOBJECT_DESC* pDesc = static_cast<PARTOBJECT_DESC*>(pArg);
@@ -58,7 +58,7 @@ void CPartObject::Update_CombinedMatrix()
 
 void CPartObject::Free()
 {
-	__super::Free();
+	CGameObject::Free();
 
 
 }

@@ -82,8 +82,6 @@ public:
 
 #pragma region 0. 충돌체가 가져야 하는 식별 정보와 관련 함수들
 
-	
-
 public:
 	// 1. 주인 체크
 	class CGameObject* Get_Owner();
@@ -97,7 +95,9 @@ public:
 	// 3. Layer 체크 => 해당 안되면 바로 무시.
 	_bool Has_TargetLayer(CCollider* pRight);
 	COLLISION_TYPE Get_Collision_Type() { return m_eCollisionType; }
+	_float3 Get_Center();
 
+	
 private:
 	/* Prototype 생성시 정해지는 변수. */
 	// 0. 콜라이더는 어떤 형태인가? => 생성과 동시에 정해짐.
@@ -140,6 +140,9 @@ public:
 
 	// 충돌 전 후보 쌍 추려내기
 	_bool BroadIntersect(const CCollider* pTargetCollider);
+
+	// 구체간 침투 깊이 구하기.
+	_float Calculate_PenetrationDepthSpehre(const CCollider* pTargetCollider);
 #pragma endregion
 
 

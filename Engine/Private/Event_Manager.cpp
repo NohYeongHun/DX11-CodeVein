@@ -29,7 +29,7 @@ CEvent_Manager* CEvent_Manager::Create()
 
 void CEvent_Manager::Free()
 {
-    __super::Free();
+    CBase::Free();
     for (auto& pair : m_Table)
         pair.second.clear();
     m_Table.clear();

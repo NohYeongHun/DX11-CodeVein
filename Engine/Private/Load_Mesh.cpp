@@ -430,7 +430,7 @@ CComponent* CLoad_Mesh::Clone(void* pArg)
 
 void CLoad_Mesh::Free()
 {
-	__super::Free();
+	CVIBuffer::Free();
 
 
 }

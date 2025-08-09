@@ -576,7 +576,7 @@ CComponent* CTool_Model::Clone(void* pArg)
 
 void CTool_Model::Free()
 {
-	__super::Free();
+	CComponent::Free();
 	for (auto& pMesh : m_Meshes)
 		Safe_Release(pMesh);
 

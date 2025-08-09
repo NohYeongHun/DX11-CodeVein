@@ -20,7 +20,7 @@ HRESULT CKnightLance::Initialize(void* pArg)
     KNIGHT_LANCE_DESC* pDesc = static_cast<KNIGHT_LANCE_DESC*>(pArg);
 
 
-    if (FAILED(__super::Initialize_Clone(pDesc)))
+    if (FAILED(CWeapon::Initialize_Clone(pDesc)))
         return E_FAIL;
 
     if (FAILED(Ready_Components()))
@@ -218,5 +218,5 @@ CGameObject* CKnightLance::Clone(void* pArg)
 
 void CKnightLance::Free()
 {
-    __super::Free();
+    CWeapon::Free();
 }

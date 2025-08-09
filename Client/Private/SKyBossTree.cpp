@@ -13,7 +13,7 @@ CSkyBossTree::CSkyBossTree(const CSkyBossTree& Prototype)
 /* 이 안에서 노드 만들기*/
 HRESULT CSkyBossTree::Initialize(void* pArg)
 {
-	if (FAILED(__super::Initialize(pArg)))
+	if (FAILED(CBehaviorTree::Initialize(pArg)))
 		return E_FAIL;
 
 	SKYBOSS_BT_DESC* pDesc = static_cast<SKYBOSS_BT_DESC*>(pArg);
@@ -256,13 +256,8 @@ CSkyBossTree* CSkyBossTree::Create(ID3D11Device* pDevice, ID3D11DeviceContext* p
 
 void CSkyBossTree::Free()
 {
-	__super::Free();
-	// 1. 모든 BT 노드들 재귀적 해제
-	/*if (m_pRootNode)
-	{
-		Safe_Release(m_pRootNode);
-		m_pRootNode = nullptr;
-	}*/
+	CBehaviorTree::Free();
+
 
 
 	m_pOwner = nullptr;

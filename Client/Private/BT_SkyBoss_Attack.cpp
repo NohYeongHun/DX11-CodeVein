@@ -184,6 +184,6 @@ CBT_SkyBoss_Attack* CBT_SkyBoss_Attack::Create(CSkyBoss* pOwner)
 
 void CBT_SkyBoss_Attack::Free()
 {
-    __super::Free();
+    CBTAction::Free();
     Safe_Release(m_pGameInstance);
 }

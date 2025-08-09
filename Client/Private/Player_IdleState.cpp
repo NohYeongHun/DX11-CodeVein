@@ -8,7 +8,7 @@ CPlayer_IdleState::CPlayer_IdleState()
 
 HRESULT CPlayer_IdleState::Initialize(_uint iStateNum, void* pArg)
 {
-	if (FAILED(__super::Initialize(iStateNum, pArg)))
+	if (FAILED(CPlayerState::Initialize(iStateNum, pArg)))
 		return E_FAIL;
 
 	
@@ -21,7 +21,7 @@ void CPlayer_IdleState::Enter(void* pArg)
 {
 
 	IDLE_ENTER_DESC* pDesc = static_cast<IDLE_ENTER_DESC*>(pArg);
-	__super::Enter(pDesc); // 기본 쿨타임 설정.
+	CPlayerState::Enter(pDesc); // 기본 쿨타임 설정.
 
 	// Idle 시에는 RootMotion 비활성화
 	m_pModelCom->Set_RootMotionRotation(true);
@@ -155,5 +155,5 @@ CPlayer_IdleState* CPlayer_IdleState::Create(_uint iStateNum, void* pArg)
 
 void CPlayer_IdleState::Free()
 {
-	__super::Free();
+	CPlayerState::Free();
 }

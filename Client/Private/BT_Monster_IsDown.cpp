@@ -3,6 +3,7 @@
 CBT_Monster_IsDown::CBT_Monster_IsDown(CMonster* pOwner)
 	: m_pOwner(pOwner)
 {
+    m_strTag = L"MonsterIdle_HitDownConditionNode";
 }
 
 /* 몬스터가 Down 상태인가? */
@@ -25,6 +26,6 @@ CBT_Monster_IsDown* CBT_Monster_IsDown::Create(CMonster* pOwner)
 
 void CBT_Monster_IsDown::Free()
 {
-    __super::Free();
+    CBTCondition::Free();
     m_pOwner = nullptr;
 }

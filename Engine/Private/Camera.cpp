@@ -67,7 +67,7 @@ HRESULT CCamera::Initialize_Clone(void* pArg)
 {
     CAMERA_DESC* pDesc = static_cast<CAMERA_DESC*>(pArg);
 
-    if (FAILED(__super::Initialize_Clone(pArg)))
+    if (FAILED(CGameObject::Initialize_Clone(pArg)))
         return E_FAIL;
 
     // 1. Transform Component에 카메라의 위치 (Eye) 설정
@@ -119,5 +119,5 @@ void CCamera::Update_PipeLines()
 
 void CCamera::Free()
 {
-    __super::Free();
+    CGameObject::Free();
 }

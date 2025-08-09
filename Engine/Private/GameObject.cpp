@@ -57,6 +57,7 @@ void CGameObject::Priority_Update(_float fTimeDelta)
 
 void CGameObject::Update(_float fTimeDelta)
 {
+	m_pTransformCom->Update_PrevPosition();
 	m_pTransformCom->Update_WorldMatrix();
 }
 
@@ -285,7 +286,7 @@ void CGameObject::Destroy()
 
 void CGameObject::Free()
 {
-	__super::Free();
+	CBase::Free();
 
 	for (auto& Pair : m_Components)
 		Safe_Release(Pair.second);

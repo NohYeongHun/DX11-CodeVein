@@ -125,7 +125,7 @@ CTool_Animation* CTool_Animation::Create(const aiAnimation* pAIAnimation, const 
 
 void CTool_Animation::Free()
 {
-    __super::Free();
+    CBase::Free();
 
     for (auto& pChannel : m_Channels)
         Safe_Release(pChannel);

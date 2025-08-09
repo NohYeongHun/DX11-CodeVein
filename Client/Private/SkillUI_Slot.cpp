@@ -46,7 +46,7 @@ HRESULT CSkillUI_Slot::Initialize_Prototype()
 
 HRESULT CSkillUI_Slot::Initialize_Clone(void* pArg)
 {
-    if (FAILED(__super::Initialize_Clone(pArg)))
+    if (FAILED(CUIObject::Initialize_Clone(pArg)))
         return E_FAIL;
 
     
@@ -69,7 +69,7 @@ void CSkillUI_Slot::Priority_Update(_float fTimeDelta)
     if (!m_IsVisibility)
         return;
 
-    __super::Priority_Update(fTimeDelta);
+    CUIObject::Priority_Update(fTimeDelta);
 }
 
 
@@ -78,7 +78,7 @@ void CSkillUI_Slot::Update(_float fTimeDelta)
     if (!m_IsVisibility)
         return;
 
-    __super::Update(fTimeDelta);   
+    CUIObject::Update(fTimeDelta);
 }
 
 void CSkillUI_Slot::Late_Update(_float fTimeDelta)
@@ -89,13 +89,13 @@ void CSkillUI_Slot::Late_Update(_float fTimeDelta)
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::STATIC_UI, this)))
         return;
 
-    __super::Late_Update(fTimeDelta);
+    CUIObject::Late_Update(fTimeDelta);
 
 }
 
 HRESULT CSkillUI_Slot::Render()
 {
-    __super::Begin();
+    CUIObject::Begin();
 
     if (FAILED(Ready_Render_Resources()))
         return E_FAIL;
@@ -107,7 +107,7 @@ HRESULT CSkillUI_Slot::Render()
     m_pVIBufferCom->Render();
 
 
-    __super::End();
+    CUIObject::End();
 
     return S_OK;
 }
@@ -203,12 +203,12 @@ CGameObject* CSkillUI_Slot::Clone(void* pArg)
 
 void CSkillUI_Slot::Destroy()
 {
-    __super::Destroy();
+    CUIObject::Destroy();
 }
 
 void CSkillUI_Slot::Free()
 {
-    __super::Free();
+    CUIObject::Free();
     Safe_Release(m_pVIBufferCom);
     Safe_Release(m_pShaderCom);
     Safe_Release(m_pTextureCom);

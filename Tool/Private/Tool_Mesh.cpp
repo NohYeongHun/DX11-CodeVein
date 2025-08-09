@@ -560,5 +560,5 @@ CComponent* CTool_Mesh::Clone(void* pArg)
 
 void CTool_Mesh::Free()
 {
-	__super::Free();
+	CVIBuffer::Free();
 }

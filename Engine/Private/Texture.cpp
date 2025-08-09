@@ -92,7 +92,7 @@ CTexture* CTexture::Clone(void* pArg)
 
 void CTexture::Free()
 {
-    __super::Free();
+    CComponent::Free();
     for (auto& pResource : m_SRVs)
         Safe_Release(pResource);
 }

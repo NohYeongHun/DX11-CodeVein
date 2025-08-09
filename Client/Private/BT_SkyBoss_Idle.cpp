@@ -33,6 +33,6 @@ CBT_SkyBoss_Idle* CBT_SkyBoss_Idle::Create(CSkyBoss* pOwner)
 
 void CBT_SkyBoss_Idle::Free()
 {
-	__super::Free();
+	CBTAction::Free();
 	Safe_Release(m_pGameInstance);
 }

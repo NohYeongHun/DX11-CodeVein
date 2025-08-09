@@ -147,7 +147,7 @@ CComponent* CFsm::Clone(void* pArg)
 
 void CFsm::Free()
 {
-    __super::Free();
+    CComponent::Free();
 
     for (auto& vec : m_States)
         Safe_Release(vec);

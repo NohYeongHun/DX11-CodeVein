@@ -20,7 +20,7 @@ HRESULT CKnightShield::Initialize(void* pArg)
     KNIGHT_SHIELD_DESC* pDesc = static_cast<KNIGHT_SHIELD_DESC*>(pArg);
 
 
-    if (FAILED(__super::Initialize_Clone(pDesc)))
+    if (FAILED(CWeapon::Initialize_Clone(pDesc)))
         return E_FAIL;
 
     if (FAILED(Ready_Components()))
@@ -213,5 +213,5 @@ CGameObject* CKnightShield::Clone(void* pArg)
 
 void CKnightShield::Free()
 {
-    __super::Free();
+    CWeapon::Free();
 }

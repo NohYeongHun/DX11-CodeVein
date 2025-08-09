@@ -200,7 +200,7 @@ CRenderer* CRenderer::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContex
 
 void CRenderer::Free()
 {
-    __super::Free();
+    CBase::Free();
 
     for (size_t i = 0; i < ENUM_CLASS(RENDERGROUP::END); i++)
     {

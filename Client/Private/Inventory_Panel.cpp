@@ -50,7 +50,7 @@ HRESULT CInventory_Panel::Initialize_Clone(void* pArg)
 
      m_ePanelType = pDesc->ePanelType;
      m_iPanelIdx = pDesc->iPanelIdx;
-    if (FAILED(__super::Initialize_Clone(pDesc)))
+    if (FAILED(CUIObject::Initialize_Clone(pDesc)))
         return E_FAIL;
 
     if (FAILED(Ready_Components()))
@@ -67,7 +67,7 @@ void CInventory_Panel::Priority_Update(_float fTimeDelta)
     if (!m_IsVisibility)
         return;
 
-    __super::Priority_Update(fTimeDelta);
+    CUIObject::Priority_Update(fTimeDelta);
 }
 
 void CInventory_Panel::Update(_float fTimeDelta)
@@ -75,7 +75,7 @@ void CInventory_Panel::Update(_float fTimeDelta)
     if (!m_IsVisibility)
         return;
 
-    __super::Update(fTimeDelta);
+    CUIObject::Update(fTimeDelta);
 }
 
 void CInventory_Panel::Late_Update(_float fTimeDelta)
@@ -83,7 +83,7 @@ void CInventory_Panel::Late_Update(_float fTimeDelta)
     if (!m_IsVisibility)
         return;
 
-    __super::Late_Update(fTimeDelta);
+    CUIObject::Late_Update(fTimeDelta);
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::STATIC_UI, this)))
         return;
 }
@@ -291,13 +291,13 @@ CGameObject* CInventory_Panel::Clone(void* pArg)
 
 void CInventory_Panel::Destroy()
 {
-    __super::Destroy();
+    CUIObject::Destroy();
 
 }
 
 void CInventory_Panel::Free()
 {
-    __super::Free();
+    CUIObject::Free();
     m_SkillSlots.clear();
     m_ItemSlots.clear();
     m_StatusIcons.clear();

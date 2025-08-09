@@ -254,7 +254,7 @@ _float CPlayerState::Get_Adaptive_Rotation_Speed()
 
 void CPlayerState::Free()
 {
-    __super::Free();
+    CState::Free();
     m_pPlayer = nullptr;
     m_pModelCom = nullptr;
     

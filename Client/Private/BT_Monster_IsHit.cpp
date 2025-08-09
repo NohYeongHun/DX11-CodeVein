@@ -1,6 +1,7 @@
 ﻿CBT_Monster_IsHit::CBT_Monster_IsHit(CMonster* pOwner)
 	: m_pOwner(pOwner)
 {
+    m_strTag = L"MonsterIdle_HitConditionNode";
 }
 
 /* 몬스터가 살았는가? */
@@ -23,7 +24,7 @@ CBT_Monster_IsHit* CBT_Monster_IsHit::Create(CMonster* pOwner)
 
 void CBT_Monster_IsHit::Free()
 {
-    __super::Free();
+    CBTCondition::Free();
     m_pOwner = nullptr;
 }
 

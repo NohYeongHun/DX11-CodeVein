@@ -14,7 +14,7 @@ CMap_Part::CMap_Part(const CMap_Part& Prototype)
 
 HRESULT CMap_Part::Initialize_Prototype()
 {
-    if (FAILED(__super::Initialize_Prototype()))
+    if (FAILED(CGameObject::Initialize_Prototype()))
         return E_FAIL;
 
     return S_OK;
@@ -27,7 +27,7 @@ HRESULT CMap_Part::Initialize_Clone(void* pArg)
     m_pModelTag = pDesc->pModelTag;
     m_strObjTag = m_pModelTag;
 
-    if (FAILED(__super::Initialize_Clone(pDesc)))
+    if (FAILED(CGameObject::Initialize_Clone(pDesc)))
         return E_FAIL;
 
     if (FAILED(Ready_Components(pDesc)))
@@ -52,12 +52,12 @@ HRESULT CMap_Part::Initialize_Load(void* pArg)
 
 void CMap_Part::Priority_Update(_float fTimeDelta)
 {
-    __super::Priority_Update(fTimeDelta);
+    CGameObject::Priority_Update(fTimeDelta);
 }
 
 void CMap_Part::Update(_float fTimeDelta)
 {
-    __super::Update(fTimeDelta);
+    CGameObject::Update(fTimeDelta);
     _float fDist = {};
 
    /* if (m_pGameInstance->Get_MouseKeyUp(MOUSEKEYSTATE::LB) &&
@@ -74,7 +74,7 @@ void CMap_Part::Update(_float fTimeDelta)
 
 void CMap_Part::Late_Update(_float fTimeDelta)
 {
-    __super::Late_Update(fTimeDelta);
+    CGameObject::Late_Update(fTimeDelta);
 
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::BLEND, this)))
         return;
@@ -139,7 +139,7 @@ HRESULT CMap_Part::Ready_Components(MODEL_CREATE_DESC* pDesc)
         TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom), nullptr)))
         return E_FAIL;
     
-    if (FAILED(__super::Add_Component(ENUM_CLASS(LEVEL::LOGO)
+    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::LOGO)
         , pDesc->pModelTag
         , TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom), nullptr)))
         return E_FAIL;
@@ -207,12 +207,12 @@ CGameObject* CMap_Part::Clone(void* pArg)
 
 void CMap_Part::Destroy()
 {
-    __super::Destroy();
+    CGameObject::Destroy();
 }
 
 void CMap_Part::Free()
 {
-    __super::Free();
+    CGameObject::Free();
     Safe_Release(m_pModelCom);
     Safe_Release(m_pShaderCom);
 }

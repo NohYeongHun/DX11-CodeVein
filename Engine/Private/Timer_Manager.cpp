@@ -1,4 +1,4 @@
-#include "Timer_Manager.h"
+﻿#include "Timer_Manager.h"
 
 CTimer_Manager::CTimer_Manager()
 {
@@ -59,7 +59,7 @@ CTimer_Manager* CTimer_Manager::Create()
 
 void CTimer_Manager::Free()
 {
-	__super::Free();
+	CBase::Free();
 
 	for (auto& Pair : m_Timers)	
 		Safe_Release(Pair.second);

@@ -52,7 +52,7 @@ HRESULT CSkillUI_Panel::Initialize_Clone(void* pArg)
      m_ePanelType = pDesc->ePanelType;
      m_strTextureTag = pDesc->pText;
      
-    if (FAILED(__super::Initialize_Clone(pDesc)))
+    if (FAILED(CUIObject::Initialize_Clone(pDesc)))
         return E_FAIL;
 
     if (FAILED(Ready_Components()))
@@ -69,7 +69,7 @@ void CSkillUI_Panel::Priority_Update(_float fTimeDelta)
     if (!m_IsVisibility)
         return;
 
-    __super::Priority_Update(fTimeDelta);
+    CUIObject::Priority_Update(fTimeDelta);
 }
 
 void CSkillUI_Panel::Update(_float fTimeDelta)
@@ -77,7 +77,7 @@ void CSkillUI_Panel::Update(_float fTimeDelta)
     if (!m_IsVisibility)
         return;
 
-    __super::Update(fTimeDelta);
+    CUIObject::Update(fTimeDelta);
 }
 
 void CSkillUI_Panel::Late_Update(_float fTimeDelta)
@@ -89,7 +89,7 @@ void CSkillUI_Panel::Late_Update(_float fTimeDelta)
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::STATIC_UI, this)))
         return;
 
-    __super::Late_Update(fTimeDelta);
+    CUIObject::Late_Update(fTimeDelta);
 }
 
 HRESULT CSkillUI_Panel::Render()
@@ -98,7 +98,7 @@ HRESULT CSkillUI_Panel::Render()
     if (m_pTextureCom == nullptr)
         return S_OK;
 
-    __super::Begin();
+    CUIObject::Begin();
 
     if (FAILED(Ready_Render_Resources()))
         return E_FAIL;
@@ -110,10 +110,7 @@ HRESULT CSkillUI_Panel::Render()
 
     m_pVIBufferCom->Render();
 
-    //if (m_ePanelType == PANELTYPE::SKILL_UI)
-    //    Render_Explain();
-
-    __super::End();
+    CUIObject::End();
 
     return S_OK;
 }
@@ -264,13 +261,13 @@ CGameObject* CSkillUI_Panel::Clone(void* pArg)
 
 void CSkillUI_Panel::Destroy()
 {
-    __super::Destroy();
+    CUIObject::Destroy();
 
 }
 
 void CSkillUI_Panel::Free()
 {
-    __super::Free();
+    CUIObject::Free();
     m_SkillSlots.clear();
 
     Safe_Release(m_pShaderCom);

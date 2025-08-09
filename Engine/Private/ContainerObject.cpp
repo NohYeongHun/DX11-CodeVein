@@ -15,7 +15,7 @@ CContainerObject::CContainerObject(const CContainerObject& Prototype)
 
 HRESULT CContainerObject::Initialize_Prototype()
 {
-    if (FAILED(__super::Initialize_Prototype()))
+    if (FAILED(CGameObject::Initialize_Prototype()))
         return E_FAIL;
 
     return S_OK;
@@ -23,7 +23,7 @@ HRESULT CContainerObject::Initialize_Prototype()
 
 HRESULT CContainerObject::Initialize_Clone(void* pArg)
 {
-    if (FAILED(__super::Initialize_Clone(pArg)))
+    if (FAILED(CGameObject::Initialize_Clone(pArg)))
     {
         CRASH("Failed Clone");
         return E_FAIL;
@@ -99,7 +99,7 @@ CPartObject* CContainerObject::Find_PartObject(const _wstring& strPartObjectTag)
 
 void CContainerObject::Free()
 {
-    __super::Free();
+    CGameObject::Free();
 
     for (auto& Pair : m_PartObjects)
         Safe_Release(Pair.second);

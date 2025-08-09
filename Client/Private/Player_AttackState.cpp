@@ -1,5 +1,4 @@
-﻿#include "Player_StrongAttackState.h"
-#include "Player_AttackState.h"
+﻿#include "Player_AttackState.h"
 
 CPlayer_AttackState::CPlayer_AttackState()
 {
@@ -7,7 +6,7 @@ CPlayer_AttackState::CPlayer_AttackState()
 
 HRESULT CPlayer_AttackState::Initialize(_uint iStateNum, void* pArg)
 {
-	if (FAILED(__super::Initialize(iStateNum, pArg)))
+	if (FAILED(CPlayerState::Initialize(iStateNum, pArg)))
 		return E_FAIL;
 
 	m_ColliderActiveMap.emplace(m_pPlayer->Find_AnimationIndex(TEXT("ATTACK1"))
@@ -33,7 +32,7 @@ void CPlayer_AttackState::Enter(void* pArg)
 {
 
 	ATTACK_ENTER_DESC* pDesc = static_cast<ATTACK_ENTER_DESC*>(pArg);
-	__super::Enter(pDesc); // 기본 쿨타임 설정.
+	CPlayerState::Enter(pDesc); // 기본 쿨타임 설정.
 
 	m_isLoop = false;
 	m_iCurAnimIdx = pDesc->iAnimation_Idx;
@@ -200,5 +199,5 @@ CPlayer_AttackState* CPlayer_AttackState::Create(_uint iStateNum, void* pArg)
 
 void CPlayer_AttackState::Free()
 {
-	__super::Free();
+	CPlayerState::Free();
 }

@@ -22,7 +22,7 @@ HRESULT CPlayerWeapon::Initialize(void* pArg)
     PLAYER_WEAPON_DESC* pDesc = static_cast<PLAYER_WEAPON_DESC*>(pArg);
     //m_pParentState = pDesc->pState;
 
-    if (FAILED(__super::Initialize_Clone(pDesc)))
+    if (FAILED(CWeapon::Initialize_Clone(pDesc)))
         return E_FAIL;
 
     if (FAILED(Ready_Components()))
@@ -47,7 +47,7 @@ HRESULT CPlayerWeapon::Initialize(void* pArg)
 
 void CPlayerWeapon::Priority_Update(_float fTimeDelta)
 {
-    __super::Priority_Update(fTimeDelta);
+    CWeapon::Priority_Update(fTimeDelta);
 
 }
 
@@ -264,5 +264,5 @@ CGameObject* CPlayerWeapon::Clone(void* pArg)
 
 void CPlayerWeapon::Free()
 {
-    __super::Free();
+    CWeapon::Free();
 }

@@ -31,12 +31,22 @@ public:
 		PART_WEAPON = 0,
 		PART_END
 	};
+
+	typedef struct tagPlayerStat
+	{
+		_float fMaxHP;
+		_float fHP;
+		_float fAttackPower;
+	}PLAYER_STAT;
 #pragma endregion
 
 public:
 	typedef struct tagPlayerDesc : public CGameObject::GAMEOBJECT_DESC
 	{
 		LEVEL eCurLevel;
+		_float fMaxHP;
+		_float fHP;
+		_float fAttackPower;
 	}PLAYER_DESC;
 
 
@@ -207,6 +217,12 @@ private:
 
 #pragma endregion
 
+#pragma region 5. 플레이어 상태 스탯들.
+private:
+	PLAYER_STAT m_Stats = {};
+#pragma endregion
+
+
 
 #pragma region Player 기본 상태 값
 private:
@@ -216,7 +232,6 @@ private:
 	class CPlayerWeapon* m_pPlayerWeapon = { nullptr };
 	class CFsm* m_pFsmCom = { nullptr };
 	class CCamera_Player* m_pPlayerCamera = { nullptr };
-	class CNavigation* m_pNavigationCom = { nullptr };
 	LEVEL m_eCurLevel = { LEVEL::END };
 
 	_float m_fOffsetY = {};

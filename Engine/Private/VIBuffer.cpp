@@ -1,4 +1,4 @@
-#include "VIBuffer.h"
+ï»¿#include "VIBuffer.h"
 
 CVIBuffer::CVIBuffer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CComponent { pDevice, pContext }
@@ -53,8 +53,8 @@ HRESULT CVIBuffer::Bind_Resources()
 	m_pContext->IASetIndexBuffer(m_pIB, m_eIndexFormat, 0);
 	m_pContext->IASetPrimitiveTopology(m_ePrimitiveType);
 
-	/* ÀåÄ¡¿¡°Ô ³» Á¤Á¡ÀÌ ¾î¶»°Ô »ý°å´Ù? (FVF) : Æó±â */
-	/* ³»°¡ ±×¸®±âÀ§ÇØ ÀÌ¿ëÇÏ·ÁÇÏ´Â ½¦ÀÌ´õ¿Í Á¤Á¡ÀÌ ¼­·Î È£È¯ÀÌ µÇ´ÂÁö¿¡ ´ëÇÑ °Ë»ç°úÁ¤À» ¼öÇàÇØ¾ßÇÑ´Ù. */
+	/* ìž¥ì¹˜ì—ê²Œ ë‚´ ì •ì ì´ ì–´ë–»ê²Œ ìƒê²¼ë‹¤? (FVF) : íê¸° */
+	/* ë‚´ê°€ ê·¸ë¦¬ê¸°ìœ„í•´ ì´ìš©í•˜ë ¤í•˜ëŠ” ì‰ì´ë”ì™€ ì •ì ì´ ì„œë¡œ í˜¸í™˜ì´ ë˜ëŠ”ì§€ì— ëŒ€í•œ ê²€ì‚¬ê³¼ì •ì„ ìˆ˜í–‰í•´ì•¼í•œë‹¤. */
 
 	//D3D11_INPUT_ELEMENT_DESC		Elements[] = {
 	//	{}, 
@@ -91,7 +91,7 @@ HRESULT CVIBuffer::Render()
 
 void CVIBuffer::Free()
 {
-	__super::Free();
+	CComponent::Free();
 
 	Safe_Release(m_pIB);
 	Safe_Release(m_pVB);

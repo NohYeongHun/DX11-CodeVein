@@ -3,5 +3,5 @@
 
 void CBTAction::Free()
 {
-    __super::Free();
+    CBTNode::Free();
 }

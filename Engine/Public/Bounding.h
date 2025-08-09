@@ -40,6 +40,7 @@ public:
 #pragma region 충돌 감시
 public:
 	virtual _bool Intersect(COLLIDER eColliderType, CBounding* pBounding) PURE;
+	virtual _float Calculate_PenetrationDepthSpehre(CBounding* pBounding) PURE;
 #pragma endregion
 
 public:

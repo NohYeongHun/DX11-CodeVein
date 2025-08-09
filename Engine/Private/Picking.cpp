@@ -79,7 +79,7 @@ CPicking* CPicking::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext,
 
 void CPicking::Free()
 {
-    __super::Free();
+    CBase::Free();
     Safe_Release(m_pGameInstance);
     Safe_Release(m_pDevice);
     Safe_Release(m_pContext);

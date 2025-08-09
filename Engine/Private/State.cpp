@@ -10,7 +10,7 @@ CState::CState()
 
 void CState::Free()
 {
-	__super::Free();
+	CBase::Free();
 	Safe_Release(m_pGameInstance);
 
 }

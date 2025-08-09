@@ -21,7 +21,7 @@ HRESULT CCamera_Free::Initialize_Clone(void* pArg)
 
 	m_fMouseSensor = pDesc->fMouseSensor;
 
-	if (FAILED(__super::Initialize_Clone(pArg)))
+	if (FAILED(CCamera::Initialize_Clone(pArg)))
 		return E_FAIL;
 
 
@@ -31,14 +31,14 @@ HRESULT CCamera_Free::Initialize_Clone(void* pArg)
 // 카메라에 대한 이동 전환은 Priority_Update에서 완료 후 Pipe Line에 행렬이 전달됨.
 void CCamera_Free::Priority_Update(_float fTimeDelta)
 {
-	__super::Priority_Update(fTimeDelta);
+	CCamera::Priority_Update(fTimeDelta);
 
 	
 }
 
 void CCamera_Free::Update(_float fTimeDelta)
 {
-	__super::Update(fTimeDelta);
+	CCamera::Update(fTimeDelta);
 
 	if (m_pGameInstance->Get_KeyPress(DIK_UPARROW))
 	{
@@ -81,14 +81,14 @@ void CCamera_Free::Update(_float fTimeDelta)
 	}
 
 
-	__super::Update_PipeLines();
+	CCamera::Update_PipeLines();
 }
 
 void CCamera_Free::Late_Update(_float fTimeDelta)
 {
 	// 여기서 마우스 이전 프레임 위치 저장.
 	
-	__super::Late_Update(fTimeDelta);
+	CCamera::Late_Update(fTimeDelta);
 }
 
 HRESULT CCamera_Free::Render()
@@ -124,6 +124,6 @@ CGameObject* CCamera_Free::Clone(void* pArg)
 
 void CCamera_Free::Free()
 {
-	__super::Free();
+	CCamera::Free();
 }
 

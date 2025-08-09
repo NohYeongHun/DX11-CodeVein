@@ -68,6 +68,11 @@ public:
     virtual void On_Collision_Stay(CGameObject* pOther) override;
     virtual void On_Collision_Exit(CGameObject* pOther) override;
 
+    
+public:
+    // 무기 및 스킬과 충돌 시 받는 데미지 처리.
+    virtual void Take_Damage(_float fDamage); 
+
 protected:
     class CCollider* m_pColliderCom = { nullptr };
 
@@ -100,6 +105,7 @@ public:
     _uint Find_AnimationIndex(const _wstring& strAnimationTag);
     const _bool Is_Animation_Finished();
 
+    _float Get_CurrentAnimationRatio() { return m_pModelCom->Get_Current_Ratio(); }
 
 public:
     void Set_RootMotionRotation(_bool IsRotate);
@@ -183,12 +189,11 @@ public:
     /* 콜라이더 제어.*/
     virtual void Enable_Collider(_uint iType) PURE; 
     virtual void Disable_Collider(_uint iType) PURE;
-    
-
 #pragma endregion
     
 
-#pragma region 6. 몬스터 삭제 처리.
+
+#pragma region 7. 몬스터 삭제 처리.
 public:
     virtual _bool Monster_Dead();
 
@@ -216,7 +221,6 @@ protected:
     class CLoad_Model* m_pModelCom = { nullptr };
     class CShader* m_pShaderCom = { nullptr };
     class CPlayer* m_pTarget = { nullptr };
-    class CNavigation* m_pNavigationCom = { nullptr };
     LEVEL m_eCurLevel = { LEVEL::END };
     MONSTERTYPE m_eMonsterType = { MONSTERTYPE::END };
 

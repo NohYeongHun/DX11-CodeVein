@@ -44,10 +44,9 @@ void CBTSelector::Reset()
 
 void CBTSelector::Free()
 {
-    __super::Free();
+    CBTNode::Free();
     for (auto& child : m_Children) {
         Safe_Release(child);
     }
     m_Children.clear();
-    __super::Free();
 }

@@ -6,8 +6,15 @@ CPlayer_StrongAttackState::CPlayer_StrongAttackState()
 
 HRESULT CPlayer_StrongAttackState::Initialize(_uint iStateNum, void* pArg)
 {
-	if (FAILED(__super::Initialize(iStateNum, pArg)))
+	if (FAILED(CPlayerState::Initialize(iStateNum, pArg)))
 		return E_FAIL;
+
+
+	m_ColliderActiveMap.emplace(m_pPlayer->Find_AnimationIndex(TEXT("STRONG_ATTACK1"))
+		, COLLIDER_ACTIVE_INFO{ 0.f, 100.f / 230.f, false });
+
+	//m_ColliderActiveMap.emplace(m_pPlayer->Find_AnimationIndex(TEXT("STRONG_ATTACK1"))
+	//	, COLLIDER_ACTIVE_INFO{ 50.f / 230.f, 100.f / 230.f, false });
 
 	return S_OK;
 }
@@ -16,7 +23,7 @@ HRESULT CPlayer_StrongAttackState::Initialize(_uint iStateNum, void* pArg)
 void CPlayer_StrongAttackState::Enter(void* pArg)
 {
 	STRONG_ENTER_DESC* pDesc = static_cast<STRONG_ENTER_DESC*>(pArg);
-	__super::Enter(pDesc); // 기본 쿨타임 설정.
+	CPlayerState::Enter(pDesc); // 기본 쿨타임 설정.
 
 	m_isLoop = false;
 
@@ -48,19 +55,8 @@ void CPlayer_StrongAttackState::Update(_float fTimeDelta)
 void CPlayer_StrongAttackState::Exit()
 {
 	
-
 	if (m_iNextState != -1) // NextIndex가 있는경우 블렌딩 시작.
 	{
-		//// 루트모션은 블렌딩안하기.
-		//if (m_iNextState == CPlayer::PLAYER_STATE::STRONG_ATTACK ||
-		//	m_iNextState == CPlayer::PLAYER_STATE::ATTACK ||
-		//	m_iNextState == CPlayer::PLAYER_STATE::DODGE ||
-		//	m_iNextState == CPlayer::PLAYER_STATE::GUARD
-		//	)
-		//{
-		//	return;
-		//}
-		//else 
 		m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, false);	
 	}
 
@@ -152,5 +148,5 @@ CPlayer_StrongAttackState* CPlayer_StrongAttackState::Create(_uint iStateNum, vo
 
 void CPlayer_StrongAttackState::Free()
 {
-	__super::Free();
+	CPlayerState::Free();
 }

@@ -13,7 +13,7 @@ CWolfDevil::CWolfDevil(const CWolfDevil& Prototype)
 #pragma region 기본 함수들
 HRESULT CWolfDevil::Initialize_Prototype()
 {
-    if (FAILED(__super::Initialize_Prototype()))
+    if (FAILED(CMonster::Initialize_Prototype()))
         return E_FAIL;
 
     return S_OK;
@@ -24,7 +24,7 @@ HRESULT CWolfDevil::Initialize_Clone(void* pArg)
 
     WOLFDEVIL_DESC* pDesc = static_cast<WOLFDEVIL_DESC*>(pArg);
 
-    if (FAILED(__super::Initialize_Clone(pDesc)))
+    if (FAILED(CMonster::Initialize_Clone(pDesc)))
     {
         CRASH("Failed Clone WolfDevil");
         return E_FAIL;
@@ -95,7 +95,7 @@ HRESULT CWolfDevil::Initialize_Clone(void* pArg)
 
 void CWolfDevil::Priority_Update(_float fTimeDelta)
 {
-    __super::Priority_Update(fTimeDelta);
+    CMonster::Priority_Update(fTimeDelta);
 }
 
 void CWolfDevil::Update(_float fTimeDelta)
@@ -104,7 +104,7 @@ void CWolfDevil::Update(_float fTimeDelta)
     Update_AI(fTimeDelta);
 
     // 하위 객체들 움직임 제어는 Tree 제어 이후에
-    __super::Update(fTimeDelta);
+    CMonster::Update(fTimeDelta);
 
     // 가장 마지막에 수행되어야 하는 업데이트. 함수들 => 콜라이더 추가 등등.
     Finalize_Update(fTimeDelta);
@@ -112,7 +112,7 @@ void CWolfDevil::Update(_float fTimeDelta)
 
 void CWolfDevil::Finalize_Update(_float fTimeDelta)
 {
-    __super::Finalize_Update(fTimeDelta);
+    CMonster::Finalize_Update(fTimeDelta);
 }
 
 void CWolfDevil::Late_Update(_float fTimeDelta)
@@ -139,7 +139,7 @@ void CWolfDevil::Late_Update(_float fTimeDelta)
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::BLEND, this)))
         return;
 
-    __super::Late_Update(fTimeDelta);
+    CMonster::Late_Update(fTimeDelta);
 }
 
 HRESULT CWolfDevil::Render()
@@ -299,7 +299,7 @@ HRESULT CWolfDevil::Ready_Components(WOLFDEVIL_DESC* pDesc)
     CLoad_Model::LOADMODEL_DESC Desc{};
     Desc.pGameObject = this;
 
-    if (FAILED(__super::Add_Component(ENUM_CLASS(m_eCurLevel)
+    if (FAILED(CMonster::Add_Component(ENUM_CLASS(m_eCurLevel)
         , TEXT("Prototype_Component_Model_WolfDevil")
         , TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom), &Desc)))
         return E_FAIL;
@@ -314,7 +314,7 @@ HRESULT CWolfDevil::Ready_Components(WOLFDEVIL_DESC* pDesc)
     AABBDesc.vCenter = _float3(0.f, box.vExtents.y, 0.f); // 중점.
     AABBDesc.pOwner = this;
 
-    if (FAILED(__super::Add_Component(ENUM_CLASS(LEVEL::STATIC)
+    if (FAILED(CMonster::Add_Component(ENUM_CLASS(LEVEL::STATIC)
         , TEXT("Prototype_Component_Collider_AABB")
         , TEXT("Com_Collider"), reinterpret_cast<CComponent**>(&m_pColliderCom), &AABBDesc)))
     {
@@ -435,12 +435,12 @@ CGameObject* CWolfDevil::Clone(void* pArg)
 
 void CWolfDevil::Destroy()
 {
-    __super::Destroy();
+    CMonster::Destroy();
 }
 
 void CWolfDevil::Free()
 {
-    __super::Free();
+    CMonster::Free();
     Safe_Release(m_pTree);
 }
 

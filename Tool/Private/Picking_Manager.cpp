@@ -87,7 +87,7 @@ CPicking_Manager* CPicking_Manager::Create()
 
 void CPicking_Manager::Free()
 {
-	__super::Free();
+	CBase::Free();
 	m_GameObjects.clear();
 	Safe_Release(m_pGameInstance);
 }

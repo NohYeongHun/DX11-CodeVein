@@ -157,7 +157,7 @@ CLevel_Loading* CLevel_Loading::Create(ID3D11Device* pDevice, ID3D11DeviceContex
 
 void CLevel_Loading::Free()
 {
-	__super::Free();
+	CLevel::Free();
 	
 	// 3. 지울 때 제거
 	for (auto& Event : m_Events)

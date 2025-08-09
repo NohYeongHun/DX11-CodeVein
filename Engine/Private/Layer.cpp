@@ -162,7 +162,7 @@ CLayer* CLayer::Create()
 
 void CLayer::Free()
 {
-	__super::Free();
+	CBase::Free();
 
 	for (auto& pGameObject : m_GameObjects)
 	{

@@ -54,7 +54,7 @@ CBT_SkyBoss_StrongHitReaction* CBT_SkyBoss_StrongHitReaction::Create(CSkyBoss* p
 
 void CBT_SkyBoss_StrongHitReaction::Free()
 {
-    __super::Free();
+    CBTAction::Free();
     Safe_Release(m_pGameInstance);
 }
 

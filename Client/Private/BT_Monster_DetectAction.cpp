@@ -1,10 +1,13 @@
 ﻿CBT_Monster_DetectAction::CBT_Monster_DetectAction(CMonster* pOwner)
     : m_pOwner{ pOwner }
 {
+    m_strTag = L"MonsterIdle_IsDectectActionNode";
 }
 
 BT_RESULT CBT_Monster_DetectAction::Perform_Action(_float fTimeDelta)
 {
+    
+
     switch (m_eDetectPhase)
     {
     case DETECT_PHASE::NONE:
@@ -123,6 +126,6 @@ CBT_Monster_DetectAction* CBT_Monster_DetectAction::Create(CMonster* pOwner)
 
 void CBT_Monster_DetectAction::Free()
 {
-    __super::Free();
+    CBTAction::Free();
     m_pOwner = nullptr;
 }

@@ -231,6 +231,6 @@ CLoad_Channel* CLoad_Channel::Create(std::ifstream& ifs)
 
 void CLoad_Channel::Free()
 {
-    __super::Free();
+    CBase::Free();
     m_KeyFrames.clear();
 }

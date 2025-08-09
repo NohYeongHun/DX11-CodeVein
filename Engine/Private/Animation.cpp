@@ -97,7 +97,7 @@ CAnimation* CAnimation::Clone()
 
 void CAnimation::Free()
 {
-    __super::Free();
+    CBase::Free();
 
     for (auto& pChannel : m_Channels)
         Safe_Release(pChannel);

@@ -244,7 +244,7 @@ CTool_MeshMaterial* CTool_MeshMaterial::Create(ID3D11Device* pDevice, ID3D11Devi
 
 void CTool_MeshMaterial::Free()
 {
-	__super::Free();
+	CBase::Free();
 	Safe_Release(m_pDevice);
 	Safe_Release(m_pContext);
 }

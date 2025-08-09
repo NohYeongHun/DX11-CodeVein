@@ -211,7 +211,7 @@ CComponent* CShader::Clone(void* pArg)
 
 void CShader::Free()
 {
-	__super::Free();
+	CComponent::Free();
 
 	Safe_Release(m_pEffect);
 

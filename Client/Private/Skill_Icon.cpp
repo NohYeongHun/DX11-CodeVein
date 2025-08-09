@@ -20,11 +20,6 @@ void CSkill_Icon::Change_Skill(CSkillUI_Icon* pSkillIcon, _uint iTextureIndex)
         return;
 
     Safe_AddRef(m_pTextureCom);
-
-    //// 무슨 이름으로 넣을래?
-    //m_pGameInstance->Change_Texture_ToGameObject(this, TEXT("Com_Texture")
-    //    , reinterpret_cast<CComponent**>(&m_pTextureCom), ENUM_CLASS(LEVEL::STATIC)
-    //    , strTextureTag);
 }
 
 HRESULT CSkill_Icon::Initialize_Prototype()
@@ -34,7 +29,7 @@ HRESULT CSkill_Icon::Initialize_Prototype()
 
 HRESULT CSkill_Icon::Initialize_Clone(void* pArg)
 {
-    if (FAILED(__super::Initialize_Clone(pArg)))
+    if (FAILED(CUIObject::Initialize_Clone(pArg)))
         return E_FAIL;
 
     SKILLICON_DESC* pDesc = static_cast<SKILLICON_DESC*>(pArg);
@@ -49,13 +44,13 @@ HRESULT CSkill_Icon::Initialize_Clone(void* pArg)
 
 void CSkill_Icon::Priority_Update(_float fTimeDelta)
 {
-    __super::Priority_Update(fTimeDelta);
+    CUIObject::Priority_Update(fTimeDelta);
 }
 
 
 void CSkill_Icon::Update(_float fTimeDelta)
 {
-    __super::Update(fTimeDelta);
+    CUIObject::Update(fTimeDelta);
 }
 
 void CSkill_Icon::Late_Update(_float fTimeDelta)
@@ -63,7 +58,7 @@ void CSkill_Icon::Late_Update(_float fTimeDelta)
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::STATIC_UI, this)))
         return;
 
-    __super::Late_Update(fTimeDelta);
+    CUIObject::Late_Update(fTimeDelta);
 }
 
 HRESULT CSkill_Icon::Render()
@@ -72,7 +67,7 @@ HRESULT CSkill_Icon::Render()
     if (m_pTextureCom == nullptr)
         return S_OK;
 
-    __super::Begin();
+    CUIObject::Begin();
 
     
     if (FAILED(Ready_Render_Resources()))
@@ -85,7 +80,7 @@ HRESULT CSkill_Icon::Render()
     m_pVIBufferCom->Render();
 
 
-    __super::End();
+    CUIObject::End();
 
     return S_OK;
 }
@@ -148,12 +143,12 @@ CGameObject* CSkill_Icon::Clone(void* pArg)
 
 void CSkill_Icon::Destroy()
 {
-    __super::Destroy();
+    CUIObject::Destroy();
 }
 
 void CSkill_Icon::Free()
 {
-    __super::Free();
+    CUIObject::Free();
     Safe_Release(m_pVIBufferCom);
     Safe_Release(m_pShaderCom);
     

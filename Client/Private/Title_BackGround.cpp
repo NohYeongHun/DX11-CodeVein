@@ -24,7 +24,7 @@ HRESULT CTitle_BackGround::Initialize_Clone(void* pArg)
 
     TITLE_BAKCGROUND_DESC* pDesc = static_cast<TITLE_BAKCGROUND_DESC*>(pArg);
 
-    if (FAILED(__super::Initialize_Clone(pDesc)))
+    if (FAILED(CUIObject::Initialize_Clone(pDesc)))
         return E_FAIL;
 
     m_iTextureCount = pDesc->iTextureCount;
@@ -45,17 +45,17 @@ HRESULT CTitle_BackGround::Initialize_Clone(void* pArg)
 
 void CTitle_BackGround::Priority_Update(_float fTimeDelta)
 {
-    __super::Priority_Update(fTimeDelta);
+    CUIObject::Priority_Update(fTimeDelta);
 }
 
 void CTitle_BackGround::Update(_float fTimeDelta)
 {
-    __super::Update(fTimeDelta);
+    CUIObject::Update(fTimeDelta);
 }
 
 void CTitle_BackGround::Late_Update(_float fTimeDelta)
 {
-    __super::Late_Update(fTimeDelta);
+    CUIObject::Late_Update(fTimeDelta);
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::UI, this)))
         return;
 
@@ -71,7 +71,7 @@ HRESULT CTitle_BackGround::Render()
     ImGui::SliderFloat(str.c_str(), &m_fAlpha, 0.f, 1.f);
     ImGui::End();*/
 
-    __super::Begin();
+    CUIObject::Begin();
 
     if (FAILED(Ready_Render_Resource()))
         return E_FAIL;
@@ -83,7 +83,7 @@ HRESULT CTitle_BackGround::Render()
 
     m_pVIBufferCom->Render();
 
-    __super::End();
+    CUIObject::End();
 
     return S_OK;
 }
@@ -187,7 +187,7 @@ CGameObject* CTitle_BackGround::Clone(void* pArg)
 
 void CTitle_BackGround::Free()
 {
-    __super::Free();
+    CUIObject::Free();
 
     Safe_Release(m_pVIBufferCom);
 

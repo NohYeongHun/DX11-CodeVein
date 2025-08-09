@@ -12,7 +12,7 @@ CTitleText::CTitleText(const CTitleText& Prototype)
 
 HRESULT CTitleText::Initialize_Prototype()
 {
-    __super::Initialize_Prototype();
+    CUIObject::Initialize_Prototype();
     return S_OK;
 }
 
@@ -24,7 +24,7 @@ HRESULT CTitleText::Initialize_Clone(void* pArg)
     TITLETEXT_DESC* pDesc = static_cast<TITLETEXT_DESC*>(pArg);
     
 
-    if (FAILED(__super::Initialize_Clone(pDesc)))
+    if (FAILED(CUIObject::Initialize_Clone(pDesc)))
         return E_FAIL;
 
     m_iTextureIndex = pDesc->iTextureIndex;
@@ -37,17 +37,17 @@ HRESULT CTitleText::Initialize_Clone(void* pArg)
 
 void CTitleText::Priority_Update(_float fTimeDelta)
 {
-    __super::Priority_Update(fTimeDelta);
+    CUIObject::Priority_Update(fTimeDelta);
 }
 
 void CTitleText::Update(_float fTimeDelta)
 {
-    __super::Update(fTimeDelta);
+    CUIObject::Update(fTimeDelta);
 }
 
 void CTitleText::Late_Update(_float fTimeDelta)
 {
-    __super::Late_Update(fTimeDelta);
+    CUIObject::Late_Update(fTimeDelta);
 
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::UI, this)))
         return;
@@ -57,7 +57,7 @@ void CTitleText::Late_Update(_float fTimeDelta)
 
 HRESULT CTitleText::Render()
 {
-    __super::Begin();
+    CUIObject::Begin();
 
     if (FAILED(Ready_Render_Resource()))
         return E_FAIL;
@@ -68,7 +68,7 @@ HRESULT CTitleText::Render()
 
     m_pVIBufferCom->Render();
 
-    __super::End();
+    CUIObject::End();
 
     return S_OK;
 }
@@ -158,7 +158,7 @@ CGameObject* CTitleText::Clone(void* pArg)
 
 void CTitleText::Free()
 {
-    __super::Free();
+    CUIObject::Free();
 
     Safe_Release(m_pVIBufferCom);
     Safe_Release(m_pShaderCom);

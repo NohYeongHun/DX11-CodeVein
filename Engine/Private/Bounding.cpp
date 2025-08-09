@@ -23,7 +23,7 @@ void CBounding::Update(_fmatrix WorldMatrix)
 
 void CBounding::Free()
 {
-    __super::Free();
+    CBase::Free();
 
     Safe_Release(m_pDevice);
     Safe_Release(m_pContext);

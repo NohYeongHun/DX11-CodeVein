@@ -24,5 +24,5 @@ CLight* CLight::Create(const LIGHT_DESC& LightDesc)
 
 void CLight::Free()
 {
-    __super::Free();
+    CBase::Free();
 }

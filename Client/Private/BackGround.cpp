@@ -23,7 +23,7 @@ HRESULT CBackGround::Initialize_Clone(void* pArg)
     Desc.fSizeX = g_iWinSizeX;
     Desc.fSizeY = g_iWinSizeY;
 
-    if (FAILED(__super::Initialize_Clone(&Desc)))
+    if (FAILED(CUIObject::Initialize_Clone(&Desc)))
         return E_FAIL;
 
     if (FAILED(Ready_Components()))
@@ -34,17 +34,17 @@ HRESULT CBackGround::Initialize_Clone(void* pArg)
 
 void CBackGround::Priority_Update(_float fTimeDelta)
 {
-    __super::Priority_Update(fTimeDelta);
+    CUIObject::Priority_Update(fTimeDelta);
 }
 
 void CBackGround::Update(_float fTimeDelta)
 {
-    __super::Update(fTimeDelta);
+    CUIObject::Update(fTimeDelta);
 }
 
 void CBackGround::Late_Update(_float fTimeDelta)
 {
-    __super::Late_Update(fTimeDelta);
+    CUIObject::Late_Update(fTimeDelta);
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::UI, this)))
         return;
 }
@@ -54,7 +54,7 @@ HRESULT CBackGround::Render()
     /*
     m_pShaderCom->Bind_Texture();*/
 
-    __super::Begin();
+    CUIObject::Begin();
 
     if (FAILED(m_pTransformCom->Bind_Shader_Resource(m_pShaderCom, "g_WorldMatrix")))
         return E_FAIL;
@@ -121,7 +121,7 @@ CGameObject* CBackGround::Clone(void* pArg)
 
 void CBackGround::Free()
 {
-    __super::Free();
+    CUIObject::Free();
 
     Safe_Release(m_pVIBufferCom);
 

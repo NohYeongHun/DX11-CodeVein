@@ -53,6 +53,13 @@ HRESULT CCollider::Initialize_Clone(void* pArg)
     m_eMyLayer = pBoundingDesc->eMyLayer;
     m_TargetLayers = pBoundingDesc->eTargetLayer;
 
+    // BODY 타입은 무조건 구로만 생성 (침투 깊이 연산 통일)
+    if (m_eCollisionType == CCollider::COLLISION_BODY)
+    {
+        if (m_eColliderShape != COLLIDER::SPHERE)
+            CRASH("Body 타입은 무조건 Sphere 로 생성하시오.");
+    }
+
     switch (m_eColliderShape)
     {
     case COLLIDER::AABB:
@@ -107,6 +114,13 @@ _bool CCollider::Has_TargetLayer(CCollider* pRight)
     // 비트 연산해서 비트가 하나라도 0이 아니라면. True 반환.
     return (m_TargetLayers & pRight->m_eMyLayer) != 0;
 }
+
+_float3 CCollider::Get_Center()
+{
+   return m_pBounding->Get_WorldCenter();
+}
+
+
 
 
 #pragma endregion
@@ -190,14 +204,24 @@ void CCollider::Update(_fmatrix WorldMatrix)
     m_pWorldBounding->Update(WorldMatrix);
 }
 
+/* 2차 충돌 감지 */
 _bool CCollider::Intersect(const CCollider* pTargetCollider)
 {
     return m_pBounding->Intersect(pTargetCollider->m_eColliderShape, pTargetCollider->m_pBounding);
 }
+
+/* 1차 충돌 감지 */
 _bool CCollider::BroadIntersect(const CCollider* pTargetCollider)
 {
-    return m_pWorldBounding->Intersect(pTargetCollider->m_eColliderShape, pTargetCollider->m_pWorldBounding);
+    return m_pWorldBounding->Intersect(COLLIDER::AABB, pTargetCollider->m_pWorldBounding);
 }
+
+_float CCollider::Calculate_PenetrationDepthSpehre(const CCollider* pTargetCollider)
+{
+    return m_pBounding->Calculate_PenetrationDepthSpehre(pTargetCollider->m_pBounding);
+}
+
+
 #pragma endregion
 
 
@@ -252,7 +276,7 @@ CComponent* CCollider::Clone(void* pArg)
 
 void CCollider::Free()
 {
-    __super::Free();
+    CComponent::Free();
     m_ColliderObjects.clear();
     if (false == m_isCloned)
     {

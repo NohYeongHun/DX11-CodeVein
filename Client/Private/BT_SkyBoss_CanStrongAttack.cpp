@@ -32,6 +32,6 @@ CBT_SkyBoss_CanStrongAttack* CBT_SkyBoss_CanStrongAttack::Create(CSkyBoss* pOwne
 
 void CBT_SkyBoss_CanStrongAttack::Free()
 {
-    __super::Free();
+    CBTCondition::Free();
     Safe_Release(m_pGameInstance);
 }

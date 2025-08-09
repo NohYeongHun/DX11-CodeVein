@@ -60,7 +60,7 @@ HRESULT CHPBar::Initialize_Prototype()
 
 HRESULT CHPBar::Initialize_Clone(void* pArg)
 {
-    if (FAILED(__super::Initialize_Clone(pArg)))
+    if (FAILED(CUIObject::Initialize_Clone(pArg)))
         return E_FAIL;
 
     m_iTextureIndex = 0;
@@ -105,7 +105,7 @@ void CHPBar::Priority_Update(_float fTimeDelta)
 
     
 
-    __super::Priority_Update(fTimeDelta);
+    CUIObject::Priority_Update(fTimeDelta);
 
 
 }
@@ -113,12 +113,12 @@ void CHPBar::Priority_Update(_float fTimeDelta)
 
 void CHPBar::Update(_float fTimeDelta)
 {
-    __super::Update(fTimeDelta);
+    CUIObject::Update(fTimeDelta);
 }
 
 void CHPBar::Late_Update(_float fTimeDelta)
 {
-    __super::Late_Update(fTimeDelta);
+    CUIObject::Late_Update(fTimeDelta);
 
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::STATIC_UI, this)))
         return;
@@ -129,7 +129,7 @@ void CHPBar::Late_Update(_float fTimeDelta)
 
 HRESULT CHPBar::Render()
 {
-    __super::Begin();
+    CUIObject::Begin();
 
   
     if (FAILED(Ready_Render_Resources()))
@@ -142,9 +142,9 @@ HRESULT CHPBar::Render()
     m_pVIBufferCom->Render();
 
     // 폰트 출력.
-    // Render_HP();
+    Render_HP();
 
-    __super::End();
+    CUIObject::End();
 
     return S_OK;
 }
@@ -256,7 +256,7 @@ CGameObject* CHPBar::Clone(void* pArg)
 
 void CHPBar::Destroy()
 {
-    __super::Destroy();
+    CUIObject::Destroy();
 
     for (auto& val : m_Events)
         m_pGameInstance->UnSubscribe(val, Get_ID());
@@ -264,7 +264,7 @@ void CHPBar::Destroy()
 
 void CHPBar::Free()
 {
-    __super::Free();
+    CUIObject::Free();
 
     Safe_Release(m_pVIBufferCom);
     Safe_Release(m_pShaderCom);

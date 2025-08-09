@@ -1,6 +1,7 @@
 ﻿CBT_Monster_IsDetectRange::CBT_Monster_IsDetectRange(CMonster* pOwner)
 	: m_pOwner(pOwner)
 {
+    m_strTag = L"MonsterIdle_IsDectectConditionNode";
 }
 
 /* 플레이어가 해당 거리에 와있는가? */
@@ -22,6 +23,6 @@ CBT_Monster_IsDetectRange* CBT_Monster_IsDetectRange::Create(CMonster* pOwner)
 
 void CBT_Monster_IsDetectRange::Free()
 {
-    __super::Free();
+    CBTCondition::Free();
     m_pOwner = nullptr;
 }

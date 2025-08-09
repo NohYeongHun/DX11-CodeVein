@@ -12,7 +12,7 @@ CPlayer::CPlayer(const CPlayer& Prototype)
 
 HRESULT CPlayer::Initialize_Prototype()
 {
-    if (FAILED(__super::Initialize_Prototype()))
+    if (FAILED(CGameObject::Initialize_Prototype()))
         return E_FAIL;
 
     return S_OK;
@@ -22,7 +22,7 @@ HRESULT CPlayer::Initialize_Clone(void* pArg)
 {
     PLAYER_DESC* pDesc = static_cast<PLAYER_DESC*>(pArg);
     
-    if (FAILED(__super::Initialize_Clone(pDesc)))
+    if (FAILED(CGameObject::Initialize_Clone(pDesc)))
         return E_FAIL;
 
     if (FAILED(Ready_Components(pDesc)))
@@ -38,12 +38,12 @@ HRESULT CPlayer::Initialize_Clone(void* pArg)
 
 void CPlayer::Priority_Update(_float fTimeDelta)
 {
-    __super::Priority_Update(fTimeDelta);
+    CGameObject::Priority_Update(fTimeDelta);
 }
 
 void CPlayer::Update(_float fTimeDelta)
 {
-    __super::Update(fTimeDelta);
+    CGameObject::Update(fTimeDelta);
     if (true == m_pModelCom->Play_Animation(fTimeDelta))
         int a = 10;
 
@@ -70,7 +70,7 @@ void CPlayer::Update(_float fTimeDelta)
 
 void CPlayer::Late_Update(_float fTimeDelta)
 {
-    __super::Late_Update(fTimeDelta);
+    CGameObject::Late_Update(fTimeDelta);
 
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::BLEND, this)))
         return;
@@ -153,24 +153,6 @@ HRESULT CPlayer::Ready_Components(PLAYER_DESC* pDesc)
     }
         
 
-    //if (FAILED(__super::Add_Component(ENUM_CLASS(LEVEL::LOGO)
-    //    , TEXT("Prototype_Component_Model_Player")
-    //    ,TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom), nullptr)))
-    //{
-    //    CRASH("Model Create Failed");
-    //    return E_FAIL;
-    //}
-
-
-    //if (FAILED(__super::Add_Component(ENUM_CLASS(LEVEL::LOGO)
-    //    , TEXT("Prototype_Component_Model_Sword")
-    //    , TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom), nullptr)))
-    //{
-    //    CRASH("Model Create Failed");
-    //    return E_FAIL;
-    //}
-
-
     return S_OK;
 }
 
@@ -217,12 +199,12 @@ CGameObject* CPlayer::Clone(void* pArg)
 
 void CPlayer::Destroy()
 {
-    __super::Destroy();
+    CGameObject::Destroy();
 }
 
 void CPlayer::Free()
 {
-    __super::Free();
+    CGameObject::Free();
     Safe_Release(m_pModelCom);
     Safe_Release(m_pShaderCom);
 }

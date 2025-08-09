@@ -492,7 +492,7 @@ CMainApp* CMainApp::Create()
 
 void CMainApp::Free()
 {
-	__super::Free();
+	CBase::Free();
 
 	FreeConsole();
 

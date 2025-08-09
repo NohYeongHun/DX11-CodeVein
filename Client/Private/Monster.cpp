@@ -15,7 +15,7 @@ CMonster::CMonster(const CMonster& Prototype)
 
 HRESULT CMonster::Initialize_Prototype()
 {
-    if (FAILED(__super::Initialize_Prototype()))
+    if (FAILED(CContainerObject::Initialize_Prototype()))
     {
         CRASH("Failed Prototype");
         return E_FAIL;
@@ -50,7 +50,7 @@ HRESULT CMonster::Initialize_Clone(void* pArg)
         return E_FAIL;
     }
 
-    if (FAILED(__super::Initialize_Clone(pArg)))
+    if (FAILED(CContainerObject::Initialize_Clone(pArg)))
     {
         CRASH("Failed Clone");
         return E_FAIL;
@@ -71,7 +71,7 @@ void CMonster::Update(_float fTimeDelta)
 
 void CMonster::Finalize_Update(_float fTimeDelta)
 {
-    __super::Finalize_Update(fTimeDelta);
+    CContainerObject::Finalize_Update(fTimeDelta);
 
 
     if (m_pColliderCom)
@@ -96,6 +96,8 @@ HRESULT CMonster::Render()
     return S_OK;
 }
 
+#pragma region 0. 충돌시 발생하는 이벤트에 대한 컨트롤.
+
 void CMonster::On_Collision_Enter(CGameObject* pOther)
 {
 }
@@ -107,6 +109,14 @@ void CMonster::On_Collision_Stay(CGameObject* pOther)
 void CMonster::On_Collision_Exit(CGameObject* pOther)
 {
 }
+
+void CMonster::Take_Damage(_float fDamage)
+{
+    m_MonsterStat.fHP -= fDamage;
+    
+}
+#pragma endregion
+
 
 
 #pragma region 애니메이션 상태 변경.
@@ -169,6 +179,9 @@ const _bool CMonster::Is_Animation_Finished()
 {
     return m_pModelCom->Is_Finished();
 }
+
+/* 현재 애니메이션이 전환 가능한가? */
+
 
 void CMonster::Set_RootMotionRotation(_bool IsRotate)
 {
@@ -522,7 +535,7 @@ const _bool CMonster::IsRotateFinished(_float fRadian)
 #pragma endregion
 
 
-#pragma region 6. 몬스터 삭제 처리.
+#pragma region 7. 몬스터 삭제 처리. => 이건 Dead Node에서 처리하기?
 _bool CMonster::Monster_Dead()
 {
     // 피가 0이면서 Dead 상태이면서.
@@ -554,7 +567,7 @@ void CMonster::Print_Position()
 
 void CMonster::Free()
 {
-    __super::Free();
+    CContainerObject::Free();
     Safe_Release(m_pModelCom);
     Safe_Release(m_pShaderCom);
     Safe_Release(m_pColliderCom);

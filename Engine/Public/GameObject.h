@@ -27,7 +27,7 @@ public:
 	HRESULT Change_Component(const _wstring& strComponentTag, CComponent** ppOut, CComponent* pChangeComponent);
 
 	class CTransform* Get_Transform() { return m_pTransformCom; }
-
+	class CNavigation* Get_Navigation() { return m_pNavigationCom; }
 	virtual void RootMotion_Translate(_fvector vTranslate);
 	
 
@@ -92,6 +92,7 @@ protected:
 	ID3D11DeviceContext*		m_pContext = { nullptr };
 	class CGameInstance*		m_pGameInstance = { nullptr };
 	class CTransform*			m_pTransformCom = { nullptr };
+	class CNavigation*			m_pNavigationCom = { nullptr };
 
 	map<const _wstring, class CComponent*>		m_Components;
 

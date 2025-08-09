@@ -49,6 +49,7 @@ public:
 #pragma region 충돌 감시
 public:
 	virtual _bool Intersect(COLLIDER eColliderType, CBounding* pBounding) override;
+	virtual _float Calculate_PenetrationDepthSpehre(CBounding* pBounding) override { return 0.f; };
 #pragma endregion
 
 

@@ -74,6 +74,6 @@ CPipeLine* CPipeLine::Create()
 
 void CPipeLine::Free()
 {
-    __super::Free();
+    CBase::Free();
 
 }

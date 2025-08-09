@@ -34,7 +34,7 @@ CPlayer::CPlayer(const CPlayer& Prototype)
 
 HRESULT CPlayer::Initialize_Prototype()
 {
-    if (FAILED(__super::Initialize_Prototype()))
+    if (FAILED(CContainerObject::Initialize_Prototype()))
         return E_FAIL;
 
     m_strObjTag = TEXT("Player");
@@ -44,11 +44,14 @@ HRESULT CPlayer::Initialize_Prototype()
 
 HRESULT CPlayer::Initialize_Clone(void* pArg)
 {
-
-
     PLAYER_DESC* pDesc = static_cast<PLAYER_DESC*>(pArg);
+    m_Stats = {
+        pDesc->fMaxHP,
+        pDesc->fHP,
+        pDesc->fAttackPower,
+    };
 
-    if (FAILED(__super::Initialize_Clone(pDesc)))
+    if (FAILED(CContainerObject::Initialize_Clone(pDesc)))
         return E_FAIL;
 
     m_eCurLevel = pDesc->eCurLevel;
@@ -606,6 +609,8 @@ HRESULT CPlayer::InitializeAction_ToAnimationMap()
     m_Action_AnimMap.emplace(L"ATTACK3", PLAYER_ANIM_S_ATK_NORMAL3);
     m_Action_AnimMap.emplace(L"ATTACK4", PLAYER_ANIM_S_ATK_NORMAL4);
     m_Action_AnimMap.emplace(L"ATTACK5", PLAYER_ANIM_S_ATK_NORMAL5);
+
+    // 220 Frame => 100 Frame까지?
     m_Action_AnimMap.emplace(L"STRONG_ATTACK1", PLAYER_ANIM_LS_ATK_STRONG1B);
     
 
@@ -873,7 +878,7 @@ HRESULT CPlayer::Ready_Components(PLAYER_DESC* pDesc)
     CLoad_Model::LOADMODEL_DESC Desc{};
     Desc.pGameObject = this;
 
-    if (FAILED(__super::Add_Component(ENUM_CLASS(LEVEL::STATIC)
+    if (FAILED(CContainerObject::Add_Component(ENUM_CLASS(LEVEL::STATIC)
         , TEXT("Prototype_Component_Model_Player")
         , TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom), &Desc)))
         return E_FAIL;
@@ -886,25 +891,21 @@ HRESULT CPlayer::Ready_Colliders(PLAYER_DESC* pDesc)
     BOUNDING_BOX box = m_pModelCom->Get_BoundingBox();
     m_fOffsetY = box.fHeight * 0.5f;
 
-    CBounding_OBB::BOUNDING_OBB_DESC  OBBDesc{};
-    
-    OBBDesc.vExtents = _float3(box.vExtents.x, box.vExtents.y, box.vExtents.z);
-    OBBDesc.vCenter = _float3(0.f, box.vExtents.y, 0.f); // 중점.
-    OBBDesc.vRotation = { m_pTransformCom->GetPitchFromQuaternion(),
-        m_pTransformCom->GetYawFromQuaternion(),
-        m_pTransformCom->GetRollFromQuaternion() };
-    OBBDesc.pOwner = this;
-    OBBDesc.eCollisionType = CCollider::COLLISION_BODY;
-    OBBDesc.eMyLayer = CCollider::PLAYER;
-    OBBDesc.eTargetLayer = CCollider::MONSTER | CCollider::MONSTER_WEAPON
+    CBounding_Sphere::BOUNDING_SPHERE_DESC SphereDesc{};
+    SphereDesc.fRadius = max(max(box.vExtents.x, box.vExtents.y), box.vExtents.z);
+    SphereDesc.vCenter = _float3(0.f, box.vExtents.y, 0.f); // 중점.
+    SphereDesc.pOwner = this;
+    SphereDesc.eCollisionType = CCollider::COLLISION_BODY;
+    SphereDesc.eMyLayer = CCollider::PLAYER;
+    SphereDesc.eTargetLayer = CCollider::MONSTER | CCollider::MONSTER_WEAPON
         | CCollider::MONSTER_SKILL | CCollider::STATIC_OBJECT;
-    
 
-    if (FAILED(__super::Add_Component(ENUM_CLASS(LEVEL::STATIC)
-        , TEXT("Prototype_Component_Collider_OBB")
-        , TEXT("Com_Collider"), reinterpret_cast<CComponent**>(&m_pColliderCom), &OBBDesc)))
+
+    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC)
+        , TEXT("Prototype_Component_Collider_SPHERE")
+        , TEXT("Com_Collider"), reinterpret_cast<CComponent**>(&m_pColliderCom), &SphereDesc)))
     {
-        CRASH("Failed Clone Collider OBB");
+        CRASH("Failed Clone Collider SPHERE");
         return E_FAIL;
     }
 
@@ -955,7 +956,7 @@ HRESULT CPlayer::Ready_Fsm()
     CFsm::FSM_DESC Desc{};
     Desc.pOwner = this;
 
-    if (FAILED(__super::Add_Component(ENUM_CLASS(LEVEL::STATIC)
+    if (FAILED(CContainerObject::Add_Component(ENUM_CLASS(LEVEL::STATIC)
         , TEXT("Prototype_Component_Fsm")
         , TEXT("Com_Fsm"), reinterpret_cast<CComponent**>(&m_pFsmCom), &Desc)))
         return E_FAIL;
@@ -973,7 +974,8 @@ HRESULT CPlayer::Ready_Fsm()
     m_pFsmCom->Add_State(CPlayer_GuardState::Create(PLAYER_STATE::GUARD, &PlayerDesc));
     m_pFsmCom->Add_State(CPlayer_AttackState::Create(PLAYER_STATE::ATTACK, &PlayerDesc));
 
-
+    m_pModelCom->Get_Current_Ratio();
+    
     /* 재생 속도 증가*/
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("RUN")], 1.5f);
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("ATTACK1")], 2.f);
@@ -1070,7 +1072,7 @@ HRESULT CPlayer::Ready_PartObjects()
     Weapon.eCurLevel = LEVEL::STATIC;
     Weapon.pOwner = this;
 
-    if (FAILED(__super::Add_PartObject(TEXT("Com_Weapon"),
+    if (FAILED(CContainerObject::Add_PartObject(TEXT("Com_Weapon"),
         ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_Weapon")
         , reinterpret_cast<CPartObject**>(& m_pPlayerWeapon), &Weapon)))
     {
@@ -1078,6 +1080,7 @@ HRESULT CPlayer::Ready_PartObjects()
         return E_FAIL;
     }
 
+    m_pPlayerWeapon->Set_AttackPower(m_Stats.fAttackPower);
     
 
     return S_OK;
@@ -1111,12 +1114,12 @@ CGameObject* CPlayer::Clone(void* pArg)
 
 void CPlayer::Destroy()
 {
-    __super::Destroy();
+    CContainerObject::Destroy();
 }
 
 void CPlayer::Free()
 {
-    __super::Free();
+    CContainerObject::Free();
     Safe_Release(m_pFsmCom);
     Safe_Release(m_pShaderCom);
     Safe_Release(m_pModelCom);
