@@ -1,4 +1,4 @@
-#include "Timer.h"
+ï»¿#include "Timer.h"
 
 CTimer::CTimer() 
 	: m_fTimeDelta(0.f)
@@ -12,12 +12,12 @@ CTimer::CTimer()
 
 HRESULT CTimer::Initialize_Clone()
 {
-	/* ÇöÀç cpuÄ«¿îÆÃÇÑ ¼ıÀÚ. */
+	/* í˜„ì¬ cpuì¹´ìš´íŒ…í•œ ìˆ«ì. */
 	QueryPerformanceCounter(&m_FrameTime);			// 1077
 	QueryPerformanceCounter(&m_LastTime);			// 1085
 	QueryPerformanceCounter(&m_FixTime);			// 1090
 
-	/* cpu°¡ 1ÃÊ¿¡ Ä«¿îÆÃÇÒ ¼ö ÀÖ´Â ÃÖ´ë ¼ıÀÚ. */
+	/* cpuê°€ 1ì´ˆì— ì¹´ìš´íŒ…í•  ìˆ˜ ìˆëŠ” ìµœëŒ€ ìˆ«ì. */
 	QueryPerformanceFrequency(&m_CpuTick);
 
 	return S_OK;
@@ -53,5 +53,5 @@ CTimer* CTimer::Create()
 
 void CTimer::Free()
 {
-	__super::Free();
+	CBase::Free();
 }

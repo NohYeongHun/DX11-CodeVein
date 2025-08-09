@@ -83,5 +83,5 @@ CTool_Bone* CTool_Bone::Clone()
 
 void CTool_Bone::Free()
 {
-    __super::Free();
+    CBase::Free();
 }

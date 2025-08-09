@@ -28,6 +28,6 @@ CBT_SkyBoss_IsStrongHit* CBT_SkyBoss_IsStrongHit::Create(CSkyBoss* pOwner)
 
 void CBT_SkyBoss_IsStrongHit::Free()
 {
-    __super::Free();
+    CBTCondition::Free();
     Safe_Release(m_pGameInstance);
 }

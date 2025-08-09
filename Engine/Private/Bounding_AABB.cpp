@@ -103,7 +103,7 @@ CBounding_AABB* CBounding_AABB::Create(ID3D11Device* pDevice, ID3D11DeviceContex
 
 void CBounding_AABB::Free()
 {
-	__super::Free();
+	CBounding::Free();
 	Safe_Delete(m_pDesc);
 	Safe_Delete(m_pOriginalDesc);
 

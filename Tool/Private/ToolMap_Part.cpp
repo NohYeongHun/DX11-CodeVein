@@ -27,7 +27,7 @@ CToolMap_Part::CToolMap_Part(const CToolMap_Part& Prototype)
 
 HRESULT CToolMap_Part::Initialize_Prototype()
 {
-    if (FAILED(__super::Initialize_Prototype()))
+    if (FAILED(CGameObject::Initialize_Prototype()))
         return E_FAIL;
 
     return S_OK;
@@ -66,10 +66,10 @@ HRESULT CToolMap_Part::Initialize_Craete(MODEL_CREATE_DESC* pDesc)
     m_strObjTag = m_strModelTag.c_str();
 
 
-    if (FAILED(__super::Initialize_Clone(pDesc)))
+    if (FAILED(CGameObject::Initialize_Clone(pDesc)))
         return E_FAIL;
 
-    if (FAILED(__super::Add_Component(ENUM_CLASS(LEVEL::LOGO)
+    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::LOGO)
         , pDesc->pModelTag
         , TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom), nullptr)))
         return E_FAIL;
@@ -85,10 +85,10 @@ HRESULT CToolMap_Part::Initialize_Load(MAP_PART_INFO* pDesc)
     m_strModelTag = pDesc->strModelTag;
     m_strObjTag = m_strModelTag.c_str();
 
-    if (FAILED(__super::Initialize_Clone(pDesc)))
+    if (FAILED(CGameObject::Initialize_Clone(pDesc)))
         return E_FAIL;
 
-    if (FAILED(__super::Add_Component(ENUM_CLASS(LEVEL::LOGO)
+    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::LOGO)
         , pDesc->strModelTag.c_str()
         , TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom), nullptr)))
         return E_FAIL;
@@ -105,14 +105,14 @@ HRESULT CToolMap_Part::Initialize_Load(MAP_PART_INFO* pDesc)
 
 void CToolMap_Part::Priority_Update(_float fTimeDelta)
 {
-    __super::Priority_Update(fTimeDelta);
+    CGameObject::Priority_Update(fTimeDelta);
 }
 
 void CToolMap_Part::Update(_float fTimeDelta)
 {
     
 
-    __super::Update(fTimeDelta);
+    CGameObject::Update(fTimeDelta);
     _float fDist = {};
 
    /* if (m_pGameInstance->Get_MouseKeyUp(MOUSEKEYSTATE::LB) &&
@@ -130,7 +130,7 @@ void CToolMap_Part::Update(_float fTimeDelta)
 void CToolMap_Part::Late_Update(_float fTimeDelta)
 {
     
-    __super::Late_Update(fTimeDelta);
+    CGameObject::Late_Update(fTimeDelta);
 
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::BLEND, this)))
         return;
@@ -304,12 +304,12 @@ CGameObject* CToolMap_Part::Clone(void* pArg)
 
 void CToolMap_Part::Destroy()
 {
-    __super::Destroy();
+    CGameObject::Destroy();
 }
 
 void CToolMap_Part::Free()
 {
-    __super::Free();
+    CGameObject::Free();
     Safe_Release(m_pModelCom);
     Safe_Release(m_pShaderCom);
 }

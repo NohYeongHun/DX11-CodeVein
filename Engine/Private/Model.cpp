@@ -248,7 +248,7 @@ CComponent* CModel::Clone(void* pArg)
 
 void CModel::Free()
 {
-	__super::Free();
+	CComponent::Free();
 
 	for (auto& pAnimation : m_Animations)
 		Safe_Release(pAnimation);

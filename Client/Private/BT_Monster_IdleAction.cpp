@@ -3,6 +3,7 @@
 CBT_Monster_IdleAction::CBT_Monster_IdleAction(CMonster* pOwner)
 	: m_pOwner(pOwner)
 {
+	m_strTag = L"MonsterIdle_ActionNode";
 }
 
 BT_RESULT CBT_Monster_IdleAction::Perform_Action(_float fTimeDelta)
@@ -18,9 +19,12 @@ BT_RESULT CBT_Monster_IdleAction::LoopIdle(_float fTimeDelta)
 {
 	m_pOwner->Set_RootMotionTranslate(false);
     m_pOwner->RotateTurn_ToTarget();
-    _uint iNextAnimationIdx = m_pOwner->Find_AnimationIndex(L"IDLE");
-	m_pOwner->Change_Animation_NonBlend(iNextAnimationIdx);
 
+	if (m_pOwner->Is_Animation_Finished())
+	{
+		_uint iNextAnimationIdx = m_pOwner->Find_AnimationIndex(L"IDLE");
+		m_pOwner->Change_Animation_NonBlend(iNextAnimationIdx);
+	}
     return BT_RESULT::SUCCESS;
 }
 
@@ -37,7 +41,7 @@ CBT_Monster_IdleAction* CBT_Monster_IdleAction::Create(CMonster* pOwner)
 
 void CBT_Monster_IdleAction::Free()
 {
-	__super::Free();
+	CBTAction::Free();
 	m_pOwner = nullptr;
 
 }

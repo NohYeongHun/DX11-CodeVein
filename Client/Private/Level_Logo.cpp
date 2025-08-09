@@ -90,7 +90,7 @@ CLevel_Logo* CLevel_Logo::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pCo
 
 void CLevel_Logo::Free()
 {
-	__super::Free();
+	CLevel::Free();
 
 	for (auto& Event : m_Events)
 		m_pGameInstance->UnSubscribe(Event.first, Event.second);

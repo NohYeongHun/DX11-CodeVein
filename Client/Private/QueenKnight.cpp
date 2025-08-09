@@ -12,7 +12,7 @@ CQueenKnight::CQueenKnight(const CQueenKnight& Prototype)
 #pragma region 0. 기본 함수들 정의
 HRESULT CQueenKnight::Initialize_Prototype()
 {
-    if (FAILED(__super::Initialize_Prototype()))
+    if (FAILED(CMonster::Initialize_Prototype()))
         return E_FAIL;
 
     m_strObjTag = TEXT("QueenKnight");
@@ -24,7 +24,7 @@ HRESULT CQueenKnight::Initialize_Clone(void* pArg)
 {
     QUEENKNIGHT_DESC* pDesc = static_cast<QUEENKNIGHT_DESC*>(pArg);
 
-    if (FAILED(__super::Initialize_Clone(pDesc)))
+    if (FAILED(CMonster::Initialize_Clone(pDesc)))
     {
         CRASH("Ready Clone Failed");
         return E_FAIL;
@@ -103,7 +103,7 @@ HRESULT CQueenKnight::Initialize_Clone(void* pArg)
 
 void CQueenKnight::Priority_Update(_float fTimeDelta)
 {
-    __super::Priority_Update(fTimeDelta);
+    CMonster::Priority_Update(fTimeDelta);
 }
 
 void CQueenKnight::Update(_float fTimeDelta)
@@ -126,7 +126,6 @@ void CQueenKnight::Update(_float fTimeDelta)
 #pragma endregion
 
     Update_AI(fTimeDelta);
-
 
     // 하위 객체들 움직임 제어는 Tree 제어 이후에
     CMonster::Update(fTimeDelta);
@@ -160,6 +159,21 @@ void CQueenKnight::Late_Update(_float fTimeDelta)
 HRESULT CQueenKnight::Render()
 {
 #ifdef _DEBUG
+    ImGuiIO& io = ImGui::GetIO();
+
+    // 기존 Player Debug Window
+
+    ImVec2 windowSize = ImVec2(300.f, 300.f);
+    ImVec2 windowPos = ImVec2(io.DisplaySize.x - windowSize.x, windowSize.y);
+    ImGui::SetNextWindowPos(windowPos, ImGuiCond_Once);
+    ImGui::SetNextWindowSize(windowSize, ImGuiCond_Once);
+
+    string strDebug = "QueenKnight Debug";
+    ImGui::Begin(strDebug.c_str(), nullptr, ImGuiWindowFlags_NoCollapse);
+    ImGui::Text("HP : (%.2f)", m_MonsterStat.fHP);
+    ImGui::Text("MAX HP : (%.2f)", m_MonsterStat.fMaxHP);
+
+    ImGui::End();
      m_pColliderCom->Render();
 #endif // _DEBUG
 
@@ -195,6 +209,32 @@ HRESULT CQueenKnight::Render()
 
 void CQueenKnight::On_Collision_Enter(CGameObject* pOther)
 {
+    // 1. 충돌 가능한 타입의 포인터들을 나열.
+    CPlayerWeapon* pPlayerWeapon = dynamic_cast<CPlayerWeapon*>(pOther);
+
+    // PlayerWeapon에 충돌 되었을 경우
+    if (nullptr != pPlayerWeapon)
+    {
+        // 0. 무적 상태 체크 
+        if (!HasBuff(BUFF_INVINCIBLE))
+        {
+            // 1. 데미지를 입고.
+            CMonster::Take_Damage(pPlayerWeapon->Get_AttackPower());
+
+            // 2. 해당 위치에 검흔 Effect 생성?
+
+            // 3. 무적 버프 추가.
+            AddBuff(BUFF_INVINCIBLE);
+
+            AddBuff(BUFF_HIT);
+        }
+
+        
+    }
+
+
+    if (m_MonsterStat.fHP <= 0.f)
+        AddBuff(BUFF_DEAD);
 }
 
 void CQueenKnight::On_Collision_Stay(CGameObject* pOther)
@@ -265,9 +305,9 @@ HRESULT CQueenKnight::InitializeAction_ToAnimationMap()
 
     /* 재생속도 증가. */
     
-    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"PHASE_ATTACK1"], 3.f);
-    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"PHASE_ATTACK2"], 3.f);
-    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"PHASE_ATTACK3"], 3.f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"PHASE_ATTACK1"], 2.f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"PHASE_ATTACK2"], 2.f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"PHASE_ATTACK3"], 2.f);
 
 
     return S_OK;
@@ -278,16 +318,15 @@ HRESULT CQueenKnight::InitializeAction_ToAnimationMap()
 #pragma region 5. 사용되는 버프 / 디버프에 대한 타이머를 관리해야합니다.
 HRESULT CQueenKnight::Initialize_BuffDurations()
 {
-    // 어찌보면 이건 그냥 쿨다운의 영역.
+    // 기본 쿨다운.
     m_BuffDefault_Durations[BUFF_HIT] = 0.5f;        // 피격: 0.6초
     m_BuffDefault_Durations[BUFF_DOWN] = 5.f;       // 다운: 20초 => 두번 클릭했을 때 다운이 되는가.
     m_BuffDefault_Durations[BUFF_CORPSE] = 2.0f;       // 시체 : 2.0초
     m_BuffDefault_Durations[BUFF_INVINCIBLE] = 0.6f; // 무적 시간.
-
     m_BuffDefault_Durations[BUFF_DEAD] = 10.f; // 사망 시간.
 
-    // 15 초마다 해당 페이즈 시퀀스 공격 반복
-    m_BuffDefault_Durations[QUEEN_BUFF_PHASE_ATTACK_COOLDOWN] = 1.f;
+    // 10 초마다 해당 페이즈 시퀀스 공격 반복
+    m_BuffDefault_Durations[QUEEN_BUFF_PHASE_ATTACK_COOLDOWN] = 10.f;
     return S_OK;
 }
 
@@ -325,7 +364,7 @@ HRESULT CQueenKnight::Ready_Components(QUEENKNIGHT_DESC* pDesc)
     CLoad_Model::LOADMODEL_DESC Desc{};
     Desc.pGameObject = this;
 
-    if (FAILED(__super::Add_Component(ENUM_CLASS(m_eCurLevel)
+    if (FAILED(CMonster::Add_Component(ENUM_CLASS(m_eCurLevel)
         , TEXT("Prototype_Component_Model_QueenKnight")
         , TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom), &Desc)))
         return E_FAIL;
@@ -341,21 +380,21 @@ HRESULT CQueenKnight::Ready_Colliders(QUEENKNIGHT_DESC* pDesc)
     // 오프셋 지정.
 
     BOUNDING_BOX box = m_pModelCom->Get_BoundingBox();
-
-    CBounding_OBB::BOUNDING_OBB_DESC  OBBDesc{};
-    OBBDesc.vExtents = _float3(box.vExtents.x, box.vExtents.y, box.vExtents.z);
-    OBBDesc.vCenter = _float3(0.f, box.vExtents.y, 0.f); // 중점.
-    OBBDesc.pOwner = this;
-    OBBDesc.eCollisionType = CCollider::COLLISION_BODY;
-    OBBDesc.eMyLayer = CCollider::MONSTER;
-    OBBDesc.eTargetLayer = CCollider::PLAYER | CCollider::PLAYER_WEAPON
+    CBounding_Sphere::BOUNDING_SPHERE_DESC SphereDesc{};
+    SphereDesc.fRadius = max(max(box.vExtents.x, box.vExtents.y), box.vExtents.z);
+    SphereDesc.vCenter = _float3(0.f, box.vExtents.y, 0.f); // 중점.
+    SphereDesc.pOwner = this;
+    SphereDesc.eCollisionType = CCollider::COLLISION_BODY;
+    SphereDesc.eMyLayer = CCollider::MONSTER;
+    SphereDesc.eTargetLayer = CCollider::PLAYER | CCollider::PLAYER_WEAPON
         | CCollider::MONSTER | CCollider::PLAYER_SKILL | CCollider::STATIC_OBJECT;
 
+
     if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC)
-        , TEXT("Prototype_Component_Collider_OBB")
-        , TEXT("Com_Collider"), reinterpret_cast<CComponent**>(&m_pColliderCom), &OBBDesc)))
+        , TEXT("Prototype_Component_Collider_SPHERE")
+        , TEXT("Com_Collider"), reinterpret_cast<CComponent**>(&m_pColliderCom), &SphereDesc)))
     {
-        CRASH("Failed Clone Collider OBB");
+        CRASH("Failed Clone Collider SPHERE");
         return E_FAIL;
     }
 
@@ -505,12 +544,12 @@ CGameObject* CQueenKnight::Clone(void* pArg)
 
 void CQueenKnight::Destroy()
 {
-    __super::Destroy();
+    CMonster::Destroy();
 }
 
 void CQueenKnight::Free()
 {
-    __super::Free();
+    CMonster::Free();
     Safe_Release(m_pWeapon);
     Safe_Release(m_pShield);
     Safe_Release(m_pTree);

@@ -11,7 +11,7 @@ CSkyBoss::CSkyBoss(const CSkyBoss& Prototype)
 
 HRESULT CSkyBoss::Initialize_Prototype()
 {
-    if (FAILED(__super::Initialize_Prototype()))
+    if (FAILED(CMonster::Initialize_Prototype()))
         return E_FAIL;
 
     return S_OK;
@@ -22,17 +22,11 @@ HRESULT CSkyBoss::Initialize_Clone(void* pArg)
 {
     SKYBOSS_DESC* pDesc = static_cast<SKYBOSS_DESC*>(pArg);
 
-    if (FAILED(__super::Initialize_Clone(pDesc)))
+    if (FAILED(CMonster::Initialize_Clone(pDesc)))
         return E_FAIL;
 
     if (FAILED(Ready_Components(pDesc)))
         return E_FAIL;
-
-    //if (FAILED(Ready_BehaviourTree()))
-    //{
-    //    CRASH("Failed Ready BehaviourTree SkyBoss")
-    //        return E_FAIL;
-    //}
 
     if (FAILED(InitializeAction_ToAnimationMap()))
     {
@@ -63,20 +57,13 @@ HRESULT CSkyBoss::Initialize_Clone(void* pArg)
 
 void CSkyBoss::Priority_Update(_float fTimeDelta)
 {
-    __super::Priority_Update(fTimeDelta);
+    CMonster::Priority_Update(fTimeDelta);
 }
 
 // 루프가 아닌데 애니메이션이 
 // 실행된다.
 void CSkyBoss::Update(_float fTimeDelta)
 {
-    //if (m_pGameInstance->Get_KeyPress(DIK_1))
-    //{
-    //    _wstring wstrDebug = TEXT("Dead키 눌렀다. \n");
-    //    OutputDebugString(wstrDebug.c_str());
-    //   // Set_Dead();
-    //}
-
     if (m_pTree)
         m_pTree->Update(fTimeDelta);
 
@@ -86,7 +73,7 @@ void CSkyBoss::Update(_float fTimeDelta)
     }
 
     // 하위 객체들 움직임 제어는 Tree 제어 이후에
-    __super::Update(fTimeDelta);
+    CMonster::Update(fTimeDelta);
 
 }
 
@@ -95,7 +82,7 @@ void CSkyBoss::Late_Update(_float fTimeDelta)
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::BLEND, this)))
         return;
 
-    __super::Late_Update(fTimeDelta);
+    CMonster::Late_Update(fTimeDelta);
 
 }
 
@@ -216,19 +203,14 @@ HRESULT CSkyBoss::Initialize_BuffDurations()
 /* 필수 컴포넌트 */
 HRESULT CSkyBoss::Ready_Components(SKYBOSS_DESC* pDesc)
 {
-    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxAnimMesh"),
+    if (FAILED(CMonster::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxAnimMesh"),
         TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom), nullptr)))
         return E_FAIL;
 
     CLoad_Model::LOADMODEL_DESC Desc{};
     Desc.pGameObject = this;
 
-    //if (FAILED(__super::Add_Component(ENUM_CLASS(m_eCurLevel)
-    //    , TEXT("Prototype_Component_Model_SkyBoss")
-    //    , TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom), &Desc)))
-    //    return E_FAIL;
-
-    if (FAILED(__super::Add_Component(ENUM_CLASS(m_eCurLevel)
+    if (FAILED(CMonster::Add_Component(ENUM_CLASS(m_eCurLevel)
         , TEXT("Prototype_Component_Model_QueenKnight")
         , TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom), &Desc)))
         return E_FAIL;
@@ -331,12 +313,12 @@ CGameObject* CSkyBoss::Clone(void* pArg)
 
 void CSkyBoss::Destroy()
 {
-    __super::Destroy();
+    CMonster::Destroy();
 }
 
 void CSkyBoss::Free()
 {
-    __super::Free();
+    CMonster::Free();
     Safe_Release(m_pTree);
 }
 

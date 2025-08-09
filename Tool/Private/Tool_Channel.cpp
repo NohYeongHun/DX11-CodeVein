@@ -152,7 +152,7 @@ CTool_Channel* CTool_Channel::Create(const aiNodeAnim* pAIChannel, const vector<
 
 void CTool_Channel::Free()
 {
-    __super::Free();
+    CBase::Free();
     m_KeyFrames.clear();
 
 }

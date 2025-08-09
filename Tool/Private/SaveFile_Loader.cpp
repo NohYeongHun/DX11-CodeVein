@@ -401,6 +401,6 @@ CSaveFile_Loader* CSaveFile_Loader::Create()
 
 void CSaveFile_Loader::Free()
 {
-	__super::Free();
+	CBase::Free();
 	Safe_Release(m_pGameInstance);
 }

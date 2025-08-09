@@ -2,6 +2,7 @@
 CBT_QueenKnight_FirstPhase_AttackAction::CBT_QueenKnight_FirstPhase_AttackAction(CQueenKnight* pOwner)
     : m_pOwner(pOwner)
 {
+    m_strTag = L"QueenKnight_FirstComboNodeAction";
 }
 
 BT_RESULT CBT_QueenKnight_FirstPhase_AttackAction::Perform_Action(_float fTimeDelta)
@@ -85,7 +86,8 @@ BT_RESULT CBT_QueenKnight_FirstPhase_AttackAction::UpdateFirstAttack(_float fTim
 {
     // 0. 바로 바뀐다.
     m_pOwner->RotateTurn_ToTargetYaw();
-    if (m_pOwner->Is_Animation_Finished())
+    //if (m_pOwner->Is_Animation_Finished())
+    if (m_pOwner->Get_CurrentAnimationRatio() > 0.7f)
     {
         m_eAttackPhase = ATTACK_PHASE::SECOND_ATTACK;
 
@@ -104,7 +106,7 @@ BT_RESULT CBT_QueenKnight_FirstPhase_AttackAction::UpdateFirstAttack(_float fTim
 BT_RESULT CBT_QueenKnight_FirstPhase_AttackAction::UpdateSecondAttack(_float fTimeDelta)
 {
     m_pOwner->RotateTurn_ToTargetYaw();
-    if (m_pOwner->Is_Animation_Finished())
+    if (m_pOwner->Get_CurrentAnimationRatio() > 0.7f)
     {
         m_eAttackPhase = ATTACK_PHASE::LAST_ATTACK;
 
@@ -154,6 +156,6 @@ CBT_QueenKnight_FirstPhase_AttackAction* CBT_QueenKnight_FirstPhase_AttackAction
 }
 void CBT_QueenKnight_FirstPhase_AttackAction::Free()
 {
-    __super::Free();
+    CBTAction::Free();
     m_pOwner = nullptr;
 }

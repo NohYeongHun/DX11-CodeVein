@@ -3,6 +3,7 @@
 CBT_Monster_IsDead::CBT_Monster_IsDead(CMonster* pOwner)
 	: m_pOwner(pOwner)
 {
+    m_strTag = L"MonsterIdle_IsDeadConditionNode";
 }
 
 /* 몬스터가 살았는가? */
@@ -25,7 +26,7 @@ CBT_Monster_IsDead* CBT_Monster_IsDead::Create(CMonster* pOwner)
 
 void CBT_Monster_IsDead::Free()
 {
-    __super::Free();
+    CBTCondition::Free();
     m_pOwner = nullptr;
 }
 

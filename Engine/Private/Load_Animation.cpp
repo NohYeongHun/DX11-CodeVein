@@ -252,7 +252,7 @@ CLoad_Animation* CLoad_Animation::Clone()
 
 void CLoad_Animation::Free()
 {
-    __super::Free();
+    CBase::Free();
 
     for (auto& pChannel : m_Channels)
         Safe_Release(pChannel);

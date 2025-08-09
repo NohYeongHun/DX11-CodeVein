@@ -92,6 +92,19 @@ public:
 
 #pragma endregion
 
+#pragma region Velocity 계산용 함수.
+public:
+	void Update_PrevPosition() { m_vPrevPosition = m_vPosition; }
+	_vector Get_Velocity() const
+	{
+		_vector vCurrent = XMLoadFloat3(&m_vPosition);
+		_vector vPrev = XMLoadFloat3(&m_vPrevPosition);
+		return vCurrent - vPrev;
+	}
+private:
+	_float3			m_vPrevPosition = {};
+#pragma endregion
+
 	
 
 public:
@@ -135,6 +148,8 @@ private:
 	_float4x4	    m_CombineMatrix = {};
 	_float4x4		m_WorldMatrix = {};
 	_float3			m_vPosition = {};
+	
+
 	_float3			m_vScale = {};
 	_vector			m_QuatRotation = {}; // 누적 쿼터니언 회전.
 

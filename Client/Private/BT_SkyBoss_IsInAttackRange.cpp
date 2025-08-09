@@ -33,6 +33,6 @@ CBT_SkyBoss_IsInAttackRange* CBT_SkyBoss_IsInAttackRange::Create(CSkyBoss* pOwne
 
 void CBT_SkyBoss_IsInAttackRange::Free()
 {
-    __super::Free();
+    CBTCondition::Free();
     Safe_Release(m_pGameInstance);
 }

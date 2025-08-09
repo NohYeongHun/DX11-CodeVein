@@ -24,5 +24,5 @@ void CBT_SkyBoss_Wait::Reset()
 
 void CBT_SkyBoss_Wait::Free()
 {
-    __super::Free();
+    CBTAction::Free();
 }

@@ -4,7 +4,7 @@
 
 HRESULT CPlayer_GuardState::Initialize(_uint iStateNum, void* pArg)
 {
-	if (FAILED(__super::Initialize(iStateNum, pArg)))
+	if (FAILED(CPlayerState::Initialize(iStateNum, pArg)))
 		return E_FAIL;
 
 	m_isLoop = false;
@@ -17,7 +17,7 @@ void CPlayer_GuardState::Enter(void* pArg)
 {
 
 	GUARD_ENTER_DESC* pDesc = static_cast<GUARD_ENTER_DESC*>(pArg);
-	__super::Enter(pDesc); // 기본 쿨타임 설정.
+	CPlayerState::Enter(pDesc); // 기본 쿨타임 설정.
 	m_iNextState = -1;
 	m_iNextAnimIdx = -1;
 	m_iCurAnimIdx = pDesc->iAnimation_Idx;
@@ -134,5 +134,5 @@ CPlayer_GuardState* CPlayer_GuardState::Create(_uint iStateNum, void* pArg)
 
 void CPlayer_GuardState::Free()
 {
-	__super::Free();
+	CPlayerState::Free();
 }

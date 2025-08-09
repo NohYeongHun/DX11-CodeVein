@@ -2,6 +2,7 @@
 CBT_Monster_HitAction::CBT_Monster_HitAction(CMonster* pOwner)
 	: m_pOwner { pOwner }
 {
+    m_strTag = L"MonsterIdle_HitActionNode";
 }
 
 BT_RESULT CBT_Monster_HitAction::Perform_Action(_float fTimeDelta)
@@ -31,22 +32,18 @@ BT_RESULT CBT_Monster_HitAction::EnterHit(_float fTimeDelta)
         CRASH("Failed Tree Hit Enter Logic");
     }
 
-    // 0. 무적 상태라면 맞지 않습니다.
-    if (m_pOwner->HasBuff(CMonster::BUFF_INVINCIBLE))
-        return BT_RESULT::FAILURE;
 
     // 0. 즉시 회전 시키기
     m_pOwner->RotateTurn_ToTarget();
 
-    // 1. 죽는 애니메이션 선택
-   // 탐색
+    // 1. 맞는 애니메이션 선택
     _uint iNextAnimationIdx = m_pOwner->Find_AnimationIndex(L"HIT");
 
-    // 2. 죽는 상태로 변경
+    // 2. 맞는 상태로 변경
     m_pOwner->Change_Animation_NonBlend(iNextAnimationIdx);
 
-    // 3. 맞았으면 무적시간 부여하기.
-    m_pOwner->AddBuff(CMonster::BUFF_INVINCIBLE);
+    // 3. 맞았으면 무적시간 부여하기. => 충돌 시 부여.
+    // m_pOwner->AddBuff(CMonster::BUFF_INVINCIBLE);
 
     // 4. 다음 단계로 진행
     m_eHitPhase = HIT_PHASE::LOOP;
@@ -94,6 +91,6 @@ CBT_Monster_HitAction* CBT_Monster_HitAction::Create(CMonster* pOwner)
 
 void CBT_Monster_HitAction::Free()
 {
-	__super::Free();
+	CBTAction::Free();
 	m_pOwner = nullptr;
 }

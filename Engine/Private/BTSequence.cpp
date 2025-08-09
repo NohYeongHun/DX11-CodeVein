@@ -48,5 +48,5 @@ void CBTSequence::Free()
         Safe_Release(child);
     }
     m_Children.clear();
-    __super::Free();
+    CBTNode::Free();
 }

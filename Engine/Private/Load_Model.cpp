@@ -589,7 +589,7 @@ CComponent* CLoad_Model::Clone(void* pArg)
 
 void CLoad_Model::Free()
 {
-	__super::Free();
+	CComponent::Free();
 	m_pOwner = nullptr;
 		
 	for (auto& pMesh : m_Meshes)

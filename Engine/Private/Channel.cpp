@@ -127,7 +127,7 @@ CChannel* CChannel::Create(const aiNodeAnim* pAIChannel, const vector<class CBon
 
 void CChannel::Free()
 {
-    __super::Free();
+    CBase::Free();
     m_KeyFrames.clear();
 
 }

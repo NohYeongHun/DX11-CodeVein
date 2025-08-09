@@ -1,4 +1,4 @@
-#include "Level.h"
+﻿#include "Level.h"
 
 #include "GameInstance.h"
 
@@ -29,7 +29,7 @@ HRESULT CLevel::Render()
 
 void CLevel::Free()
 {
-	__super::Free();
+	CBase::Free();
 
 	Safe_Release(m_pGameInstance);
 	Safe_Release(m_pDevice);

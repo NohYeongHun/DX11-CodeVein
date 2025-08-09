@@ -40,7 +40,7 @@ HRESULT CStatusPanel::Initialize_Clone(void* pArg)
     if (nullptr == pArg)
         return E_FAIL;
 
-    if (FAILED(__super::Initialize_Clone(pArg)))
+    if (FAILED(CUIObject::Initialize_Clone(pArg)))
         return E_FAIL;
 
     if (FAILED(Ready_Components()))
@@ -55,17 +55,17 @@ HRESULT CStatusPanel::Initialize_Clone(void* pArg)
 
 void CStatusPanel::Priority_Update(_float fTimeDelta)
 {
-    __super::Priority_Update(fTimeDelta);
+    CUIObject::Priority_Update(fTimeDelta);
 }
 
 void CStatusPanel::Update(_float fTimeDelta)
 {
-    __super::Update(fTimeDelta);
+    CUIObject::Update(fTimeDelta);
 }
 
 void CStatusPanel::Late_Update(_float fTimeDelta)
 {
-    __super::Late_Update(fTimeDelta);
+    CUIObject::Late_Update(fTimeDelta);
 }
 
 HRESULT CStatusPanel::Render()
@@ -152,10 +152,10 @@ CGameObject* CStatusPanel::Clone(void* pArg)
 
 void CStatusPanel::Destroy()
 {
-    __super::Destroy();
+    CUIObject::Destroy();
 }
 
 void CStatusPanel::Free()
 {
-    __super::Free();
+    CUIObject::Free();
 }

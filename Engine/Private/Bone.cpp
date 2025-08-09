@@ -64,5 +64,5 @@ CBone* CBone::Clone()
 
 void CBone::Free()
 {
-    __super::Free();
+    CBase::Free();
 }

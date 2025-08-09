@@ -2,5 +2,5 @@
 
 void CBTCondition::Free()
 {
-	__super::Free();
+	CBase::Free();
 }

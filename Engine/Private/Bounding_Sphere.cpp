@@ -83,6 +83,35 @@ _bool CBounding_Sphere::Intersect(COLLIDER eColliderType, CBounding* pBounding)
 
 }
 
+_float CBounding_Sphere::Calculate_PenetrationDepthSpehre(CBounding* pBounding)
+{
+	_float		fPenetrationDepth = 0.0f; // 침투 깊이를 담을 변수
+
+	CBounding_Sphere* pTarget = dynamic_cast<CBounding_Sphere*>(pBounding);
+	if (nullptr == pTarget)
+	{
+		CRASH("Target Shape Not Sphere");
+		return 0.f;
+	}
+
+	// 1. 중심점 구하기.
+	_float3 vLeftCenter = m_pDesc->Center;
+	_float3 vRightCenter = pTarget->m_pDesc->Center;
+
+	// 2. 반지름 구하기.
+	_float fLeftRadius = m_pDesc->Radius;
+	_float fRightRadius = pTarget->m_pDesc->Radius;
+
+	// 3. 중심점 간 거리.
+	_vector vDistance = XMLoadFloat3(&vRightCenter) - XMLoadFloat3(&vLeftCenter);
+	_float fDistance = XMVectorGetX(XMVector3Length(vDistance));
+
+	// 4. 침투 깊이 구하기
+	_float fPenerationDepth = (fLeftRadius + fRightRadius) - fDistance;
+
+	return max(0.0f,fPenerationDepth);
+}
+
 
 
 CBounding_Sphere* CBounding_Sphere::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CBounding::BOUNDING_DESC* pBoundingDesc)
@@ -98,7 +127,7 @@ CBounding_Sphere* CBounding_Sphere::Create(ID3D11Device* pDevice, ID3D11DeviceCo
 
 void CBounding_Sphere::Free()
 {
-	__super::Free();
+	CBounding::Free();
 	Safe_Delete(m_pDesc);
 	Safe_Delete(m_pOriginalDesc);
 }

@@ -57,7 +57,7 @@ CFont* CFont::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const
 
 void CFont::Free()
 {
-    __super::Free();
+    CBase::Free();
 
     if (nullptr != m_pBatch)
         delete m_pBatch;

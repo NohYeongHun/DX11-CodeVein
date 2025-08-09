@@ -23,7 +23,7 @@ HRESULT CInventoryItem_Slot::Initialize_Prototype()
 
 HRESULT CInventoryItem_Slot::Initialize_Clone(void* pArg)
 {
-    if (FAILED(__super::Initialize_Clone(pArg)))
+    if (FAILED(CUIObject::Initialize_Clone(pArg)))
         return E_FAIL;
 
     SKILLSLOT_DESC* pDesc = static_cast<SKILLSLOT_DESC*>(pArg);
@@ -41,7 +41,7 @@ void CInventoryItem_Slot::Priority_Update(_float fTimeDelta)
     if (!m_IsVisibility)
         return;
 
-    __super::Priority_Update(fTimeDelta);
+    CUIObject::Priority_Update(fTimeDelta);
 }
 
 
@@ -50,7 +50,7 @@ void CInventoryItem_Slot::Update(_float fTimeDelta)
     if (!m_IsVisibility)
         return;
 
-    __super::Update(fTimeDelta);   
+    CUIObject::Update(fTimeDelta);
 }
 
 void CInventoryItem_Slot::Late_Update(_float fTimeDelta)
@@ -61,13 +61,13 @@ void CInventoryItem_Slot::Late_Update(_float fTimeDelta)
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::STATIC_UI, this)))
         return;
 
-    __super::Late_Update(fTimeDelta);
+    CUIObject::Late_Update(fTimeDelta);
 
 }
 
 HRESULT CInventoryItem_Slot::Render()
 {
-    __super::Begin();
+    CUIObject::Begin();
 
     if (FAILED(Ready_Render_Resources()))
         return E_FAIL;
@@ -79,7 +79,7 @@ HRESULT CInventoryItem_Slot::Render()
     m_pVIBufferCom->Render();
 
 
-    __super::End();
+    CUIObject::End();
 
     return S_OK;
 }
@@ -172,12 +172,12 @@ CGameObject* CInventoryItem_Slot::Clone(void* pArg)
 
 void CInventoryItem_Slot::Destroy()
 {
-    __super::Destroy();
+    CUIObject::Destroy();
 }
 
 void CInventoryItem_Slot::Free()
 {
-    __super::Free();
+    CUIObject::Free();
     Safe_Release(m_pVIBufferCom);
     Safe_Release(m_pShaderCom);
     Safe_Release(m_pTextureCom);

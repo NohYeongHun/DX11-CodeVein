@@ -973,7 +973,7 @@ CMap_Tool* CMap_Tool::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContex
 
 void CMap_Tool::Free()
 {
-    __super::Free();
+    CBase::Free();
 
     for (auto& Event : m_Events)
         m_pGameInstance->UnSubscribe(Event, Get_ID());

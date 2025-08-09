@@ -131,7 +131,7 @@ CPrototype_Manager* CPrototype_Manager::Create(_uint iNumLevels)
 
 void CPrototype_Manager::Free()
 {
-	__super::Free();
+	CBase::Free();
 
 	for (size_t i = 0; i < m_iNumLevels; i++)
 	{

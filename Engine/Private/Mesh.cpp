@@ -306,7 +306,7 @@ CComponent* CMesh::Clone(void* pArg)
 
 void CMesh::Free()
 {
-	__super::Free();
+	CVIBuffer::Free();
 
 
 }

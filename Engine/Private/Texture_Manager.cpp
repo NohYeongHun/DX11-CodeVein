@@ -87,7 +87,7 @@ CTexture_Manager* CTexture_Manager::Create(_uint iNumLevels)
 
 void CTexture_Manager::Free()
 {
-    __super::Free();
+    CBase::Free();
 
     Safe_Release(m_pGameInstance);
 

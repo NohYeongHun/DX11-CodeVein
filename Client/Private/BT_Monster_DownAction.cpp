@@ -4,6 +4,7 @@
 CBT_Monster_DownAction::CBT_Monster_DownAction(CMonster* pOwner)
     : m_pOwner{ pOwner }
 {
+    m_strTag = L"MonsterIdle_HitDownActionNode";
 }
 
 BT_RESULT CBT_Monster_DownAction::Perform_Action(_float fTimeDelta)
@@ -102,6 +103,6 @@ CBT_Monster_DownAction* CBT_Monster_DownAction::Create(CMonster* pOwner)
 
 void CBT_Monster_DownAction::Free()
 {
-    __super::Free();
+    CBTAction::Free();
 }
 

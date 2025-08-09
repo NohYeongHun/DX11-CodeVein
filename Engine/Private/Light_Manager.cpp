@@ -33,7 +33,7 @@ CLight_Manager* CLight_Manager::Create()
 
 void CLight_Manager::Free()
 {
-    __super::Free();
+    CBase::Free();
 
     for (auto& pLight : m_Lights)
         Safe_Release(pLight);

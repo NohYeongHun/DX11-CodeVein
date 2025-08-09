@@ -23,7 +23,7 @@ HRESULT CWeapon::Initialize_Clone(void* pArg)
     m_eCurLevel = pDesc->eCurLevel;
     m_pOwner = pDesc->pOwner;
 
-    if (FAILED(__super::Initialize_Clone(pDesc)))
+    if (FAILED(CPartObject::Initialize_Clone(pDesc)))
     {
         CRASH("Failed Clone Weapon");
         return E_FAIL;
@@ -153,7 +153,7 @@ HRESULT CWeapon::Bind_ShaderResources()
 
 void CWeapon::Free()
 {
-    __super::Free();
+    CPartObject::Free();
     Safe_Release(m_pModelCom);
     Safe_Release(m_pShaderCom);
     Safe_Release(m_pColliderCom);

@@ -34,7 +34,7 @@ HRESULT CInventoryStatus_Info::Initialize_Clone(void* pArg)
 {
     m_iTextureIndex = 0;
 
-    if (FAILED(__super::Initialize_Clone(pArg)))
+    if (FAILED(CUIObject::Initialize_Clone(pArg)))
         return E_FAIL;
 
     STATUS_INFO_DESC* pDesc = static_cast<STATUS_INFO_DESC*>(pArg);
@@ -51,7 +51,7 @@ void CInventoryStatus_Info::Priority_Update(_float fTimeDelta)
         return;
 
 
-    __super::Priority_Update(fTimeDelta);
+    CUIObject::Priority_Update(fTimeDelta);
 }
 
 
@@ -60,7 +60,7 @@ void CInventoryStatus_Info::Update(_float fTimeDelta)
     if (!m_IsVisibility)
         return;
 
-    __super::Update(fTimeDelta);
+    CUIObject::Update(fTimeDelta);
 
 }
 
@@ -72,7 +72,7 @@ void CInventoryStatus_Info::Late_Update(_float fTimeDelta)
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::STATIC_UI, this)))
         return;
 
-    __super::Late_Update(fTimeDelta);
+    CUIObject::Late_Update(fTimeDelta);
 }
 
 HRESULT CInventoryStatus_Info::Render()
@@ -90,7 +90,7 @@ HRESULT CInventoryStatus_Info::Render()
 
    
 
-    __super::Begin();
+    CUIObject::Begin();
     
     if (FAILED(Ready_Render_Resources()))
         return E_FAIL;
@@ -103,7 +103,7 @@ HRESULT CInventoryStatus_Info::Render()
 
 
     Render_Info();
-    __super::End();
+    CUIObject::End();
 
     return S_OK;
 }
@@ -187,12 +187,12 @@ CGameObject* CInventoryStatus_Info::Clone(void* pArg)
 
 void CInventoryStatus_Info::Destroy()
 {
-    __super::Destroy();
+    CUIObject::Destroy();
 }
 
 void CInventoryStatus_Info::Free()
 {
-    __super::Free();
+    CUIObject::Free();
     Safe_Release(m_pVIBufferCom);
     Safe_Release(m_pShaderCom);
     Safe_Release(m_pTextureCom);

@@ -41,7 +41,7 @@ HRESULT CInventorySkill_Icon::Initialize_Clone(void* pArg)
 {
     m_iTextureIndex = 0;
 
-    if (FAILED(__super::Initialize_Clone(pArg)))
+    if (FAILED(CUIObject::Initialize_Clone(pArg)))
         return E_FAIL;
 
     SKILLICON_DESC* pDesc = static_cast<SKILLICON_DESC*>(pArg);
@@ -61,7 +61,7 @@ void CInventorySkill_Icon::Priority_Update(_float fTimeDelta)
     if (!m_IsVisibility)
         return;
 
-    __super::Priority_Update(fTimeDelta);
+    CUIObject::Priority_Update(fTimeDelta);
 }
 
 
@@ -70,7 +70,7 @@ void CInventorySkill_Icon::Update(_float fTimeDelta)
     if (!m_IsVisibility)
         return;
 
-    __super::Update(fTimeDelta);
+    CUIObject::Update(fTimeDelta);
 
    
 }
@@ -83,7 +83,7 @@ void CInventorySkill_Icon::Late_Update(_float fTimeDelta)
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::STATIC_UI, this)))
         return;
 
-    __super::Late_Update(fTimeDelta);
+    CUIObject::Late_Update(fTimeDelta);
 }
 
 HRESULT CInventorySkill_Icon::Render()
@@ -92,7 +92,7 @@ HRESULT CInventorySkill_Icon::Render()
     if (m_pTextureCom == nullptr)
         return S_OK;
 
-    __super::Begin();
+    CUIObject::Begin();
     
     if (FAILED(Ready_Render_Resources()))
         return E_FAIL;
@@ -103,7 +103,7 @@ HRESULT CInventorySkill_Icon::Render()
 
     m_pVIBufferCom->Render();
 
-    __super::End();
+    CUIObject::End();
 
     return S_OK;
 }
@@ -168,12 +168,12 @@ CGameObject* CInventorySkill_Icon::Clone(void* pArg)
 
 void CInventorySkill_Icon::Destroy()
 {
-    __super::Destroy();
+    CUIObject::Destroy();
 }
 
 void CInventorySkill_Icon::Free()
 {
-    __super::Free();
+    CUIObject::Free();
     Safe_Release(m_pVIBufferCom);
     Safe_Release(m_pShaderCom);
     

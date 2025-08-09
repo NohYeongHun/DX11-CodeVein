@@ -134,7 +134,7 @@ CLoader* CLoader::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, L
 
 void CLoader::Free()
 {
-	__super::Free();
+	CBase::Free();
 	
 	WaitForSingleObject(m_hThread, INFINITE);
 

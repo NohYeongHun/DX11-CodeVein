@@ -3,6 +3,7 @@
 CBT_Monster_DeadAction::CBT_Monster_DeadAction(CMonster* pOwner)
     : m_pOwner{ pOwner }
 {
+    m_strTag = L"MonsterIdle_IsDeadActionNode";
 }
 
 BT_RESULT CBT_Monster_DeadAction::Perform_Action(_float fTimeDelta)
@@ -116,5 +117,5 @@ CBT_Monster_DeadAction* CBT_Monster_DeadAction::Create(CMonster* pOwner)
 
 void CBT_Monster_DeadAction::Free()
 {
-    __super::Free();
+    CBTAction::Free();
 }

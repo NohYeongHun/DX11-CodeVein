@@ -29,7 +29,7 @@ HRESULT CInventorySkill_Slot::Initialize_Prototype()
 
 HRESULT CInventorySkill_Slot::Initialize_Clone(void* pArg)
 {
-    if (FAILED(__super::Initialize_Clone(pArg)))
+    if (FAILED(CUIObject::Initialize_Clone(pArg)))
         return E_FAIL;
 
     SKILLSLOT_DESC* pDesc = static_cast<SKILLSLOT_DESC*>(pArg);
@@ -51,7 +51,7 @@ void CInventorySkill_Slot::Priority_Update(_float fTimeDelta)
     if (!m_IsVisibility)
         return;
 
-    __super::Priority_Update(fTimeDelta);
+    CUIObject::Priority_Update(fTimeDelta);
 }
 
 
@@ -60,7 +60,7 @@ void CInventorySkill_Slot::Update(_float fTimeDelta)
     if (!m_IsVisibility)
         return;
 
-    __super::Update(fTimeDelta);   
+    CUIObject::Update(fTimeDelta);
 
     // UI 전용 확인.
     if (m_pGameInstance->Get_MouseKeyUp(MOUSEKEYSTATE::LB))
@@ -85,13 +85,13 @@ void CInventorySkill_Slot::Late_Update(_float fTimeDelta)
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::STATIC_UI, this)))
         return;
 
-    __super::Late_Update(fTimeDelta);
+    CUIObject::Late_Update(fTimeDelta);
 
 }
 
 HRESULT CInventorySkill_Slot::Render()
 {
-    __super::Begin();
+    CUIObject::Begin();
 
     if (FAILED(Ready_Render_Resources()))
         return E_FAIL;
@@ -103,7 +103,7 @@ HRESULT CInventorySkill_Slot::Render()
     m_pVIBufferCom->Render();
 
 
-    __super::End();
+    CUIObject::End();
 
     return S_OK;
 }
@@ -196,12 +196,12 @@ CGameObject* CInventorySkill_Slot::Clone(void* pArg)
 
 void CInventorySkill_Slot::Destroy()
 {
-    __super::Destroy();
+    CUIObject::Destroy();
 }
 
 void CInventorySkill_Slot::Free()
 {
-    __super::Free();
+    CUIObject::Free();
     Safe_Release(m_pVIBufferCom);
     Safe_Release(m_pShaderCom);
     Safe_Release(m_pTextureCom);

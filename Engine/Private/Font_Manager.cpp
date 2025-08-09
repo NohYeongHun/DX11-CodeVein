@@ -65,7 +65,7 @@ CFont_Manager* CFont_Manager::Create(ID3D11Device* pDevice, ID3D11DeviceContext*
 
 void CFont_Manager::Free()
 {
-    __super::Free();
+    CBase::Free();
     Safe_Release(m_pGameInstance);
     Safe_Release(m_pContext);
     Safe_Release(m_pDevice);

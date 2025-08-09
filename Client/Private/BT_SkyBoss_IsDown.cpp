@@ -49,6 +49,6 @@ CBT_SkyBoss_DownCondition* CBT_SkyBoss_DownCondition::Create(CSkyBoss* pOwner, _
 
 void CBT_SkyBoss_DownCondition::Free()
 {
-    __super::Free();
+    CBTCondition::Free();
     Safe_Release(m_pGameInstance);
 }

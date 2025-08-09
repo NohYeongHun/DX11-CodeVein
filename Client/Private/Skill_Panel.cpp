@@ -32,7 +32,7 @@ HRESULT CSkill_Panel::Initialize_Clone(void* pArg)
     if (nullptr == pArg)
         return E_FAIL;
 
-    if (FAILED(__super::Initialize_Clone(pArg)))
+    if (FAILED(CUIObject::Initialize_Clone(pArg)))
         return E_FAIL;
 
     if (FAILED(Ready_Components()))
@@ -50,19 +50,19 @@ HRESULT CSkill_Panel::Initialize_Clone(void* pArg)
 
 void CSkill_Panel::Priority_Update(_float fTimeDelta)
 {
-    __super::Priority_Update(fTimeDelta);
+    CUIObject::Priority_Update(fTimeDelta);
 }
 
 void CSkill_Panel::Update(_float fTimeDelta)
 {
-    __super::Update(fTimeDelta);
+    CUIObject::Update(fTimeDelta);
 
    
 }
 
 void CSkill_Panel::Late_Update(_float fTimeDelta)
 {
-    __super::Late_Update(fTimeDelta);
+    CUIObject::Late_Update(fTimeDelta);
 }
 
 HRESULT CSkill_Panel::Render()
@@ -146,10 +146,10 @@ CGameObject* CSkill_Panel::Clone(void* pArg)
 
 void CSkill_Panel::Destroy()
 {
-    __super::Destroy();
+    CUIObject::Destroy();
 }
 
 void CSkill_Panel::Free()
 {
-    __super::Free();
+    CUIObject::Free();
 }

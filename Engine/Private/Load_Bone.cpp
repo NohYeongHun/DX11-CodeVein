@@ -65,5 +65,5 @@ CLoad_Bone* CLoad_Bone::Clone()
 
 void CLoad_Bone::Free()
 {
-    __super::Free();
+    CBase::Free();
 }

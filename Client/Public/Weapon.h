@@ -54,10 +54,17 @@ public:
 	
 
 
+public:
+	void Set_AttackPower(_float fAttackPower) { m_fAttackPower = fAttackPower; }
+	virtual _float Get_AttackPower() { return m_fAttackPower; }
+
 protected:
 	class CCollider* m_pColliderCom = { nullptr };
 	_bool m_IsColliderActive = { false };
 	_float m_fColliderLifeTime = { true };
+
+	//_uint* m_pParentState = { nullptr };
+	_float m_fAttackPower = {}; // 공격 데미지.
 #pragma endregion
 
 

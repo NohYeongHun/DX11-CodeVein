@@ -18,7 +18,7 @@ HRESULT CSky::Initialize_Prototype()
 
 HRESULT CSky::Initialize_Clone(void* pArg)
 {
-    if (FAILED(__super::Initialize_Clone(pArg)))
+    if (FAILED(CGameObject::Initialize_Clone(pArg)))
         return E_FAIL;
 
     if (FAILED(Ready_Components()))
@@ -29,7 +29,7 @@ HRESULT CSky::Initialize_Clone(void* pArg)
 
 void CSky::Priority_Update(_float fTimeDelta)
 {
-    int a = 10;
+
 }
 
 void CSky::Update(_float fTimeDelta)
@@ -124,7 +124,7 @@ CGameObject* CSky::Clone(void* pArg)
 
 void CSky::Free()
 {
-    __super::Free();
+    CGameObject::Free();
 
     Safe_Release(m_pVIBufferCom);
     Safe_Release(m_pTextureCom);

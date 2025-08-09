@@ -120,7 +120,7 @@ CCamera_Manager* CCamera_Manager::Create(_uint iNumLevels)
 
 void CCamera_Manager::Free()
 {
-	__super::Free();
+	CBase::Free();
 	Safe_Release(m_pGameInstance);
 
 	for (_uint i = 0; i < m_iNumLevels; i++)

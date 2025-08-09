@@ -35,7 +35,7 @@ void CHUD::Execute_Skill(_uint iSkillPanel, _uint iSkillSlot, _float fSkillCoolT
 
 HRESULT CHUD::Initialize_Prototype()
 {
-    __super::Initialize_Prototype();
+    CUIObject::Initialize_Prototype();
     m_IsVisibility = false;
     return S_OK;
 }
@@ -51,7 +51,7 @@ HRESULT CHUD::Initialize_Clone(void* pArg)
     Desc.fSizeY = 0;
     
 
-    if (FAILED(__super::Initialize_Clone(&Desc)))
+    if (FAILED(CUIObject::Initialize_Clone(&Desc)))
         return E_FAIL;
 
     if (FAILED(Ready_Childs()))
@@ -68,7 +68,7 @@ void CHUD::Priority_Update(_float fTimeDelta)
 {
     if (!m_IsVisibility)
         return;
-    __super::Priority_Update(fTimeDelta);
+    CUIObject::Priority_Update(fTimeDelta);
 }
 
 void CHUD::Update(_float fTimeDelta)
@@ -79,31 +79,8 @@ void CHUD::Update(_float fTimeDelta)
     /*HUD_SKILLCHANGE_DESC Desc{};
     Desc.iSkillPanelIdx = SKILL_PANEL_TOP;
     Desc.pText = TEXT("Action_SkillIcon");
+    */
     
-    if (m_pGameInstance->Get_KeyUp(DIK_1))
-    {
-        Desc.iSlotIdx = 0;
-        Desc.iTextureIdx = 0;
-        m_pGameInstance->Publish(EventType::HUD_SKILL_CHANGE, & Desc);
-    }
-    if (m_pGameInstance->Get_KeyUp(DIK_2))
-    {
-        Desc.iSlotIdx = 1;
-        Desc.iTextureIdx = 1;
-        m_pGameInstance->Publish(EventType::HUD_SKILL_CHANGE, &Desc);
-    }
-    if (m_pGameInstance->Get_KeyUp(DIK_3))
-    {
-        Desc.iSlotIdx = 2;
-        Desc.iTextureIdx = 2;
-        m_pGameInstance->Publish(EventType::HUD_SKILL_CHANGE, &Desc);
-    }
-    if (m_pGameInstance->Get_KeyUp(DIK_4))
-    {
-        Desc.iSlotIdx = 3;
-        Desc.iTextureIdx = 3;
-        m_pGameInstance->Publish(EventType::HUD_SKILL_CHANGE, &Desc);
-    }*/
 
     if (m_pGameInstance->Get_KeyUp(DIK_1))
     {
@@ -160,14 +137,14 @@ void CHUD::Update(_float fTimeDelta)
         m_pGameInstance->Publish(EventType::STEMINA_CHANGE, &SteminaDesc);
     }*/
 
-    __super::Update(fTimeDelta);
+    CUIObject::Update(fTimeDelta);
 }
 
 void CHUD::Late_Update(_float fTimeDelta)
 {
     if (!m_IsVisibility)
         return;
-    __super::Late_Update(fTimeDelta);
+    CUIObject::Late_Update(fTimeDelta);
 }
 
 HRESULT CHUD::Render()
@@ -352,7 +329,7 @@ CGameObject* CHUD::Clone(void* pArg)
 
 void CHUD::Destroy()
 {
-    __super::Destroy();
+    CUIObject::Destroy();
 
     for (auto& val : m_Events)
         m_pGameInstance->UnSubscribe(val, Get_ID());
@@ -362,7 +339,7 @@ void CHUD::Destroy()
 
 void CHUD::Free()
 {
-    __super::Free();
+    CUIObject::Free();
     m_StatusPanels.clear();
     m_SkillPanels.clear();
 }

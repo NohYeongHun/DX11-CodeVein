@@ -14,7 +14,7 @@ CMonsterTree::CMonsterTree(const CMonsterTree& Prototype)
 HRESULT CMonsterTree::Initialize(void* pArg)
 {
     // 기본 상태들 초기화.
-    if (FAILED(__super::Initialize(pArg)))
+    if (FAILED(CBehaviorTree::Initialize(pArg)))
         return E_FAIL;
 
     // Owner와 몬스터 타겟 설정. => 플레이어로
@@ -161,5 +161,5 @@ CMonsterTree* CMonsterTree::Create(ID3D11Device* pDevice, ID3D11DeviceContext* p
 
 void CMonsterTree::Free()
 {
-    __super::Free();
+    CBehaviorTree::Free();
 }

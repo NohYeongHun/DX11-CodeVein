@@ -7,7 +7,7 @@ CPlayer_WalkState::CPlayer_WalkState()
 
 HRESULT CPlayer_WalkState::Initialize(_uint iStateNum, void* pArg)
 {
-	if (FAILED(__super::Initialize(iStateNum, pArg)))
+	if (FAILED(CPlayerState::Initialize(iStateNum, pArg)))
 		return E_FAIL;
 
 
@@ -18,7 +18,7 @@ HRESULT CPlayer_WalkState::Initialize(_uint iStateNum, void* pArg)
 void CPlayer_WalkState::Enter(void* pArg)
 {
 	WALK_ENTER_DESC* pDesc = static_cast<WALK_ENTER_DESC*>(pArg);
-	__super::Enter(pDesc); // 기본 쿨타임 설정.
+	CPlayerState::Enter(pDesc); // 기본 쿨타임 설정.
 
 	// 애니메이션 인덱스를 변경해줍니다.
 	m_iNextState = -1;
@@ -90,5 +90,5 @@ CPlayer_WalkState* CPlayer_WalkState::Create(_uint iStateNum, void* pArg)
 
 void CPlayer_WalkState::Free()
 {
-	__super::Free();
+	CPlayerState::Free();
 }

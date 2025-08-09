@@ -29,7 +29,7 @@ void CLoading_BackGround::Loading_End()
 
 HRESULT CLoading_BackGround::Initialize_Prototype()
 {
-    __super::Initialize_Prototype();
+    CUIObject::Initialize_Prototype();
     return S_OK;
 }
 
@@ -43,7 +43,7 @@ HRESULT CLoading_BackGround::Initialize_Clone(void* pArg)
     Desc.fSizeY = g_iWinSizeY;
 
 
-    if (FAILED(__super::Initialize_Clone(&Desc)))
+    if (FAILED(CUIObject::Initialize_Clone(&Desc)))
         return E_FAIL;
 
     m_iTextureIndex = 0;
@@ -74,14 +74,14 @@ void CLoading_BackGround::Priority_Update(_float fTimeDelta)
         m_fFade = 0.f;
     }
 
-    __super::Priority_Update(fTimeDelta);
+    CUIObject::Priority_Update(fTimeDelta);
 }
 
 void CLoading_BackGround::Update(_float fTimeDelta)
 {
     /*if (!m_IsVisibility)
         return;*/
-    __super::Update(fTimeDelta);
+    CUIObject::Update(fTimeDelta);
 }
 
 void CLoading_BackGround::Late_Update(_float fTimeDelta)
@@ -92,7 +92,7 @@ void CLoading_BackGround::Late_Update(_float fTimeDelta)
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::STATIC_UI, this)))
         return;
 
-    __super::Late_Update(fTimeDelta);
+    CUIObject::Late_Update(fTimeDelta);
 
     if (m_IsLoadingFadeOut)
     {
@@ -105,7 +105,7 @@ void CLoading_BackGround::Late_Update(_float fTimeDelta)
 HRESULT CLoading_BackGround::Render()
 {
 
-    __super::Begin();
+    CUIObject::Begin();
 
     if (FAILED(Ready_Render_Resources()))
         return E_FAIL;
@@ -126,7 +126,7 @@ HRESULT CLoading_BackGround::Render()
     m_pVIBufferCom->Render();
 
 
-    __super::End();
+    CUIObject::End();
 
     return S_OK;
 }
@@ -254,7 +254,7 @@ CGameObject* CLoading_BackGround::Clone(void* pArg)
 
 void CLoading_BackGround::Destroy()
 {
-    __super::Destroy();
+    CUIObject::Destroy();
 
     for (auto& Event : m_Events)
         m_pGameInstance->UnSubscribe(Event.first, Event.second);
@@ -263,7 +263,7 @@ void CLoading_BackGround::Destroy()
 
 void CLoading_BackGround::Free()
 {
-    __super::Free();
+    CUIObject::Free();
 
     Safe_Release(m_pVIBufferCom);
     Safe_Release(m_pShaderCom);

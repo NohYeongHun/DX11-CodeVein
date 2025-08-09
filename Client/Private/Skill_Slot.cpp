@@ -41,7 +41,7 @@ HRESULT CSkill_Slot::Initialize_Prototype()
 
 HRESULT CSkill_Slot::Initialize_Clone(void* pArg)
 {
-    if (FAILED(__super::Initialize_Clone(pArg)))
+    if (FAILED(CUIObject::Initialize_Clone(pArg)))
         return E_FAIL;
 
     SKILLSLOT_DESC* pDesc = static_cast<SKILLSLOT_DESC*>(pArg);
@@ -56,13 +56,13 @@ HRESULT CSkill_Slot::Initialize_Clone(void* pArg)
 
 void CSkill_Slot::Priority_Update(_float fTimeDelta)
 {
-    __super::Priority_Update(fTimeDelta);
+    CUIObject::Priority_Update(fTimeDelta);
 }
 
 
 void CSkill_Slot::Update(_float fTimeDelta)
 {
-    __super::Update(fTimeDelta);
+    CUIObject::Update(fTimeDelta);
 
     // CoolTime인데 시간이 다되었으면.
     if (m_IsCoolTime)
@@ -74,16 +74,7 @@ void CSkill_Slot::Update(_float fTimeDelta)
             m_fTime = 0.f;
             m_IsCoolTime = false;
         }
-    }
-
-    /*if (Mouse_InRect2D(g_hWnd))
-    {
-        if (GetAsyncKeyState(MOUSE_R))
-            MSG_BOX(TEXT("Slot Check"));
-    }*/
-   
-
-    
+    }    
 }
 
 void CSkill_Slot::Late_Update(_float fTimeDelta)
@@ -91,12 +82,12 @@ void CSkill_Slot::Late_Update(_float fTimeDelta)
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::STATIC_UI, this)))
         return;
 
-    __super::Late_Update(fTimeDelta);
+    CUIObject::Late_Update(fTimeDelta);
 }
 
 HRESULT CSkill_Slot::Render()
 {
-    __super::Begin();
+    CUIObject::Begin();
 
     if (FAILED(Ready_Render_Resources()))
         return E_FAIL;
@@ -108,7 +99,7 @@ HRESULT CSkill_Slot::Render()
     m_pVIBufferCom->Render();
 
 
-    __super::End();
+    CUIObject::End();
 
     return S_OK;
 }
@@ -213,12 +204,12 @@ CGameObject* CSkill_Slot::Clone(void* pArg)
 
 void CSkill_Slot::Destroy()
 {
-    __super::Destroy();
+    CUIObject::Destroy();
 }
 
 void CSkill_Slot::Free()
 {
-    __super::Free();
+    CUIObject::Free();
     Safe_Release(m_pVIBufferCom);
     Safe_Release(m_pShaderCom);
     Safe_Release(m_pTextureCom);

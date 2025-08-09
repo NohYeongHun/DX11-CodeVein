@@ -3,6 +3,7 @@
 CBT_Monster_AttackAction::CBT_Monster_AttackAction(CMonster* pOwner)
     : m_pOwner(pOwner)
 {
+    m_strTag = L"CBT_Monster_AttackActionNode";
 }
 
 BT_RESULT CBT_Monster_AttackAction::Perform_Action(_float fTimeDelta)
@@ -112,6 +113,6 @@ CBT_Monster_AttackAction* CBT_Monster_AttackAction::Create(CMonster* pOwner)
 
 void CBT_Monster_AttackAction::Free()
 {
-    __super::Free();
+    CBTAction::Free();
     m_pOwner = nullptr;
 }

@@ -361,5 +361,5 @@ CTransform* CTransform::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pCont
 
 void CTransform::Free()
 {
-	__super::Free();
+	CComponent::Free();
 }

@@ -42,7 +42,7 @@ void CSkillUI::Change_Skill(_uint iSkillPanel, _uint iSkillSlot, const _wstring&
 
 HRESULT CSkillUI::Initialize_Prototype()
 {
-    __super::Initialize_Prototype();
+    CUIObject::Initialize_Prototype();
     m_IsVisibility = false;
 
     return S_OK;
@@ -58,7 +58,7 @@ HRESULT CSkillUI::Initialize_Clone(void* pArg)
     Desc.fSizeX = 0;
     Desc.fSizeY = 0;
 
-    if (FAILED(__super::Initialize_Clone(&Desc)))
+    if (FAILED(CUIObject::Initialize_Clone(&Desc)))
         return E_FAIL;
 
     if (FAILED(Ready_Childs()))
@@ -79,7 +79,7 @@ void CSkillUI::Priority_Update(_float fTimeDelta)
 {
     if (!m_IsVisibility)
         return;
-    __super::Priority_Update(fTimeDelta);
+    CUIObject::Priority_Update(fTimeDelta);
 }
 
 void CSkillUI::Update(_float fTimeDelta)
@@ -90,7 +90,7 @@ void CSkillUI::Update(_float fTimeDelta)
     if (m_pGameInstance->Get_KeyUp(DIK_ESCAPE))
         Set_Visibility();
 
-    __super::Update(fTimeDelta);
+    CUIObject::Update(fTimeDelta);
 }
 
 void CSkillUI::Late_Update(_float fTimeDelta)
@@ -98,7 +98,7 @@ void CSkillUI::Late_Update(_float fTimeDelta)
     if (!m_IsVisibility)
         return;
 
-    __super::Late_Update(fTimeDelta);
+    __sCUIObjectuper::Late_Update(fTimeDelta);
 }
 
 HRESULT CSkillUI::Render()
@@ -253,7 +253,7 @@ CGameObject* CSkillUI::Clone(void* pArg)
 
 void CSkillUI::Destroy()
 {
-    __super::Destroy();
+    CUIObject::Destroy();
 
     for (auto& val : m_Events)
         m_pGameInstance->UnSubscribe(val, Get_ID());
@@ -263,5 +263,5 @@ void CSkillUI::Destroy()
 
 void CSkillUI::Free()
 {
-    __super::Free();
+    CUIObject::Free();
 }

@@ -163,7 +163,7 @@ CImgui_Manager* CImgui_Manager::Create(ID3D11Device* pDevice, ID3D11DeviceContex
 
 void CImgui_Manager::Free()
 {
-    __super::Free();
+    CBase::Free();
     Safe_Release(m_pGameInstance);
     Safe_Release(m_pDeviceContext);
     Safe_Release(m_pDevice);

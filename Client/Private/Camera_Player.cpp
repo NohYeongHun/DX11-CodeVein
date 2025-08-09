@@ -36,7 +36,7 @@ HRESULT CCamera_Player::Initialize_Clone(void* pArg)
 	// 줌인 시 오프셋 (더 가까이, 살짝 위에서)
 	XMStoreFloat4(&m_vZoomTargetOffset, XMVectorSet(0.f, 2.2f, -5.f, 0.f));
 
-	if (FAILED(__super::Initialize_Clone(pArg)))
+	if (FAILED(CCamera::Initialize_Clone(pArg)))
 		return E_FAIL;
 
 	return S_OK;
@@ -44,41 +44,27 @@ HRESULT CCamera_Player::Initialize_Clone(void* pArg)
 
 void CCamera_Player::Priority_Update(_float fTimeDelta)
 {
-	__super::Priority_Update(fTimeDelta);
+	CCamera::Priority_Update(fTimeDelta);
 	
 }
 
 void CCamera_Player::Update(_float fTimeDelta)
 {
-	__super::Update(fTimeDelta);
-
+	CCamera::Update(fTimeDelta);
 
 	// 줌 업데이트 (마우스 처리 전에)
 	Update_Zoom(fTimeDelta);
 
-	//// ✨ LockOn 모드에 따른 카메라 업데이트 분기
-	//if (m_bLockOnMode && m_pLockOnTarget)
-	//{
-	//	Update_LockOn_Camera(fTimeDelta);
-	//}
-	//else
-	//{
-	//	Update_Normal_Camera(fTimeDelta);
-	//}
-
-
 	//Update_Normal_Camera(fTimeDelta);
 	Update_Chase_Target(fTimeDelta);
 
-
-
-	// 6. 파이프라인 업데이트
-	__super::Update_PipeLines();
+	// . 파이프라인 업데이트
+	CCamera::Update_PipeLines();
 }
 
 void CCamera_Player::Late_Update(_float fTimeDelta)
 {
-	__super::Late_Update(fTimeDelta);
+	CCamera::Late_Update(fTimeDelta);
 
 }
 
@@ -631,5 +617,5 @@ CGameObject* CCamera_Player::Clone(void* pArg)
 
 void CCamera_Player::Free()
 {
-	__super::Free();
+	CCamera::Free();
 }

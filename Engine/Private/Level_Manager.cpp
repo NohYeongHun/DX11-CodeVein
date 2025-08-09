@@ -58,7 +58,7 @@ CLevel_Manager* CLevel_Manager::Create()
 
 void CLevel_Manager::Free()
 {
-	__super::Free();
+	CBase::Free();
 
 	Safe_Release(m_pCurrentLevel);
 	Safe_Release(m_pGameInstance);

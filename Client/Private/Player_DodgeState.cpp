@@ -5,7 +5,7 @@ CPlayer_DodgeState::CPlayer_DodgeState()
 
 HRESULT CPlayer_DodgeState::Initialize(_uint iStateNum, void* pArg)
 {
-	if (FAILED(__super::Initialize(iStateNum, pArg)))
+	if (FAILED(CPlayerState::Initialize(iStateNum, pArg)))
 		return E_FAIL;
 
 	m_isLoop = false;
@@ -18,7 +18,7 @@ void CPlayer_DodgeState::Enter(void* pArg)
 {
 
   	DODGE_ENTER_DESC* pDesc = static_cast<DODGE_ENTER_DESC*>(pArg);
-	__super::Enter(pDesc); // 기본 쿨타임 설정.
+	CPlayerState::Enter(pDesc); // 기본 쿨타임 설정.
 
 	m_iNextState = -1;
 	m_iNextAnimIdx = -1;
@@ -178,5 +178,5 @@ CPlayer_DodgeState* CPlayer_DodgeState::Create(_uint iStateNum, void* pArg)
 
 void CPlayer_DodgeState::Free()
 {
-	__super::Free();
+	CPlayerState::Free();
 }

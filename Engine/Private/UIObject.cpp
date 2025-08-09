@@ -24,7 +24,7 @@ HRESULT CUIObject::Initialize_Clone(void* pArg)
 	if (nullptr == pArg)
 		return E_FAIL;
 
-	if (FAILED(__super::Initialize_Clone(pArg)))
+	if (FAILED(CGameObject::Initialize_Clone(pArg)))
 		return E_FAIL;
 
 	UIOBJECT_DESC* pDesc = static_cast<UIOBJECT_DESC*>(pArg);
@@ -202,12 +202,12 @@ HRESULT CUIObject::Blend_End()
 
 void CUIObject::Destroy()
 {
-	__super::Destroy();
+	CGameObject::Destroy();
 }
 
 void CUIObject::Free()
 {
-	__super::Free();
+	CGameObject::Free();
 	for (auto& pChild : m_Children)
 	{
 		if (nullptr != pChild)

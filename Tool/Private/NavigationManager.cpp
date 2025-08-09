@@ -426,7 +426,7 @@ CNavigationManager* CNavigationManager::Create(ID3D11Device* pDevice, ID3D11Devi
 
 void CNavigationManager::Free()
 {
-    __super::Free();
+    CBase::Free();
     Clear_Cells();
 
     Safe_Release(m_pDevice);

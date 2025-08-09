@@ -1,4 +1,4 @@
-#include "Imgui_Manager.h"
+ï»¿#include "Imgui_Manager.h"
 
 // SingleTon
 CImgui_Manager* CImgui_Manager::m_pInstance = nullptr;
@@ -47,7 +47,7 @@ void CImgui_Manager::Render()
 
     // Button
     if (ImGui::Button("Test Me")) {
-        // ¹öÆ°ÀÌ Å¬¸¯µÇ¾úÀ» ¶§ ½ÇÇàµÉ ÄÚµå
+        // ë²„íŠ¼ì´ í´ë¦­ë˜ì—ˆì„ ë•Œ ì‹¤í–‰ë  ì½”ë“œ
         MessageBoxA(nullptr, "Button clicked!", "Info", MB_OK);
 
     }
@@ -72,7 +72,7 @@ void CImgui_Manager::Render_End()
 
 HRESULT CImgui_Manager::Initialize_Clone(HWND hWnd, ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-    // 1. ÄÁÅØ½ºÆ® »ı¼º.
+    // 1. ì»¨í…ìŠ¤íŠ¸ ìƒì„±.
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
 
@@ -107,7 +107,7 @@ CImgui_Manager* CImgui_Manager::Create(ID3D11Device* pDevice, ID3D11DeviceContex
 
 void CImgui_Manager::Free()
 {
-    __super::Free();
+    CBase::Free();
     Safe_Release(m_pGameInstance);
     Safe_Release(m_pDeviceContext);
     Safe_Release(m_pDevice);

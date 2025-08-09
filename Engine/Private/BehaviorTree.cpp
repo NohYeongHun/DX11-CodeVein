@@ -31,7 +31,7 @@ void CBehaviorTree::Update(_float fTimeDelta)
 
 void CBehaviorTree::Free()
 {
-    __super::Free();
+    CBase::Free();
     m_pRootNode->Destroy_Recursive(); // 모든 자식 노드까지 해제
     Safe_Release(m_pRootNode);
 

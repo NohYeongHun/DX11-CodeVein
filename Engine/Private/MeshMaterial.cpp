@@ -176,7 +176,7 @@ CMeshMaterial* CMeshMaterial::Create(ID3D11Device* pDevice, ID3D11DeviceContext*
 
 void CMeshMaterial::Free()
 {
-	__super::Free();
+	CBase::Free();
 	Safe_Release(m_pDevice);
 	Safe_Release(m_pContext);
 }

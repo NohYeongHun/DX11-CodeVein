@@ -50,8 +50,16 @@ private:
 	HRESULT Remove_Collider();
 
 private:
-	void Handle_Collision_Exit(CCollider* pLeft, CCollider* pRight, CGameObject* pLeftOwner, CGameObject* pRightOwner);
-	void Handle_Collision_By_Type(CCollider* pLeft, CCollider* pRight, CGameObject* pLeftOwner, CGameObject* pRightOwner);
+	void Handle_Collision_Exit(class CCollider* pLeft, class CCollider* pRight, class CGameObject* pLeftOwner, class CGameObject* pRightOwner);
+	void Handle_Collision_By_Type(class CCollider* pLeft, class CCollider* pRight, class CGameObject* pLeftOwner, class CGameObject* pRightOwner);
+
+private:
+	void Handle_SlidingVector(class CCollider* pLeft, class CCollider* pRight, class CGameObject* pLeftOwner, class CGameObject* pRightOwner);
+
+private:
+	_vector Calculate_ColliderNormal(class CCollider* pLeft, class CCollider* pRight);
+	_vector Calculate_SlidingVector(_vector vInputDirection, _vector vCollisionNormal);
+	_float Calculate_PenetrationDepthSpehre(class CCollider* pLeft, class CCollider* pRight);
 #pragma endregion
 
 
@@ -63,22 +71,17 @@ private:
 	// 삭제할 인덱스를 담는 Pool
 	vector<_uint>		m_freePool;
 
-private:
-	_uint m_iFree_StartIdx = {}; // Free가 시작되는 인덱스.
+	// 현재 프레임 충돌 검사하는 Collider들
+	unordered_set<pair<CCollider*, CCollider*>
+		, ColliderPairHash, ColliderPairEqual> m_ActiveColliders;
+
+
 #pragma endregion
 
 private:
 	class CGameInstance* m_pGameInstance = { nullptr };
 	_uint m_iNumLevels = { };
-
-	// 최적화는 각 객체들이 업데이트나 Render에서 조건에 따라 Collider를 안넣으면 되려나?
-	
 private:
-	unordered_set<pair<CCollider*, CCollider*>
-		, ColliderPairHash, ColliderPairEqual> m_ActiveColliders;
-
-	list<CCollider*> m_Narrow_ColliderList = {};
-
 	list<CCollider*> m_ColliderList = {};
 
 

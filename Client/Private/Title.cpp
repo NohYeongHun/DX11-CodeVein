@@ -12,7 +12,7 @@ CTitle::CTitle(const CTitle& Prototype)
 
 HRESULT CTitle::Initialize_Prototype()
 {
-    __super::Initialize_Prototype();
+    CUIObject::Initialize_Prototype();
 
     return S_OK;
 }
@@ -25,7 +25,7 @@ HRESULT CTitle::Initialize_Clone(void* pArg)
     Desc.fSizeX = 0;
     Desc.fSizeY = 0;
    
-    if (FAILED(__super::Initialize_Clone(&Desc)))
+    if (FAILED(CUIObject::Initialize_Clone(&Desc)))
         return E_FAIL;
 
     if (FAILED(Ready_Components()))
@@ -55,19 +55,19 @@ void CTitle::Priority_Update(_float fTimeDelta)
         return;
     }
 
-    __super::Priority_Update(fTimeDelta);
+    CUIObject::Priority_Update(fTimeDelta);
 
     
 }
 
 void CTitle::Update(_float fTimeDelta)
 {
-    __super::Update(fTimeDelta);
+    CUIObject::Update(fTimeDelta);
 }
 
 void CTitle::Late_Update(_float fTimeDelta)
 {
-    __super::Late_Update(fTimeDelta);
+    CUIObject::Late_Update(fTimeDelta);
 
     if (m_fFadeTime < 1.f)
     {
@@ -379,7 +379,7 @@ CGameObject* CTitle::Clone(void* pArg)
 
 void CTitle::Destroy()
 {
-    __super::Destroy();
+    CUIObject::Destroy();
 
     for (auto& Event : m_Events)
         m_pGameInstance->UnSubscribe(Event.first, Event.second);
@@ -387,7 +387,7 @@ void CTitle::Destroy()
 
 void CTitle::Free()
 {
-    __super::Free();
+    CUIObject::Free();
     m_TitleTexts.clear();
     
 

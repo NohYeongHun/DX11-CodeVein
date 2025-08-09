@@ -55,6 +55,6 @@ CBT_SkyBoss_NormalHitReaction* CBT_SkyBoss_NormalHitReaction::Create(CSkyBoss* p
 
 void CBT_SkyBoss_NormalHitReaction::Free()
 {
-    __super::Free();
+    CBTAction::Free();
     Safe_Release(m_pGameInstance);
 }

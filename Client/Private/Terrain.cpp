@@ -19,7 +19,7 @@ HRESULT CTerrain::Initialize_Clone(void* pArg)
 {
   
 
-    if (FAILED(__super::Initialize_Clone(pArg)))
+    if (FAILED(CGameObject::Initialize_Clone(pArg)))
         return E_FAIL;
 
     if (FAILED(Ready_Components()))
@@ -141,7 +141,7 @@ CGameObject* CTerrain::Clone(void* pArg)
 
 void CTerrain::Free()
 {
-    __super::Free();
+    CGameObject::Free();
 
     Safe_Release(m_pVIBufferCom);
 

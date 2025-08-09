@@ -183,7 +183,7 @@ CTool_MainApp* CTool_MainApp::Create()
 
 void CTool_MainApp::Free()
 {
-	__super::Free();
+	CBase::Free();
 
 	FreeConsole();
 

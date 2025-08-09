@@ -59,6 +59,7 @@ namespace Client
 		_float fMoveSpeed;
 		_float fRotationSpeed;
 	}MONSTER_STAT;
+
 }
 
 extern HWND g_hWnd;

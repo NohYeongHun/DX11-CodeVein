@@ -52,8 +52,8 @@ private:
 
 
 #pragma region 0. 기본 값들
-private:
-	//_uint* m_pParentState = { nullptr };
+
+
 
 
 private:
