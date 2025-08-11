@@ -34,6 +34,7 @@ void CPlayer_DodgeState::Enter(void* pArg)
 
 	m_pModelCom->Set_Animation(m_iCurAnimIdx, m_isLoop);
 
+	m_pPlayer->AddBuff(CPlayer::BUFF_INVINCIBLE);
 
 }
 

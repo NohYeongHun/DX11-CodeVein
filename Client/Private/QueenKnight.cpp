@@ -121,7 +121,7 @@ void CQueenKnight::Update(_float fTimeDelta)
 
 #pragma region 테스트
 
-    if (m_pGameInstance->Get_KeyPress(DIK_3))
+  /*  if (m_pGameInstance->Get_KeyPress(DIK_3))
         AddBuff(CMonster::BUFF_HIT);
     if (m_pGameInstance->Get_KeyPress(DIK_5))
         AddBuff(CMonster::BUFF_DOWN);
@@ -129,7 +129,7 @@ void CQueenKnight::Update(_float fTimeDelta)
     {
         m_MonsterStat.fHP = 0;
         AddBuff(CMonster::BUFF_DEAD);
-    }
+    }*/
         
 
     //m_pModelCom->Play_Animation(fTimeDelta);
@@ -339,10 +339,10 @@ HRESULT CQueenKnight::InitializeAction_ToAnimationMap()
 HRESULT CQueenKnight::Initialize_BuffDurations()
 {
     // 기본 쿨다운.
-    m_BuffDefault_Durations[BUFF_HIT] = 0.5f;        // 피격: 0.6초
+    m_BuffDefault_Durations[BUFF_HIT] = 0.3f;        // 피격: 0.6초
     m_BuffDefault_Durations[BUFF_DOWN] = 5.f;       // 다운: 20초 => 두번 클릭했을 때 다운이 되는가.
     m_BuffDefault_Durations[BUFF_CORPSE] = 2.0f;       // 시체 : 2.0초
-    m_BuffDefault_Durations[BUFF_INVINCIBLE] = 0.6f; // 무적 시간.
+    m_BuffDefault_Durations[BUFF_INVINCIBLE] = 0.3f; // 무적 시간.
     m_BuffDefault_Durations[BUFF_DEAD] = 10.f; // 사망 시간.
 
     // 10 초마다 해당 페이즈 시퀀스 공격 반복

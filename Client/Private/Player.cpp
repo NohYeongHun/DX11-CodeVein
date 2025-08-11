@@ -98,20 +98,6 @@ HRESULT CPlayer::Initialize_Clone(void* pArg)
         return E_FAIL;
     }
 
-    
-    //m_pModelCom->Set_Animation(PLAYER_ANIM_IDLE_LSWORD, true);
-        
-
-
-    // 위치 초기화를 이제 Navigations 에서.
-    /*_vector qInitRot = XMQuaternionRotationAxis(XMVectorSet(0.f, 1.f, 0.f, 0.f), 0.0f);
-    m_pTransformCom->Set_Quaternion(qInitRot);
-
-    _float3 vPos = { 0.f, 5.f, 0.f };
-    m_pTransformCom->Set_State(STATE::POSITION, XMLoadFloat3(&vPos));*/
-
-    
-
     return S_OK;
 }
 
@@ -750,6 +736,9 @@ void CPlayer::Tick_BuffTimers(_float fTimeDelta)
 
 HRESULT CPlayer::Initialize_BuffDurations()
 {
+    m_BuffDefault_Durations[BUFF_HIT] = 0.3f;        // 피격: 0.6초
+    m_BuffDefault_Durations[BUFF_DOWN] = 5.f;       // 다운: 20초 => 두번 클릭했을 때 다운이 되는가.
+    m_BuffDefault_Durations[BUFF_INVINCIBLE] = 0.3f; // 무적 시간.
     return S_OK;
 }
 #pragma endregion
@@ -764,7 +753,13 @@ void CPlayer::On_Collision_Enter(CGameObject* pOther)
     // 이미 충돌 레이어를 몬스터, 몬스터 Weapon으로 한정했으므로 이건 Weapon 충돌.
     if (nullptr != pWeapon)
     {
+        if (HasBuff(BUFF_INVINCIBLE))
+            return;
+
         Take_Damage(pWeapon->Get_AttackPower());
+
+        AddBuff(BUFF_INVINCIBLE);
+        AddBuff(BUFF_HIT);
     }
 }
 
