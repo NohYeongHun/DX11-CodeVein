@@ -51,9 +51,21 @@ void CPlayer_AttackState::Enter(void* pArg)
 	m_fCurrentLockTime = 0.0f;
 	m_bIsDirectionLocked = false;
 
-
-	
-	// 애니메이션이 존재할때 언제부터 활성화되어야 하는가에 대한 결정을 애니메이션이?
+	// 락온 중이면 타겟을 향해 즉시 회전
+	if (m_pPlayer->Is_LockOn() && m_pPlayer->Has_LockOn_Target())
+	{
+		_vector vLockOnDirection = m_pPlayer->Calculate_LockOn_Direction();
+		if (!XMVector3Equal(vLockOnDirection, XMVectorZero()))
+		{
+			// 락온 방향으로 즉시 회전
+			_float x = XMVectorGetX(vLockOnDirection);
+			_float z = XMVectorGetZ(vLockOnDirection);
+			_float fTargetYaw = atan2f(x, z);
+			
+			_vector qNewRot = XMQuaternionRotationAxis(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTargetYaw);
+			m_pPlayer->Get_Transform()->Set_Quaternion(qNewRot);
+		}
+	}
 }
 
 /* State 실행 */

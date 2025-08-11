@@ -52,7 +52,7 @@ typedef struct tagSkillExecuteDesc
 
 typedef struct tagHPChangeDesc
 {
-	_uint iHp;
+	_float fHp;
 	_float fTime;
 	_bool bIncrease;
 }HPCHANGE_DESC;

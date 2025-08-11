@@ -175,6 +175,9 @@
     <Filter Include="02. GameObject\Monster\Boss\QueenKnight\BT\Attack">
       <UniqueIdentifier>{ad0d12b4-5e2f-41c3-8e21-2293a3770e0b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. GameObject\UI\Player\LockOn">
+      <UniqueIdentifier>{40dbc150-248b-4525-bf0b-f32ee08c0bb3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -483,6 +486,12 @@
     <ClInclude Include="..\Public\Client_Debug.h">
       <Filter>99. Defines</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\LockOnUI.h">
+      <Filter>02. GameObject\UI\Player\LockOn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BossHpBarUI.h">
+      <Filter>02. GameObject\Monster\Boss</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -770,6 +779,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\KnightShield.cpp">
       <Filter>02. GameObject\Monster\Boss\QueenKnight\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\LockOnUI.cpp">
+      <Filter>02. GameObject\UI\Player\LockOn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BossHpBarUI.cpp">
+      <Filter>02. GameObject\Monster\Boss</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

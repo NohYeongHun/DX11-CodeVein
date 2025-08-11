@@ -191,6 +191,15 @@ public:
     virtual void Disable_Collider(_uint iType) PURE;
 #pragma endregion
     
+#pragma region 6. 체력 감소시 UI 연동
+public:
+    virtual void Increase_HpUI(_float fHp, _float fTime) {};
+    virtual void Decrease_HpUI(_float fHp, _float fTime) {};
+
+private:
+
+
+#pragma endregion
 
 
 #pragma region 7. 몬스터 삭제 처리.

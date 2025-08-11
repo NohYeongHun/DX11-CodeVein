@@ -93,6 +93,10 @@ void CGameInstance::Update_Engine(_float fTimeDelta)
 	// 1. 입력 처리
 	m_pInput_Device->Update();
 
+
+	// => 카메라 Priority Update
+	m_pCamera_Manager->Priority_Update(fTimeDelta);
+
 	// 2. 게임 오브젝트 우선 업데이트
 	m_pObject_Manager->Priority_Update(fTimeDelta);
 
@@ -103,7 +107,6 @@ void CGameInstance::Update_Engine(_float fTimeDelta)
 	// 4. 파이프라인 업데이트 (카메라에서 설정한 View 행렬 적용)
 	m_pPipleLine->Update();
 
-
 	// 5 게임 오브젝트 일반 업데이트 (플레이어 움직임 완료)
 	m_pObject_Manager->Update(fTimeDelta); 
 
@@ -112,6 +115,9 @@ void CGameInstance::Update_Engine(_float fTimeDelta)
 
 	// 7. 게임 오브젝트 Late 업데이트 => 객체 Destroy 설정
 	m_pObject_Manager->Late_Update(fTimeDelta);
+
+	// 카메라 Late_Update
+	m_pCamera_Manager->Late_Update(fTimeDelta);
 
 	// 8. Object Manager Late Update에서 Destroy 객체들의 Collider를 제거
 	m_pCollider_Manager->Collision_CleanUp();

@@ -126,6 +126,9 @@ void CPlayer::Update(_float fTimeDelta)
     Update_KeyInput();
     HandleState(fTimeDelta);
     
+    // LockOn 상태를 카메라와 동기화
+    Update_LockOn(fTimeDelta);
+    
 #ifdef _DEBUG
     //m_pModelCom->Play_Animation(fTimeDelta);
 #endif // _DEBUG
@@ -361,10 +364,15 @@ void CPlayer::Rotate_Player_To_Camera_Direction()
 
 void CPlayer::Toggle_LockOn()
 {
-    if (m_isLockOn)
-        Clear_LockOn_Target();
-    else
-        Search_LockOn_Target();
+    // 카메라 락온 시스템 사용
+    if (m_pPlayerCamera)
+    {
+        m_pPlayerCamera->Toggle_LockOn_Mode();
+        
+        // 플레이어 상태도 카메라 상태에 맞춰 업데이트
+        m_isLockOn = m_pPlayerCamera->Is_LockOn_Mode();
+        m_pLockOn_Target = m_pPlayerCamera->Get_LockOn_Target();
+    }
 }
 
 void CPlayer::Search_LockOn_Target()
@@ -474,23 +482,17 @@ void CPlayer::Clear_LockOn_Target()
 
 void CPlayer::Update_LockOn(_float fTimeDelta)
 {
+    // 카메라의 락온 상태와 동기화
+    if (m_pPlayerCamera)
+    {
+        m_isLockOn = m_pPlayerCamera->Is_LockOn_Mode();
+        m_pLockOn_Target = m_pPlayerCamera->Get_LockOn_Target();
+    }
+    
     if (!m_isLockOn || !m_pLockOn_Target)
         return;
 
     m_fLockOnTimer += fTimeDelta;
-
-    // 주기적으로 LockOn 타겟 유효성 검사
-    if (m_fLockOnTimer >= m_fLockOnCheckInterval)
-    {
-        m_fLockOnTimer = 0.0f;
-
-        if (!Is_Valid_LockOn_Target(m_pLockOn_Target))
-        {
-            Clear_LockOn_Target();
-            return;
-        }
-    }
-
 }
 
 _bool CPlayer::Is_Valid_LockOn_Target(CGameObject* pTarget)
@@ -565,7 +567,7 @@ _vector CPlayer::Calculate_LockOn_Direction() const
 {
     if (!m_isLockOn || !m_pLockOn_Target)
         return XMVectorZero();
-
+     
     _vector vPlayerPos = m_pTransformCom->Get_State(STATE::POSITION);
     _vector vTargetPos = m_pLockOn_Target->Get_Transform()->Get_State(STATE::POSITION);
 
@@ -597,22 +599,50 @@ _vector CPlayer::Get_LockOn_Attack_Direction() const
 HRESULT CPlayer::InitializeAction_ToAnimationMap()
 {
 
+#pragma region 0. 이동
     m_Action_AnimMap.emplace(L"IDLE", PLAYER_ANIM_IDLE_LSWORD);
     m_Action_AnimMap.emplace(L"RUN", PLAYER_ANIM_RUN_F_LOOP);
     m_Action_AnimMap.emplace(L"DODGE", PLAYER_ANIM_LS_DODGE_ROLL_F);
 
+    // LockOn시 일어나는 행동
+    m_Action_AnimMap.emplace(L"RUN_F", PLAYER_ANIM_RUN_F_LOOP);
+    m_Action_AnimMap.emplace(L"RUN_F_END", PLAYER_ANIM_RUN_F_END);
+    m_Action_AnimMap.emplace(L"RUN_B", PLAYER_ANIM_RUN_B_LOOP);
+    m_Action_AnimMap.emplace(L"RUN_B_END", PLAYER_ANIM_RUN_B_END);
+    m_Action_AnimMap.emplace(L"RUN_L", PLAYER_ANIM_RUN_L_LOOP);
+    m_Action_AnimMap.emplace(L"RUN_L_END", PLAYER_ANIM_RUN_L_END);
+    m_Action_AnimMap.emplace(L"RUN_R", PLAYER_ANIM_RUN_R_LOOP);
+    m_Action_AnimMap.emplace(L"RUN_R_END", PLAYER_ANIM_RUN_R_END);
+
+
+    m_Action_AnimMap.emplace(L"DODGE_B", PLAYER_ANIM_LS_DODGE_ROLL_B);
+    m_Action_AnimMap.emplace(L"DODGE_BL", PLAYER_ANIM_LS_DODGE_ROLL_BL);
+    m_Action_AnimMap.emplace(L"DODGE_BR", PLAYER_ANIM_LS_DODGE_ROLL_BR);
+    m_Action_AnimMap.emplace(L"DODGE_F", PLAYER_ANIM_LS_DODGE_ROLL_F);
+    m_Action_AnimMap.emplace(L"DODGE_FL", PLAYER_ANIM_LS_DODGE_ROLL_FL);
+    m_Action_AnimMap.emplace(L"DODGE_FR", PLAYER_ANIM_LS_DODGE_ROLL_FR);
+    m_Action_AnimMap.emplace(L"DODGE_L", PLAYER_ANIM_LS_DODGE_ROLL_L);
+    m_Action_AnimMap.emplace(L"DODGE_R", PLAYER_ANIM_LS_DODGE_ROLL_R);
+
+#pragma endregion
+
+#pragma region 1. HIT 판정
     m_Action_AnimMap.emplace(L"GUARD_START", PLAYER_ANIM_LS_GUARD_START);
     m_Action_AnimMap.emplace(L"GUARD_LOOP", PLAYER_ANIM_LS_GUARD_LOOP);
     m_Action_AnimMap.emplace(L"GUARD_END", PLAYER_ANIM_LS_GUARD_END);
+#pragma endregion
+
+
+#pragma region 2. 공격
     m_Action_AnimMap.emplace(L"ATTACK1", PLAYER_ANIM_S_ATK_NORMAL1);
     m_Action_AnimMap.emplace(L"ATTACK2", PLAYER_ANIM_S_ATK_NORMAL2);
     m_Action_AnimMap.emplace(L"ATTACK3", PLAYER_ANIM_S_ATK_NORMAL3);
     m_Action_AnimMap.emplace(L"ATTACK4", PLAYER_ANIM_S_ATK_NORMAL4);
     m_Action_AnimMap.emplace(L"ATTACK5", PLAYER_ANIM_S_ATK_NORMAL5);
 
-    // 220 Frame => 100 Frame까지?
+    // 220 Frame => 100 Frame까지? 공격 판정?
     m_Action_AnimMap.emplace(L"STRONG_ATTACK1", PLAYER_ANIM_LS_ATK_STRONG1B);
-    
+#pragma endregion
 
 
     /* 재생속도 증가. */
@@ -728,6 +758,14 @@ HRESULT CPlayer::Initialize_BuffDurations()
 #pragma region 충돌 관리
 void CPlayer::On_Collision_Enter(CGameObject* pOther)
 {
+    // 몬스터 무기와 충돌했을 경우?
+    CWeapon* pWeapon = dynamic_cast<CWeapon*>(pOther);
+
+    // 이미 충돌 레이어를 몬스터, 몬스터 Weapon으로 한정했으므로 이건 Weapon 충돌.
+    if (nullptr != pWeapon)
+    {
+        Take_Damage(pWeapon->Get_AttackPower());
+    }
 }
 
 void CPlayer::On_Collision_Stay(CGameObject* pOther)
@@ -746,6 +784,10 @@ void CPlayer::Enable_Collider(COLLIDER_PARTS eColliderParts)
     case PART_WEAPON:
         m_pPlayerWeapon->Activate_Collider();
         break;
+    case PART_BODY:
+        if (m_pColliderCom)
+            m_pColliderCom->Set_Active(true);
+        break;
     default:
         break;
     }
@@ -758,9 +800,24 @@ void CPlayer::Disable_Collider(COLLIDER_PARTS eColliderParts)
     case PART_WEAPON:
         m_pPlayerWeapon->Deactivate_Collider();
         break;
+    case PART_BODY:
+        if (m_pColliderCom)
+            m_pColliderCom->Set_Active(false);
+        break;
     default:
         break;
     }
+}
+
+void CPlayer::Take_Damage(_float fHp)
+{
+    m_Stats.fHP -= fHp;
+    // UI에 전달.
+    HPCHANGE_DESC HpDesc{};
+    HpDesc.bIncrease = false;
+    HpDesc.fHp = fHp;
+    HpDesc.fTime = 0.2f;
+    m_pGameInstance->Publish(EventType::HP_CHANGE, &HpDesc);
 }
 
 #pragma endregion
@@ -974,15 +1031,30 @@ HRESULT CPlayer::Ready_Fsm()
     m_pFsmCom->Add_State(CPlayer_GuardState::Create(PLAYER_STATE::GUARD, &PlayerDesc));
     m_pFsmCom->Add_State(CPlayer_AttackState::Create(PLAYER_STATE::ATTACK, &PlayerDesc));
 
-    m_pModelCom->Get_Current_Ratio();
+    //m_pModelCom->Get_Current_Ratio();
     
     /* 재생 속도 증가*/
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("RUN")], 1.5f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("RUN_B")], 1.5f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("RUN_F")], 1.5f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("RUN_L")], 1.5f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("RUN_R")], 1.5f);
+
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("DODGE_B")], 1.5f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("DODGE_BL")], 1.5f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("DODGE_BR")], 1.5f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("DODGE_F")], 1.5f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("DODGE_FL")], 1.5f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("DODGE_FR")], 1.5f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("DODGE_L")], 1.5f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("DODGE_R")], 1.5f);
+
+
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("ATTACK1")], 2.f);
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("ATTACK2")], 2.f);
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("ATTACK3")], 2.f);
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("ATTACK4")], 2.f);
-    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("DODGE")], 2.f);
+    
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("STRONG_ATTACK1")], 2.f);
         //, m_pModelCom->Get_CurrentTickPerSecond(m_Action_AnimMap[TEXT("RUN")]) * 2.f);
 
@@ -999,12 +1071,9 @@ HRESULT CPlayer::Ready_Fsm()
     return S_OK;
 }
 
+// 애니메이션 쿨타임 보다. Ratio로 판단하는게 더맞을듯.
 void CPlayer::Register_CoolTime()
 {
-   
-
-   
-
     _float fTimeDelta = m_pGameInstance->Get_TimeDelta();
     m_pFsmCom->Register_StateCoolTime(PLAYER_STATE::IDLE, 0.f);
     m_pFsmCom->Register_StateCoolTime(PLAYER_STATE::WALK, 0.f);
@@ -1069,8 +1138,9 @@ HRESULT CPlayer::Ready_PartObjects()
     CPlayerWeapon::PLAYER_WEAPON_DESC Weapon{};
     Weapon.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
     Weapon.pSocketMatrix = m_pModelCom->Get_BoneMatrix("IKSocket_RightHandAttach");
-    Weapon.eCurLevel = LEVEL::STATIC;
     Weapon.pOwner = this;
+    Weapon.eCurLevel = LEVEL::STATIC;
+    Weapon.fAttackPower = m_Stats.fAttackPower;
 
     if (FAILED(CContainerObject::Add_PartObject(TEXT("Com_Weapon"),
         ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_Weapon")
@@ -1080,7 +1150,7 @@ HRESULT CPlayer::Ready_PartObjects()
         return E_FAIL;
     }
 
-    m_pPlayerWeapon->Set_AttackPower(m_Stats.fAttackPower);
+    //m_pPlayerWeapon->Set_AttackPower(m_Stats.fAttackPower);
     
 
     return S_OK;

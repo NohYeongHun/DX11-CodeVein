@@ -49,6 +49,12 @@ HRESULT CQueenKnight::Initialize_Clone(void* pArg)
         return E_FAIL;
     }
 
+    if (FAILED(Initailize_UI()))
+    {
+        CRASH("Init UI Failed");
+        return E_FAIL;
+    }
+
     if (FAILED(Ready_Navigations()))
     {
         CRASH("Ready Navigations Failed");
@@ -104,10 +110,14 @@ HRESULT CQueenKnight::Initialize_Clone(void* pArg)
 void CQueenKnight::Priority_Update(_float fTimeDelta)
 {
     CMonster::Priority_Update(fTimeDelta);
+    if (m_pBossHpBarUI)
+        m_pBossHpBarUI->Priority_Update(fTimeDelta);
 }
 
 void CQueenKnight::Update(_float fTimeDelta)
 {
+    if (m_pBossHpBarUI)
+        m_pBossHpBarUI->Update(fTimeDelta);
 
 #pragma region 테스트
 
@@ -142,6 +152,9 @@ void CQueenKnight::Finalize_Update(_float fTimeDelta)
 
 void CQueenKnight::Late_Update(_float fTimeDelta)
 {
+    if (m_pBossHpBarUI)
+        m_pBossHpBarUI->Late_Update(fTimeDelta);
+
     //m_pTransformCom->Set_State(STATE::POSITION
     //    , m_pNavigationCom->Compute_OnCell(
     //        m_pTransformCom->Get_State(STATE::POSITION), m_fOffsetY));
@@ -172,6 +185,10 @@ HRESULT CQueenKnight::Render()
     ImGui::Begin(strDebug.c_str(), nullptr, ImGuiWindowFlags_NoCollapse);
     ImGui::Text("HP : (%.2f)", m_MonsterStat.fHP);
     ImGui::Text("MAX HP : (%.2f)", m_MonsterStat.fMaxHP);
+
+    _float3 vPos = {};
+    XMStoreFloat3(&vPos, m_pTransformCom->Get_State(STATE::POSITION));
+    ImGui::Text("POS : (%.2f, %.2f, %.2f)", vPos.x, vPos.y, vPos.z);
 
     ImGui::End();
      m_pColliderCom->Render();
@@ -219,7 +236,7 @@ void CQueenKnight::On_Collision_Enter(CGameObject* pOther)
         if (!HasBuff(BUFF_INVINCIBLE))
         {
             // 1. 데미지를 입고.
-            CMonster::Take_Damage(pPlayerWeapon->Get_AttackPower());
+            Take_Damage(pPlayerWeapon->Get_AttackPower());
 
             // 2. 해당 위치에 검흔 Effect 생성?
 
@@ -268,6 +285,9 @@ void CQueenKnight::Update_AI(_float fTimeDelta)
 HRESULT CQueenKnight::Initialize_Stats()
 {
     m_fMinDetectionDistance = 6.f;
+
+   
+
     return S_OK;
 }
 #pragma endregion
@@ -348,8 +368,61 @@ void CQueenKnight::Enable_Collider(_uint iType)
 void CQueenKnight::Disable_Collider(_uint iType)
 {
 }
+
+
+
 #pragma endregion
 
+#pragma region 7. 보스몹 UI 관리
+void CQueenKnight::Take_Damage(_float fDamage)
+{
+    m_MonsterStat.fHP -= fDamage;
+    Decrease_HpUI(fDamage, 0.1f);
+
+}
+void CQueenKnight::Increase_HpUI(_float fHp, _float fTime)
+{
+    m_pBossHpBarUI->Increase_Hp(fHp, fTime);
+}
+
+void CQueenKnight::Decrease_HpUI(_float fHp, _float fTime)
+{
+    m_pBossHpBarUI->Decrease_Hp(fHp, fTime);
+}
+
+HRESULT CQueenKnight::Initailize_UI()
+{
+    // 위에는 보스몹
+
+    CBossHpBarUI::BOSS_HPBAR_DESC Desc{};
+    // 정중앙 위치
+    Desc.fX = g_iWinSizeX * 0.5f;
+    Desc.fY = 100.f;
+    Desc.fSizeX = 1200.f;
+    Desc.fSizeY = 40.f;
+    Desc.fMaxHp = m_MonsterStat.fMaxHP;
+
+
+    CUIObject* pUIObject = nullptr;
+
+    pUIObject = dynamic_cast<CUIObject*>(
+        m_pGameInstance->Clone_Prototype(
+            PROTOTYPE::GAMEOBJECT
+            , ENUM_CLASS(LEVEL::STATIC)
+            , TEXT("Prototype_GameObject_BossHPBar"), &Desc));
+
+    m_pBossHpBarUI = dynamic_cast<CBossHpBarUI*>(pUIObject);
+    if (nullptr == m_pBossHpBarUI)
+    {
+        CRASH("Failed Clone BossHPBar UI");
+        return E_FAIL;
+    }
+
+    return S_OK;
+}
+
+
+#pragma endregion
 
 
 
@@ -486,8 +559,11 @@ HRESULT CQueenKnight::Ready_PartObjects()
     CKnightLance::KNIGHT_LANCE_DESC Weapon{};
     Weapon.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
     Weapon.pSocketMatrix = m_pModelCom->Get_BoneMatrix("RightHandAttachSocket");
-    Weapon.eCurLevel = m_eCurLevel;
     Weapon.pOwner = this;
+    Weapon.eCurLevel = m_eCurLevel;
+    Weapon.fAttackPower = m_MonsterStat.fAttackPower;
+    
+    
 
     if (FAILED(CContainerObject::Add_PartObject(TEXT("Com_Weapon"),
         ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_GodChildLance")
@@ -550,6 +626,7 @@ void CQueenKnight::Destroy()
 void CQueenKnight::Free()
 {
     CMonster::Free();
+    Safe_Release(m_pBossHpBarUI);
     Safe_Release(m_pWeapon);
     Safe_Release(m_pShield);
     Safe_Release(m_pTree);

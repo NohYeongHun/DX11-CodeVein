@@ -31,6 +31,13 @@ DepthStencilState DSS_None
     DepthWriteMask = zero;
 };
 
+DepthStencilState DSS_UI
+{
+    DepthEnable = false;
+    DepthWriteMask = all;
+    DepthFunc = LESS_EQUAL;
+};
+
 BlendState BS_Default
 {
     BlendEnable[0] = false;

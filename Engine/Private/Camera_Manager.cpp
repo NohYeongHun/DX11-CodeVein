@@ -14,11 +14,23 @@ HRESULT CCamera_Manager::Initialize(_uint iNumLevels)
 	return S_OK;
 }
 
+void CCamera_Manager::Priority_Update(_float fTimeDelta)
+{
+	if (nullptr != m_pCurrentCamera)
+		m_pCurrentCamera->Priority_Update(fTimeDelta);
+}
+
 /* 업데이트 카메라 매니저*/
 void CCamera_Manager::Update(_float fTimeDelta)
 {
 	if (nullptr != m_pCurrentCamera)
 		m_pCurrentCamera->Update(fTimeDelta);
+}
+
+void CCamera_Manager::Late_Update(_float fTimeDelta)
+{
+	if (nullptr != m_pCurrentCamera)
+		m_pCurrentCamera->Late_Update(fTimeDelta);
 }
 
 void CCamera_Manager::Clear(_uint iLevelIndex)

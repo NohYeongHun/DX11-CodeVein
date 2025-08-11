@@ -18,6 +18,7 @@ private:
     class CMonster* m_pOwner = { nullptr };
     DETECT_PHASE m_eDetectPhase = { DETECT_PHASE::NONE };
     _bool m_IsRootMotion = { false };
+    _bool m_bIsStopped = { false };  // 추적 중단 상태
 
 public:
     explicit CBT_Monster_DetectAction(class CMonster* pOwner);

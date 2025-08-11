@@ -1,4 +1,5 @@
 ﻿#include "Loader_GamePlay.h"
+#include "LockOnUI.h"
 
 HRESULT CLoader_GamePlay::Loading_Resource(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
 {
@@ -70,6 +71,13 @@ HRESULT CLoader_GamePlay::Loading_Resource(ID3D11Device* pDevice, ID3D11DeviceCo
 	{
 		CRASH("Create SkyBox Failed");
 		MSG_BOX(TEXT("Create Failed Loading : GamePlay SkyBox "));
+		return E_FAIL;
+	}
+
+	if (FAILED(Add_Prototype_UI(pDevice, pContext, pGameInstance)))
+	{
+		CRASH("Create UI Failed");
+		MSG_BOX(TEXT("Create Failed Loading : GamePlay UI "));
 		return E_FAIL;
 	}
 
@@ -306,6 +314,12 @@ HRESULT CLoader_GamePlay::Add_Prototype_SkyBox(ID3D11Device* pDevice, ID3D11Devi
 	}
 		
 
+	return S_OK;
+}
+
+HRESULT CLoader_GamePlay::Add_Prototype_UI(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
+{
+	
 	return S_OK;
 }
 

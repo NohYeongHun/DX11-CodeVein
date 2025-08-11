@@ -11,7 +11,7 @@ HRESULT CPlayer_StrongAttackState::Initialize(_uint iStateNum, void* pArg)
 
 
 	m_ColliderActiveMap.emplace(m_pPlayer->Find_AnimationIndex(TEXT("STRONG_ATTACK1"))
-		, COLLIDER_ACTIVE_INFO{ 0.f, 100.f / 230.f, false });
+		, COLLIDER_ACTIVE_INFO{ 70.f / 230.f, 100.f / 230.f, false });
 
 	//m_ColliderActiveMap.emplace(m_pPlayer->Find_AnimationIndex(TEXT("STRONG_ATTACK1"))
 	//	, COLLIDER_ACTIVE_INFO{ 50.f / 230.f, 100.f / 230.f, false });
@@ -37,6 +37,21 @@ void CPlayer_StrongAttackState::Enter(void* pArg)
 	m_pModelCom->Set_RootMotionRotation(true);
 	m_pModelCom->Set_RootMotionTranslate(true);
 
+	// 락온 중이면 타겟을 향해 즉시 회전
+	if (m_pPlayer->Is_LockOn() && m_pPlayer->Has_LockOn_Target())
+	{
+		_vector vLockOnDirection = m_pPlayer->Calculate_LockOn_Direction();
+		if (!XMVector3Equal(vLockOnDirection, XMVectorZero()))
+		{
+			// 락온 방향으로 즉시 회전
+			_float x = XMVectorGetX(vLockOnDirection);
+			_float z = XMVectorGetZ(vLockOnDirection);
+			_float fTargetYaw = atan2f(x, z);
+			
+			_vector qNewRot = XMQuaternionRotationAxis(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTargetYaw);
+			m_pPlayer->Get_Transform()->Set_Quaternion(qNewRot);
+		}
+	}
 
 	// 이 때 검에 콜라이더 활성화 이런 과정 진행
 }

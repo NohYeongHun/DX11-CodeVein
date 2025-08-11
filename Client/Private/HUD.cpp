@@ -86,7 +86,7 @@ void CHUD::Update(_float fTimeDelta)
     {
         HPCHANGE_DESC HpDesc{};
         HpDesc.bIncrease = false;
-        HpDesc.iHp = 50;
+        HpDesc.fHp = 50.f;
         HpDesc.fTime = 1.f;
         m_pGameInstance->Publish(EventType::HP_CHANGE, &HpDesc);
     }
@@ -94,7 +94,7 @@ void CHUD::Update(_float fTimeDelta)
     {
         HPCHANGE_DESC HpDesc{};
         HpDesc.bIncrease = true;
-        HpDesc.iHp = 50;
+        HpDesc.fHp = 50.f;
         HpDesc.fTime = 1.f;
         m_pGameInstance->Publish(EventType::HP_CHANGE, &HpDesc);
     }

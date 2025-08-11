@@ -46,6 +46,7 @@
 #include "HPBar.h"
 #include "SteminaBar.h"
 #include "StatusPanel.h"
+#include "LockOnUI.h"
 
 /* ======================================= Inventory =================================== */
 #include "Inventory.h"
@@ -113,6 +114,7 @@
 #include "BT_Monster_IdleAction.h"
 
 /* ======================================== Monster Object ===================================== */
+#include "BossHpBarUI.h"
 #include "Monster.h"
 #include "MonsterTree.h"
 /* ======================================== WolfDevil Object ===================================== */

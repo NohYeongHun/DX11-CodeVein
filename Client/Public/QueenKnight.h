@@ -87,6 +87,25 @@ public:
 	virtual void Disable_Collider(_uint iType) override;
 #pragma endregion
 
+#pragma region 7. 보스몹 체력 UI 관리
+public:
+	virtual void Take_Damage(_float fDamage) override;
+
+	virtual void Increase_HpUI(_float fHp, _float fTime) override;
+	virtual void Decrease_HpUI(_float fHp, _float fTime) override;
+
+
+private:
+	HRESULT Initailize_UI();
+	
+
+private:
+	class CBossHpBarUI* m_pBossHpBarUI = { nullptr };
+
+public:
+	
+#pragma endregion
+
 
 #pragma region 0. 기본 함수들 정의
 private:

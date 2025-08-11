@@ -28,6 +28,7 @@ protected:
 protected:
 	unordered_map<_uint, COLLIDER_ACTIVE_INFO> m_ColliderActiveMap;
 	_bool m_bPrevColliderState = false;
+	CPlayer::COLLIDER_PARTS m_eColliderType = CPlayer::PART_WEAPON; // 기본값은 무기 충돌체
 
 
 protected:

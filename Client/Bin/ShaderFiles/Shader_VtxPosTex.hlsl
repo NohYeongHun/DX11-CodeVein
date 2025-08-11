@@ -54,7 +54,6 @@ struct PS_IN
 struct PS_OUT
 {
     float4 vColor : SV_TARGET0;
-    
 };
 
 /* 만든 픽셀 각각에 대해서 픽셀 쉐이더를 수행한다. */
@@ -218,6 +217,20 @@ PS_OUT PS_MAIN7(PS_IN In)
     return Out;
 }
 
+PS_OUT PS_MAIN8(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+    
+    float2 uv = In.vTexcoord;
+    float4 baseColor = g_Texture.Sample(DefaultSampler, uv); // 원본 텍스처 색
+    
+    Out.vColor = baseColor;
+    
+    //Out.vColor.rgb = In.vTexcoord.y;
+    
+    return Out;
+}
+
 
 technique11 DefaultTechnique
 {
@@ -285,6 +298,15 @@ technique11 DefaultTechnique
         SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
         VertexShader = compile vs_5_0 VS_MAIN();
         PixelShader = compile ps_5_0 PS_MAIN7();
+    }
+
+    pass LockOnPass
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_None, 0);
+        SetBlendState(BS_AlphaBlend, float4(0, 0, 0, 0), 0xffffffff);
+        VertexShader = compile vs_5_0 VS_MAIN();
+        PixelShader = compile ps_5_0 PS_MAIN8();
     }
     
 

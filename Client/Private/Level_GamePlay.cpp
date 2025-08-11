@@ -35,6 +35,7 @@ HRESULT CLevel_GamePlay::Initialize_Clone()
 	}
 	
 
+	// 잠시만 끄기
 	if (FAILED(Ready_Layer_Monster(TEXT("Layer_Monster"))))
 	{
 		CRASH("Failed Layer_Monster");

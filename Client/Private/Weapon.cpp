@@ -22,6 +22,7 @@ HRESULT CWeapon::Initialize_Clone(void* pArg)
     m_pSocketMatrix = pDesc->pSocketMatrix;
     m_eCurLevel = pDesc->eCurLevel;
     m_pOwner = pDesc->pOwner;
+    m_fAttackPower = pDesc->fAttackPower;
 
     if (FAILED(CPartObject::Initialize_Clone(pDesc)))
     {

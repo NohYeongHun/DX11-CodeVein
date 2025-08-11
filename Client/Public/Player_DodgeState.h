@@ -43,6 +43,7 @@ public:
 	virtual void Reset() override;
 
 	void Change_State();
+	void Handle_Invincible_Buff(); // 무적 버프 처리
 
 private:
 	ACTORDIR			   m_eDir = { ACTORDIR::END };

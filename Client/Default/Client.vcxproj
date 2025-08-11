@@ -160,6 +160,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\public\BackGround.h" />
+    <ClInclude Include="..\Public\BossHpBarUI.h" />
     <ClInclude Include="..\Public\BT_Monster_AttackAction.h" />
     <ClInclude Include="..\Public\BT_Monster_DeadAction.h" />
     <ClInclude Include="..\Public\BT_Monster_DetectAction.h" />
@@ -219,6 +220,7 @@
     <ClInclude Include="..\Public\Loading_BackGround.h" />
     <ClInclude Include="..\Public\Loading_Panel.h" />
     <ClInclude Include="..\Public\Loading_Slot.h" />
+    <ClInclude Include="..\Public\LockOnUI.h" />
     <ClInclude Include="..\Public\Map.h" />
     <ClInclude Include="..\Public\Monster.h" />
     <ClInclude Include="..\Public\MonsterTree.h" />
@@ -264,6 +266,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\BackGround.cpp" />
+    <ClCompile Include="..\Private\BossHpBarUI.cpp" />
     <ClCompile Include="..\Private\BT_Monster_AttackAction.cpp" />
     <ClCompile Include="..\Private\BT_Monster_DeadAction.cpp" />
     <ClCompile Include="..\Private\BT_Monster_DetectAction.cpp" />
@@ -324,6 +327,7 @@
     <ClCompile Include="..\Private\Loading_BackGround.cpp" />
     <ClCompile Include="..\Private\Loading_Panel.cpp" />
     <ClCompile Include="..\Private\Loading_Slot.cpp" />
+    <ClCompile Include="..\Private\LockOnUI.cpp" />
     <ClCompile Include="..\Private\Map.cpp" />
     <ClCompile Include="..\Private\Monster.cpp" />
     <ClCompile Include="..\Private\MonsterTree.cpp" />

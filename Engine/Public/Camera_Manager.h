@@ -11,7 +11,9 @@ public:
 
 public:
 	HRESULT Initialize(_uint iNumLevels);
+	void Priority_Update(_float fTimeDelta);
 	void Update(_float fTimeDelta);
+	void Late_Update(_float fTimeDelta);
 	void Clear(_uint iLevelIndex);
 #pragma region ENGINE에 제공
 public:

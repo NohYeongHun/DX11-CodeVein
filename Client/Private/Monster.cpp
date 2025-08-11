@@ -536,6 +536,7 @@ const _bool CMonster::IsRotateFinished(_float fRadian)
 
 
 #pragma region 7. 몬스터 삭제 처리. => 이건 Dead Node에서 처리하기?
+
 _bool CMonster::Monster_Dead()
 {
     // 피가 0이면서 Dead 상태이면서.
