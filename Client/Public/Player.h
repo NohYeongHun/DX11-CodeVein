@@ -11,7 +11,7 @@ public:
 	enum PLAYER_STATE : _int
 	{
 		IDLE = 0, WALK, RUN, DODGE,
-		STRONG_ATTACK, GUARD, ATTACK,
+		STRONG_ATTACK, GUARD, ATTACK, DAMAGE,
 		STATE_END
 	};
 
@@ -85,6 +85,7 @@ public:
 private:
 	// 데미지 
 	void Take_Damage(_float fHp);
+	ACTORDIR Calculate_Damage_Direction(class CMonster* pAttacker);
 
 private:
 	class CCollider* m_pColliderCom = { nullptr };

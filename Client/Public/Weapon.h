@@ -57,6 +57,7 @@ public:
 public:
 	void Set_AttackPower(_float fAttackPower) { m_fAttackPower = fAttackPower; }
 	virtual _float Get_AttackPower() { return m_fAttackPower; }
+	CGameObject* Get_Owner() { return m_pOwner; }
 
 protected:
 	class CCollider* m_pColliderCom = { nullptr };

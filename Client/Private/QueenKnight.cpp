@@ -121,18 +121,7 @@ void CQueenKnight::Update(_float fTimeDelta)
 
 #pragma region 테스트
 
-  /*  if (m_pGameInstance->Get_KeyPress(DIK_3))
-        AddBuff(CMonster::BUFF_HIT);
-    if (m_pGameInstance->Get_KeyPress(DIK_5))
-        AddBuff(CMonster::BUFF_DOWN);
-    if (m_pGameInstance->Get_KeyPress(DIK_6))
-    {
-        m_MonsterStat.fHP = 0;
-        AddBuff(CMonster::BUFF_DEAD);
-    }*/
-        
-
-    //m_pModelCom->Play_Animation(fTimeDelta);
+  
 #pragma endregion
 
     Update_AI(fTimeDelta);
@@ -272,6 +261,9 @@ void CQueenKnight::Update_AI(_float fTimeDelta)
 
     Tick_BuffTimers(fTimeDelta);
 
+    /* 콜라이더 활성화 구간 확인 */
+    CMonster::Handle_Collider_State();
+
     if (true == m_pModelCom->Play_Animation(fTimeDelta))
     {
 
@@ -347,6 +339,14 @@ HRESULT CQueenKnight::Initialize_BuffDurations()
 
     // 10 초마다 해당 페이즈 시퀀스 공격 반복
     m_BuffDefault_Durations[QUEEN_BUFF_PHASE_ATTACK_COOLDOWN] = 10.f;
+
+
+#pragma region COllider 활성화 프레임 관리
+    Add_Collider_Frame(m_Action_AnimMap[TEXT("PHASE_ATTACK1")], 40.f / 180.f, 80.f / 180.f, PART_WEAPON);     // Weapon attack
+    Add_Collider_Frame(m_Action_AnimMap[TEXT("PHASE_ATTACK2")], 40.f / 180.f, 80.f / 180.f, PART_WEAPON);     // Weapon attack
+    Add_Collider_Frame(m_Action_AnimMap[TEXT("PHASE_ATTACK3")], 40.f / 180.f, 80.f / 180.f, PART_WEAPON);     // Weapon attack
+#pragma endregion
+
     return S_OK;
 }
 
@@ -359,6 +359,10 @@ void CQueenKnight::Enable_Collider(_uint iType)
     switch (iType)
     {
     case PART_WEAPON:
+        m_pWeapon->Activate_Collider();
+        break;
+    case PART_SHIELD:
+        m_pShield->Activate_Collider();
         break;
     default:
         break;
@@ -367,9 +371,18 @@ void CQueenKnight::Enable_Collider(_uint iType)
 
 void CQueenKnight::Disable_Collider(_uint iType)
 {
+    switch (iType)
+    {
+    case PART_WEAPON:
+        m_pWeapon->Deactivate_Collider();
+        break;
+    case PART_SHIELD:
+        m_pShield->Deactivate_Collider();
+        break;
+    default:
+        break;
+    }
 }
-
-
 
 #pragma endregion
 

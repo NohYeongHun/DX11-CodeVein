@@ -563,8 +563,118 @@ void CMonster::Print_Position()
 #endif // _DEBUG
 #pragma endregion
 
+#pragma region 통합 콜라이더 제어 시스템 구현
+void CMonster::Add_Collider_Frame(_uint iAnimationIndex, _float fStartRatio, _float fEndRatio, _uint iPartType)
+{
+	MONSTER_COLLIDER_FRAME colliderFrame(fStartRatio, fEndRatio, iPartType);
 
+	// 해당 애니메이션의 콜라이더 제어 정보가 없으면 생성
+	if (m_ColliderControlMap.find(iAnimationIndex) == m_ColliderControlMap.end())
+	{
+		m_ColliderControlMap[iAnimationIndex] = MONSTER_COLLIDER_CONTROL();
+	}
 
+	m_ColliderControlMap[iAnimationIndex].vecColliderFrames.push_back(colliderFrame);
+	
+	// Part별 인덱스 초기화
+	if (m_ColliderControlMap[iAnimationIndex].partCurrentIndex.find(iPartType) == 
+		m_ColliderControlMap[iAnimationIndex].partCurrentIndex.end())
+	{
+		m_ColliderControlMap[iAnimationIndex].partCurrentIndex[iPartType] = 0;
+		m_ColliderControlMap[iAnimationIndex].partProcessed[iPartType] = false;
+	}
+}
+
+void CMonster::Handle_Collider_State()
+{
+	_float fCurrentRatio = m_pModelCom->Get_Current_Ratio();
+	
+	auto iter = m_ColliderControlMap.find(Get_CurrentAnimation());
+	if (iter == m_ColliderControlMap.end())
+		return;
+
+	MONSTER_COLLIDER_CONTROL& colliderControl = iter->second;
+	
+	// 모든 콜라이더 프레임을 순회
+	for (auto& colliderFrame : colliderControl.vecColliderFrames)
+	{
+		_uint partType = colliderFrame.iPartType;
+		
+		// 해당 Part가 모두 처리되었으면 스킵
+		if (colliderControl.partProcessed[partType])
+			continue;
+
+		// 현재 콜라이더 구간 확인
+		_bool bShouldActive = (fCurrentRatio >= colliderFrame.fStartRatio && 
+							   fCurrentRatio <= colliderFrame.fEndRatio);
+
+		// Part별 이전 상태와 비교
+		_bool bPrevState = m_PartPrevColliderState[partType];
+
+		if (bShouldActive != bPrevState)
+		{
+			if (bShouldActive)
+			{
+				// 콜라이더 활성화
+				Enable_Collider(partType);
+				colliderFrame.bIsActive = true;
+			}
+			else
+			{
+				// 콜라이더 비활성화
+				Disable_Collider(partType);
+				colliderFrame.bIsActive = false;
+				
+				// 구간을 벗어났으면 해당 Part 처리 완료 체크
+				if (fCurrentRatio > colliderFrame.fEndRatio)
+				{
+					// 해당 Part의 모든 구간이 끝났는지 확인
+					_bool bAllFramesProcessed = true;
+					for (auto& frame : colliderControl.vecColliderFrames)
+					{
+						if (frame.iPartType == partType && fCurrentRatio <= frame.fEndRatio)
+						{
+							bAllFramesProcessed = false;
+							break;
+						}
+					}
+					
+					if (bAllFramesProcessed)
+					{
+						colliderControl.partProcessed[partType] = true;
+					}
+				}
+			}
+
+			m_PartPrevColliderState[partType] = bShouldActive;
+		}
+	}
+}
+
+void CMonster::Reset_Collider_ActiveInfo()
+{
+	for (auto& pair : m_ColliderControlMap)
+	{
+		MONSTER_COLLIDER_CONTROL& colliderControl = pair.second;
+		
+		// Part별 인덱스와 상태 초기화
+		for (auto& partPair : colliderControl.partCurrentIndex)
+		{
+			colliderControl.partCurrentIndex[partPair.first] = 0;
+			colliderControl.partProcessed[partPair.first] = false;
+		}
+		
+		// 모든 콜라이더 프레임 비활성화
+		for (auto& colliderFrame : colliderControl.vecColliderFrames)
+		{
+			colliderFrame.bIsActive = false;
+		}
+	}
+	
+	// Part별 이전 상태도 초기화
+	m_PartPrevColliderState.clear();
+}
+#pragma endregion
 
 void CMonster::Free()
 {

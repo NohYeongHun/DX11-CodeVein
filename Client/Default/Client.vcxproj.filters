@@ -178,6 +178,9 @@
     <Filter Include="02. GameObject\UI\Player\LockOn">
       <UniqueIdentifier>{40dbc150-248b-4525-bf0b-f32ee08c0bb3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. GameObject\Player\State\Damage">
+      <UniqueIdentifier>{bd0331cb-0c63-43c1-8d18-270e024a188f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -492,6 +495,9 @@
     <ClInclude Include="..\Public\BossHpBarUI.h">
       <Filter>02. GameObject\Monster\Boss</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Player_DamageState.h">
+      <Filter>02. GameObject\Player\State\Damage</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -785,6 +791,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\BossHpBarUI.cpp">
       <Filter>02. GameObject\Monster\Boss</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Player_DamageState.cpp">
+      <Filter>02. GameObject\Player\State\Damage</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

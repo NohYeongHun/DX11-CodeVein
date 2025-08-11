@@ -76,7 +76,10 @@ BT_RESULT CBT_QueenKnight_FirstPhase_AttackAction::UpdateRotating(_float fTimeDe
         // 2. 공격 상태로 변경
         //m_pOwner->Change_Animation_Combo(iNextAnimationIdx);
 
-        // 3. Collider 활성화 필요. => 공격용 콜라이더만 활성화.(Weapon?)
+        // 3. 콜라이더 상태 초기화
+        m_pOwner->Reset_Collider_ActiveInfo();
+
+        // 4. Collider 활성화 필요. => 공격용 콜라이더만 활성화.(Weapon?)
     }
 
     return BT_RESULT::RUNNING;
@@ -96,6 +99,9 @@ BT_RESULT CBT_QueenKnight_FirstPhase_AttackAction::UpdateFirstAttack(_float fTim
 
         // 2. 공격 상태로 변경
         m_pOwner->Change_Animation_Blend(iNextAnimationIdx, false, 0.2f, true, true, true);
+        
+        // 3. 콜라이더 상태 초기화
+        m_pOwner->Reset_Collider_ActiveInfo();
        
 
     }
@@ -115,6 +121,9 @@ BT_RESULT CBT_QueenKnight_FirstPhase_AttackAction::UpdateSecondAttack(_float fTi
 
         // 2. 공격 상태로 변경
         m_pOwner->Change_Animation_Blend(iNextAnimationIdx, false ,0.2f, true, true, true);
+        
+        // 3. 콜라이더 상태 초기화
+        m_pOwner->Reset_Collider_ActiveInfo();
         
     }
 

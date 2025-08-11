@@ -39,6 +39,8 @@ HRESULT CKnightLance::Initialize(void* pArg)
     m_pTransformCom->Rotation(XMVectorSet(0.f, 1.f, 0.f, 0.f), XMConvertToRadians(90.0f));
     m_pTransformCom->Set_State(STATE::POSITION, XMVectorSet(0.8f, 0.f, 0.f, 1.f));*/
 
+    // 기본 false;
+    m_pColliderCom->Set_Active(false);
     return S_OK;
 }
 

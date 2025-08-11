@@ -613,6 +613,11 @@ HRESULT CPlayer::InitializeAction_ToAnimationMap()
 #pragma endregion
 
 #pragma region 1. HIT 판정
+    m_Action_AnimMap.emplace(L"DAMAGE_B", PLAYER_ANIM_DAMAGE_B);
+    m_Action_AnimMap.emplace(L"DAMAGE_F", PLAYER_ANIM_DAMAGE_F);
+    m_Action_AnimMap.emplace(L"DAMAGE_L", PLAYER_ANIM_DAMAGE_L);
+    m_Action_AnimMap.emplace(L"DAMAGE_R", PLAYER_ANIM_DAMAGE_R);
+
     m_Action_AnimMap.emplace(L"GUARD_START", PLAYER_ANIM_LS_GUARD_START);
     m_Action_AnimMap.emplace(L"GUARD_LOOP", PLAYER_ANIM_LS_GUARD_LOOP);
     m_Action_AnimMap.emplace(L"GUARD_END", PLAYER_ANIM_LS_GUARD_END);
@@ -631,7 +636,38 @@ HRESULT CPlayer::InitializeAction_ToAnimationMap()
 #pragma endregion
 
 
-    /* 재생속도 증가. */
+
+#pragma region 99. 재생속도 증가.
+    /* 재생 속도 증가*/
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("RUN")], 1.5f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("RUN_B")], 1.5f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("RUN_F")], 1.5f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("RUN_L")], 1.5f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("RUN_R")], 1.5f);
+
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("DODGE_B")], 1.5f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("DODGE_BL")], 1.5f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("DODGE_BR")], 1.5f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("DODGE_F")], 1.5f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("DODGE_FL")], 1.5f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("DODGE_FR")], 1.5f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("DODGE_L")], 1.5f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("DODGE_R")], 1.5f);
+
+
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("ATTACK1")], 2.f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("ATTACK2")], 2.f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("ATTACK3")], 2.f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("ATTACK4")], 2.f);
+
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("DAMAGE_B")], 2.f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("DAMAGE_F")], 2.f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("DAMAGE_L")], 2.f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("DAMAGE_R")], 2.f);
+
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("STRONG_ATTACK1")], 2.f);
+#pragma endregion
+
     return S_OK;
 }
 
@@ -736,9 +772,9 @@ void CPlayer::Tick_BuffTimers(_float fTimeDelta)
 
 HRESULT CPlayer::Initialize_BuffDurations()
 {
-    m_BuffDefault_Durations[BUFF_HIT] = 0.3f;        // 피격: 0.6초
+    m_BuffDefault_Durations[BUFF_HIT] = 1.f;        // 피격: 1초
     m_BuffDefault_Durations[BUFF_DOWN] = 5.f;       // 다운: 20초 => 두번 클릭했을 때 다운이 되는가.
-    m_BuffDefault_Durations[BUFF_INVINCIBLE] = 0.3f; // 무적 시간.
+    m_BuffDefault_Durations[BUFF_INVINCIBLE] = 1.f; // 무적 시간.
     return S_OK;
 }
 #pragma endregion
@@ -756,10 +792,15 @@ void CPlayer::On_Collision_Enter(CGameObject* pOther)
         if (HasBuff(BUFF_INVINCIBLE))
             return;
 
-        Take_Damage(pWeapon->Get_AttackPower());
+        // 무기의 소유자(몬스터) 가져오기
+        CMonster* pMonster = dynamic_cast<CMonster*>(pWeapon->Get_Owner());
+        if (nullptr != pMonster)
+        {
+            // 몬스터 위치를 기반으로 피격 방향 계산 및 DamageState 전환
+            Take_Damage(pWeapon->Get_AttackPower(), pMonster);
+        }
 
-        AddBuff(BUFF_INVINCIBLE);
-        AddBuff(BUFF_HIT);
+      
     }
 }
 
@@ -813,6 +854,45 @@ void CPlayer::Take_Damage(_float fHp)
     HpDesc.fHp = fHp;
     HpDesc.fTime = 0.2f;
     m_pGameInstance->Publish(EventType::HP_CHANGE, &HpDesc);
+}
+
+ACTORDIR CPlayer::Calculate_Damage_Direction(CMonster* pAttacker)
+{
+    if (nullptr == pAttacker)
+        return ACTORDIR::U; // 기본값: 앞쪽
+        
+    // 플레이어와 공격자의 위치
+    _vector vPlayerPos = m_pTransformCom->Get_State(STATE::POSITION);
+    _vector vAttackerPos = pAttacker->Get_Transform()->Get_State(STATE::POSITION);
+    
+    // 공격자로부터 플레이어로의 방향 벡터
+    _vector vToPlayer = vPlayerPos - vAttackerPos;
+    vToPlayer = XMVectorSetY(vToPlayer, 0.f); // Y축 제거 (수평면에서만 계산)
+    vToPlayer = XMVector3Normalize(vToPlayer);
+    
+    // 플레이어의 전방 벡터
+    _vector vPlayerForward = m_pTransformCom->Get_State(STATE::LOOK);
+    vPlayerForward = XMVectorSetY(vPlayerForward, 0.f);
+    vPlayerForward = XMVector3Normalize(vPlayerForward);
+    
+    // 플레이어의 오른쪽 벡터
+    _vector vPlayerRight = m_pTransformCom->Get_State(STATE::RIGHT);
+    vPlayerRight = XMVectorSetY(vPlayerRight, 0.f);
+    vPlayerRight = XMVector3Normalize(vPlayerRight);
+    
+    // 내적을 통해 방향 계산
+    _float fForwardDot = XMVectorGetX(XMVector3Dot(vToPlayer, vPlayerForward));
+    _float fRightDot = XMVectorGetX(XMVector3Dot(vToPlayer, vPlayerRight));
+    
+    // 방향 결정 (가장 강한 방향으로 결정)
+    if (abs(fForwardDot) > abs(fRightDot))
+    {
+        return (fForwardDot > 0) ? ACTORDIR::D : ACTORDIR::U;
+    }
+    else
+    {
+        return (fRightDot > 0) ? ACTORDIR::L : ACTORDIR::R;
+    }
 }
 
 #pragma endregion
@@ -914,6 +994,23 @@ ACTORDIR CPlayer::Calculate_Direction()
 
 void CPlayer::Take_Damage(_float fDamage, CMonster* pMonster)
 {
+    // 기본 데미지 처리
+    Take_Damage(fDamage);
+
+    if (fDamage <= 0.f)
+        return;
+
+    AddBuff(BUFF_INVINCIBLE);
+    AddBuff(BUFF_HIT);
+    
+    // 공격자로부터 피격 방향 계산
+    ACTORDIR eDamageDirection = Calculate_Damage_Direction(pMonster);
+    
+    // DamageState로 전환
+    CPlayer_DamageState::DAMAGE_ENTER_DESC damageDesc{};
+    damageDesc.eDamageDirection = eDamageDirection;
+    
+    m_pFsmCom->Change_State(PLAYER_STATE::DAMAGE, &damageDesc);
 }
 
 
@@ -1025,33 +1122,7 @@ HRESULT CPlayer::Ready_Fsm()
     m_pFsmCom->Add_State(CPlayer_StrongAttackState::Create(PLAYER_STATE::STRONG_ATTACK, &PlayerDesc));
     m_pFsmCom->Add_State(CPlayer_GuardState::Create(PLAYER_STATE::GUARD, &PlayerDesc));
     m_pFsmCom->Add_State(CPlayer_AttackState::Create(PLAYER_STATE::ATTACK, &PlayerDesc));
-
-    //m_pModelCom->Get_Current_Ratio();
-    
-    /* 재생 속도 증가*/
-    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("RUN")], 1.5f);
-    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("RUN_B")], 1.5f);
-    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("RUN_F")], 1.5f);
-    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("RUN_L")], 1.5f);
-    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("RUN_R")], 1.5f);
-
-    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("DODGE_B")], 1.5f);
-    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("DODGE_BL")], 1.5f);
-    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("DODGE_BR")], 1.5f);
-    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("DODGE_F")], 1.5f);
-    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("DODGE_FL")], 1.5f);
-    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("DODGE_FR")], 1.5f);
-    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("DODGE_L")], 1.5f);
-    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("DODGE_R")], 1.5f);
-
-
-    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("ATTACK1")], 2.f);
-    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("ATTACK2")], 2.f);
-    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("ATTACK3")], 2.f);
-    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("ATTACK4")], 2.f);
-    
-    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("STRONG_ATTACK1")], 2.f);
-        //, m_pModelCom->Get_CurrentTickPerSecond(m_Action_AnimMap[TEXT("RUN")]) * 2.f);
+    m_pFsmCom->Add_State(CPlayer_DamageState::Create(PLAYER_STATE::DAMAGE, &PlayerDesc));
 
     Register_CoolTime();
 

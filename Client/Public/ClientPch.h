@@ -93,6 +93,7 @@
 #include "Player_StrongAttackState.h"
 #include "Player_AttackState.h"
 #include "Player_GuardState.h"
+#include "Player_DamageState.h"
 
 
 

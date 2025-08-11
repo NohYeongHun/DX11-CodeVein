@@ -43,6 +43,30 @@ public:
         _float fRotationSpeed;
     }MONSTER_DESC;
 
+public:
+    // 개선된 콜라이더 정보 구조체
+    typedef struct tagMonsterColliderFrame
+    {
+        _float fStartRatio;
+        _float fEndRatio;
+        _uint iPartType;        // 어떤 Part 타입을 제어할 것인가?
+        _bool bIsActive;
+        
+        tagMonsterColliderFrame() : fStartRatio(0.0f), fEndRatio(0.0f), iPartType(0), bIsActive(false) {}
+        tagMonsterColliderFrame(_float start, _float end, _uint part) 
+            : fStartRatio(start), fEndRatio(end), iPartType(part), bIsActive(false) {}
+    }MONSTER_COLLIDER_FRAME;
+
+    // 하나의 애니메이션에서 여러 Part, 여러 타이밍의 콜라이더 제어
+    typedef struct tagMonsterColliderControl
+    {
+        vector<MONSTER_COLLIDER_FRAME> vecColliderFrames;  // 여러 콜라이더 구간들
+        unordered_map<_uint, _uint> partCurrentIndex;      // Part별 현재 처리 중인 인덱스
+        unordered_map<_uint, _bool> partProcessed;         // Part별 모든 처리 완료 여부
+        
+        tagMonsterColliderControl() {}
+    }MONSTER_COLLIDER_CONTROL;
+
 #pragma region 기본 함수들
 protected:
     explicit CMonster(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -72,15 +96,45 @@ public:
 public:
     // 무기 및 스킬과 충돌 시 받는 데미지 처리.
     virtual void Take_Damage(_float fDamage); 
+    virtual void Collider_Part_Active(_uint iPartType, _bool bActive) {};
+
 
 protected:
     class CCollider* m_pColliderCom = { nullptr };
+
+
+
+
+protected:
+    // 통합된 콜라이더 제어 시스템
+    unordered_map<_uint, MONSTER_COLLIDER_CONTROL> m_ColliderControlMap; // 애니메이션별 콜라이더 제어
+    unordered_map<_uint, _bool> m_PartPrevColliderState; // Part별 이전 콜라이더 상태
 
 #pragma endregion
 
 #pragma region Update AI
 public:
     virtual void Update_AI(_float fTimeDelta) PURE;
+#pragma endregion
+
+#pragma region 통합 콜라이더 제어 시스템
+public:
+	// 콜라이더 프레임 추가 함수
+	void Add_Collider_Frame(_uint iAnimationIndex, _float fStartRatio, _float fEndRatio, _uint iPartType);
+	
+	// 콜라이더 상태 제어 함수들
+	void Handle_Collider_State();
+	void Reset_Collider_ActiveInfo();
+	
+	// 편의 함수들 - 기존 Add_Attack_Frame 호환성 유지
+	void Add_Attack_Frame(_uint iAnimationIndex, _float fStartRatio, _float fEndRatio) {
+		Add_Collider_Frame(iAnimationIndex, fStartRatio, fEndRatio, 0); // 기본값은 0번 Part
+	}
+	
+	// 기존 Handle_Attack_Collider_State 호환성 유지
+	void Handle_Attack_Collider_State() { Handle_Collider_State(); }
+	void Reset_Attack_ActiveInfo() { Reset_Collider_ActiveInfo(); }
+
 #pragma endregion
 
 
@@ -99,12 +153,9 @@ public:
     virtual HRESULT InitializeAction_ToAnimationMap() PURE; // 필수적으로 애니메이션 초기화를 진행해야합니다. => 인스턴스화 될거라면.
     
 public:
-    void Change_Action(_wstring strAction) { m_CurrentAction = strAction; }
-    _wstring Current_Action() { return m_CurrentAction; }
-    _uint Get_CurrentAnimation() { return m_Action_AnimMap[m_CurrentAction]; }
+    _uint Get_CurrentAnimation() { return m_pModelCom->Get_CurrentAnimationIndex(); }
     _uint Find_AnimationIndex(const _wstring& strAnimationTag);
     const _bool Is_Animation_Finished();
-
     _float Get_CurrentAnimationRatio() { return m_pModelCom->Get_Current_Ratio(); }
 
 public:

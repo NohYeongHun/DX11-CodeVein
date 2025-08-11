@@ -228,6 +228,7 @@
     <ClInclude Include="..\Public\PlayerDefine.h" />
     <ClInclude Include="..\Public\PlayerState.h" />
     <ClInclude Include="..\Public\Player_AttackState.h" />
+    <ClInclude Include="..\Public\Player_DamageState.h" />
     <ClInclude Include="..\Public\Player_DodgeState.h" />
     <ClInclude Include="..\Public\Player_GuardState.h" />
     <ClInclude Include="..\Public\Player_IdleState.h" />
@@ -334,6 +335,7 @@
     <ClCompile Include="..\Private\Player.cpp" />
     <ClCompile Include="..\Private\PlayerState.cpp" />
     <ClCompile Include="..\Private\Player_AttackState.cpp" />
+    <ClCompile Include="..\Private\Player_DamageState.cpp" />
     <ClCompile Include="..\Private\Player_DodgeState.cpp" />
     <ClCompile Include="..\Private\Player_GuardState.cpp" />
     <ClCompile Include="..\Private\Player_IdleState.cpp" />

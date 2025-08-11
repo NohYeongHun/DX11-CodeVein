@@ -65,8 +65,11 @@ BT_RESULT CBT_Monster_AttackAction::UpdateRotating(_float fTimeDelta)
 
         // 2. 공격 상태로 변경
         m_pOwner->Change_Animation_Blend(iNextAnimationIdx);
+        
+        // 3. 콜라이더 상태 초기화
+        m_pOwner->Reset_Collider_ActiveInfo();
 
-        // 3. Collider 활성화 필요. => 공격용 콜라이더만 활성화.(Weapon?)
+        // 4. Collider 활성화 필요. => 공격용 콜라이더만 활성화.(Weapon?)
     }
         
 
@@ -75,6 +78,9 @@ BT_RESULT CBT_Monster_AttackAction::UpdateRotating(_float fTimeDelta)
 
 BT_RESULT CBT_Monster_AttackAction::UpdateAttack(_float fTimeDelta)
 {
+    // 통합 콜라이더 제어 시스템으로 모든 Part 제어
+    //m_pOwner->Handle_Collider_State();
+    
     if (m_pOwner->Is_Animation_Finished())
         m_eAttackPhase = ATTACK_PHASE::COMPLETED;
 
