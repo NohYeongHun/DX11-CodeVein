@@ -403,11 +403,12 @@ HRESULT CMainApp::Ready_Prototype_BossUI()
 
 HRESULT CMainApp::Ready_Prototype_Fonts()
 {
- 	/*if (FAILED(m_pGameInstance
+	if (FAILED(m_pGameInstance
 		->Load_Font(
-			TEXT("HUD_TEXT")
-			, TEXT("../Bin/Resources/Font/143.spritefont"))))
-		return E_FAIL;*/
+			TEXT("KR_TEXT")
+			, TEXT("../Bin/Resources/Font/153ex.spritefont"))))
+		return E_FAIL;
+
 
 	if (FAILED(m_pGameInstance
 		->Load_Font(

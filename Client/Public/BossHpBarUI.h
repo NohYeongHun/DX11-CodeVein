@@ -6,6 +6,7 @@ class CBossHpBarUI final : public CUIObject
 public:
 	typedef struct tagBossHpBarDesc : CUIObject::UIOBJECT_DESC
 	{
+		_wstring strName = {};
 		_uint iTextureIndex = {};
 		_float fMaxHp = {};
 	}BOSS_HPBAR_DESC;
@@ -33,11 +34,16 @@ private:
 	/* 스킬 정보? */
 	_float  m_fHp = {};
 	_float  m_fMaxHp = {};
+	_wstring m_strName = {};
+
+private:
+	void Render_Text();
 
 #pragma region HP 깎는 효과를 위한 SHADER 용도
 public:
 	void Increase_Hp(_float fHp, _float fTime);
 	void Decrease_Hp(_float fHp, _float fTime);
+
 
 private:
 	_bool m_bDecrease = { false };
@@ -45,8 +51,6 @@ private:
 
 	_float m_fRightRatio = {};
 	_float m_fLeftRatio = {};
-
-
 
 
 

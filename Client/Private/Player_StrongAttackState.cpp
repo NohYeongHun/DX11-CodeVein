@@ -69,6 +69,8 @@ void CPlayer_StrongAttackState::Update(_float fTimeDelta)
 // 종료될 때 실행할 동작..
 void CPlayer_StrongAttackState::Exit()
 {
+	// 무기 콜라이더 강제 비활성화
+	Force_Disable_All_Colliders();
 	
 	if (m_iNextState != -1) // NextIndex가 있는경우 블렌딩 시작.
 	{

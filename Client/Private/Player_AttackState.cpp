@@ -82,12 +82,13 @@ void CPlayer_AttackState::Update(_float fTimeDelta)
 // 종료될 때 실행할 동작..
 void CPlayer_AttackState::Exit()
 {
+	// 무기 콜라이더 강제 비활성화
+	Force_Disable_All_Colliders();
+	
 	if (m_iNextState != -1)
 	{
 		m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, false);
 	}
-
-	//m_pFsm->Set_StateCoolTime(CPlayer::DODGE, 0.1f);
 	
 }
 

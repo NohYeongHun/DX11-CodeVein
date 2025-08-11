@@ -29,6 +29,7 @@ HRESULT CBossHpBarUI::Initialize_Clone(void* pArg)
 
     m_fMaxHp = pDesc->fMaxHp;
     m_fHp = m_fMaxHp;
+    m_strName = pDesc->strName;
 
     m_pTransformCom->Scale(_float3(0.7f, 0.7f, 1.f));
 
@@ -96,9 +97,56 @@ HRESULT CBossHpBarUI::Render()
 
     m_pVIBufferCom->Render();
 
+    Render_Text();
+
     CUIObject::End();
 
     return S_OK;
+}
+
+void CBossHpBarUI::Render_Text()
+{
+
+  
+
+    _float fScreenX = (g_iWinSizeX >> 1) - 60.f;
+    _float fScreenY = (g_iWinSizeY >> 1) - m_RenderMatrix._42 - 50.f;
+
+    _float2 vPosition = { fScreenX , fScreenY };
+
+    
+    // Window 좌표계 기준 출력. (0, 0이 좌측 상단)
+
+#ifdef _DEBUG
+    ImGuiIO& io = ImGui::GetIO();
+
+    // 기존 Player Debug Window
+
+    ImVec2 windowSize = ImVec2(300.f, 300.f);
+    ImVec2 windowPos = ImVec2(0, 0);
+    ImGui::SetNextWindowPos(windowPos, ImGuiCond_Once);
+    ImGui::SetNextWindowSize(windowSize, ImGuiCond_Once);
+
+    string strDebug = "Boss HPBar Debug";
+    ImGui::Begin(strDebug.c_str(), nullptr, ImGuiWindowFlags_NoCollapse);
+    ImGui::Text("Position : (%.2f, %.2f)", vPosition.x, vPosition.y);
+
+    static _float Position[2] = { vPosition.x, vPosition.y };
+
+    ImGui::InputFloat2("Position", Position);
+
+
+    vPosition = { Position[0], Position[1] };
+    ImGui::End();
+
+
+    wchar_t szBuffer[64] = {};
+    swprintf_s(szBuffer, m_strName.c_str());
+#endif // _DEBUG
+
+
+    m_pGameInstance->Render_Font(TEXT("KR_TEXT"), szBuffer
+        , vPosition, XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f, {}, 1.f);
 }
 
 void CBossHpBarUI::Increase_Hp(_float fHp, _float fTime)

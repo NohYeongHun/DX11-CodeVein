@@ -600,10 +600,6 @@ void CMonster::Handle_Collider_State()
 	{
 		_uint partType = colliderFrame.iPartType;
 		
-		// 해당 Part가 모두 처리되었으면 스킵
-		if (colliderControl.partProcessed[partType])
-			continue;
-
 		// 현재 콜라이더 구간 확인
 		_bool bShouldActive = (fCurrentRatio >= colliderFrame.fStartRatio && 
 							   fCurrentRatio <= colliderFrame.fEndRatio);
@@ -624,29 +620,31 @@ void CMonster::Handle_Collider_State()
 				// 콜라이더 비활성화
 				Disable_Collider(partType);
 				colliderFrame.bIsActive = false;
-				
-				// 구간을 벗어났으면 해당 Part 처리 완료 체크
-				if (fCurrentRatio > colliderFrame.fEndRatio)
-				{
-					// 해당 Part의 모든 구간이 끝났는지 확인
-					_bool bAllFramesProcessed = true;
-					for (auto& frame : colliderControl.vecColliderFrames)
-					{
-						if (frame.iPartType == partType && fCurrentRatio <= frame.fEndRatio)
-						{
-							bAllFramesProcessed = false;
-							break;
-						}
-					}
-					
-					if (bAllFramesProcessed)
-					{
-						colliderControl.partProcessed[partType] = true;
-					}
-				}
 			}
 
 			m_PartPrevColliderState[partType] = bShouldActive;
+		}
+		
+		// EndRatio를 벗어난 경우 강제로 콜라이더 비활성화
+		if (fCurrentRatio > colliderFrame.fEndRatio && colliderFrame.bIsActive)
+		{
+			Disable_Collider(partType);
+			colliderFrame.bIsActive = false;
+			m_PartPrevColliderState[partType] = false;
+		}
+	}
+	
+	// 애니메이션이 완료된 경우 모든 콜라이더 비활성화 (안전장치)
+	if (m_pModelCom->Is_Finished())
+	{
+		for (auto& colliderFrame : colliderControl.vecColliderFrames)
+		{
+			if (colliderFrame.bIsActive)
+			{
+				Disable_Collider(colliderFrame.iPartType);
+				colliderFrame.bIsActive = false;
+				m_PartPrevColliderState[colliderFrame.iPartType] = false;
+			}
 		}
 	}
 }

@@ -279,7 +279,6 @@ void CObject_Manager::Free()
 	m_DestroyObjects.clear();
 
 	Safe_Release(m_pGameInstance);
-
 	Safe_Delete_Array(m_pLayers);
 	
 }

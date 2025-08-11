@@ -84,6 +84,20 @@ void CPlayerState::Update_Collider_State()
         m_bPrevColliderState = bShouldActive;
     }
 }
+
+void CPlayerState::Force_Disable_All_Colliders()
+{
+    // 모든 콜라이더를 강제로 비활성화
+    for (auto& pair : m_ColliderActiveMap)
+    {
+        if (pair.second.bIsActive)
+        {
+            m_pPlayer->Disable_Collider(m_eColliderType);
+            pair.second.bIsActive = false;
+        }
+    }
+    m_bPrevColliderState = false;
+}
 #pragma endregion
 
 

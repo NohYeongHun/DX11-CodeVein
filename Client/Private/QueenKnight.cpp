@@ -414,6 +414,7 @@ HRESULT CQueenKnight::Initailize_UI()
     Desc.fSizeX = 1200.f;
     Desc.fSizeY = 40.f;
     Desc.fMaxHp = m_MonsterStat.fMaxHP;
+    Desc.strName = TEXT("여왕의 기사");
 
 
     CUIObject* pUIObject = nullptr;

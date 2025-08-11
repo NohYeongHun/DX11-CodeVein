@@ -35,6 +35,7 @@ protected:
 	virtual void Handle_Collider_State();
 	virtual void Reset_ColliderActiveInfo();
 	virtual void Update_Collider_State();
+	virtual void Force_Disable_All_Colliders(); // 모든 콜라이더 강제 비활성화
 
 #pragma endregion
 

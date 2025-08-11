@@ -7,6 +7,7 @@ CBT_QueenKnight_FirstPhase_AttackAction::CBT_QueenKnight_FirstPhase_AttackAction
 
 BT_RESULT CBT_QueenKnight_FirstPhase_AttackAction::Perform_Action(_float fTimeDelta)
 {
+    // DEAD 상태라면 Update 도중에 멈추고 다음 프레임으로 넘아가야함.
     if (m_pOwner->HasBuff(CMonster::BUFF_DEAD))
         return BT_RESULT::FAILURE;
 
