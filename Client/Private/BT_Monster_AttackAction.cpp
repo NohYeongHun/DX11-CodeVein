@@ -8,7 +8,7 @@ CBT_Monster_AttackAction::CBT_Monster_AttackAction(CMonster* pOwner)
 
 BT_RESULT CBT_Monster_AttackAction::Perform_Action(_float fTimeDelta)
 {
-    if (m_pOwner->HasBuff(CMonster::BUFF_DEAD))
+    if (m_pOwner->HasAnyBuff(CMonster::BUFF_DEAD | CMonster::BUFF_ATTACK_TIME))
         return BT_RESULT::FAILURE;
 
     switch (m_eAttackPhase)
@@ -29,6 +29,9 @@ BT_RESULT CBT_Monster_AttackAction::Perform_Action(_float fTimeDelta)
 void CBT_Monster_AttackAction::Reset()
 {
     m_eAttackPhase = ATTACK_PHASE::NONE;
+    
+    // FAILURE 발생시 활성화된 콜라이더들이 남아있을 수 있으므로 모든 콜라이더 비활성화
+    m_pOwner->Reset_Part_Colliders();
 }
 
 BT_RESULT CBT_Monster_AttackAction::EnterAttack(_float fTimeDelta)
@@ -39,11 +42,10 @@ BT_RESULT CBT_Monster_AttackAction::EnterAttack(_float fTimeDelta)
         CRASH("Failed Tree Attack Enter Logic");
     }
 
-
-
     // 1. 다음 단계로 진행
     m_eAttackPhase = ATTACK_PHASE::ROTATING;
 
+    
     // 2. 루트모션 설정.
     
 
@@ -101,6 +103,8 @@ BT_RESULT CBT_Monster_AttackAction::EndAttack(_float fTimeDleta)
         m_pOwner->Set_RootMotionTranslate(false);
         // 디버그용 함수.
         //m_pOwner->Print_Position();
+
+        m_pOwner->AddBuff(CMonster::BUFF_ATTACK_TIME);
     }
 
     return BT_RESULT::SUCCESS;

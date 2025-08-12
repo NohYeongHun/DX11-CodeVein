@@ -189,14 +189,9 @@ void CPlayer_AttackState::Change_State(_float fTimeDelta)
 
 _vector CPlayer_AttackState::Calculate_Input_Direction_From_Camera()
 {
-	// 기존 Player 클래스의 함수를 재사용
 	ACTORDIR eInputDir = m_pPlayer->Calculate_Direction();
 	return m_pPlayer->Calculate_Move_Direction(eInputDir);
 }
-
-
-
-
 
 
 CPlayer_AttackState* CPlayer_AttackState::Create(_uint iStateNum, void* pArg)

@@ -151,17 +151,23 @@ HRESULT CHPBar::Render()
 
 void CHPBar::Render_HP()
 {
-    _float fScreenX = m_RenderMatrix._41 + (g_iWinSizeX >> 1) + 80.f;
-    _float fScreenY = (g_iWinSizeY >> 1) - m_RenderMatrix._42 - 15.f;
-
-    _float2 vPosition = { fScreenX , fScreenY };
+    
+    _float2 vPosition = { 340.f, 965.f };
     // Window 좌표계 기준 출력. (0, 0이 좌측 상단)
 
     wchar_t szBuffer[64] = {};
-    swprintf_s(szBuffer, L"%.f / %.f", m_fHp, m_fMaxHp);
+    swprintf_s(szBuffer, L"%.f /", m_fHp);
 
-    m_pGameInstance->Render_Font(TEXT("HUD_TEXT"), szBuffer
+    m_pGameInstance->Render_Font(TEXT("KR_TEXT"), szBuffer
         , vPosition, XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f, {}, 1.f);
+
+    vPosition.x += 90.f;
+
+    wchar_t szNextBuffer[64] = {};
+    swprintf_s(szNextBuffer, L"%.f ", m_fMaxHp);
+
+    m_pGameInstance->Render_Font(TEXT("KR_TEXT"), szNextBuffer
+        , vPosition, XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f, {}, 0.7f);
 }
 
 HRESULT CHPBar::Ready_Components()

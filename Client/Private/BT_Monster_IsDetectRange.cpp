@@ -7,6 +7,7 @@
 /* 플레이어가 해당 거리에 와있는가? */
 _bool CBT_Monster_IsDetectRange::Check_Condition()
 {
+    
     return m_pOwner->Is_TargetDetectionRange();
 }
 

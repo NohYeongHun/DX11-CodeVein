@@ -12,7 +12,7 @@ public:
 		PART_END
 	};
 
-	// 1 ~ 23은 커스텀사용
+	// 1 ~ 22은 커스텀사용
 	enum QUEEN_BUFF_FLAGS : _uint
 	{
 		QUEEN_BUFF_NONE = 0,

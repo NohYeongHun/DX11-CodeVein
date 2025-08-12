@@ -14,18 +14,21 @@ public:
     // 너 지금 어떤 버프/디버프에 걸려있니?
     // Has 관계 => 가지고 있는지 여부를 판단합니다. (여러 개)
 
-    // 1 ~ 23은 커스텀사용
-    enum BUFF_FLAGS : _uint
+
+    // 1 ~ 21은 커스텀사용
+    enum BUFFe_FLAGS : _uint
     {
         BUFF_NONE = 0,
         
-        BUFF_HIT = 1 << 24,
-        BUFF_DOWN = 1 << 25,
-        BUFF_STUN = 1 << 26,
-        BUFF_INVINCIBLE = 1 << 27, // 무적시간.
-        BUFF_DEAD = 1 << 28,
-        BUFF_CORPSE = 1 << 29, // 거의 마지막에만 사용할듯?
-        BUFF_DISSOLVE = 1 << 30,
+        BUFF_DETECT = 1 << 21,
+        BUFF_ATTACK_TIME = 1 << 22,
+        BUFF_HIT = 1 << 23,
+        BUFF_DOWN = 1 << 24,
+        BUFF_STUN = 1 << 25,
+        BUFF_INVINCIBLE = 1 << 26, // 무적시간.
+        BUFF_DEAD = 1 << 27,
+        BUFF_CORPSE = 1 << 28, // 거의 마지막에만 사용할듯?
+        BUFF_DISSOLVE = 1 << 29,
         BUFF_END
     };
 
@@ -41,6 +44,7 @@ public:
         _float fAttackRange;
         _float fMoveSpeed;
         _float fRotationSpeed;
+        _float3 vPos = { 0.f, 0.f, 0.f }; // 시작 위치.
     }MONSTER_DESC;
 
 public:
@@ -97,7 +101,6 @@ public:
     // 무기 및 스킬과 충돌 시 받는 데미지 처리.
     virtual void Take_Damage(_float fDamage); 
     virtual void Collider_Part_Active(_uint iPartType, _bool bActive) {};
-
 
 protected:
     class CCollider* m_pColliderCom = { nullptr };
@@ -188,6 +191,7 @@ protected:
     MONSTER_STAT m_MonsterStat = {};
     _float m_fMinDetectionDistance = 5.f;
     _float m_fMinRotationDistance = 2.f;
+    _bool m_bIsCurrentlyDetecting = false;  // 현재 탐지 중인지 상태
 #pragma endregion
 
 
@@ -240,6 +244,11 @@ public:
     /* 콜라이더 제어.*/
     virtual void Enable_Collider(_uint iType) PURE; 
     virtual void Disable_Collider(_uint iType) PURE;
+    
+    /* Reset 시 파츠 콜라이더 비활성화 */
+    virtual void Reset_Part_Colliders();
+
+    virtual void Dead_Action();
 #pragma endregion
     
 #pragma region 6. 체력 감소시 UI 연동
@@ -290,6 +299,7 @@ protected:
 
 
 public:
+    virtual void Destroy() override;
     virtual void Free() override;
 };
 

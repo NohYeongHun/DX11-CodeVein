@@ -249,6 +249,11 @@ HRESULT CLoader_GamePlay::Add_Prototype_WolfDevil(ID3D11Device* pDevice, ID3D11D
 		, CWolfDevil::Create(pDevice, pContext))))
 		return E_FAIL;
 
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level)
+		, TEXT("Prototype_GameObject_WolfWeapon")
+		, CWolfWeapon::Create(pDevice, pContext))))
+		return E_FAIL;
+
 	return S_OK;
 }
 

@@ -12,7 +12,7 @@
 #include "Timer_Manager.h"
 #include "Level.h"
 #include "Level_Manager.h"
-
+#include "Trigger_Manager.h"
 #include "Renderer.h"
 
 #pragma region COMPONENT

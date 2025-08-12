@@ -235,6 +235,7 @@ call copy.bat</Command>
     <ClCompile Include="..\Private\Load_MeshMaterial.cpp" />
     <ClCompile Include="..\Private\Load_Model.cpp" />
     <ClCompile Include="..\private\Transform.cpp" />
+    <ClCompile Include="..\Private\Trigger_Manager.cpp" />
     <ClCompile Include="..\private\UIObject.cpp" />
     <ClCompile Include="..\private\VIBuffer.cpp" />
     <ClCompile Include="..\Private\VIBuffer_Cell.cpp" />
@@ -313,6 +314,7 @@ call copy.bat</Command>
     <ClInclude Include="..\Public\Load_MeshMaterial.h" />
     <ClInclude Include="..\Public\Load_Model.h" />
     <ClInclude Include="..\public\Transform.h" />
+    <ClInclude Include="..\Public\Trigger_Manager.h" />
     <ClInclude Include="..\public\UIObject.h" />
     <ClInclude Include="..\public\VIBuffer.h" />
     <ClInclude Include="..\Public\VIBuffer_Cell.h" />

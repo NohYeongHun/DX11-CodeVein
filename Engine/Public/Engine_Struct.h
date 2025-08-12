@@ -233,6 +233,17 @@ namespace Engine
 		_float3 vTriangleVertices[3]; // 히트된 삼각형의 3개 정점
 						
 	} MODEL_PICKING_INFO;
+
+	typedef struct tagTriggerMonsterDesc
+	{
+		_float3  vTriggerPos;      // 트리거 발동 위치.
+		_float   fRadius;          // 트리거 반지름 범위.
+		_wstring strTriggerLayer; // 어떤 Layer에서 객체를 꺼낼건지?
+		_wstring strObjectLayer;  // 어떤 Layer로 추가해줄 것인지?
+		_uint    iCount;	      // 얼마나 꺼낼건지?
+		_int     iFlag = -1;      // 0 : 초기, 1 : 실행 완료, -1 : 오류
+	}TRIGGER_MONSTER_DESC;
+
 }
 
 #include "Event_Type.h"

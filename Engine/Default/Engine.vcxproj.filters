@@ -196,6 +196,9 @@
     <Filter Include="01. Utility\03. Component\VIBuffer\Cell">
       <UniqueIdentifier>{cf456c6c-b9ec-4c27-a039-5c0b4a4473f8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01. Utility\11. Trigger">
+      <UniqueIdentifier>{f69af1e9-9375-462a-9135-0e63498a2973}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Timer.cpp">
@@ -398,6 +401,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\DebugDraw.cpp">
       <Filter>01. Utility\03. Component\Collider</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Trigger_Manager.cpp">
+      <Filter>01. Utility\11. Trigger</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -628,6 +634,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\DebugDraw.h">
       <Filter>01. Utility\03. Component\Collider</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Trigger_Manager.h">
+      <Filter>01. Utility\11. Trigger</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

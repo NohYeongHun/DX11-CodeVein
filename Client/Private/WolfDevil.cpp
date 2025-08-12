@@ -1,4 +1,5 @@
 ﻿#include "WolfDevil.h"
+#include "WolfDevilDefine.h"
 
 CWolfDevil::CWolfDevil(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CMonster{pDevice, pContext}
@@ -79,12 +80,17 @@ HRESULT CWolfDevil::Initialize_Clone(void* pArg)
         return E_FAIL;
     }
 
+    if (FAILED(Initialize_ColliderFrames()))
+    {
+        CRASH("Failed Init ColliderFrames WolfDevil");
+        return E_FAIL;
+    }
 
     _vector qInitRot = XMQuaternionRotationAxis(XMVectorSet(0.f, 1.f, 0.f, 0.f), 0.0f);
     m_pTransformCom->Set_Quaternion(qInitRot);
 
-    _float3 vPos = { 5.f, 5.f, 0.f };
-    m_pTransformCom->Set_State(STATE::POSITION, XMLoadFloat3(&vPos));
+    /*_float3 vPos = { 5.f, 5.f, 0.f };
+    m_pTransformCom->Set_State(STATE::POSITION, XMLoadFloat3(&vPos));*/
 
     m_pModelCom->Set_RootMotionRotation(true);
     m_pModelCom->Set_RootMotionTranslate(false);
@@ -113,6 +119,9 @@ void CWolfDevil::Update(_float fTimeDelta)
 void CWolfDevil::Finalize_Update(_float fTimeDelta)
 {
     CMonster::Finalize_Update(fTimeDelta);
+    
+    // 콜라이더 상태 처리 (애니메이션 기반)
+    
 }
 
 void CWolfDevil::Late_Update(_float fTimeDelta)
@@ -182,6 +191,31 @@ HRESULT CWolfDevil::Render()
 #pragma region 0.  몬스터는 충돌에 대한 상태제어를 할 수 있어야한다. => 충돌에 따라 상태가 변하기도, 수치값이 바뀌기도한다.
 void CWolfDevil::On_Collision_Enter(CGameObject* pOther)
 {
+    // 1. 충돌 가능한 타입의 포인터들을 나열.
+    CPlayerWeapon* pPlayerWeapon = dynamic_cast<CPlayerWeapon*>(pOther);
+
+    // PlayerWeapon에 충돌 되었을 경우
+    if (nullptr != pPlayerWeapon)
+    {
+        // 0. 무적 상태 체크 
+        if (!HasBuff(BUFF_INVINCIBLE))
+        {
+            // 1. 데미지를 입고.
+            Take_Damage(pPlayerWeapon->Get_AttackPower());
+
+            // 2. 해당 위치에 검흔 Effect 생성?
+
+            // 3. 무적 버프 추가.
+            AddBuff(BUFF_INVINCIBLE);
+
+            AddBuff(BUFF_HIT);
+        }
+    }
+
+
+    if (m_MonsterStat.fHP <= 0.f)
+        AddBuff(BUFF_DEAD);
+
 }
 
 void CWolfDevil::On_Collision_Stay(CGameObject* pOther)
@@ -205,6 +239,8 @@ void CWolfDevil::Update_AI(_float fTimeDelta)
     // 트리 이후에 상태 값에 대한 초기화를 담당하는 Tick_BuffTimer 실행
     Tick_BuffTimers(fTimeDelta);
 
+    /* 콜라이더 활성화 구간 확인 */
+    CMonster::Handle_Collider_State();
 
     if (true == m_pModelCom->Play_Animation(fTimeDelta))
     {
@@ -218,7 +254,7 @@ void CWolfDevil::Update_AI(_float fTimeDelta)
 // 기본적으로 몬스터 생성시 필요한 STAT 값들을 제외하고 더 필요한 경우 정의
 HRESULT CWolfDevil::Initialize_Stats()
 {
-    m_fMinDetectionDistance = 4.f;
+    m_fMinDetectionDistance = 6.f;
     return S_OK;
 }
 #pragma endregion
@@ -248,7 +284,14 @@ HRESULT CWolfDevil::InitializeAction_ToAnimationMap()
     m_Action_AnimMap.emplace(L"STUN", WOLFDEVIL_STUN);
 
     /* 재생속도 증가. */ 
-    m_pModelCom->Set_CurrentTickPerSecond(WOLFDEVIL_ATTACK_JUMP, m_pModelCom->Get_CurrentTickPerSecond(WOLFDEVIL_ATTACK_JUMP) * 2.f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"DEATH_NORMAL"], 2.f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"ATTACK"], 2.f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"DETECT"], 1.5f);
+
+
+#pragma region COllider 활성화 프레임 관리
+    Add_Collider_Frame(m_Action_AnimMap[TEXT("ATTACK")], 50.f / 114.f, 80.f / 114.f, PART_WEAPON);     // Weapon attack
+#pragma endregion
 
     return S_OK;
 }
@@ -260,12 +303,14 @@ HRESULT CWolfDevil::InitializeAction_ToAnimationMap()
 HRESULT CWolfDevil::Initialize_BuffDurations()
 {
     // 어찌보면 이건 그냥 쿨다운의 영역.
-    m_BuffDefault_Durations[BUFF_HIT] = 0.5f;        // 피격: 0.6초
+    m_BuffDefault_Durations[BUFF_HIT] = 0.3f;        // 피격: 0.6초
     m_BuffDefault_Durations[BUFF_DOWN] = 5.f;       // 다운: 20초 => 두번 클릭했을 때 다운이 되는가.
-    m_BuffDefault_Durations[BUFF_CORPSE] = 2.0f;       // 시체 : 2.0초
-    m_BuffDefault_Durations[BUFF_INVINCIBLE] = 0.6f; // 무적 시간.
-    // 추가 버프 있으면 추가.
-    // m_BuffDefault_Durations[BUFF_HIT] = 0.6f;        // 피격: 0.6초
+    m_BuffDefault_Durations[BUFF_DEAD] = 10.f;
+    m_BuffDefault_Durations[BUFF_CORPSE] = 5.f;       // 시체 : 2.0초
+    m_BuffDefault_Durations[BUFF_INVINCIBLE] = 0.3f; // 무적 시간.
+    m_BuffDefault_Durations[BUFF_ATTACK_TIME] = 2.f; // 공격 쿨타임.
+    m_BuffDefault_Durations[BUFF_DETECT] = 0.2f; // 탐지 쿨타임: 0.2초
+
 
     return S_OK;
 }
@@ -279,10 +324,27 @@ HRESULT CWolfDevil::Initialize_BuffDurations()
 #pragma region 4. 특수한 상태를 제어하기 위한 함수들
 void CWolfDevil::Enable_Collider(_uint iType)
 {
+    /* PART_WEAPON이면 WEAPON Colider Enable */
+    switch (iType)
+    {
+    case PART_WEAPON:
+        m_pWeapon->Activate_Collider();
+        break;
+    default:
+        break;
+    }
 }
 
 void CWolfDevil::Disable_Collider(_uint iType)
 {
+    switch (iType)
+    {
+    case PART_WEAPON:
+        m_pWeapon->Deactivate_Collider();
+        break;
+    default:
+        break;
+    }
 }
 #pragma endregion
 
@@ -307,20 +369,26 @@ HRESULT CWolfDevil::Ready_Components(WOLFDEVIL_DESC* pDesc)
     // 오프셋 지정.
 
     BOUNDING_BOX box = m_pModelCom->Get_BoundingBox();
-    m_fOffsetY = box.fHeight * 0.5f;
-
-    CBounding_AABB::BOUNDING_AABB_DESC  AABBDesc{};
-    AABBDesc.vExtents = _float3(box.vExtents.x, box.vExtents.y, box.vExtents.z);
-    AABBDesc.vCenter = _float3(0.f, box.vExtents.y, 0.f); // 중점.
-    AABBDesc.pOwner = this;
+    CBounding_Sphere::BOUNDING_SPHERE_DESC SphereDesc{};
+    //SphereDesc.fRadius = max(max(box.vExtents.x, box.vExtents.y), box.vExtents.z);
+    //SphereDesc.vCenter = _float3(0.f, box.vExtents.y, 0.f); // 중점.
+    SphereDesc.fRadius = 0.7f;
+    SphereDesc.vCenter = _float3(0.f, 0.7f, 0.f); // 중점.
+    SphereDesc.pOwner = this;
+    SphereDesc.eCollisionType = CCollider::COLLISION_BODY;
+    SphereDesc.eMyLayer = CCollider::MONSTER;
+    SphereDesc.eTargetLayer = CCollider::PLAYER | CCollider::PLAYER_WEAPON
+        | CCollider::MONSTER | CCollider::PLAYER_SKILL | CCollider::STATIC_OBJECT;
 
     if (FAILED(CMonster::Add_Component(ENUM_CLASS(LEVEL::STATIC)
-        , TEXT("Prototype_Component_Collider_AABB")
-        , TEXT("Com_Collider"), reinterpret_cast<CComponent**>(&m_pColliderCom), &AABBDesc)))
+        , TEXT("Prototype_Component_Collider_SPHERE")
+        , TEXT("Com_Collider"), reinterpret_cast<CComponent**>(&m_pColliderCom), &SphereDesc)))
     {
-        CRASH("Failed Clone Collider AABB");
+        CRASH("Failed Clone Collider SPEHRE");
         return E_FAIL;
     }
+
+    m_pGameInstance->Add_Collider_To_Manager(m_pColliderCom);
 
     return S_OK;
 }
@@ -337,8 +405,10 @@ HRESULT CWolfDevil::Ready_Navigations()
         return E_FAIL;
     }
         
-    _float3 vPos = { 0.f, 5.f, 0.f };
+    _float3 vPos = { };
     _float3 vFinalPos = {};
+
+    XMStoreFloat3(&vPos, m_pTransformCom->Get_State(STATE::POSITION));
     _int iNearCell = m_pNavigationCom->Find_NearCellIndex(vPos);
 
     if (iNearCell == -1)
@@ -403,6 +473,46 @@ HRESULT CWolfDevil::Ready_Render_Resources()
 
 HRESULT CWolfDevil::Ready_PartObjects()
 {
+    //Head_Jaw
+    CWolfWeapon::WOLF_WEAPON_DESC Weapon{};
+    Weapon.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
+    Weapon.pSocketMatrix = m_pModelCom->Get_BoneMatrix("Head_Jaw");
+    Weapon.pOwner = this;
+    Weapon.eCurLevel = m_eCurLevel;
+    Weapon.fAttackPower = m_MonsterStat.fAttackPower;
+
+    if (FAILED(CContainerObject::Add_PartObject(TEXT("Com_Weapon"),
+        ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_WolfWeapon")
+        , reinterpret_cast<CPartObject**>(&m_pWeapon), &Weapon)))
+    {
+        CRASH("Failed Create Wolf Weapon");
+        return E_FAIL;
+    }
+    
+    if (nullptr == m_pWeapon)
+    {
+        CRASH("Wolf Weapon is nullptr after creation");
+        return E_FAIL;
+    }
+
+
+    return S_OK;
+}
+
+HRESULT CWolfDevil::Initialize_ColliderFrames()
+{
+    // WolfDevil 공격 애니메이션에 콜라이더 프레임 추가
+    
+    // WOLFDEVIL_ATTACK_JUMP (인덱스 0) - 점프 공격
+    // 애니메이션의 50%~80% 구간에서 무기 콜라이더 활성화
+    Add_Collider_Frame(WOLFDEVIL_ATTACK_JUMP, 0.5f, 0.8f, PART_WEAPON);
+    
+    // WOLFDEVIL_ATTACK_NORMAL (인덱스 1) - 일반 공격  
+    // 애니메이션의 30%~70% 구간에서 무기 콜라이더 활성화
+    Add_Collider_Frame(WOLFDEVIL_ATTACK_NORMAL, 0.3f, 0.7f, PART_WEAPON);
+    
+    OutputDebugStringA("WolfDevil: Collider frames initialized for attack animations\n");
+    
     return S_OK;
 }
 
@@ -442,6 +552,7 @@ void CWolfDevil::Free()
 {
     CMonster::Free();
     Safe_Release(m_pTree);
+    Safe_Release(m_pWeapon);
 }
 
 

@@ -179,6 +179,12 @@ HRESULT CQueenKnight::Render()
     XMStoreFloat3(&vPos, m_pTransformCom->Get_State(STATE::POSITION));
     ImGui::Text("POS : (%.2f, %.2f, %.2f)", vPos.x, vPos.y, vPos.z);
 
+    _vector vMyPos =  m_pTransformCom->Get_State(STATE::POSITION);
+    _vector vTargetPos = m_pTarget->Get_Transform()->Get_State(STATE::POSITION);
+    _vector vDistance = vTargetPos - vMyPos;
+    _float fDistance = XMVectorGetX(XMVector3Length(vDistance));
+    ImGui::Text("Target Distance : (%.2f)", fDistance);
+
     ImGui::End();
      m_pColliderCom->Render();
 #endif // _DEBUG
@@ -268,6 +274,20 @@ void CQueenKnight::Update_AI(_float fTimeDelta)
     {
 
     }
+
+    if (m_pModelCom->Get_CurrentAnimationIndex() == Find_AnimationIndex(TEXT("DETECT")))
+    {
+        OutputDebugWstring(TEXT("현재 애니메이션은 Detect 입니다."));
+    }
+    else if (m_pModelCom->Get_CurrentAnimationIndex() == Find_AnimationIndex(TEXT("IDLE")))
+    {
+        OutputDebugWstring(TEXT("현재 애니메이션은 IDLE 입니다."));
+    }
+    else
+    {
+        OutputDebugWstring(TEXT("현재 애니메이션은 Detect Idle이 아닙니다."));
+    }
+
 }
 #pragma endregion
 
@@ -294,6 +314,7 @@ HRESULT CQueenKnight::InitializeAction_ToAnimationMap()
     m_Action_AnimMap.emplace(L"GUARDHIT", AS_TStdKnight_TShieldSword_GuardHit01_N);
     m_Action_AnimMap.emplace(L"DAMAGE", AS_TStdKnight_TCmn_Damage01_BR);
     m_Action_AnimMap.emplace(L"HIT", AS_TStdKnight_TCmn_Damage01_BR);
+    m_Action_AnimMap.emplace(L"ATTACK", AS_TStdKnight_TLSword_AttackNormal01_N);
     m_Action_AnimMap.emplace(L"ATTACK1", AS_TStdKnight_TLSword_AttackNormal01_N);
     m_Action_AnimMap.emplace(L"ATTACK2", AS_TStdKnight_TLSword_AttackNormal02_N);
     m_Action_AnimMap.emplace(L"ATTACK3", AS_TStdKnight_TLSword_AttackNormal03_N);
@@ -336,6 +357,7 @@ HRESULT CQueenKnight::Initialize_BuffDurations()
     m_BuffDefault_Durations[BUFF_CORPSE] = 2.0f;       // 시체 : 2.0초
     m_BuffDefault_Durations[BUFF_INVINCIBLE] = 0.3f; // 무적 시간.
     m_BuffDefault_Durations[BUFF_DEAD] = 10.f; // 사망 시간.
+    m_BuffDefault_Durations[BUFF_DETECT] = 0.5f; // 탐지 쿨타임: 0.5초
 
     // 10 초마다 해당 페이즈 시퀀스 공격 반복
     m_BuffDefault_Durations[QUEEN_BUFF_PHASE_ATTACK_COOLDOWN] = 10.f;

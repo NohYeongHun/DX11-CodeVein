@@ -56,6 +56,10 @@ HRESULT CMonster::Initialize_Clone(void* pArg)
         return E_FAIL;
     }
 
+    // 위치 지정.
+    _vector vMonsterPos = XMVectorSetW(XMLoadFloat3(&pDesc->vPos), 1.f);
+    m_pTransformCom->Set_State(STATE::POSITION, vMonsterPos);
+
     return S_OK;
 }
 
@@ -215,7 +219,7 @@ const _bool CMonster::Is_TargetAttackRange()
     return fDistance <= m_MonsterStat.fAttackRange;
 }
 
-// 현재 문제점 => 최소 탐지거리일때도 계속 탐지됨 => 그떄는 탐지 상태로 빠지면 안된다.
+// 히스테리시스 적용: 탐지 시작과 해제 범위를 다르게 설정
 const _bool CMonster::Is_TargetDetectionRange()
 {
     if (nullptr == m_pTarget)
@@ -230,7 +234,39 @@ const _bool CMonster::Is_TargetDetectionRange()
     // 거리 계산
     _float fDistance = XMVectorGetX(XMVector3Length(vDirection));
 
-    return (fDistance <= m_MonsterStat.fDetectionRange) && (fDistance >= m_fMinDetectionDistance);
+    if (fDistance <= m_fMinDetectionDistance)
+    {
+        return false;
+    }
+
+    // 공격 범위에 있으면 탐지 상태가 아님
+    if (fDistance <= m_MonsterStat.fAttackRange)
+    {
+        m_bIsCurrentlyDetecting = false;
+        return false;
+    }
+
+    // 현재 탐지 중이지 않은 경우: 일반 탐지 범위 체크
+    if (!m_bIsCurrentlyDetecting)
+    {
+        if (fDistance <= m_MonsterStat.fDetectionRange)
+        {
+            m_bIsCurrentlyDetecting = true;
+            return true;
+        }
+        return false;
+    }
+    // 현재 탐지 중인 경우: 더 넓은 범위에서만 해제
+    else
+    {
+        _float fDetectionLoseRange = m_MonsterStat.fDetectionRange * 1.3f; // 30% 더 넓게
+        if (fDistance > fDetectionLoseRange)
+        {
+            m_bIsCurrentlyDetecting = false;
+            return false;
+        }
+        return true;
+    }
 }
 
 #pragma endregion
@@ -526,6 +562,25 @@ const _bool CMonster::IsRotateFinished(_float fRadian)
     return fAngleDiff <= ROTATION_THRESHOLD;
 }
 
+/* Reset 시 모든 콜라이더 비활성화 */
+void CMonster::Reset_Part_Colliders()
+{
+       
+    // 2. 모든 Part 타입에 대해 콜라이더 비활성화 호출
+    // 각 몬스터의 구현에 따라 처리됨 (WolfDevil의 경우 PART_WEAPON 등)
+    Disable_Collider(0);
+    
+    // 3. 콜라이더 활성화 정보 초기화
+    Reset_Collider_ActiveInfo();
+}
+
+void CMonster::Dead_Action()
+{
+    if (m_pColliderCom)
+        m_pColliderCom->Set_Active(false);
+
+}
+
 
 
 
@@ -673,6 +728,14 @@ void CMonster::Reset_Collider_ActiveInfo()
 	m_PartPrevColliderState.clear();
 }
 #pragma endregion
+
+void CMonster::Destroy()
+{
+    CContainerObject::Destroy();
+    
+    if (m_pColliderCom)
+        m_pColliderCom->Set_Active(false);
+}
 
 void CMonster::Free()
 {

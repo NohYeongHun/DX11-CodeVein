@@ -120,6 +120,7 @@
 #include "MonsterTree.h"
 /* ======================================== WolfDevil Object ===================================== */
 #include "WolfDevilDefine.h"
+#include "WolfWeapon.h"
 #include "WolfDevil.h"
 
 /* ======================================== QueenKnight Boss BT ===================================== */

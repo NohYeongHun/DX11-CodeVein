@@ -48,6 +48,7 @@ public:
 		_float fMaxHP;
 		_float fHP;
 		_float fAttackPower;
+		_float3 vPos; // 초기 위치.
 	}PLAYER_DESC;
 
 

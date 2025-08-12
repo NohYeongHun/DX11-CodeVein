@@ -32,6 +32,10 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11De
 	if (nullptr == m_pObject_Manager)
 		return E_FAIL;
 
+	m_pTrigger_Manager = CTrigger_Manager::Create(EngineDesc.iNumLevels);
+	if (nullptr == m_pTrigger_Manager)
+		return E_FAIL;
+
 	m_pRenderer = CRenderer::Create(*ppDevice, *ppContext);
 	if (nullptr == m_pRenderer)
 		return E_FAIL;
@@ -79,6 +83,9 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11De
 	if (nullptr == m_pCamera_Manager)
 		return E_FAIL;
 
+
+		
+
 	return S_OK;
 }
 
@@ -90,9 +97,11 @@ void CGameInstance::Update_Engine(_float fTimeDelta)
 	if (FAILED(Task()))
 		return;
 
+	// 0. Trigger Manager => Object Manager Layer에 조건이 부합하면 추가.
+	m_pTrigger_Manager->Update(fTimeDelta); 
+
 	// 1. 입력 처리
 	m_pInput_Device->Update();
-
 
 	// => 카메라 Priority Update
 	m_pCamera_Manager->Priority_Update(fTimeDelta);
@@ -240,6 +249,7 @@ _bool CGameInstance::Mouse_InRect2D(HWND hWnd, _float2 vPosition, _float fSizeX,
 
 #pragma region LEVEL_MANAGER
 
+/* Task Queue에 담아두고 게임 프레임이 시작할때 실행합니다. */
 HRESULT CGameInstance::Open_Level(_uint iLevelID, CLevel* pNewLevel)
 {
 	if (nullptr == m_pLevel_Manager)
@@ -341,6 +351,14 @@ HRESULT CGameInstance::Add_GameObject_ToLayer(_uint iLayerLevelIndex, const _wst
 		return E_FAIL;
 
 	return m_pObject_Manager->Add_GameObject_ToLayer(iLayerLevelIndex, strLayerTag, iPrototypeLevelIndex, strPrototypeTag, pArg);
+}
+
+HRESULT CGameInstance::Add_GameObject_ToLayer(_uint iLayerLevelIndex, const _wstring& strLayerTag, CGameObject* pGameObject)
+{
+	if (nullptr == m_pObject_Manager)
+		return E_FAIL;
+
+	return m_pObject_Manager->Add_GameObject_ToLayer(iLayerLevelIndex, strLayerTag, pGameObject);
 }
 
 /* Layer 객체들이 Picking 되었는지 확인하기. */
@@ -592,6 +610,25 @@ _bool CGameInstance::Is_In_Camera_Frustum(_vector vWorldPos) const
 {
 	return m_pCamera_Manager->Is_In_Camera_Frustum(vWorldPos);
 }
+
+
+#pragma endregion
+
+#pragma region TRIGGER_MANAGER
+HRESULT CGameInstance::Add_GameObject_ToTrigger(_uint iLayerLevelIndex, const _wstring& strLayerTag, _uint iPrototypeLevelIndex, const _wstring& strPrototypeTag, void* pArg)
+{
+	return m_pTrigger_Manager->Add_GameObject_ToTrigger(iLayerLevelIndex, strLayerTag, iPrototypeLevelIndex, strPrototypeTag, pArg);
+}
+
+HRESULT CGameInstance::Add_Trigger(_uint iLayerLevelIndex, const TRIGGER_MONSTER_DESC& triggerDesc)
+{
+	return m_pTrigger_Manager->Add_Trigger(iLayerLevelIndex, triggerDesc);
+}
+
+void CGameInstance::Set_TargetPlayer(CGameObject* pTargetPlayer)
+{
+	m_pTrigger_Manager->Set_TargetPlayer(pTargetPlayer);
+}
 #pragma endregion
 
 
@@ -604,6 +641,7 @@ void CGameInstance::Release_Engine()
 	Safe_Release(m_pTimer_Manager);
 	Safe_Release(m_pRenderer);
 	Safe_Release(m_pCollider_Manager);
+	Safe_Release(m_pTrigger_Manager);
 	Safe_Release(m_pObject_Manager);
 	Safe_Release(m_pTexture_Manager);
 
@@ -615,6 +653,7 @@ void CGameInstance::Release_Engine()
 	Safe_Release(m_pLight_Manager);
 	Safe_Release(m_pPicking);
 	Safe_Release(m_pCamera_Manager);
+	
 
 
 	Safe_Release(m_pInput_Device);

@@ -55,6 +55,9 @@ HRESULT CPlayer::Initialize_Clone(void* pArg)
         return E_FAIL;
 
     m_eCurLevel = pDesc->eCurLevel;
+    _vector vStartPos = XMVectorSetW(XMLoadFloat3(&pDesc->vPos), 1.f);
+    m_pTransformCom->Set_State(STATE::POSITION, vStartPos);
+
     if (FAILED(Ready_Components(pDesc)))
     {
         CRASH("Failed Ready_Components");
@@ -67,12 +70,13 @@ HRESULT CPlayer::Initialize_Clone(void* pArg)
         return E_FAIL;
     }
 
+  
+
     if (FAILED(Ready_Navigations()))
     {
         CRASH("Failed Ready_Navigations");
         return E_FAIL;
     }
-     
 
     if (FAILED(Ready_PartObjects()))
     {
@@ -98,6 +102,8 @@ HRESULT CPlayer::Initialize_Clone(void* pArg)
         return E_FAIL;
     }
 
+    
+
     return S_OK;
 }
 
@@ -109,18 +115,16 @@ void CPlayer::Priority_Update(_float fTimeDelta)
 void CPlayer::Update(_float fTimeDelta)
 {
     CContainerObject::Update(fTimeDelta);
+
     Update_KeyInput();
+
+   
     HandleState(fTimeDelta);
     
     // LockOn 상태를 카메라와 동기화
     Update_LockOn(fTimeDelta);
     
-#ifdef _DEBUG
-    //m_pModelCom->Play_Animation(fTimeDelta);
-#endif // _DEBUG
-
-
-    // Update 분기의 마지막 시점에 실행되어야 하는 함수 모음..
+    // Update 분기의 마지막 시점에 실행되어야 하는 함수 모음
     Finalize_Update(fTimeDelta);
 }
 
@@ -969,6 +973,9 @@ void CPlayer::Update_KeyInput()
     if (m_pGameInstance->Get_MouseKeyPress(MOUSEKEYSTATE::RB))
         m_KeyInput |= static_cast<uint16_t>(PLAYER_KEY::STRONG_ATTACK);
 
+    if (m_pGameInstance->Get_KeyUp(DIK_I))
+        m_pGameInstance->Publish<CInventory>(EventType::INVENTORY_DISPLAY, nullptr);
+
     // 방향 계산 추가 => Player State에 추가했음. HandleInput
     //m_eCurrentDirection = Calculate_Direction();
 }
@@ -1083,7 +1090,9 @@ HRESULT CPlayer::Ready_Navigations()
     // Navigation을 이용해서 내 초기화 위치와 가까운 실제 셀을 찾습니다. 
     // => 그리고 해당 Cell의 Center로 보내버립니다.
 
-    _float3 vPos = { 0.f, 5.f, 0.f };
+    _float3 vPos = {};
+
+    XMStoreFloat3(&vPos, m_pTransformCom->Get_State(STATE::POSITION));
     _float3 vFinalPos = {};
     _int iNearCell = m_pNavigationCom->Find_NearCellIndex(vPos);
     
