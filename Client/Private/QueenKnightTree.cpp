@@ -97,8 +97,7 @@ CBTSelector* CQueenKnightTree::Create_ActionStates_ToSelector()
     // 액션 상태에서는 Sequence를 제어합니다.
     pActionState_Selector->Add_Child(Create_FirstPhaseAttack_ToSequence());
     pActionState_Selector->Add_Child(Create_AttackAction_ToSequence());
-    //pActionState_Selector->Add_Child(Create_SearchAction_ToSequence());
-    pActionState_Selector->Add_Child(CBT_Monster_DetectAction::Create(m_pOwner));
+    pActionState_Selector->Add_Child(Create_SearchAction_ToSequence());
 
     return pActionState_Selector;
 }
@@ -135,6 +134,7 @@ CBTSequence* CQueenKnightTree::Create_SearchAction_ToSequence()
 {
     // DetectAction을 독립 Action으로 사용 (조건을 내부에서 처리)
     CBTSequence* pSearch_Sequence = CBTSequence::Create();
+    pSearch_Sequence->Add_Child(CBT_Monster_IsDetectRange::Create(m_pOwner));
     pSearch_Sequence->Add_Child(CBT_Monster_DetectAction::Create(m_pOwner));
     return pSearch_Sequence;
 }

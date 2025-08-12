@@ -123,7 +123,9 @@ CBTSequence* CMonsterTree::Create_SearchAction_ToSequence()
 {
     // DetectAction을 독립 Action으로 사용 (조건을 내부에서 처리)
     CBTSequence* pSearchSequence = CBTSequence::Create();
+    pSearchSequence->Add_Child(CBT_Monster_IsDetectRange::Create(m_pOwner));
     pSearchSequence->Add_Child(CBT_Monster_DetectAction::Create(m_pOwner));
+    
     return pSearchSequence;
 }
 

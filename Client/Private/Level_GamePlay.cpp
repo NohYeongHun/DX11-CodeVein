@@ -128,8 +128,8 @@ HRESULT CLevel_GamePlay::Ready_Layer_Player(const _wstring& strLayerTag)
 	Desc.fMaxHP = 1672;
 	Desc.fHP = 1672;
 	Desc.fAttackPower = 90;
-	//Desc.vPos = { 270.f, 0.f, 0.f };
-	Desc.vPos = { 100.f, 0.f, 0.f };
+	Desc.vPos = { 270.f, 0.f, 0.f };
+	//Desc.vPos = { 100.f, 0.f, 0.f };
 	
 
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel), strLayerTag,
@@ -237,11 +237,11 @@ HRESULT CLevel_GamePlay::Ready_Monster_Trigger()
 HRESULT CLevel_GamePlay::Ready_Layer_Monster(const _wstring& strLayerTag)
 {
 
-	//if (FAILED(Ready_Layer_WolfDevil(strLayerTag)))
-	//{
-	//	CRASH("Failed Layer_WolfDevil");
-	//	return E_FAIL;
-	//}
+	if (FAILED(Ready_Layer_WolfDevil(strLayerTag)))
+	{
+		CRASH("Failed Layer_WolfDevil");
+		return E_FAIL;
+	}
 
 	/* 다 같은 Monster 레이어에 추가하기. */
 	if (FAILED(Ready_Layer_QueenKnight(strLayerTag)))
@@ -311,7 +311,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_QueenKnight(const _wstring& strLayerTag)
 
 	Desc = { 50.f, XMConvertToRadians(180.f)
 		, nullptr, m_eCurLevel, MONSTERTYPE::BOSS, 2500.f, 150.f
-		, 30.f, 10.f, 10.f, 10.f, {1.f, 1.f, 1.f}
+		, 30.f, 11.f, 10.f, 10.f, {1.f, 1.f, 1.f}
 	};
 
 	Desc.pPlayer = dynamic_cast<CPlayer*>(

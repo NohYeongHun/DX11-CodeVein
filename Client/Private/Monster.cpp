@@ -234,39 +234,8 @@ const _bool CMonster::Is_TargetDetectionRange()
     // 거리 계산
     _float fDistance = XMVectorGetX(XMVector3Length(vDirection));
 
-    if (fDistance <= m_fMinDetectionDistance)
-    {
-        return false;
-    }
 
-    // 공격 범위에 있으면 탐지 상태가 아님
-    if (fDistance <= m_MonsterStat.fAttackRange)
-    {
-        m_bIsCurrentlyDetecting = false;
-        return false;
-    }
-
-    // 현재 탐지 중이지 않은 경우: 일반 탐지 범위 체크
-    if (!m_bIsCurrentlyDetecting)
-    {
-        if (fDistance <= m_MonsterStat.fDetectionRange)
-        {
-            m_bIsCurrentlyDetecting = true;
-            return true;
-        }
-        return false;
-    }
-    // 현재 탐지 중인 경우: 더 넓은 범위에서만 해제
-    else
-    {
-        _float fDetectionLoseRange = m_MonsterStat.fDetectionRange * 1.3f; // 30% 더 넓게
-        if (fDistance > fDetectionLoseRange)
-        {
-            m_bIsCurrentlyDetecting = false;
-            return false;
-        }
-        return true;
-    }
+    return fDistance <= m_MonsterStat.fDetectionRange && fDistance >= m_fMinDetectionDistance;
 }
 
 #pragma endregion
