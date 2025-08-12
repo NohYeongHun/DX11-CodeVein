@@ -357,13 +357,15 @@ HRESULT CQueenKnight::Initialize_BuffDurations()
     m_BuffDefault_Durations[BUFF_CORPSE] = 2.0f;       // 시체 : 2.0초
     m_BuffDefault_Durations[BUFF_INVINCIBLE] = 0.3f; // 무적 시간.
     m_BuffDefault_Durations[BUFF_DEAD] = 10.f; // 사망 시간.
-    m_BuffDefault_Durations[BUFF_DETECT] = 0.5f; // 탐지 쿨타임: 0.5초
+    m_BuffDefault_Durations[BUFF_DETECT] = 5.f; // 탐지 쿨타임: 0.5초
+    m_BuffDefault_Durations[BUFF_ATTACK_TIME] = 0.5f; // 탐지 쿨타임: 0.5초
 
     // 10 초마다 해당 페이즈 시퀀스 공격 반복
     m_BuffDefault_Durations[QUEEN_BUFF_PHASE_ATTACK_COOLDOWN] = 10.f;
 
 
 #pragma region COllider 활성화 프레임 관리
+    Add_Collider_Frame(m_Action_AnimMap[TEXT("ATTACK")], 40.f / 156.f, 60.f / 156.f, PART_WEAPON);     // Weapon attack
     Add_Collider_Frame(m_Action_AnimMap[TEXT("PHASE_ATTACK1")], 40.f / 180.f, 80.f / 180.f, PART_WEAPON);     // Weapon attack
     Add_Collider_Frame(m_Action_AnimMap[TEXT("PHASE_ATTACK2")], 40.f / 180.f, 80.f / 180.f, PART_WEAPON);     // Weapon attack
     Add_Collider_Frame(m_Action_AnimMap[TEXT("PHASE_ATTACK3")], 40.f / 180.f, 80.f / 180.f, PART_WEAPON);     // Weapon attack

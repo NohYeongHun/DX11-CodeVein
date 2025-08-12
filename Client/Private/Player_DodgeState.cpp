@@ -52,7 +52,7 @@ void CPlayer_DodgeState::Update(_float fTimeDelta)
 			
 			// 락온시: 애니메이션 방향에 맞게 이동
 			_vector vMoveDir = m_pPlayer->Calculate_Move_Direction(m_eDir);
-			m_pPlayer->Move_Direction(vMoveDir * 0.7f, fTimeDelta);
+			m_pPlayer->Move_Direction(vMoveDir * 0.4f, fTimeDelta);
 		}
 		else
 		{

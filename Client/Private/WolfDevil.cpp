@@ -309,7 +309,7 @@ HRESULT CWolfDevil::Initialize_BuffDurations()
     m_BuffDefault_Durations[BUFF_CORPSE] = 5.f;       // 시체 : 2.0초
     m_BuffDefault_Durations[BUFF_INVINCIBLE] = 0.3f; // 무적 시간.
     m_BuffDefault_Durations[BUFF_ATTACK_TIME] = 2.f; // 공격 쿨타임.
-    m_BuffDefault_Durations[BUFF_DETECT] = 0.2f; // 탐지 쿨타임: 0.2초
+    m_BuffDefault_Durations[BUFF_DETECT] = 1.f; // 탐지 쿨타임: 0.2초
 
 
     return S_OK;
