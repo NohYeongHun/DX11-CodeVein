@@ -85,7 +85,6 @@ HRESULT CQueenKnight::Initialize_Clone(void* pArg)
         return E_FAIL;
     }
 
-
     _vector qInitRot = XMQuaternionRotationAxis(XMVectorSet(0.f, 1.f, 0.f, 0.f), 0.0f);
     m_pTransformCom->Set_Quaternion(qInitRot);
 
@@ -296,7 +295,7 @@ void CQueenKnight::Update_AI(_float fTimeDelta)
 #pragma region 3. 몬스터는 자신에게 필요한 수치값들을 초기화해야 합니다.
 HRESULT CQueenKnight::Initialize_Stats()
 {
-    m_fMinDetectionDistance = 6.f;
+    m_fMinDetectionDistance = 5.f;
 
    
 
@@ -331,16 +330,21 @@ HRESULT CQueenKnight::InitializeAction_ToAnimationMap()
     m_Action_AnimMap.emplace(L"DEATH_NORMAL", AS_TStdKnight_TCmn_Death_N);
     m_Action_AnimMap.emplace(L"DEATH", AS_TStdKnight_TCmn_Death_N);
     
-
+    /* 연속 3번 공격. */
     m_Action_AnimMap.emplace(L"PHASE_ATTACK1", AS_TStdKnight_TShieldSword_AttackShield02B_N);
     m_Action_AnimMap.emplace(L"PHASE_ATTACK2", AS_TStdKnight_TShieldSword_AttackShield02C_N);
     m_Action_AnimMap.emplace(L"PHASE_ATTACK3", AS_TStdKnight_TShieldSword_AttackShield02A_N);
 
+
+    /* 점프 어택. (사라졌다가 나오는 모션.) */
+    m_Action_AnimMap.emplace(L"DISAPPEAR_ATTACK", AS_TStdKnight_TSword_AttackJump01_N);
+
     /* 재생속도 증가. */
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"DISAPPEAR_ATTACK"], 2.5f);
     
-    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"PHASE_ATTACK1"], 2.f);
-    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"PHASE_ATTACK2"], 2.f);
-    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"PHASE_ATTACK3"], 2.f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"PHASE_ATTACK1"], 2.5f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"PHASE_ATTACK2"], 2.5f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"PHASE_ATTACK3"], 2.5f);
 
 
     return S_OK;

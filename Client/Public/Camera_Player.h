@@ -34,10 +34,6 @@ public:
 
 public:
 	// 줌 관련 함수들
-	void Start_Zoom_In(_float fZoomDuration = 0.3f);
-	void Start_Zoom_Out(_float fZoomDuration = 0.3f);
-	void Update_Zoom(_float fTimeDelta);
-	void Reset_Zoom();
 
 public:
 	void Debug_CameraVectors();
@@ -74,10 +70,10 @@ public:
 
 
 private:
-	// ✨ LockOn 관련 멤버 변수들 추가
+	// LockOn 관련 멤버 변수들 추가
 	class CMonster* m_pLockOnTarget = { nullptr };    // LockOn 타겟
-	_bool m_bLockOnMode = { false };               // LockOn 모드 활성화 여부
 	class CLockOnUI* m_pLockOnUI = { nullptr };    // LockOn UI
+	_bool m_bLockOnMode = { false };               // LockOn 모드 활성화 여부
 
 	// LockOn 카메라 설정값들
 	_float m_fLockOnDistance = 10.0f;               // LockOn 시 카메라 거리
@@ -96,7 +92,6 @@ private:
 
 	void Update_Chase_Target(_float fTimeDelta);
 	void Calculate_LockOn_Camera_Position(_float fTimeDelta);  // LockOn 카메라 위치 계산
-	//void Update_Normal_Camera(_float fTimeDelta);    // 일반 카메라 모드
 
 #pragma endregion
 
@@ -136,21 +131,12 @@ private:
 
 private:
 	_float4 m_vOriginalOffset = {};      // 원래 오프셋을 저장
-	_float4 m_vZoomTargetOffset = {};    // 줌인 시 목표 오프셋
-	_bool m_bIsZooming = {};             // 줌 상태 플래그
-	_float m_fZoomLerpTime = {};         // 줌 보간 시간
-	_float m_fZoomMaxTime = {};          // 줌 전체 시간
-	_bool m_bZoomIn = {};                // 줌인 중인지 줌아웃 중인지
 
 	// 락온 해제시 부드러운 전환용
-	_bool m_bLockOnTransitioning = {};   // 락온 해제 전환 중인지
 	_float m_fTransitionTime = {};       // 전환 진행 시간
-	_float m_fTransitionDuration = 0.5f; // 전환 총 시간
-	_float4 m_vTransitionStartOffset = {}; // 전환 시작시 오프셋
 	_float m_fTransitionStartYaw = {};   // 전환 시작시 Yaw
 	
 	// 카메라 모드 전환용 변수들
-	_bool m_bTransitioning = {};         // 전환 중인지 여부
 	_float m_fMaxTransitionTime = {};    // 최대 전환 시간
 	_float m_fTransitionStartPitch = {}; // 전환 시작시 Pitch
 	_float4 m_vTransitionStartPos = {};  // 전환 시작시 카메라 위치

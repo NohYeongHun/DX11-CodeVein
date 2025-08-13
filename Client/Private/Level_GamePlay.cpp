@@ -311,7 +311,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_QueenKnight(const _wstring& strLayerTag)
 
 	Desc = { 50.f, XMConvertToRadians(180.f)
 		, nullptr, m_eCurLevel, MONSTERTYPE::BOSS, 2500.f, 150.f
-		, 30.f, 11.f, 10.f, 10.f, {1.f, 1.f, 1.f}
+		, 30.f, 7.f, 10.f, 10.f, {1.f, 1.f, 1.f}
 	};
 
 	Desc.pPlayer = dynamic_cast<CPlayer*>(

@@ -448,10 +448,10 @@ void CPlayer::Set_LockOn_Target(CGameObject* pTarget)
     m_fLockOnTimer = 0.0f;
 
     // 카메라에 LockOn 타겟 설정
-    if (m_pPlayerCamera)
-    {
-        m_pPlayerCamera->Start_Zoom_In(0.3f);
-    }
+    //if (m_pPlayerCamera)
+    //{
+    //    m_pPlayerCamera->Start_Zoom_In(0.3f);
+    //}
 }
 
 void CPlayer::Clear_LockOn_Target()
@@ -461,13 +461,11 @@ void CPlayer::Clear_LockOn_Target()
     m_fLockOnTimer = 0.0f;
 
     // 카메라 LockOn 해제
-    if (m_pPlayerCamera)
-    {
-        m_pPlayerCamera->Start_Zoom_Out(0.3f); 
-    }
+    //if (m_pPlayerCamera)
+    //{
+    //    m_pPlayerCamera->Start_Zoom_Out(0.3f); 
+    //}
 
-    // UI나 이펙트 숨기기 (필요시)
-    // m_pGameInstance->Hide_LockOn_UI();
 }
 
 void CPlayer::Update_LockOn(_float fTimeDelta)

@@ -1,6 +1,4 @@
 ﻿#include "Camera_Player.h"
-#include "Monster.h"
-#include "LockOnUI.h"
 
 CCamera_Player::CCamera_Player(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CCamera(pDevice, pContext)
@@ -32,6 +30,7 @@ HRESULT CCamera_Player::Initialize_Clone(void* pArg)
 	XMStoreFloat4(&m_vTargetOffset, XMVectorSet(0.f, 1.7f, -4.3f, 0.f));
 	m_vOriginalOffset = m_vTargetOffset;
 	
+
 	// 락온 모드 전용 오프셋 (일반 카메라와 동일하게 설정)
 	XMStoreFloat4(&m_vLockOnOffset, XMVectorSet(0.f, 1.7f, -4.3f, 0.f));
 
@@ -40,9 +39,6 @@ HRESULT CCamera_Player::Initialize_Clone(void* pArg)
 	m_fPitch = XMConvertToRadians(m_fDefaultPitch);  // 기본 각도로 설정
 	m_fTargetYaw = m_fYaw;
 	m_fTargetPitch = m_fPitch;
-
-	// 줌인 시 오프셋 (더 가까이, 살짝 위에서)
-	XMStoreFloat4(&m_vZoomTargetOffset, XMVectorSet(0.f, 4.f, -5.f, 0.f));
 
 	if (FAILED(CCamera::Initialize_Clone(pArg)))
 		return E_FAIL;
@@ -76,6 +72,8 @@ void CCamera_Player::Priority_Update(_float fTimeDelta)
 
 void CCamera_Player::Update(_float fTimeDelta)
 {
+
+
 	CCamera::Update(fTimeDelta);
 
 	// 마우스 클립 업데이트
@@ -94,6 +92,10 @@ void CCamera_Player::Update(_float fTimeDelta)
 	// LockOn UI 업데이트
 	Update_LockOn_UI(fTimeDelta);
 
+
+
+
+
 	// 파이프라인 업데이트
 	CCamera::Update_PipeLines();
 }
@@ -104,10 +106,48 @@ void CCamera_Player::Late_Update(_float fTimeDelta)
 
 	if (m_pLockOnUI)
 		m_pLockOnUI->Late_Update(fTimeDelta);
+
+
+#ifdef _DEBUG
+	// 임시 디버깅용도 Render 추가
+
+	m_pGameInstance->Add_RenderGroup(RENDERGROUP::STATIC_UI, this);
+#endif // _DEBUG
+
+	
 }
 
 HRESULT CCamera_Player::Render()
 {
+
+#ifdef _DEBUG
+	ImGuiIO& io = ImGui::GetIO();
+
+	// 기존 Player Debug Window
+
+	ImVec2 windowSize = ImVec2(300.f, 300.f);
+	ImVec2 windowPos = ImVec2(0.f, 0.f);
+
+	ImGui::SetNextWindowPos(windowPos, ImGuiCond_Once);
+	ImGui::SetNextWindowSize(windowSize, ImGuiCond_Once);
+
+	ImGui::Begin("CC", nullptr, ImGuiWindowFlags_NoCollapse);
+
+	_float3 vPos = {};
+	XMStoreFloat3(&vPos, m_pTransformCom->Get_State(STATE::POSITION));
+
+	if (m_bLockOnMode)
+	{
+		ImGui::Text("Lock On Camera Pos : (%.2f, %.2f, %.2f)", vPos.x, vPos.y, vPos.z);
+	}
+	else
+	{
+		ImGui::Text("Normal Camera Pos : (%.2f, %.2f, %.2f)", vPos.x, vPos.y, vPos.z);
+	}
+
+	ImGui::End();
+#endif // _DEBUG
+
 	return S_OK;
 }
 
@@ -132,70 +172,6 @@ void CCamera_Player::Set_TargetOffset(_float4 vOffset)
 {
 	m_vTargetOffset = vOffset;
 }
-
-void CCamera_Player::Start_Zoom_In(_float fZoomDuration)
-{
-	if (m_bIsZooming && m_bZoomIn) return; // 이미 줌인 중이면 무시
-
-	m_bIsZooming = true;
-	m_bZoomIn = true;
-	m_fZoomLerpTime = 0.f;
-	m_fZoomMaxTime = fZoomDuration;
-}
-
-void CCamera_Player::Start_Zoom_Out(_float fZoomDuration)
-{
-	if (m_bIsZooming && !m_bZoomIn) return; // 이미 줌아웃 중이면 무시
-
-	m_bIsZooming = true;
-	m_bZoomIn = false;
-	m_fZoomLerpTime = 0.f;
-	m_fZoomMaxTime = fZoomDuration;
-}
-
-void CCamera_Player::Update_Zoom(_float fTimeDelta)
-{
-	if (!m_bIsZooming) return;
-
-	m_fZoomLerpTime += fTimeDelta;
-	_float fLerpRatio = m_fZoomLerpTime / m_fZoomMaxTime;
-
-	if (fLerpRatio >= 1.f)
-	{
-		fLerpRatio = 1.f;
-		m_bIsZooming = false;
-	}
-
-	// 부드러운 보간을 위한 easing 함수 적용 (선택사항)
-	fLerpRatio = fLerpRatio * fLerpRatio * (3.f - 2.f * fLerpRatio); 
-
-	_vector vCurrentOffset, vTargetOffset;
-
-	if (m_bZoomIn)
-	{
-		// 줌인: 원래 오프셋 -> 줌 오프셋
-		vCurrentOffset = XMLoadFloat4(&m_vOriginalOffset);
-		vTargetOffset = XMLoadFloat4(&m_vZoomTargetOffset);
-	}
-	else
-	{
-		// 줌아웃: 줌 오프셋 -> 원래 오프셋
-		vCurrentOffset = XMLoadFloat4(&m_vZoomTargetOffset);
-		vTargetOffset = XMLoadFloat4(&m_vOriginalOffset);
-	}
-
-	// 현재 오프셋으로부터 TargetOffset으로 자연스럽게 보간.
-	_vector vLerpedOffset = XMVectorLerp(vCurrentOffset, vTargetOffset, fLerpRatio);
-	XMStoreFloat4(&m_vTargetOffset, vLerpedOffset);
-}
-
-void CCamera_Player::Reset_Zoom()
-{
-	m_bIsZooming = false;
-	m_fZoomLerpTime = 0.f;
-	m_vTargetOffset = m_vOriginalOffset;
-}
-
 
 void CCamera_Player::Set_LockOn_Target(CMonster* pTarget)
 {
@@ -244,13 +220,30 @@ void CCamera_Player::Disable_LockOn_Mode()
 {
 	m_bLockOnMode = false;
 	
-	// 전환 없이 현재 LockOn 상태를 일반 모드로 직접 변환
-	m_fYaw = m_fLockOnYaw;
-	m_fTargetYaw = m_fLockOnYaw;
-	m_fTargetPitch = XMConvertToRadians(m_fDefaultPitch);
-	
-	// 현재 카메라 위치와 상태를 그대로 유지
-	// 일반 모드가 자연스럽게 이어받아서 처리
+	// 1. 현재 카메라의 Look 방향을 가져와서 Yaw/Pitch로 변환
+	_vector vCurrentLook = m_pTransformCom->Get_State(STATE::LOOK);
+	vCurrentLook = XMVector3Normalize(vCurrentLook);
+
+	// 2. Look 벡터에서 Yaw 계산 (Y축 제거한 수평 방향)
+	_vector vHorizontalLook = XMVectorSetY(vCurrentLook, 0.0f);
+	_float fHorizontalLength = XMVectorGetX(XMVector3Length(vHorizontalLook));
+
+	if (fHorizontalLength > 0.001f)
+	{
+		vHorizontalLook = XMVector3Normalize(vHorizontalLook);
+		m_fYaw = atan2f(XMVectorGetX(vHorizontalLook), XMVectorGetZ(vHorizontalLook));
+		m_fTargetYaw = m_fYaw;
+	}
+	else
+	{
+		// 수직으로 바라보는 경우 현재 LockOn Yaw 유지
+		m_fYaw = m_fLockOnYaw;
+		m_fTargetYaw = m_fLockOnYaw;
+	}
+
+	// Look 벡터에서 Pitch 계산
+	m_fPitch = asinf(-XMVectorGetY(vCurrentLook));
+	m_fTargetPitch = m_fPitch;
 	
 	// LockOn UI 비활성화
 	if (m_pLockOnUI)
@@ -280,7 +273,7 @@ void CCamera_Player::Update_LockOn_Camera(_float fTimeDelta)
 		return;
 	}
 
-	// 타겟과의 거리 체크 (너무 멀면 락온 해제)
+	// 1. 타겟과의 거리 체크 (너무 멀면 락온 해제)
 	_vector vPlayerPos = m_pTarget->Get_Transform()->Get_State(STATE::POSITION);
 	_vector vTargetPos_Enemy = m_pLockOnTarget->Get_Transform()->Get_State(STATE::POSITION);
 	_float fDistance = XMVectorGetX(XMVector3Length(vTargetPos_Enemy - vPlayerPos));
@@ -292,7 +285,7 @@ void CCamera_Player::Update_LockOn_Camera(_float fTimeDelta)
 		return;
 	}
 
-	// 마우스 입력으로 카메라 회전 (LockOn 중에도 약간의 조작 가능)
+	// 2. 마우스 입력으로 카메라 회전 (LockOn 중에도 약간의 조작 가능)
 	POINT ptMouse = m_pGameInstance->Get_Mouse_Cursor(g_hWnd);
 	RECT rcClient;
 	GetClientRect(g_hWnd, &rcClient);
@@ -306,21 +299,21 @@ void CCamera_Player::Update_LockOn_Camera(_float fTimeDelta)
 		}
 	}
 
-	// LockOn 카메라 위치 계산
+	// 3. LockOn 카메라 위치 계산
 	Calculate_LockOn_Camera_Position(fTimeDelta);
 
-	// 부드러운 카메라 이동
+	// 4. 부드러운 카메라 이동
 	_vector vCurrentPos = XMLoadFloat4(&m_vCurrentCameraPos);
 	_vector vTargetPos = XMLoadFloat4(&m_vLockOnCameraPos);
 
 	_float fLerpFactor = 1.0f - powf(0.3f, m_fLockOnSmoothSpeed * fTimeDelta); // 0.8f -> 0.3f로 변경 (더 빠른 보간)
 	_vector vSmoothedPos = XMVectorLerp(vCurrentPos, vTargetPos, fLerpFactor);
 
-	// 카메라 위치 설정
+	// 5. 카메라 위치 설정
 	XMStoreFloat4(&m_vCurrentCameraPos, vSmoothedPos);
 	m_pTransformCom->Set_State(STATE::POSITION, vSmoothedPos);
 
-	// 락온 상태에서는 몬스터를 직접 바라보도록 설정
+	// 6. 락온 상태에서는 몬스터를 직접 바라보도록 설정
 	_float3 vTargetPosFloat3;
 	XMStoreFloat3(&vTargetPosFloat3, vTargetPos_Enemy);
 	m_pTransformCom->LookAt(vTargetPosFloat3);
@@ -329,7 +322,6 @@ void CCamera_Player::Update_LockOn_Camera(_float fTimeDelta)
 
 void CCamera_Player::Update_Chase_Target(_float fTimeDelta)
 {
-
 	if (nullptr == m_pTarget)
 		return;
 
@@ -662,7 +654,6 @@ void CCamera_Player::Update_Transition(_float fTimeDelta)
 	// 전환 완료 체크
 	if (m_fTransitionTime >= m_fMaxTransitionTime)
 	{
-		m_bTransitioning = false;
 		m_fTransitionTime = 0.0f;
 		
 		// 최종 상태로 설정 후 일반 카메라 업데이트로 전환
