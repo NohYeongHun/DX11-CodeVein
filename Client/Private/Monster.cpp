@@ -163,6 +163,22 @@ void CMonster::Move_Direction(_fvector vDirection, _float fTimeDelta)
     m_pTransformCom->Move_Direction(vDirection, fTimeDelta, m_pNavigationCom);
 }
 
+/* Animation Speed 증가.*/
+void CMonster::Set_Animation_AddSpeed(_uint iAnimationIndex, _float fSpeed)
+{
+    m_pModelCom->Set_AnimSpeed(iAnimationIndex, m_pModelCom->Get_AnimSpeed(iAnimationIndex) + fSpeed);
+}
+
+_float CMonster::Get_Animation_Speed(_uint iAnimationIndex)
+{
+    return m_pModelCom->Get_AnimSpeed(iAnimationIndex);
+}
+
+void CMonster::Set_Animation_Speed(_uint iAnimationIndex, _float fSpeed)
+{
+    m_pModelCom->Set_AnimSpeed(iAnimationIndex, fSpeed);
+}
+
 /* 애니메이션 인덱스.*/
 _uint CMonster::Find_AnimationIndex(const _wstring& strAnimationTag)
 {
@@ -195,6 +211,27 @@ void CMonster::Set_RootMotionRotation(_bool IsRotate)
 void CMonster::Set_RootMotionTranslate(_bool IsTranslate)
 {
     m_pModelCom->Set_RootMotionTranslate(IsTranslate);
+}
+
+void CMonster::Set_AnimationActivate()
+{
+    m_pModelCom->Set_AnimationActivate();
+}
+
+void CMonster::Set_AnimationDeActivate()
+{
+    m_pModelCom->Set_AnimationDeActivate();
+}
+
+void CMonster::Compute_OnCell()
+{
+    if (m_pNavigationCom)
+    {
+        m_pTransformCom->Set_State(STATE::POSITION
+            , m_pNavigationCom->Compute_OnCell(
+                m_pTransformCom->Get_State(STATE::POSITION)));
+    }
+    
 }
 
 
@@ -529,6 +566,24 @@ const _bool CMonster::IsRotateFinished(_float fRadian)
     const _float ROTATION_THRESHOLD = fRadian;
 
     return fAngleDiff <= ROTATION_THRESHOLD;
+}
+
+/* 근처 셀로 설정. */
+void CMonster::NearCell_Translate()
+{
+    _float3 vPos = {};
+    _float3 vFinalPos = {};
+    XMStoreFloat3(&vPos, m_pTransformCom->Get_State(STATE::POSITION));
+    _int iNearCell = m_pNavigationCom->Find_NearCellIndex(vPos);
+
+    if (iNearCell == -1)
+    {
+        CRASH("Failed Search Navigation Cell");
+    }
+
+    m_pNavigationCom->Set_CurrentCellIndex(iNearCell);
+    XMStoreFloat3(&vFinalPos, m_pNavigationCom->Get_CellPos(iNearCell));
+    m_pTransformCom->Set_State(STATE::POSITION, XMLoadFloat3(&vFinalPos));
 }
 
 /* Reset 시 모든 콜라이더 비활성화 */

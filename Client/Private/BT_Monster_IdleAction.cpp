@@ -1,6 +1,4 @@
-﻿#include "BT_Monster_IdleAction.h"
-
-CBT_Monster_IdleAction::CBT_Monster_IdleAction(CMonster* pOwner)
+﻿CBT_Monster_IdleAction::CBT_Monster_IdleAction(CMonster* pOwner)
 	: m_pOwner(pOwner)
 {
 	m_strTag = L"MonsterIdle_ActionNode";

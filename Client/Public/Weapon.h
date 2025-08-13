@@ -69,6 +69,16 @@ protected:
 #pragma endregion
 
 
+#pragma region 2. Rendering 설정
+
+public:
+	void Set_Visible(_bool isVisible) { m_bVisible = isVisible; }
+	_bool Is_Visible() { return m_bVisible; }
+
+protected:
+	_bool m_bVisible = { true };
+#pragma endregion
+
 
 #pragma region 0. 기본 값들.
 protected:

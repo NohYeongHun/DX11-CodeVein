@@ -583,14 +583,6 @@ void CCamera_Player::Debug_CameraVectors()
 		std::to_wstring(XMVectorGetZ(vLook)) + L")\n").c_str());
 }
 
-
-
-
-
-
-
-
-
 CCamera_Player* CCamera_Player::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
 	CCamera_Player* pInstance = new CCamera_Player(pDevice, pContext);

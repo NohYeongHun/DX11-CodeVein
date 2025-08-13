@@ -504,6 +504,21 @@
     <ClInclude Include="..\Public\WolfWeapon.h">
       <Filter>02. GameObject\Monster\WolfDevil\Weapon</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\BT_QueenKnight_DashAttackAction.h">
+      <Filter>02. GameObject\Monster\Boss\QueenKnight\BT\Attack</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BT_QueenKnight_IsDashAttackCondition.h">
+      <Filter>02. GameObject\Monster\Boss\QueenKnight\BT\Attack</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BT_QueenKnight_DownStrikeAction.h">
+      <Filter>02. GameObject\Monster\Boss\QueenKnight\BT\Attack</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BT_QueenKnight_TripleDownStrikeAction.h">
+      <Filter>02. GameObject\Monster\Boss\QueenKnight\BT\Attack</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BT_QueenKnight_IsTripleDownStrikeCondition.h">
+      <Filter>02. GameObject\Monster\Boss\QueenKnight\BT\Attack</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -803,6 +818,21 @@
     </ClCompile>
     <ClCompile Include="..\Private\WolfWeapon.cpp">
       <Filter>02. GameObject\Monster\WolfDevil\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BT_QueenKnight_DashAttackAction.cpp">
+      <Filter>02. GameObject\Monster\Boss\QueenKnight\BT\Attack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BT_QueenKnight_IsDashAttackCondition.cpp">
+      <Filter>02. GameObject\Monster\Boss\QueenKnight\BT\Attack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BT_QueenKnight_TripleDownStrikeAction.cpp">
+      <Filter>02. GameObject\Monster\Boss\QueenKnight\BT\Attack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BT_QueenKnight_DownStrikeAction.cpp">
+      <Filter>02. GameObject\Monster\Boss\QueenKnight\BT\Attack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BT_QueenKnight_IsTripleDownStrikeCondition.cpp">
+      <Filter>02. GameObject\Monster\Boss\QueenKnight\BT\Attack</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

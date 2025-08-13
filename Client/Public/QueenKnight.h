@@ -12,7 +12,7 @@ public:
 		PART_END
 	};
 
-	// 1 ~ 22은 커스텀사용
+	// 1 ~ 20은 커스텀사용
 	enum QUEEN_BUFF_FLAGS : _uint
 	{
 		QUEEN_BUFF_NONE = 0,
@@ -23,6 +23,8 @@ public:
 		QUEEN_BUFF_PHASE_SECOND = 1 << 5,
 		QUEEN_BUFF_PHASE_LAST = 1 << 6,
 		QUEEN_BUFF_PHASE_ATTACK_COOLDOWN = 1 << 7, // 페이즈 마다 다른 공격 시퀀스 => 쿨타임 존재
+		QUEEN_BUFF_DASH_ATTACK_COOLDOWN = 1 << 8, // 돌진 공격 시퀀스 => 쿨타임 존재.
+		QUEEN_BUFF_DOWN_TRIPLE_STRIKE_COOLDOWN = 1 << 9, // Down Strike 시퀀스 => 쿨타임 존재.
 		QUEEN_BUFF_END = 1 << 30
 	};
 
@@ -70,6 +72,19 @@ private:
 #pragma region 3. 몬스터는 자신에게 필요한 수치값들을 초기화해야한다.
 public:
 	virtual HRESULT Initialize_Stats() override;
+
+
+public:
+	_bool Is_TargetDashRange();
+	_bool Is_TargetDodgeRange();
+	_bool Is_TargetDownStrikeRange();
+
+
+private:
+	_float m_fDashMaxDistance = {};
+	_float m_fDashMinDistance = {};
+	_float m_fDashDodgeDistance = {};
+	_float m_fDownStrikeDistance = {};
 #pragma endregion
 
 #pragma region 4. 몬스터는 자신의 애니메이션을 관리해야한다.
@@ -108,6 +123,15 @@ public:
 	
 #pragma endregion
 
+
+#pragma region 8. 렌더링 제어
+public:
+	void Set_Visible(_bool bVisible);
+	_bool Is_Visible() const { return m_bVisible; }
+
+private:
+	_bool m_bVisible = { true };  // 기본적으로 보이는 상태
+#pragma endregion
 
 #pragma region 0. 기본 함수들 정의
 private:

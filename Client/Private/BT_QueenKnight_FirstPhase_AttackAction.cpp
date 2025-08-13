@@ -32,6 +32,7 @@ BT_RESULT CBT_QueenKnight_FirstPhase_AttackAction::Perform_Action(_float fTimeDe
 void CBT_QueenKnight_FirstPhase_AttackAction::Reset()
 {
     m_eAttackPhase = ATTACK_PHASE::NONE;
+    m_pOwner->Reset_Collider_ActiveInfo();
 }
 
 BT_RESULT CBT_QueenKnight_FirstPhase_AttackAction::EnterAttack(_float fTimeDelta)

@@ -171,7 +171,12 @@
     <ClInclude Include="..\Public\BT_Monster_IsDead.h" />
     <ClInclude Include="..\Public\BT_Monster_IsDown.h" />
     <ClInclude Include="..\Public\BT_Monster_IsHit.h" />
+    <ClInclude Include="..\Public\BT_QueenKnight_DashAttackAction.h" />
+    <ClInclude Include="..\Public\BT_QueenKnight_DownStrikeAction.h" />
     <ClInclude Include="..\Public\BT_QueenKnight_FirstPhase_AttackAction.h" />
+    <ClInclude Include="..\Public\BT_QueenKnight_IsDashAttackCondition.h" />
+    <ClInclude Include="..\Public\BT_QueenKnight_IsTripleDownStrikeCondition.h" />
+    <ClInclude Include="..\Public\BT_QueenKnight_TripleDownStrikeAction.h" />
     <ClInclude Include="..\Public\BT_SkyBoss_Attack.h" />
     <ClInclude Include="..\Public\BT_SkyBoss_CanStrongAttack.h" />
     <ClInclude Include="..\Public\BT_Monster_IsDetectRange.h" />
@@ -279,7 +284,12 @@
     <ClCompile Include="..\Private\BT_Monster_IsDead.cpp" />
     <ClCompile Include="..\Private\BT_Monster_IsDown.cpp" />
     <ClCompile Include="..\Private\BT_Monster_IsHit.cpp" />
+    <ClCompile Include="..\Private\BT_QueenKnight_DashAttackAction.cpp" />
+    <ClCompile Include="..\Private\BT_QueenKnight_DownStrikeAction.cpp" />
     <ClCompile Include="..\Private\BT_QueenKnight_FirstPhase_AttackAction.cpp" />
+    <ClCompile Include="..\Private\BT_QueenKnight_IsDashAttackCondition.cpp" />
+    <ClCompile Include="..\Private\BT_QueenKnight_IsTripleDownStrikeCondition.cpp" />
+    <ClCompile Include="..\Private\BT_QueenKnight_TripleDownStrikeAction.cpp" />
     <ClCompile Include="..\Private\BT_SkyBoss_Attack.cpp" />
     <ClCompile Include="..\Private\BT_SkyBoss_CanStrongAttack.cpp" />
     <ClCompile Include="..\Private\BT_Monster_IsDetectRange.cpp" />

@@ -73,6 +73,8 @@ public:
 	_float Get_AnimSpeed(_uint iAnimIndex) { return m_Animations[iAnimIndex]->Get_AnimSpeed(); }
 	void Set_AnimSpeed(_uint iAnimIndex, _float fSpeed) { m_Animations[iAnimIndex]->Set_AnimSpeed(fSpeed); }
 
+	
+
 #pragma endregion
 
 	
@@ -95,8 +97,14 @@ private:
 private:
 	void Calculate_Bounding_Box(); // Initialize 시점에 한번만 구합니다.
 	void Rotate_Bounding_Box();
-public:
 
+public:
+	void Set_AnimationActivate() { m_IsStopAnimation = false; }
+	void Set_AnimationDeActivate() { m_IsStopAnimation = true; }
+	
+
+private:
+	_bool m_IsStopAnimation = { false };
 	
 #pragma endregion
 
@@ -127,7 +135,7 @@ public:
 #pragma region ROOT MOTION
 private:
 	void Handle_RootMotion(_float fTimeDelta);
-
+	
 #pragma endregion
 
 

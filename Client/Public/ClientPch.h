@@ -125,6 +125,13 @@
 
 /* ======================================== QueenKnight Boss BT ===================================== */
 #include "BT_QueenKnight_FirstPhase_AttackAction.h"
+#include "BT_QueenKnight_IsDashAttackCondition.h"
+#include "BT_QueenKnight_DashAttackAction.h"
+#include "BT_QueenKnight_IsTripleDownStrikeCondition.h"
+#include "BT_QueenKnight_TripleDownStrikeAction.h"
+#include "BT_QueenKnight_DownStrikeAction.h"
+
+
 
 #include "QueenKnightTree.h"
 /* ======================================== QueenKnight Boss Object ===================================== */

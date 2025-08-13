@@ -61,8 +61,13 @@ void CKnightShield::Update(_float fTimeDelta)
 void CKnightShield::Late_Update(_float fTimeDelta)
 {
     CWeapon::Late_Update(fTimeDelta);
-    if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::BLEND, this)))
-        return;
+
+    if (Is_Visible())
+    {
+        if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::BLEND, this)))
+            return;
+    }
+    
 }
 
 HRESULT CKnightShield::Render()

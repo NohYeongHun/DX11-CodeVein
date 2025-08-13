@@ -37,9 +37,9 @@ private:
 private:
     /* 우선순위가 높은 공격 행동 체크 */
     // 특수 공격 => 쿨타임 돌았다면?
-    CBTSequence* Create_SpecialAttack_ToSequence(); 
 
-    
+    CBTSequence* Create_TripleDownAttack_ToSequence();
+    CBTSequence* Create_DashAttack_ToSequence(); 
     CBTSequence* Create_FirstPhaseAttack_ToSequence(); // Phase1 기본 공격.
     CBTSequence* Create_SecondPhaseAttack_ToSequence();   // Phase2 기본 공격
     CBTSequence* Create_AttackAction_ToSequence();

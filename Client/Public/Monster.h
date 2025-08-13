@@ -14,12 +14,12 @@ public:
     // 너 지금 어떤 버프/디버프에 걸려있니?
     // Has 관계 => 가지고 있는지 여부를 판단합니다. (여러 개)
 
-
     // 1 ~ 21은 커스텀사용
     enum BUFFe_FLAGS : _uint
     {
         BUFF_NONE = 0,
         
+        BUFF_NAVIGATION_OFF =  1 << 20,
         BUFF_DETECT = 1 << 21,
         BUFF_ATTACK_TIME = 1 << 22,
         BUFF_HIT = 1 << 23,
@@ -152,6 +152,12 @@ public:
 
     void Move_Direction(_fvector vDirection, _float fTimeDelta); // 이동용 함수. 
 
+
+public:
+    void Set_Animation_AddSpeed(_uint iAnimationIndex, _float fSpeed);
+    _float Get_Animation_Speed(_uint iAnimationIndex);
+    void Set_Animation_Speed(_uint iAnimationIndex, _float fSpeed);
+
 public:
     virtual HRESULT InitializeAction_ToAnimationMap() PURE; // 필수적으로 애니메이션 초기화를 진행해야합니다. => 인스턴스화 될거라면.
     
@@ -164,6 +170,15 @@ public:
 public:
     void Set_RootMotionRotation(_bool IsRotate);
     void Set_RootMotionTranslate(_bool IsTranslate);
+
+public:
+    void Set_AnimationActivate();
+    void Set_AnimationDeActivate();
+
+    // 현재 위치에서 셀 위로 강제로 올리는법
+    void Compute_OnCell();
+
+        
 protected:
     _wstring m_CurrentAction = { L"IDLE" };
 
@@ -239,6 +254,8 @@ public:
     
 
     virtual const _bool IsRotateFinished(_float fRadian);
+
+    virtual void NearCell_Translate();
 
 public:
     /* 콜라이더 제어.*/

@@ -260,25 +260,6 @@ _bool CTool_Model::Picking(_float3* PickingPoint)
 
 	return bAnyHit;
 
-	//// Mesh 순회 할때도 가장 가까운 것을 골라야합니다.
-	//for (_uint i = 0; i < m_iNumMeshes; i++)
-	//{
-	//	_float3 vTempPoint = {};
-	//	_bool bCurrentHit = m_Meshes[i]->Picking(vLocalRayOrigin, vLocalRayDir, PickingPoint, &vNormal, &fDist);
-	//	if (bCurrentHit)
-	//	{
-	//		bAnyHit = true;  // 하나라도 충돌했음을 기록
-
-	//		if (fDist < fMinDist)
-	//			fMinDist = fDist;
-	//	}
-	//}
-
-	//if (bAnyHit)
-	//	return true;
-
-	/*return false;*/
-	
 }
 
 void CTool_Model::Save_AnimModel(ANIMMODEL_INFO& AnimModelInfo, _fmatrix PreTransformMatrix)
