@@ -341,26 +341,6 @@ HRESULT CLevel_GamePlay::Ready_Layer_QueenKnight(const _wstring& strLayerTag)
 
 	m_pGameInstance->Add_Trigger(ENUM_CLASS(m_eCurLevel), TriggerDesc);
 
-	/*if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel), strLayerTag,
-		ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_QueenKnight"), &Desc)))
-	{
-		CRASH("Failed Search QueenKnight");
-		return E_FAIL;
-	}*/
-
-
-	/*if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel), strLayerTag,
-		ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_QueenKnight"), &Desc)))
-	{
-		CRASH("Failed Search QueenKnight");
-		return E_FAIL;
-	}*/
-
-
-	//if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel), strLayerTag,
-	//	ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_BlackKnight"), &Desc)))
-	//	return E_FAIL;
-
 	return S_OK;
 }
 #pragma endregion
