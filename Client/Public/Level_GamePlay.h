@@ -32,6 +32,7 @@ private:
 	HRESULT Ready_Monster_Trigger();
 	HRESULT Ready_Layer_Monster(const _wstring& strLayerTag);
 	HRESULT Ready_Layer_WolfDevil(const _wstring& strLayerTag);
+	HRESULT Ready_Layer_SlaveVampire(const _wstring& strLayerTag);
 	HRESULT Ready_Layer_QueenKnight(const _wstring& strLayerTag);
 #pragma endregion
 

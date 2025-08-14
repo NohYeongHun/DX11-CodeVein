@@ -15,8 +15,6 @@ public:
         ASCEND,         // 상승
         WAIT_TELEPORT,  // 상승 후 대기 (텔레포트 전)
         TELEPORT,       // 맵 중앙으로 텔레포트
-        HANG,           // 캐릭터 머리위로 이동.
-        DESCEND,        // 하강.
         SKILL,          // 스킬.
         COMPLETED       // IDLE로 변환되어야 함.
     };
@@ -65,8 +63,6 @@ private:
     BT_RESULT Update_Ascend(_float fTimeDelta);
     BT_RESULT Update_WaitTeleport(_float fTimeDelta);
     BT_RESULT Update_Teleport(_float fTimeDelta);
-    BT_RESULT Update_Hang(_float fTimeDelta);
-    BT_RESULT Update_Descend(_float fTimeDelta);
     BT_RESULT Update_Skill(_float fTimeDelta);
 
 public:

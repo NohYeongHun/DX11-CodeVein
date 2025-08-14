@@ -100,6 +100,16 @@ HRESULT CMonster::Render()
     return S_OK;
 }
 
+#pragma region TRIGGER -> TO OBJECT_MANAGER
+
+void CMonster::OnMoved_ToObjectManager()
+{
+    Collider_All_Active(true);
+}
+#pragma endregion
+
+
+
 #pragma region 0. 충돌시 발생하는 이벤트에 대한 컨트롤.
 
 void CMonster::On_Collision_Enter(CGameObject* pOther)
@@ -286,7 +296,7 @@ const _bool CMonster::Is_TargetDetectionRange()
 // Timer가 종료되거나 특정 시점에는 BuffFlag를 해제합니다.
 void CMonster::RemoveBuff(uint32_t buffFlag, _bool removeTimer)
 {
-    m_ActiveBuffs &= ~buffFlag;
+     m_ActiveBuffs &= ~buffFlag;
 
     if (removeTimer)
         m_BuffTimers.erase(buffFlag); 

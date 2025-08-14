@@ -252,6 +252,9 @@
     <ClInclude Include="..\Public\SkillUI_Icon.h" />
     <ClInclude Include="..\Public\SkillUI_Panel.h" />
     <ClInclude Include="..\Public\SkillUI_Slot.h" />
+    <ClInclude Include="..\Public\SlaveVampire.h" />
+    <ClInclude Include="..\Public\SlaveVampireDefine.h" />
+    <ClInclude Include="..\Public\SlaveVampireSword.h" />
     <ClInclude Include="..\Public\SteminaBar.h" />
     <ClInclude Include="..\Public\Title_BackGround.h" />
     <ClInclude Include="..\Public\MainApp.h" />
@@ -363,6 +366,8 @@
     <ClCompile Include="..\Private\SkillUI_Icon.cpp" />
     <ClCompile Include="..\Private\SkillUI_Panel.cpp" />
     <ClCompile Include="..\Private\SkillUI_Slot.cpp" />
+    <ClCompile Include="..\Private\SlaveVampire.cpp" />
+    <ClCompile Include="..\Private\SlaveVampireSword.cpp" />
     <ClCompile Include="..\Private\SteminaBar.cpp" />
     <ClCompile Include="..\Private\Title_BackGround.cpp" />
     <ClCompile Include="..\Private\MainApp.cpp" />
@@ -395,6 +400,7 @@
   <ItemGroup>
     <Text Include="..\Public\PlayerAnimation.txt" />
     <Text Include="QueenKnightDefine.txt" />
+    <Text Include="SlaveVampireDefine.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />

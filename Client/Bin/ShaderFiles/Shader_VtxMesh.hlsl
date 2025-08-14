@@ -101,6 +101,18 @@ PS_OUT PS_MAIN(PS_IN In)
     return Out;
 }
 
+
+PS_OUT PS_MAIN2(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+    
+    
+    Out.vColor = float4(In.vTexcoord, 0.f, 1.f);
+    
+    
+    return Out;
+}
+
 technique11 DefaultTechnique
 {
     /* 특정 패스를 이용해서 점정을 그려냈다. */
@@ -114,6 +126,16 @@ technique11 DefaultTechnique
 
         VertexShader = compile vs_5_0 VS_MAIN();
         PixelShader = compile ps_5_0 PS_MAIN();
+    }
+
+    pass SkyPass // 하늘 전용 패스
+    {
+        SetRasterizerState(RS_Cull_CCW);
+        SetDepthStencilState(DSS_None, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        PixelShader = compile ps_5_0 PS_MAIN2();
     }
 
     ///* 모델의 상황에 따라 다른 쉐이딩 기법 세트(블렌딩 + 디스토션  )를 먹여주기위해서 */

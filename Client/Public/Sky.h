@@ -19,9 +19,10 @@ public:
 	virtual HRESULT Render();
 
 private:
-	CShader* m_pShaderCom = { nullptr };
-	CTexture* m_pTextureCom = { nullptr };
-	CVIBuffer_Cube* m_pVIBufferCom = { nullptr };
+	class CLoad_Model* m_pModelCom = { nullptr };
+	class CShader* m_pShaderCom = { nullptr };
+	class CTexture* m_pTextureCom = { nullptr };
+	class CVIBuffer_Cube* m_pVIBufferCom = { nullptr };
 
 private:
 	HRESULT Ready_Components();

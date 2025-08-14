@@ -184,6 +184,12 @@
     <Filter Include="02. GameObject\Monster\WolfDevil\Weapon">
       <UniqueIdentifier>{2391e3f2-b183-40d9-88e2-08d0b978ed79}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. GameObject\Monster\SlaveVampire">
+      <UniqueIdentifier>{110a8a1b-58b0-4583-b048-b4ab149621ae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Monster\SlaveVampire\Weapon">
+      <UniqueIdentifier>{459dc932-6ee6-46fb-aea6-a6a8c8ff3eaf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -519,6 +525,15 @@
     <ClInclude Include="..\Public\BT_QueenKnight_IsTripleDownStrikeCondition.h">
       <Filter>02. GameObject\Monster\Boss\QueenKnight\BT\Attack</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\SlaveVampire.h">
+      <Filter>02. GameObject\Monster\SlaveVampire</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\SlaveVampireDefine.h">
+      <Filter>02. GameObject\Monster\SlaveVampire</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\SlaveVampireSword.h">
+      <Filter>02. GameObject\Monster\SlaveVampire\Weapon</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -834,6 +849,12 @@
     <ClCompile Include="..\Private\BT_QueenKnight_IsTripleDownStrikeCondition.cpp">
       <Filter>02. GameObject\Monster\Boss\QueenKnight\BT\Attack</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\SlaveVampire.cpp">
+      <Filter>02. GameObject\Monster\SlaveVampire</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\SlaveVampireSword.cpp">
+      <Filter>02. GameObject\Monster\SlaveVampire\Weapon</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxMesh.hlsl">
@@ -858,6 +879,9 @@
     </Text>
     <Text Include="QueenKnightDefine.txt">
       <Filter>02. GameObject\Monster\Boss\QueenKnight</Filter>
+    </Text>
+    <Text Include="SlaveVampireDefine.txt">
+      <Filter>02. GameObject\Monster\SlaveVampire</Filter>
     </Text>
   </ItemGroup>
 </Project>

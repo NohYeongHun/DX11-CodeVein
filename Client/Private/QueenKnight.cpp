@@ -1,4 +1,5 @@
-﻿
+﻿#include "QueenKnight.h"
+
 CQueenKnight::CQueenKnight(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CMonster(pDevice, pContext)
 {
@@ -91,16 +92,9 @@ HRESULT CQueenKnight::Initialize_Clone(void* pArg)
     m_pTransformCom->Set_Scale(vScale);
 
 
-    _float3 vPos = { 0.f, 0.f, 0.f };
-    m_pTransformCom->Set_State(STATE::POSITION, XMLoadFloat3(&vPos));
 
-
-
-#pragma region 창 위치 확인용
-    m_pModelCom->Set_Animation(AS_TStdKnight_TSword_Idle_N_Loop, true);
-#pragma endregion
-
-    
+    /* 현재 Object Manager에 담기 전에는 모든 Collider를 충돌 비교 하지 않습니다. */
+    Collider_All_Active(false);
 
     return S_OK;
 }
@@ -258,6 +252,22 @@ void CQueenKnight::On_Collision_Stay(CGameObject* pOther)
 
 void CQueenKnight::On_Collision_Exit(CGameObject* pOther)
 {
+}
+
+void CQueenKnight::Collider_All_Active(_bool bActive)
+{
+    m_pColliderCom->Set_Active(bActive);
+
+    if (bActive)
+    {
+        m_pWeapon->Activate_Collider();
+        m_pShield->Activate_Collider();
+    }
+    else
+    {
+        m_pWeapon->Deactivate_Collider();
+        m_pShield->Deactivate_Collider();
+    }
 }
 #pragma endregion
 
@@ -616,6 +626,7 @@ HRESULT CQueenKnight::Ready_Colliders(QUEENKNIGHT_DESC* pDesc)
 
     /* 생성과 동시에 등록 */
     m_pGameInstance->Add_Collider_To_Manager(m_pColliderCom);
+
 
     return S_OK;
 }

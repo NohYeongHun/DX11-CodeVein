@@ -89,6 +89,10 @@ public:
 
 #pragma endregion
 
+#pragma region TRIGGER -> TO OBJECT_MANAGER
+    virtual void OnMoved_ToObjectManager();
+#pragma endregion
+
 
 #pragma region 0. 몬스터는 충돌에 대한 상태제어를 할 수 있어야한다. => 충돌에 따라 상태가 변하기도, 수치값이 바뀌기도한다.
 public:
@@ -101,6 +105,7 @@ public:
     // 무기 및 스킬과 충돌 시 받는 데미지 처리.
     virtual void Take_Damage(_float fDamage); 
     virtual void Collider_Part_Active(_uint iPartType, _bool bActive) {};
+    virtual void Collider_All_Active(_bool bActive) {};
 
 protected:
     class CCollider* m_pColliderCom = { nullptr };

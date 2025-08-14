@@ -242,6 +242,32 @@ HRESULT CLevel_GamePlay::Ready_Layer_Monster(const _wstring& strLayerTag)
 	//	CRASH("Failed Layer_WolfDevil");
 	//	return E_FAIL;
 	//}
+	//
+	//if (FAILED(Ready_Layer_SlaveVampire(strLayerTag)))
+	//{
+	//	CRASH("Failed Layer SlaveVampire");
+	//	return E_FAIL;
+	//}
+	//
+	///*
+	//* 트리거 등록
+	//*/
+	//// 2. 트리거 등록. => 생성과 트리거 등록은 구별.
+	//TRIGGER_MONSTER_DESC TriggerDesc{};
+	//
+	//TriggerDesc = { { 250.f , 0.f, 0.f }, 200.f , TEXT("Layer_WolfDevil")
+	//	, TEXT("Layer_Monster") , 2, 0 };
+	//
+	//m_pGameInstance->Add_Trigger(ENUM_CLASS(m_eCurLevel), TriggerDesc);
+	//
+	//
+	//TriggerDesc = { { 200.f , 0.f, 0.f }, 200.f , TEXT("Layer_SlaveVampire")
+	//	, TEXT("Layer_Monster") , 2, 0 };
+	//
+	//m_pGameInstance->Add_Trigger(ENUM_CLASS(m_eCurLevel), TriggerDesc);
+
+	//TriggerDesc.vTriggerPos = { 250.f, 0.f, 0.f };
+	//m_pGameInstance->Add_Trigger(ENUM_CLASS(m_eCurLevel), TriggerDesc);
 
 	/* 다 같은 Monster 레이어에 추가하기. */
 	if (FAILED(Ready_Layer_QueenKnight(strLayerTag)))
@@ -276,7 +302,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_WolfDevil(const _wstring& strLayerTag)
 	
 	for (_uint i = 0; i < 4; ++i)
 	{
-		Desc.vPos = { 260.f, 0.f, 3.f};
+		Desc.vPos = { 250.f, 0.f, 3.f};
 		Desc.vPos.x += (i / 2) * -10.f;
 		Desc.vPos.z *= i % 2 == 0 ? -1.f : 1.f;
 		if (FAILED(m_pGameInstance->Add_GameObject_ToTrigger(ENUM_CLASS(m_eCurLevel)
@@ -288,16 +314,45 @@ HRESULT CLevel_GamePlay::Ready_Layer_WolfDevil(const _wstring& strLayerTag)
 		}
 	}
 
-	// 2. 트리거 등록. => 생성과 트리거 등록은 구별.
-	TRIGGER_MONSTER_DESC TriggerDesc{};
+	
 
-	TriggerDesc = { { 260.f , 0.f, 0.f }, 10.f , TEXT("Layer_WolfDevil")
-		, TEXT("Layer_Monster") , 2, 0 };
+	return S_OK;
+}
 
-	m_pGameInstance->Add_Trigger(ENUM_CLASS(m_eCurLevel), TriggerDesc);
+HRESULT CLevel_GamePlay::Ready_Layer_SlaveVampire(const _wstring& strLayerTag)
+{
 
-	TriggerDesc.vTriggerPos = { 250.f, 0.f, 0.f };
-	m_pGameInstance->Add_Trigger(ENUM_CLASS(m_eCurLevel), TriggerDesc);
+	CSlaveVampire::SLAVE_VAMPIRE_DSEC Desc{};
+
+	Desc = { 50.f, XMConvertToRadians(90.0f)
+		, nullptr,  m_eCurLevel, MONSTERTYPE::NORMAL,
+		900.f, 70.f, 10.f, 5.f, 50.f, 50.f };
+
+	Desc.pPlayer = dynamic_cast<CPlayer*>(
+		m_pGameInstance->Get_GameObjcet(
+			ENUM_CLASS(m_eCurLevel)
+			, TEXT("Layer_Player"), 0));
+
+	if (nullptr == Desc.pPlayer)
+	{
+		CRASH("Failed Search Player");
+		return E_FAIL;
+	}
+
+	for (_uint i = 0; i < 2; ++i)
+	{
+		Desc.vPos = { 200.f, 0.f, 3.f };
+		Desc.vPos.x += (i) * -20.f;
+		Desc.vPos.z *= i % 2 == 0 ? -1.f : 1.f;
+		if (FAILED(m_pGameInstance->Add_GameObject_ToTrigger(ENUM_CLASS(m_eCurLevel)
+			, TEXT("Layer_SlaveVampire"), ENUM_CLASS(m_eCurLevel)
+			, TEXT("Prototype_GameObject_SlaveVampire"), &Desc)))
+		{
+			CRASH("Failed_Create SlaveVampire");
+			return E_FAIL;
+		}
+	}
+
 
 	return S_OK;
 }
@@ -343,6 +398,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_QueenKnight(const _wstring& strLayerTag)
 
 	return S_OK;
 }
+
 #pragma endregion
 
 
@@ -384,22 +440,11 @@ HRESULT CLevel_GamePlay::Ready_Layer_SkyBoss(const _wstring& strLayerTag)
 	return S_OK;
 }
 
-
-
-
-
-
-
-
-
-
-
 HRESULT CLevel_GamePlay::Ready_Layer_Effect(const _wstring& strLayerTag)
 {
 	
 	return S_OK;
 }
-
 
 
 

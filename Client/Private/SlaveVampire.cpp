@@ -1,16 +1,16 @@
-﻿#include "WolfDevil.h"
-CWolfDevil::CWolfDevil(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿#include "SlaveVampire.h"
+CSlaveVampire::CSlaveVampire(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CMonster{pDevice, pContext}
 {
 }
 
-CWolfDevil::CWolfDevil(const CWolfDevil& Prototype)
+CSlaveVampire::CSlaveVampire(const CSlaveVampire& Prototype)
     : CMonster(Prototype)
 {
 }
 
 #pragma region 기본 함수들
-HRESULT CWolfDevil::Initialize_Prototype()
+HRESULT CSlaveVampire::Initialize_Prototype()
 {
     if (FAILED(CMonster::Initialize_Prototype()))
         return E_FAIL;
@@ -18,20 +18,20 @@ HRESULT CWolfDevil::Initialize_Prototype()
     return S_OK;
 }
 
-HRESULT CWolfDevil::Initialize_Clone(void* pArg)
+HRESULT CSlaveVampire::Initialize_Clone(void* pArg)
 {
 
-    WOLFDEVIL_DESC* pDesc = static_cast<WOLFDEVIL_DESC*>(pArg);
+    SLAVE_VAMPIRE_DSEC* pDesc = static_cast<SLAVE_VAMPIRE_DSEC*>(pArg);
 
     if (FAILED(CMonster::Initialize_Clone(pDesc)))
     {
-        CRASH("Failed Clone WolfDevil");
+        CRASH("Failed Clone SlaveVampire");
         return E_FAIL;
     }
 
     if (FAILED(Ready_Components(pDesc)))
     {
-        CRASH("Failed Ready Components WolfDevil");
+        CRASH("Failed Ready Components SlaveVampire");
         return E_FAIL;
     }
 
@@ -55,43 +55,45 @@ HRESULT CWolfDevil::Initialize_Clone(void* pArg)
 
     if (FAILED(Initialize_Stats()))
     {
-        CRASH("Failed InitializeStat WolfDevil");
+        CRASH("Failed InitializeStat SlaveVampire");
         return E_FAIL;
     }
     
 
     if (FAILED(InitializeAction_ToAnimationMap()))
     {
-        CRASH("Failed InitializeAction WolfDevil");
+        CRASH("Failed InitializeAction SlaveVampire");
         return E_FAIL;
     }
 
     if (FAILED(Ready_PartObjects()))
     {
-        CRASH("Failed Ready Components WolfDevil");
+        CRASH("Failed Ready Components SlaveVampire");
         return E_FAIL;
     }
 
     if (FAILED(Initialize_BuffDurations()))
     {
-        CRASH("Failed Init BuffDuration WolfDevil");
+        CRASH("Failed Init BuffDuration SlaveVampire");
         return E_FAIL;
     }
 
     if (FAILED(Initialize_ColliderFrames()))
     {
-        CRASH("Failed Init ColliderFrames WolfDevil");
+        CRASH("Failed Init ColliderFrames SlaveVampire");
         return E_FAIL;
     }
 
     _vector qInitRot = XMQuaternionRotationAxis(XMVectorSet(0.f, 1.f, 0.f, 0.f), 0.0f);
     m_pTransformCom->Set_Quaternion(qInitRot);
-
-    /*_float3 vPos = { 5.f, 5.f, 0.f };
-    m_pTransformCom->Set_State(STATE::POSITION, XMLoadFloat3(&vPos));*/
-
+  
     m_pModelCom->Set_RootMotionRotation(true);
     m_pModelCom->Set_RootMotionTranslate(false);
+    //m_pModelCom->Set_Animation(SLAVEVAMPIRE_LSWORD_IDLE_LOOP, true);
+
+   /* _vector vPos = XMLoadFloat3(&pDesc->vPos);
+    m_pTransformCom->Set_State(STATE::POSITION, vPos);*/
+    m_pModelCom->Set_Animation(SLAVEVAMPIRE_LSWORD_IDLE_LOOP, true);  // 기본 애니메이션 설정
 
 
     /* 현재 Object Manager에 담기 전에는 모든 Collider를 충돌 비교 하지 않습니다. */
@@ -100,15 +102,19 @@ HRESULT CWolfDevil::Initialize_Clone(void* pArg)
     return S_OK;
 }
 
-void CWolfDevil::Priority_Update(_float fTimeDelta)
+void CSlaveVampire::Priority_Update(_float fTimeDelta)
 {
     CMonster::Priority_Update(fTimeDelta);
 }
 
-void CWolfDevil::Update(_float fTimeDelta)
+void CSlaveVampire::Update(_float fTimeDelta)
 {
     // 이 순서대로 AI 작업을 호출해라.
     Update_AI(fTimeDelta);
+#ifdef _DEBUG
+    //m_pModelCom->Play_Animation(fTimeDelta);
+#endif // _DEBUG
+
 
     // 하위 객체들 움직임 제어는 Tree 제어 이후에
     CMonster::Update(fTimeDelta);
@@ -117,7 +123,7 @@ void CWolfDevil::Update(_float fTimeDelta)
     Finalize_Update(fTimeDelta);
 }
 
-void CWolfDevil::Finalize_Update(_float fTimeDelta)
+void CSlaveVampire::Finalize_Update(_float fTimeDelta)
 {
     CMonster::Finalize_Update(fTimeDelta);
     
@@ -125,9 +131,8 @@ void CWolfDevil::Finalize_Update(_float fTimeDelta)
     
 }
 
-void CWolfDevil::Late_Update(_float fTimeDelta)
+void CSlaveVampire::Late_Update(_float fTimeDelta)
 {
-    
     m_pTransformCom->Set_State(STATE::POSITION
         , m_pNavigationCom->Compute_OnCell(
             m_pTransformCom->Get_State(STATE::POSITION)));
@@ -138,7 +143,7 @@ void CWolfDevil::Late_Update(_float fTimeDelta)
     CMonster::Late_Update(fTimeDelta);
 }
 
-HRESULT CWolfDevil::Render()
+HRESULT CSlaveVampire::Render()
 {
 #ifdef _DEBUG
     m_pColliderCom->Render();
@@ -176,7 +181,7 @@ HRESULT CWolfDevil::Render()
 
 
 #pragma region 0.  몬스터는 충돌에 대한 상태제어를 할 수 있어야한다. => 충돌에 따라 상태가 변하기도, 수치값이 바뀌기도한다.
-void CWolfDevil::On_Collision_Enter(CGameObject* pOther)
+void CSlaveVampire::On_Collision_Enter(CGameObject* pOther)
 {
     // 1. 충돌 가능한 타입의 포인터들을 나열.
     CPlayerWeapon* pPlayerWeapon = dynamic_cast<CPlayerWeapon*>(pOther);
@@ -205,22 +210,23 @@ void CWolfDevil::On_Collision_Enter(CGameObject* pOther)
 
 }
 
-void CWolfDevil::On_Collision_Stay(CGameObject* pOther)
+void CSlaveVampire::On_Collision_Stay(CGameObject* pOther)
 {
 }
 
-void CWolfDevil::On_Collision_Exit(CGameObject* pOther)
+void CSlaveVampire::On_Collision_Exit(CGameObject* pOther)
 {
 }
 
-void CWolfDevil::Collider_All_Active(_bool bActive)
+void CSlaveVampire::Collider_All_Active(_bool bActive)
 {
     m_pColliderCom->Set_Active(bActive);
 
     if (bActive)
         m_pWeapon->Activate_Collider();
-    else
+    else 
         m_pWeapon->Deactivate_Collider();
+
 }
 
 #pragma endregion
@@ -228,7 +234,7 @@ void CWolfDevil::Collider_All_Active(_bool bActive)
 
 #pragma region 1. AI 관리
 /* Update 시 AI가 수행해야 하는 순서들을 함수로 표현. */
-void CWolfDevil::Update_AI(_float fTimeDelta)
+void CSlaveVampire::Update_AI(_float fTimeDelta)
 {
     if (m_pTree)
         m_pTree->Update(fTimeDelta);
@@ -249,7 +255,7 @@ void CWolfDevil::Update_AI(_float fTimeDelta)
 
 #pragma region 2. 몬스터는 자신에게 필요한 수치값들을 초기화해야한다.
 // 기본적으로 몬스터 생성시 필요한 STAT 값들을 제외하고 더 필요한 경우 정의
-HRESULT CWolfDevil::Initialize_Stats()
+HRESULT CSlaveVampire::Initialize_Stats()
 {
     m_fMinDetectionDistance = 4.f;
     return S_OK;
@@ -258,36 +264,29 @@ HRESULT CWolfDevil::Initialize_Stats()
 
 #pragma region 3. 몬스터는 내 애니메이션이 무엇인지 알아야한다.
 /* STRING Index 형태로 관리.*/
-HRESULT CWolfDevil::InitializeAction_ToAnimationMap()
+HRESULT CSlaveVampire::InitializeAction_ToAnimationMap()
 {
     m_pModelCom->Set_RootMotionRotation(true);
     m_pModelCom->Set_RootMotionTranslate(true);
 
-    m_Action_AnimMap.emplace(L"IDLE", WOLFDEVIL_IDLE_LOOP);
-    m_Action_AnimMap.emplace(L"HIT", WOLFDEVIL_DAMAGE_FRONT);
-    m_Action_AnimMap.emplace(L"ATTACK_JUMP", WOLFDEVIL_ATTACK_NORMAL);
-    m_Action_AnimMap.emplace(L"ATTACK", WOLFDEVIL_ATTACK_JUMP);
-    m_Action_AnimMap.emplace(L"DEATH_BACK", WOLFDEVIL_DEATH_BACK);
-    m_Action_AnimMap.emplace(L"DEATH_NORMAL", WOLFDEVIL_DEATH_NORMAL);
-    m_Action_AnimMap.emplace(L"DODGE_BACK", WOLFDEVIL_DODGE_BACK);
-    m_Action_AnimMap.emplace(L"DOWN_START", WOLFDEVIL_DOWN_P_START);
-    m_Action_AnimMap.emplace(L"DOWN_LOOP", WOLFDEVIL_DOWN_P_LOOP);
-    m_Action_AnimMap.emplace(L"DOWN_END", WOLFDEVIL_DOWN_P_END);
-    m_Action_AnimMap.emplace(L"THREAT", WOLFDEVIL_THREAT_01);
-    m_Action_AnimMap.emplace(L"WALK", WOLFDEVIL_WALK_F);
-    m_Action_AnimMap.emplace(L"RUN", WOLFDEVIL_RUN);
+    m_Action_AnimMap.emplace(L"IDLE", SLAVEVAMPIRE_LSWORD_IDLE_LOOP);
+    m_Action_AnimMap.emplace(L"HIT", SLAVEVAMPIRE_DAMAGE01_FR);
+    m_Action_AnimMap.emplace(L"ATTACK", SLAVEVAMPIRE_LSWORD_NORMAL02);
+    m_Action_AnimMap.emplace(L"DEATH_BACK", SLAVEVAMPIRE_DEATH_B);
+    m_Action_AnimMap.emplace(L"DEATH_NORMAL", SLAVEVAMPIRE_DEATH_N);
+    m_Action_AnimMap.emplace(L"WALK", SLAVEVAMPIRE_WALK_F_LOOP);
+    m_Action_AnimMap.emplace(L"RUN", SLAVEVAMPIRE_RUN_F_LOOP);
     // 같은 애니메이션이지만 다른 이름으로 설정해서 Node에서 사용할 수 있게함.
-    m_Action_AnimMap.emplace(L"DETECT", WOLFDEVIL_RUN); 
-    m_Action_AnimMap.emplace(L"STUN", WOLFDEVIL_STUN);
+    m_Action_AnimMap.emplace(L"DETECT", SLAVEVAMPIRE_RUN_F_LOOP);
 
     /* 재생속도 증가. */ 
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"DEATH_NORMAL"], 2.f);
-    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"ATTACK"], 2.f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"ATTACK"], 1.f);
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"DETECT"], 1.5f);
 
 
 #pragma region COllider 활성화 프레임 관리
-    Add_Collider_Frame(m_Action_AnimMap[TEXT("ATTACK")], 50.f / 114.f, 80.f / 114.f, PART_WEAPON);     // Weapon attack
+    Add_Collider_Frame(m_Action_AnimMap[TEXT("ATTACK")], 70.f / 256.f, 100.f / 256.f, PART_WEAPON);     // Weapon attack
 #pragma endregion
 
     return S_OK;
@@ -297,7 +296,7 @@ HRESULT CWolfDevil::InitializeAction_ToAnimationMap()
 
 
 #pragma region 3. 몬스터는 자신이 어떤 버프를 소유할 수 있는지를 알아야 한다. => 그리고 그에 맞는 쿨타임도 알아야한다.(몬스터마다 달라질 수 있다.)
-HRESULT CWolfDevil::Initialize_BuffDurations()
+HRESULT CSlaveVampire::Initialize_BuffDurations()
 {
     // 어찌보면 이건 그냥 쿨다운의 영역.
     m_BuffDefault_Durations[BUFF_HIT] = 0.3f;        // 피격: 0.6초
@@ -319,7 +318,7 @@ HRESULT CWolfDevil::Initialize_BuffDurations()
 
 
 #pragma region 4. 특수한 상태를 제어하기 위한 함수들
-void CWolfDevil::Enable_Collider(_uint iType)
+void CSlaveVampire::Enable_Collider(_uint iType)
 {
     /* PART_WEAPON이면 WEAPON Colider Enable */
     switch (iType)
@@ -332,7 +331,7 @@ void CWolfDevil::Enable_Collider(_uint iType)
     }
 }
 
-void CWolfDevil::Disable_Collider(_uint iType)
+void CSlaveVampire::Disable_Collider(_uint iType)
 {
     switch (iType)
     {
@@ -349,7 +348,7 @@ void CWolfDevil::Disable_Collider(_uint iType)
 
 
 #pragma region 5. 기본적인 WolfDevil이 생성되기 위한 컴포넌트 객체들.
-HRESULT CWolfDevil::Ready_Components(WOLFDEVIL_DESC* pDesc)
+HRESULT CSlaveVampire::Ready_Components(SLAVE_VAMPIRE_DSEC* pDesc)
 {
     if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxAnimMesh"),
         TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom), nullptr)))
@@ -359,7 +358,7 @@ HRESULT CWolfDevil::Ready_Components(WOLFDEVIL_DESC* pDesc)
     Desc.pGameObject = this;
 
     if (FAILED(CMonster::Add_Component(ENUM_CLASS(m_eCurLevel)
-        , TEXT("Prototype_Component_Model_WolfDevil")
+        , TEXT("Prototype_Component_Model_SlaveVampire")
         , TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom), &Desc)))
         return E_FAIL;
 
@@ -390,7 +389,7 @@ HRESULT CWolfDevil::Ready_Components(WOLFDEVIL_DESC* pDesc)
     return S_OK;
 }
 
-HRESULT CWolfDevil::Ready_Navigations()
+HRESULT CSlaveVampire::Ready_Navigations()
 {
     CNavigation::NAVIGATION_DESC        NaviDesc{};
     NaviDesc.iCurrentCellIndex = 0;
@@ -422,7 +421,7 @@ HRESULT CWolfDevil::Ready_Navigations()
     return S_OK;
 }
 
-HRESULT CWolfDevil::Ready_BehaviorTree()
+HRESULT CSlaveVampire::Ready_BehaviorTree()
 {
    
     CMonsterTree::MONSTER_BT_DESC BT{};
@@ -435,7 +434,7 @@ HRESULT CWolfDevil::Ready_BehaviorTree()
     return S_OK;
 }
 
-HRESULT CWolfDevil::Ready_Render_Resources()
+HRESULT CSlaveVampire::Ready_Render_Resources()
 {
     if (FAILED(m_pTransformCom->Bind_Shader_Resource(m_pShaderCom, "g_WorldMatrix")))
         return E_FAIL;
@@ -468,21 +467,21 @@ HRESULT CWolfDevil::Ready_Render_Resources()
     return S_OK;
 }
 
-HRESULT CWolfDevil::Ready_PartObjects()
+HRESULT CSlaveVampire::Ready_PartObjects()
 {
     //Head_Jaw
-    CWolfWeapon::WOLF_WEAPON_DESC Weapon{};
+    CSlaveVampireSword::SLAVEVAMPIRE_WEAPON_DESC Weapon{};
     Weapon.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
-    Weapon.pSocketMatrix = m_pModelCom->Get_BoneMatrix("Head_Jaw");
+    Weapon.pSocketMatrix = m_pModelCom->Get_BoneMatrix("IKSocket_RightHandAttach");
     Weapon.pOwner = this;
     Weapon.eCurLevel = m_eCurLevel;
     Weapon.fAttackPower = m_MonsterStat.fAttackPower;
-
+    
     if (FAILED(CContainerObject::Add_PartObject(TEXT("Com_Weapon"),
-        ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_WolfWeapon")
+        ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_SlaveVampireSword")
         , reinterpret_cast<CPartObject**>(&m_pWeapon), &Weapon)))
     {
-        CRASH("Failed Create Wolf Weapon");
+        CRASH("Failed Create SlaveVampire Weapon");
         return E_FAIL;
     }
     
@@ -496,56 +495,56 @@ HRESULT CWolfDevil::Ready_PartObjects()
     return S_OK;
 }
 
-HRESULT CWolfDevil::Initialize_ColliderFrames()
+HRESULT CSlaveVampire::Initialize_ColliderFrames()
 {
     // WolfDevil 공격 애니메이션에 콜라이더 프레임 추가
     
     // WOLFDEVIL_ATTACK_JUMP (인덱스 0) - 점프 공격
     // 애니메이션의 50%~80% 구간에서 무기 콜라이더 활성화
-    Add_Collider_Frame(WOLFDEVIL_ATTACK_JUMP, 0.5f, 0.8f, PART_WEAPON);
-    
-    // WOLFDEVIL_ATTACK_NORMAL (인덱스 1) - 일반 공격  
-    // 애니메이션의 30%~70% 구간에서 무기 콜라이더 활성화
-    Add_Collider_Frame(WOLFDEVIL_ATTACK_NORMAL, 0.3f, 0.7f, PART_WEAPON);
-    
-    OutputDebugStringA("WolfDevil: Collider frames initialized for attack animations\n");
+    //Add_Collider_Frame(WOLFDEVIL_ATTACK_JUMP, 0.5f, 0.8f, PART_WEAPON);
+    //
+    //// WOLFDEVIL_ATTACK_NORMAL (인덱스 1) - 일반 공격  
+    //// 애니메이션의 30%~70% 구간에서 무기 콜라이더 활성화
+    //Add_Collider_Frame(WOLFDEVIL_ATTACK_NORMAL, 0.3f, 0.7f, PART_WEAPON);
+    //
+    //OutputDebugStringA("WolfDevil: Collider frames initialized for attack animations\n");
     
     return S_OK;
 }
 
 
-CWolfDevil* CWolfDevil::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CSlaveVampire* CSlaveVampire::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-    CWolfDevil* pInstance = new CWolfDevil(pDevice, pContext);
+    CSlaveVampire* pInstance = new CSlaveVampire(pDevice, pContext);
 
     if (FAILED(pInstance->Initialize_Prototype()))
     {
-        MSG_BOX(TEXT("Failed to Cloned : CWolfDevil"));
+        MSG_BOX(TEXT("Failed to Cloned : CSlaveVampire"));
         Safe_Release(pInstance);
     }
 
     return pInstance;
 }
 
-CGameObject* CWolfDevil::Clone(void* pArg)
+CGameObject* CSlaveVampire::Clone(void* pArg)
 {
-    CWolfDevil* pInstance = new CWolfDevil(*this);
+    CSlaveVampire* pInstance = new CSlaveVampire(*this);
 
     if (FAILED(pInstance->Initialize_Clone(pArg)))
     {
-        MSG_BOX(TEXT("Failed to Cloned : CWolfDevil"));
+        MSG_BOX(TEXT("Failed to Cloned : CSlaveVampire"));
         Safe_Release(pInstance);
     }
 
     return pInstance;
 }
 
-void CWolfDevil::Destroy()
+void CSlaveVampire::Destroy()
 {
     CMonster::Destroy();
 }
 
-void CWolfDevil::Free()
+void CSlaveVampire::Free()
 {
     CMonster::Free();
     Safe_Release(m_pTree);

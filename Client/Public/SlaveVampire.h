@@ -2,7 +2,7 @@
 #include "Monster.h"
 
 NS_BEGIN(Client)
-class CWolfDevil final : public CMonster
+class CSlaveVampire final : public CMonster
 {
 public:
 	// 어떤 타입의 Collider를 제어할것인지 정의.
@@ -15,16 +15,16 @@ public:
 	};
 
 public:
-	typedef struct tagWolfDevilDesc : public CMonster::MONSTER_DESC
+	typedef struct tagSlaveVampireDesc : public CMonster::MONSTER_DESC
 	{
 
-	}WOLFDEVIL_DESC;
+	}SLAVE_VAMPIRE_DSEC;
 
 #pragma region 기본 함수들
 private:
-	explicit CWolfDevil(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	explicit CWolfDevil(const CWolfDevil& Prototype);
-	virtual ~CWolfDevil() = default;
+	explicit CSlaveVampire(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	explicit CSlaveVampire(const CSlaveVampire& Prototype);
+	virtual ~CSlaveVampire() = default;
 
 
 public:
@@ -47,10 +47,9 @@ public:
 	virtual void On_Collision_Stay(CGameObject* pOther);
 	virtual void On_Collision_Exit(CGameObject* pOther);
 	virtual void Collider_All_Active(_bool bActive);
-
 	// 무기 정의.
 private:
-	class CWolfWeapon* m_pWeapon = { nullptr };
+	class CSlaveVampireSword* m_pWeapon = { nullptr };
 #pragma endregion
 
 
@@ -89,7 +88,7 @@ public:
 
 #pragma region 6. 기본적으로 몬스터가 필요한 상태들을 정의합니다.
 private:
-	HRESULT Ready_Components(WOLFDEVIL_DESC* pDesc);
+	HRESULT Ready_Components(SLAVE_VAMPIRE_DSEC* pDesc);
 	HRESULT Ready_Navigations();
 	HRESULT Ready_BehaviorTree();
 	HRESULT Ready_Render_Resources();
@@ -99,10 +98,8 @@ private:
 
 
 
-
-
 public:
-	static CWolfDevil* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CSlaveVampire* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;
 	virtual void Destroy();
 	virtual void Free() override;

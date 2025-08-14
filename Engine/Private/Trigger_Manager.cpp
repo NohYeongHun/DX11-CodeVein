@@ -57,10 +57,12 @@ HRESULT CTrigger_Manager::Add_GameObject_ToObjectLayer(_uint iLayerLevelIndex, c
 	auto iter = gameObjects.begin();
 	for (_uint i = 0; i < iCount; ++i)
 	{
+		
 		// 3. 전달할 객체들은 추적해야하므로 list에 추가.
 		m_Current_TrackObjects.emplace_back(*iter);
 		Safe_AddRef(*iter);
 
+		(*iter)->OnMoved_ToObjectManager();
 
 		m_pGameInstance->Add_GameObject_ToLayer(iLayerLevelIndex, strDestTag, *iter);
 		iter = gameObjects.erase(iter);
@@ -89,6 +91,7 @@ HRESULT CTrigger_Manager::Trigger_Check(_uint iLayerLevelIndex, CGameObject* pTa
 	const TRIGGER_MONSTER_DESC& triggerDesc = m_pPhases[iLayerLevelIndex][m_iCurrentPhase];
 
 	// 1. 완료 조건 체크 먼저 수행
+
 	_bool IsTrackObjectDestroy = Check_Destroyed_TrackObjects();
 	_bool IsPlayerReachedZone = Check_Player_ReachedZone(triggerDesc.vTriggerPos, triggerDesc.fRadius);
 	
@@ -200,11 +203,6 @@ _bool CTrigger_Manager::Check_Player_ReachedZone(const _float3& vTriggerPos, _fl
 }
 #pragma endregion
 
-
-
-#pragma region 트리거 완료 조건 체크 함수들
-
-#pragma endregion
 
 void CTrigger_Manager::Free()
 {

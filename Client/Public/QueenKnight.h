@@ -55,7 +55,7 @@ public:
 	virtual void On_Collision_Enter(CGameObject* pOther);
 	virtual void On_Collision_Stay(CGameObject* pOther);
 	virtual void On_Collision_Exit(CGameObject* pOther);
-
+	virtual void Collider_All_Active(_bool bActive);
 
 #pragma endregion
 

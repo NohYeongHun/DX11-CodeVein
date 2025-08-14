@@ -123,6 +123,13 @@
 #include "WolfWeapon.h"
 #include "WolfDevil.h"
 
+/* ======================================== SlaveVampire Object ===================================== */
+#include "SlaveVampireDefine.h"
+#include "SlaveVampireSword.h"
+#include "SlaveVampire.h"
+
+
+
 /* ======================================== QueenKnight Boss BT ===================================== */
 #include "BT_QueenKnight_FirstPhase_AttackAction.h"
 #include "BT_QueenKnight_IsDashAttackCondition.h"
