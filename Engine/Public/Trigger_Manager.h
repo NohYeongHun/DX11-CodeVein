@@ -19,6 +19,7 @@ public:
 	HRESULT Add_GameObject_ToObjectLayer(_uint iLayerLevelIndex, const _wstring& strSourTag, const _wstring& strDestTag, _uint iCount);
 	HRESULT Add_Trigger(_uint iLayerLevelIndex, const TRIGGER_MONSTER_DESC& triggerDesc);
 	HRESULT Trigger_Check(_uint iLayerLevelIndex, class CGameObject* pTarget);
+	_bool Trigger_Finished(_uint iLayerLevelIndex);
 	void Update(_float fTimeDelta);
 	void Clear(_uint iLayerLevelIndex);
 
@@ -55,13 +56,15 @@ private:
 
 #pragma region 트리거 완료 추적
 private:
-	list<class CGameObject*> m_Current_TrackObjects;
-	_uint m_iCurrentPhase = {};
+	// 레벨별 독립적인 트리거 상태 관리
+	list<class CGameObject*>* m_Current_TrackObjects; // 레벨별 추적 객체
+	_uint* m_iCurrentPhase; // 레벨별 현재 페이즈
 
 private:
 	/* 객체들이 삭제되었는지 확인합니다. */
-	_bool Check_Destroyed_TrackObjects();
-	 void Clear_TrackedObjects();
+	_bool Check_Destroyed_TrackObjects(_uint iLevelIndex);
+	void Clear_TrackedObjects(_uint iLevelIndex);
+	void Clear_TrackedObjects(); // 호환성을 위한 전역 버전
 	_bool Check_Player_ReachedZone(const _float3& vTargetPos, _float fRadius);
 #pragma endregion
 

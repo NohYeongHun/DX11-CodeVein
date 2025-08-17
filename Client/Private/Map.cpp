@@ -20,11 +20,21 @@ HRESULT CMap::Initialize_Clone(void* pArg)
 {
     MAP_DESC* pDesc = static_cast<MAP_DESC*>(pArg);
     
+    m_eCurLevel = pDesc->eCurLevel;
+
     if (FAILED(CGameObject::Initialize_Clone(pDesc)))
+    {
+        CRASH("Failed Init GameObject");
         return E_FAIL;
+    }
+        
 
     if (FAILED(Ready_Components(pDesc)))
+    {
+        CRASH("Failed Ready_Components");
         return E_FAIL;
+    }
+        
 
 
     /* 2배 기준으로 NaviMesh 깔았음. */
@@ -124,12 +134,12 @@ HRESULT CMap::Ready_Components(MAP_DESC* pDesc)
 
     CLoad_Model::LOADMODEL_DESC Desc{};
     Desc.pGameObject = this;
-    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::GAMEPLAY)
+    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(m_eCurLevel)
         , pDesc->PrototypeTag
         , TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom), &Desc)))
         return E_FAIL;
 
-    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Navigation"),
+    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(m_eCurLevel), TEXT("Prototype_Component_Navigation"),
         TEXT("Com_Navigation"), reinterpret_cast<CComponent**>(&m_pNavigationCom), nullptr)))
     {
 

@@ -32,7 +32,8 @@ public:
 
 #pragma region ENGINE에 제공
 public:
-	HRESULT Add_Collider_To_Manager(CCollider* pCollider);
+	HRESULT Add_Collider_To_Manager(CCollider* pCollider, _uint iLevelIndex);
+	HRESULT Clear(_uint iLevelIndex);
 
 public:
 	void Update();
@@ -47,7 +48,7 @@ private:
 	void Narrow_Phase();
 
 private:
-	HRESULT Remove_Collider();
+	HRESULT Remove_Collider(_uint iLevelIndex);
 
 private:
 	void Handle_Collision_Exit(class CCollider* pLeft, class CCollider* pRight, class CGameObject* pLeftOwner, class CGameObject* pRightOwner);
@@ -66,10 +67,10 @@ private:
 #pragma region 0. 충돌 관리용 멤버 변수
 
 private:
-	// 전체 등록될 콜라이더
-	vector<CCollider*>  m_RegisterPool;
-	// 삭제할 인덱스를 담는 Pool
-	vector<_uint>		m_freePool;
+	// 레벨별 등록될 콜라이더
+	vector<CCollider*>* m_RegisterPools;
+	// 레벨별 삭제할 인덱스를 담는 Pool
+	vector<vector<_uint>> m_freePools;
 
 	// 현재 프레임 충돌 검사하는 Collider들
 	unordered_set<pair<CCollider*, CCollider*>

@@ -45,14 +45,25 @@ HRESULT CPlayer::Initialize_Prototype()
 HRESULT CPlayer::Initialize_Clone(void* pArg)
 {
     PLAYER_DESC* pDesc = static_cast<PLAYER_DESC*>(pArg);
+    m_eCurLevel = pDesc->eCurLevel;
+
     m_Stats = {
         pDesc->fMaxHP,
         pDesc->fHP,
         pDesc->fAttackPower,
     };
 
+    /* 1. 생성과 동시에 UI와 연동이 필요 */
+    HPSYNCRONIZE_DESC HpSyncDesc = { m_Stats.fHP, m_Stats.fMaxHP };
+
+    m_pGameInstance->Publish(EventType::HP_SYNCRONIZE, &HpSyncDesc);
+
     if (FAILED(CContainerObject::Initialize_Clone(pDesc)))
+    {
+        CRASH("Failed ContainerObject Initialize Clone");
         return E_FAIL;
+    }
+        
 
     m_eCurLevel = pDesc->eCurLevel;
     _vector vStartPos = XMVectorSetW(XMLoadFloat3(&pDesc->vPos), 1.f);
@@ -1064,7 +1075,7 @@ HRESULT CPlayer::Ready_Colliders(PLAYER_DESC* pDesc)
     }
 
     /* 생성과 동시에 등록 */
-    m_pGameInstance->Add_Collider_To_Manager(m_pColliderCom);
+    m_pGameInstance->Add_Collider_To_Manager(m_pColliderCom, ENUM_CLASS(m_eCurLevel));
 
     return S_OK;
 }
@@ -1212,11 +1223,11 @@ HRESULT CPlayer::Ready_PartObjects()
     Weapon.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
     Weapon.pSocketMatrix = m_pModelCom->Get_BoneMatrix("IKSocket_RightHandAttach");
     Weapon.pOwner = this;
-    Weapon.eCurLevel = LEVEL::STATIC;
+    Weapon.eCurLevel = m_eCurLevel;
     Weapon.fAttackPower = m_Stats.fAttackPower;
 
     if (FAILED(CContainerObject::Add_PartObject(TEXT("Com_Weapon"),
-        ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_Weapon")
+        ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Weapon")
         , reinterpret_cast<CPartObject**>(& m_pPlayerWeapon), &Weapon)))
     {
         CRASH("Failed Create Weapon");

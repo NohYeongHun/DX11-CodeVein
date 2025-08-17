@@ -611,7 +611,9 @@ void CMonster::Reset_Part_Colliders()
 void CMonster::Dead_Action()
 {
     if (m_pColliderCom)
-        m_pColliderCom->Set_Active(false);
+    {
+        Collider_All_Active(false);
+    }
 
 }
 

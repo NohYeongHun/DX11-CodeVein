@@ -291,6 +291,15 @@ public:
 #pragma endregion
 
 
+#pragma region 8. 렌더링 제어
+public:
+    virtual void Set_Visible(_bool bVisible) {};
+    _bool Is_Visible() const { return m_bVisible; }
+
+protected:
+    _bool m_bVisible = { true };  // 기본적으로 보이는 상태
+#pragma endregion
+
 #pragma region 99. DEBUG 용도 함수.
 
 #ifdef _DEBUG

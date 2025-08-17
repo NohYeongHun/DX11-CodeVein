@@ -10,6 +10,17 @@ HRESULT CTrigger_Manager::Initialize(_uint iNumLevels)
 {
 	m_pLayers = new map<const _wstring, CLayer*>[iNumLevels];
 	m_pPhases = new vector<TRIGGER_MONSTER_DESC>[iNumLevels];
+	
+	// 레벨별 트리거 상태 배열 초기화
+	m_Current_TrackObjects = new list<CGameObject*>[iNumLevels];
+	m_iCurrentPhase = new _uint[iNumLevels];
+	
+	// 모든 레벨의 현재 페이즈를 0으로 초기화
+	for (_uint i = 0; i < iNumLevels; ++i)
+	{
+		m_iCurrentPhase[i] = 0;
+	}
+	
 	m_iNumLevels = iNumLevels;
 
 	return S_OK;
@@ -59,7 +70,7 @@ HRESULT CTrigger_Manager::Add_GameObject_ToObjectLayer(_uint iLayerLevelIndex, c
 	{
 		
 		// 3. 전달할 객체들은 추적해야하므로 list에 추가.
-		m_Current_TrackObjects.emplace_back(*iter);
+		m_Current_TrackObjects[iLayerLevelIndex].emplace_back(*iter);
 		Safe_AddRef(*iter);
 
 		(*iter)->OnMoved_ToObjectManager();
@@ -84,28 +95,41 @@ HRESULT CTrigger_Manager::Trigger_Check(_uint iLayerLevelIndex, CGameObject* pTa
 {
 	if (nullptr == pTarget ||
 		m_pPhases[iLayerLevelIndex].size() == 0 || 
-		m_iCurrentPhase >= m_pPhases[iLayerLevelIndex].size())
+		m_iCurrentPhase[iLayerLevelIndex] >= m_pPhases[iLayerLevelIndex].size())
 		return E_FAIL;
 	
 
-	const TRIGGER_MONSTER_DESC& triggerDesc = m_pPhases[iLayerLevelIndex][m_iCurrentPhase];
+	const TRIGGER_MONSTER_DESC& triggerDesc = m_pPhases[iLayerLevelIndex][m_iCurrentPhase[iLayerLevelIndex]];
 
 	// 1. 완료 조건 체크 먼저 수행
 
-	_bool IsTrackObjectDestroy = Check_Destroyed_TrackObjects();
+	_bool IsTrackObjectDestroy = Check_Destroyed_TrackObjects(iLayerLevelIndex);
 	_bool IsPlayerReachedZone = Check_Player_ReachedZone(triggerDesc.vTriggerPos, triggerDesc.fRadius);
 	
 	if (IsTrackObjectDestroy && IsPlayerReachedZone)
 	{
 		// 2. 현재 추적중인 객체들 제거.
-		Clear_TrackedObjects();
+		Clear_TrackedObjects(iLayerLevelIndex);
 
 		// 3. 객체들을 Object Manager에 추가.
 		Add_GameObject_ToObjectLayer(iLayerLevelIndex, triggerDesc.strTriggerLayer, triggerDesc.strObjectLayer, triggerDesc.iCount);
-		++m_iCurrentPhase;
+		++m_iCurrentPhase[iLayerLevelIndex];
 	}
 		
 	return S_OK;
+}
+
+_bool CTrigger_Manager::Trigger_Finished(_uint iLayerLevelIndex)
+{
+	// 0. 모든 트리거 객체들이 소멸처리되었으며
+	_bool IsTrackObjectDestroy = Check_Destroyed_TrackObjects(iLayerLevelIndex);
+
+	// 1. 마지막이라면?
+	if (IsTrackObjectDestroy && m_iCurrentPhase[iLayerLevelIndex] >= m_pPhases[iLayerLevelIndex].size())
+		return true;
+		
+
+	return false;
 }
 
 /* 매 프레임 트리거 체크. */
@@ -124,11 +148,15 @@ void CTrigger_Manager::Clear(_uint iLayerLevelIndex)
 	for (auto& Pair : m_pLayers[iLayerLevelIndex])
 		Safe_Release(Pair.second);
 
-	Clear_TrackedObjects();
+	// 해당 레벨의 데이터만 초기화
 	m_pLayers[iLayerLevelIndex].clear();
 	m_pPhases[iLayerLevelIndex].clear();
-	m_pPlayer = nullptr;
-	m_iCurrentPhase = 0;
+	
+	// 해당 레벨의 트리거 상태만 초기화
+	Clear_TrackedObjects(iLayerLevelIndex);
+	m_iCurrentPhase[iLayerLevelIndex] = 0;
+	
+	// m_pPlayer는 전역이므로 유지 (다른 레벨에서도 사용)
 }
 
 #pragma endregion
@@ -165,12 +193,15 @@ CTrigger_Manager* CTrigger_Manager::Create(_uint iNumLevels)
 #pragma region Trigger 완료 추적
 
 /* 처음에는 list에 아무런 객체들이 없을 것이므로 true 반환됨. */
-_bool CTrigger_Manager::Check_Destroyed_TrackObjects()
+_bool CTrigger_Manager::Check_Destroyed_TrackObjects(_uint iLevelIndex)
 {
+	if (iLevelIndex >= m_iNumLevels)
+		return true;
+		
 	_bool isDestroyed = true;
 		
 	/* 추적 중인 객체들이 제거되지 않았다면 */
-	for (auto& pGameObject : m_Current_TrackObjects)
+	for (auto& pGameObject : m_Current_TrackObjects[iLevelIndex])
 	{
 		if (!pGameObject->Is_Destroy())
 			isDestroyed = false;
@@ -180,12 +211,22 @@ _bool CTrigger_Manager::Check_Destroyed_TrackObjects()
 }
 
 /* 객체들 추적 제거. */
-void CTrigger_Manager::Clear_TrackedObjects()
+void CTrigger_Manager::Clear_TrackedObjects(_uint iLevelIndex)
 {
-	for (auto& pGameObject : m_Current_TrackObjects)
+	if (iLevelIndex >= m_iNumLevels)
+		return;
+		
+	for (auto& pGameObject : m_Current_TrackObjects[iLevelIndex])
 		Safe_Release(pGameObject);
 
-	m_Current_TrackObjects.clear();
+	m_Current_TrackObjects[iLevelIndex].clear();
+}
+
+/* 전역 Clear_TrackedObjects() - 호환성을 위해 유지 */
+void CTrigger_Manager::Clear_TrackedObjects()
+{
+	_uint iLevelIndex = m_pGameInstance->Get_CurrentLevelID();
+	Clear_TrackedObjects(iLevelIndex);
 }
 
 
@@ -217,4 +258,6 @@ void CTrigger_Manager::Free()
 	Safe_Release(m_pGameInstance);
 	Safe_Delete_Array(m_pLayers);
 	Safe_Delete_Array(m_pPhases);
+	Safe_Delete_Array(m_Current_TrackObjects);
+	Safe_Delete_Array(m_iCurrentPhase);
 }

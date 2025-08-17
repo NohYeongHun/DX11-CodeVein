@@ -83,9 +83,6 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11De
 	if (nullptr == m_pCamera_Manager)
 		return E_FAIL;
 
-
-		
-
 	return S_OK;
 }
 
@@ -149,7 +146,8 @@ HRESULT CGameInstance::Clear_Resources(_uint iClearLevelID)
 	m_pCamera_Manager->Clear(iClearLevelID); 
 
 	m_pPrototype_Manager->Clear(iClearLevelID);
-
+	m_pCollider_Manager->Clear(iClearLevelID);
+	m_pTrigger_Manager->Clear(iClearLevelID);
 	
 	
 
@@ -449,12 +447,12 @@ HRESULT CGameInstance::Render_Font(const _wstring& strFontTag, const _tchar* pTe
 #pragma endregion
 
 #pragma region COLLIDER_MANAGER
-HRESULT CGameInstance::Add_Collider_To_Manager(CCollider* pCollider)
+HRESULT CGameInstance::Add_Collider_To_Manager(CCollider* pCollider, _uint iLevelIndex)
 {
 	if (nullptr == m_pCollider_Manager)
 		return E_FAIL;
 
-	return m_pCollider_Manager->Add_Collider_To_Manager(pCollider);
+	return m_pCollider_Manager->Add_Collider_To_Manager(pCollider, iLevelIndex);
 }
 
 #pragma endregion
@@ -617,12 +615,26 @@ _bool CGameInstance::Is_In_Camera_Frustum(_vector vWorldPos) const
 #pragma region TRIGGER_MANAGER
 HRESULT CGameInstance::Add_GameObject_ToTrigger(_uint iLayerLevelIndex, const _wstring& strLayerTag, _uint iPrototypeLevelIndex, const _wstring& strPrototypeTag, void* pArg)
 {
+	if (nullptr == m_pTrigger_Manager)
+		return S_OK;
+
 	return m_pTrigger_Manager->Add_GameObject_ToTrigger(iLayerLevelIndex, strLayerTag, iPrototypeLevelIndex, strPrototypeTag, pArg);
 }
 
 HRESULT CGameInstance::Add_Trigger(_uint iLayerLevelIndex, const TRIGGER_MONSTER_DESC& triggerDesc)
 {
+	if (nullptr == m_pTrigger_Manager)
+		return S_OK;
+
 	return m_pTrigger_Manager->Add_Trigger(iLayerLevelIndex, triggerDesc);
+}
+
+_bool CGameInstance::Trigger_Finished(_uint iLayerLevelIndex)
+{
+	if (nullptr == m_pTrigger_Manager)
+		return false;
+
+	return m_pTrigger_Manager->Trigger_Finished(iLayerLevelIndex);
 }
 
 void CGameInstance::Set_TargetPlayer(CGameObject* pTargetPlayer)
@@ -653,7 +665,6 @@ void CGameInstance::Release_Engine()
 	Safe_Release(m_pLight_Manager);
 	Safe_Release(m_pPicking);
 	Safe_Release(m_pCamera_Manager);
-	
 
 
 	Safe_Release(m_pInput_Device);

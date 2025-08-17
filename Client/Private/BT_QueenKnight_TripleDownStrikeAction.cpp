@@ -27,10 +27,10 @@ BT_RESULT CBT_QueenKnight_TripleDownStrikeAction::Perform_Action(_float fTimeDel
     {
     case ATTACK_PHASE::NONE:
         return Enter_Attack(fTimeDelta);
-    case ATTACK_PHASE::READY:
-        return Update_Ready(fTimeDelta);
-    case ATTACK_PHASE::ASCEND:
-        return Update_Ascend(fTimeDelta);
+    //case ATTACK_PHASE::READY:
+    //    return Update_Ready(fTimeDelta);
+    //case ATTACK_PHASE::ASCEND:
+    //    return Update_Ascend(fTimeDelta);
     case ATTACK_PHASE::WAIT_TELEPORT:
         return Update_WaitTeleport(fTimeDelta);
     case ATTACK_PHASE::TELEPORT:
@@ -68,11 +68,23 @@ BT_RESULT CBT_QueenKnight_TripleDownStrikeAction::Enter_Attack(_float fTimeDelta
     }
 
     // 1. 다음 단계로 진행 => 플레이어 머리 위에서 내려찍는 거라. 회전이 굳이 필요는 없다?
-    m_eAttackPhase = ATTACK_PHASE::READY;
+    //m_eAttackPhase = ATTACK_PHASE::READY;
+    //m_eAttackPhase = ATTACK_PHASE::WAIT_TELEPORT;
+    m_eAttackPhase = ATTACK_PHASE::WAIT_TELEPORT;
 
     // 2. 애니메이션 전환.
-    _uint iNextAnimationIdx = m_pOwner->Find_AnimationIndex(L"DOWN_STRIKE");
+    /*_uint iNextAnimationIdx = m_pOwner->Find_AnimationIndex(L"DOWN_STRIKE");
+    m_pOwner->Change_Animation_Blend(iNextAnimationIdx, false, 0.1f, true, true, true);*/
+
+    _uint iNextAnimationIdx = m_pOwner->Find_AnimationIndex(L"IDLE");
     m_pOwner->Change_Animation_Blend(iNextAnimationIdx, false, 0.1f, true, true, true);
+
+    _vector vCenterPos = XMVectorSet(1.f, 2.f, 1.f, 1.f);
+    m_pOwner->Get_Transform()->Set_State(STATE::POSITION, vCenterPos);
+    
+    m_pOwner->NearCell_Translate();
+    
+    m_pOwner->Set_Visible(false);
 
     return BT_RESULT::RUNNING;
 }
@@ -91,7 +103,7 @@ BT_RESULT CBT_QueenKnight_TripleDownStrikeAction::Update_Ready(_float fTimeDelta
         m_pOwner->Change_Animation_Blend(iNextAnimationIdx, false, 0.1f, true, true, true);
 
         // 3. Navigation 끄기
-        m_pOwner->AddBuff(CMonster::BUFF_NAVIGATION_OFF, 10.f);
+        //m_pOwner->AddBuff(CMonster::BUFF_NAVIGATION_OFF, 10.f);
 
         // 4. 목표 위치 지정.
         _vector vOwnerPos = m_pOwner->Get_Transform()->Get_State(STATE::POSITION);
@@ -149,38 +161,14 @@ BT_RESULT CBT_QueenKnight_TripleDownStrikeAction::Update_WaitTeleport(_float fTi
 BT_RESULT CBT_QueenKnight_TripleDownStrikeAction::Update_Teleport(_float fTimeDelta)
 {
     // 1. 맵 중앙으로 이동 (1.f, 1.f, 1.f)
-    //m_pOwner->RotateTurn_ToTarget();
-
-    _vector vCenterPos = XMVectorSet(1.f, 2.f, 1.f, 1.f);
-    m_pOwner->Get_Transform()->Set_State(STATE::POSITION, vCenterPos);
-
-    // 4. 애니메이션 전환
+    // 1. 애니메이션 전환
     _uint iNextAnimationIdx = m_pOwner->Find_AnimationIndex(L"DOWN_STRIKE_SKILL");
     m_pOwner->Change_Animation_Blend(iNextAnimationIdx, false, 0.1f, true, true, true);
-    
 
-    // 2. Navigation 활성화
-    m_pOwner->RemoveBuff(CMonster::BUFF_NAVIGATION_OFF, true);
-    
-    m_pOwner->Compute_OnCell();
-
-    // 3. 맵 중앙으로 이동한 후 Visible 활성화
+    // 2. 맵 중앙으로 이동한 후 Visible 활성화
     m_pOwner->Set_Visible(true);
 
-    // 5. 플레이어 후방으로 이동할 목표 지점 계산
-    _vector vTargetPos = m_pOwner->Get_Target()->Get_Transform()->Get_State(STATE::POSITION);
-    _vector vTargetLook = m_pOwner->Get_Target()->Get_Transform()->Get_State(STATE::LOOK);
-
-    // Y값은 뺀 Look 값 구하기.
-    vTargetLook = XMVectorSetY(vTargetLook, 0.f);
-
-    
-
- 
-
-    
-
-    // 6. 다음 페이즈로 전환
+    // 3. 다음 페이즈로 전환
     m_eAttackPhase = ATTACK_PHASE::SKILL;
 
     return BT_RESULT::RUNNING;

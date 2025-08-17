@@ -134,6 +134,22 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 		CCollider::Create(m_pDevice, m_pContext, COLLIDER::SPHERE))))
 		return E_FAIL;
 
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
+		, TEXT("Prototype_Component_FadeOut_Texture")
+		, CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/FadeOut/FadeOut%d.png"), 1))))
+	{
+		CRASH("Failed Create FadeOut Texture")
+		return E_FAIL;
+	}
+		
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_FadeOut")
+	, CFade_Out::Create(m_pDevice, m_pContext))))
+	{
+		CRASH("Failed Create Fade Out");
+		return E_FAIL;
+	}
+
 	/* ==================================================== FSM ====================================================*/
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Fsm"),
 		CFsm::Create(m_pDevice, m_pContext))))
@@ -144,7 +160,7 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 		return E_FAIL;
 	
 	/* Model Load */
-	if (FAILED(Ready_Prototype_ForModel()))
+	if (FAILED(Ready_Prototype_ForPlayer()))
 		return E_FAIL;
 
 	if (FAILED(Ready_Prototype_HUD()))
@@ -194,25 +210,34 @@ HRESULT CMainApp::Ready_Prototype_ForUsageTexture()
 	return S_OK;
 }
 
-// 2. Model Prototype Static에 생성.
-HRESULT CMainApp::Ready_Prototype_ForModel()
+HRESULT CMainApp::Ready_Prototype_ForPlayer()
 {
+
 	_matrix		PreTransformMatrix = XMMatrixIdentity();
 
 	/* Prototype_Component_Model */
 	PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XM_PI);
-	
-	 
+
+
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
 		, TEXT("Prototype_Component_Model_Player")
 		, CLoad_Model::Create(m_pDevice, m_pContext, MODELTYPE::ANIM, PreTransformMatrix, "../../SaveFile/Model/Player/Player.dat", L"Player\\"))))
 		return E_FAIL;
 
- 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
 		, TEXT("Prototype_Component_Model_Sword")
 		, CLoad_Model::Create(m_pDevice, m_pContext, MODELTYPE::NONANIM, PreTransformMatrix, "../../SaveFile/Model/Player/Sword.dat", L""))))
 		return E_FAIL;
 
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
+		, TEXT("Prototype_GameObject_Weapon")
+		, CPlayerWeapon::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
+		, TEXT("Prototype_GameObject_Player")
+		, CPlayer::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
 
 	return S_OK;
 }

@@ -17,7 +17,11 @@ CLockOnUI::CLockOnUI(const CLockOnUI& Prototype)
 HRESULT CLockOnUI::Initialize_Prototype()
 {
     if (FAILED(CGameObject::Initialize_Prototype()))
+    {
+        CRASH("Failed Initialize Prototype LockOn UI");
         return E_FAIL;
+    }
+        
 
     return S_OK;
 }
@@ -31,7 +35,7 @@ HRESULT CLockOnUI::Initialize_Clone(void* pArg)
         CRASH("Failed Clone LockOn UI");
         return E_FAIL;
     }
-        
+    m_eCurLevel = pDesc->eCurLevel;
 
     // 화면 크기 가져오기
     RECT rcClient;

@@ -26,7 +26,7 @@ BT_RESULT CBT_Monster_DeadAction::Perform_Action(_float fTimeDelta)
 
 void CBT_Monster_DeadAction::Reset()
 {
-
+    
 }
 
 BT_RESULT CBT_Monster_DeadAction::EnterDead()

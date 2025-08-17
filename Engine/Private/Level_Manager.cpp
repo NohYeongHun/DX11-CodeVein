@@ -1,8 +1,4 @@
-﻿#include "Level_Manager.h"
-#include "GameInstance.h"
-
-#include "Level.h"
-
+﻿
 CLevel_Manager::CLevel_Manager()
 	: m_pGameInstance { CGameInstance::GetInstance() }
 {
@@ -14,7 +10,11 @@ HRESULT CLevel_Manager::Open_Level(_uint iLevelID, CLevel* pNewLevel)
 {
 	/* 기존레벨용 자원을 파괴한다. */
 	if (FAILED(Clear_Resources()))
+	{
+		CRASH("Failed Clear_Resource");
 		return E_FAIL;
+	}
+		
 
 	if (0 != Safe_Release(m_pCurrentLevel))
 		MSG_BOX(TEXT("Failed to Change Level"));	

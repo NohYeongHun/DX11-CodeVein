@@ -120,6 +120,7 @@ BT_RESULT CBT_QueenKnight_DashAttackAction::Update_Dodge(_float fTimeDelta)
 
         m_pOwner->Change_Animation_Blend(iNextAnimationIdx, false, 0.2f, true, true, true);
 
+
         // 2. 콜라이더 상태 초기화
         m_pOwner->Reset_Collider_ActiveInfo();
 

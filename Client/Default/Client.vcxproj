@@ -193,6 +193,7 @@
     <ClInclude Include="..\Public\ClientPch.h" />
     <ClInclude Include="..\Public\Client_Debug.h" />
     <ClInclude Include="..\Public\Client_Defines.h" />
+    <ClInclude Include="..\Public\Fade_Out.h" />
     <ClInclude Include="..\Public\HPBar.h" />
     <ClInclude Include="..\Public\HUD.h" />
     <ClInclude Include="..\Public\imconfig.h" />
@@ -218,10 +219,12 @@
     <ClInclude Include="..\Public\Level_GamePlay.h" />
     <ClInclude Include="..\Public\Level_Loading.h" />
     <ClInclude Include="..\Public\Level_Logo.h" />
+    <ClInclude Include="..\Public\Level_StageOne.h" />
     <ClInclude Include="..\Public\Loader.h" />
     <ClInclude Include="..\Public\Loader_GamePlay.h" />
     <ClInclude Include="..\Public\Loader_Logo.h" />
     <ClInclude Include="..\Public\Loader_Personal.h" />
+    <ClInclude Include="..\Public\Loader_StageOne.h" />
     <ClInclude Include="..\Public\Loading_BackGround.h" />
     <ClInclude Include="..\Public\Loading_Panel.h" />
     <ClInclude Include="..\Public\Loading_Slot.h" />
@@ -312,6 +315,7 @@
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ClientPch.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ClientPch.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
     </ClCompile>
+    <ClCompile Include="..\Private\Fade_Out.cpp" />
     <ClCompile Include="..\Private\HPBar.cpp" />
     <ClCompile Include="..\Private\HUD.cpp" />
     <ClCompile Include="..\Private\imgui.cpp" />
@@ -335,10 +339,12 @@
     <ClCompile Include="..\Private\Level_GamePlay.cpp" />
     <ClCompile Include="..\Private\Level_Loading.cpp" />
     <ClCompile Include="..\Private\Level_Logo.cpp" />
+    <ClCompile Include="..\Private\Level_StageOne.cpp" />
     <ClCompile Include="..\Private\Loader.cpp" />
     <ClCompile Include="..\Private\Loader_GamePlay.cpp" />
     <ClCompile Include="..\Private\Loader_Logo.cpp" />
     <ClCompile Include="..\Private\Loader_Personal.cpp" />
+    <ClCompile Include="..\Private\Loader_StageOne.cpp" />
     <ClCompile Include="..\Private\Loading_BackGround.cpp" />
     <ClCompile Include="..\Private\Loading_Panel.cpp" />
     <ClCompile Include="..\Private\Loading_Slot.cpp" />

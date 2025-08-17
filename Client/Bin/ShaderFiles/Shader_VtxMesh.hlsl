@@ -98,6 +98,7 @@ PS_OUT PS_MAIN(PS_IN In)
                     (g_vLightSpecular * g_vMtrlSpecular) * fSpecular;
     
     
+    
     return Out;
 }
 
@@ -107,8 +108,20 @@ PS_OUT PS_MAIN2(PS_IN In)
     PS_OUT Out = (PS_OUT) 0;
     
     
-    Out.vColor = float4(In.vTexcoord, 0.f, 1.f);
+    vector vMtrlDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
     
+    float fShade = max(dot(normalize(g_vLightDir) * -1.f, normalize(In.vNormal)), 0.f);
+    
+    /*슬라이딩 이야기했다*/
+    vector vReflect = reflect(normalize(g_vLightDir), normalize(In.vNormal));
+    vector vLook = In.vWorldPos - g_vCamPosition;
+    
+    float fSpecular = pow(max(dot(normalize(vLook) * -1.f, normalize(vReflect)), 0.f), 50.0f);
+    
+    Out.vColor = (g_vLightDiffuse * vMtrlDiffuse) * saturate(fShade + (g_vLightAmbient * g_vMtrlAmbient)) +
+                    (g_vLightSpecular * g_vMtrlSpecular) * fSpecular;
+    
+    Out.vColor = float4(Out.vColor.rgb, 1.0f);
     
     return Out;
 }

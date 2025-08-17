@@ -22,6 +22,7 @@ HRESULT CSlaveVampire::Initialize_Clone(void* pArg)
 {
 
     SLAVE_VAMPIRE_DSEC* pDesc = static_cast<SLAVE_VAMPIRE_DSEC*>(pArg);
+    m_eCurLevel = pDesc->eCurLevel;
 
     if (FAILED(CMonster::Initialize_Clone(pDesc)))
     {
@@ -384,7 +385,7 @@ HRESULT CSlaveVampire::Ready_Components(SLAVE_VAMPIRE_DSEC* pDesc)
         return E_FAIL;
     }
 
-    m_pGameInstance->Add_Collider_To_Manager(m_pColliderCom);
+    m_pGameInstance->Add_Collider_To_Manager(m_pColliderCom, ENUM_CLASS(m_eCurLevel));
 
     return S_OK;
 }

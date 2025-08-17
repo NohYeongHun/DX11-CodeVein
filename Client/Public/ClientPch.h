@@ -12,6 +12,8 @@
 
 #pragma region LOADER
 #include "Loader_Logo.h"
+#include "Loader_Personal.h"
+#include "Loader_StageOne.h"
 #include "Loader_GamePlay.h"
 #include "Loader.h"
 #pragma endregion
@@ -19,6 +21,7 @@
 #pragma region LEVEL
 #include "Level_Loading.h"
 #include "Level_Logo.h"
+#include "Level_StageOne.h"
 #include "Level_GamePlay.h"
 #pragma endregion
 
@@ -48,6 +51,7 @@
 #include "StatusPanel.h"
 #include "LockOnUI.h"
 
+
 /* ======================================= Inventory =================================== */
 #include "Inventory.h"
 #include "Inventory_Panel.h"
@@ -67,6 +71,7 @@
 
 
 /* ======================================= Loading Object =================================== */
+#include "Fade_Out.h"
 #include "Loading_BackGround.h"
 #include "Loading_Panel.h"
 #include "Loading_Slot.h"

@@ -151,7 +151,7 @@ HRESULT CToolMap_Part::Render()
         m_pModelCom->Bind_Materials(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE, 0);
         
 
-        if (FAILED(m_pShaderCom->Begin(1)))
+        if (FAILED(m_pShaderCom->Begin(0)))
         {
             CRASH("Failed Begin Failed");
             return E_FAIL;

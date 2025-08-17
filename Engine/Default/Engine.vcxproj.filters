@@ -199,6 +199,9 @@
     <Filter Include="01. Utility\11. Trigger">
       <UniqueIdentifier>{f69af1e9-9375-462a-9135-0e63498a2973}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01. Utility\12. PlayerData">
+      <UniqueIdentifier>{94bb1a37-cc6a-4afc-972b-7ede930059aa}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Timer.cpp">

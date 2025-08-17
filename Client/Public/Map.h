@@ -7,6 +7,7 @@ class CMap final : public CGameObject
 public:
 	typedef struct tagMapDesc : public CGameObject::GAMEOBJECT_DESC
 	{
+		LEVEL eCurLevel = LEVEL::END;
 		const _tchar* PrototypeTag;
 		_float3 vScale;
 	}MAP_DESC;
@@ -36,6 +37,7 @@ private:
 	class CLoad_Model* m_pModelCom = { nullptr };
 	class CShader* m_pShaderCom = { nullptr };
 	class CNavigation* m_pNavigationCom = { nullptr };
+	LEVEL m_eCurLevel = { LEVEL::END };
 
 private:
 	HRESULT Ready_Components(MAP_DESC* pDesc);

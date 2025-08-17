@@ -23,6 +23,7 @@ HRESULT CQueenKnight::Initialize_Prototype()
 HRESULT CQueenKnight::Initialize_Clone(void* pArg)
 {
     QUEENKNIGHT_DESC* pDesc = static_cast<QUEENKNIGHT_DESC*>(pArg);
+    m_eCurLevel = pDesc->eCurLevel;
 
     if (FAILED(CMonster::Initialize_Clone(pDesc)))
     {
@@ -95,6 +96,8 @@ HRESULT CQueenKnight::Initialize_Clone(void* pArg)
 
     /* 현재 Object Manager에 담기 전에는 모든 Collider를 충돌 비교 하지 않습니다. */
     Collider_All_Active(false);
+
+	m_pModelCom->Set_Animation(m_Action_AnimMap[TEXT("IDLE")], true); // 초기 애니메이션은 IDLE로 설정.
 
     return S_OK;
 }
@@ -438,7 +441,7 @@ HRESULT CQueenKnight::InitializeAction_ToAnimationMap()
 #pragma region COllider 활성화 프레임 관리
     // 100 ~ 136 Frame 활성화
     Add_Collider_Frame(m_Action_AnimMap[TEXT("DASH_ATTACK_START")], 100.f / 136.f, 136.f / 136.f, PART_WEAPON);     // Dash Attack
-    Add_Collider_Frame(m_Action_AnimMap[TEXT("DASH_ATTACK_END")], 0.f / 130.f, 20.f / 130.f, PART_WEAPON);     // Dash Attack
+    Add_Collider_Frame(m_Action_AnimMap[TEXT("DASH_ATTACK_END")], 0.f / 130.f, 60.f / 130.f, PART_WEAPON);     // Dash Attack
 
     // 공격 프레임 60 ~ 100프레임.1
     Add_Collider_Frame(m_Action_AnimMap[TEXT("DOWN_STRIKE")], 60.f / 224.f, 85.f / 224.f, PART_WEAPON);     // Dash Attack
@@ -495,6 +498,9 @@ void CQueenKnight::Enable_Collider(_uint iType)
     case PART_SHIELD:
         m_pShield->Activate_Collider();
         break;
+    case PART_BODY:
+        m_pColliderCom->Set_Active(true);
+        break;
     default:
         break;
     }
@@ -509,6 +515,9 @@ void CQueenKnight::Disable_Collider(_uint iType)
         break;
     case PART_SHIELD:
         m_pShield->Deactivate_Collider();
+        break;
+    case PART_BODY:
+        m_pColliderCom->Set_Active(false);
         break;
     default:
         break;
@@ -625,7 +634,7 @@ HRESULT CQueenKnight::Ready_Colliders(QUEENKNIGHT_DESC* pDesc)
     }
 
     /* 생성과 동시에 등록 */
-    m_pGameInstance->Add_Collider_To_Manager(m_pColliderCom);
+    m_pGameInstance->Add_Collider_To_Manager(m_pColliderCom, ENUM_CLASS(m_eCurLevel));
 
 
     return S_OK;

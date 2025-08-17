@@ -22,6 +22,7 @@ public:
 
 private:
 	_bool m_IsLogoEnd = { false };
+	LEVEL m_eCurLevel = { LEVEL::LOGO };
 	vector<pair<EventType, uint32_t>> m_Events = {};
 
 private:

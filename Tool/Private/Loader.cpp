@@ -124,7 +124,7 @@ HRESULT CLoader::Loading_For_Logo_Level()
 
 #pragma region MAP PART
 // Map Prototype 생성.
-	PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f);
+	PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XM_PI);
 
 	for (_uint i = 0; i < Model_PrototypeSize; ++i)
 	{

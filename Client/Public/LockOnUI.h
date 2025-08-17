@@ -7,12 +7,14 @@ class CLockOnUI final : public CGameObject
 public:
     typedef struct tagLockOnUIDesc : public CGameObject::GAMEOBJECT_DESC
     {
+        LEVEL eCurLevel = { LEVEL::END };
         _float fX = 0.f;
         _float fY = 0.f;
         _float fSizeX = 64.f;
         _float fSizeY = 64.f;
         class CGameObject* pTarget = { nullptr };
         _float fTargetRadius = 1.0f;    // 타겟의 반지름 (크기 조정용)
+
     }LOCKONUI_DESC;
 
 private:
@@ -48,6 +50,7 @@ private:
     class CTexture* m_pTextureCom = { nullptr };
     class CVIBuffer_Rect* m_pVIBufferCom = { nullptr };
     
+    LEVEL m_eCurLevel = { LEVEL::END };
     // LockOn 관련
     CGameObject* m_pTarget = { nullptr };
     _float m_fTargetRadius = 1.0f;

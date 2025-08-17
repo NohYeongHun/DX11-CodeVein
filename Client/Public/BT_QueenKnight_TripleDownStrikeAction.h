@@ -47,7 +47,7 @@ private:
 
     // 텔레포트 대기 시간
     _float m_fWaitTime = { 0.f };
-    _float m_fMaxWaitTime = { 1.0f }; // 2초 대기
+    _float m_fMaxWaitTime = { 1.5f }; // 2초 대기
 
 public:
     explicit CBT_QueenKnight_TripleDownStrikeAction(class CQueenKnight* pOwner);

@@ -1,14 +1,9 @@
-﻿HRESULT CLoader_GamePlay::Loading_Resource(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
+﻿HRESULT CLoader_StageOne::Loading_Resource(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
 {
-	if (FAILED(Add_Prototype_Terrain(pDevice, pContext, pGameInstance)))
-	{
-		MSG_BOX(TEXT("Create Failed Loading : GamePlay Terrain "));
-		return E_FAIL;
-	}
 
 	if (FAILED(Add_Prototype_Map(pDevice, pContext, pGameInstance)))
 	{
-		MSG_BOX(TEXT("Create Failed Loading : GamePlay Map "));
+		MSG_BOX(TEXT("Create Failed Loading : StageOne Map "));
 		return E_FAIL;
 	}
 
@@ -16,7 +11,7 @@
 	if (FAILED(Add_Prototype_Navigation(pDevice, pContext, pGameInstance)))
 	{
 		CRASH("Create Navigation Failed");
-		MSG_BOX(TEXT("Create Failed Loading : GamePlay Navigation"));
+		MSG_BOX(TEXT("Create Failed Loading : StageOne Navigation"));
 		return E_FAIL;
 	}
 
@@ -24,76 +19,62 @@
 	if (FAILED(Add_Prototype_Camera_Free(pDevice, pContext, pGameInstance)))
 	{
 		CRASH("Create Camera Free Failed");
-		MSG_BOX(TEXT("Create Failed Loading : GamePlay Camera_Free "));
+		MSG_BOX(TEXT("Create Failed Loading : StageOne Camera_Free "));
 		return E_FAIL;
 	}
 
 	if (FAILED(Add_Prototype_Camera_Player(pDevice, pContext, pGameInstance)))
 	{
 		CRASH("Create Camera Player Failed");
-		MSG_BOX(TEXT("Create Failed Loading : GamePlay Camera_Player "));
+		MSG_BOX(TEXT("Create Failed Loading : StageOne Camera_Player "));
 		return E_FAIL;
 	}
 
 	if (FAILED(Add_Prototype_Player(pDevice, pContext, pGameInstance)))
 	{
 		CRASH("Create Player Failed");
-		MSG_BOX(TEXT("Create Failed Loading : GamePlay Player "));
-		return E_FAIL;
-	}
-
-	if (FAILED(Add_Prototype_SkyBoss(pDevice, pContext, pGameInstance)))
-	{
-		CRASH("Create SkyBoss Failed");
-		MSG_BOX(TEXT("Create Failed Loading : GamePlay SkyBoss "));
+		MSG_BOX(TEXT("Create Failed Loading : StageOne Player "));
 		return E_FAIL;
 	}
 
 	if (FAILED(Add_Prototype_QueenKnight(pDevice, pContext, pGameInstance)))
 	{
 		CRASH("Create SkyBoss Failed");
-		MSG_BOX(TEXT("Create Failed Loading : GamePlay QueenKnight "));
+		MSG_BOX(TEXT("Create Failed Loading : StageOne QueenKnight "));
 		return E_FAIL;
 	}
 
 	if (FAILED(Add_Prototype_WolfDevil(pDevice, pContext, pGameInstance)))
 	{
 		CRASH("Create WolfDevil Failed");
-		MSG_BOX(TEXT("Create Failed Loading : GamePlay WolfDevil "));
+		MSG_BOX(TEXT("Create Failed Loading : StageOne WolfDevil "));
 		return E_FAIL;
 	}
 
 	if (FAILED(Add_Prototype_SlaveVampire(pDevice, pContext, pGameInstance)))
 	{
 		CRASH("Create SlaveVampire Failed");
-		MSG_BOX(TEXT("Create Failed Loading : GamePlay SlaveVampire "));
+		MSG_BOX(TEXT("Create Failed Loading : StageOne SlaveVampire "));
 		return E_FAIL;
 	}
 
 	if (FAILED(Add_Prototype_SkyBox(pDevice, pContext, pGameInstance)))
 	{
 		CRASH("Create SkyBox Failed");
-		MSG_BOX(TEXT("Create Failed Loading : GamePlay SkyBox "));
+		MSG_BOX(TEXT("Create Failed Loading : StageOne SkyBox "));
 		return E_FAIL;
 	}
 
-	if (FAILED(Add_Prototype_UI(pDevice, pContext, pGameInstance)))
-	{
-		CRASH("Create UI Failed");
-		MSG_BOX(TEXT("Create Failed Loading : GamePlay UI "));
-		return E_FAIL;
-	}
 
-	
 	return S_OK;
 }
 
 // 1. Game 에서 사용할 Model.
-HRESULT CLoader_GamePlay::Add_Prototype_Map(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
+HRESULT CLoader_StageOne::Add_Prototype_Map(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
 {
 	_matrix		PreTransformMatrix = XMMatrixIdentity();
 
-	PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f);
+  	PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f);
 
 	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level)
 		, TEXT("Prototype_Component_Model_BossStage")
@@ -108,16 +89,8 @@ HRESULT CLoader_GamePlay::Add_Prototype_Map(ID3D11Device* pDevice, ID3D11DeviceC
 	return S_OK;
 }
 
-HRESULT CLoader_GamePlay::Add_Prototype_Navigation(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
+HRESULT CLoader_StageOne::Add_Prototype_Navigation(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
 {
-	/* Prototype_Component_Navigation */
-	/*if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level), TEXT("Prototype_Component_Navigation"),
-		CNavigation::Create(pDevice, pContext, TEXT("../Bin/DataFiles/Navigation.dat")))))
-	{
-		CRASH("Failed Load Navigation File");
-		return E_FAIL;
-	}*/
-
 	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level), TEXT("Prototype_Component_Navigation"),
 		CNavigation::Create(pDevice, pContext, "../../SaveFile/Navigation/BossStage.nav"))))
 	{
@@ -131,50 +104,19 @@ HRESULT CLoader_GamePlay::Add_Prototype_Navigation(ID3D11Device* pDevice, ID3D11
 
 
 // 1.
-HRESULT CLoader_GamePlay::Add_Prototype_Player(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
+HRESULT CLoader_StageOne::Add_Prototype_Player(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
 {
-	// Player Prototype 생성.
-	/*if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level)
-		, TEXT("Prototype_GameObject_Player_Body")
-		, CPlayer_Body::Create(pDevice, pContext))))
-		return E_FAIL;*/
 
-	
-
-	
 
 	return S_OK;
 }
 
-HRESULT CLoader_GamePlay::Add_Prototype_SkyBoss(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
+
+HRESULT CLoader_StageOne::Add_Prototype_QueenKnight(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
 {
 	_matrix		PreTransformMatrix = XMMatrixIdentity();
 	PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XM_PI);
 
-	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level)
-		, TEXT("Prototype_Component_Model_SkyBoss")
-		, CLoad_Model::Create(pDevice, pContext, MODELTYPE::ANIM, PreTransformMatrix, "../../SaveFile/Model/Boss/SkyBoss.dat", L""))))
-		return E_FAIL;
-
-
-	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level)
-		, TEXT("Prototype_GameObject_SkyBoss")
-		, CSkyBoss::Create(pDevice, pContext))))
-		return E_FAIL;
-
-	/*if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level)
-		, TEXT("Prototype_Component_SkyBossTree")
-		, CSKyBossTree::Create(pDevice, pContext))))
-		return E_FAIL;*/
-
-	return S_OK;
-}
-
-HRESULT CLoader_GamePlay::Add_Prototype_QueenKnight(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
-{
-	_matrix		PreTransformMatrix = XMMatrixIdentity();
-	PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XM_PI);
-	
 	// 방패
 	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level)
 		, TEXT("Prototype_Component_Model_GodChildShield")
@@ -186,9 +128,9 @@ HRESULT CLoader_GamePlay::Add_Prototype_QueenKnight(ID3D11Device* pDevice, ID3D1
 		, CKnightShield::Create(pDevice, pContext))))
 	{
 		CRASH("Failed Create QueenKnight Shield")
-		return E_FAIL;
+			return E_FAIL;
 	}
-		
+
 
 	// 무기
 	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level)
@@ -217,7 +159,7 @@ HRESULT CLoader_GamePlay::Add_Prototype_QueenKnight(ID3D11Device* pDevice, ID3D1
 	return S_OK;
 }
 
-HRESULT CLoader_GamePlay::Add_Prototype_WolfDevil(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
+HRESULT CLoader_StageOne::Add_Prototype_WolfDevil(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
 {
 	_matrix		PreTransformMatrix = XMMatrixIdentity();
 	PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XM_PI);
@@ -241,7 +183,7 @@ HRESULT CLoader_GamePlay::Add_Prototype_WolfDevil(ID3D11Device* pDevice, ID3D11D
 	return S_OK;
 }
 
-HRESULT CLoader_GamePlay::Add_Prototype_SlaveVampire(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
+HRESULT CLoader_StageOne::Add_Prototype_SlaveVampire(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
 {
 
 	_matrix		PreTransformMatrix = XMMatrixIdentity();
@@ -262,7 +204,7 @@ HRESULT CLoader_GamePlay::Add_Prototype_SlaveVampire(ID3D11Device* pDevice, ID3D
 
 	PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f);
 	// 무기
- 	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level)
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level)
 		, TEXT("Prototype_Component_Model_SlaveVampireGreatSword")
 		, CLoad_Model::Create(pDevice, pContext, MODELTYPE::ANIM, PreTransformMatrix, "../../SaveFile/Model/Weapon/SlaveGreatSword.dat", L""))))
 		return E_FAIL;
@@ -282,27 +224,7 @@ HRESULT CLoader_GamePlay::Add_Prototype_SlaveVampire(ID3D11Device* pDevice, ID3D
 }
 
 
-
-HRESULT CLoader_GamePlay::Add_Prototype_Terrain(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
-{
-	// Terrain 용도 텍스쳐.
-	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level), TEXT("Prototype_Component_Texture_Terrain"),
-		CTexture::Create(pDevice, pContext, TEXT("../Bin/Resources/Textures/Terrain/Tile%d.dds"), 1))))
-		return E_FAIL;
-
-	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level), TEXT("Prototype_Component_VIBuffer_Terrain"),
-		CVIBuffer_Terrain::Create(pDevice, pContext, TEXT("../Bin/Resources/Textures/Terrain/Height1.bmp")))))
-		return E_FAIL;
-
-	// Terrain 생성.
-	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level), TEXT("Prototype_GameObject_Terrain"),
-		CTerrain::Create(pDevice, pContext))))
-		return E_FAIL;
-
-	return S_OK;
-}
-
-HRESULT CLoader_GamePlay::Add_Prototype_Camera_Free(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
+HRESULT CLoader_StageOne::Add_Prototype_Camera_Free(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
 {
 	// Free 시점 카메라 생성.
 	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level), TEXT("Prototype_GameObject_Camera_Free"),
@@ -313,40 +235,12 @@ HRESULT CLoader_GamePlay::Add_Prototype_Camera_Free(ID3D11Device* pDevice, ID3D1
 }
 
 /* Camera Player Create */
-HRESULT CLoader_GamePlay::Add_Prototype_Camera_Player(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
+HRESULT CLoader_StageOne::Add_Prototype_Camera_Player(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
 {
 	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level), TEXT("Prototype_GameObject_Camera_Player"),
 		CCamera_Player::Create(pDevice, pContext))))
-		return E_FAIL;
-
-	return S_OK;
-}
-
-
-HRESULT CLoader_GamePlay::Add_Prototype_SkyBox(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
-{
-	/* Prototype_Component_Texture_Sky */
-	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level), TEXT("Prototype_Component_Texture_Sky"),
-		CTexture::Create(pDevice, pContext, TEXT("../Bin/Resources/Textures/SkyBox/Sky_%d.dds"), 6))))
-		return E_FAIL;
-
-	//if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level), TEXT("Prototype_Component_Texture_Sky"),
-	//	CTexture::Create(pDevice, pContext, TEXT("../Bin/Resources/Textures/SkyBox/SkyStar%d.dds"), 1))))
-	//	return E_FAIL;
-
-	_matrix PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f);
-	// SkySphere
-	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level)
-		, TEXT("Prototype_Component_Model_SkySphere")
-		, CLoad_Model::Create(pDevice, pContext, MODELTYPE::ANIM, PreTransformMatrix, "../../SaveFile/Model/Sky/SkySphere.dat", L""))))
-		return E_FAIL;
-
-
-	/* Prototype_GameObject_Sky */
-	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Sky"),
-		CSky::Create(pDevice, pContext))))
 	{
-		CRASH("Sky Box Create Failed");
+		CRASH("Ready Failed Camera Player");
 		return E_FAIL;
 	}
 		
@@ -354,10 +248,39 @@ HRESULT CLoader_GamePlay::Add_Prototype_SkyBox(ID3D11Device* pDevice, ID3D11Devi
 	return S_OK;
 }
 
-HRESULT CLoader_GamePlay::Add_Prototype_UI(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
+
+HRESULT CLoader_StageOne::Add_Prototype_SkyBox(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
 {
-	
+	/* Prototype_Component_Texture_Sky */
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level), TEXT("Prototype_Component_Texture_Sky"),
+		CTexture::Create(pDevice, pContext, TEXT("../Bin/Resources/Textures/SkyBox/Sky_%d.dds"), 6))))
+	{
+		CRASH("Failed Create SkyTexture");
+		return E_FAIL;
+	}
+		
+
+	_matrix PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f);
+	// SkySphere
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level)
+		, TEXT("Prototype_Component_Model_SkySphere")
+		, CLoad_Model::Create(pDevice, pContext, MODELTYPE::ANIM, PreTransformMatrix, "../../SaveFile/Model/Sky/SkySphere.dat", L""))))
+	{
+		CRASH("Failed Create SkySphere Prototype");
+		return E_FAIL;
+	}
+		
+
+
+	/* Prototype_GameObject_Sky */
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level), TEXT("Prototype_GameObject_Sky"),
+		CSky::Create(pDevice, pContext))))
+	{
+		CRASH("Sky Box Create Failed");
+		return E_FAIL;
+	}
+
+
 	return S_OK;
 }
-
 

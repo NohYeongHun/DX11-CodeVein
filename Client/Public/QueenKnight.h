@@ -9,6 +9,7 @@ public:
 	{
 		PART_WEAPON = 0,
 		PART_SHIELD = 1,
+		PART_BODY = 2,
 		PART_END
 	};
 
@@ -126,11 +127,7 @@ public:
 
 #pragma region 8. 렌더링 제어
 public:
-	void Set_Visible(_bool bVisible);
-	_bool Is_Visible() const { return m_bVisible; }
-
-private:
-	_bool m_bVisible = { true };  // 기본적으로 보이는 상태
+	virtual void Set_Visible(_bool bVisible) override ;
 #pragma endregion
 
 #pragma region 0. 기본 함수들 정의

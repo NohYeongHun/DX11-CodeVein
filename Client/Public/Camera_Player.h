@@ -8,6 +8,7 @@ public:
 	{
 		_float fMouseSensor{};
 		class CPlayer* pTarget = {};
+		LEVEL eCurLevel = LEVEL::END; // 현재 레벨 정보
 	}CAMERA_PLAYER_DESC;
 
 private:
@@ -39,6 +40,7 @@ private:
 	void Update_Mouse_Clip();
 
 private:
+	LEVEL m_eCurLevel = LEVEL::END; // 현재 레벨 정보
 	class CPlayer* m_pTarget = {};
 	_float m_fMouseSensor = {};
 	_float4 m_vTargetOffset = {};

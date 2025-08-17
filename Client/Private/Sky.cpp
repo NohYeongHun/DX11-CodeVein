@@ -18,11 +18,25 @@ HRESULT CSky::Initialize_Prototype()
 
 HRESULT CSky::Initialize_Clone(void* pArg)
 {
+
+    SKY_DESC* pDesc = static_cast<SKY_DESC*>(pArg);
+    m_eCurLevel = pDesc->eCurLevel;
+
     if (FAILED(CGameObject::Initialize_Clone(pArg)))
+    {
+		CRASH("Failed Init GameObject")
         return E_FAIL;
+    }
+        
 
     if (FAILED(Ready_Components()))
+    {
+        CRASH("Failed Ready_Components");
         return E_FAIL;
+    }
+        
+
+    //m_pTransformCom->Set_Scale({ 5.f, 5.f, 5.f });
 
     return S_OK;
 }
@@ -48,14 +62,33 @@ void CSky::Late_Update(_float fTimeDelta)
 HRESULT CSky::Render()
 {
     if (FAILED(Bind_ShaderResources()))
+    {
+        CRASH("Failed Bind Shader Resources");
         return E_FAIL;
+    }
+        
 
-    //m_pShaderCom->Begin(0);
-    //m_pShaderCom->Begin(1);
+    if (FAILED(m_pShaderCom->Begin(0)))
+    {
+        CRASH("Failed Begin Shader Resources");
+        return E_FAIL;
+    }
+    
+    if (FAILED(m_pVIBufferCom->Bind_Resources()))
+    {
+        CRASH("Failed Bind_Resources");
+        return E_FAIL;
+    }
 
-    //m_pVIBufferCom->Bind_Resources();
+   
+    if (FAILED(m_pVIBufferCom->Render()))
+    {
+        CRASH("Failed VIBuffer Render");
+        return E_FAIL;
+    }
 
-    _uint iNumMeshes = m_pModelCom->Get_NumMeshes();
+#pragma region MODEL
+   /* _uint iNumMeshes = m_pModelCom->Get_NumMeshes();
     for (_uint i = 0; i < iNumMeshes; i++)
     {
         m_pModelCom->Bind_Materials(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE, 0);
@@ -73,32 +106,45 @@ HRESULT CSky::Render()
             return E_FAIL;
         }
 
-    }
+    }*/
+#pragma endregion
 
 
-    //m_pVIBufferCom->Render();
+  
+
+
+    
 
     return S_OK;
 }
 
 HRESULT CSky::Ready_Components()
 {
-    /*if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxCube"),
+    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxCube"),
         TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom), nullptr)))
-        return E_FAIL;*/
-
-    //if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_VIBuffer_Cube"),
-    //    TEXT("Com_VIBuffer"), reinterpret_cast<CComponent**>(&m_pVIBufferCom), nullptr)))
-    //    return E_FAIL;
-
-    /*if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_Component_Texture_Sky"),
-        TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom), nullptr)))
-        return E_FAIL;*/
-
-
-    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxMesh"),
-        TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom), nullptr)))
+    {
+		CRASH("Failed Add Shader Component");
         return E_FAIL;
+    }
+        
+
+    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_VIBuffer_Cube"),
+        TEXT("Com_VIBuffer"), reinterpret_cast<CComponent**>(&m_pVIBufferCom), nullptr)))
+    {
+        CRASH("Failed Add Com_VIBuffer");
+        return E_FAIL;
+    }
+     
+
+    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(m_eCurLevel), TEXT("Prototype_Component_Texture_Sky"),
+        TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom), nullptr)))
+        return E_FAIL;
+
+
+#pragma region MODEL
+   /* if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxMesh"),
+    TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom), nullptr)))
+    return E_FAIL;
 
 
     CLoad_Model::LOADMODEL_DESC Desc{};
@@ -110,7 +156,10 @@ HRESULT CSky::Ready_Components()
     {
         CRASH("Failed Load SkySphere");
         return E_FAIL;
-    }
+    }*/
+
+#pragma endregion
+
         
 
 
@@ -120,7 +169,10 @@ HRESULT CSky::Ready_Components()
 
 HRESULT CSky::Bind_ShaderResources()
 {
-    if (FAILED(m_pTransformCom->Bind_Shader_Resource(m_pShaderCom, "g_WorldMatrix")))
+   
+
+#pragma region MODEL
+    /*if (FAILED(m_pTransformCom->Bind_Shader_Resource(m_pShaderCom, "g_WorldMatrix")))
         return E_FAIL;
 
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance->Get_Transform_Float4x4(D3DTS::VIEW))))
@@ -128,7 +180,6 @@ HRESULT CSky::Bind_ShaderResources()
 
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_Transform_Float4x4(D3DTS::PROJ))))
         return E_FAIL;
-
     const LIGHT_DESC* pLightDesc = m_pGameInstance->Get_LightDesc(0);
     if (nullptr == pLightDesc)
         return E_FAIL;
@@ -146,9 +197,12 @@ HRESULT CSky::Bind_ShaderResources()
         return E_FAIL;
 
     if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
-        return E_FAIL;
+        return E_FAIL;*/
+#pragma endregion
 
-    /*if (FAILED(m_pTransformCom->Bind_Shader_Resource(m_pShaderCom, "g_WorldMatrix")))
+   
+
+    if (FAILED(m_pTransformCom->Bind_Shader_Resource(m_pShaderCom, "g_WorldMatrix")))
         return E_FAIL;
 
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance->Get_Transform_Float4x4(D3DTS::VIEW))))
@@ -157,8 +211,8 @@ HRESULT CSky::Bind_ShaderResources()
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_Transform_Float4x4(D3DTS::PROJ))))
         return E_FAIL;
 
-    if (FAILED(m_pTextureCom->Bind_Shader_Resource(m_pShaderCom, "g_Texture", 0)))
-        return E_FAIL;*/
+    if (FAILED(m_pTextureCom->Bind_Shader_Resource(m_pShaderCom, "g_Texture", 5)))
+        return E_FAIL;
 
     return S_OK;
 }
@@ -193,8 +247,8 @@ void CSky::Free()
 {
     CGameObject::Free();
 
-    //Safe_Release(m_pVIBufferCom);
+    Safe_Release(m_pVIBufferCom);
     Safe_Release(m_pTextureCom);
     Safe_Release(m_pShaderCom);
-    Safe_Release(m_pModelCom);
+    //Safe_Release(m_pModelCom);
 }

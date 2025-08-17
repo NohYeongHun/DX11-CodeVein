@@ -108,7 +108,7 @@ public:
 
 #pragma region COLLIDER_MANAGER
 public:
-	HRESULT Add_Collider_To_Manager(class CCollider* pCollider);
+	HRESULT Add_Collider_To_Manager(class CCollider* pCollider, _uint iLevelIndex);
 #pragma endregion
 
 #pragma region TEXTURE_MANAGER
@@ -179,7 +179,11 @@ public:
 public:
 	HRESULT Add_GameObject_ToTrigger(_uint iLayerLevelIndex, const _wstring& strLayerTag, _uint iPrototypeLevelIndex, const _wstring& strPrototypeTag, void* pArg = nullptr);
 	HRESULT Add_Trigger(_uint iLayerLevelIndex, const TRIGGER_MONSTER_DESC& triggerDesc);
+	_bool Trigger_Finished(_uint iLayerLevelIndex);
 	void Set_TargetPlayer(class CGameObject* pTargetPlayer);
+#pragma endregion
+
+#pragma region PLAYER_DATA_MANAGER
 #pragma endregion
 
 

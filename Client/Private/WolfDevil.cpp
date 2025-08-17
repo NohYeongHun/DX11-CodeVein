@@ -22,6 +22,7 @@ HRESULT CWolfDevil::Initialize_Clone(void* pArg)
 {
 
     WOLFDEVIL_DESC* pDesc = static_cast<WOLFDEVIL_DESC*>(pArg);
+    m_eCurLevel = pDesc->eCurLevel;
 
     if (FAILED(CMonster::Initialize_Clone(pDesc)))
     {
@@ -96,6 +97,8 @@ HRESULT CWolfDevil::Initialize_Clone(void* pArg)
 
     /* 현재 Object Manager에 담기 전에는 모든 Collider를 충돌 비교 하지 않습니다. */
     Collider_All_Active(false);
+
+    m_pModelCom->Set_Animation(m_Action_AnimMap[TEXT("IDLE")], true);
 
     return S_OK;
 }
@@ -385,7 +388,7 @@ HRESULT CWolfDevil::Ready_Components(WOLFDEVIL_DESC* pDesc)
         return E_FAIL;
     }
 
-    m_pGameInstance->Add_Collider_To_Manager(m_pColliderCom);
+    m_pGameInstance->Add_Collider_To_Manager(m_pColliderCom, ENUM_CLASS(m_eCurLevel));
 
     return S_OK;
 }
@@ -477,6 +480,7 @@ HRESULT CWolfDevil::Ready_PartObjects()
     Weapon.pOwner = this;
     Weapon.eCurLevel = m_eCurLevel;
     Weapon.fAttackPower = m_MonsterStat.fAttackPower;
+    
 
     if (FAILED(CContainerObject::Add_PartObject(TEXT("Com_Weapon"),
         ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_WolfWeapon")

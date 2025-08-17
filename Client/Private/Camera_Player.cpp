@@ -19,6 +19,7 @@ HRESULT CCamera_Player::Initialize_Clone(void* pArg)
 {
 	CAMERA_PLAYER_DESC* pDesc = static_cast<CAMERA_PLAYER_DESC*>(pArg);
 
+	m_eCurLevel = pDesc->eCurLevel;
 	m_fMouseSensor = pDesc->fMouseSensor * 0.8f; // 감도를 낮춤
 	m_pTarget = pDesc->pTarget;
 
@@ -71,8 +72,6 @@ void CCamera_Player::Priority_Update(_float fTimeDelta)
 
 void CCamera_Player::Update(_float fTimeDelta)
 {
-
-
 	CCamera::Update(fTimeDelta);
 
 	// 1. 마우스 클립 업데이트 => 창 크기를 벗어나지 못하게 함.
@@ -335,7 +334,7 @@ void CCamera_Player::Update_LockOn_Camera(_float fTimeDelta)
 
 	// 락온 타겟이 죽었는지 확인
 	if (m_pLockOnTarget && (m_pLockOnTarget->HasBuff(CMonster::BUFF_DEAD)
-		|| m_pLockOnTarget->HasBuff(CMonster::BUFF_CORPSE)))
+		|| m_pLockOnTarget->HasBuff(CMonster::BUFF_CORPSE) || !m_pLockOnTarget->Is_Visible()))
 	{
 		// 락온 해제
 		Clear_LockOn_Target();
@@ -467,7 +466,7 @@ CMonster* CCamera_Player::Find_Closest_Monster(_float fMaxDistance)
 	_float fClosestDistance = FLT_MAX;
 
 	// Object Manager에서 모든 몬스터 검색
-	CLayer* pLayer = m_pGameInstance->Get_Layer(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Layer_Monster"));
+	CLayer* pLayer = m_pGameInstance->Get_Layer(ENUM_CLASS(m_eCurLevel), TEXT("Layer_Monster"));
 	if (!pLayer)
 		return nullptr;
 

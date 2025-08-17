@@ -18,7 +18,7 @@ HRESULT CWolfWeapon::Initialize_Prototype()
 HRESULT CWolfWeapon::Initialize(void* pArg)
 {
     WOLF_WEAPON_DESC* pDesc = static_cast<WOLF_WEAPON_DESC*>(pArg);
-
+    m_eCurLevel = pDesc->eCurLevel;
 
     if (FAILED(CWeapon::Initialize_Clone(pDesc)))
         return E_FAIL;
@@ -132,7 +132,7 @@ HRESULT CWolfWeapon::Ready_Colliders()
     }
 
     /* 생성과 동시에 등록 */
-    m_pGameInstance->Add_Collider_To_Manager(m_pColliderCom);
+    m_pGameInstance->Add_Collider_To_Manager(m_pColliderCom, ENUM_CLASS(m_eCurLevel));
     OutputDebugStringA("WolfWeapon: Collider created and registered successfully\n");
 
     return S_OK;

@@ -232,6 +232,17 @@ HRESULT CHPBar::Ready_Events()
     // Event 목록 관리.
     m_Events.push_back(EventType::HP_CHANGE);
 
+
+    m_pGameInstance->Subscribe(EventType::HP_SYNCRONIZE, Get_ID(), [this](void* pData)
+        {
+            HPSYNCRONIZE_DESC* pDesc = static_cast<HPSYNCRONIZE_DESC*>(pData);
+            m_fHp = pDesc->fHp;
+            m_fMaxHp = pDesc->fMaxHp;
+        });
+
+    // Event 목록 관리.
+    m_Events.push_back(EventType::HP_CHANGE);
+
 #pragma endregion
     return S_OK;
 }
