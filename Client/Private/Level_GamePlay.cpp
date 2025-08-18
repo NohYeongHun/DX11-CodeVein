@@ -113,7 +113,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_Map(const _wstring& strLayerTag)
 {
 	CMap::MAP_DESC Desc = {};
 
-	// X, Z 2배로 깔았음.
+	// X, Z 2배로 깔았음. => Prototype Tag에 해당하는 맵 모델 가져옴.
 	Desc.PrototypeTag = L"Prototype_Component_Model_BossStage";
 	Desc.vScale = { 2.f, 1.f, 2.f };
 	Desc.eCurLevel = m_eCurLevel;
@@ -225,9 +225,9 @@ HRESULT CLevel_GamePlay::Ready_Layer_SkyBox(const _wstring& strLayerTag)
 {
 	CSky::SKY_DESC Desc{};
 	Desc.eCurLevel = m_eCurLevel;
-
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::GAMEPLAY), strLayerTag,
-		ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Sky"), &Desc)))
+	Desc.PrototypeTag = TEXT("Prototype_Component_Texture_Sky");
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel), strLayerTag,
+		ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_Sky"), &Desc)))
 	{
 
 		CRASH("Failed SkyBox");
@@ -417,7 +417,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_QueenKnight(const _wstring& strLayerTag)
 	// 3. 세 번째 트리거: QueenKnight (보스)
 	TRIGGER_MONSTER_DESC TriggerDesc{};
 
-	TriggerDesc = { { 150.f , 0.f, 0.f }, 30.f , TEXT("Layer_QueenKnight")
+	TriggerDesc = { { 150.f , 0.f, 0.f }, 200.f , TEXT("Layer_QueenKnight")
 		, TEXT("Layer_Monster") , 1, 2 }; // 이전 2개 트리거 완료 후 발동
 
 	m_pGameInstance->Add_Trigger(ENUM_CLASS(m_eCurLevel), TriggerDesc);

@@ -149,7 +149,7 @@ HRESULT CToolMap_Part::Render()
     for (_uint i = 0; i < iNumMeshes; i++)
     {
         m_pModelCom->Bind_Materials(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE, 0);
-        
+		//m_pModelCom->Bind_Materials(m_pShaderCom, "g_NormalTexture", i, aiTextureType_NORMALS, 0);
 
         if (FAILED(m_pShaderCom->Begin(0)))
         {

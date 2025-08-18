@@ -34,7 +34,7 @@ private:
 	LEVEL m_eCurLevel = { LEVEL::END };
 
 private:
-	HRESULT Ready_Components();
+	HRESULT Ready_Components(SKY_DESC* pDesc);
 	HRESULT Bind_ShaderResources();
 
 public:

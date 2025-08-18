@@ -76,10 +76,19 @@ HRESULT CLoader_StageOne::Add_Prototype_Map(ID3D11Device* pDevice, ID3D11DeviceC
 
   	PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f);
 
-	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level)
+	/*if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level)
 		, TEXT("Prototype_Component_Model_BossStage")
 		, CLoad_Model::Create(pDevice, pContext, MODELTYPE::NONANIM, PreTransformMatrix, "../../SaveFile/Model/Map/BossStageType1.dat", L"BossStage\\"))))
+		return E_FAIL;*/
+
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level)
+		, TEXT("Prototype_Component_Model_StageOne")
+		, CLoad_Model::Create(pDevice, pContext, MODELTYPE::NONANIM, PreTransformMatrix, "../../SaveFile/Model/Map/StageOne.dat", L""))))
+	{
+		CRASH("Failed Load Stage One");
 		return E_FAIL;
+	}
+		
 
 	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level)
 		, TEXT("Prototype_GameObject_Map")
@@ -252,8 +261,8 @@ HRESULT CLoader_StageOne::Add_Prototype_Camera_Player(ID3D11Device* pDevice, ID3
 HRESULT CLoader_StageOne::Add_Prototype_SkyBox(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
 {
 	/* Prototype_Component_Texture_Sky */
-	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level), TEXT("Prototype_Component_Texture_Sky"),
-		CTexture::Create(pDevice, pContext, TEXT("../Bin/Resources/Textures/SkyBox/Sky_%d.dds"), 6))))
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level), TEXT("Prototype_Component_Texture_SkyStageOne"),
+		CTexture::Create(pDevice, pContext, TEXT("../Bin/Resources/Textures/SkyBox/StageOne%d.dds"), 1))))
 	{
 		CRASH("Failed Create SkyTexture");
 		return E_FAIL;

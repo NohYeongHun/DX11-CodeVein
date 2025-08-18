@@ -87,8 +87,7 @@ void CCamera_Free::Update(_float fTimeDelta)
 			m_fYaw += (_float)MouseMoveX * fTimeDelta * m_fMouseSensor;
 			m_fPitch += (_float)MouseMoveY * fTimeDelta * m_fMouseSensor;
 
-			// 2. Pitch 제한
-			m_fPitch = max(-XM_PIDIV2 * 0.9f, min(XM_PIDIV2 * 0.9f, m_fPitch));
+			// 2. Pitch 제한 제거 (연속 회전 가능)
 
 			// 3. 올바른 함수 사용 - XMQuaternionRotationRollPitchYaw
 			_vector qFinalRotation = XMQuaternionRotationRollPitchYaw(m_fPitch, m_fYaw, 0.f);
@@ -98,11 +97,11 @@ void CCamera_Free::Update(_float fTimeDelta)
 		}
 	}
 
-	/* 값이 일정이상 튀지 않게 관리. */
-	while (m_fYaw > XM_PI) m_fYaw -= XM_PI;
-	while (m_fPitch > XM_PI * 0.5f) m_fPitch -= XM_PI * 0.5f;
-	while (m_fYaw < -XM_PI) m_fYaw += XM_PI;
-	while (m_fPitch < XM_PI * -0.5f) m_fPitch += XM_PI * 0.5f;
+	/* 각도 정규화 - 연속 회전 허용 */
+	while (m_fYaw > XM_2PI) m_fYaw -= XM_2PI;
+	while (m_fYaw < -XM_2PI) m_fYaw += XM_2PI;
+	while (m_fPitch > XM_2PI) m_fPitch -= XM_2PI;
+	while (m_fPitch < -XM_2PI) m_fPitch += XM_2PI;
 
 	CCamera::Update_PipeLines();
 }

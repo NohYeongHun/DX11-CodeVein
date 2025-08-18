@@ -20,7 +20,8 @@ const MODEL_DESC Model_Prototypes[] =
 	//{ MODELTYPE::ANIM,  TEXT("Prototype_Component_Model_GodChildShield"), "../Bin/Resources/Models/Weapon/GodsChildServant/GodChildShield.fbx",        "textures/"}	
 	//{ MODELTYPE::ANIM,  TEXT("Prototype_Component_Model_QueenKnight"), "../Bin/Resources/Models/QueenKnight/QueenKnight.fbx",        "textures/"},
 	//{ MODELTYPE::ANIM,  TEXT("Prototype_Component_Model_SlaveVampire"), "../Bin/Resources/Models/SlaveVampire/SlaveVampire.fbx",        "textures/"},
-	{ MODELTYPE::NONANIM,  TEXT("Prototype_Component_Model_SkyBox"), "../Bin/Resources/Models/Sky/SkySphere.fbx",        "textures/"},
+	//{ MODELTYPE::NONANIM,  TEXT("Prototype_Component_Model_SkyBox"), "../Bin/Resources/Models/Sky/SkySphere.fbx",        "textures/"},
+	{ MODELTYPE::NONANIM,  TEXT("Prototype_Component_Model_StageOne"), "../Bin/Resources/Models/Map/StageOne/StageOne.fbx",        "textures/"},
 	//{ MODELTYPE::ANIM,  TEXT("Prototype_Component_Model_SlaveVampire_Sword"), "../Bin/Resources/Models/Weapon/SlaveSword/SlaveSword.fbx",        "textures/"},
 	//{ MODELTYPE::ANIM,  TEXT("Prototype_Component_Model_SlaveVampire_GreatSword"), "../Bin/Resources/Models/Weapon/SlaveGreatSword/SlaveGreatSword.fbx",        "textures/"},
 	//{ MODELTYPE::ANIM,  TEXT("Prototype_Component_Model_Fiona"), "../Bin/Resources/Models/Fiona/Fiona.fbx",        "/" }

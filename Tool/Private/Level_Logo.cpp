@@ -163,7 +163,7 @@ HRESULT CLevel_Logo::Ready_Layer_Camera(const _wstring& strLayerTag)
 	CameraDesc.fFovy = XMConvertToRadians(60.0f);
 	CameraDesc.fNear = 0.1f;
 	CameraDesc.fFar = 500.f;
-	CameraDesc.fSpeedPerSec = 30.f;
+	CameraDesc.fSpeedPerSec = 10.f;
 	CameraDesc.fRotationPerSec = XMConvertToRadians(180.0f);
 	CameraDesc.fMouseSensor = 0.5f;
 

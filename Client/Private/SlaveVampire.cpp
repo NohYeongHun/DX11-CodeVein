@@ -287,7 +287,7 @@ HRESULT CSlaveVampire::InitializeAction_ToAnimationMap()
 
 
 #pragma region COllider 활성화 프레임 관리
-    Add_Collider_Frame(m_Action_AnimMap[TEXT("ATTACK")], 70.f / 256.f, 100.f / 256.f, PART_WEAPON);     // Weapon attack
+    Add_Collider_Frame(m_Action_AnimMap[TEXT("ATTACK")], 70.f / 256.f, 85.f / 256.f, PART_WEAPON);     // Weapon attack
 #pragma endregion
 
     return S_OK;

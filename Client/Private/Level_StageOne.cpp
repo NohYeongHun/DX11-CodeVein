@@ -142,7 +142,8 @@ HRESULT CLevel_StageOne::Ready_Layer_Map(const _wstring& strLayerTag)
 	CMap::MAP_DESC Desc = {};
 
 	// X, Z 2배로 깔았음.
-	Desc.PrototypeTag = L"Prototype_Component_Model_BossStage";
+	//Desc.PrototypeTag = L"Prototype_Component_Model_BossStage";
+	Desc.PrototypeTag = L"Prototype_Component_Model_StageOne";
 	Desc.vScale = { 2.f, 1.f, 2.f };
 	Desc.eCurLevel = m_eCurLevel;
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel), strLayerTag,
@@ -231,7 +232,7 @@ HRESULT CLevel_StageOne::Ready_Layer_SkyBox(const _wstring& strLayerTag)
 
 	CSky::SKY_DESC Desc{};
 	Desc.eCurLevel = m_eCurLevel;
-
+	Desc.PrototypeTag = TEXT("Prototype_Component_Texture_SkyStageOne");
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel), strLayerTag,
 		ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_Sky"), &Desc)))
 	{

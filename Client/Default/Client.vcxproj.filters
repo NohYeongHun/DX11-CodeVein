@@ -190,11 +190,11 @@
     <Filter Include="01. Levels\02. GamePlay">
       <UniqueIdentifier>{4c028a6b-0d86-4e59-9833-8ebd1556de8b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01. Levels\01. 1Stage">
-      <UniqueIdentifier>{fb8c9382-2604-48c3-911a-f55df82be670}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02. GameObject\UI\FadeOut">
       <UniqueIdentifier>{5864f09d-b3ab-439c-8167-dd3d5dcdecf8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Levels\01. StageOne">
+      <UniqueIdentifier>{fb8c9382-2604-48c3-911a-f55df82be670}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -541,7 +541,7 @@
       <Filter>02. GameObject\Monster\SlaveVampire\Weapon</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Level_StageOne.h">
-      <Filter>01. Levels\01. 1Stage</Filter>
+      <Filter>01. Levels\01. StageOne</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Loader_StageOne.h">
       <Filter>01. Levels\99. Loading\Loader\Personal</Filter>
@@ -871,7 +871,7 @@
       <Filter>02. GameObject\Monster\SlaveVampire\Weapon</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Level_StageOne.cpp">
-      <Filter>01. Levels\01. 1Stage</Filter>
+      <Filter>01. Levels\01. StageOne</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Loader_StageOne.cpp">
       <Filter>01. Levels\99. Loading\Loader\Personal</Filter>
