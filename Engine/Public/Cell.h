@@ -23,6 +23,7 @@ public:
 		return m_vPoints[ENUM_CLASS(ePoint)]; 
 	}
 
+	void Set_PointPos(CELLPOINT ePoint, _float3 vPos);
 	
 
 public:

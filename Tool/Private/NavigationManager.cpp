@@ -31,7 +31,7 @@ HRESULT CNavigationManager::Render()
 
     _float4x4			WorldMatrix;
     XMStoreFloat4x4(&WorldMatrix, XMMatrixIdentity());
-    WorldMatrix._42 += 0.1f;
+    //WorldMatrix._42 += 0.1f;
 
     if (FAILED(m_pShader->Bind_Matrix("g_ViewMatrix", m_pGameInstance->Get_Transform_Float4x4(D3DTS::VIEW))))
     {

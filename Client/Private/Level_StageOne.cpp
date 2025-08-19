@@ -144,7 +144,7 @@ HRESULT CLevel_StageOne::Ready_Layer_Map(const _wstring& strLayerTag)
 	// X, Z 2배로 깔았음.
 	//Desc.PrototypeTag = L"Prototype_Component_Model_BossStage";
 	Desc.PrototypeTag = L"Prototype_Component_Model_StageOne";
-	Desc.vScale = { 2.f, 1.f, 2.f };
+	Desc.vScale = { 1.f, 1.f, 1.f };
 	Desc.eCurLevel = m_eCurLevel;
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel), strLayerTag,
 		ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_Map"), &Desc)))
@@ -158,8 +158,7 @@ HRESULT CLevel_StageOne::Ready_Layer_Player(const _wstring& strLayerTag)
 	CPlayer::PLAYER_DESC Desc{};
 #pragma region 1. 플레이어에게 넣어줘야할 레벨 별 다른 값들.
 	Desc.eCurLevel = m_eCurLevel;
-	Desc.vPos = { 270.f, 0.f, 0.f };
-	//Desc.vPos = { 100.f, 0.f, 0.f };
+	Desc.vPos = { 0.f, 0.f, 0.f };
 #pragma endregion
 
 #pragma region 2. 게임에서 계속 들고있어야할 플레이어 값들.
@@ -196,7 +195,7 @@ HRESULT CLevel_StageOne::Ready_Layer_Camera(const _wstring& strLayerTag)
 	CameraPlayerDesc.fFar = 500.f;
 	CameraPlayerDesc.fSpeedPerSec = 10.f;
 	CameraPlayerDesc.fRotationPerSec = XMConvertToRadians(90.0f);
-	CameraPlayerDesc.fMouseSensor = 0.5f;
+	CameraPlayerDesc.fMouseSensor = 0.8f;
 	CameraPlayerDesc.eCurLevel = m_eCurLevel;
 
 	list<CGameObject*> pGameObjects = m_pGameInstance->Get_Layer(ENUM_CLASS(m_eCurLevel), TEXT("Layer_Player"))->Get_GameObjects();
@@ -281,8 +280,11 @@ HRESULT CLevel_StageOne::Ready_Layer_Monster(const _wstring& strLayerTag)
 	// 2. 트리거 등록. => 생성과 트리거 등록은 구별.
 	TRIGGER_MONSTER_DESC TriggerDesc{};
 
-	TriggerDesc = { { 250.f , 0.f, 0.f }, 200.f , TEXT("Layer_WolfDevil")
-		, TEXT("Layer_Monster") , 2, 0 };
+	TriggerDesc = { { 0.f ,0.f, 0.f }, 250.f , TEXT("Layer_SlaveVampire")
+		, TEXT("Layer_Monster") , 5, 0 };
+
+	/*TriggerDesc = { { 250.f , 0.f, 0.f }, 200.f , TEXT("Layer_WolfDevil")
+		, TEXT("Layer_Monster") , 2, 0 };*/
 
 	m_pGameInstance->Add_Trigger(ENUM_CLASS(m_eCurLevel), TriggerDesc);
 
@@ -360,11 +362,15 @@ HRESULT CLevel_StageOne::Ready_Layer_SlaveVampire(const _wstring& strLayerTag)
 		return E_FAIL;
 	}
 
-	for (_uint i = 0; i < 2; ++i)
+	_float3 monsterPositionArray[5] = {
+		{ 32.f, 21.f, -46.f }, { 32.f, 21.f, -28.f }, { 50.f, 21.f, -28.f },
+		{ 62.f, 21.f, -38.f }, { 61.f, 21.f, -38.f }
+	};
+
+
+	for (_uint i = 0; i < 5; ++i)
 	{
-		Desc.vPos = { 200.f, 0.f, 3.f };
-		Desc.vPos.x += (i) * -20.f;
-		Desc.vPos.z *= i % 2 == 0 ? -1.f : 1.f;
+		Desc.vPos = monsterPositionArray[i];
 		if (FAILED(m_pGameInstance->Add_GameObject_ToTrigger(ENUM_CLASS(m_eCurLevel)
 			, TEXT("Layer_SlaveVampire"), ENUM_CLASS(m_eCurLevel)
 			, TEXT("Prototype_GameObject_SlaveVampire"), &Desc)))

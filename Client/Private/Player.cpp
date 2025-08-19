@@ -1150,7 +1150,6 @@ HRESULT CPlayer::Ready_Fsm()
     CPlayer_RunState::RUN_ENTER_DESC Run{};
     Run.iAnimation_Idx = PLAYER_ANIM_RUN_F_LOOP;
     m_pFsmCom->Change_State(PLAYER_STATE::RUN, &Run);
-
     m_pFsmCom->Change_State(PLAYER_STATE::IDLE, &enter);
     return S_OK;
 }

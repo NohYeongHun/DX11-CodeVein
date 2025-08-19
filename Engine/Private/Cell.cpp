@@ -9,6 +9,11 @@ CCell::CCell(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 
 
 
+void CCell::Set_PointPos(CELLPOINT ePoint, _float3 vPos)
+{
+	m_vPoints[ENUM_CLASS(ePoint)] = vPos;
+}
+
 HRESULT CCell::Initialize(const _float3* pPoints, _int iIndex)
 {
 	m_iIndex = iIndex;

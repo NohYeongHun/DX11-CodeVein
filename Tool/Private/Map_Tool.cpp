@@ -696,6 +696,13 @@ void CMap_Tool::Render_NavigationChild()
         ImGui::Text("B :"); ImGui::SameLine(); ImGui::InputFloat3("PointB", fPointB);
         ImGui::Text("C :"); ImGui::SameLine(); ImGui::InputFloat3("PointC", fPointC);
 
+		/*if (pCurrentCell != nullptr)
+		{  정점이 이미 VIBuffer에서 만들어져버려서 의미가 없다..
+            pCurrentCell->Set_PointPos(CELLPOINT::A, _float3(fPointA[0], fPointA[1], fPointA[2]));
+            pCurrentCell->Set_PointPos(CELLPOINT::B, _float3(fPointB[0], fPointB[1], fPointB[2]));
+            pCurrentCell->Set_PointPos(CELLPOINT::C, _float3(fPointC[0], fPointC[1], fPointC[2]));
+		}*/
+
         ImGui::Text("X Y Z :"); ImGui::SameLine(); ImGui::DragFloat3("X Y Z", fClickedPosition, 0.01f);
         m_fClickPoint = _float3(fClickedPosition[0], fClickedPosition[1], fClickedPosition[2]);
         m_pNavigation_Manager->Update_ClickedPosition(m_fClickPoint);

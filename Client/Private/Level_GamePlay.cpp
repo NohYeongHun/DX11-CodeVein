@@ -173,7 +173,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_Camera(const _wstring& strLayerTag)
 	CameraPlayerDesc.fFar = 500.f;
 	CameraPlayerDesc.fSpeedPerSec = 10.f;
 	CameraPlayerDesc.fRotationPerSec = XMConvertToRadians(90.0f);
-	CameraPlayerDesc.fMouseSensor = 0.5f;
+	CameraPlayerDesc.fMouseSensor = 0.8f;
 	CameraPlayerDesc.eCurLevel = m_eCurLevel;
 
 	list<CGameObject*> pGameObjects = m_pGameInstance->Get_Layer(ENUM_CLASS(m_eCurLevel), TEXT("Layer_Player"))->Get_GameObjects();

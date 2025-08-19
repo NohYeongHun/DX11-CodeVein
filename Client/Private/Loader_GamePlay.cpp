@@ -111,12 +111,6 @@ HRESULT CLoader_GamePlay::Add_Prototype_Map(ID3D11Device* pDevice, ID3D11DeviceC
 HRESULT CLoader_GamePlay::Add_Prototype_Navigation(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
 {
 	/* Prototype_Component_Navigation */
-	/*if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level), TEXT("Prototype_Component_Navigation"),
-		CNavigation::Create(pDevice, pContext, TEXT("../Bin/DataFiles/Navigation.dat")))))
-	{
-		CRASH("Failed Load Navigation File");
-		return E_FAIL;
-	}*/
 
 	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level), TEXT("Prototype_Component_Navigation"),
 		CNavigation::Create(pDevice, pContext, "../../SaveFile/Navigation/BossStage.nav"))))
