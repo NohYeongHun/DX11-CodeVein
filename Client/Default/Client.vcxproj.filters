@@ -907,5 +907,8 @@
     <Text Include="SlaveVampireDefine.txt">
       <Filter>02. GameObject\Monster\SlaveVampire</Filter>
     </Text>
+    <Text Include="WolfDevilDefine.txt">
+      <Filter>02. GameObject\Monster\WolfDevil</Filter>
+    </Text>
   </ItemGroup>
 </Project>

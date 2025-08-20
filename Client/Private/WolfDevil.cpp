@@ -267,6 +267,10 @@ HRESULT CWolfDevil::InitializeAction_ToAnimationMap()
     m_pModelCom->Set_RootMotionTranslate(true);
 
     m_Action_AnimMap.emplace(L"IDLE", WOLFDEVIL_IDLE_LOOP);
+    m_Action_AnimMap.emplace(L"IDLE_L180", WOLFDEVIL_TURN_LEFT_180);
+    m_Action_AnimMap.emplace(L"IDLE_L90", WOLFDEVIL_TURN_LEFT_90);
+    m_Action_AnimMap.emplace(L"IDLE_R180", WOLFDEVIL_TURN_RIGHT_180);
+    m_Action_AnimMap.emplace(L"IDLE_R90", WOLFDEVIL_TURN_RIGHT_90);
     m_Action_AnimMap.emplace(L"HIT", WOLFDEVIL_DAMAGE_FRONT);
     m_Action_AnimMap.emplace(L"ATTACK_JUMP", WOLFDEVIL_ATTACK_NORMAL);
     m_Action_AnimMap.emplace(L"ATTACK", WOLFDEVIL_ATTACK_JUMP);

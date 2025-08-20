@@ -8,6 +8,8 @@ public:
 	{
 		_float fMouseSensor{};
 		class CPlayer* pTarget = {};
+		_float4 vTargetOffset = { 0.f, 0.f, 0.f, 0.f }; // 플레이어와 카메라 사이의 오프셋
+		_float4 vLockOnOffset = { 0.f, 0.f, 0.f, 0.f }; // 플레이어와 카메라 사이의 오프셋
 		LEVEL eCurLevel = LEVEL::END; // 현재 레벨 정보
 	}CAMERA_PLAYER_DESC;
 

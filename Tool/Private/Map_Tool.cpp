@@ -196,6 +196,7 @@ void CMap_Tool::Render_SaveLoad()
             if (ImGui::MenuItem("open"))
             {
                 IGFD::FileDialogConfig config;
+                
                 config.path = "../../SaveFile/Model/";
                 config.flags = ImGuiFileDialogFlags_ReadOnlyFileNameField;
 
@@ -520,6 +521,7 @@ void CMap_Tool::Render_Edit_Inspector()
 void CMap_Tool::Open_FileDialog()
 {
     IGFD::FileDialogConfig config;
+    
 
     switch (m_eSaveType)
     {
@@ -546,6 +548,8 @@ void CMap_Tool::Open_FileDialog()
 void CMap_Tool::Save_FileDialog()
 {
     IGFD::FileDialogConfig config;
+    
+    // FileDialog 창 크기 고정 설정 (너비 1200, 높이 700)
 
     switch (m_eSaveType)
     {

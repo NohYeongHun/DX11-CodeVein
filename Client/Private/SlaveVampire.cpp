@@ -271,6 +271,10 @@ HRESULT CSlaveVampire::InitializeAction_ToAnimationMap()
     m_pModelCom->Set_RootMotionTranslate(true);
 
     m_Action_AnimMap.emplace(L"IDLE", SLAVEVAMPIRE_LSWORD_IDLE_LOOP);
+    m_Action_AnimMap.emplace(L"IDLE_L180", SLAVEVAMPIRE_NONFIGHT_TURN_L180);
+    m_Action_AnimMap.emplace(L"IDLE_L90", SLAVEVAMPIRE_NONFIGHT_TURN_L90);
+    m_Action_AnimMap.emplace(L"IDLE_R180", SLAVEVAMPIRE_NONFIGHT_TURN_R180);
+    m_Action_AnimMap.emplace(L"IDLE_R90", SLAVEVAMPIRE_NONFIGHT_TURN_R90);
     m_Action_AnimMap.emplace(L"HIT", SLAVEVAMPIRE_DAMAGE01_FR);
     m_Action_AnimMap.emplace(L"ATTACK", SLAVEVAMPIRE_LSWORD_NORMAL02);
     m_Action_AnimMap.emplace(L"DEATH_BACK", SLAVEVAMPIRE_DEATH_B);

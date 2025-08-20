@@ -7,6 +7,12 @@ NS_BEGIN(Client)
 class CMonster abstract : public CContainerObject
 {
 public:
+    typedef struct tagRotationInfo {
+        _float fSignedAngleDegrees; // -180~+180 (음수=왼쪽, 양수=오른쪽)
+        _bool bIsRight;
+    }ROTATION_INFO;
+
+public:
     // 지금 뭘하고 있니? => 한번에 하나밖에 수행 못함. (Is a 관계 하나만 됨.)
 
     // 액션에 맞는 Animation 동기화가 필요함.
@@ -109,8 +115,6 @@ public:
 
 protected:
     class CCollider* m_pColliderCom = { nullptr };
-
-
 
 
 protected:
@@ -259,8 +263,10 @@ public:
     
 
     virtual const _bool IsRotateFinished(_float fRadian);
-
     virtual void NearCell_Translate();
+    const _float Get_TargetDegreeNoPitch();
+    const ROTATION_INFO Get_SimpleTargetRotation();
+
 
 public:
     /* 콜라이더 제어.*/

@@ -596,6 +596,60 @@ void CMonster::NearCell_Translate()
     m_pTransformCom->Set_State(STATE::POSITION, XMLoadFloat3(&vFinalPos));
 }
 
+const _float CMonster::Get_TargetDegreeNoPitch()
+{
+    if (!m_pTarget)
+        return 0.f;
+
+    _vector vMyPos = m_pTransformCom->Get_State(STATE::POSITION);
+    _vector vTargetPos = m_pTarget->Get_Transform()->Get_State(STATE::POSITION);
+    _vector vToTarget = vTargetPos - vMyPos;
+    vToTarget = XMVectorSetY(vToTarget, 0.f);
+    vToTarget = XMVector3Normalize(vToTarget);
+
+    _vector vLook = m_pTransformCom->Get_State(STATE::LOOK);
+    vLook = XMVectorSetY(vLook, 0.f);
+    vLook = XMVector3Normalize(vLook);
+
+    // 내적으로 각도 차이 계산
+    _float fDot = XMVectorGetX(XMVector3Dot(vLook, vToTarget));
+    _float fAngleDiff = acosf(max(-1.f, min(1.f, fDot)));
+
+    // 라디안을 도로 변환
+    return XMConvertToDegrees(fAngleDiff);
+}
+
+const CMonster::ROTATION_INFO CMonster::Get_SimpleTargetRotation()
+{
+    CMonster::ROTATION_INFO info = {};
+
+    if (!m_pTarget)
+        return info;
+
+    _vector vMyPos = m_pTransformCom->Get_State(STATE::POSITION);
+    _vector vTargetPos = m_pTarget->Get_Transform()->Get_State(STATE::POSITION);
+    _vector vToTarget = vTargetPos - vMyPos;
+    vToTarget = XMVectorSetY(vToTarget, 0.f);
+
+    _vector vLook = m_pTransformCom->Get_State(STATE::LOOK);
+    vLook = XMVectorSetY(vLook, 0.f);
+
+    // atan2를 사용한 더 간단한 방법
+    _float fTargetYaw = atan2f(XMVectorGetX(vToTarget), XMVectorGetZ(vToTarget));
+    _float fCurrentYaw = atan2f(XMVectorGetX(vLook), XMVectorGetZ(vLook));
+
+    _float fYawDiff = fTargetYaw - fCurrentYaw;
+
+    // 최단 경로로 정규화
+    while (fYawDiff > XM_PI) fYawDiff -= XM_2PI;
+    while (fYawDiff < -XM_PI) fYawDiff += XM_2PI;
+
+    info.fSignedAngleDegrees = XMConvertToDegrees(fYawDiff);
+    info.bIsRight = (fYawDiff > 0);
+
+    return info;
+}
+
 /* Reset 시 모든 콜라이더 비활성화 */
 void CMonster::Reset_Part_Colliders()
 {

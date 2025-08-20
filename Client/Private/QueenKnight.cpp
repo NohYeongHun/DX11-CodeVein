@@ -376,6 +376,10 @@ HRESULT CQueenKnight::InitializeAction_ToAnimationMap()
     m_pModelCom->Set_RootMotionTranslate(true);
 
     m_Action_AnimMap.emplace(L"IDLE", AS_TStdKnight_TLSword_Idle_N_Loop);
+    m_Action_AnimMap.emplace(L"IDLE_L180", AS_TStdKnight_TShieldSword_Guard_IdleTurn_L180);
+    m_Action_AnimMap.emplace(L"IDLE_L90", AS_TStdKnight_TShieldSword_Guard_IdleTurn_L90);
+    m_Action_AnimMap.emplace(L"IDLE_R180", AS_TStdKnight_TShieldSword_Guard_IdleTurn_R180);
+    m_Action_AnimMap.emplace(L"IDLE_R90", AS_TStdKnight_TShieldSword_Guard_IdleTurn_R90);
     m_Action_AnimMap.emplace(L"GUARDHIT", AS_TStdKnight_TShieldSword_GuardHit01_N);
     m_Action_AnimMap.emplace(L"DAMAGE", AS_TStdKnight_TCmn_Damage01_BR);
     m_Action_AnimMap.emplace(L"HIT", AS_TStdKnight_TCmn_Damage01_BR);
@@ -436,6 +440,12 @@ HRESULT CQueenKnight::InitializeAction_ToAnimationMap()
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"DODGE_B"], 2.5f);
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"DASH_ATTACK_START"], 2.5f);
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"DASH_ATTACK_END"], 4.f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"IDLE_L180"], 10.f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"IDLE_L90"], 10.f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"IDLE_R180"], 10.f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"IDLE_R90"], 10.f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"IDLE"], 10.f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"ATTACK"], 1.5f);
 
 
 #pragma region COllider 활성화 프레임 관리
@@ -467,7 +477,7 @@ HRESULT CQueenKnight::Initialize_BuffDurations()
     m_BuffDefault_Durations[BUFF_CORPSE] = 2.0f;       // 시체 : 2.0초
     m_BuffDefault_Durations[BUFF_INVINCIBLE] = 0.3f; // 무적 시간.
     m_BuffDefault_Durations[BUFF_DEAD] = 10.f; // 사망 시간.
-    m_BuffDefault_Durations[BUFF_DETECT] = 2.f; // 탐지 쿨타임: 0.5초
+    m_BuffDefault_Durations[BUFF_DETECT] = 1.f; // 탐지 쿨타임: 0.5초
     m_BuffDefault_Durations[BUFF_ATTACK_TIME] = 0.5f; // 탐지 쿨타임: 0.5초
     m_BuffDefault_Durations[BUFF_NAVIGATION_OFF] = 0.2f; // 왠만하면 기본 쿨타임이아니라 지정 쿨타임.
     

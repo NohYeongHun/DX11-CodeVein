@@ -174,6 +174,8 @@ HRESULT CLevel_GamePlay::Ready_Layer_Camera(const _wstring& strLayerTag)
 	CameraPlayerDesc.fSpeedPerSec = 10.f;
 	CameraPlayerDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 	CameraPlayerDesc.fMouseSensor = 0.8f;
+	CameraPlayerDesc.vTargetOffset = { 0.f, 1.7f, -3.3f, 0.f };
+	CameraPlayerDesc.vLockOnOffset = { 0.f, 1.7f, -3.3f, 0.f };
 	CameraPlayerDesc.eCurLevel = m_eCurLevel;
 
 	list<CGameObject*> pGameObjects = m_pGameInstance->Get_Layer(ENUM_CLASS(m_eCurLevel), TEXT("Layer_Player"))->Get_GameObjects();
@@ -313,7 +315,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_WolfDevil(const _wstring& strLayerTag)
 	Desc.eCurLevel = m_eCurLevel;
 	Desc = { 50.f, XMConvertToRadians(90.0f)
 		, nullptr,  m_eCurLevel, MONSTERTYPE::NORMAL,
-		500.f, 70.f, 10.f, 5.f, 50.f, 50.f};
+		500.f, 70.f, 15.f, 7.f, 50.f, 50.f};
 
 	Desc.pPlayer = dynamic_cast<CPlayer*>(
 		m_pGameInstance->Get_GameObjcet(
@@ -352,7 +354,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_SlaveVampire(const _wstring& strLayerTag)
 	Desc.eCurLevel = m_eCurLevel;
 	Desc = { 50.f, XMConvertToRadians(90.0f)
 		, nullptr,  m_eCurLevel, MONSTERTYPE::NORMAL,
-		900.f, 70.f, 10.f, 5.f, 50.f, 50.f };
+		900.f, 70.f, 15.f, 7.f, 50.f, 50.f };
 
 	Desc.pPlayer = dynamic_cast<CPlayer*>(
 		m_pGameInstance->Get_GameObjcet(

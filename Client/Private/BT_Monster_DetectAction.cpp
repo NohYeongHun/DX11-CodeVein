@@ -39,18 +39,20 @@ BT_RESULT CBT_Monster_DetectAction::EnterDetect(_float fTimeDelta)
         CRASH("Failed Tree Detect Enter Logic");
     }
 
+    
+
     // 1. 다음 단계로 진행
     m_eDetectPhase = DETECT_PHASE::ROTATING;
-
     m_pOwner->Set_RootMotionTranslate(true);
+ 
 
     return BT_RESULT::RUNNING;
 }
 
 BT_RESULT CBT_Monster_DetectAction::UpdateRotating(_float fTimeDelta)
 {
-    m_pOwner->Rotate_ToTarget(fTimeDelta);
-    if (m_pOwner->IsRotateFinished(XMConvertToRadians(10.f))) // 라디안 10도 차이까지만 허용
+    m_pOwner->RotateTurn_ToTargetYaw(fTimeDelta * 3.f);
+    if (m_pOwner->IsRotateFinished(XMConvertToRadians(4.f))) // 라디안 10도 차이까지만 허용
     {
         m_eDetectPhase = DETECT_PHASE::LOOP;
 
@@ -60,8 +62,6 @@ BT_RESULT CBT_Monster_DetectAction::UpdateRotating(_float fTimeDelta)
         // 2. 탐지 상태로 변경
         m_pOwner->Change_Animation_Blend(iNextAnimationIdx, true);
     }
-
-
     return BT_RESULT::RUNNING;
 }
 
@@ -99,6 +99,7 @@ BT_RESULT CBT_Monster_DetectAction::EndDetect(_float fTimeDleta)
     // 2. 현재 애니메이션으로 NON 블렌딩하면서 변경. => Idle은 NonBlend로 변경.
     m_pOwner->Change_Animation_Blend(iNextAnimationIdx, false, 0.2f, true, true, true);
 
+    // 3. DETECT가 끝났는데 무한으로 Detect 애니메이션 실행을 방지하기 위한 Buff 추가.
     m_pOwner->AddBuff(CMonster::BUFF_DETECT);
 
     return BT_RESULT::SUCCESS; // SUCCESS로 변경하여 Selector가 Reset 호출하도록 함

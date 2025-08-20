@@ -25,7 +25,6 @@ HRESULT CNavigationManager::Initialize()
 HRESULT CNavigationManager::Render()
 {
 
-#ifdef _DEBUG
     if (m_Cells.size() == 0)
         return S_OK;
 
@@ -66,12 +65,11 @@ HRESULT CNavigationManager::Render()
 
             m_pShader->Bind_RawValue("g_vColor", &vColor, sizeof(_float4));
             m_pShader->Begin(0);
-            pCell->Render();
+            pCell->Rendear();
         }
         i++;
     }
 
-#endif
 
     return S_OK;
 }

@@ -407,6 +407,7 @@
     <Text Include="..\Public\PlayerAnimation.txt" />
     <Text Include="QueenKnightDefine.txt" />
     <Text Include="SlaveVampireDefine.txt" />
+    <Text Include="WolfDevilDefine.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />

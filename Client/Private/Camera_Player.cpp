@@ -23,16 +23,18 @@ HRESULT CCamera_Player::Initialize_Clone(void* pArg)
 	m_fMouseSensor = pDesc->fMouseSensor * 0.8f; // 감도를 낮춤
 	m_pTarget = pDesc->pTarget;
 
+	m_vTargetOffset = pDesc->vTargetOffset;
+	m_vLockOnOffset = pDesc->vLockOnOffset;
 	// 화면 크기 가져오기
 	RECT rcClient;
 	GetClientRect(g_hWnd, &rcClient);
 
-	// 타겟 기준 뒤에서 바라보는 오프셋 (일반 카메라)
-	XMStoreFloat4(&m_vTargetOffset, XMVectorSet(0.f, 1.7f, -4.3f, 0.f));
-	
-
-	// 락온 모드 전용 오프셋 (일반 카메라와 동일하게 설정)
-	XMStoreFloat4(&m_vLockOnOffset, XMVectorSet(0.f, 1.7f, -4.3f, 0.f));
+	//// 타겟 기준 뒤에서 바라보는 오프셋 (일반 카메라)
+	//XMStoreFloat4(&m_vTargetOffset, XMVectorSet(0.f, 1.7f, -4.3f, 0.f));
+	//
+	//
+	//// 락온 모드 전용 오프셋 (일반 카메라와 동일하게 설정)
+	//XMStoreFloat4(&m_vLockOnOffset, XMVectorSet(0.f, 1.7f, -4.3f, 0.f));
 
 	// 초기 각도 (플레이어 후방에서 플레이어를 바라봄)
 	m_fYaw = 0.f;   
