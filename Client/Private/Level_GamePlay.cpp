@@ -354,7 +354,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_SlaveVampire(const _wstring& strLayerTag)
 	Desc.eCurLevel = m_eCurLevel;
 	Desc = { 50.f, XMConvertToRadians(90.0f)
 		, nullptr,  m_eCurLevel, MONSTERTYPE::NORMAL,
-		900.f, 70.f, 15.f, 7.f, 50.f, 50.f };
+		900.f, 70.f, 20.f, 5.f, 50.f, 50.f };
 
 	Desc.pPlayer = dynamic_cast<CPlayer*>(
 		m_pGameInstance->Get_GameObjcet(

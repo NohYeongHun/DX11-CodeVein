@@ -14,8 +14,8 @@ BT_RESULT CBT_Monster_IdleAction::Perform_Action(_float fTimeDelta)
 	{
 	case IDLE_PHASE::ENTER:
 		return EnterIdle(fTimeDelta);
-	case IDLE_PHASE::LOOP:
-		return LoopIdle(fTimeDelta);
+	/*case IDLE_PHASE::LOOP:
+		return LoopIdle(fTimeDelta);*/
 	case IDLE_PHASE::COMPLETED:
 		return BT_RESULT::SUCCESS;
 	}
@@ -33,25 +33,29 @@ void CBT_Monster_IdleAction::Reset()
 BT_RESULT CBT_Monster_IdleAction::EnterIdle(_float fTimeDelta)
 {
 	m_pOwner->Set_RootMotionTranslate(false);
-	_uint iNextAnimationIdx = m_pOwner->Find_AnimationIndex(L"IDLE");
-	m_pOwner->Change_Animation_NonBlend(iNextAnimationIdx);
-	m_eIdlePhase = IDLE_PHASE::LOOP;
+	if (m_pOwner->Is_Animation_Finished())
+	{ 
+		_uint iNextAnimationIdx = m_pOwner->Find_AnimationIndex(L"IDLE");
+		m_pOwner->Change_Animation_NonBlend(iNextAnimationIdx);
+		m_eIdlePhase = IDLE_PHASE::COMPLETED;
+	}
+	
 
 	return BT_RESULT::RUNNING;
 }
 
-BT_RESULT CBT_Monster_IdleAction::LoopIdle(_float fTimeDelta)
-{
-	m_pOwner->RotateTurn_ToTargetYaw(fTimeDelta * 4.f);
-	if (m_pOwner->IsRotateFinished(XMConvertToRadians(4.f)))
-	{
-		m_eIdlePhase = IDLE_PHASE::COMPLETED;
-	}
-
-
-
-    return BT_RESULT::RUNNING;
-}
+//BT_RESULT CBT_Monster_IdleAction::LoopIdle(_float fTimeDelta)
+//{
+//	m_pOwner->RotateTurn_ToTargetYaw(fTimeDelta * 4.f);
+//	if (m_pOwner->IsRotateFinished(XMConvertToRadians(4.f)))
+//	{
+//		m_eIdlePhase = IDLE_PHASE::COMPLETED;
+//	}
+//
+//
+//
+//    return BT_RESULT::RUNNING;
+//}
 
 CBT_Monster_IdleAction* CBT_Monster_IdleAction::Create(CMonster* pOwner)
 {

@@ -62,7 +62,7 @@ BT_RESULT CBT_QueenKnight_DashAttackAction::Enter_Attack(_float fTimeDelta)
 BT_RESULT CBT_QueenKnight_DashAttackAction::Update_Rotating(_float fTimeDelta)
 {
     // 1. 타겟을 향해 Rotate
-    m_pOwner->RotateTurn_ToTargetYaw(fTimeDelta);
+    m_pOwner->RotateTurn_ToTargetYaw();
 
     // 라디안 5도 차이까지만 허용
     if (m_pOwner->IsRotateFinished(XMConvertToRadians(5.f)))

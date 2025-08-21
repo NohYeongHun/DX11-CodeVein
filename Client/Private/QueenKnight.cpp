@@ -393,6 +393,7 @@ HRESULT CQueenKnight::InitializeAction_ToAnimationMap()
 
     m_Action_AnimMap.emplace(L"RUN", AS_TStdKnight_TShieldSword_Guard_Run_F_Loop);
     m_Action_AnimMap.emplace(L"WALK", AS_TStdKnight_TShieldSword_Guard_Walk_F_Loop);
+    m_Action_AnimMap.emplace(L"WALK_B", AS_TStdKnight_TShieldSword_Guard_Walk_B_Loop);
     // 같은 애니메이션이지만 다른 이름으로 설정해서 Node에서 사용할 수 있게함.
     m_Action_AnimMap.emplace(L"DETECT", AS_TStdKnight_TShieldSword_Guard_Run_F_Loop);
     m_Action_AnimMap.emplace(L"DOWN_START", AS_TStdKnight_TCmn_Down_P_Loop);

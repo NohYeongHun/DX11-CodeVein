@@ -34,15 +34,31 @@ private:
 private:
     CBTSelector* Create_ActionStates_ToSelector();
 
+
 private:
     /* 우선순위가 높은 공격 행동 체크 */
     // 특수 공격 => 쿨타임 돌았다면?
 
+#pragma region 특수 공격
+private:
+    /* 우선 순위 순*/
     CBTSequence* Create_TripleDownAttack_ToSequence();
-    CBTSequence* Create_DashAttack_ToSequence(); 
+    CBTSequence* Create_DashAttack_ToSequence();
     CBTSequence* Create_FirstPhaseAttack_ToSequence(); // Phase1 기본 공격.
     CBTSequence* Create_SecondPhaseAttack_ToSequence();   // Phase2 기본 공격
+#pragma endregion
+
+    
+#pragma region 일반 공격
+
+
+private:
     CBTSequence* Create_AttackAction_ToSequence();
+#pragma endregion
+
+private:
+    CBTSequence* Create_Rotate_ToSequence();
+
 
 private:
     CBTSequence* Create_SearchAction_ToSequence();

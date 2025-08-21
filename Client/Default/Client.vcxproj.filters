@@ -196,6 +196,9 @@
     <Filter Include="01. Levels\01. StageOne">
       <UniqueIdentifier>{fb8c9382-2604-48c3-911a-f55df82be670}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. GameObject\Monster\BT\Rotate">
+      <UniqueIdentifier>{dadaae67-9fc8-4332-a9ce-cd1234a26380}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -477,9 +480,6 @@
     <ClInclude Include="..\Public\BT_Monster_DetectAction.h">
       <Filter>02. GameObject\Monster\BT\Detect</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\BT_Monster_IdleAction.h">
-      <Filter>02. GameObject\Monster\BT\Idle</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\QueenKnightDefine.h">
       <Filter>02. GameObject\Monster\Boss\QueenKnight</Filter>
     </ClInclude>
@@ -548,6 +548,15 @@
     </ClInclude>
     <ClInclude Include="..\Public\Fade_Out.h">
       <Filter>02. GameObject\UI\FadeOut</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BT_Monster_RotateAction.h">
+      <Filter>02. GameObject\Monster\BT\Rotate</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BT_Monster_IsRotate.h">
+      <Filter>02. GameObject\Monster\BT\Rotate</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BT_Monster_IdleAction.h">
+      <Filter>02. GameObject\Monster\BT\Idle</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -878,6 +887,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\Fade_Out.cpp">
       <Filter>02. GameObject\UI\FadeOut</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BT_Monster_RotateAction.cpp">
+      <Filter>02. GameObject\Monster\BT\Rotate</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BT_Monster_IsRotate.cpp">
+      <Filter>02. GameObject\Monster\BT\Rotate</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

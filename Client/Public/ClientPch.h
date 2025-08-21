@@ -118,6 +118,8 @@
 #include "BT_Monster_IsDetectRange.h"
 #include "BT_Monster_DetectAction.h"
 #include "BT_Monster_IdleAction.h"
+#include "BT_Monster_IsRotate.h"
+#include "BT_Monster_RotateAction.h"
 
 /* ======================================== Monster Object ===================================== */
 #include "BossHpBarUI.h"

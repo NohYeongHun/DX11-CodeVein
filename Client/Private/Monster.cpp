@@ -197,8 +197,7 @@ _uint CMonster::Find_AnimationIndex(const _wstring& strAnimationTag)
     // 찾는 애니메이션이 없는 경우
     if (iter == m_Action_AnimMap.end())
     {
-        CRASH("Failed Find Animation"); 
-        return 0;
+        return (_uint)-1; // -1 반환으로 애니메이션 없음을 표시
     }
 
     return iter->second;
@@ -549,6 +548,42 @@ void CMonster::RotateTurn_ToTargetYaw()
     // 즉시 회전 적용
     _vector qNewRot = XMQuaternionRotationAxis(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTargetYaw);
     m_pTransformCom->Set_Quaternion(qNewRot);
+}
+
+/* Rotate를 해야하는가? */
+_bool CMonster::Is_RotateCondition()
+{
+    if (nullptr == m_pTarget)
+        return false;
+
+    // 현재 몬스터와 타겟 방향 계산
+    _vector vMyPos = m_pTransformCom->Get_State(STATE::POSITION);
+    _vector vTargetPos = m_pTarget->Get_Transform()->Get_State(STATE::POSITION);
+    _vector vToTarget = vTargetPos - vMyPos;
+
+    vToTarget = XMVectorSetY(vToTarget, 0.f);
+    vToTarget = XMVector3Normalize(vToTarget);
+
+    // 현재 몬스터의 전방 벡터
+    _vector vLook = m_pTransformCom->Get_State(STATE::LOOK);
+    vLook = XMVectorSetY(vLook, 0.f);
+    vLook = XMVector3Normalize(vLook);
+
+    // 내적으로 각도 차이 계산
+    _float fDot = XMVectorGetX(XMVector3Dot(vLook, vToTarget));
+    _float fAngleDiff = acosf(max(-1.f, min(1.f, fDot)));
+
+
+    // 45도 이상이면 Rotate (더 자연스러운 회전 조건)
+    return fAngleDiff >= XMConvertToRadians(30.f);
+}
+
+_vector CMonster::Get_TargetVector()
+{
+    _vector vPos = m_pTransformCom->Get_State(STATE::POSITION);
+    _vector vTargetPos = m_pTarget->Get_Transform()->Get_State(STATE::POSITION);
+
+    return XMVector3Normalize(vTargetPos - vPos);
 }
 
 const _bool CMonster::IsRotateFinished(_float fRadian)

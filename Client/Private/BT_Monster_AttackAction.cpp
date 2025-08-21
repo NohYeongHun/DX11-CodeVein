@@ -43,11 +43,18 @@ BT_RESULT CBT_Monster_AttackAction::EnterAttack(_float fTimeDelta)
     }
 
     // 1. 다음 단계로 진행
-    m_eAttackPhase = ATTACK_PHASE::ROTATING;
+    //m_eAttackPhase = ATTACK_PHASE::ROTATING;
 
-    
-    // 2. 루트모션 설정.
-    
+    m_eAttackPhase = ATTACK_PHASE::LOOP;
+    m_pOwner->Set_RootMotionTranslate(true);
+    // 1. 공격 애니메이션 선택
+    _uint iNextAnimationIdx = m_pOwner->Find_AnimationIndex(L"ATTACK");
+
+    // 2. 공격 상태로 변경
+    m_pOwner->Change_Animation_Blend(iNextAnimationIdx);
+
+    // 3. 콜라이더 상태 초기화
+    m_pOwner->Reset_Collider_ActiveInfo();
 
     return BT_RESULT::RUNNING;
 }
@@ -55,7 +62,7 @@ BT_RESULT CBT_Monster_AttackAction::EnterAttack(_float fTimeDelta)
 BT_RESULT CBT_Monster_AttackAction::UpdateRotating(_float fTimeDelta)
 {
     // 0. 한번에 회전.
-    m_pOwner->Rotate_ToTarget(fTimeDelta);
+    m_pOwner->RotateTurn_ToTargetYaw(fTimeDelta);
 
     if (m_pOwner->IsRotateFinished(XMConvertToRadians(10.f))) // 라디안 10도 차이까지만 허용
     {

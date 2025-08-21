@@ -37,10 +37,10 @@ public:
 public:
 	_vector Get_Center();
 
-#ifdef _DEBUG
-public:
-	HRESULT Render();
-#endif
+//#ifdef _DEBUG
+//public:
+//	HRESULT Render();
+//#endif
 
 public:
 	HRESULT Render();
