@@ -32,6 +32,13 @@
 #include "VIBuffer_Rect.h"
 #include "VIBuffer_Terrain.h"
 #include "VIBuffer_Cube.h"
+
+#pragma region INSTANCING
+#include "VIBuffer_Instance.h"
+#include "VIBuffer_Rect_Instance.h"
+#pragma endregion
+
+
 #include "Texture.h"
 #include "Texture_Manager.h"
 
