@@ -280,6 +280,7 @@ HRESULT CSlaveVampire::InitializeAction_ToAnimationMap()
     m_Action_AnimMap.emplace(L"DEATH_BACK", SLAVEVAMPIRE_DEATH_B);
     m_Action_AnimMap.emplace(L"DEATH_NORMAL", SLAVEVAMPIRE_DEATH_N);
     m_Action_AnimMap.emplace(L"WALK", SLAVEVAMPIRE_WALK_F_LOOP);
+    m_Action_AnimMap.emplace(L"WALK_B", SLAVEVAMPIRE_WALK_B_LOOP);
     m_Action_AnimMap.emplace(L"RUN", SLAVEVAMPIRE_RUN_F_LOOP);
     // 같은 애니메이션이지만 다른 이름으로 설정해서 Node에서 사용할 수 있게함.
     m_Action_AnimMap.emplace(L"DETECT", SLAVEVAMPIRE_RUN_F_LOOP);
@@ -309,7 +310,7 @@ HRESULT CSlaveVampire::Initialize_BuffDurations()
     m_BuffDefault_Durations[BUFF_DEAD] = 10.f;
     m_BuffDefault_Durations[BUFF_CORPSE] = 5.f;       // 시체 : 2.0초
     m_BuffDefault_Durations[BUFF_INVINCIBLE] = 0.3f; // 무적 시간.
-    m_BuffDefault_Durations[BUFF_ATTACK_TIME] = 2.f; // 공격 쿨타임.
+    m_BuffDefault_Durations[BUFF_ATTACK_TIME] = 1.f; // 공격 쿨타임.
     m_BuffDefault_Durations[BUFF_DETECT] = 1.f; // 탐지 쿨타임: 0.2초
 
 

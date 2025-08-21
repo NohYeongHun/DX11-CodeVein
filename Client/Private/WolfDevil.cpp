@@ -282,6 +282,7 @@ HRESULT CWolfDevil::InitializeAction_ToAnimationMap()
     m_Action_AnimMap.emplace(L"DOWN_END", WOLFDEVIL_DOWN_P_END);
     m_Action_AnimMap.emplace(L"THREAT", WOLFDEVIL_THREAT_01);
     m_Action_AnimMap.emplace(L"WALK", WOLFDEVIL_WALK_F);
+    m_Action_AnimMap.emplace(L"WALK_B", WOLFDEVIL_DODGE_BACK);
     m_Action_AnimMap.emplace(L"RUN", WOLFDEVIL_RUN);
     // 같은 애니메이션이지만 다른 이름으로 설정해서 Node에서 사용할 수 있게함.
     m_Action_AnimMap.emplace(L"DETECT", WOLFDEVIL_RUN); 
@@ -312,8 +313,8 @@ HRESULT CWolfDevil::Initialize_BuffDurations()
     m_BuffDefault_Durations[BUFF_DEAD] = 10.f;
     m_BuffDefault_Durations[BUFF_CORPSE] = 5.f;       // 시체 : 2.0초
     m_BuffDefault_Durations[BUFF_INVINCIBLE] = 0.3f; // 무적 시간.
-    m_BuffDefault_Durations[BUFF_ATTACK_TIME] = 2.f; // 공격 쿨타임.
-    m_BuffDefault_Durations[BUFF_DETECT] = 1.f; // 탐지 쿨타임: 0.2초
+    m_BuffDefault_Durations[BUFF_ATTACK_TIME] = 1.f; // 공격 쿨타임.
+    m_BuffDefault_Durations[BUFF_DETECT] = 0.5f; // 탐지 쿨타임: 0.2초
 
 
     return S_OK;

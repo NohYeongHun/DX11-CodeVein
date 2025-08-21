@@ -27,7 +27,7 @@ public:
 private:
     BT_RESULT EnterIdle(_float fTimeDelta);
     
-    BT_RESULT LoopIdle(_float fTimeDelta);
+    //BT_RESULT LoopIdle(_float fTimeDelta);
     
    
 

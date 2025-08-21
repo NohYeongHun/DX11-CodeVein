@@ -7,9 +7,10 @@
 /* 플레이어가 해당 거리에 와있는가? */
 _bool CBT_Monster_IsDetectRange::Check_Condition()
 {
-    _bool bCheckCondition =
-        (m_pOwner->Is_TargetDetectionRange()
-            && !m_pOwner->HasAnyBuff(CMonster::BUFF_DEAD | CMonster::BUFF_DETECT));
+    if (m_pOwner->HasAnyBuff(CMonster::BUFF_DEAD | CMonster::BUFF_DETECT | CMonster::BUFF_HIT))
+        return false;
+
+    _bool bCheckCondition = m_pOwner->Is_TargetDetectionRange();
     return bCheckCondition;
 }
 

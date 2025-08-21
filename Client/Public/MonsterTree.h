@@ -35,10 +35,13 @@ private:
     CBTSelector* Create_ActionStates_ToSelector();
 
 private:
+    CBTSequence* Create_Rotate_ToSequence();
+
     /* 액션 행동 체크 */
     CBTSequence* Create_AttackAction_ToSequence();
 
 private:
+    
     CBTSequence* Create_SearchAction_ToSequence();
 
 #pragma endregion
@@ -53,6 +56,7 @@ private:
     //CBTNode* Create_PatrolBranch();
 
 private:
+    CBTSequence* Create_IdleAction_ToSequence();
     /* 모든 상태가 실패하면? */
     CBTAction* Create_IdleAction();
 

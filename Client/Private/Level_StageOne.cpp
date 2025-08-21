@@ -253,11 +253,11 @@ HRESULT CLevel_StageOne::Ready_Monster_Trigger()
 			, TEXT("Layer_Player"), 0));
 
 	// 1. 객체 생성 해서 Trigger Manager에 전달.
-	if (FAILED(Ready_Layer_Monster(TEXT("Layer_Monster"))))
-	{
-		CRASH("Failed Layer_Monster");
-		return E_FAIL;
-	}
+	//if (FAILED(Ready_Layer_Monster(TEXT("Layer_Monster"))))
+	//{
+	//	CRASH("Failed Layer_Monster");
+	//	return E_FAIL;
+	//}
 
 	return S_OK;
 }
@@ -351,7 +351,7 @@ HRESULT CLevel_StageOne::Ready_Layer_SlaveVampire(const _wstring& strLayerTag)
 	Desc.eCurLevel = m_eCurLevel;
 	Desc = { 50.f, XMConvertToRadians(90.0f)
 		, nullptr,  m_eCurLevel, MONSTERTYPE::NORMAL,
-		900.f, 70.f, 10.f, 7.f, 50.f, 50.f };
+		900.f, 70.f, 15.f, 5.f, 50.f, 50.f };
 
 	Desc.pPlayer = dynamic_cast<CPlayer*>(
 		m_pGameInstance->Get_GameObjcet(

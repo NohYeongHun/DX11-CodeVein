@@ -261,11 +261,15 @@ public:
     virtual void RotateTurn_ToTargetYaw(_float fTimeDelta); // 플레이어를 보면서 회전하는데 Yaw로만 회전.
     virtual void RotateTurn_ToTargetYaw(); // 플레이어를 보면서 회전하는데 Yaw로만 회전.
     
+    _bool Is_RotateCondition();
+    _vector Get_TargetVector();
 
     virtual const _bool IsRotateFinished(_float fRadian);
     virtual void NearCell_Translate();
     const _float Get_TargetDegreeNoPitch();
     const ROTATION_INFO Get_SimpleTargetRotation();
+
+
 
 
 public:

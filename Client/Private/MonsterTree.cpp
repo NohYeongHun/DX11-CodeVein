@@ -39,7 +39,8 @@ HRESULT CMonsterTree::Initialize(void* pArg)
     pRootSelector->Add_Child(Create_ActionStates_ToSelector());
 
     // 4. 모두 실패했을 경우.
-    pRootSelector->Add_Child(Create_IdleAction());
+    //pRootSelector->Add_Child(Create_IdleAction());
+    pRootSelector->Add_Child(Create_IdleAction_ToSequence());
     Set_Root_Node(pRootSelector);
 
     return S_OK;
@@ -104,9 +105,22 @@ CBTSelector* CMonsterTree::Create_ActionStates_ToSelector()
 
     // 액션 상태에서는 Sequence를 제어합니다.
     pActionState_Selector->Add_Child(Create_AttackAction_ToSequence());
+    pActionState_Selector->Add_Child(Create_Rotate_ToSequence());
     pActionState_Selector->Add_Child(Create_SearchAction_ToSequence());
+    
+    
+    
 
     return pActionState_Selector;
+}
+
+CBTSequence* CMonsterTree::Create_Rotate_ToSequence()
+{
+    CBTSequence* pRotate_Sequence = CBTSequence::Create();
+    pRotate_Sequence->Add_Child(CBT_Monster_IsRotate::Create(m_pOwner));
+    pRotate_Sequence->Add_Child(CBT_Monster_RotateAction::Create(m_pOwner));
+
+    return pRotate_Sequence;
 }
 
 /* Attack Action은 가지고 있는 Resource를 이용해야 확인 가능합니다. */
@@ -129,6 +143,16 @@ CBTSequence* CMonsterTree::Create_SearchAction_ToSequence()
     return pSearchSequence;
 }
 
+
+CBTSequence* CMonsterTree::Create_IdleAction_ToSequence()
+{
+    CBTSequence* pIdleSequence = CBTSequence::Create();
+    //pIdleSequence->Add_Child(CBT_Monster_RotateAction::Create(m_pOwner));
+    pIdleSequence->Add_Child(CBT_Monster_IdleAction::Create(m_pOwner));
+    
+
+    return pIdleSequence;
+}
 
 CBTAction* CMonsterTree::Create_IdleAction()
 {

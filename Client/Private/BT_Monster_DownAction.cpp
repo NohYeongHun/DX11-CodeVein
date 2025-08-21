@@ -1,5 +1,4 @@
-﻿#include "BT_Monster_DownAction.h"
-
+﻿
 /* 공용해서 쓸 수 있을것인가? */
 CBT_Monster_DownAction::CBT_Monster_DownAction(CMonster* pOwner)
     : m_pOwner{ pOwner }

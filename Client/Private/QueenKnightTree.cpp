@@ -101,9 +101,12 @@ CBTSelector* CQueenKnightTree::Create_ActionStates_ToSelector()
     pActionState_Selector->Add_Child(Create_FirstPhaseAttack_ToSequence());
     pActionState_Selector->Add_Child(Create_AttackAction_ToSequence());
     pActionState_Selector->Add_Child(Create_SearchAction_ToSequence());
+    pActionState_Selector->Add_Child(Create_Rotate_ToSequence());
 
     return pActionState_Selector;
 }
+
+
 
 
 CBTSequence* CQueenKnightTree::Create_TripleDownAttack_ToSequence()
@@ -139,6 +142,9 @@ CBTSequence* CQueenKnightTree::Create_SecondPhaseAttack_ToSequence()
     return nullptr;
 }
 
+
+
+
 CBTSequence* CQueenKnightTree::Create_AttackAction_ToSequence()
 {
     CBTSequence* pAttack_Sequence = CBTSequence::Create();
@@ -146,6 +152,14 @@ CBTSequence* CQueenKnightTree::Create_AttackAction_ToSequence()
     pAttack_Sequence->Add_Child(CBT_Monster_AttackAction::Create(m_pOwner));
 
     return pAttack_Sequence;
+}
+
+CBTSequence* CQueenKnightTree::Create_Rotate_ToSequence()
+{
+    CBTSequence* pRotate_Sequence = CBTSequence::Create();
+    pRotate_Sequence->Add_Child(CBT_Monster_IsRotate::Create(m_pOwner));
+    pRotate_Sequence->Add_Child(CBT_Monster_RotateAction::Create(m_pOwner));
+    return pRotate_Sequence;
 }
 
 CBTSequence* CQueenKnightTree::Create_SearchAction_ToSequence()

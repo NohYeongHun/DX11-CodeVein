@@ -174,8 +174,21 @@ HRESULT CPlayer::Render()
     ImGui::Begin("Player Debug", nullptr, ImGuiWindowFlags_NoCollapse);
 
     _float3 vPos = {};
-    XMStoreFloat3(&vPos, m_pTransformCom->Get_State(STATE::POSITION));
+    _vector vMine = m_pTransformCom->Get_State(STATE::POSITION);
+    XMStoreFloat3(&vPos, vMine);
     ImGui::Text("Player Pos: (%.2f, %.2f, %.2f)", vPos.x, vPos.y, vPos.z);
+
+    if (m_pLockOn_Target)
+    {
+        _float3 vLockOnPos = {};
+        _vector vLockOn = m_pLockOn_Target->Get_Transform()->Get_State(STATE::POSITION);
+        XMStoreFloat3(&vLockOnPos, vLockOn);
+        ImGui::Text("LockOn Target Pos: (%.2f, %.2f, %.2f)", vLockOnPos.x, vLockOnPos.y, vLockOnPos.z);
+
+        _float fDistance = XMVectorGetX(XMVector3Length(vLockOn - vMine));
+        ImGui::Text("LockOn Distance : (%.2f)", fDistance);
+    }
+    
 
     // === Navigation Debug UI 추가 ===
     ImGui::Separator();
