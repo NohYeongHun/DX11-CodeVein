@@ -28,12 +28,14 @@ protected:
 protected:
 	unordered_map<_uint, COLLIDER_ACTIVE_INFO> m_ColliderActiveMap;
 	_bool m_bPrevColliderState = false;
+	CPlayer::COLLIDER_PARTS m_eColliderType = CPlayer::PART_WEAPON; // 기본값은 무기 충돌체
 
 
 protected:
 	virtual void Handle_Collider_State();
 	virtual void Reset_ColliderActiveInfo();
 	virtual void Update_Collider_State();
+	virtual void Force_Disable_All_Colliders(); // 모든 콜라이더 강제 비활성화
 
 #pragma endregion
 

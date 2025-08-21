@@ -135,6 +135,42 @@ namespace Engine
 		};
 	}VTXMESH;
 
+#pragma region PARTICLE INSTANCE STRUCTS
+	typedef struct tagVertexInstanceMesh
+	{
+		XMFLOAT4	vRight;
+		XMFLOAT4	vUp;
+		XMFLOAT4	vLook;
+		XMFLOAT4	vTranslation;
+	}VTXINSTANCE_MESH;
+
+	typedef struct tagVertexInstanceParticle
+	{
+		XMFLOAT4	vRight;
+		XMFLOAT4	vUp;
+		XMFLOAT4	vLook;
+		XMFLOAT4	vTranslation;
+
+		XMFLOAT2	vLifeTime;
+	}VTXINSTANCE_PARTICLE;
+
+	typedef struct tagVertexParticle
+	{
+		static const unsigned int	iNumElements = { 6 };
+		static constexpr D3D11_INPUT_ELEMENT_DESC	Elements[iNumElements] = {
+			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+			{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+
+			{ "TEXCOORD", 1, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 0, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+			{ "TEXCOORD", 2, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 16, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+			{ "TEXCOORD", 3, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 32, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+			{ "TEXCOORD", 4, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 48, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+		};
+	}VTXPARTICLE;
+#pragma endregion
+
+	
+
 	/* KEYFRAME에 대한 정보. */
 	typedef struct tagKeyFrame
 	{
@@ -233,6 +269,17 @@ namespace Engine
 		_float3 vTriangleVertices[3]; // 히트된 삼각형의 3개 정점
 						
 	} MODEL_PICKING_INFO;
+
+	typedef struct tagTriggerMonsterDesc
+	{
+		_float3  vTriggerPos;      // 트리거 발동 위치.
+		_float   fRadius;          // 트리거 반지름 범위.
+		_wstring strTriggerLayer; // 어떤 Layer에서 객체를 꺼낼건지?
+		_wstring strObjectLayer;  // 어떤 Layer로 추가해줄 것인지?
+		_uint    iCount;	      // 얼마나 꺼낼건지?
+		_int     iFlag = -1;      // 0 : 초기, 1 : 실행 완료, -1 : 오류
+	}TRIGGER_MONSTER_DESC;
+
 }
 
 #include "Event_Type.h"

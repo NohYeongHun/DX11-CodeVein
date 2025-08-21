@@ -321,6 +321,9 @@ _bool CLoad_Model::Play_Animation(_float fTimeDelta)
 	m_isFinished = false;
 	m_isTrackEnd = false;
 
+	if (m_IsStopAnimation)
+		fTimeDelta = 0.f;
+		
 
 	// 2. 애니메이션을 실행합니다. => 실행하기전에 루트 움직이지마라.
 	m_Animations[m_iCurrentAnimIndex]->Update_TransformationMatrices(

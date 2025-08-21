@@ -51,9 +51,21 @@ void CPlayer_AttackState::Enter(void* pArg)
 	m_fCurrentLockTime = 0.0f;
 	m_bIsDirectionLocked = false;
 
-
-	
-	// 애니메이션이 존재할때 언제부터 활성화되어야 하는가에 대한 결정을 애니메이션이?
+	// 락온 중이면 타겟을 향해 즉시 회전
+	if (m_pPlayer->Is_LockOn() && m_pPlayer->Has_LockOn_Target())
+	{
+		_vector vLockOnDirection = m_pPlayer->Calculate_LockOn_Direction();
+		if (!XMVector3Equal(vLockOnDirection, XMVectorZero()))
+		{
+			// 락온 방향으로 즉시 회전
+			_float x = XMVectorGetX(vLockOnDirection);
+			_float z = XMVectorGetZ(vLockOnDirection);
+			_float fTargetYaw = atan2f(x, z);
+			
+			_vector qNewRot = XMQuaternionRotationAxis(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTargetYaw);
+			m_pPlayer->Get_Transform()->Set_Quaternion(qNewRot);
+		}
+	}
 }
 
 /* State 실행 */
@@ -70,12 +82,13 @@ void CPlayer_AttackState::Update(_float fTimeDelta)
 // 종료될 때 실행할 동작..
 void CPlayer_AttackState::Exit()
 {
+	// 무기 콜라이더 강제 비활성화
+	Force_Disable_All_Colliders();
+	
 	if (m_iNextState != -1)
 	{
 		m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, false);
 	}
-
-	//m_pFsm->Set_StateCoolTime(CPlayer::DODGE, 0.1f);
 	
 }
 
@@ -176,14 +189,9 @@ void CPlayer_AttackState::Change_State(_float fTimeDelta)
 
 _vector CPlayer_AttackState::Calculate_Input_Direction_From_Camera()
 {
-	// 기존 Player 클래스의 함수를 재사용
 	ACTORDIR eInputDir = m_pPlayer->Calculate_Direction();
 	return m_pPlayer->Calculate_Move_Direction(eInputDir);
 }
-
-
-
-
 
 
 CPlayer_AttackState* CPlayer_AttackState::Create(_uint iStateNum, void* pArg)

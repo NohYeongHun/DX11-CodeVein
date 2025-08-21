@@ -15,8 +15,8 @@ private:
 	virtual ~CHPBar() = default;
 
 public:
-	void Increase_Hp(_uint iHp, _float fTime);
-	void Decrease_Hp(_uint iHp, _float fTime);
+	void Increase_Hp(_float fHp, _float fTime);
+	void Decrease_Hp(_float fHp, _float fTime);
 
 public:
 	virtual HRESULT Initialize_Prototype();
@@ -40,8 +40,8 @@ private:
 	_float m_fRightRatio = {};
 	_float m_fLeftRatio = {};
 
-	_uint  m_iHp = {};
-	_uint  m_iMaxHp = {};
+	_float  m_fHp = {};
+	_float  m_fMaxHp = {};
 
 	_bool  m_bIncrease = { false };
 	_bool  m_bDecrease = { false };

@@ -6,9 +6,12 @@ class CWolfDevil final : public CMonster
 {
 public:
 	// 어떤 타입의 Collider를 제어할것인지 정의.
+public:
+	// 어떤 타입의 PART OBJECT 를 제어할것인지 정의.
 	enum PART_TYPE : _uint
 	{
-
+		PART_WEAPON = 0,
+		PART_END
 	};
 
 public:
@@ -43,6 +46,11 @@ public:
 	virtual void On_Collision_Enter(CGameObject* pOther);
 	virtual void On_Collision_Stay(CGameObject* pOther);
 	virtual void On_Collision_Exit(CGameObject* pOther);
+	virtual void Collider_All_Active(_bool bActive);
+
+	// 무기 정의.
+private:
+	class CWolfWeapon* m_pWeapon = { nullptr };
 #pragma endregion
 
 
@@ -86,6 +94,7 @@ private:
 	HRESULT Ready_BehaviorTree();
 	HRESULT Ready_Render_Resources();
 	HRESULT Ready_PartObjects();
+	HRESULT Initialize_ColliderFrames();
 #pragma endregion
 
 

@@ -64,6 +64,9 @@ void CLevel_Loading::Open_Level()
 	case LEVEL::GAMEPLAY:
 		pNewLevel = CLevel_GamePlay::Create(m_pDevice, m_pContext);
 		break;
+	case LEVEL::STAGEONE:
+		pNewLevel = CLevel_StageOne::Create(m_pDevice, m_pContext);
+		break;
 	}
 
 	if (FAILED(m_pGameInstance->Open_Level(static_cast<_uint>(m_eNextLevelID), pNewLevel)))

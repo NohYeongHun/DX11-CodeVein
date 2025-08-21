@@ -23,6 +23,7 @@ public:
 		return m_vPoints[ENUM_CLASS(ePoint)]; 
 	}
 
+	void Set_PointPos(CELLPOINT ePoint, _float3 vPos);
 	
 
 public:
@@ -39,8 +40,10 @@ public:
 #ifdef _DEBUG
 public:
 	HRESULT Render();
-
 #endif
+
+public:
+	HRESULT Render();
 
 private:
 	ID3D11Device* m_pDevice = { nullptr };
@@ -50,11 +53,9 @@ private:
 	_int					m_iIndex = {};
 	_int					m_iNeighborIndices[ENUM_CLASS(LINE::END)] = { -1, -1, -1 };
 
-#ifdef _DEBUG
 private:
 	class CVIBuffer_Cell* m_pVIBuffer = { nullptr };
 
-#endif
 
 public:
 	static CCell* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _float3* pPoints, _int iIndex);

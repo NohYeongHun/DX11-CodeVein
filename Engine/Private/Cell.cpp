@@ -9,6 +9,11 @@ CCell::CCell(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 
 
 
+void CCell::Set_PointPos(CELLPOINT ePoint, _float3 vPos)
+{
+	m_vPoints[ENUM_CLASS(ePoint)] = vPos;
+}
+
 HRESULT CCell::Initialize(const _float3* pPoints, _int iIndex)
 {
 	m_iIndex = iIndex;
@@ -27,11 +32,15 @@ HRESULT CCell::Initialize(const _float3* pPoints, _int iIndex)
 	m_vNormals[ENUM_CLASS(LINE::CA)] = _float3(XMVectorGetZ(vLine) * -1.f, 0.f, XMVectorGetX(vLine));
 
 
-#ifdef _DEBUG
 	m_pVIBuffer = CVIBuffer_Cell::Create(m_pDevice, m_pContext, pPoints);
 	if (nullptr == m_pVIBuffer)
 		return E_FAIL;
-#endif
+
+//#ifdef _DEBUG
+//	m_pVIBuffer = CVIBuffer_Cell::Create(m_pDevice, m_pContext, pPoints);
+//	if (nullptr == m_pVIBuffer)
+//		return E_FAIL;
+//#endif
 
 	return S_OK;
 }
@@ -104,7 +113,6 @@ _vector CCell::Get_Center()
 	return XMVectorSet(PositionX, PositionY, PositionZ, 1.f);
 }
 
-#ifdef _DEBUG
 HRESULT CCell::Render()
 {
 	m_pVIBuffer->Bind_Resources();
@@ -112,7 +120,16 @@ HRESULT CCell::Render()
 
 	return S_OK;
 }
-#endif
+
+//#ifdef _DEBUG
+//HRESULT CCell::Render()
+//{
+//	m_pVIBuffer->Bind_Resources();
+//	m_pVIBuffer->Render();
+//
+//	return S_OK;
+//}
+//#endif
 
 CCell* CCell::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _float3* pPoints, _int iIndex)
 {
@@ -131,9 +148,11 @@ void CCell::Free()
 {
 	CBase::Free();
 
-#ifdef _DEBUG
+//#ifdef _DEBUG
+//	Safe_Release(m_pVIBuffer);
+//#endif
+
 	Safe_Release(m_pVIBuffer);
-#endif
 
 	Safe_Release(m_pDevice);
 	Safe_Release(m_pContext);

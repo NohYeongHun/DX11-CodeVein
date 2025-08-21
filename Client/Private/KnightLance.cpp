@@ -39,6 +39,8 @@ HRESULT CKnightLance::Initialize(void* pArg)
     m_pTransformCom->Rotation(XMVectorSet(0.f, 1.f, 0.f, 0.f), XMConvertToRadians(90.0f));
     m_pTransformCom->Set_State(STATE::POSITION, XMVectorSet(0.8f, 0.f, 0.f, 1.f));*/
 
+    // 기본 false;
+    m_pColliderCom->Set_Active(false);
     return S_OK;
 }
 
@@ -62,8 +64,13 @@ void CKnightLance::Update(_float fTimeDelta)
 void CKnightLance::Late_Update(_float fTimeDelta)
 {
     CWeapon::Late_Update(fTimeDelta);
-    if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::BLEND, this)))
-        return;
+
+    if (Is_Visible())
+    {
+        if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::BLEND, this)))
+            return;
+    }
+    
 }
 
 HRESULT CKnightLance::Render()
@@ -131,7 +138,7 @@ HRESULT CKnightLance::Ready_Colliders()
     BOUNDING_BOX box = m_pModelCom->Get_BoundingBox();
 
     CBounding_OBB::BOUNDING_OBB_DESC  OBBDesc{};
-    OBBDesc.vExtents = _float3(box.vExtents.x, box.vExtents.y, box.vExtents.z);
+    OBBDesc.vExtents = _float3(box.vExtents.x * 3.f, box.vExtents.y, box.vExtents.z);
     OBBDesc.vCenter = _float3(0.f, -box.vExtents.y, 0.f); // 중점.
 
 
@@ -156,7 +163,7 @@ HRESULT CKnightLance::Ready_Colliders()
     }
 
     /* 생성과 동시에 등록 */
-    m_pGameInstance->Add_Collider_To_Manager(m_pColliderCom);
+    m_pGameInstance->Add_Collider_To_Manager(m_pColliderCom, ENUM_CLASS(m_eCurLevel));
 
     return S_OK;
 }

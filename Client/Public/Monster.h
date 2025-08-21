@@ -7,6 +7,12 @@ NS_BEGIN(Client)
 class CMonster abstract : public CContainerObject
 {
 public:
+    typedef struct tagRotationInfo {
+        _float fSignedAngleDegrees; // -180~+180 (음수=왼쪽, 양수=오른쪽)
+        _bool bIsRight;
+    }ROTATION_INFO;
+
+public:
     // 지금 뭘하고 있니? => 한번에 하나밖에 수행 못함. (Is a 관계 하나만 됨.)
 
     // 액션에 맞는 Animation 동기화가 필요함.
@@ -14,18 +20,21 @@ public:
     // 너 지금 어떤 버프/디버프에 걸려있니?
     // Has 관계 => 가지고 있는지 여부를 판단합니다. (여러 개)
 
-    // 1 ~ 23은 커스텀사용
-    enum BUFF_FLAGS : _uint
+    // 1 ~ 21은 커스텀사용
+    enum BUFFe_FLAGS : _uint
     {
         BUFF_NONE = 0,
         
-        BUFF_HIT = 1 << 24,
-        BUFF_DOWN = 1 << 25,
-        BUFF_STUN = 1 << 26,
-        BUFF_INVINCIBLE = 1 << 27, // 무적시간.
-        BUFF_DEAD = 1 << 28,
-        BUFF_CORPSE = 1 << 29, // 거의 마지막에만 사용할듯?
-        BUFF_DISSOLVE = 1 << 30,
+        BUFF_NAVIGATION_OFF =  1 << 20,
+        BUFF_DETECT = 1 << 21,
+        BUFF_ATTACK_TIME = 1 << 22,
+        BUFF_HIT = 1 << 23,
+        BUFF_DOWN = 1 << 24,
+        BUFF_STUN = 1 << 25,
+        BUFF_INVINCIBLE = 1 << 26, // 무적시간.
+        BUFF_DEAD = 1 << 27,
+        BUFF_CORPSE = 1 << 28, // 거의 마지막에만 사용할듯?
+        BUFF_DISSOLVE = 1 << 29,
         BUFF_END
     };
 
@@ -41,7 +50,32 @@ public:
         _float fAttackRange;
         _float fMoveSpeed;
         _float fRotationSpeed;
+        _float3 vPos = { 0.f, 0.f, 0.f }; // 시작 위치.
     }MONSTER_DESC;
+
+public:
+    // 개선된 콜라이더 정보 구조체
+    typedef struct tagMonsterColliderFrame
+    {
+        _float fStartRatio;
+        _float fEndRatio;
+        _uint iPartType;        // 어떤 Part 타입을 제어할 것인가?
+        _bool bIsActive;
+        
+        tagMonsterColliderFrame() : fStartRatio(0.0f), fEndRatio(0.0f), iPartType(0), bIsActive(false) {}
+        tagMonsterColliderFrame(_float start, _float end, _uint part) 
+            : fStartRatio(start), fEndRatio(end), iPartType(part), bIsActive(false) {}
+    }MONSTER_COLLIDER_FRAME;
+
+    // 하나의 애니메이션에서 여러 Part, 여러 타이밍의 콜라이더 제어
+    typedef struct tagMonsterColliderControl
+    {
+        vector<MONSTER_COLLIDER_FRAME> vecColliderFrames;  // 여러 콜라이더 구간들
+        unordered_map<_uint, _uint> partCurrentIndex;      // Part별 현재 처리 중인 인덱스
+        unordered_map<_uint, _bool> partProcessed;         // Part별 모든 처리 완료 여부
+        
+        tagMonsterColliderControl() {}
+    }MONSTER_COLLIDER_CONTROL;
 
 #pragma region 기본 함수들
 protected:
@@ -61,6 +95,10 @@ public:
 
 #pragma endregion
 
+#pragma region TRIGGER -> TO OBJECT_MANAGER
+    virtual void OnMoved_ToObjectManager();
+#pragma endregion
+
 
 #pragma region 0. 몬스터는 충돌에 대한 상태제어를 할 수 있어야한다. => 충돌에 따라 상태가 변하기도, 수치값이 바뀌기도한다.
 public:
@@ -72,15 +110,43 @@ public:
 public:
     // 무기 및 스킬과 충돌 시 받는 데미지 처리.
     virtual void Take_Damage(_float fDamage); 
+    virtual void Collider_Part_Active(_uint iPartType, _bool bActive) {};
+    virtual void Collider_All_Active(_bool bActive) {};
 
 protected:
     class CCollider* m_pColliderCom = { nullptr };
+
+
+protected:
+    // 통합된 콜라이더 제어 시스템
+    unordered_map<_uint, MONSTER_COLLIDER_CONTROL> m_ColliderControlMap; // 애니메이션별 콜라이더 제어
+    unordered_map<_uint, _bool> m_PartPrevColliderState; // Part별 이전 콜라이더 상태
 
 #pragma endregion
 
 #pragma region Update AI
 public:
     virtual void Update_AI(_float fTimeDelta) PURE;
+#pragma endregion
+
+#pragma region 통합 콜라이더 제어 시스템
+public:
+	// 콜라이더 프레임 추가 함수
+	void Add_Collider_Frame(_uint iAnimationIndex, _float fStartRatio, _float fEndRatio, _uint iPartType);
+	
+	// 콜라이더 상태 제어 함수들
+	void Handle_Collider_State();
+	void Reset_Collider_ActiveInfo();
+	
+	// 편의 함수들 - 기존 Add_Attack_Frame 호환성 유지
+	void Add_Attack_Frame(_uint iAnimationIndex, _float fStartRatio, _float fEndRatio) {
+		Add_Collider_Frame(iAnimationIndex, fStartRatio, fEndRatio, 0); // 기본값은 0번 Part
+	}
+	
+	// 기존 Handle_Attack_Collider_State 호환성 유지
+	void Handle_Attack_Collider_State() { Handle_Collider_State(); }
+	void Reset_Attack_ActiveInfo() { Reset_Collider_ActiveInfo(); }
+
 #pragma endregion
 
 
@@ -95,21 +161,33 @@ public:
 
     void Move_Direction(_fvector vDirection, _float fTimeDelta); // 이동용 함수. 
 
+
+public:
+    void Set_Animation_AddSpeed(_uint iAnimationIndex, _float fSpeed);
+    _float Get_Animation_Speed(_uint iAnimationIndex);
+    void Set_Animation_Speed(_uint iAnimationIndex, _float fSpeed);
+
 public:
     virtual HRESULT InitializeAction_ToAnimationMap() PURE; // 필수적으로 애니메이션 초기화를 진행해야합니다. => 인스턴스화 될거라면.
     
 public:
-    void Change_Action(_wstring strAction) { m_CurrentAction = strAction; }
-    _wstring Current_Action() { return m_CurrentAction; }
-    _uint Get_CurrentAnimation() { return m_Action_AnimMap[m_CurrentAction]; }
+    _uint Get_CurrentAnimation() { return m_pModelCom->Get_CurrentAnimationIndex(); }
     _uint Find_AnimationIndex(const _wstring& strAnimationTag);
     const _bool Is_Animation_Finished();
-
     _float Get_CurrentAnimationRatio() { return m_pModelCom->Get_Current_Ratio(); }
 
 public:
     void Set_RootMotionRotation(_bool IsRotate);
     void Set_RootMotionTranslate(_bool IsTranslate);
+
+public:
+    void Set_AnimationActivate();
+    void Set_AnimationDeActivate();
+
+    // 현재 위치에서 셀 위로 강제로 올리는법
+    void Compute_OnCell();
+
+        
 protected:
     _wstring m_CurrentAction = { L"IDLE" };
 
@@ -137,6 +215,7 @@ protected:
     MONSTER_STAT m_MonsterStat = {};
     _float m_fMinDetectionDistance = 5.f;
     _float m_fMinRotationDistance = 2.f;
+    _bool m_bIsCurrentlyDetecting = false;  // 현재 탐지 중인지 상태
 #pragma endregion
 
 
@@ -184,13 +263,31 @@ public:
     
 
     virtual const _bool IsRotateFinished(_float fRadian);
+    virtual void NearCell_Translate();
+    const _float Get_TargetDegreeNoPitch();
+    const ROTATION_INFO Get_SimpleTargetRotation();
+
 
 public:
     /* 콜라이더 제어.*/
     virtual void Enable_Collider(_uint iType) PURE; 
     virtual void Disable_Collider(_uint iType) PURE;
+    
+    /* Reset 시 파츠 콜라이더 비활성화 */
+    virtual void Reset_Part_Colliders();
+
+    virtual void Dead_Action();
 #pragma endregion
     
+#pragma region 6. 체력 감소시 UI 연동
+public:
+    virtual void Increase_HpUI(_float fHp, _float fTime) {};
+    virtual void Decrease_HpUI(_float fHp, _float fTime) {};
+
+private:
+
+
+#pragma endregion
 
 
 #pragma region 7. 몬스터 삭제 처리.
@@ -199,6 +296,15 @@ public:
 
 #pragma endregion
 
+
+#pragma region 8. 렌더링 제어
+public:
+    virtual void Set_Visible(_bool bVisible) {};
+    _bool Is_Visible() const { return m_bVisible; }
+
+protected:
+    _bool m_bVisible = { true };  // 기본적으로 보이는 상태
+#pragma endregion
 
 #pragma region 99. DEBUG 용도 함수.
 
@@ -230,6 +336,7 @@ protected:
 
 
 public:
+    virtual void Destroy() override;
     virtual void Free() override;
 };
 

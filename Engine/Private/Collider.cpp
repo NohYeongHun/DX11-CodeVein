@@ -280,8 +280,12 @@ void CCollider::Free()
     m_ColliderObjects.clear();
     if (false == m_isCloned)
     {
+#ifdef _DEBUG
         Safe_Delete(m_pEffect);
         Safe_Delete(m_pBatch);
+#endif // _DEBUG
+
+        
     }
     
 #ifdef _DEBUG

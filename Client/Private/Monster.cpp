@@ -56,6 +56,10 @@ HRESULT CMonster::Initialize_Clone(void* pArg)
         return E_FAIL;
     }
 
+    // 위치 지정.
+    _vector vMonsterPos = XMVectorSetW(XMLoadFloat3(&pDesc->vPos), 1.f);
+    m_pTransformCom->Set_State(STATE::POSITION, vMonsterPos);
+
     return S_OK;
 }
 
@@ -95,6 +99,16 @@ HRESULT CMonster::Render()
 {
     return S_OK;
 }
+
+#pragma region TRIGGER -> TO OBJECT_MANAGER
+
+void CMonster::OnMoved_ToObjectManager()
+{
+    Collider_All_Active(true);
+}
+#pragma endregion
+
+
 
 #pragma region 0. 충돌시 발생하는 이벤트에 대한 컨트롤.
 
@@ -159,6 +173,22 @@ void CMonster::Move_Direction(_fvector vDirection, _float fTimeDelta)
     m_pTransformCom->Move_Direction(vDirection, fTimeDelta, m_pNavigationCom);
 }
 
+/* Animation Speed 증가.*/
+void CMonster::Set_Animation_AddSpeed(_uint iAnimationIndex, _float fSpeed)
+{
+    m_pModelCom->Set_AnimSpeed(iAnimationIndex, m_pModelCom->Get_AnimSpeed(iAnimationIndex) + fSpeed);
+}
+
+_float CMonster::Get_Animation_Speed(_uint iAnimationIndex)
+{
+    return m_pModelCom->Get_AnimSpeed(iAnimationIndex);
+}
+
+void CMonster::Set_Animation_Speed(_uint iAnimationIndex, _float fSpeed)
+{
+    m_pModelCom->Set_AnimSpeed(iAnimationIndex, fSpeed);
+}
+
 /* 애니메이션 인덱스.*/
 _uint CMonster::Find_AnimationIndex(const _wstring& strAnimationTag)
 {
@@ -193,6 +223,27 @@ void CMonster::Set_RootMotionTranslate(_bool IsTranslate)
     m_pModelCom->Set_RootMotionTranslate(IsTranslate);
 }
 
+void CMonster::Set_AnimationActivate()
+{
+    m_pModelCom->Set_AnimationActivate();
+}
+
+void CMonster::Set_AnimationDeActivate()
+{
+    m_pModelCom->Set_AnimationDeActivate();
+}
+
+void CMonster::Compute_OnCell()
+{
+    if (m_pNavigationCom)
+    {
+        m_pTransformCom->Set_State(STATE::POSITION
+            , m_pNavigationCom->Compute_OnCell(
+                m_pTransformCom->Get_State(STATE::POSITION)));
+    }
+    
+}
+
 
 
 #pragma endregion
@@ -215,7 +266,7 @@ const _bool CMonster::Is_TargetAttackRange()
     return fDistance <= m_MonsterStat.fAttackRange;
 }
 
-// 현재 문제점 => 최소 탐지거리일때도 계속 탐지됨 => 그떄는 탐지 상태로 빠지면 안된다.
+// 히스테리시스 적용: 탐지 시작과 해제 범위를 다르게 설정
 const _bool CMonster::Is_TargetDetectionRange()
 {
     if (nullptr == m_pTarget)
@@ -230,7 +281,8 @@ const _bool CMonster::Is_TargetDetectionRange()
     // 거리 계산
     _float fDistance = XMVectorGetX(XMVector3Length(vDirection));
 
-    return (fDistance <= m_MonsterStat.fDetectionRange) && (fDistance >= m_fMinDetectionDistance);
+
+    return fDistance <= m_MonsterStat.fDetectionRange && fDistance >= m_fMinDetectionDistance;
 }
 
 #pragma endregion
@@ -244,7 +296,7 @@ const _bool CMonster::Is_TargetDetectionRange()
 // Timer가 종료되거나 특정 시점에는 BuffFlag를 해제합니다.
 void CMonster::RemoveBuff(uint32_t buffFlag, _bool removeTimer)
 {
-    m_ActiveBuffs &= ~buffFlag;
+     m_ActiveBuffs &= ~buffFlag;
 
     if (removeTimer)
         m_BuffTimers.erase(buffFlag); 
@@ -526,6 +578,99 @@ const _bool CMonster::IsRotateFinished(_float fRadian)
     return fAngleDiff <= ROTATION_THRESHOLD;
 }
 
+/* 근처 셀로 설정. */
+void CMonster::NearCell_Translate()
+{
+    _float3 vPos = {};
+    _float3 vFinalPos = {};
+    XMStoreFloat3(&vPos, m_pTransformCom->Get_State(STATE::POSITION));
+    _int iNearCell = m_pNavigationCom->Find_NearCellIndex(vPos);
+
+    if (iNearCell == -1)
+    {
+        CRASH("Failed Search Navigation Cell");
+    }
+
+    m_pNavigationCom->Set_CurrentCellIndex(iNearCell);
+    XMStoreFloat3(&vFinalPos, m_pNavigationCom->Get_CellPos(iNearCell));
+    m_pTransformCom->Set_State(STATE::POSITION, XMLoadFloat3(&vFinalPos));
+}
+
+const _float CMonster::Get_TargetDegreeNoPitch()
+{
+    if (!m_pTarget)
+        return 0.f;
+
+    _vector vMyPos = m_pTransformCom->Get_State(STATE::POSITION);
+    _vector vTargetPos = m_pTarget->Get_Transform()->Get_State(STATE::POSITION);
+    _vector vToTarget = vTargetPos - vMyPos;
+    vToTarget = XMVectorSetY(vToTarget, 0.f);
+    vToTarget = XMVector3Normalize(vToTarget);
+
+    _vector vLook = m_pTransformCom->Get_State(STATE::LOOK);
+    vLook = XMVectorSetY(vLook, 0.f);
+    vLook = XMVector3Normalize(vLook);
+
+    // 내적으로 각도 차이 계산
+    _float fDot = XMVectorGetX(XMVector3Dot(vLook, vToTarget));
+    _float fAngleDiff = acosf(max(-1.f, min(1.f, fDot)));
+
+    // 라디안을 도로 변환
+    return XMConvertToDegrees(fAngleDiff);
+}
+
+const CMonster::ROTATION_INFO CMonster::Get_SimpleTargetRotation()
+{
+    CMonster::ROTATION_INFO info = {};
+
+    if (!m_pTarget)
+        return info;
+
+    _vector vMyPos = m_pTransformCom->Get_State(STATE::POSITION);
+    _vector vTargetPos = m_pTarget->Get_Transform()->Get_State(STATE::POSITION);
+    _vector vToTarget = vTargetPos - vMyPos;
+    vToTarget = XMVectorSetY(vToTarget, 0.f);
+
+    _vector vLook = m_pTransformCom->Get_State(STATE::LOOK);
+    vLook = XMVectorSetY(vLook, 0.f);
+
+    // atan2를 사용한 더 간단한 방법
+    _float fTargetYaw = atan2f(XMVectorGetX(vToTarget), XMVectorGetZ(vToTarget));
+    _float fCurrentYaw = atan2f(XMVectorGetX(vLook), XMVectorGetZ(vLook));
+
+    _float fYawDiff = fTargetYaw - fCurrentYaw;
+
+    // 최단 경로로 정규화
+    while (fYawDiff > XM_PI) fYawDiff -= XM_2PI;
+    while (fYawDiff < -XM_PI) fYawDiff += XM_2PI;
+
+    info.fSignedAngleDegrees = XMConvertToDegrees(fYawDiff);
+    info.bIsRight = (fYawDiff > 0);
+
+    return info;
+}
+
+/* Reset 시 모든 콜라이더 비활성화 */
+void CMonster::Reset_Part_Colliders()
+{
+       
+    // 2. 모든 Part 타입에 대해 콜라이더 비활성화 호출
+    // 각 몬스터의 구현에 따라 처리됨 (WolfDevil의 경우 PART_WEAPON 등)
+    Disable_Collider(0);
+    
+    // 3. 콜라이더 활성화 정보 초기화
+    Reset_Collider_ActiveInfo();
+}
+
+void CMonster::Dead_Action()
+{
+    if (m_pColliderCom)
+    {
+        Collider_All_Active(false);
+    }
+
+}
+
 
 
 
@@ -536,6 +681,7 @@ const _bool CMonster::IsRotateFinished(_float fRadian)
 
 
 #pragma region 7. 몬스터 삭제 처리. => 이건 Dead Node에서 처리하기?
+
 _bool CMonster::Monster_Dead()
 {
     // 피가 0이면서 Dead 상태이면서.
@@ -562,8 +708,124 @@ void CMonster::Print_Position()
 #endif // _DEBUG
 #pragma endregion
 
+#pragma region 통합 콜라이더 제어 시스템 구현
+void CMonster::Add_Collider_Frame(_uint iAnimationIndex, _float fStartRatio, _float fEndRatio, _uint iPartType)
+{
+	MONSTER_COLLIDER_FRAME colliderFrame(fStartRatio, fEndRatio, iPartType);
 
+	// 해당 애니메이션의 콜라이더 제어 정보가 없으면 생성
+	if (m_ColliderControlMap.find(iAnimationIndex) == m_ColliderControlMap.end())
+	{
+		m_ColliderControlMap[iAnimationIndex] = MONSTER_COLLIDER_CONTROL();
+	}
 
+	m_ColliderControlMap[iAnimationIndex].vecColliderFrames.push_back(colliderFrame);
+	
+	// Part별 인덱스 초기화
+	if (m_ColliderControlMap[iAnimationIndex].partCurrentIndex.find(iPartType) == 
+		m_ColliderControlMap[iAnimationIndex].partCurrentIndex.end())
+	{
+		m_ColliderControlMap[iAnimationIndex].partCurrentIndex[iPartType] = 0;
+		m_ColliderControlMap[iAnimationIndex].partProcessed[iPartType] = false;
+	}
+}
+
+void CMonster::Handle_Collider_State()
+{
+	_float fCurrentRatio = m_pModelCom->Get_Current_Ratio();
+	
+	auto iter = m_ColliderControlMap.find(Get_CurrentAnimation());
+	if (iter == m_ColliderControlMap.end())
+		return;
+
+	MONSTER_COLLIDER_CONTROL& colliderControl = iter->second;
+	
+	// 모든 콜라이더 프레임을 순회
+	for (auto& colliderFrame : colliderControl.vecColliderFrames)
+	{
+		_uint partType = colliderFrame.iPartType;
+		
+		// 현재 콜라이더 구간 확인
+		_bool bShouldActive = (fCurrentRatio >= colliderFrame.fStartRatio && 
+							   fCurrentRatio <= colliderFrame.fEndRatio);
+
+		// Part별 이전 상태와 비교
+		_bool bPrevState = m_PartPrevColliderState[partType];
+
+		if (bShouldActive != bPrevState)
+		{
+			if (bShouldActive)
+			{
+				// 콜라이더 활성화
+				Enable_Collider(partType);
+				colliderFrame.bIsActive = true;
+			}
+			else
+			{
+				// 콜라이더 비활성화
+				Disable_Collider(partType);
+				colliderFrame.bIsActive = false;
+			}
+
+			m_PartPrevColliderState[partType] = bShouldActive;
+		}
+		
+		// EndRatio를 벗어난 경우 강제로 콜라이더 비활성화
+		if (fCurrentRatio > colliderFrame.fEndRatio && colliderFrame.bIsActive)
+		{
+			Disable_Collider(partType);
+			colliderFrame.bIsActive = false;
+			m_PartPrevColliderState[partType] = false;
+		}
+	}
+	
+	// 애니메이션이 완료된 경우 모든 콜라이더 비활성화 (안전장치)
+	if (m_pModelCom->Is_Finished())
+	{
+		for (auto& colliderFrame : colliderControl.vecColliderFrames)
+		{
+			if (colliderFrame.bIsActive)
+			{
+				Disable_Collider(colliderFrame.iPartType);
+				colliderFrame.bIsActive = false;
+				m_PartPrevColliderState[colliderFrame.iPartType] = false;
+			}
+		}
+	}
+}
+
+void CMonster::Reset_Collider_ActiveInfo()
+{
+	for (auto& pair : m_ColliderControlMap)
+	{
+		MONSTER_COLLIDER_CONTROL& colliderControl = pair.second;
+		
+		// Part별 인덱스와 상태 초기화
+		for (auto& partPair : colliderControl.partCurrentIndex)
+		{
+			colliderControl.partCurrentIndex[partPair.first] = 0;
+			colliderControl.partProcessed[partPair.first] = false;
+		}
+		
+		// 모든 콜라이더 프레임 비활성화
+		for (auto& colliderFrame : colliderControl.vecColliderFrames)
+		{
+			colliderFrame.bIsActive = false;
+		}
+	}
+	
+	// Part별 이전 상태도 초기화
+	m_PartPrevColliderState.clear();
+}
+#pragma endregion
+
+void CMonster::Destroy()
+{
+    CContainerObject::Destroy();
+    
+    if (m_pColliderCom)
+        m_pColliderCom->Set_Active(false);
+}
 
 void CMonster::Free()
 {

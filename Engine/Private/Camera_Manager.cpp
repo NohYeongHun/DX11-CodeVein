@@ -14,6 +14,12 @@ HRESULT CCamera_Manager::Initialize(_uint iNumLevels)
 	return S_OK;
 }
 
+void CCamera_Manager::Priority_Update(_float fTimeDelta)
+{
+	if (nullptr != m_pCurrentCamera)
+		m_pCurrentCamera->Priority_Update(fTimeDelta);
+}
+
 /* 업데이트 카메라 매니저*/
 void CCamera_Manager::Update(_float fTimeDelta)
 {
@@ -21,13 +27,25 @@ void CCamera_Manager::Update(_float fTimeDelta)
 		m_pCurrentCamera->Update(fTimeDelta);
 }
 
+void CCamera_Manager::Late_Update(_float fTimeDelta)
+{
+	if (nullptr != m_pCurrentCamera)
+		m_pCurrentCamera->Late_Update(fTimeDelta);
+}
+
 void CCamera_Manager::Clear(_uint iLevelIndex)
 {
 	if (iLevelIndex >= m_iNumLevels)
 		return;
 
+	// 현재 카메라가 삭제될 레벨의 카메라인지 확인
 	for (auto& Pair : m_Cameras[iLevelIndex])
+	{
+		if (m_pCurrentCamera == Pair.second)
+			m_pCurrentCamera = nullptr;
+		
 		Safe_Release(Pair.second);
+	}
 
 	m_Cameras[iLevelIndex].clear();
 }
@@ -123,6 +141,7 @@ void CCamera_Manager::Free()
 	CBase::Free();
 	Safe_Release(m_pGameInstance);
 
+	m_pCurrentCamera = nullptr;
 	for (_uint i = 0; i < m_iNumLevels; i++)
 	{
 		for (auto& Pair : m_Cameras[i])

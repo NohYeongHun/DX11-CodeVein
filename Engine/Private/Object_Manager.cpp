@@ -122,6 +122,7 @@ HRESULT CObject_Manager::Initialize(_uint iNumLevels)
 	return S_OK;
 }
 
+#pragma region ENGINE에 제공
 HRESULT CObject_Manager::Add_GameObject_ToLayer(_uint iLayerLevelIndex, const _wstring& strLayerTag, _uint iPrototypeLevelIndex, const _wstring& strPrototypeTag, void* pArg)
 {
 	CGameObject* pGameObject = dynamic_cast<CGameObject*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT, iPrototypeLevelIndex, strPrototypeTag, pArg));
@@ -140,6 +141,31 @@ HRESULT CObject_Manager::Add_GameObject_ToLayer(_uint iLayerLevelIndex, const _w
 
 	return S_OK;
 }
+
+/* Trigger Manager에서 생성한 GameObject들을 Layer에 바로 추가. */
+HRESULT CObject_Manager::Add_GameObject_ToLayer(_uint iLayerLevelIndex, const _wstring& strLayerTag, CGameObject* pGameObject)
+{
+	if (nullptr == pGameObject)
+	{
+		CRASH("Failed Add GameObject To Layer");
+		return E_FAIL;
+	}
+
+	CLayer* pLayer = Find_Layer(iLayerLevelIndex, strLayerTag);
+	if (nullptr == pLayer)
+	{
+		pLayer = CLayer::Create();
+		pLayer->Add_GameObject(pGameObject);
+		m_pLayers[iLayerLevelIndex].emplace(strLayerTag, pLayer);
+	}
+	else
+		pLayer->Add_GameObject(pGameObject);
+
+	return S_OK;
+}
+#pragma endregion
+
+
 
 void CObject_Manager::Priority_Update(_float fTimeDelta)
 {
@@ -279,7 +305,6 @@ void CObject_Manager::Free()
 	m_DestroyObjects.clear();
 
 	Safe_Release(m_pGameInstance);
-
 	Safe_Delete_Array(m_pLayers);
 	
 }

@@ -36,7 +36,13 @@ public:
 
 public:
 	HRESULT Initialize(_uint iNumLevels);
+
+#pragma region ENGINE에 제공
 	HRESULT Add_GameObject_ToLayer(_uint iLayerLevelIndex, const _wstring& strLayerTag, _uint iPrototypeLevelIndex, const _wstring& strPrototypeTag, void* pArg);
+	HRESULT Add_GameObject_ToLayer(_uint iLayerLevelIndex, const _wstring& strLayerTag, class CGameObject* pGameObject);
+#pragma endregion
+
+	
 	void Priority_Update(_float fTimeDelta);
 	void Update(_float fTimeDelta);
 	void Late_Update(_float fTimeDelta);

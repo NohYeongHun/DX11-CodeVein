@@ -91,7 +91,51 @@ void CPlayer_RunState::Change_State(_float fTimeDelta)
 			return;
 
 		m_iNextState = CPlayer::PLAYER_STATE::DODGE;
-		m_iNextAnimIdx = m_pPlayer->Find_AnimationIndex(TEXT("DODGE"));
+		
+		// 락온 상태에 따라 방향별 Dodge 애니메이션 선택
+		if (m_pPlayer->Is_LockOn())
+		{
+			// 락온시: 방향키에 따라 8방향 Dodge
+			ACTORDIR dir = m_pPlayer->Calculate_Direction();
+			switch (dir)
+			{
+			case ACTORDIR::U:   // W키: 전진
+				m_iNextAnimIdx = m_pPlayer->Find_AnimationIndex(TEXT("DODGE_F"));
+				break;
+			case ACTORDIR::D:   // S키: 후진
+				m_iNextAnimIdx = m_pPlayer->Find_AnimationIndex(TEXT("DODGE_B"));
+				break;
+			case ACTORDIR::L:   // A키: 좌측
+				m_iNextAnimIdx = m_pPlayer->Find_AnimationIndex(TEXT("DODGE_L"));
+				break;
+			case ACTORDIR::R:   // D키: 우측
+				m_iNextAnimIdx = m_pPlayer->Find_AnimationIndex(TEXT("DODGE_R"));
+				break;
+			case ACTORDIR::LU:  // W+A: 좌상향
+				m_iNextAnimIdx = m_pPlayer->Find_AnimationIndex(TEXT("DODGE_FL"));
+				break;
+			case ACTORDIR::LD:  // S+A: 좌하향  
+				m_iNextAnimIdx = m_pPlayer->Find_AnimationIndex(TEXT("DODGE_BL"));
+				break;
+			case ACTORDIR::RU:  // W+D: 우상향
+				m_iNextAnimIdx = m_pPlayer->Find_AnimationIndex(TEXT("DODGE_FR"));
+				break;
+			case ACTORDIR::RD:  // S+D: 우하향
+				m_iNextAnimIdx = m_pPlayer->Find_AnimationIndex(TEXT("DODGE_BR"));
+				break;
+			default:
+				m_iNextAnimIdx = m_pPlayer->Find_AnimationIndex(TEXT("DODGE_F"));
+				break;
+			}
+			Dodge.eDirection = dir;
+		}
+		else
+		{
+			// 일반 상태: 기본 Dodge (전진)
+			m_iNextAnimIdx = m_pPlayer->Find_AnimationIndex(TEXT("DODGE_F"));
+			Dodge.eDirection = ACTORDIR::U;
+		}
+		
 		Dodge.iAnimation_Idx = m_iNextAnimIdx;
 		m_pFsm->Change_State(m_iNextState, &Dodge);
 
@@ -106,6 +150,17 @@ void CPlayer_RunState::Change_State(_float fTimeDelta)
 		m_iNextState = CPlayer::PLAYER_STATE::STRONG_ATTACK;
 		m_iNextAnimIdx = m_pPlayer->Find_AnimationIndex(TEXT("STRONG_ATTACK1"));
 		StrongAttack.iAnimation_Idx = m_iNextAnimIdx;
+		
+		// 락온 중이면 방향 무시, 일반 상태면 이동 방향 사용
+		if (m_pPlayer->Is_LockOn() && m_pPlayer->Has_LockOn_Target())
+		{
+			StrongAttack.eDirection = ACTORDIR::U; // 락온 중에는 방향 무시 (StrongAttackState에서 타겟 방향으로 회전)
+		}
+		else
+		{
+			StrongAttack.eDirection = m_eDir; // 일반 상태에서는 이동 방향 사용
+		}
+		
 		m_pFsm->Change_State(m_iNextState, &StrongAttack);
 		return;
 	}
@@ -118,7 +173,17 @@ void CPlayer_RunState::Change_State(_float fTimeDelta)
 		m_iNextState = CPlayer::PLAYER_STATE::ATTACK;
 		m_iNextAnimIdx = m_pPlayer->Find_AnimationIndex(TEXT("ATTACK1"));
 		Attack.iAnimation_Idx = m_iNextAnimIdx;
-		Attack.eDirection = m_eDir;
+		
+		// 락온 중이면 방향 무시, 일반 상태면 이동 방향 사용
+		if (m_pPlayer->Is_LockOn() && m_pPlayer->Has_LockOn_Target())
+		{
+			Attack.eDirection = ACTORDIR::U; // 락온 중에는 방향 무시 (AttackState에서 타겟 방향으로 회전)
+		}
+		else
+		{
+			Attack.eDirection = m_eDir; // 일반 상태에서는 이동 방향 사용
+		}
+		
 		m_pFsm->Change_State(m_iNextState, &Attack);
 		return;
 	}
@@ -139,6 +204,42 @@ void CPlayer_RunState::Change_State(_float fTimeDelta)
 
 	if (m_pPlayer->Is_MovementKeyPressed()) // 입력키 이용 중이라면.
 	{
+		// LockOn 상태로 변경되었으면 WALK로 전환
+		if (m_pPlayer->Is_LockOn())
+		{
+			CPlayer_WalkState::WALK_ENTER_DESC Walk{};
+			
+			// 방향에 따라 초기 애니메이션 결정
+			ACTORDIR dir = m_pPlayer->Calculate_Direction();
+			switch (dir)
+			{
+			case ACTORDIR::U:   // W키: 전진
+			case ACTORDIR::LU:  // W+A: 좌상향
+			case ACTORDIR::RU:  // W+D: 우상향
+				Walk.iAnimation_Idx = m_pPlayer->Find_AnimationIndex(TEXT("RUN_F"));
+				break;
+			case ACTORDIR::D:   // S키: 후진
+			case ACTORDIR::LD:  // S+A: 좌하향  
+			case ACTORDIR::RD:  // S+D: 우하향
+				Walk.iAnimation_Idx = m_pPlayer->Find_AnimationIndex(TEXT("RUN_B"));
+				break;
+			case ACTORDIR::L:   // A키: 좌측
+				Walk.iAnimation_Idx = m_pPlayer->Find_AnimationIndex(TEXT("RUN_L"));
+				break;
+			case ACTORDIR::R:   // D키: 우측
+				Walk.iAnimation_Idx = m_pPlayer->Find_AnimationIndex(TEXT("RUN_R"));
+				break;
+			default:
+				Walk.iAnimation_Idx = m_pPlayer->Find_AnimationIndex(TEXT("RUN_F"));
+				break;
+			}
+			
+			m_iNextState = CPlayer::PLAYER_STATE::WALK;
+			m_pFsm->Change_State(m_iNextState, &Walk);
+			return;
+		}
+		
+		// 일반 상태: 계속 달리기
 		m_pPlayer->Move_By_Camera_Direction_8Way(m_eDir, fTimeDelta, 1.f);
 		return;
 	}

@@ -14,39 +14,39 @@ CHPBar::CHPBar(const CHPBar& Prototype)
 * 주의점 : 플레이어의 무적 시간 만큼 제공해야합니다. (피격 시간) 
 * 피격 시간 이내에 한번 더 맞았을 경우 효과가 제대로 안나올 수도 있음.
 */
-void CHPBar::Increase_Hp(_uint iHp, _float fTime)
+void CHPBar::Increase_Hp(_float fHp, _float fTime)
 {
     if (m_bDecrease)
     {
         m_fLeftRatio = m_fRightRatio;
-        m_iHp = m_iHp < iHp ? 0 : m_iHp + iHp;
-        m_fRightRatio = static_cast<_float>(m_iHp) / static_cast<_float>(m_iMaxHp);
+        m_fHp = m_fHp < fHp ? 0 : m_fHp + fHp;
+        m_fRightRatio = static_cast<_float>(m_fHp) / static_cast<_float>(m_fMaxHp);
         m_bDecrease = false;
     }
     else
     {
-        m_fLeftRatio = static_cast<_float>(m_iHp) / static_cast<_float>(m_iMaxHp);
-        m_iHp = min(m_iHp + iHp, m_iMaxHp);
-        m_fRightRatio = static_cast<_float>(m_iHp) / static_cast<_float>(m_iMaxHp);
+        m_fLeftRatio = static_cast<_float>(m_fHp) / static_cast<_float>(m_fMaxHp);
+        m_fHp = min(m_fHp + fHp, m_fMaxHp);
+        m_fRightRatio = static_cast<_float>(m_fHp) / static_cast<_float>(m_fMaxHp);
     }
     
     m_bIncrease = true;
 }
 
-void CHPBar::Decrease_Hp(_uint iHp, _float fTime)
+void CHPBar::Decrease_Hp(_float fHp, _float fTime)
 {
     if (m_bIncrease)
     {
         m_fRightRatio = m_fLeftRatio;
-        m_iHp = m_iHp < iHp ? 0 : m_iHp - iHp;
-        m_fLeftRatio = static_cast<_float>(m_iHp) / static_cast<_float>(m_iMaxHp);
+        m_fHp = m_fHp < fHp ? 0 : m_fHp - fHp;
+        m_fLeftRatio = static_cast<_float>(m_fHp) / static_cast<_float>(m_fMaxHp);
         m_bIncrease = false;
     }
     else
     {
-        m_fRightRatio = static_cast<_float>(m_iHp) / static_cast<_float>(m_iMaxHp);
-        m_iHp = max(m_iHp - iHp, 0);
-        m_fLeftRatio = static_cast<_float>(m_iHp) / static_cast<_float>(m_iMaxHp);
+        m_fRightRatio = static_cast<_float>(m_fHp) / static_cast<_float>(m_fMaxHp);
+        m_fHp = max(m_fHp - fHp, 0);
+        m_fLeftRatio = static_cast<_float>(m_fHp) / static_cast<_float>(m_fMaxHp);
     }
 
     
@@ -64,8 +64,8 @@ HRESULT CHPBar::Initialize_Clone(void* pArg)
         return E_FAIL;
 
     m_iTextureIndex = 0;
-    m_iMaxHp = 500;
-    m_iHp    = m_iMaxHp;
+    m_fMaxHp = 1672;
+    m_fHp    = m_fMaxHp;
 
     if (FAILED(Ready_Components()))
         return E_FAIL;
@@ -151,17 +151,23 @@ HRESULT CHPBar::Render()
 
 void CHPBar::Render_HP()
 {
-    _float fScreenX = m_RenderMatrix._41 + (g_iWinSizeX >> 1) + 80.f;
-    _float fScreenY = (g_iWinSizeY >> 1) - m_RenderMatrix._42 - 15.f;
-
-    _float2 vPosition = { fScreenX , fScreenY };
+    
+    _float2 vPosition = { 340.f, 965.f };
     // Window 좌표계 기준 출력. (0, 0이 좌측 상단)
 
     wchar_t szBuffer[64] = {};
-    swprintf_s(szBuffer, L"%d / %d", m_iHp, m_iMaxHp);
+    swprintf_s(szBuffer, L"%.f /", m_fHp);
 
-    m_pGameInstance->Render_Font(TEXT("HUD_TEXT"), szBuffer
+    m_pGameInstance->Render_Font(TEXT("KR_TEXT"), szBuffer
         , vPosition, XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f, {}, 1.f);
+
+    vPosition.x += 90.f;
+
+    wchar_t szNextBuffer[64] = {};
+    swprintf_s(szNextBuffer, L"%.f ", m_fMaxHp);
+
+    m_pGameInstance->Render_Font(TEXT("KR_TEXT"), szNextBuffer
+        , vPosition, XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f, {}, 0.7f);
 }
 
 HRESULT CHPBar::Ready_Components()
@@ -192,7 +198,7 @@ HRESULT CHPBar::Ready_Render_Resources()
         return E_FAIL;
 
 
-    _float fFillRatio = 1.f - (static_cast<_float>(m_iHp) / static_cast<_float>(m_iMaxHp));
+    _float fFillRatio = 1.f - (static_cast<_float>(m_fHp) / static_cast<_float>(m_fMaxHp));
     if (FAILED(m_pShaderCom->Bind_RawValue("g_fFillRatio", static_cast<void*>(&fFillRatio), sizeof(fFillRatio))))
         return E_FAIL;
 
@@ -218,9 +224,20 @@ HRESULT CHPBar::Ready_Events()
         {
             HPCHANGE_DESC* desc = static_cast<HPCHANGE_DESC*>(pData);
             if (desc->bIncrease)
-                this->Increase_Hp(desc->iHp, desc->fTime);
+                this->Increase_Hp(desc->fHp, desc->fTime);
             else
-                this->Decrease_Hp(desc->iHp, desc->fTime);
+                this->Decrease_Hp(desc->fHp, desc->fTime);
+        });
+
+    // Event 목록 관리.
+    m_Events.push_back(EventType::HP_CHANGE);
+
+
+    m_pGameInstance->Subscribe(EventType::HP_SYNCRONIZE, Get_ID(), [this](void* pData)
+        {
+            HPSYNCRONIZE_DESC* pDesc = static_cast<HPSYNCRONIZE_DESC*>(pData);
+            m_fHp = pDesc->fHp;
+            m_fMaxHp = pDesc->fMaxHp;
         });
 
     // Event 목록 관리.

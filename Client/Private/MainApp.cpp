@@ -134,6 +134,22 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 		CCollider::Create(m_pDevice, m_pContext, COLLIDER::SPHERE))))
 		return E_FAIL;
 
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
+		, TEXT("Prototype_Component_FadeOut_Texture")
+		, CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/FadeOut/FadeOut%d.png"), 1))))
+	{
+		CRASH("Failed Create FadeOut Texture")
+		return E_FAIL;
+	}
+		
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_FadeOut")
+	, CFade_Out::Create(m_pDevice, m_pContext))))
+	{
+		CRASH("Failed Create Fade Out");
+		return E_FAIL;
+	}
+
 	/* ==================================================== FSM ====================================================*/
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Fsm"),
 		CFsm::Create(m_pDevice, m_pContext))))
@@ -144,7 +160,7 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 		return E_FAIL;
 	
 	/* Model Load */
-	if (FAILED(Ready_Prototype_ForModel()))
+	if (FAILED(Ready_Prototype_ForPlayer()))
 		return E_FAIL;
 
 	if (FAILED(Ready_Prototype_HUD()))
@@ -154,6 +170,9 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 		return E_FAIL;
 	
 	if (FAILED(Ready_Prototype_SkillUI()))
+		return E_FAIL;
+
+	if (FAILED(Ready_Prototype_BossUI()))
 		return E_FAIL;
 
 
@@ -181,48 +200,44 @@ HRESULT CMainApp::Ready_Prototype_ForUsageTexture()
 		, CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/User/Inventory/Category/Category%d.png"), 10))))
 		return E_FAIL;
 
+	/* Boss HP Bar*/
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
+		, TEXT("Prototype_Component_Texture_BossHPBar")
+		, CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Monster/QueenKnight/HPBar%d.png"), 1))))
+		return E_FAIL;
+
 	return S_OK;
 }
 
-// 2. Model Prototype Static에 생성.
-HRESULT CMainApp::Ready_Prototype_ForModel()
+HRESULT CMainApp::Ready_Prototype_ForPlayer()
 {
+
 	_matrix		PreTransformMatrix = XMMatrixIdentity();
 
 	/* Prototype_Component_Model */
 	PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XM_PI);
-	
-	//PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f);
-	///PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f);
-	 
+
+
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
 		, TEXT("Prototype_Component_Model_Player")
 		, CLoad_Model::Create(m_pDevice, m_pContext, MODELTYPE::ANIM, PreTransformMatrix, "../../SaveFile/Model/Player/Player.dat", L"Player\\"))))
 		return E_FAIL;
 
- 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
 		, TEXT("Prototype_Component_Model_Sword")
 		, CLoad_Model::Create(m_pDevice, m_pContext, MODELTYPE::NONANIM, PreTransformMatrix, "../../SaveFile/Model/Player/Sword.dat", L""))))
 		return E_FAIL;
 
-	/* Non Anim Test */
-	/*if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
-		, TEXT("Prototype_Component_Model_Player")
-		, CModel::Create(m_pDevice, m_pContext, MODELTYPE::ANIM, PreTransformMatrix, "../Bin/Resources/Models/Player/Player.fbx", "../Bin/Resources/Models/Player/Textures/Player/"))))
-		return E_FAIL;*/
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
+		, TEXT("Prototype_GameObject_Weapon")
+		, CPlayerWeapon::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
 
-	/*if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
-		, TEXT("Prototype_Component_Model_Player")
-		, CModel::Create(m_pDevice, m_pContext, MODELTYPE::ANIM, PreTransformMatrix, "../Bin/Resources/Models/Fiona/Fiona.fbx", "/"))))
-		return E_FAIL;*/
-
-
-
-	
-	/*if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
-		, TEXT("Prototype_Component_Model_Player")
-		, CLoad_Model::Create(m_pDevice, m_pContext, MODELTYPE::ANIM, PreTransformMatrix, "../../SaveFile/Model/Player/Fiona.dat", L""))))
-		return E_FAIL;*/
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
+		, TEXT("Prototype_GameObject_Player")
+		, CPlayer::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
 
 	return S_OK;
 }
@@ -281,6 +296,26 @@ HRESULT CMainApp::Ready_Prototype_HUD()
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_HUD"),
 		CHUD::Create(m_pDevice, m_pContext))))
 		return E_FAIL;
+
+#pragma region LOCKON
+	// LockOn UI 텍스처
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_LockOnSite"),
+		CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/User/LockOn/LockOnSite%d.png"), 1))))
+	{
+		CRASH("Failed Load LockOnUI Texture");
+		return E_FAIL;
+	}
+		
+
+	// LockOn UI 게임오브젝트
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_LockOnUI"),
+		CLockOnUI::Create(m_pDevice, m_pContext))))
+	{
+		CRASH("Failed Load LockOn GameObject ");
+		return E_FAIL;
+	}
+#pragma endregion
+
 
 	return S_OK;
 }
@@ -382,13 +417,23 @@ HRESULT CMainApp::Ready_Prototype_SkillUI()
 	return S_OK;
 }
 
+HRESULT CMainApp::Ready_Prototype_BossUI()
+{
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_BossHPBar"),
+		CBossHpBarUI::Create(m_pDevice, m_pContext))))
+		return E_FAIL;
+
+	return S_OK;
+}
+
 HRESULT CMainApp::Ready_Prototype_Fonts()
 {
- 	/*if (FAILED(m_pGameInstance
+	if (FAILED(m_pGameInstance
 		->Load_Font(
-			TEXT("HUD_TEXT")
-			, TEXT("../Bin/Resources/Font/143.spritefont"))))
-		return E_FAIL;*/
+			TEXT("KR_TEXT")
+			, TEXT("../Bin/Resources/Font/153ex.spritefont"))))
+		return E_FAIL;
+
 
 	if (FAILED(m_pGameInstance
 		->Load_Font(

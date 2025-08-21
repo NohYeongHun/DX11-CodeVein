@@ -11,7 +11,7 @@ public:
 	enum PLAYER_STATE : _int
 	{
 		IDLE = 0, WALK, RUN, DODGE,
-		STRONG_ATTACK, GUARD, ATTACK,
+		STRONG_ATTACK, GUARD, ATTACK, DAMAGE,
 		STATE_END
 	};
 
@@ -29,6 +29,7 @@ public:
 	enum COLLIDER_PARTS : _uint
 	{
 		PART_WEAPON = 0,
+		PART_BODY,
 		PART_END
 	};
 
@@ -47,6 +48,7 @@ public:
 		_float fMaxHP;
 		_float fHP;
 		_float fAttackPower;
+		_float3 vPos; // 초기 위치.
 	}PLAYER_DESC;
 
 
@@ -79,6 +81,12 @@ public:
 public:
 	void Enable_Collider(COLLIDER_PARTS eColliderParts);
 	void Disable_Collider(COLLIDER_PARTS eColliderParts);
+
+
+private:
+	// 데미지 
+	void Take_Damage(_float fHp);
+	ACTORDIR Calculate_Damage_Direction(class CMonster* pAttacker);
 
 private:
 	class CCollider* m_pColliderCom = { nullptr };
@@ -156,6 +164,7 @@ public:
 public:
 	// LockOn 방향만 반환하는 함수 (공격 시 사용)
 	_vector Get_LockOn_Attack_Direction() const;
+	// 락온 상태인지 확인하기.
 	_bool Has_LockOn_Target() const { return m_isLockOn && m_pLockOn_Target; }
 
 private:

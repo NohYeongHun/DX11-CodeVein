@@ -11,10 +11,18 @@ HRESULT CLevel_Logo::Initialize_Clone()
 
 	/* 현재 레벨을 구성해주기 위한 객체들을 생성한다. */
 	if (FAILED(Ready_Layer_Title(TEXT("Layer_Title"))))
+	{
+		CRASH("Failed Ready Layer Title");
 		return E_FAIL;
+	}
+		
 
 	if (FAILED(Ready_Events()))
+	{
+		CRASH("Failed to Ready Events in CLevel_Logo");
 		return E_FAIL;
+	}
+		
 	
 	
 	return S_OK;
@@ -48,14 +56,25 @@ HRESULT CLevel_Logo::Render()
 
 void CLevel_Logo::Open_Level()
 {
-	if (FAILED(m_pGameInstance->Open_Level(static_cast<_uint>(LEVEL::LOADING), CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL::GAMEPLAY))))
+	/*if (FAILED(m_pGameInstance->Open_Level(static_cast<_uint>(LEVEL::LOADING), CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL::GAMEPLAY))))
+	{
+		CRASH("Failed Open GamePlay Level");
 		return;
+	}*/
+		
+
+	if (FAILED(m_pGameInstance->Open_Level(static_cast<_uint>(LEVEL::LOADING), CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL::STAGEONE))))
+	{
+		CRASH("Failed Open Level StageOne");
+		return;
+	}
+		
 }
 
 HRESULT CLevel_Logo::Ready_Layer_Title(const _wstring& strLayerTag)
 {
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(LEVEL::LOGO), strLayerTag,
-		ENUM_CLASS(LEVEL::LOGO), TEXT("Prototype_GameObject_Title"))))
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel), strLayerTag,
+		ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_Title"))))
 		return E_FAIL;
 
 	return S_OK;
@@ -63,12 +82,19 @@ HRESULT CLevel_Logo::Ready_Layer_Title(const _wstring& strLayerTag)
 
 HRESULT CLevel_Logo::Ready_Events()
 {
-	m_pGameInstance->Subscribe(EventType::OPEN_GAMEPAY, Get_ID(), [this](void* pData)
+	m_pGameInstance->Subscribe(EventType::OPEN_STAGEONE, Get_ID(), [this](void* pData)
 		{
 			this->Open_Level();
 		});
 
-	m_Events.emplace_back(EventType::OPEN_GAMEPAY, Get_ID());
+	m_Events.emplace_back(EventType::OPEN_STAGEONE, Get_ID());
+
+	/*m_pGameInstance->Subscribe(EventType::OPEN_GAMEPAY, Get_ID(), [this](void* pData)
+		{
+			this->Open_Level();
+		});
+
+	m_Events.emplace_back(EventType::OPEN_GAMEPAY, Get_ID());*/
 
 	return S_OK;
 }

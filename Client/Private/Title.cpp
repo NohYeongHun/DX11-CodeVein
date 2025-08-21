@@ -46,10 +46,10 @@ void CTitle::Priority_Update(_float fTimeDelta)
     // 자식 객체들에게 모두 FadeOut 효과 부여 => Rendering Pass 변경.
     if (m_IsLogoFadeOut && m_fFadeTime >= 1.f)
     {
-        m_pGameInstance->Publish<CLevel_Logo>(EventType::OPEN_GAMEPAY, nullptr);
 
-        // Logo 에서 Loading에 호출해야함. => 이 이벤트가 아님.
-        //m_pGameInstance->Publish<CLevel_Loading>(EventType::OPEN_LEVEL, nullptr);
+        //m_pGameInstance->Publish<CLevel_Logo>(EventType::OPEN_GAMEPAY, nullptr);
+        m_pGameInstance->Publish<CLevel_Logo>(EventType::OPEN_STAGEONE, nullptr);
+        
         m_IsLogoFadeOut = false;
 
         return;

@@ -77,6 +77,7 @@ public:
 	void Request_DeleteObject(_uint iLayerLevelIndex, const _wstring& strLayerTag, uint32_t objID);
 
 	HRESULT Add_GameObject_ToLayer(_uint iLayerLevelIndex, const _wstring& strLayerTag, _uint iPrototypeLevelIndex, const _wstring& strPrototypeTag, void* pArg = nullptr);
+	HRESULT Add_GameObject_ToLayer(_uint iLayerLevelIndex, const _wstring& strLayerTag, class CGameObject* pGameObject);
 	RAYHIT_DESC Get_PickingLocalObject(_uint iLayerLevelIndex, const _wstring strLayerTag, _float* pOutDist);
 	MODEL_PICKING_INFO Get_PickingLocalObject(_uint iLayerLevelIndex, const _wstring strLayerTag);
 #pragma endregion
@@ -107,7 +108,7 @@ public:
 
 #pragma region COLLIDER_MANAGER
 public:
-	HRESULT Add_Collider_To_Manager(class CCollider* pCollider);
+	HRESULT Add_Collider_To_Manager(class CCollider* pCollider, _uint iLevelIndex);
 #pragma endregion
 
 #pragma region TEXTURE_MANAGER
@@ -174,6 +175,17 @@ public:
 	_bool Is_In_Camera_Frustum(_vector vWorldPos) const;
 #pragma endregion
 
+#pragma region TRIGGER_MANAGER
+public:
+	HRESULT Add_GameObject_ToTrigger(_uint iLayerLevelIndex, const _wstring& strLayerTag, _uint iPrototypeLevelIndex, const _wstring& strPrototypeTag, void* pArg = nullptr);
+	HRESULT Add_Trigger(_uint iLayerLevelIndex, const TRIGGER_MONSTER_DESC& triggerDesc);
+	_bool Trigger_Finished(_uint iLayerLevelIndex);
+	void Set_TargetPlayer(class CGameObject* pTargetPlayer);
+#pragma endregion
+
+#pragma region PLAYER_DATA_MANAGER
+#pragma endregion
+
 
 //
 //#pragma region PICKING 
@@ -198,9 +210,10 @@ private:
 	class CInput_Device*		m_pInput_Device = { nullptr };
 	class CLight_Manager*		m_pLight_Manager = { nullptr };
 	class CCamera_Manager*		m_pCamera_Manager = { nullptr };
+	class CTrigger_Manager*		m_pTrigger_Manager = { nullptr };
 	
 	_float m_fTimeDelta = {};
-	
+
 	queue<INSTANCE_TASK> m_Tasks = {}; // Task
 
 

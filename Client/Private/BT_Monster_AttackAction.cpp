@@ -8,7 +8,7 @@ CBT_Monster_AttackAction::CBT_Monster_AttackAction(CMonster* pOwner)
 
 BT_RESULT CBT_Monster_AttackAction::Perform_Action(_float fTimeDelta)
 {
-    if (m_pOwner->HasBuff(CMonster::BUFF_DEAD))
+    if (m_pOwner->HasAnyBuff(CMonster::BUFF_DEAD | CMonster::BUFF_ATTACK_TIME))
         return BT_RESULT::FAILURE;
 
     switch (m_eAttackPhase)
@@ -29,6 +29,9 @@ BT_RESULT CBT_Monster_AttackAction::Perform_Action(_float fTimeDelta)
 void CBT_Monster_AttackAction::Reset()
 {
     m_eAttackPhase = ATTACK_PHASE::NONE;
+    
+    // FAILURE 발생시 활성화된 콜라이더들이 남아있을 수 있으므로 모든 콜라이더 비활성화
+    m_pOwner->Reset_Part_Colliders();
 }
 
 BT_RESULT CBT_Monster_AttackAction::EnterAttack(_float fTimeDelta)
@@ -39,11 +42,10 @@ BT_RESULT CBT_Monster_AttackAction::EnterAttack(_float fTimeDelta)
         CRASH("Failed Tree Attack Enter Logic");
     }
 
-
-
     // 1. 다음 단계로 진행
     m_eAttackPhase = ATTACK_PHASE::ROTATING;
 
+    
     // 2. 루트모션 설정.
     
 
@@ -65,8 +67,11 @@ BT_RESULT CBT_Monster_AttackAction::UpdateRotating(_float fTimeDelta)
 
         // 2. 공격 상태로 변경
         m_pOwner->Change_Animation_Blend(iNextAnimationIdx);
+        
+        // 3. 콜라이더 상태 초기화
+        m_pOwner->Reset_Collider_ActiveInfo();
 
-        // 3. Collider 활성화 필요. => 공격용 콜라이더만 활성화.(Weapon?)
+        // 4. Collider 활성화 필요. => 공격용 콜라이더만 활성화.(Weapon?)
     }
         
 
@@ -75,6 +80,9 @@ BT_RESULT CBT_Monster_AttackAction::UpdateRotating(_float fTimeDelta)
 
 BT_RESULT CBT_Monster_AttackAction::UpdateAttack(_float fTimeDelta)
 {
+    // 통합 콜라이더 제어 시스템으로 모든 Part 제어
+    //m_pOwner->Handle_Collider_State();
+    
     if (m_pOwner->Is_Animation_Finished())
         m_eAttackPhase = ATTACK_PHASE::COMPLETED;
 
@@ -95,6 +103,8 @@ BT_RESULT CBT_Monster_AttackAction::EndAttack(_float fTimeDleta)
         m_pOwner->Set_RootMotionTranslate(false);
         // 디버그용 함수.
         //m_pOwner->Print_Position();
+
+        m_pOwner->AddBuff(CMonster::BUFF_ATTACK_TIME);
     }
 
     return BT_RESULT::SUCCESS;

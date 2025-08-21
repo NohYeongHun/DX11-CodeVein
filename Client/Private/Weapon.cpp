@@ -22,6 +22,7 @@ HRESULT CWeapon::Initialize_Clone(void* pArg)
     m_pSocketMatrix = pDesc->pSocketMatrix;
     m_eCurLevel = pDesc->eCurLevel;
     m_pOwner = pDesc->pOwner;
+    m_fAttackPower = pDesc->fAttackPower;
 
     if (FAILED(CPartObject::Initialize_Clone(pDesc)))
     {
@@ -79,15 +80,6 @@ void CWeapon::Update_Timer(_float fTimeDelta)
     Update_ColliderFrame(fTimeDelta);
 }
 
-
-
-#ifdef _DEBUG
-
-
-#endif // _DEBUG
-
-
-
 #pragma region 1. 무기는 충돌에 대한 상태제어를 할 수 있어야한다.=> 충돌에 따라 상태가 변하기도, 수치값이 바뀌기도한다.
 
 // 기본적으로 Owner랑은 충돌 처리 자체를 안한다.
@@ -114,7 +106,6 @@ void CWeapon::Activate_ColliderFrame(_float fDuration)
 
 void CWeapon::Activate_Collider()
 {
-    //OutputDebugWstring(TEXT("Collider Activate 호출 "));
     m_pColliderCom->Set_Active(true);
     m_IsColliderActive = true;
 }

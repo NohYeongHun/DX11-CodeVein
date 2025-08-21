@@ -41,21 +41,17 @@ private:
 public:
 	const _wstring& Get_ObjectTag();
 
+#pragma region TRIGGER -> TO OBJECT_MANAGER
+	
+	virtual void OnMoved_ToObjectManager() {}
+#pragma endregion
+
+
 #pragma region 생존 여부 확인
 public:
 	const _bool Is_Destroy() { return m_IsDestroy; }
 	void Set_Destroy(_bool IsDestroy) { m_IsDestroy = IsDestroy; }
 	
-	//const _bool Is_Active() { return m_IsActive; }
-	//const _bool Is_Dead() { return m_IsDead; }
-	//void Set_Active(_bool IsActive) { m_IsActive = IsActive; }
-	//void Set_Dead(_bool IsDead) { m_IsDead = IsDead; }
-
-	//const _bool Is_Active() { return m_IsActive; }
-	//const _bool Is_Dead() { return m_IsDead; }
-	//void Set_Active(_bool IsActive) { m_IsActive = IsActive; }
-	//void Set_Dead(_bool IsDead) { m_IsDead = IsDead; }
-
 #pragma endregion
 
 

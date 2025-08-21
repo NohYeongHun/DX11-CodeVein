@@ -98,6 +98,31 @@ PS_OUT PS_MAIN(PS_IN In)
                     (g_vLightSpecular * g_vMtrlSpecular) * fSpecular;
     
     
+    
+    return Out;
+}
+
+
+PS_OUT PS_MAIN2(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+    
+    
+    vector vMtrlDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
+    
+    float fShade = max(dot(normalize(g_vLightDir) * -1.f, normalize(In.vNormal)), 0.f);
+    
+    /*슬라이딩 이야기했다*/
+    vector vReflect = reflect(normalize(g_vLightDir), normalize(In.vNormal));
+    vector vLook = In.vWorldPos - g_vCamPosition;
+    
+    float fSpecular = pow(max(dot(normalize(vLook) * -1.f, normalize(vReflect)), 0.f), 50.0f);
+    
+    Out.vColor = (g_vLightDiffuse * vMtrlDiffuse) * saturate(fShade + (g_vLightAmbient * g_vMtrlAmbient)) +
+                    (g_vLightSpecular * g_vMtrlSpecular) * fSpecular;
+    
+    Out.vColor = float4(Out.vColor.rgb, 1.0f);
+    
     return Out;
 }
 
@@ -114,6 +139,16 @@ technique11 DefaultTechnique
 
         VertexShader = compile vs_5_0 VS_MAIN();
         PixelShader = compile ps_5_0 PS_MAIN();
+    }
+
+    pass SkyPass // 하늘 전용 패스
+    {
+        SetRasterizerState(RS_Cull_CCW);
+        SetDepthStencilState(DSS_None, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        PixelShader = compile ps_5_0 PS_MAIN2();
     }
 
     ///* 모델의 상황에 따라 다른 쉐이딩 기법 세트(블렌딩 + 디스토션  )를 먹여주기위해서 */

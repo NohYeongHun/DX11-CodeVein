@@ -82,11 +82,11 @@ void CHUD::Update(_float fTimeDelta)
     */
     
 
-    if (m_pGameInstance->Get_KeyUp(DIK_1))
+    /*if (m_pGameInstance->Get_KeyUp(DIK_1))
     {
         HPCHANGE_DESC HpDesc{};
         HpDesc.bIncrease = false;
-        HpDesc.iHp = 50;
+        HpDesc.fHp = 50.f;
         HpDesc.fTime = 1.f;
         m_pGameInstance->Publish(EventType::HP_CHANGE, &HpDesc);
     }
@@ -94,7 +94,7 @@ void CHUD::Update(_float fTimeDelta)
     {
         HPCHANGE_DESC HpDesc{};
         HpDesc.bIncrease = true;
-        HpDesc.iHp = 50;
+        HpDesc.fHp = 50.f;
         HpDesc.fTime = 1.f;
         m_pGameInstance->Publish(EventType::HP_CHANGE, &HpDesc);
     }
@@ -105,7 +105,7 @@ void CHUD::Update(_float fTimeDelta)
         SteminaDesc.iStemina = 40;
         SteminaDesc.fTime = 1.f;
         m_pGameInstance->Publish(EventType::STEMINA_CHANGE, &SteminaDesc);
-    }
+    }*/
 
     // 마우스 왼쪽 클릭 시 쿨타임 돌게하기.
     /*if (m_pGameInstance->Get_MouseKeyUp(MOUSEKEYSTATE::LB))

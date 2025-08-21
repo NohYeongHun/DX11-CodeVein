@@ -1,34 +1,5 @@
 ﻿#pragma once
-//0. Animation Name : SK_WolfDevil_LOD0.ao | AS_TWolfDevil_TCmn_AttackJump01_N
-//1. Animation Name : SK_WolfDevil_LOD0.ao | AS_TWolfDevil_TCmn_AttackNormal01_N
-//2. Animation Name : SK_WolfDevil_LOD0.ao | AS_TWolfDevil_TCmn_Damage_B
-//3. Animation Name : SK_WolfDevil_LOD0.ao | AS_TWolfDevil_TCmn_Damage_F
-//4. Animation Name : SK_WolfDevil_LOD0.ao | AS_TWolfDevil_TCmn_Death_B
-//5. Animation Name : SK_WolfDevil_LOD0.ao | AS_TWolfDevil_TCmn_Death_N
-//6. Animation Name : SK_WolfDevil_LOD0.ao | AS_TWolfDevil_TCmn_Dodge_B
-//7. Animation Name : SK_WolfDevil_LOD0.ao | AS_TWolfDevil_TCmn_Down_P_End
-//8. Animation Name : SK_WolfDevil_LOD0.ao | AS_TWolfDevil_TCmn_Down_P_Loop
-//9. Animation Name : SK_WolfDevil_LOD0.ao | AS_TWolfDevil_TCmn_Down_P_Start
-//10. Animation Name : SK_WolfDevil_LOD0.ao | AS_TWolfDevil_TCmn_Down_S_End
-//11. Animation Name : SK_WolfDevil_LOD0.ao | AS_TWolfDevil_TCmn_Down_S_Loop
-//12. Animation Name : SK_WolfDevil_LOD0.ao | AS_TWolfDevil_TCmn_Down_S_Start
-//13. Animation Name : SK_WolfDevil_LOD0.ao | AS_TWolfDevil_TCmn_Idle_N_Loop
-//14. Animation Name : SK_WolfDevil_LOD0.ao | AS_TWolfDevil_TCmn_IdleTurn_L180
-//15. Animation Name : SK_WolfDevil_LOD0.ao | AS_TWolfDevil_TCmn_IdleTurn_L90
-//16. Animation Name : SK_WolfDevil_LOD0.ao | AS_TWolfDevil_TCmn_IdleTurn_R180
-//17. Animation Name : SK_WolfDevil_LOD0.ao | AS_TWolfDevil_TCmn_IdleTurn_R90
-//18. Animation Name : SK_WolfDevil_LOD0.ao | AS_TWolfDevil_TCmn_NoneFightIdleEat_N_Loop
-//19. Animation Name : SK_WolfDevil_LOD0.ao | AS_TWolfDevil_TCmn_NoneFightIdleIdle_N_Loop
-//20. Animation Name : SK_WolfDevil_LOD0.ao | AS_TWolfDevil_TCmn_NoneFightIdleSit_N_Loop
-//21. Animation Name : SK_WolfDevil_LOD0.ao | AS_TWolfDevil_TCmn_NoneFightThreatEat01_N
-//22. Animation Name : SK_WolfDevil_LOD0.ao | AS_TWolfDevil_TCmn_NoneFightThreatEat02_N
-//23. Animation Name : SK_WolfDevil_LOD0.ao | AS_TWolfDevil_TCmn_NoneFightThreatSit01_N
-//24. Animation Name : SK_WolfDevil_LOD0.ao | AS_TWolfDevil_TCmn_NoneFightThreatSit02_N
-//25. Animation Name : SK_WolfDevil_LOD0.ao | AS_TWolfDevil_TCmn_NoneFightWalk_F_Loop
-//26. Animation Name : SK_WolfDevil_LOD0.ao | AS_TWolfDevil_TCmn_StatusAilment_Stun_N
-//27. Animation Name : SK_WolfDevil_LOD0.ao | AS_TWolfDevil_TCmn_Threat01_N
-//28. Animation Name : SK_WolfDevil_LOD0.ao | AS_TWolfDevil_TCmn_Threat02_N
-//29. Animation Name : SK_WolfDevil_LOD0.ao | AS_TWolfDevil_TCmn_Walk_F_Loop
+
 
 NS_BEGIN(Client)
 // ========== WolfDevil 애니메이션 Enum 분류 ==========

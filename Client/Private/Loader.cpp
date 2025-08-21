@@ -1,4 +1,5 @@
-﻿CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿#include "Loader.h"
+CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: m_pDevice{ pDevice }
 	, m_pContext { pContext }
 	, m_pGameInstance { CGameInstance::GetInstance() }
@@ -52,10 +53,17 @@ HRESULT CLoader::Loading()
 	case LEVEL::GAMEPLAY:
 		hr = Loading_For_GamePlay_Level();
 		break;
+	case LEVEL::STAGEONE:
+		hr = Loading_For_StageOne_Level();
+		break;
 	}
 
 	if (FAILED(hr))
+	{
+		CRASH("Failed Create Stage");
 		return E_FAIL;
+	}
+		
 
 	LeaveCriticalSection(&m_CriticalSection);
 
@@ -100,6 +108,23 @@ HRESULT CLoader::Loading_For_Logo_Level()
 	m_isFinished = true;
 	
 	
+	return S_OK;
+}
+
+HRESULT CLoader::Loading_For_StageOne_Level()
+{
+	lstrcpy(m_szLoadingText, TEXT("Stage One 레벨을 로딩중입니다."));
+
+	if (FAILED(m_cLoader_StatgeOne
+		.Loading_Resource(m_pDevice, m_pContext, m_pGameInstance)))
+		return E_FAIL;
+
+
+
+	lstrcpy(m_szLoadingText, TEXT("Stage One 레벨 로딩이 완료되었습니다."));
+
+	m_isFinished = true;
+
 	return S_OK;
 }
 

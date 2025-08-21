@@ -7,10 +7,10 @@ class CWeapon abstract : public CPartObject
 public:
 	typedef struct tagWeaponDesc : public CPartObject::PARTOBJECT_DESC
 	{
-		CGameObject* pOwner = { nullptr };
 		const _float4x4* pSocketMatrix = { nullptr }; // 장착할 뼈
+		class CGameObject* pOwner = { nullptr };
 		LEVEL eCurLevel = {}; // 현재 레벨
-
+		_float fAttackPower = {}; // 데미지
 	}WEAPON_DESC;
 
 #pragma region 0. 기본 함수들
@@ -57,6 +57,7 @@ public:
 public:
 	void Set_AttackPower(_float fAttackPower) { m_fAttackPower = fAttackPower; }
 	virtual _float Get_AttackPower() { return m_fAttackPower; }
+	CGameObject* Get_Owner() { return m_pOwner; }
 
 protected:
 	class CCollider* m_pColliderCom = { nullptr };
@@ -67,6 +68,16 @@ protected:
 	_float m_fAttackPower = {}; // 공격 데미지.
 #pragma endregion
 
+
+#pragma region 2. Rendering 설정
+
+public:
+	void Set_Visible(_bool isVisible) { m_bVisible = isVisible; }
+	_bool Is_Visible() { return m_bVisible; }
+
+protected:
+	_bool m_bVisible = { true };
+#pragma endregion
 
 
 #pragma region 0. 기본 값들.

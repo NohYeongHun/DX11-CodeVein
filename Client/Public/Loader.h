@@ -1,9 +1,9 @@
-#pragma once
+ï»¿#pragma once
 
 #include "Client_Defines.h"
 #include "Base.h"
 
-/* ·Î°í, °ÔÀÓÇÃ·¹ÀÌ -> °´Ã¼, ¸®¼Ò½ºµé, »ç¿îµå, ½¦ÀÌ´õ ->ÀÚ¿øÁØºñ¸¦ °ÅÄ¡´Â °úÁ¤ => ·Îµù */
+/* ë¡œê³ , ê²Œì„í”Œë ˆì´ -> ê°ì²´, ë¦¬ì†ŒìŠ¤ë“¤, ì‚¬ìš´ë“œ, ì‰ì´ë” ->ìì›ì¤€ë¹„ë¥¼ ê±°ì¹˜ëŠ” ê³¼ì • => ë¡œë”© */
 
 NS_BEGIN(Engine)
 class CGameInstance;
@@ -17,7 +17,7 @@ private:
 	CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual ~CLoader() = default;
 
-	/* ¼¼¸¶Æ÷¾î , ¹ÂÅØ½º, Å©¸®Æ¼ÄÃ¼½¼Ç */
+	/* ì„¸ë§ˆí¬ì–´ , ë®¤í…ìŠ¤, í¬ë¦¬í‹°ì»¬ì„¹ì…˜ */
 
 public:
 	HRESULT Initialize_Clone(LEVEL eNextLevelID);
@@ -45,12 +45,15 @@ private:
 
 private:
 	CLoader_Logo m_cLoader_Logo;
+	CLoader_StageOne m_cLoader_StatgeOne;
 	CLoader_GamePlay m_cLoader_GamePlay;
 	
 	
 private:
 	HRESULT Loading_For_Logo_Level();
+	HRESULT Loading_For_StageOne_Level();
 	HRESULT Loading_For_GamePlay_Level();
+	
 
 
 

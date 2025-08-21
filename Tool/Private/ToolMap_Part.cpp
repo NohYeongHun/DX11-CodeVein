@@ -132,26 +132,38 @@ void CToolMap_Part::Late_Update(_float fTimeDelta)
     
     CGameObject::Late_Update(fTimeDelta);
 
-    if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::BLEND, this)))
+    if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::PRIORITY, this)))
         return;
 }
 
 HRESULT CToolMap_Part::Render()
 {
     if (FAILED(Ready_Render_Resources()))
+    {
+        CRASH("Failed Ready_Render Resource");
         return E_FAIL;
+    }
+        
 
     _uint iNumMeshes = m_pModelCom->Get_NumMeshes();
     for (_uint i = 0; i < iNumMeshes; i++)
     {
         m_pModelCom->Bind_Materials(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE, 0);
-        
+		//m_pModelCom->Bind_Materials(m_pShaderCom, "g_NormalTexture", i, aiTextureType_NORMALS, 0);
 
         if (FAILED(m_pShaderCom->Begin(0)))
+        {
+            CRASH("Failed Begin Failed");
             return E_FAIL;
+        }
+            
 
         if (FAILED(m_pModelCom->Render(i)))
+        {
+            CRASH("Failed Render Failed");
             return E_FAIL;
+        }
+            
     }
     
     

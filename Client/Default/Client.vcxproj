@@ -160,6 +160,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\public\BackGround.h" />
+    <ClInclude Include="..\Public\BossHpBarUI.h" />
     <ClInclude Include="..\Public\BT_Monster_AttackAction.h" />
     <ClInclude Include="..\Public\BT_Monster_DeadAction.h" />
     <ClInclude Include="..\Public\BT_Monster_DetectAction.h" />
@@ -170,7 +171,12 @@
     <ClInclude Include="..\Public\BT_Monster_IsDead.h" />
     <ClInclude Include="..\Public\BT_Monster_IsDown.h" />
     <ClInclude Include="..\Public\BT_Monster_IsHit.h" />
+    <ClInclude Include="..\Public\BT_QueenKnight_DashAttackAction.h" />
+    <ClInclude Include="..\Public\BT_QueenKnight_DownStrikeAction.h" />
     <ClInclude Include="..\Public\BT_QueenKnight_FirstPhase_AttackAction.h" />
+    <ClInclude Include="..\Public\BT_QueenKnight_IsDashAttackCondition.h" />
+    <ClInclude Include="..\Public\BT_QueenKnight_IsTripleDownStrikeCondition.h" />
+    <ClInclude Include="..\Public\BT_QueenKnight_TripleDownStrikeAction.h" />
     <ClInclude Include="..\Public\BT_SkyBoss_Attack.h" />
     <ClInclude Include="..\Public\BT_SkyBoss_CanStrongAttack.h" />
     <ClInclude Include="..\Public\BT_Monster_IsDetectRange.h" />
@@ -187,6 +193,7 @@
     <ClInclude Include="..\Public\ClientPch.h" />
     <ClInclude Include="..\Public\Client_Debug.h" />
     <ClInclude Include="..\Public\Client_Defines.h" />
+    <ClInclude Include="..\Public\Fade_Out.h" />
     <ClInclude Include="..\Public\HPBar.h" />
     <ClInclude Include="..\Public\HUD.h" />
     <ClInclude Include="..\Public\imconfig.h" />
@@ -212,13 +219,16 @@
     <ClInclude Include="..\Public\Level_GamePlay.h" />
     <ClInclude Include="..\Public\Level_Loading.h" />
     <ClInclude Include="..\Public\Level_Logo.h" />
+    <ClInclude Include="..\Public\Level_StageOne.h" />
     <ClInclude Include="..\Public\Loader.h" />
     <ClInclude Include="..\Public\Loader_GamePlay.h" />
     <ClInclude Include="..\Public\Loader_Logo.h" />
     <ClInclude Include="..\Public\Loader_Personal.h" />
+    <ClInclude Include="..\Public\Loader_StageOne.h" />
     <ClInclude Include="..\Public\Loading_BackGround.h" />
     <ClInclude Include="..\Public\Loading_Panel.h" />
     <ClInclude Include="..\Public\Loading_Slot.h" />
+    <ClInclude Include="..\Public\LockOnUI.h" />
     <ClInclude Include="..\Public\Map.h" />
     <ClInclude Include="..\Public\Monster.h" />
     <ClInclude Include="..\Public\MonsterTree.h" />
@@ -226,6 +236,7 @@
     <ClInclude Include="..\Public\PlayerDefine.h" />
     <ClInclude Include="..\Public\PlayerState.h" />
     <ClInclude Include="..\Public\Player_AttackState.h" />
+    <ClInclude Include="..\Public\Player_DamageState.h" />
     <ClInclude Include="..\Public\Player_DodgeState.h" />
     <ClInclude Include="..\Public\Player_GuardState.h" />
     <ClInclude Include="..\Public\Player_IdleState.h" />
@@ -244,6 +255,9 @@
     <ClInclude Include="..\Public\SkillUI_Icon.h" />
     <ClInclude Include="..\Public\SkillUI_Panel.h" />
     <ClInclude Include="..\Public\SkillUI_Slot.h" />
+    <ClInclude Include="..\Public\SlaveVampire.h" />
+    <ClInclude Include="..\Public\SlaveVampireDefine.h" />
+    <ClInclude Include="..\Public\SlaveVampireSword.h" />
     <ClInclude Include="..\Public\SteminaBar.h" />
     <ClInclude Include="..\Public\Title_BackGround.h" />
     <ClInclude Include="..\Public\MainApp.h" />
@@ -257,6 +271,7 @@
     <ClInclude Include="..\Public\Weapon.h" />
     <ClInclude Include="..\Public\WolfDevil.h" />
     <ClInclude Include="..\Public\WolfDevilDefine.h" />
+    <ClInclude Include="..\Public\WolfWeapon.h" />
     <ClInclude Include="Client.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="Resource.h" />
@@ -264,6 +279,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\BackGround.cpp" />
+    <ClCompile Include="..\Private\BossHpBarUI.cpp" />
     <ClCompile Include="..\Private\BT_Monster_AttackAction.cpp" />
     <ClCompile Include="..\Private\BT_Monster_DeadAction.cpp" />
     <ClCompile Include="..\Private\BT_Monster_DetectAction.cpp" />
@@ -274,7 +290,12 @@
     <ClCompile Include="..\Private\BT_Monster_IsDead.cpp" />
     <ClCompile Include="..\Private\BT_Monster_IsDown.cpp" />
     <ClCompile Include="..\Private\BT_Monster_IsHit.cpp" />
+    <ClCompile Include="..\Private\BT_QueenKnight_DashAttackAction.cpp" />
+    <ClCompile Include="..\Private\BT_QueenKnight_DownStrikeAction.cpp" />
     <ClCompile Include="..\Private\BT_QueenKnight_FirstPhase_AttackAction.cpp" />
+    <ClCompile Include="..\Private\BT_QueenKnight_IsDashAttackCondition.cpp" />
+    <ClCompile Include="..\Private\BT_QueenKnight_IsTripleDownStrikeCondition.cpp" />
+    <ClCompile Include="..\Private\BT_QueenKnight_TripleDownStrikeAction.cpp" />
     <ClCompile Include="..\Private\BT_SkyBoss_Attack.cpp" />
     <ClCompile Include="..\Private\BT_SkyBoss_CanStrongAttack.cpp" />
     <ClCompile Include="..\Private\BT_Monster_IsDetectRange.cpp" />
@@ -294,6 +315,7 @@
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ClientPch.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ClientPch.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
     </ClCompile>
+    <ClCompile Include="..\Private\Fade_Out.cpp" />
     <ClCompile Include="..\Private\HPBar.cpp" />
     <ClCompile Include="..\Private\HUD.cpp" />
     <ClCompile Include="..\Private\imgui.cpp" />
@@ -317,19 +339,23 @@
     <ClCompile Include="..\Private\Level_GamePlay.cpp" />
     <ClCompile Include="..\Private\Level_Loading.cpp" />
     <ClCompile Include="..\Private\Level_Logo.cpp" />
+    <ClCompile Include="..\Private\Level_StageOne.cpp" />
     <ClCompile Include="..\Private\Loader.cpp" />
     <ClCompile Include="..\Private\Loader_GamePlay.cpp" />
     <ClCompile Include="..\Private\Loader_Logo.cpp" />
     <ClCompile Include="..\Private\Loader_Personal.cpp" />
+    <ClCompile Include="..\Private\Loader_StageOne.cpp" />
     <ClCompile Include="..\Private\Loading_BackGround.cpp" />
     <ClCompile Include="..\Private\Loading_Panel.cpp" />
     <ClCompile Include="..\Private\Loading_Slot.cpp" />
+    <ClCompile Include="..\Private\LockOnUI.cpp" />
     <ClCompile Include="..\Private\Map.cpp" />
     <ClCompile Include="..\Private\Monster.cpp" />
     <ClCompile Include="..\Private\MonsterTree.cpp" />
     <ClCompile Include="..\Private\Player.cpp" />
     <ClCompile Include="..\Private\PlayerState.cpp" />
     <ClCompile Include="..\Private\Player_AttackState.cpp" />
+    <ClCompile Include="..\Private\Player_DamageState.cpp" />
     <ClCompile Include="..\Private\Player_DodgeState.cpp" />
     <ClCompile Include="..\Private\Player_GuardState.cpp" />
     <ClCompile Include="..\Private\Player_IdleState.cpp" />
@@ -346,6 +372,8 @@
     <ClCompile Include="..\Private\SkillUI_Icon.cpp" />
     <ClCompile Include="..\Private\SkillUI_Panel.cpp" />
     <ClCompile Include="..\Private\SkillUI_Slot.cpp" />
+    <ClCompile Include="..\Private\SlaveVampire.cpp" />
+    <ClCompile Include="..\Private\SlaveVampireSword.cpp" />
     <ClCompile Include="..\Private\SteminaBar.cpp" />
     <ClCompile Include="..\Private\Title_BackGround.cpp" />
     <ClCompile Include="..\Private\MainApp.cpp" />
@@ -358,6 +386,7 @@
     <ClCompile Include="..\Private\TitleText.cpp" />
     <ClCompile Include="..\Private\Weapon.cpp" />
     <ClCompile Include="..\Private\WolfDevil.cpp" />
+    <ClCompile Include="..\Private\WolfWeapon.cpp" />
     <ClCompile Include="Client.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -377,6 +406,8 @@
   <ItemGroup>
     <Text Include="..\Public\PlayerAnimation.txt" />
     <Text Include="QueenKnightDefine.txt" />
+    <Text Include="SlaveVampireDefine.txt" />
+    <Text Include="WolfDevilDefine.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />

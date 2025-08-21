@@ -25,13 +25,12 @@ HRESULT CNavigationManager::Initialize()
 HRESULT CNavigationManager::Render()
 {
 
-#ifdef _DEBUG
     if (m_Cells.size() == 0)
         return S_OK;
 
     _float4x4			WorldMatrix;
     XMStoreFloat4x4(&WorldMatrix, XMMatrixIdentity());
-    WorldMatrix._42 += 0.1f;
+    //WorldMatrix._42 += 0.1f;
 
     if (FAILED(m_pShader->Bind_Matrix("g_ViewMatrix", m_pGameInstance->Get_Transform_Float4x4(D3DTS::VIEW))))
     {
@@ -66,12 +65,11 @@ HRESULT CNavigationManager::Render()
 
             m_pShader->Bind_RawValue("g_vColor", &vColor, sizeof(_float4));
             m_pShader->Begin(0);
-            pCell->Render();
+            pCell->Rendear();
         }
         i++;
     }
 
-#endif
 
     return S_OK;
 }

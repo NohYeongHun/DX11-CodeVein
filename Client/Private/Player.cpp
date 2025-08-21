@@ -45,16 +45,30 @@ HRESULT CPlayer::Initialize_Prototype()
 HRESULT CPlayer::Initialize_Clone(void* pArg)
 {
     PLAYER_DESC* pDesc = static_cast<PLAYER_DESC*>(pArg);
+    m_eCurLevel = pDesc->eCurLevel;
+
     m_Stats = {
         pDesc->fMaxHP,
         pDesc->fHP,
         pDesc->fAttackPower,
     };
 
+    /* 1. 생성과 동시에 UI와 연동이 필요 */
+    HPSYNCRONIZE_DESC HpSyncDesc = { m_Stats.fHP, m_Stats.fMaxHP };
+
+    m_pGameInstance->Publish(EventType::HP_SYNCRONIZE, &HpSyncDesc);
+
     if (FAILED(CContainerObject::Initialize_Clone(pDesc)))
+    {
+        CRASH("Failed ContainerObject Initialize Clone");
         return E_FAIL;
+    }
+        
 
     m_eCurLevel = pDesc->eCurLevel;
+    _vector vStartPos = XMVectorSetW(XMLoadFloat3(&pDesc->vPos), 1.f);
+    m_pTransformCom->Set_State(STATE::POSITION, vStartPos);
+
     if (FAILED(Ready_Components(pDesc)))
     {
         CRASH("Failed Ready_Components");
@@ -67,12 +81,13 @@ HRESULT CPlayer::Initialize_Clone(void* pArg)
         return E_FAIL;
     }
 
+  
+
     if (FAILED(Ready_Navigations()))
     {
         CRASH("Failed Ready_Navigations");
         return E_FAIL;
     }
-     
 
     if (FAILED(Ready_PartObjects()))
     {
@@ -99,18 +114,6 @@ HRESULT CPlayer::Initialize_Clone(void* pArg)
     }
 
     
-    //m_pModelCom->Set_Animation(PLAYER_ANIM_IDLE_LSWORD, true);
-        
-
-
-    // 위치 초기화를 이제 Navigations 에서.
-    /*_vector qInitRot = XMQuaternionRotationAxis(XMVectorSet(0.f, 1.f, 0.f, 0.f), 0.0f);
-    m_pTransformCom->Set_Quaternion(qInitRot);
-
-    _float3 vPos = { 0.f, 5.f, 0.f };
-    m_pTransformCom->Set_State(STATE::POSITION, XMLoadFloat3(&vPos));*/
-
-    
 
     return S_OK;
 }
@@ -123,15 +126,16 @@ void CPlayer::Priority_Update(_float fTimeDelta)
 void CPlayer::Update(_float fTimeDelta)
 {
     CContainerObject::Update(fTimeDelta);
+
     Update_KeyInput();
+
+   
     HandleState(fTimeDelta);
     
-#ifdef _DEBUG
-    //m_pModelCom->Play_Animation(fTimeDelta);
-#endif // _DEBUG
-
-
-    // Update 분기의 마지막 시점에 실행되어야 하는 함수 모음..
+    // LockOn 상태를 카메라와 동기화
+    Update_LockOn(fTimeDelta);
+    
+    // Update 분기의 마지막 시점에 실행되어야 하는 함수 모음
     Finalize_Update(fTimeDelta);
 }
 
@@ -361,10 +365,15 @@ void CPlayer::Rotate_Player_To_Camera_Direction()
 
 void CPlayer::Toggle_LockOn()
 {
-    if (m_isLockOn)
-        Clear_LockOn_Target();
-    else
-        Search_LockOn_Target();
+    // 카메라 락온 시스템 사용
+    if (m_pPlayerCamera)
+    {
+        m_pPlayerCamera->Toggle_LockOn_Mode();
+        
+        // 플레이어 상태도 카메라 상태에 맞춰 업데이트
+        m_isLockOn = m_pPlayerCamera->Is_LockOn_Mode();
+        m_pLockOn_Target = m_pPlayerCamera->Get_LockOn_Target();
+    }
 }
 
 void CPlayer::Search_LockOn_Target()
@@ -450,10 +459,10 @@ void CPlayer::Set_LockOn_Target(CGameObject* pTarget)
     m_fLockOnTimer = 0.0f;
 
     // 카메라에 LockOn 타겟 설정
-    if (m_pPlayerCamera)
-    {
-        m_pPlayerCamera->Start_Zoom_In(0.3f);
-    }
+    //if (m_pPlayerCamera)
+    //{
+    //    m_pPlayerCamera->Start_Zoom_In(0.3f);
+    //}
 }
 
 void CPlayer::Clear_LockOn_Target()
@@ -463,34 +472,26 @@ void CPlayer::Clear_LockOn_Target()
     m_fLockOnTimer = 0.0f;
 
     // 카메라 LockOn 해제
-    if (m_pPlayerCamera)
-    {
-        m_pPlayerCamera->Start_Zoom_Out(0.3f); 
-    }
+    //if (m_pPlayerCamera)
+    //{
+    //    m_pPlayerCamera->Start_Zoom_Out(0.3f); 
+    //}
 
-    // UI나 이펙트 숨기기 (필요시)
-    // m_pGameInstance->Hide_LockOn_UI();
 }
 
 void CPlayer::Update_LockOn(_float fTimeDelta)
 {
+    // 카메라의 락온 상태와 동기화
+    if (m_pPlayerCamera)
+    {
+        m_isLockOn = m_pPlayerCamera->Is_LockOn_Mode();
+        m_pLockOn_Target = m_pPlayerCamera->Get_LockOn_Target();
+    }
+    
     if (!m_isLockOn || !m_pLockOn_Target)
         return;
 
     m_fLockOnTimer += fTimeDelta;
-
-    // 주기적으로 LockOn 타겟 유효성 검사
-    if (m_fLockOnTimer >= m_fLockOnCheckInterval)
-    {
-        m_fLockOnTimer = 0.0f;
-
-        if (!Is_Valid_LockOn_Target(m_pLockOn_Target))
-        {
-            Clear_LockOn_Target();
-            return;
-        }
-    }
-
 }
 
 _bool CPlayer::Is_Valid_LockOn_Target(CGameObject* pTarget)
@@ -565,7 +566,7 @@ _vector CPlayer::Calculate_LockOn_Direction() const
 {
     if (!m_isLockOn || !m_pLockOn_Target)
         return XMVectorZero();
-
+     
     _vector vPlayerPos = m_pTransformCom->Get_State(STATE::POSITION);
     _vector vTargetPos = m_pLockOn_Target->Get_Transform()->Get_State(STATE::POSITION);
 
@@ -597,25 +598,89 @@ _vector CPlayer::Get_LockOn_Attack_Direction() const
 HRESULT CPlayer::InitializeAction_ToAnimationMap()
 {
 
+#pragma region 0. 이동
     m_Action_AnimMap.emplace(L"IDLE", PLAYER_ANIM_IDLE_LSWORD);
     m_Action_AnimMap.emplace(L"RUN", PLAYER_ANIM_RUN_F_LOOP);
     m_Action_AnimMap.emplace(L"DODGE", PLAYER_ANIM_LS_DODGE_ROLL_F);
 
+    // LockOn시 일어나는 행동
+    m_Action_AnimMap.emplace(L"RUN_F", PLAYER_ANIM_RUN_F_LOOP);
+    m_Action_AnimMap.emplace(L"RUN_F_END", PLAYER_ANIM_RUN_F_END);
+    m_Action_AnimMap.emplace(L"RUN_B", PLAYER_ANIM_RUN_B_LOOP);
+    m_Action_AnimMap.emplace(L"RUN_B_END", PLAYER_ANIM_RUN_B_END);
+    m_Action_AnimMap.emplace(L"RUN_L", PLAYER_ANIM_RUN_L_LOOP);
+    m_Action_AnimMap.emplace(L"RUN_L_END", PLAYER_ANIM_RUN_L_END);
+    m_Action_AnimMap.emplace(L"RUN_R", PLAYER_ANIM_RUN_R_LOOP);
+    m_Action_AnimMap.emplace(L"RUN_R_END", PLAYER_ANIM_RUN_R_END);
+
+
+    m_Action_AnimMap.emplace(L"DODGE_B", PLAYER_ANIM_LS_DODGE_ROLL_B);
+    m_Action_AnimMap.emplace(L"DODGE_BL", PLAYER_ANIM_LS_DODGE_ROLL_BL);
+    m_Action_AnimMap.emplace(L"DODGE_BR", PLAYER_ANIM_LS_DODGE_ROLL_BR);
+    m_Action_AnimMap.emplace(L"DODGE_F", PLAYER_ANIM_LS_DODGE_ROLL_F);
+    m_Action_AnimMap.emplace(L"DODGE_FL", PLAYER_ANIM_LS_DODGE_ROLL_FL);
+    m_Action_AnimMap.emplace(L"DODGE_FR", PLAYER_ANIM_LS_DODGE_ROLL_FR);
+    m_Action_AnimMap.emplace(L"DODGE_L", PLAYER_ANIM_LS_DODGE_ROLL_L);
+    m_Action_AnimMap.emplace(L"DODGE_R", PLAYER_ANIM_LS_DODGE_ROLL_R);
+
+#pragma endregion
+
+#pragma region 1. HIT 판정
+    m_Action_AnimMap.emplace(L"DAMAGE_B", PLAYER_ANIM_DAMAGE_B);
+    m_Action_AnimMap.emplace(L"DAMAGE_F", PLAYER_ANIM_DAMAGE_F);
+    m_Action_AnimMap.emplace(L"DAMAGE_L", PLAYER_ANIM_DAMAGE_L);
+    m_Action_AnimMap.emplace(L"DAMAGE_R", PLAYER_ANIM_DAMAGE_R);
+
     m_Action_AnimMap.emplace(L"GUARD_START", PLAYER_ANIM_LS_GUARD_START);
     m_Action_AnimMap.emplace(L"GUARD_LOOP", PLAYER_ANIM_LS_GUARD_LOOP);
     m_Action_AnimMap.emplace(L"GUARD_END", PLAYER_ANIM_LS_GUARD_END);
+#pragma endregion
+
+
+#pragma region 2. 공격
     m_Action_AnimMap.emplace(L"ATTACK1", PLAYER_ANIM_S_ATK_NORMAL1);
     m_Action_AnimMap.emplace(L"ATTACK2", PLAYER_ANIM_S_ATK_NORMAL2);
     m_Action_AnimMap.emplace(L"ATTACK3", PLAYER_ANIM_S_ATK_NORMAL3);
     m_Action_AnimMap.emplace(L"ATTACK4", PLAYER_ANIM_S_ATK_NORMAL4);
     m_Action_AnimMap.emplace(L"ATTACK5", PLAYER_ANIM_S_ATK_NORMAL5);
 
-    // 220 Frame => 100 Frame까지?
+    // 220 Frame => 100 Frame까지? 공격 판정?
     m_Action_AnimMap.emplace(L"STRONG_ATTACK1", PLAYER_ANIM_LS_ATK_STRONG1B);
-    
+#pragma endregion
 
 
-    /* 재생속도 증가. */
+
+#pragma region 99. 재생속도 증가.
+    /* 재생 속도 증가*/
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("RUN")], 1.5f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("RUN_B")], 1.5f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("RUN_F")], 1.5f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("RUN_L")], 1.5f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("RUN_R")], 1.5f);
+
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("DODGE_B")], 1.5f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("DODGE_BL")], 1.5f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("DODGE_BR")], 1.5f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("DODGE_F")], 1.5f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("DODGE_FL")], 1.5f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("DODGE_FR")], 1.5f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("DODGE_L")], 1.5f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("DODGE_R")], 1.5f);
+
+
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("ATTACK1")], 2.f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("ATTACK2")], 2.f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("ATTACK3")], 2.f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("ATTACK4")], 2.f);
+
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("DAMAGE_B")], 2.f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("DAMAGE_F")], 2.f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("DAMAGE_L")], 2.f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("DAMAGE_R")], 2.f);
+
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("STRONG_ATTACK1")], 2.f);
+#pragma endregion
+
     return S_OK;
 }
 
@@ -720,6 +785,9 @@ void CPlayer::Tick_BuffTimers(_float fTimeDelta)
 
 HRESULT CPlayer::Initialize_BuffDurations()
 {
+    m_BuffDefault_Durations[BUFF_HIT] = 1.f;        // 피격: 1초
+    m_BuffDefault_Durations[BUFF_DOWN] = 5.f;       // 다운: 20초 => 두번 클릭했을 때 다운이 되는가.
+    m_BuffDefault_Durations[BUFF_INVINCIBLE] = 1.f; // 무적 시간.
     return S_OK;
 }
 #pragma endregion
@@ -728,6 +796,25 @@ HRESULT CPlayer::Initialize_BuffDurations()
 #pragma region 충돌 관리
 void CPlayer::On_Collision_Enter(CGameObject* pOther)
 {
+    // 몬스터 무기와 충돌했을 경우?
+    CWeapon* pWeapon = dynamic_cast<CWeapon*>(pOther);
+
+    // 이미 충돌 레이어를 몬스터, 몬스터 Weapon으로 한정했으므로 이건 Weapon 충돌.
+    if (nullptr != pWeapon)
+    {
+        if (HasBuff(BUFF_INVINCIBLE))
+            return;
+
+        // 무기의 소유자(몬스터) 가져오기
+        CMonster* pMonster = dynamic_cast<CMonster*>(pWeapon->Get_Owner());
+        if (nullptr != pMonster)
+        {
+            // 몬스터 위치를 기반으로 피격 방향 계산 및 DamageState 전환
+            Take_Damage(pWeapon->Get_AttackPower(), pMonster);
+        }
+
+      
+    }
 }
 
 void CPlayer::On_Collision_Stay(CGameObject* pOther)
@@ -746,6 +833,10 @@ void CPlayer::Enable_Collider(COLLIDER_PARTS eColliderParts)
     case PART_WEAPON:
         m_pPlayerWeapon->Activate_Collider();
         break;
+    case PART_BODY:
+        if (m_pColliderCom)
+            m_pColliderCom->Set_Active(true);
+        break;
     default:
         break;
     }
@@ -758,8 +849,62 @@ void CPlayer::Disable_Collider(COLLIDER_PARTS eColliderParts)
     case PART_WEAPON:
         m_pPlayerWeapon->Deactivate_Collider();
         break;
+    case PART_BODY:
+        if (m_pColliderCom)
+            m_pColliderCom->Set_Active(false);
+        break;
     default:
         break;
+    }
+}
+
+void CPlayer::Take_Damage(_float fHp)
+{
+    m_Stats.fHP -= fHp;
+    // UI에 전달.
+    HPCHANGE_DESC HpDesc{};
+    HpDesc.bIncrease = false;
+    HpDesc.fHp = fHp;
+    HpDesc.fTime = 0.2f;
+    m_pGameInstance->Publish(EventType::HP_CHANGE, &HpDesc);
+}
+
+ACTORDIR CPlayer::Calculate_Damage_Direction(CMonster* pAttacker)
+{
+    if (nullptr == pAttacker)
+        return ACTORDIR::U; // 기본값: 앞쪽
+        
+    // 플레이어와 공격자의 위치
+    _vector vPlayerPos = m_pTransformCom->Get_State(STATE::POSITION);
+    _vector vAttackerPos = pAttacker->Get_Transform()->Get_State(STATE::POSITION);
+    
+    // 공격자로부터 플레이어로의 방향 벡터
+    _vector vToPlayer = vPlayerPos - vAttackerPos;
+    vToPlayer = XMVectorSetY(vToPlayer, 0.f); // Y축 제거 (수평면에서만 계산)
+    vToPlayer = XMVector3Normalize(vToPlayer);
+    
+    // 플레이어의 전방 벡터
+    _vector vPlayerForward = m_pTransformCom->Get_State(STATE::LOOK);
+    vPlayerForward = XMVectorSetY(vPlayerForward, 0.f);
+    vPlayerForward = XMVector3Normalize(vPlayerForward);
+    
+    // 플레이어의 오른쪽 벡터
+    _vector vPlayerRight = m_pTransformCom->Get_State(STATE::RIGHT);
+    vPlayerRight = XMVectorSetY(vPlayerRight, 0.f);
+    vPlayerRight = XMVector3Normalize(vPlayerRight);
+    
+    // 내적을 통해 방향 계산
+    _float fForwardDot = XMVectorGetX(XMVector3Dot(vToPlayer, vPlayerForward));
+    _float fRightDot = XMVectorGetX(XMVector3Dot(vToPlayer, vPlayerRight));
+    
+    // 방향 결정 (가장 강한 방향으로 결정)
+    if (abs(fForwardDot) > abs(fRightDot))
+    {
+        return (fForwardDot > 0) ? ACTORDIR::D : ACTORDIR::U;
+    }
+    else
+    {
+        return (fRightDot > 0) ? ACTORDIR::L : ACTORDIR::R;
     }
 }
 
@@ -837,6 +982,9 @@ void CPlayer::Update_KeyInput()
     if (m_pGameInstance->Get_MouseKeyPress(MOUSEKEYSTATE::RB))
         m_KeyInput |= static_cast<uint16_t>(PLAYER_KEY::STRONG_ATTACK);
 
+    if (m_pGameInstance->Get_KeyUp(DIK_I))
+        m_pGameInstance->Publish<CInventory>(EventType::INVENTORY_DISPLAY, nullptr);
+
     // 방향 계산 추가 => Player State에 추가했음. HandleInput
     //m_eCurrentDirection = Calculate_Direction();
 }
@@ -862,6 +1010,23 @@ ACTORDIR CPlayer::Calculate_Direction()
 
 void CPlayer::Take_Damage(_float fDamage, CMonster* pMonster)
 {
+    // 기본 데미지 처리
+    Take_Damage(fDamage);
+
+    if (fDamage <= 0.f)
+        return;
+
+    AddBuff(BUFF_INVINCIBLE);
+    AddBuff(BUFF_HIT);
+    
+    // 공격자로부터 피격 방향 계산
+    ACTORDIR eDamageDirection = Calculate_Damage_Direction(pMonster);
+    
+    // DamageState로 전환
+    CPlayer_DamageState::DAMAGE_ENTER_DESC damageDesc{};
+    damageDesc.eDamageDirection = eDamageDirection;
+    
+    m_pFsmCom->Change_State(PLAYER_STATE::DAMAGE, &damageDesc);
 }
 
 
@@ -910,7 +1075,7 @@ HRESULT CPlayer::Ready_Colliders(PLAYER_DESC* pDesc)
     }
 
     /* 생성과 동시에 등록 */
-    m_pGameInstance->Add_Collider_To_Manager(m_pColliderCom);
+    m_pGameInstance->Add_Collider_To_Manager(m_pColliderCom, ENUM_CLASS(m_eCurLevel));
 
     return S_OK;
 }
@@ -934,7 +1099,9 @@ HRESULT CPlayer::Ready_Navigations()
     // Navigation을 이용해서 내 초기화 위치와 가까운 실제 셀을 찾습니다. 
     // => 그리고 해당 Cell의 Center로 보내버립니다.
 
-    _float3 vPos = { 0.f, 5.f, 0.f };
+    _float3 vPos = {};
+
+    XMStoreFloat3(&vPos, m_pTransformCom->Get_State(STATE::POSITION));
     _float3 vFinalPos = {};
     _int iNearCell = m_pNavigationCom->Find_NearCellIndex(vPos);
     
@@ -973,18 +1140,7 @@ HRESULT CPlayer::Ready_Fsm()
     m_pFsmCom->Add_State(CPlayer_StrongAttackState::Create(PLAYER_STATE::STRONG_ATTACK, &PlayerDesc));
     m_pFsmCom->Add_State(CPlayer_GuardState::Create(PLAYER_STATE::GUARD, &PlayerDesc));
     m_pFsmCom->Add_State(CPlayer_AttackState::Create(PLAYER_STATE::ATTACK, &PlayerDesc));
-
-    m_pModelCom->Get_Current_Ratio();
-    
-    /* 재생 속도 증가*/
-    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("RUN")], 1.5f);
-    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("ATTACK1")], 2.f);
-    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("ATTACK2")], 2.f);
-    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("ATTACK3")], 2.f);
-    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("ATTACK4")], 2.f);
-    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("DODGE")], 2.f);
-    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("STRONG_ATTACK1")], 2.f);
-        //, m_pModelCom->Get_CurrentTickPerSecond(m_Action_AnimMap[TEXT("RUN")]) * 2.f);
+    m_pFsmCom->Add_State(CPlayer_DamageState::Create(PLAYER_STATE::DAMAGE, &PlayerDesc));
 
     Register_CoolTime();
 
@@ -994,17 +1150,13 @@ HRESULT CPlayer::Ready_Fsm()
     CPlayer_RunState::RUN_ENTER_DESC Run{};
     Run.iAnimation_Idx = PLAYER_ANIM_RUN_F_LOOP;
     m_pFsmCom->Change_State(PLAYER_STATE::RUN, &Run);
-
     m_pFsmCom->Change_State(PLAYER_STATE::IDLE, &enter);
     return S_OK;
 }
 
+// 애니메이션 쿨타임 보다. Ratio로 판단하는게 더맞을듯.
 void CPlayer::Register_CoolTime()
 {
-   
-
-   
-
     _float fTimeDelta = m_pGameInstance->Get_TimeDelta();
     m_pFsmCom->Register_StateCoolTime(PLAYER_STATE::IDLE, 0.f);
     m_pFsmCom->Register_StateCoolTime(PLAYER_STATE::WALK, 0.f);
@@ -1069,18 +1221,19 @@ HRESULT CPlayer::Ready_PartObjects()
     CPlayerWeapon::PLAYER_WEAPON_DESC Weapon{};
     Weapon.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
     Weapon.pSocketMatrix = m_pModelCom->Get_BoneMatrix("IKSocket_RightHandAttach");
-    Weapon.eCurLevel = LEVEL::STATIC;
     Weapon.pOwner = this;
+    Weapon.eCurLevel = m_eCurLevel;
+    Weapon.fAttackPower = m_Stats.fAttackPower;
 
     if (FAILED(CContainerObject::Add_PartObject(TEXT("Com_Weapon"),
-        ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_Weapon")
+        ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Weapon")
         , reinterpret_cast<CPartObject**>(& m_pPlayerWeapon), &Weapon)))
     {
         CRASH("Failed Create Weapon");
         return E_FAIL;
     }
 
-    m_pPlayerWeapon->Set_AttackPower(m_Stats.fAttackPower);
+    //m_pPlayerWeapon->Set_AttackPower(m_Stats.fAttackPower);
     
 
     return S_OK;

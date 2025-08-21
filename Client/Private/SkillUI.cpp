@@ -98,12 +98,11 @@ void CSkillUI::Late_Update(_float fTimeDelta)
     if (!m_IsVisibility)
         return;
 
-    __sCUIObjectuper::Late_Update(fTimeDelta);
+    CUIObject::Late_Update(fTimeDelta);
 }
 
 HRESULT CSkillUI::Render()
 {
-
     return S_OK;
 }
 

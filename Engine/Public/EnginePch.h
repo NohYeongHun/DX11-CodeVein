@@ -12,7 +12,7 @@
 #include "Timer_Manager.h"
 #include "Level.h"
 #include "Level_Manager.h"
-
+#include "Trigger_Manager.h"
 #include "Renderer.h"
 
 #pragma region COMPONENT
@@ -32,6 +32,13 @@
 #include "VIBuffer_Rect.h"
 #include "VIBuffer_Terrain.h"
 #include "VIBuffer_Cube.h"
+
+#pragma region INSTANCING
+#include "VIBuffer_Instance.h"
+#include "VIBuffer_Rect_Instance.h"
+#pragma endregion
+
+
 #include "Texture.h"
 #include "Texture_Manager.h"
 

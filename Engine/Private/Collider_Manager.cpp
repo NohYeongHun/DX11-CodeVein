@@ -9,17 +9,35 @@ CCollider_Manager::CCollider_Manager()
 HRESULT CCollider_Manager::Initialize(_uint iNumLevels)
 {
 	m_iNumLevels = iNumLevels;
+	m_RegisterPools = new vector<CCollider*>[iNumLevels];
+	m_freePools.resize(iNumLevels);
 	return S_OK;
 }
 
 #pragma region ENGINE에 제공
-HRESULT CCollider_Manager::Add_Collider_To_Manager(CCollider* pCollider)
+HRESULT CCollider_Manager::Add_Collider_To_Manager(CCollider* pCollider, _uint iLevelIndex)
 {
-	if (nullptr == pCollider)
+	if (nullptr == pCollider || iLevelIndex >= m_iNumLevels)
 		return E_FAIL;
 
-	m_RegisterPool.emplace_back(pCollider);
+	m_RegisterPools[iLevelIndex].emplace_back(pCollider);
 	Safe_AddRef(pCollider);
+
+	return S_OK;
+}
+
+HRESULT CCollider_Manager::Clear(_uint iLevelIndex)
+{
+	if (iLevelIndex >= m_iNumLevels)
+		return E_FAIL;
+
+	for (auto& pCollider : m_RegisterPools[iLevelIndex])
+	{
+		Safe_Release(pCollider);
+	}
+
+	m_RegisterPools[iLevelIndex].clear();
+	m_freePools[iLevelIndex].clear();
 
 	return S_OK;
 }
@@ -38,74 +56,31 @@ void CCollider_Manager::Update()
 	// 2. 실제 충돌 처리.
 	Narrow_Phase();
 
-
-	//for (auto& pLeft : m_ColliderList)
-	//{
-	//	for (auto& pRight : m_ColliderList)
-	//	{
-	//		// 1. 예외처리. => 같은 경우 무시하기.
-	//		if (pLeft == pRight || nullptr == pLeft || nullptr == pRight)
-	//			continue;
-
-	//		CGameObject* pLeftOwner = pLeft->Get_Owner();
-	//		CGameObject* pRightOwner = pRight->Get_Owner();
-
-	//		// 2. Owner가 없는 경우
-	//		if (nullptr == pLeftOwner || nullptr == pRightOwner)
-	//			continue;
-
-	//		// 3. 타겟 Layer가 아닌 경우
-	//		if (!pLeft->Has_TargetLayer(pRight))
-	//			continue;
-
-
-	//		// 1. 만약 Active 되어 있지 않은 Collider 라면?
-	//		if (!pLeft->Is_Active() || !pRight->Is_Active())
-	//		{
-	//			Handle_Collision_Exit(pLeft, pRight, pLeftOwner, pRightOwner);
-	//			continue;
-	//		}
-
-	//		// 2. 둘다 충돌이 성공했다면?
-	//		if (pLeft->Intersect(pRight) && pRight->Intersect(pLeft))
-	//		{
-	//			Handle_Collision_By_Type(pLeft, pRight, pLeftOwner, pRightOwner);
-	//		}
-	//		// 3. 둘중 하나라도 충돌 실패했다면?
-	//		else
-	//		{
-	//			Handle_Collision_Exit(pLeft, pRight, pLeftOwner, pRightOwner);
-	//		}
-	//		
-	//	}
-	//}
-
 	m_ActiveColliders.clear();
-	/*for (auto& pCollider : m_ColliderList)
-		Safe_Release(pCollider);
-	m_ColliderList.clear();*/
 }
 
 /* 죽은 것들을 솎아낸다. */
 void CCollider_Manager::Collision_CleanUp()
 {
-	m_freePool.clear();
-
-	for (_uint i = 0; i < m_RegisterPool.size(); ++i)
+	for (_uint levelIndex = 0; levelIndex < m_iNumLevels; ++levelIndex)
 	{
-		// Collider Owner가 삭제되어야 하는 상황이라면?
-		if (m_RegisterPool[i]->Get_Owner()->Is_Destroy())
-			m_freePool.emplace_back(i);
+		m_freePools[levelIndex].clear();
+
+		for (_uint i = 0; i < m_RegisterPools[levelIndex].size(); ++i)
+		{
+			// Collider Owner가 삭제되어야 하는 상황이라면?
+			if (m_RegisterPools[levelIndex][i]->Get_Owner()->Is_Destroy())
+				m_freePools[levelIndex].emplace_back(i);
+		}
+
+		// 인덱스 정리: 중복 제거 + 내림차순 정렬
+		sort(m_freePools[levelIndex].begin(), m_freePools[levelIndex].end());
+		m_freePools[levelIndex].erase(std::unique(m_freePools[levelIndex].begin(), m_freePools[levelIndex].end()), m_freePools[levelIndex].end());
+		sort(m_freePools[levelIndex].begin(), m_freePools[levelIndex].end(), std::greater<_uint>());
+
+		Remove_Collider(levelIndex);
+		m_freePools[levelIndex].clear();
 	}
-
-	// 인덱스 정리: 중복 제거 + 내림차순 정렬
-	sort(m_freePool.begin(), m_freePool.end());
-	m_freePool.erase(std::unique(m_freePool.begin(), m_freePool.end()), m_freePool.end()); // 4) 방어적
-	sort(m_freePool.begin(), m_freePool.end(), std::greater<_uint>());
-
-	Remove_Collider();
-	m_freePool.clear();
-	
 }
 
 
@@ -114,20 +89,22 @@ void CCollider_Manager::Collision_CleanUp()
 // 1. 충돌 가능성 있는 것 선별
 void CCollider_Manager::Build_BroadPhase()
 {
-	if (m_RegisterPool.size() == 0)
-		return;
-
 	CCollider* pLeft = { nullptr };
 	CCollider* pRight = { nullptr };
 	CGameObject* pLeftOwner = { nullptr };
 	CGameObject* pRightOwner = { nullptr };
 
-	for (_uint i = 0; i < m_RegisterPool.size() - 1; ++i)
+	// 현재 레벨의 콜라이더들만 검사
+	_uint currentLevel = m_pGameInstance->Get_CurrentLevelID();
+	if (currentLevel >= m_iNumLevels || m_RegisterPools[currentLevel].size() == 0)
+		return;
+
+	for (_uint i = 0; i < m_RegisterPools[currentLevel].size() - 1; ++i)
 	{
-		for (_uint j = i + 1; j < m_RegisterPool.size(); ++j)
+		for (_uint j = i + 1; j < m_RegisterPools[currentLevel].size(); ++j)
 		{
-			pLeft = m_RegisterPool[i];
-			pRight = m_RegisterPool[j];
+			pLeft = m_RegisterPools[currentLevel][i];
+			pRight = m_RegisterPools[currentLevel][j];
 			 
 			// 1. null pointer인 객체가 등록되었으므로 Crash
 			if (nullptr == pLeft || nullptr == pRight)
@@ -192,35 +169,34 @@ void CCollider_Manager::Narrow_Phase()
 }
 
 /* 제거 하면 인덱스에 변화가 생기잖아? */
-HRESULT CCollider_Manager::Remove_Collider()
+HRESULT CCollider_Manager::Remove_Collider(_uint iLevelIndex)
 {
-	if (m_freePool.size() == 0)
+	if (iLevelIndex >= m_iNumLevels || m_freePools[iLevelIndex].size() == 0)
 		return S_OK;
 		
-	for (_uint idxToRemove : m_freePool)
+	for (_uint idxToRemove : m_freePools[iLevelIndex])
 	{
-		_uint last = (_uint)m_RegisterPool.size() - 1;
+		_uint last = (_uint)m_RegisterPools[iLevelIndex].size() - 1;
 		if (idxToRemove > last) continue; 
 
 		// (마지막이면 스왑 불필요)
 		if (idxToRemove == last)
 		{
-			CCollider* dead = m_RegisterPool[last];
+			CCollider* dead = m_RegisterPools[iLevelIndex][last];
 			Safe_Release(dead);
-			m_RegisterPool.pop_back();
+			m_RegisterPools[iLevelIndex].pop_back();
 			continue;
 		}
 
 		// swap-and-pop
-		CCollider* dead = m_RegisterPool[idxToRemove];
-		CCollider* tail = m_RegisterPool[last];
+		CCollider* dead = m_RegisterPools[iLevelIndex][idxToRemove];
+		CCollider* tail = m_RegisterPools[iLevelIndex][last];
 
-		swap(m_RegisterPool[idxToRemove], m_RegisterPool[last]);
+		swap(m_RegisterPools[iLevelIndex][idxToRemove], m_RegisterPools[iLevelIndex][last]);
 		Safe_Release(dead);
-		m_RegisterPool.pop_back();
+		m_RegisterPools[iLevelIndex].pop_back();
 	}
 
-	m_freePool.clear();
 	return S_OK;
 }
 
@@ -351,12 +327,19 @@ void CCollider_Manager::Free()
 	CBase::Free();
 	Safe_Release(m_pGameInstance);
 
-	for (auto& pCollider : m_RegisterPool)
+	if (nullptr != m_RegisterPools)
 	{
-		Safe_Release(pCollider);
-	}
+		for (_uint i = 0; i < m_iNumLevels; ++i)
+		{
+			for (auto& pCollider : m_RegisterPools[i])
+			{
+				Safe_Release(pCollider);
+			}
+			m_RegisterPools[i].clear();
+		}
 		
+		Safe_Delete_Array(m_RegisterPools);
+	}
 
-	m_RegisterPool.clear();
-
+	m_freePools.clear();
 }

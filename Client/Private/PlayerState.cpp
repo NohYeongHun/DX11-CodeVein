@@ -72,17 +72,31 @@ void CPlayerState::Update_Collider_State()
     {
         if (bShouldActive)
         {
-            m_pPlayer->Enable_Collider(CPlayer::PART_WEAPON);
+            m_pPlayer->Enable_Collider(m_eColliderType);
             colliderInfo.bIsActive = true;
         }
         else
         {
-            m_pPlayer->Disable_Collider(CPlayer::PART_WEAPON);
+            m_pPlayer->Disable_Collider(m_eColliderType);
             colliderInfo.bIsActive = false;
         }
 
         m_bPrevColliderState = bShouldActive;
     }
+}
+
+void CPlayerState::Force_Disable_All_Colliders()
+{
+    // 모든 콜라이더를 강제로 비활성화
+    for (auto& pair : m_ColliderActiveMap)
+    {
+        if (pair.second.bIsActive)
+        {
+            m_pPlayer->Disable_Collider(m_eColliderType);
+            pair.second.bIsActive = false;
+        }
+    }
+    m_bPrevColliderState = false;
 }
 #pragma endregion
 
@@ -116,10 +130,15 @@ _vector CPlayerState::Calculate_Unified_Attack_Direction()
 
 _vector CPlayerState::Determine_Final_Direction(_vector vInputDirection, _vector vLockOnDirection)
 {
-    // 키 입력이 있으면 항상 키 입력 우선 (플레이어 의도 존중)
+    // LockOn 상태일 때는 타겟 방향을 우선시
+    if (m_pPlayer->Is_LockOn() && !XMVector3Equal(vLockOnDirection, XMVectorZero()))
+    {
+        return vLockOnDirection;
+    }
+    
+    // LockOn이 아닌 경우 키 입력이 있으면 키 입력 우선 (플레이어 의도 존중)
     if (!XMVector3Equal(vInputDirection, XMVectorZero()))
     {
-        // LockOn 중이라도 키 입력 방향을 사용 (스트레이핑 효과)
         return vInputDirection;
     }
 

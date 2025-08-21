@@ -25,9 +25,6 @@
     <Filter Include="01. Levels\99. Loading\Loader\Personal">
       <UniqueIdentifier>{91b5ea89-f2b5-4bb5-a0be-5e14f3856d01}</UniqueIdentifier>
     </Filter>
-    <Filter Include="01. Levels\01. GamePlay">
-      <UniqueIdentifier>{4c028a6b-0d86-4e59-9833-8ebd1556de8b}</UniqueIdentifier>
-    </Filter>
     <Filter Include="01. Levels\00. Logo">
       <UniqueIdentifier>{3b48192d-e33f-4d1d-b0c2-1a87fd3b50f8}</UniqueIdentifier>
     </Filter>
@@ -175,6 +172,30 @@
     <Filter Include="02. GameObject\Monster\Boss\QueenKnight\BT\Attack">
       <UniqueIdentifier>{ad0d12b4-5e2f-41c3-8e21-2293a3770e0b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. GameObject\UI\Player\LockOn">
+      <UniqueIdentifier>{40dbc150-248b-4525-bf0b-f32ee08c0bb3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Player\State\Damage">
+      <UniqueIdentifier>{bd0331cb-0c63-43c1-8d18-270e024a188f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Monster\WolfDevil\Weapon">
+      <UniqueIdentifier>{2391e3f2-b183-40d9-88e2-08d0b978ed79}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Monster\SlaveVampire">
+      <UniqueIdentifier>{110a8a1b-58b0-4583-b048-b4ab149621ae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Monster\SlaveVampire\Weapon">
+      <UniqueIdentifier>{459dc932-6ee6-46fb-aea6-a6a8c8ff3eaf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Levels\02. GamePlay">
+      <UniqueIdentifier>{4c028a6b-0d86-4e59-9833-8ebd1556de8b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\UI\FadeOut">
+      <UniqueIdentifier>{5864f09d-b3ab-439c-8167-dd3d5dcdecf8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Levels\01. StageOne">
+      <UniqueIdentifier>{fb8c9382-2604-48c3-911a-f55df82be670}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -196,7 +217,7 @@
       <Filter>00. MainApp</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Level_GamePlay.h">
-      <Filter>01. Levels\01. GamePlay</Filter>
+      <Filter>01. Levels\02. GamePlay</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Level_Loading.h">
       <Filter>01. Levels\99. Loading</Filter>
@@ -483,6 +504,51 @@
     <ClInclude Include="..\Public\Client_Debug.h">
       <Filter>99. Defines</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\LockOnUI.h">
+      <Filter>02. GameObject\UI\Player\LockOn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BossHpBarUI.h">
+      <Filter>02. GameObject\Monster\Boss</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Player_DamageState.h">
+      <Filter>02. GameObject\Player\State\Damage</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\WolfWeapon.h">
+      <Filter>02. GameObject\Monster\WolfDevil\Weapon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BT_QueenKnight_DashAttackAction.h">
+      <Filter>02. GameObject\Monster\Boss\QueenKnight\BT\Attack</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BT_QueenKnight_IsDashAttackCondition.h">
+      <Filter>02. GameObject\Monster\Boss\QueenKnight\BT\Attack</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BT_QueenKnight_DownStrikeAction.h">
+      <Filter>02. GameObject\Monster\Boss\QueenKnight\BT\Attack</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BT_QueenKnight_TripleDownStrikeAction.h">
+      <Filter>02. GameObject\Monster\Boss\QueenKnight\BT\Attack</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BT_QueenKnight_IsTripleDownStrikeCondition.h">
+      <Filter>02. GameObject\Monster\Boss\QueenKnight\BT\Attack</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\SlaveVampire.h">
+      <Filter>02. GameObject\Monster\SlaveVampire</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\SlaveVampireDefine.h">
+      <Filter>02. GameObject\Monster\SlaveVampire</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\SlaveVampireSword.h">
+      <Filter>02. GameObject\Monster\SlaveVampire\Weapon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Level_StageOne.h">
+      <Filter>01. Levels\01. StageOne</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Loader_StageOne.h">
+      <Filter>01. Levels\99. Loading\Loader\Personal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Fade_Out.h">
+      <Filter>02. GameObject\UI\FadeOut</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -505,7 +571,7 @@
       <Filter>00. MainApp</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Level_GamePlay.cpp">
-      <Filter>01. Levels\01. GamePlay</Filter>
+      <Filter>01. Levels\02. GamePlay</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Level_Loading.cpp">
       <Filter>01. Levels\99. Loading</Filter>
@@ -771,6 +837,48 @@
     <ClCompile Include="..\Private\KnightShield.cpp">
       <Filter>02. GameObject\Monster\Boss\QueenKnight\Weapon</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\LockOnUI.cpp">
+      <Filter>02. GameObject\UI\Player\LockOn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BossHpBarUI.cpp">
+      <Filter>02. GameObject\Monster\Boss</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Player_DamageState.cpp">
+      <Filter>02. GameObject\Player\State\Damage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\WolfWeapon.cpp">
+      <Filter>02. GameObject\Monster\WolfDevil\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BT_QueenKnight_DashAttackAction.cpp">
+      <Filter>02. GameObject\Monster\Boss\QueenKnight\BT\Attack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BT_QueenKnight_IsDashAttackCondition.cpp">
+      <Filter>02. GameObject\Monster\Boss\QueenKnight\BT\Attack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BT_QueenKnight_TripleDownStrikeAction.cpp">
+      <Filter>02. GameObject\Monster\Boss\QueenKnight\BT\Attack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BT_QueenKnight_DownStrikeAction.cpp">
+      <Filter>02. GameObject\Monster\Boss\QueenKnight\BT\Attack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BT_QueenKnight_IsTripleDownStrikeCondition.cpp">
+      <Filter>02. GameObject\Monster\Boss\QueenKnight\BT\Attack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\SlaveVampire.cpp">
+      <Filter>02. GameObject\Monster\SlaveVampire</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\SlaveVampireSword.cpp">
+      <Filter>02. GameObject\Monster\SlaveVampire\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Level_StageOne.cpp">
+      <Filter>01. Levels\01. StageOne</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Loader_StageOne.cpp">
+      <Filter>01. Levels\99. Loading\Loader\Personal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Fade_Out.cpp">
+      <Filter>02. GameObject\UI\FadeOut</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxMesh.hlsl">
@@ -795,6 +903,12 @@
     </Text>
     <Text Include="QueenKnightDefine.txt">
       <Filter>02. GameObject\Monster\Boss\QueenKnight</Filter>
+    </Text>
+    <Text Include="SlaveVampireDefine.txt">
+      <Filter>02. GameObject\Monster\SlaveVampire</Filter>
+    </Text>
+    <Text Include="WolfDevilDefine.txt">
+      <Filter>02. GameObject\Monster\WolfDevil</Filter>
     </Text>
   </ItemGroup>
 </Project>

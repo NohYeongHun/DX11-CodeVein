@@ -11,14 +11,16 @@ enum class EventType : _uint
 	LOGO_END = 6,
 	OPEN_LEVEL = 7,
 	OPEN_GAMEPAY = 8,
-	HP_CHANGE = 9,
-	STEMINA_CHANGE = 10,
-	INVENTORY_DISPLAY = 11,
-	INVENTORY_SKILL_CHANGE = 12,
-	SKILLINFO_DISPLAY = 13,
-	SKILLINFO_SKILL_CHANGE = 14,
+	OPEN_STAGEONE = 9,
+	HP_CHANGE = 10,
+	HP_SYNCRONIZE = 11, // HP_SYNCRONIZE는 HP_CHANGE와 동일한 이벤트로 사용됨.
+	STEMINA_CHANGE = 12,
+	INVENTORY_DISPLAY = 13,
+	INVENTORY_SKILL_CHANGE = 14,
+	SKILLINFO_DISPLAY = 15,
+	SKILLINFO_SKILL_CHANGE = 16,
 	/* Map Tool */
-	SELECTED_MODEL = 15,
+	SELECTED_MODEL = 17,
 	EVENT_END
 };
 
@@ -52,10 +54,16 @@ typedef struct tagSkillExecuteDesc
 
 typedef struct tagHPChangeDesc
 {
-	_uint iHp;
+	_float fHp;
 	_float fTime;
 	_bool bIncrease;
 }HPCHANGE_DESC;
+
+typedef struct tagHPSyncronizeDesc
+{
+	_float fHp;
+	_float fMaxHp;
+}HPSYNCRONIZE_DESC;
 
 
 typedef struct tagSteminaChangeDesc

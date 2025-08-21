@@ -61,8 +61,13 @@ void CKnightShield::Update(_float fTimeDelta)
 void CKnightShield::Late_Update(_float fTimeDelta)
 {
     CWeapon::Late_Update(fTimeDelta);
-    if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::BLEND, this)))
-        return;
+
+    if (Is_Visible())
+    {
+        if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::BLEND, this)))
+            return;
+    }
+    
 }
 
 HRESULT CKnightShield::Render()
@@ -151,7 +156,7 @@ HRESULT CKnightShield::Ready_Colliders()
     }
 
     /* 생성과 동시에 등록 */
-    m_pGameInstance->Add_Collider_To_Manager(m_pColliderCom);
+    m_pGameInstance->Add_Collider_To_Manager(m_pColliderCom, ENUM_CLASS(m_eCurLevel));
 
     return S_OK;
 }

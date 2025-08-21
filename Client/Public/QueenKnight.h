@@ -9,10 +9,11 @@ public:
 	{
 		PART_WEAPON = 0,
 		PART_SHIELD = 1,
+		PART_BODY = 2,
 		PART_END
 	};
 
-	// 1 ~ 23은 커스텀사용
+	// 1 ~ 20은 커스텀사용
 	enum QUEEN_BUFF_FLAGS : _uint
 	{
 		QUEEN_BUFF_NONE = 0,
@@ -23,6 +24,8 @@ public:
 		QUEEN_BUFF_PHASE_SECOND = 1 << 5,
 		QUEEN_BUFF_PHASE_LAST = 1 << 6,
 		QUEEN_BUFF_PHASE_ATTACK_COOLDOWN = 1 << 7, // 페이즈 마다 다른 공격 시퀀스 => 쿨타임 존재
+		QUEEN_BUFF_DASH_ATTACK_COOLDOWN = 1 << 8, // 돌진 공격 시퀀스 => 쿨타임 존재.
+		QUEEN_BUFF_DOWN_TRIPLE_STRIKE_COOLDOWN = 1 << 9, // Down Strike 시퀀스 => 쿨타임 존재.
 		QUEEN_BUFF_END = 1 << 30
 	};
 
@@ -53,6 +56,8 @@ public:
 	virtual void On_Collision_Enter(CGameObject* pOther);
 	virtual void On_Collision_Stay(CGameObject* pOther);
 	virtual void On_Collision_Exit(CGameObject* pOther);
+	virtual void Collider_All_Active(_bool bActive);
+
 #pragma endregion
 
 
@@ -68,6 +73,19 @@ private:
 #pragma region 3. 몬스터는 자신에게 필요한 수치값들을 초기화해야한다.
 public:
 	virtual HRESULT Initialize_Stats() override;
+
+
+public:
+	_bool Is_TargetDashRange();
+	_bool Is_TargetDodgeRange();
+	_bool Is_TargetDownStrikeRange();
+
+
+private:
+	_float m_fDashMaxDistance = {};
+	_float m_fDashMinDistance = {};
+	_float m_fDashDodgeDistance = {};
+	_float m_fDownStrikeDistance = {};
 #pragma endregion
 
 #pragma region 4. 몬스터는 자신의 애니메이션을 관리해야한다.
@@ -87,6 +105,30 @@ public:
 	virtual void Disable_Collider(_uint iType) override;
 #pragma endregion
 
+#pragma region 7. 보스몹 체력 UI 관리
+public:
+	virtual void Take_Damage(_float fDamage) override;
+
+	virtual void Increase_HpUI(_float fHp, _float fTime) override;
+	virtual void Decrease_HpUI(_float fHp, _float fTime) override;
+
+
+private:
+	HRESULT Initailize_UI();
+	
+
+private:
+	class CBossHpBarUI* m_pBossHpBarUI = { nullptr };
+
+public:
+	
+#pragma endregion
+
+
+#pragma region 8. 렌더링 제어
+public:
+	virtual void Set_Visible(_bool bVisible) override ;
+#pragma endregion
 
 #pragma region 0. 기본 함수들 정의
 private:

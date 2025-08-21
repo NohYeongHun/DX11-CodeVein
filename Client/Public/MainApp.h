@@ -31,10 +31,12 @@ private:
 #pragma region PROTOTYPE
 	HRESULT Ready_Prototype_ForStatic();
 	HRESULT Ready_Prototype_ForUsageTexture();
-	HRESULT Ready_Prototype_ForModel();
+	//HRESULT Ready_Prototype_ForModel();
+	HRESULT Ready_Prototype_ForPlayer();
 	HRESULT Ready_Prototype_HUD();
 	HRESULT Ready_Prototype_Inventory();
 	HRESULT Ready_Prototype_SkillUI();
+	HRESULT Ready_Prototype_BossUI();
 	HRESULT Ready_Prototype_Fonts();
 #pragma endregion
 

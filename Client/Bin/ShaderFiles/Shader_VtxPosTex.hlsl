@@ -19,14 +19,14 @@ struct VS_OUT
     float4 vWorldPos : TEXCOORD1;
 };
 
-/* Á¤Á¡½¦ÀÌ´õ : Á¤Á¡ À§Ä¡ÀÇ ½ºÆäÀÌ½º º¯È¯(·ÎÄÃ -> ¿ùµå -> ºä -> Åõ¿µ). */ 
-/*          : Á¤Á¡ÀÇ ±¸¼ºÀ» º¯°æ.(in:3°³, out:2°³ or 5°³) */
-/*          : Á¤Á¡ ´ÜÀ§(Á¤Á¡ ÇÏ³ª´ç VS_MAINÇÑ¹øÈ£Ãâ) */ 
+/* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ì´ï¿½ : ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ì½ï¿½ ï¿½ï¿½È¯(ï¿½ï¿½ï¿½ï¿½ -> ï¿½ï¿½ï¿½ï¿½ -> ï¿½ï¿½ -> ï¿½ï¿½ï¿½ï¿½). */ 
+/*          : ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½.(in:3ï¿½ï¿½, out:2ï¿½ï¿½ or 5ï¿½ï¿½) */
+/*          : ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½(ï¿½ï¿½ï¿½ï¿½ ï¿½Ï³ï¿½ï¿½ï¿½ VS_MAINï¿½Ñ¹ï¿½È£ï¿½ï¿½) */ 
 VS_OUT VS_MAIN(VS_IN In)
 {
     VS_OUT Out = (VS_OUT)0;    
     
-    /* Á¤Á¡ÀÇ ·ÎÄÃÀ§Ä¡ * ¿ùµå * ºä * Åõ¿µ */ 
+    /* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¡ * ï¿½ï¿½ï¿½ï¿½ * ï¿½ï¿½ * ï¿½ï¿½ï¿½ï¿½ */ 
         
     float4x4 matWV, matWVP;
     
@@ -40,9 +40,9 @@ VS_OUT VS_MAIN(VS_IN In)
     return Out;     
 }
 
-/* /WÀ» ¼öÇàÇÑ´Ù. Åõ¿µ½ºÆäÀÌ½º·Î º¯È¯ */
-/* ºäÆ÷Æ®·Î º¯È¯ÇÏ°í.*/
-/* ·¡½ºÅÍ¶óÀÌÁî : ÇÈ¼¿À» ¸¸µç´Ù. */
+/* /Wï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ñ´ï¿½. ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ì½ï¿½ï¿½ï¿½ ï¿½ï¿½È¯ */
+/* ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½È¯ï¿½Ï°ï¿½.*/
+/* ï¿½ï¿½ï¿½ï¿½ï¿½Í¶ï¿½ï¿½ï¿½ï¿½ï¿½ : ï¿½È¼ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½. */
 
 struct PS_IN
 {
@@ -54,11 +54,10 @@ struct PS_IN
 struct PS_OUT
 {
     float4 vColor : SV_TARGET0;
-    
 };
 
-/* ¸¸µç ÇÈ¼¿ °¢°¢¿¡ ´ëÇØ¼­ ÇÈ¼¿ ½¦ÀÌ´õ¸¦ ¼öÇàÇÑ´Ù. */
-/* ÇÈ¼¿ÀÇ »öÀ» °áÁ¤ÇÑ´Ù. */
+/* ï¿½ï¿½ï¿½ï¿½ ï¿½È¼ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ø¼ï¿½ ï¿½È¼ï¿½ ï¿½ï¿½ï¿½Ì´ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ñ´ï¿½. */
+/* ï¿½È¼ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ñ´ï¿½. */
 
 
 
@@ -73,24 +72,24 @@ PS_OUT PS_MAIN(PS_IN In)
 }
 
 
-// Texture Index¿¡ µû¶ó¼­ ´Ù¸¥ ÇÈ¼¿ ½¦ÀÌ´õ¸¦ Á¦°øÇÏ±â.
+// Texture Indexï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ù¸ï¿½ ï¿½È¼ï¿½ ï¿½ï¿½ï¿½Ì´ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï±ï¿½.
 PS_OUT PS_MAIN2(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
     
     float2 uv = In.vTexcoord;
     
-    float4 baseColor = g_Texture.Sample(DefaultSampler, uv); // ¿øº» ÅØ½ºÃ³ »ö
-    float4 fillerColor = float4(1, 1, 1, 1); // ´ÙÀÌ¾Æ¸óµå ¾È¿¡ Ã¤¿öÁú »ö
+    float4 baseColor = g_Texture.Sample(DefaultSampler, uv); // ï¿½ï¿½ï¿½ï¿½ ï¿½Ø½ï¿½Ã³ ï¿½ï¿½
+    float4 fillerColor = float4(1, 1, 1, 1); // ï¿½ï¿½ï¿½Ì¾Æ¸ï¿½ï¿½ ï¿½È¿ï¿½ Ã¤ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½
     
-    // ´ÙÀÌ¾Æ¸óµå Áß½É
+    // ï¿½ï¿½ï¿½Ì¾Æ¸ï¿½ï¿½ ï¿½ß½ï¿½
     float2 center = float2(0.5f, 0.5f);
     float2 delta = abs(uv - center);
     bool bIsInDiamond = (delta.x + delta.y) < 0.5f;
     
     if (bIsInDiamond)
     {
-        Out.vColor = lerp(baseColor, fillerColor, 0.8f); // ºÎµå·´°Ô ¼¯±â
+        Out.vColor = lerp(baseColor, fillerColor, 0.8f); // ï¿½Îµå·´ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     }
     else
     {
@@ -105,26 +104,26 @@ PS_OUT PS_MAIN3(PS_IN In)
     PS_OUT Out = (PS_OUT) 0;
 
     float2 uv = In.vTexcoord;
-    float4 fillerColor = float4(0, 0, 0, 1); // ´ÙÀÌ¾Æ¸óµå ¾È¿¡ Ã¤¿öÁú »ö
-    float4 baseColor = g_Texture.Sample(DefaultSampler, uv); // ¿øº» ÅØ½ºÃ³ »ö
+    float4 fillerColor = float4(0, 0, 0, 1); // ï¿½ï¿½ï¿½Ì¾Æ¸ï¿½ï¿½ ï¿½È¿ï¿½ Ã¤ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½
+    float4 baseColor = g_Texture.Sample(DefaultSampler, uv); // ï¿½ï¿½ï¿½ï¿½ ï¿½Ø½ï¿½Ã³ ï¿½ï¿½
 
     
-    // ´ÙÀÌ¾Æ¸óµå Áß½É
+    // ï¿½ï¿½ï¿½Ì¾Æ¸ï¿½ï¿½ ï¿½ß½ï¿½
     float2 center = float2(0.5f, 0.5f); 
     float2 delta = abs(uv - center);
     bool bIsInDiamond = (delta.x + delta.y) < 0.51f;
 
-    // ¾Æ·¡¼­ À§·Î Ã¤¿ì±â
+    // ï¿½Æ·ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ Ã¤ï¿½ï¿½ï¿½
     bool bIsFillRegion = uv.y > (1.0 - g_fFillRatio); 
 
     if (bIsInDiamond && bIsFillRegion)
     {
-        // ´ÙÀÌ¾Æ¸óµå ³»ºÎÀÌ¸é¼­, Ã¤¿öÁú ¿µ¿ªÀÌ¸é
-        Out.vColor = lerp(baseColor, fillerColor, 0.8f); // ºÎµå·´°Ô ¼¯±â
+        // ï¿½ï¿½ï¿½Ì¾Æ¸ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ì¸é¼­, Ã¤ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ì¸ï¿½
+        Out.vColor = lerp(baseColor, fillerColor, 0.8f); // ï¿½Îµå·´ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     }
     else
     {
-        // ±× ¿Ü´Â ¿øº» ÅØ½ºÃ³ À¯Áö
+        // ï¿½ï¿½ ï¿½Ü´ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ø½ï¿½Ã³ ï¿½ï¿½ï¿½ï¿½
         Out.vColor = baseColor;
     }
 
@@ -145,7 +144,7 @@ PS_OUT PS_MAIN4(PS_IN In)
     // Alpha Blend
     baseColor.rgb = lerp(baseColor.rgb, float3(0.0, 0.0, 0.0), saturate(g_fFade));
     
-    // ÇÙ½É ÇÑ ÁÙ: ¿øº»¡æ°ËÁ¤À¸·Î ¼±Çü º¸°£
+    // ï¿½Ù½ï¿½ ï¿½ï¿½ ï¿½ï¿½: ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     Out.vColor = baseColor;
     
 
@@ -154,7 +153,7 @@ PS_OUT PS_MAIN4(PS_IN In)
 
 float g_fAlpha;
 
-// Logo Alpha Light Àü¿ë
+// Logo Alpha Light ï¿½ï¿½ï¿½ï¿½
 PS_OUT PS_MAIN5(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
@@ -169,39 +168,39 @@ float g_fRightRatio;
 float g_fLeftRatio;
 bool g_bIncrease;
 
-// HP Bar Progress ¿ëµµ.
+// HP Bar Progress ï¿½ëµµ.
 PS_OUT PS_MAIN6(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
 
     float2 uv = In.vTexcoord;
-    float4 fillerColor = float4(0.5, 0.5, 0.5, 1); // ÁÙ¾îµç Ã¼·Â¿¡ Ã¤¿öÁú È¸»ö.
-    float4 fillerBlack = float4(0, 0, 0, 1); // ÁÙ¾îµç Ã¼·Â¿¡ Ã¤¿öÁú È¸»ö.
-    float4 baseColor = g_Texture.Sample(DefaultSampler, uv); // ¿øº» ÅØ½ºÃ³ »ö
+    float4 fillerColor = float4(0.5, 0.5, 0.5, 1); // ï¿½Ù¾ï¿½ï¿½ Ã¼ï¿½Â¿ï¿½ Ã¤ï¿½ï¿½ï¿½ï¿½ È¸ï¿½ï¿½.
+    float4 fillerBlack = float4(0, 0, 0, 1); // ï¿½Ù¾ï¿½ï¿½ Ã¼ï¿½Â¿ï¿½ Ã¤ï¿½ï¿½ï¿½ï¿½ È¸ï¿½ï¿½.
+    float4 baseColor = g_Texture.Sample(DefaultSampler, uv); // ï¿½ï¿½ï¿½ï¿½ ï¿½Ø½ï¿½Ã³ ï¿½ï¿½
 
     bool bIsFillGray = uv.x < g_fRightRatio && uv.x > g_fLeftRatio;
     bool bIsFill; 
     
     if (g_bIncrease)
-        bIsFill = uv.x > g_fLeftRatio; // uv.x°¡ g_fLeftRatioº¸´Ù Å©´Ù¸é?
+        bIsFill = uv.x > g_fLeftRatio; // uv.xï¿½ï¿½ g_fLeftRatioï¿½ï¿½ï¿½ï¿½ Å©ï¿½Ù¸ï¿½?
     else
-        bIsFill = uv.x > (1.0 - g_fFillRatio); // ÀÌ°Å ¶§¹®ÀÓ. => ¹Ì¸® Áõ°¡ÇØ¹ö·Á¼­ ¾Èº¸ÀÓ.
+        bIsFill = uv.x > (1.0 - g_fFillRatio); // ï¿½Ì°ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½. => ï¿½Ì¸ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ø¹ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Èºï¿½ï¿½ï¿½.
        
     
     
     if (bIsFill)
     {
-        // °¨¼ÒÇØ¾ßÇÑ´Ù¸é?
+        // ï¿½ï¿½ï¿½ï¿½ï¿½Ø¾ï¿½ï¿½Ñ´Ù¸ï¿½?
         if (bIsFillGray)
         {
-            Out.vColor = lerp(baseColor, fillerColor, 0.8f); // ºÎµå·´°Ô ¼¯±â  
+            Out.vColor = lerp(baseColor, fillerColor, 0.8f); // ï¿½Îµå·´ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½  
         }
         else
-            Out.vColor = fillerBlack; // °ËÁ¤ ¼³Á¤.
+            Out.vColor = fillerBlack; // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½.
     }
     else
     {
-        // ±× ¿Ü´Â ¿øº» ÅØ½ºÃ³ À¯Áö
+        // ï¿½ï¿½ ï¿½Ü´ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ø½ï¿½Ã³ ï¿½ï¿½ï¿½ï¿½
         Out.vColor = baseColor;
     }
 
@@ -218,12 +217,37 @@ PS_OUT PS_MAIN7(PS_IN In)
     return Out;
 }
 
+PS_OUT PS_MAIN8(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+    
+    float2 uv = In.vTexcoord;
+    float4 baseColor = g_Texture.Sample(DefaultSampler, uv); 
+    
+    Out.vColor = baseColor;
+    
+    //Out.vColor.rgb = In.vTexcoord.y;
+    
+    return Out;
+}
+
+PS_OUT PS_MAIN9(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+    // í…ìŠ¤ì²˜ ì—†ì´ ê²€ì •ìƒ‰ ì˜¤ë²„ë ˆì´ë§Œ ìƒì„±
+    float fadeAmount = saturate(g_fFade);
+    
+    // ê²€ì •ìƒ‰ ì˜¤ë²„ë ˆì´ (ì•ŒíŒŒ ê°’ìœ¼ë¡œ ì ì§„ì  íŽ˜ì´ë“œ ì œì–´)
+    Out.vColor = float4(0.0, 0.0, 0.0, fadeAmount);
+    
+
+    return Out;
+}
+
 
 technique11 DefaultTechnique
 {
-    /* Æ¯Á¤ ÆÐ½º¸¦ ÀÌ¿ëÇØ¼­ Á¡Á¤À» ±×·Á³Â´Ù. */
-    /* ÇÏ³ªÀÇ ¸ðµ¨À» ±×·Á³Â´Ù. */ 
-    /* ¸ðµ¨ÀÇ »óÈ²¿¡ µû¶ó ´Ù¸¥ ½¦ÀÌµù ±â¹ý ¼¼Æ®(¸í¾Ï + ¸²¶óÀÌÆ® + ½ºÆåÅ§·¯ + ³ë¸Ö¸Ê + ssao )¸¦ ¸Ô¿©ÁÖ±âÀ§ÇØ¼­ */
     pass DefaultPass
     {
         SetRasterizerState(RS_Default);
@@ -260,7 +284,7 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_MAIN4();
     }
 
-    pass TitleBackGroundPass // Alpha Blend¿ë (Alpha °ª¸¸ ¼¯À½)
+    pass TitleBackGroundPass // Alpha Blendï¿½ï¿½ (Alpha ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½)
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_Default, 0);
@@ -286,22 +310,25 @@ technique11 DefaultTechnique
         VertexShader = compile vs_5_0 VS_MAIN();
         PixelShader = compile ps_5_0 PS_MAIN7();
     }
-    
+
+    pass LockOnPass
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_None, 0);
+        SetBlendState(BS_AlphaBlend, float4(0, 0, 0, 0), 0xffffffff);
+        VertexShader = compile vs_5_0 VS_MAIN();
+        PixelShader = compile ps_5_0 PS_MAIN8();
+    }
 
 
-    ///* ¸ðµ¨ÀÇ »óÈ²¿¡ µû¶ó ´Ù¸¥ ½¦ÀÌµù ±â¹ý ¼¼Æ®(ºí·»µù + µð½ºÅä¼Ç  )¸¦ ¸Ô¿©ÁÖ±âÀ§ÇØ¼­ */
-    //pass DefaultPass1
-    //{
-    //    VertexShader = compile vs_5_0 VS_MAIN1();
+    pass FadeInPass
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        VertexShader = compile vs_5_0 VS_MAIN();
+        PixelShader = compile ps_5_0 PS_MAIN9();
+    }
 
-    //}
-
-    ///* Á¤Á¡ÀÇ Á¤º¸¿¡ µû¶ó ½¦ÀÌ´õ ÆÄÀÏÀ» ÀÛ¼ºÇÑ´Ù. */
-    ///* Á¤Á¡ÀÇ Á¤º¸°¡ °°Áö¸¸ ¿ÏÀüÈ÷ ´Ù¸¥ Ãë±ÞÀ» ÇÏ´À ¤¤°´Ã¼³ª ¸ðµ¨À» ±×¸®´Â ¹æ½Ä -> ·»´õ¸µ¹æ½Ä¿¡ Â÷ÀÌ°¡ »ý±æ ¼ö ÀÖ´Ù. */ 
-    //pass DefaultPass1
-    //{
-    //    VertexShader = compile vs_5_0 VS_MAIN1();
-
-    //}
 
 }

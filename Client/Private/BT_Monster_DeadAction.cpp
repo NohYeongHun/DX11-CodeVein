@@ -26,7 +26,7 @@ BT_RESULT CBT_Monster_DeadAction::Perform_Action(_float fTimeDelta)
 
 void CBT_Monster_DeadAction::Reset()
 {
-
+    
 }
 
 BT_RESULT CBT_Monster_DeadAction::EnterDead()
@@ -46,7 +46,7 @@ BT_RESULT CBT_Monster_DeadAction::EnterDead()
     m_pOwner->Change_Animation_Blend(iNextAnimationIdx);
 
     // 3. 콜리전 비활성화 (즉시) => 죽었는데 맞으면 안되겠지요
-    // m_pOwner->Set_CollisionEnabled(false);
+    m_pOwner->Dead_Action();
 
     // 4. 죽음 이벤트 처리 (점수, 아이템 드롭 등)
     //HandleDeathEvents();

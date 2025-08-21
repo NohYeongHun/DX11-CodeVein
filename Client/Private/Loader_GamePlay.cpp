@@ -1,6 +1,4 @@
-﻿#include "Loader_GamePlay.h"
-
-HRESULT CLoader_GamePlay::Loading_Resource(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
+﻿HRESULT CLoader_GamePlay::Loading_Resource(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
 {
 	if (FAILED(Add_Prototype_Terrain(pDevice, pContext, pGameInstance)))
 	{
@@ -65,6 +63,12 @@ HRESULT CLoader_GamePlay::Loading_Resource(ID3D11Device* pDevice, ID3D11DeviceCo
 		return E_FAIL;
 	}
 
+	if (FAILED(Add_Prototype_SlaveVampire(pDevice, pContext, pGameInstance)))
+	{
+		CRASH("Create SlaveVampire Failed");
+		MSG_BOX(TEXT("Create Failed Loading : GamePlay SlaveVampire "));
+		return E_FAIL;
+	}
 
 	if (FAILED(Add_Prototype_SkyBox(pDevice, pContext, pGameInstance)))
 	{
@@ -73,20 +77,16 @@ HRESULT CLoader_GamePlay::Loading_Resource(ID3D11Device* pDevice, ID3D11DeviceCo
 		return E_FAIL;
 	}
 
+	if (FAILED(Add_Prototype_UI(pDevice, pContext, pGameInstance)))
+	{
+		CRASH("Create UI Failed");
+		MSG_BOX(TEXT("Create Failed Loading : GamePlay UI "));
+		return E_FAIL;
+	}
+
 	
 	return S_OK;
 }
-
-HRESULT CLoader_GamePlay::Add_Prototype_Component(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
-{
-	return S_OK;
-}
-
-HRESULT CLoader_GamePlay::Add_Prototype_GameObject(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
-{
-	return S_OK;
-}
-
 
 // 1. Game 에서 사용할 Model.
 HRESULT CLoader_GamePlay::Add_Prototype_Map(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
@@ -111,12 +111,6 @@ HRESULT CLoader_GamePlay::Add_Prototype_Map(ID3D11Device* pDevice, ID3D11DeviceC
 HRESULT CLoader_GamePlay::Add_Prototype_Navigation(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
 {
 	/* Prototype_Component_Navigation */
-	/*if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level), TEXT("Prototype_Component_Navigation"),
-		CNavigation::Create(pDevice, pContext, TEXT("../Bin/DataFiles/Navigation.dat")))))
-	{
-		CRASH("Failed Load Navigation File");
-		return E_FAIL;
-	}*/
 
 	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level), TEXT("Prototype_Component_Navigation"),
 		CNavigation::Create(pDevice, pContext, "../../SaveFile/Navigation/BossStage.nav"))))
@@ -139,15 +133,7 @@ HRESULT CLoader_GamePlay::Add_Prototype_Player(ID3D11Device* pDevice, ID3D11Devi
 		, CPlayer_Body::Create(pDevice, pContext))))
 		return E_FAIL;*/
 
-	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level)
-		, TEXT("Prototype_GameObject_Weapon")
-		, CPlayerWeapon::Create(pDevice, pContext))))
-		return E_FAIL;
-
-	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level)
-		, TEXT("Prototype_GameObject_Player")
-		, CPlayer::Create(pDevice, pContext))))
-		return E_FAIL;
+	
 
 	
 
@@ -241,6 +227,51 @@ HRESULT CLoader_GamePlay::Add_Prototype_WolfDevil(ID3D11Device* pDevice, ID3D11D
 		, CWolfDevil::Create(pDevice, pContext))))
 		return E_FAIL;
 
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level)
+		, TEXT("Prototype_GameObject_WolfWeapon")
+		, CWolfWeapon::Create(pDevice, pContext))))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CLoader_GamePlay::Add_Prototype_SlaveVampire(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
+{
+
+	_matrix		PreTransformMatrix = XMMatrixIdentity();
+	PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XM_PI);
+
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level)
+		, TEXT("Prototype_Component_Model_SlaveVampire")
+		, CLoad_Model::Create(pDevice, pContext, MODELTYPE::ANIM, PreTransformMatrix, "../../SaveFile/Model/Monster/SlaveVampire.dat", L""))))
+		return E_FAIL;
+
+
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level)
+		, TEXT("Prototype_GameObject_SlaveVampire")
+		, CSlaveVampire::Create(pDevice, pContext))))
+		return E_FAIL;
+
+
+
+	PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f);
+	// 무기
+ 	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level)
+		, TEXT("Prototype_Component_Model_SlaveVampireGreatSword")
+		, CLoad_Model::Create(pDevice, pContext, MODELTYPE::ANIM, PreTransformMatrix, "../../SaveFile/Model/Weapon/SlaveGreatSword.dat", L""))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level)
+		, TEXT("Prototype_GameObject_SlaveVampireSword")
+		, CSlaveVampireSword::Create(pDevice, pContext))))
+		return E_FAIL;
+
+
+	//if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level)
+	//	, TEXT("Prototype_GameObject_WolfWeapon")
+	//	, CWolfWeapon::Create(pDevice, pContext))))
+	//	return E_FAIL;
+
 	return S_OK;
 }
 
@@ -290,12 +321,20 @@ HRESULT CLoader_GamePlay::Add_Prototype_SkyBox(ID3D11Device* pDevice, ID3D11Devi
 {
 	/* Prototype_Component_Texture_Sky */
 	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level), TEXT("Prototype_Component_Texture_Sky"),
-		CTexture::Create(pDevice, pContext, TEXT("../Bin/Resources/Textures/SkyBox/Sky_%d.dds"), 4))))
+		CTexture::Create(pDevice, pContext, TEXT("../Bin/Resources/Textures/SkyBox/Sky_%d.dds"), 6))))
 		return E_FAIL;
 
 	//if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level), TEXT("Prototype_Component_Texture_Sky"),
 	//	CTexture::Create(pDevice, pContext, TEXT("../Bin/Resources/Textures/SkyBox/SkyStar%d.dds"), 1))))
 	//	return E_FAIL;
+
+	_matrix PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f);
+	// SkySphere
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level)
+		, TEXT("Prototype_Component_Model_SkySphere")
+		, CLoad_Model::Create(pDevice, pContext, MODELTYPE::ANIM, PreTransformMatrix, "../../SaveFile/Model/Sky/SkySphere.dat", L""))))
+		return E_FAIL;
+
 
 	/* Prototype_GameObject_Sky */
 	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::GAMEPLAY), TEXT("Prototype_GameObject_Sky"),
@@ -306,6 +345,12 @@ HRESULT CLoader_GamePlay::Add_Prototype_SkyBox(ID3D11Device* pDevice, ID3D11Devi
 	}
 		
 
+	return S_OK;
+}
+
+HRESULT CLoader_GamePlay::Add_Prototype_UI(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
+{
+	
 	return S_OK;
 }
 

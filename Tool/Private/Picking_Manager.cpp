@@ -59,7 +59,8 @@ _bool CPicking_Manager::Picking()
 			vecPicked.push_back(pGameObject);
 			vecPos.push_back(vPosition);
 
-			vPosition.y += 0.2f;
+			/* 발 땅에 붙이기 방지. */
+			vPosition.y += 0.02f;
 			m_vPickingPos = vPosition; // 여기가 메시 피킹된 위치?
 			
 		}

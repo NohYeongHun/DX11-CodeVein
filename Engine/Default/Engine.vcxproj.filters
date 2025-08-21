@@ -196,6 +196,24 @@
     <Filter Include="01. Utility\03. Component\VIBuffer\Cell">
       <UniqueIdentifier>{cf456c6c-b9ec-4c27-a039-5c0b4a4473f8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01. Utility\11. Trigger">
+      <UniqueIdentifier>{f69af1e9-9375-462a-9135-0e63498a2973}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\12. PlayerData">
+      <UniqueIdentifier>{94bb1a37-cc6a-4afc-972b-7ede930059aa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\03. Component\VIBuffer\Instance">
+      <UniqueIdentifier>{e7c5628e-703e-425b-b369-3f3483cf0890}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\03. Component\VIBuffer\Instance\Mesh">
+      <UniqueIdentifier>{8cd1ec03-340c-44c2-8e18-0f3726cad914}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\03. Component\VIBuffer\Instance\Point">
+      <UniqueIdentifier>{16986ad3-3419-481b-8f14-b22453ee51b5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\03. Component\VIBuffer\Instance\Rect">
+      <UniqueIdentifier>{797883ba-80f9-4fad-91a3-63c11bf9b803}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Timer.cpp">
@@ -398,6 +416,15 @@
     </ClCompile>
     <ClCompile Include="..\Private\DebugDraw.cpp">
       <Filter>01. Utility\03. Component\Collider</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Trigger_Manager.cpp">
+      <Filter>01. Utility\11. Trigger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\VIBuffer_Instance.cpp">
+      <Filter>01. Utility\03. Component\VIBuffer\Instance</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\VIBuffer_Rect_Instance.cpp">
+      <Filter>01. Utility\03. Component\VIBuffer\Instance\Rect</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -628,6 +655,15 @@
     </ClInclude>
     <ClInclude Include="..\Public\DebugDraw.h">
       <Filter>01. Utility\03. Component\Collider</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Trigger_Manager.h">
+      <Filter>01. Utility\11. Trigger</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\VIBuffer_Instance.h">
+      <Filter>01. Utility\03. Component\VIBuffer\Instance</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\VIBuffer_Rect_Instance.h">
+      <Filter>01. Utility\03. Component\VIBuffer\Instance\Rect</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
