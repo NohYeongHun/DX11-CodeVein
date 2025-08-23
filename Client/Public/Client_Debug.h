@@ -24,7 +24,7 @@ static void Edit_OBB(CCollider* pColliderCom)
 
     ImGui::InputFloat3("Center", vCenter);
     ImGui::InputFloat3("Rotation", vRotation);
-    ImGui::InputFloat3("Scale", vExtents);
+    ImGui::InputFloat3("Extents", vExtents);
 
     if (ImGui::Button("Apply"))
     {

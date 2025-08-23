@@ -2,22 +2,26 @@
 #include "BehaviorTree.h"
 
 NS_BEGIN(Client)
-class CQueenKnightTree final : public CBehaviorTree
+class CGiant_WhiteDevilTree final : public CBehaviorTree
 {
 public:
-    typedef struct tagQueenKnightTreeDesc : CBehaviorTree::BT_DESC
+    typedef struct tagGiant_WhiteDevilTreeDesc : CBehaviorTree::BT_DESC
     {
-        class CQueenKnight* pOwner = { nullptr };
-    } QUEEN_KNIGHT_BT_DESC;
+        class CGiant_WhiteDevil* pOwner = { nullptr };
+    }GIANT_WHITEDEVIL_BT_DESC;
 
 private:
-    explicit CQueenKnightTree(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-    explicit CQueenKnightTree(const CQueenKnightTree& Prototype);
-    virtual ~CQueenKnightTree() = default;
+    explicit CGiant_WhiteDevilTree(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+    virtual ~CGiant_WhiteDevilTree() = default;
 
 #pragma region 1. TREE 초기화
 public:
     virtual HRESULT Initialize(void* pArg) override;
+
+#pragma region 조우 상태 제어.
+    CBTSequence* Create_EncounterState_ToSequence();
+#pragma endregion
+
 
 
 #pragma region 특수 상태 제어. Selector -> Buff Sequence
@@ -41,14 +45,11 @@ private:
 
 #pragma region 특수 공격
 private:
-    /* 우선 순위 순*/
-    CBTSequence* Create_TripleDownAttack_ToSequence();
-    CBTSequence* Create_DashAttack_ToSequence();
-    CBTSequence* Create_FirstPhaseAttack_ToSequence(); // Phase1 기본 공격.
-    CBTSequence* Create_SecondPhaseAttack_ToSequence();   // Phase2 기본 공격
+    /* 우선 순위 가 높음.*/
+    CBTSequence* Create_ComboAttack_ToSequence(); // 연속공격
 #pragma endregion
 
-    
+
 #pragma region 일반 공격
 
 
@@ -64,15 +65,6 @@ private:
     CBTSequence* Create_SearchAction_ToSequence();
 
 #pragma endregion
-
-
-
-    /* 특수 상태 Health 체크, Down, Hit Reaction*/
-
-
-
-
-    //CBTNode* Create_PatrolBranch();
 
 private:
     /* 모든 상태가 실패하면? */
@@ -92,17 +84,15 @@ public:
 
     CBTNode* Get_Root_Node() const { return m_pRootNode; }
 
-
 #pragma endregion
 
 
 private:
-    //CBTNode* m_pRootNode = nullptr;
-    class CQueenKnight* m_pOwner = nullptr;
+    class CGiant_WhiteDevil* m_pOwner = nullptr;
     class CPlayer* m_pTarget = nullptr;
 
 public:
-    static CQueenKnightTree* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, void* pArg);
+    static CGiant_WhiteDevilTree* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, void* pArg);
     virtual void Free() override;
 };
 NS_END

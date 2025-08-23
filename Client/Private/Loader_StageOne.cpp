@@ -1,4 +1,5 @@
-﻿HRESULT CLoader_StageOne::Loading_Resource(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
+﻿#include "Loader_StageOne.h"
+HRESULT CLoader_StageOne::Loading_Resource(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
 {
 
 	if (FAILED(Add_Prototype_Map(pDevice, pContext, pGameInstance)))
@@ -37,10 +38,10 @@
 		return E_FAIL;
 	}
 
-	if (FAILED(Add_Prototype_QueenKnight(pDevice, pContext, pGameInstance)))
+	if (FAILED(Add_Prototype_GiantWhiteDevil(pDevice, pContext, pGameInstance)))
 	{
-		CRASH("Create SkyBoss Failed");
-		MSG_BOX(TEXT("Create Failed Loading : StageOne QueenKnight "));
+		CRASH("Create GiantWhiteDevil Failed");
+		MSG_BOX(TEXT("Create Failed Loading : StageOne GiantWhiteDevil "));
 		return E_FAIL;
 	}
 
@@ -116,49 +117,47 @@ HRESULT CLoader_StageOne::Add_Prototype_Player(ID3D11Device* pDevice, ID3D11Devi
 }
 
 
-HRESULT CLoader_StageOne::Add_Prototype_QueenKnight(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
+HRESULT CLoader_StageOne::Add_Prototype_GiantWhiteDevil(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
 {
 	_matrix		PreTransformMatrix = XMMatrixIdentity();
 	PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XM_PI);
 
-	// 방패
-	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level)
-		, TEXT("Prototype_Component_Model_GodChildShield")
-		, CLoad_Model::Create(pDevice, pContext, MODELTYPE::ANIM, PreTransformMatrix, "../../SaveFile/Model/Weapon/GodChildShield.dat", L""))))
-		return E_FAIL;
-
-	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level)
-		, TEXT("Prototype_GameObject_GodChildShield")
-		, CKnightShield::Create(pDevice, pContext))))
-	{
-		CRASH("Failed Create QueenKnight Shield")
-			return E_FAIL;
-	}
-
-
 	// 무기
 	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level)
-		, TEXT("Prototype_Component_Model_GodChildLance")
-		, CLoad_Model::Create(pDevice, pContext, MODELTYPE::ANIM, PreTransformMatrix, "../../SaveFile/Model/Weapon/GodChildLance.dat", L""))))
+		, TEXT("Prototype_Component_Model_WhiteLargeHalberd")
+		, CLoad_Model::Create(pDevice, pContext, MODELTYPE::ANIM, PreTransformMatrix, "../../SaveFile/Model/Weapon/WhiteLargeHalberd.dat", L""))))
+	{
+		CRASH("Failed Load Model WhiteLargeHalberd");
 		return E_FAIL;
+	}
+		
 
 	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level)
-		, TEXT("Prototype_GameObject_GodChildLance")
-		, CKnightLance::Create(pDevice, pContext))))
+		, TEXT("Prototype_GameObject_WhiteLargeHalberd")
+		, CWhiteLargeHalberd::Create(pDevice, pContext))))
+	{
+		CRASH("Failed Create WhiteLargeHalberd Weapon")
 		return E_FAIL;
+	}
+		
 
 	// 본체
 	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level)
-		, TEXT("Prototype_Component_Model_QueenKnight")
-		, CLoad_Model::Create(pDevice, pContext, MODELTYPE::ANIM, PreTransformMatrix, "../../SaveFile/Model/Boss/QueenKnight.dat", L""))))
+		, TEXT("Prototype_Component_Model_Giant_WhiteDevil")
+		, CLoad_Model::Create(pDevice, pContext, MODELTYPE::ANIM, PreTransformMatrix, "../../SaveFile/Model/Boss/GiantWhiteDevil.dat", L""))))
+	{
+		CRASH("Failed Load Model GiantWhite Devil")
 		return E_FAIL;
+	}
+		
 
 	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level)
-		, TEXT("Prototype_GameObject_QueenKnight")
-		, CQueenKnight::Create(pDevice, pContext))))
+		, TEXT("Prototype_GameObject_Giant_WhiteDevil")
+		, CGiant_WhiteDevil::Create(pDevice, pContext))))
+	{
+		CRASH("Failed Create White Giant Devil");
 		return E_FAIL;
-
-
+	}
 
 	return S_OK;
 }

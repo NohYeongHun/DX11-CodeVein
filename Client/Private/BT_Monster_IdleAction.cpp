@@ -44,19 +44,6 @@ BT_RESULT CBT_Monster_IdleAction::EnterIdle(_float fTimeDelta)
 	return BT_RESULT::RUNNING;
 }
 
-//BT_RESULT CBT_Monster_IdleAction::LoopIdle(_float fTimeDelta)
-//{
-//	m_pOwner->RotateTurn_ToTargetYaw(fTimeDelta * 4.f);
-//	if (m_pOwner->IsRotateFinished(XMConvertToRadians(4.f)))
-//	{
-//		m_eIdlePhase = IDLE_PHASE::COMPLETED;
-//	}
-//
-//
-//
-//    return BT_RESULT::RUNNING;
-//}
-
 CBT_Monster_IdleAction* CBT_Monster_IdleAction::Create(CMonster* pOwner)
 {
 	if (nullptr == pOwner)

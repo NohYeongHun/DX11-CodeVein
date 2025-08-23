@@ -33,6 +33,10 @@ void CBT_QueenKnight_FirstPhase_AttackAction::Reset()
 {
     m_eAttackPhase = ATTACK_PHASE::NONE;
     m_pOwner->Reset_Collider_ActiveInfo();
+
+    m_IsFirstAttack = false;
+    m_IsSecondAttack = false;
+    m_IsLastAttack = false;
 }
 
 BT_RESULT CBT_QueenKnight_FirstPhase_AttackAction::EnterAttack(_float fTimeDelta)
@@ -51,7 +55,7 @@ BT_RESULT CBT_QueenKnight_FirstPhase_AttackAction::EnterAttack(_float fTimeDelta
 
     // 1. 다음 단계로 진행
     m_eAttackPhase = ATTACK_PHASE::ROTATING;
-    m_pOwner->AddBuff(CQueenKnight::QUEEN_BUFF_PHASE_ATTACK_COOLDOWN);
+    
 
     // 2. 루트모션 설정.
     return BT_RESULT::RUNNING;
@@ -59,7 +63,7 @@ BT_RESULT CBT_QueenKnight_FirstPhase_AttackAction::EnterAttack(_float fTimeDelta
 
 BT_RESULT CBT_QueenKnight_FirstPhase_AttackAction::UpdateRotating(_float fTimeDelta)
 {
-    
+
     m_pOwner->RotateTurn_ToTargetYaw(fTimeDelta);
 
     if (m_pOwner->IsRotateFinished(XMConvertToRadians(5.f))) // 라디안 5도 차이까지만 허용
@@ -68,29 +72,30 @@ BT_RESULT CBT_QueenKnight_FirstPhase_AttackAction::UpdateRotating(_float fTimeDe
         //m_eAttackPhase = ATTACK_PHASE::SECOND_ATTACK;
 
         m_pOwner->Set_RootMotionTranslate(true);
-        
+
         // 1. 공격 애니메이션 선택
         _uint iNextAnimationIdx = m_pOwner->Find_AnimationIndex(L"PHASE_ATTACK1");
 
-        //m_pOwner->Change_Animation_Blend(iNextAnimationIdx, false, 0.2f, true, true, false);
-        m_pOwner->Change_Animation_Blend(iNextAnimationIdx, false, 0.2f, true, true, true);
 
-        // 2. 공격 상태로 변경
-        //m_pOwner->Change_Animation_Combo(iNextAnimationIdx);
+        m_pOwner->Change_Animation_Blend(iNextAnimationIdx, false, 0.2f, true, true, true);
 
         // 3. 콜라이더 상태 초기화
         m_pOwner->Reset_Collider_ActiveInfo();
-
-        // 4. Collider 활성화 필요. => 공격용 콜라이더만 활성화.(Weapon?)
     }
-
     return BT_RESULT::RUNNING;
 }
 
 BT_RESULT CBT_QueenKnight_FirstPhase_AttackAction::UpdateFirstAttack(_float fTimeDelta)
 {
-    // 0. 바로 바뀐다.
-    m_pOwner->RotateTurn_ToTargetYaw();
+    // 0. 공격할때만 한번 바뀌어야하는데. 음..
+
+    if (!m_IsFirstAttack)
+    {
+        m_pOwner->RotateTurn_ToTargetYaw();
+        m_IsFirstAttack = true;
+    }
+
+    
     //if (m_pOwner->Is_Animation_Finished())
     if (m_pOwner->Get_CurrentAnimationRatio() > 0.7f)
     {
@@ -113,7 +118,13 @@ BT_RESULT CBT_QueenKnight_FirstPhase_AttackAction::UpdateFirstAttack(_float fTim
 
 BT_RESULT CBT_QueenKnight_FirstPhase_AttackAction::UpdateSecondAttack(_float fTimeDelta)
 {
-    m_pOwner->RotateTurn_ToTargetYaw();
+
+    if (!m_IsSecondAttack)
+    {
+        m_pOwner->RotateTurn_ToTargetYaw();
+        m_IsSecondAttack = true;
+    }
+    
     if (m_pOwner->Get_CurrentAnimationRatio() > 0.7f)
     {
         m_eAttackPhase = ATTACK_PHASE::LAST_ATTACK;
@@ -134,6 +145,12 @@ BT_RESULT CBT_QueenKnight_FirstPhase_AttackAction::UpdateSecondAttack(_float fTi
 
 BT_RESULT CBT_QueenKnight_FirstPhase_AttackAction::UpdateLastAttack(_float fTimeDelta)
 {
+    if (!m_IsLastAttack)
+    {
+        m_pOwner->RotateTurn_ToTargetYaw();
+        m_IsLastAttack = true;
+    }
+
     if (m_pOwner->Is_Animation_Finished())
     {
         m_eAttackPhase = ATTACK_PHASE::COMPLETED;
@@ -151,6 +168,7 @@ BT_RESULT CBT_QueenKnight_FirstPhase_AttackAction::UpdateLastAttack(_float fTime
 
 BT_RESULT CBT_QueenKnight_FirstPhase_AttackAction::Complete(_float fTimeDleta)
 {
+    m_pOwner->AddBuff(CQueenKnight::QUEEN_BUFF_PHASE_ATTACK_COOLDOWN);
     return BT_RESULT::SUCCESS;
 }
 

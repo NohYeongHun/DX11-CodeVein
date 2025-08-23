@@ -24,7 +24,7 @@ _bool CBT_Monster_IsRotate::Check_Condition()
 
 	_float fDistance = XMVectorGetX(XMVector3Length(vToTarget));
     /* Detection Range보다 크면 회전하지 않음. */
-    if (fDistance >= m_pOwner->Get_DetectionRange() * 2.f)
+    if (fDistance >= m_pOwner->Get_DetectionRange())
         return false;
 
     

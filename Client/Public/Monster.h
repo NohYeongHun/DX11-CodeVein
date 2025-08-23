@@ -99,6 +99,11 @@ public:
     virtual void OnMoved_ToObjectManager();
 #pragma endregion
 
+#pragma region 타겟과의 거리 구하기.
+    _float Get_TargetDistance();
+#pragma endregion
+
+
 
 #pragma region 0. 몬스터는 충돌에 대한 상태제어를 할 수 있어야한다. => 충돌에 따라 상태가 변하기도, 수치값이 바뀌기도한다.
 public:
@@ -268,9 +273,7 @@ public:
     virtual void NearCell_Translate();
     const _float Get_TargetDegreeNoPitch();
     const ROTATION_INFO Get_SimpleTargetRotation();
-
-
-
+    
 
 public:
     /* 콜라이더 제어.*/
@@ -279,8 +282,22 @@ public:
     
     /* Reset 시 파츠 콜라이더 비활성화 */
     virtual void Reset_Part_Colliders();
-
     virtual void Dead_Action();
+
+// 특수 조건 : 조우 했는가?
+protected:
+    _bool m_IsEncountered = { false };
+    _float m_fEncounterDistance = { 0.f }; // 조우 거리.
+
+public:
+	const _bool Is_Encountered() const { return m_IsEncountered; }
+	void Set_Encountered(_bool bEncountered) { m_IsEncountered = bEncountered; }
+    _bool Is_EncounterDistance();
+
+    /* Encounter시 실행해야할 작업. */
+    virtual void Encounter_Action() {};
+
+
 #pragma endregion
     
 #pragma region 6. 체력 감소시 UI 연동
