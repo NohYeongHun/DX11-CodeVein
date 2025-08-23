@@ -161,6 +161,9 @@
   <ItemGroup>
     <ClInclude Include="..\public\BackGround.h" />
     <ClInclude Include="..\Public\BossHpBarUI.h" />
+    <ClInclude Include="..\Public\BT_Monster_EncounterAction.h" />
+    <ClInclude Include="..\Public\BT_GiantWhiteDevil_ComboAttackAction.h" />
+    <ClInclude Include="..\Public\BT_Monster_IsEncounterCondition.h" />
     <ClInclude Include="..\Public\BT_Monster_AttackAction.h" />
     <ClInclude Include="..\Public\BT_Monster_DeadAction.h" />
     <ClInclude Include="..\Public\BT_Monster_DetectAction.h" />
@@ -172,6 +175,7 @@
     <ClInclude Include="..\Public\BT_Monster_IsDown.h" />
     <ClInclude Include="..\Public\BT_Monster_IsHit.h" />
     <ClInclude Include="..\Public\BT_Monster_IsRotate.h" />
+    <ClInclude Include="..\Public\BT_Monster_PrevEncounterAction.h" />
     <ClInclude Include="..\Public\BT_Monster_RotateAction.h" />
     <ClInclude Include="..\Public\BT_QueenKnight_DashAttackAction.h" />
     <ClInclude Include="..\Public\BT_QueenKnight_DownStrikeAction.h" />
@@ -196,6 +200,9 @@
     <ClInclude Include="..\Public\Client_Debug.h" />
     <ClInclude Include="..\Public\Client_Defines.h" />
     <ClInclude Include="..\Public\Fade_Out.h" />
+    <ClInclude Include="..\Public\Giant_WhiteDevil.h" />
+    <ClInclude Include="..\public\Giant_WhiteDevilDefine.h" />
+    <ClInclude Include="..\Public\Giant_WhiteDevilTree.h" />
     <ClInclude Include="..\Public\HPBar.h" />
     <ClInclude Include="..\Public\HUD.h" />
     <ClInclude Include="..\Public\imconfig.h" />
@@ -271,6 +278,7 @@
     <ClInclude Include="..\Public\Title.h" />
     <ClInclude Include="..\Public\TitleText.h" />
     <ClInclude Include="..\Public\Weapon.h" />
+    <ClInclude Include="..\Public\WhiteLargeHalberd.h" />
     <ClInclude Include="..\Public\WolfDevil.h" />
     <ClInclude Include="..\Public\WolfDevilDefine.h" />
     <ClInclude Include="..\Public\WolfWeapon.h" />
@@ -282,6 +290,9 @@
   <ItemGroup>
     <ClCompile Include="..\private\BackGround.cpp" />
     <ClCompile Include="..\Private\BossHpBarUI.cpp" />
+    <ClCompile Include="..\Private\BT_Monster_EncounterAction.cpp" />
+    <ClCompile Include="..\Private\BT_GiantWhiteDevil_ComboAttackAction.cpp" />
+    <ClCompile Include="..\Private\BT_Monster_IsEncounterCondition.cpp" />
     <ClCompile Include="..\Private\BT_Monster_AttackAction.cpp" />
     <ClCompile Include="..\Private\BT_Monster_DeadAction.cpp" />
     <ClCompile Include="..\Private\BT_Monster_DetectAction.cpp" />
@@ -293,6 +304,7 @@
     <ClCompile Include="..\Private\BT_Monster_IsDown.cpp" />
     <ClCompile Include="..\Private\BT_Monster_IsHit.cpp" />
     <ClCompile Include="..\Private\BT_Monster_IsRotate.cpp" />
+    <ClCompile Include="..\Private\BT_Monster_PrevEncounterAction.cpp" />
     <ClCompile Include="..\Private\BT_Monster_RotateAction.cpp" />
     <ClCompile Include="..\Private\BT_QueenKnight_DashAttackAction.cpp" />
     <ClCompile Include="..\Private\BT_QueenKnight_DownStrikeAction.cpp" />
@@ -320,6 +332,8 @@
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ClientPch.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
     </ClCompile>
     <ClCompile Include="..\Private\Fade_Out.cpp" />
+    <ClCompile Include="..\Private\Giant_WhiteDevil.cpp" />
+    <ClCompile Include="..\Private\Giant_WhiteDevilTree.cpp" />
     <ClCompile Include="..\Private\HPBar.cpp" />
     <ClCompile Include="..\Private\HUD.cpp" />
     <ClCompile Include="..\Private\imgui.cpp" />
@@ -389,6 +403,7 @@
     <ClCompile Include="..\Private\Title.cpp" />
     <ClCompile Include="..\Private\TitleText.cpp" />
     <ClCompile Include="..\Private\Weapon.cpp" />
+    <ClCompile Include="..\Private\WhiteLargeHalberd.cpp" />
     <ClCompile Include="..\Private\WolfDevil.cpp" />
     <ClCompile Include="..\Private\WolfWeapon.cpp" />
     <ClCompile Include="Client.cpp" />
@@ -409,6 +424,7 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\Public\PlayerAnimation.txt" />
+    <Text Include="Giant_WhiteDevilDefine.txt" />
     <Text Include="QueenKnightDefine.txt" />
     <Text Include="SlaveVampireDefine.txt" />
     <Text Include="WolfDevilDefine.txt" />

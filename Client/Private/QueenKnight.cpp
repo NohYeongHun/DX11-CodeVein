@@ -240,10 +240,7 @@ void CQueenKnight::On_Collision_Enter(CGameObject* pOther)
 
             AddBuff(BUFF_HIT);
         }
-
-        
     }
-
 
     if (m_MonsterStat.fHP <= 0.f)
         AddBuff(BUFF_DEAD);
@@ -290,20 +287,6 @@ void CQueenKnight::Update_AI(_float fTimeDelta)
     {
 
     }
-
- /*   if (m_pModelCom->Get_CurrentAnimationIndex() == Find_AnimationIndex(TEXT("DETECT")))
-    {
-        OutputDebugWstring(TEXT("현재 애니메이션은 Detect 입니다."));
-    }
-    else if (m_pModelCom->Get_CurrentAnimationIndex() == Find_AnimationIndex(TEXT("IDLE")))
-    {
-        OutputDebugWstring(TEXT("현재 애니메이션은 IDLE 입니다."));
-    }
-    else
-    {
-        OutputDebugWstring(TEXT("현재 애니메이션은 Detect Idle이 아닙니다."));
-    }*/
-
 }
 #pragma endregion
 
@@ -546,7 +529,14 @@ void CQueenKnight::Take_Damage(_float fDamage)
 }
 void CQueenKnight::Increase_HpUI(_float fHp, _float fTime)
 {
-    m_pBossHpBarUI->Increase_Hp(fHp, fTime);
+    /* 예외처리. */
+	_float fModifyHp = m_MonsterStat.fHP + fHp;
+	if (fModifyHp > m_MonsterStat.fMaxHP)
+        fModifyHp = m_MonsterStat.fMaxHP;
+
+	_float fResultHp = fModifyHp - m_MonsterStat.fHP;
+    
+    m_pBossHpBarUI->Increase_Hp(fResultHp, fTime);
 }
 
 void CQueenKnight::Decrease_HpUI(_float fHp, _float fTime)
@@ -697,6 +687,42 @@ HRESULT CQueenKnight::Ready_BehaviorTree()
     return S_OK;
 }
 
+HRESULT CQueenKnight::Ready_PartObjects()
+{
+    CKnightLance::KNIGHT_LANCE_DESC Weapon{};
+    Weapon.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
+    Weapon.pSocketMatrix = m_pModelCom->Get_BoneMatrix("RightHandAttachSocket");
+    Weapon.pOwner = this;
+    Weapon.eCurLevel = m_eCurLevel;
+    Weapon.fAttackPower = m_MonsterStat.fAttackPower;
+
+
+
+    if (FAILED(CContainerObject::Add_PartObject(TEXT("Com_Weapon"),
+        ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_GodChildLance")
+        , reinterpret_cast<CPartObject**>(&m_pWeapon), &Weapon)))
+    {
+        CRASH("Failed Create Queen Weapon");
+        return E_FAIL;
+    }
+
+    CKnightShield::KNIGHT_SHIELD_DESC Shield{};
+    Shield.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
+    Shield.pSocketMatrix = m_pModelCom->Get_BoneMatrix("LeftHandAttachSocket");
+    Shield.eCurLevel = m_eCurLevel;
+    Shield.pOwner = this;
+
+    if (FAILED(CContainerObject::Add_PartObject(TEXT("Com_Shield"),
+        ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_GodChildShield")
+        , reinterpret_cast<CPartObject**>(&m_pShield), &Shield)))
+    {
+        CRASH("Failed Create Queen Shield");
+        return E_FAIL;
+    }
+
+    return S_OK;
+}
+
 HRESULT CQueenKnight::Ready_Render_Resources()
 {
     if (FAILED(m_pTransformCom->Bind_Shader_Resource(m_pShaderCom, "g_WorldMatrix")))
@@ -730,41 +756,7 @@ HRESULT CQueenKnight::Ready_Render_Resources()
     return S_OK;
 }
 
-HRESULT CQueenKnight::Ready_PartObjects()
-{
-    CKnightLance::KNIGHT_LANCE_DESC Weapon{};
-    Weapon.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
-    Weapon.pSocketMatrix = m_pModelCom->Get_BoneMatrix("RightHandAttachSocket");
-    Weapon.pOwner = this;
-    Weapon.eCurLevel = m_eCurLevel;
-    Weapon.fAttackPower = m_MonsterStat.fAttackPower;
-    
-    
 
-    if (FAILED(CContainerObject::Add_PartObject(TEXT("Com_Weapon"),
-        ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_GodChildLance")
-        , reinterpret_cast<CPartObject**>(&m_pWeapon), &Weapon)))
-    {
-        CRASH("Failed Create Queen Weapon");
-        return E_FAIL;
-    }
-
-    CKnightShield::KNIGHT_SHIELD_DESC Shield{};
-    Shield.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
-    Shield.pSocketMatrix = m_pModelCom->Get_BoneMatrix("LeftHandAttachSocket");
-    Shield.eCurLevel = m_eCurLevel;
-    Shield.pOwner = this;
-
-    if (FAILED(CContainerObject::Add_PartObject(TEXT("Com_Shield"),
-        ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_GodChildShield")
-        , reinterpret_cast<CPartObject**>(&m_pShield), &Shield)))
-    {
-        CRASH("Failed Create Queen Shield");
-        return E_FAIL;
-    }
-
-    return S_OK;
-}
 
 CQueenKnight* CQueenKnight::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {

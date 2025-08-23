@@ -199,6 +199,24 @@
     <Filter Include="02. GameObject\Monster\BT\Rotate">
       <UniqueIdentifier>{dadaae67-9fc8-4332-a9ce-cd1234a26380}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. GameObject\Monster\Boss\GiantWhiteDevil">
+      <UniqueIdentifier>{6f836136-2a4e-4559-b99f-bcace88e3ef1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Monster\Boss\GiantWhiteDevil\Weapon">
+      <UniqueIdentifier>{226f3c41-6f1e-42e9-bd3c-f5ee552cec0b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Monster\Boss\GiantWhiteDevil\BT">
+      <UniqueIdentifier>{dd9d4ecc-76bf-4fb7-909d-c786db2b3b83}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Monster\Boss\GiantWhiteDevil\BT\Down">
+      <UniqueIdentifier>{8c840928-557d-44ef-a8d5-350f81f56ea0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Monster\Boss\GiantWhiteDevil\BT\Attack">
+      <UniqueIdentifier>{34f3421c-75aa-457f-b1b1-c67cb49d7fa1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Monster\BT\Encounter">
+      <UniqueIdentifier>{fbdfd345-7448-4d7d-bed5-0698e4356a0f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -558,6 +576,30 @@
     <ClInclude Include="..\Public\BT_Monster_IdleAction.h">
       <Filter>02. GameObject\Monster\BT\Idle</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Giant_WhiteDevil.h">
+      <Filter>02. GameObject\Monster\Boss\GiantWhiteDevil</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\WhiteLargeHalberd.h">
+      <Filter>02. GameObject\Monster\Boss\GiantWhiteDevil\Weapon</Filter>
+    </ClInclude>
+    <ClInclude Include="..\public\Giant_WhiteDevilDefine.h">
+      <Filter>02. GameObject\Monster\Boss\GiantWhiteDevil</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Giant_WhiteDevilTree.h">
+      <Filter>02. GameObject\Monster\Boss\GiantWhiteDevil\BT</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BT_GiantWhiteDevil_ComboAttackAction.h">
+      <Filter>02. GameObject\Monster\Boss\GiantWhiteDevil\BT\Attack</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BT_Monster_EncounterAction.h">
+      <Filter>02. GameObject\Monster\BT\Encounter</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BT_Monster_IsEncounterCondition.h">
+      <Filter>02. GameObject\Monster\BT\Encounter</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\BT_Monster_PrevEncounterAction.h">
+      <Filter>02. GameObject\Monster\BT\Encounter</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -894,6 +936,27 @@
     <ClCompile Include="..\Private\BT_Monster_IsRotate.cpp">
       <Filter>02. GameObject\Monster\BT\Rotate</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Giant_WhiteDevil.cpp">
+      <Filter>02. GameObject\Monster\Boss\GiantWhiteDevil</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\WhiteLargeHalberd.cpp">
+      <Filter>02. GameObject\Monster\Boss\GiantWhiteDevil\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Giant_WhiteDevilTree.cpp">
+      <Filter>02. GameObject\Monster\Boss\GiantWhiteDevil\BT</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BT_GiantWhiteDevil_ComboAttackAction.cpp">
+      <Filter>02. GameObject\Monster\Boss\GiantWhiteDevil\BT\Attack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BT_Monster_EncounterAction.cpp">
+      <Filter>02. GameObject\Monster\BT\Encounter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BT_Monster_IsEncounterCondition.cpp">
+      <Filter>02. GameObject\Monster\BT\Encounter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\BT_Monster_PrevEncounterAction.cpp">
+      <Filter>02. GameObject\Monster\BT\Encounter</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxMesh.hlsl">
@@ -924,6 +987,9 @@
     </Text>
     <Text Include="WolfDevilDefine.txt">
       <Filter>02. GameObject\Monster\WolfDevil</Filter>
+    </Text>
+    <Text Include="Giant_WhiteDevilDefine.txt">
+      <Filter>02. GameObject\Monster\Boss\GiantWhiteDevil</Filter>
     </Text>
   </ItemGroup>
 </Project>

@@ -65,7 +65,7 @@ HRESULT CNavigationManager::Render()
 
             m_pShader->Bind_RawValue("g_vColor", &vColor, sizeof(_float4));
             m_pShader->Begin(0);
-            pCell->Rendear();
+            pCell->Render();
         }
         i++;
     }

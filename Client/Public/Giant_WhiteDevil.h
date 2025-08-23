@@ -1,45 +1,34 @@
 ﻿#pragma once
+#include "Monster.h"
 
 NS_BEGIN(Client)
-class CQueenKnight final : public CMonster
+class CGiant_WhiteDevil final : public CMonster
 {
 public:
-	// 어떤 타입의 PART OBJECT 를 제어할것인지 정의.
 	enum PART_TYPE : _uint
 	{
 		PART_WEAPON = 0,
-		PART_SHIELD = 1,
-		PART_BODY = 2,
+		PART_BODY = 1,
 		PART_END
 	};
 
-	// 1 ~ 19은 커스텀사용
-	enum QUEEN_BUFF_FLAGS : _uint
+	enum GIANT_BUFF_FLAGS : _uint
 	{
-		QUEEN_BUFF_NONE = 0,
-		QUEEN_BUFF_SPECIAL_ATTACK1 = 1 << 1, // 몬스터 상태와 안곂치게
-		QUEEN_BUFF_SPECIAL_ATTACK2 = 1 << 2, // 몬스터 상태와 안곂치게
-		QUEEN_BUFF_SPECIAL_ATTACK3 = 1 << 3, // 몬스터 상태와 안곂치게
-		QUEEN_BUFF_PHASE_FIRST = 1 << 4, // 어떤 페이즈인지?
-		QUEEN_BUFF_PHASE_SECOND = 1 << 5,
-		QUEEN_BUFF_PHASE_LAST = 1 << 6,
-		QUEEN_BUFF_PHASE_ATTACK_COOLDOWN = 1 << 7, // 페이즈 마다 다른 공격 시퀀스 => 쿨타임 존재
-		QUEEN_BUFF_DASH_ATTACK_COOLDOWN = 1 << 8, // 돌진 공격 시퀀스 => 쿨타임 존재.
-		QUEEN_BUFF_DOWN_TRIPLE_STRIKE_COOLDOWN = 1 << 9, // Down Strike 시퀀스 => 쿨타임 존재.
-		QUEEN_BUFF_END = 1 << 30
+		GIANT_BUFF_NONE = 0,
+		GIANT_BUFF_COMBO_ATTACK = 1 << 1,
 	};
 
 public:
-	typedef struct tagQueenKnightDesc : public CMonster::MONSTER_DESC
+	typedef struct tagGiantWhiteDevil : public CMonster::MONSTER_DESC
 	{
 
-	}QUEENKNIGHT_DESC;
-
+	}GIANTWHITEDEVIL_DESC;
 
 private:
-	explicit CQueenKnight(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-	explicit CQueenKnight(const CQueenKnight& Prototype);
-	virtual ~CQueenKnight() = default;
+	explicit CGiant_WhiteDevil(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	explicit CGiant_WhiteDevil(const CGiant_WhiteDevil& Prototype);
+	virtual ~CGiant_WhiteDevil() = default;
+
 
 #pragma region 0. 기본 함수 관리
 public:
@@ -53,6 +42,7 @@ public:
 
 #pragma endregion
 
+
 #pragma region 1. 충돌 함수 정의
 public:
 	virtual void On_Collision_Enter(CGameObject* pOther);
@@ -62,32 +52,32 @@ public:
 
 #pragma endregion
 
-
 #pragma region 2. 몬스터 AI 관리.
 public:
 	// AI에 대한 호출 순서를 정의합니다.
 	virtual void Update_AI(_float fTimeDelta) override;
 
 private:
-	class CQueenKnightTree* m_pTree = { nullptr };
+	class CGiant_WhiteDevilTree* m_pTree = { nullptr };
+
 #pragma endregion
+
 
 #pragma region 3. 몬스터는 자신에게 필요한 수치값들을 초기화해야한다.
 public:
 	virtual HRESULT Initialize_Stats() override;
 
 
-public:
-	_bool Is_TargetDashRange();
-	_bool Is_TargetDodgeRange();
-	_bool Is_TargetDownStrikeRange();
-
-
-private:
-	_float m_fDashMaxDistance = {};
-	_float m_fDashMinDistance = {};
-	_float m_fDashDodgeDistance = {};
-	_float m_fDownStrikeDistance = {};
+	//public:
+	//	_bool Is_TargetDashRange();
+	//	_bool Is_TargetDodgeRange();
+	//	_bool Is_TargetDownStrikeRange();
+	//
+	//private:
+	//	_float m_fDashMaxDistance = {};
+	//	_float m_fDashMinDistance = {};
+	//	_float m_fDashDodgeDistance = {};
+	//	_float m_fDownStrikeDistance = {};
 #pragma endregion
 
 #pragma region 4. 몬스터는 자신의 애니메이션을 관리해야한다.
@@ -100,7 +90,7 @@ private:
 
 #pragma region 6. 특수한 상태를 제어하기 위한 함수들입니다.
 
-	
+
 public:
 	/* 어떤 파츠의 Colider를 제어할 것인지? */
 	virtual void Enable_Collider(_uint iType) override;
@@ -117,29 +107,20 @@ public:
 
 private:
 	HRESULT Initailize_UI();
-	
+
 
 private:
 	class CBossHpBarUI* m_pBossHpBarUI = { nullptr };
 
-public:
-	
 #pragma endregion
 
-
-#pragma region 8. 렌더링 제어
-public:
-	virtual void Set_Visible(_bool bVisible) override ;
-#pragma endregion
-
-#pragma region 0. 기본 함수들 정의
+#pragma region 99. 초기화 함수들 정의
 private:
-	class CKnightLance* m_pWeapon = { nullptr };
-	class CKnightShield* m_pShield = { nullptr };
+	class CWhiteLargeHalberd* m_pWeapon = { nullptr };
 
 private:
-	HRESULT Ready_Components(QUEENKNIGHT_DESC* pDesc);
-	HRESULT Ready_Colliders(QUEENKNIGHT_DESC* pDesc);
+	HRESULT Ready_Components(GIANTWHITEDEVIL_DESC* pDesc);
+	HRESULT Ready_Colliders(GIANTWHITEDEVIL_DESC* pDesc);
 	HRESULT Ready_Navigations();
 	HRESULT Ready_BehaviorTree();
 	HRESULT Ready_PartObjects();
@@ -147,13 +128,10 @@ private:
 	
 
 public:
-	static CQueenKnight* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+	static CGiant_WhiteDevil* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg) override;
 	virtual void Destroy();
 	virtual void Free() override;
 #pragma endregion
-
-
 };
 NS_END
-

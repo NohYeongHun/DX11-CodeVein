@@ -105,6 +105,14 @@ HRESULT CMonster::Render()
 void CMonster::OnMoved_ToObjectManager()
 {
     Collider_All_Active(true);
+    
+}
+_float CMonster::Get_TargetDistance()
+{
+	_vector vTargetPos = m_pTarget->Get_Transform()->Get_State(STATE::POSITION);
+	_vector vMyPos = m_pTransformCom->Get_State(STATE::POSITION);
+
+    return XMVectorGetX(XMVector3Length(vTargetPos - vMyPos));
 }
 #pragma endregion
 
@@ -704,6 +712,16 @@ void CMonster::Dead_Action()
         Collider_All_Active(false);
     }
 
+}
+
+/* 조우 거리인지만 체크.*/
+_bool CMonster::Is_EncounterDistance()
+{
+    if (nullptr == m_pTarget)
+        return false;
+
+    _float fTargetDistnace = Get_TargetDistance();
+    return fTargetDistnace <= m_fEncounterDistance;
 }
 
 

@@ -111,6 +111,9 @@
 #include "BT_Monster_DownAction.h"
 #include "BT_Monster_IsHit.h"
 #include "BT_Monster_HitAction.h"
+#include "BT_Monster_IsEncounterCondition.h"
+#include "BT_Monster_EncounterAction.h"
+#include "BT_Monster_PrevEncounterAction.h"
 #pragma endregion
 
 #include "BT_Monster_IsAttackRange.h"
@@ -155,6 +158,14 @@
 #include "KnightLance.h"
 #include "QueenKnight.h"
 
+/* ======================================== GiantWhiteDevil Boss BT ===================================== */
+#include "BT_GiantWhiteDevil_ComboAttackAction.h"
+#include "Giant_WhiteDevilTree.h"
+
+/* ======================================== GiantWhiteDevil Boss Object ===================================== */
+#include "Giant_WhiteDevilDefine.h"
+#include "WhiteLargeHalberd.h"
+#include "Giant_WhiteDevil.h"
 
 
 

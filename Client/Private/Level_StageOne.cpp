@@ -158,7 +158,9 @@ HRESULT CLevel_StageOne::Ready_Layer_Player(const _wstring& strLayerTag)
 	CPlayer::PLAYER_DESC Desc{};
 #pragma region 1. 플레이어에게 넣어줘야할 레벨 별 다른 값들.
 	Desc.eCurLevel = m_eCurLevel;
-	Desc.vPos = { 0.f, 0.f, 0.f };
+	Desc.vPos = { 183.f, 21.f, -24.f };
+	//Desc.vPos = { 200.f, 13.f, 9.f };
+	//Desc.vPos = { 0.f, 0.f, 0.f };
 #pragma endregion
 
 #pragma region 2. 게임에서 계속 들고있어야할 플레이어 값들.
@@ -245,6 +247,7 @@ HRESULT CLevel_StageOne::Ready_Layer_SkyBox(const _wstring& strLayerTag)
 	return S_OK;
 }
 
+#pragma region 1. Monster Trigger 준비 => 몬스터들을 Trigger Manager에 담아둡니다.
 HRESULT CLevel_StageOne::Ready_Monster_Trigger()
 {
 	// 0. TriggerManager에 Player 전달.
@@ -253,11 +256,11 @@ HRESULT CLevel_StageOne::Ready_Monster_Trigger()
 			, TEXT("Layer_Player"), 0));
 
 	// 1. 객체 생성 해서 Trigger Manager에 전달.
-	//if (FAILED(Ready_Layer_Monster(TEXT("Layer_Monster"))))
-	//{
-	//	CRASH("Failed Layer_Monster");
-	//	return E_FAIL;
-	//}
+	if (FAILED(Ready_Layer_Monster(TEXT("Layer_Monster"))))
+	{
+		CRASH("Failed Layer_Monster");
+		return E_FAIL;
+	}
 
 	return S_OK;
 }
@@ -288,20 +291,13 @@ HRESULT CLevel_StageOne::Ready_Layer_Monster(const _wstring& strLayerTag)
 	/*TriggerDesc = { { 250.f , 0.f, 0.f }, 200.f , TEXT("Layer_WolfDevil")
 		, TEXT("Layer_Monster") , 2, 0 };*/
 
-	m_pGameInstance->Add_Trigger(ENUM_CLASS(m_eCurLevel), TriggerDesc);
-
-
-	//TriggerDesc = { { 200.f , 0.f, 0.f }, 200.f , TEXT("Layer_SlaveVampire")
-	//	, TEXT("Layer_Monster") , 2, 0 };
-	//
 	//m_pGameInstance->Add_Trigger(ENUM_CLASS(m_eCurLevel), TriggerDesc);
 
-	/* 다 같은 Monster 레이어에 추가하기. */
-	//if (FAILED(Ready_Layer_QueenKnight(strLayerTag)))
-	//{
-	//	CRASH("Failed Layer_QueenKnight");
-	//	return E_FAIL;
-	//}
+	if (FAILED(Ready_Layer_GiantWhiteDevil(strLayerTag)))
+	{
+		CRASH("Faiiled Layer GiantWhite Devil");
+		return E_FAIL;
+	}
 
 	return S_OK;
 }
@@ -385,18 +381,20 @@ HRESULT CLevel_StageOne::Ready_Layer_SlaveVampire(const _wstring& strLayerTag)
 	return S_OK;
 }
 
-HRESULT CLevel_StageOne::Ready_Layer_QueenKnight(const _wstring& strLayerTag)
+HRESULT CLevel_StageOne::Ready_Layer_GiantWhiteDevil(const _wstring& strLayerTag)
 {
-	CQueenKnight::QUEENKNIGHT_DESC Desc{};
-	Desc.eCurLevel = m_eCurLevel;
+	CGiant_WhiteDevil::GIANTWHITEDEVIL_DESC Desc{};
 	/* Transform 설정.*/
 	Desc.fSpeedPerSec = 50.f;
 	Desc.fRotationPerSec = XMConvertToRadians(180.f);
-
+	Desc.eCurLevel = m_eCurLevel;
 	Desc = { 50.f, XMConvertToRadians(180.f)
-		, nullptr, m_eCurLevel, MONSTERTYPE::BOSS, 2500.f, 150.f
-		, 30.f, 7.f, 10.f, 10.f, {1.f, 1.f, 1.f}
+		, nullptr, m_eCurLevel, MONSTERTYPE::BOSS, 2200.f, 150.f
+		, 22.f, 7.f, 10.f, 10.f, {1.f, 1.f, 1.f}
 	};
+	// 60, 21, -28
+	Desc.vPos = { 203.f, 15.f, 18.f }; // 위치 설정.
+	//Desc.vPos = { 60.f, 21.f, -28.f }; // 위치 설정.
 
 	Desc.pPlayer = dynamic_cast<CPlayer*>(
 		m_pGameInstance->Get_GameObjcet(
@@ -410,23 +408,25 @@ HRESULT CLevel_StageOne::Ready_Layer_QueenKnight(const _wstring& strLayerTag)
 	}
 
 	if (FAILED(m_pGameInstance->Add_GameObject_ToTrigger(ENUM_CLASS(m_eCurLevel)
-		, TEXT("Layer_QueenKnight"), ENUM_CLASS(m_eCurLevel)
-		, TEXT("Prototype_GameObject_QueenKnight"), &Desc)))
+		, TEXT("Layer_GiantWhiteDevil"), ENUM_CLASS(m_eCurLevel)
+		, TEXT("Prototype_GameObject_Giant_WhiteDevil"), &Desc)))
 	{
 		CRASH("Failed_Create WolfDevil");
 		return E_FAIL;
 	}
 
-	// 2. 트리거 등록
 	TRIGGER_MONSTER_DESC TriggerDesc{};
-
-	TriggerDesc = { { 100.f , 0.f, 0.f }, 20.f , TEXT("Layer_QueenKnight")
-		, TEXT("Layer_Monster") , 1, 0 };
+	// 60, 21, -28
+	TriggerDesc = { { 200.f , 15.f, 18.f }, 200.f , TEXT("Layer_GiantWhiteDevil")
+		, TEXT("Layer_Monster") , 1, 0 }; // 이전 2개 트리거 완료 후 발동
 
 	m_pGameInstance->Add_Trigger(ENUM_CLASS(m_eCurLevel), TriggerDesc);
 
 	return S_OK;
 }
+
+#pragma endregion
+
 
 HRESULT CLevel_StageOne::Ready_Layer_Effect(const _wstring& strLayerTag)
 {

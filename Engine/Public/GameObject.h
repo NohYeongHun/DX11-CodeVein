@@ -112,8 +112,8 @@ public:
 	virtual HRESULT  Initialize_Debug();
 
 public:
-	virtual HRESULT  BoundingBoxRender(const BOUNDING_BOX& box, _matrix WorldMatrix);
-	virtual void    Render_AABB(const BOUNDING_BOX& box);
+	//virtual HRESULT  BoundingBoxRender(const BOUNDING_BOX& box, _matrix WorldMatrix);
+	//virtual void    Render_AABB(const BOUNDING_BOX& box);
 #endif // _DEBUG
 
 protected:

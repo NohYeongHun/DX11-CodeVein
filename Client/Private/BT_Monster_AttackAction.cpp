@@ -1,5 +1,4 @@
-﻿#include "BT_Monster_AttackAction.h"
-
+﻿
 CBT_Monster_AttackAction::CBT_Monster_AttackAction(CMonster* pOwner)
     : m_pOwner(pOwner)
 {
@@ -91,28 +90,24 @@ BT_RESULT CBT_Monster_AttackAction::UpdateAttack(_float fTimeDelta)
     //m_pOwner->Handle_Collider_State();
     
     if (m_pOwner->Is_Animation_Finished())
+    {
         m_eAttackPhase = ATTACK_PHASE::COMPLETED;
+    }
+        
 
     return BT_RESULT::RUNNING;
 }
 
 BT_RESULT CBT_Monster_AttackAction::EndAttack(_float fTimeDleta)
 {
-    if (m_pOwner->Is_Animation_Finished())
-    {
-        // 1. Animation 탐색 시작
-        _uint iNextAnimationIdx = m_pOwner->Find_AnimationIndex(L"IDLE");
 
-        // 2. 현재 애니메이션으로 NON 블렌딩하면서 변경. => Idle은 NonBlend로 변경.
-        m_pOwner->Change_Animation_NonBlend(iNextAnimationIdx);
+    // 1. Animation 탐색 시작
+    _uint iNextAnimationIdx = m_pOwner->Find_AnimationIndex(L"IDLE");
 
-
-        m_pOwner->Set_RootMotionTranslate(false);
-        // 디버그용 함수.
-        //m_pOwner->Print_Position();
-
-        m_pOwner->AddBuff(CMonster::BUFF_ATTACK_TIME);
-    }
+    // 2. 현재 애니메이션으로 NON 블렌딩하면서 변경. => Idle은 NonBlend로 변경.
+    m_pOwner->Change_Animation_NonBlend(iNextAnimationIdx);
+    m_pOwner->Set_RootMotionTranslate(false);
+    m_pOwner->AddBuff(CMonster::BUFF_ATTACK_TIME);
 
     return BT_RESULT::SUCCESS;
 }
