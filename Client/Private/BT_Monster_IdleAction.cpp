@@ -36,7 +36,7 @@ BT_RESULT CBT_Monster_IdleAction::EnterIdle(_float fTimeDelta)
 	if (m_pOwner->Is_Animation_Finished())
 	{ 
 		_uint iNextAnimationIdx = m_pOwner->Find_AnimationIndex(L"IDLE");
-		m_pOwner->Change_Animation_NonBlend(iNextAnimationIdx);
+		m_pOwner->Change_Animation_Blend(iNextAnimationIdx);
 		m_eIdlePhase = IDLE_PHASE::COMPLETED;
 	}
 	
