@@ -14,7 +14,7 @@ _bool CBT_Monster_IsRotate::Check_Condition()
         return false;
 
     // 현재 다른 중요한 행동 중이면 회전하지 않음
-    if (m_pOwner->HasAnyBuff(CMonster::BUFF_DOWN | CMonster::BUFF_HIT))
+    if (m_pOwner->HasAnyBuff(CMonster::BUFF_DOWN | CMonster::BUFF_HIT | CMonster::BUFF_DETECT))
         return false;
 
     // 공격 범위에 있으면 회전보다는 공격 우선

@@ -165,6 +165,7 @@ void CPlayerState::Handle_Attack_Movement(_vector vDirection, _float fTimeDelta)
     // 방향으로 이동
     /*m_pPlayer->Get_Transform()->Move_Direction(vDirection, fTimeDelta * fMoveSpeed);*/
     m_pPlayer->Move_Direction(vDirection, fTimeDelta * fMoveSpeed);
+    //m_pPlayer->Move_Direction(vDirection, fTimeDelta * 1.f);
 }
 
 _float CPlayerState::Calculate_Attack_Move_Speed()

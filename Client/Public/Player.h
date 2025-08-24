@@ -12,6 +12,7 @@ public:
 	{
 		IDLE = 0, WALK, RUN, DODGE,
 		STRONG_ATTACK, GUARD, ATTACK, DAMAGE,
+		SKILL_1,
 		STATE_END
 	};
 

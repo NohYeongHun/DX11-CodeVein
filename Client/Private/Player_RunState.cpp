@@ -81,6 +81,22 @@ void CPlayer_RunState::Change_State(_float fTimeDelta)
 	CPlayer_StrongAttackState::STRONG_ENTER_DESC StrongAttack{};
 	CPlayer_AttackState::ATTACK_ENTER_DESC Attack{};
 	CPlayer_GuardState::GUARD_ENTER_DESC Guard{};
+	CPlayer_FirstSkillState::FIRSTSKILL_ENTER_DESC Skill{};
+
+	if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::SKILL_1))
+	{
+		// 스킬 쿨타임은 Register_CoolTime() 함수에서 설정.
+		if (!m_pFsm->Is_ExitCoolTimeEnd(CPlayer::SKILL_1))
+			return;
+
+		m_iNextState = CPlayer::PLAYER_STATE::SKILL_1;
+		m_iNextAnimIdx = m_pPlayer->Find_AnimationIndex(TEXT("CIRCULATE_PURGE"));
+		/* DIR 딱히 상관없을듯. */
+		// ACTORDIR dir = m_pPlayer->Calculate_Direction();
+
+		Skill.iAnimation_Idx = m_iNextAnimIdx;
+		m_pFsm->Change_State(m_iNextState, &Skill);
+	}
 
 	
 
@@ -235,6 +251,7 @@ void CPlayer_RunState::Change_State(_float fTimeDelta)
 			}
 			
 			m_iNextState = CPlayer::PLAYER_STATE::WALK;
+			m_iNextAnimIdx = Walk.iAnimation_Idx;
 			m_pFsm->Change_State(m_iNextState, &Walk);
 			return;
 		}

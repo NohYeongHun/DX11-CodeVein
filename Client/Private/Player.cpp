@@ -1,5 +1,4 @@
-﻿#include "Player.h"
-
+﻿
 #pragma region KEY CODE 미리 정의
 const _uint CPlayer::m_KeyboardMappingsCount = 12;
 const std::pair<PLAYER_KEY, _ubyte> CPlayer::m_KeyboardMappings[] = {
@@ -661,6 +660,10 @@ HRESULT CPlayer::InitializeAction_ToAnimationMap()
     m_Action_AnimMap.emplace(L"STRONG_ATTACK1", PLAYER_ANIM_LS_ATK_STRONG1B);
 #pragma endregion
 
+#pragma region 3. 특수 공격. (스킬)
+    m_Action_AnimMap.emplace(L"CIRCULATE_PURGE", PLAYER_ANIM_SKILL_STRONG3);
+#pragma endregion
+
 
 
 #pragma region 99. 재생속도 증가.
@@ -692,6 +695,7 @@ HRESULT CPlayer::InitializeAction_ToAnimationMap()
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("DAMAGE_R")], 2.f);
 
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("STRONG_ATTACK1")], 2.f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("CIRCULATE_PURGE")], 1.3f);
 #pragma endregion
 
     return S_OK;
@@ -1155,6 +1159,12 @@ HRESULT CPlayer::Ready_Fsm()
     m_pFsmCom->Add_State(CPlayer_AttackState::Create(PLAYER_STATE::ATTACK, &PlayerDesc));
     m_pFsmCom->Add_State(CPlayer_DamageState::Create(PLAYER_STATE::DAMAGE, &PlayerDesc));
 
+    // Z키
+    m_pFsmCom->Add_State(CPlayer_FirstSkillState::Create(PLAYER_STATE::SKILL_1, &PlayerDesc));
+    //m_pFsmCom->Add_State(CPlayer_FirstSkillState::Create(PLAYER_STATE::SKILL_1, &PlayerDesc));
+    //m_pFsmCom->Add_State(CPlayer_FirstSkillState::Create(PLAYER_STATE::SKILL_1, &PlayerDesc));
+    //m_pFsmCom->Add_State(CPlayer_FirstSkillState::Create(PLAYER_STATE::SKILL_1, &PlayerDesc));
+
     Register_CoolTime();
 
     CPlayer_IdleState::IDLE_ENTER_DESC enter{};
@@ -1178,6 +1188,7 @@ void CPlayer::Register_CoolTime()
     m_pFsmCom->Register_StateCoolTime(PLAYER_STATE::STRONG_ATTACK, 1.5f);
     m_pFsmCom->Register_StateCoolTime(PLAYER_STATE::ATTACK, 1.f);
     m_pFsmCom->Register_StateCoolTime(PLAYER_STATE::GUARD, 0.5f);
+    m_pFsmCom->Register_StateCoolTime(PLAYER_STATE::SKILL_1, 5.f);
 
 
     m_pFsmCom->Register_StateExitCoolTime(PLAYER_STATE::IDLE, 0.f);

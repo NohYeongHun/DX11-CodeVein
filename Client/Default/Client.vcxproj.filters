@@ -600,6 +600,12 @@
     <ClInclude Include="..\Public\BT_Monster_PrevEncounterAction.h">
       <Filter>02. GameObject\Monster\BT\Encounter</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Player_FirstSkillState.h">
+      <Filter>02. GameObject\Player\State\Attack</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Player_SecondSkillState.h">
+      <Filter>02. GameObject\Player\State\Attack</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -956,6 +962,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\BT_Monster_PrevEncounterAction.cpp">
       <Filter>02. GameObject\Monster\BT\Encounter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Player_FirstSkillState.cpp">
+      <Filter>02. GameObject\Player\State\Attack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Player_SecondSkillState.cpp">
+      <Filter>02. GameObject\Player\State\Attack</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

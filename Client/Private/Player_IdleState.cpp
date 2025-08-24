@@ -27,11 +27,11 @@ void CPlayer_IdleState::Enter(void* pArg)
 	m_pModelCom->Set_RootMotionRotation(true);
 	m_pModelCom->Set_RootMotionTranslate(false);
 
+	
+
 	m_iNextState = -1;
 	m_iCurAnimIdx = pDesc->iAnimation_Idx;
 	m_pModelCom->Set_Animation(m_iCurAnimIdx, m_isLoop);
-
-
 }
 
 /* State 실행 */
@@ -67,7 +67,22 @@ void CPlayer_IdleState::Change_State()
 	CPlayer_StrongAttackState::STRONG_ENTER_DESC StrongAttack{};
 	CPlayer_AttackState::ATTACK_ENTER_DESC Attack{};
 	CPlayer_GuardState::GUARD_ENTER_DESC Guard{};
+	CPlayer_FirstSkillState::FIRSTSKILL_ENTER_DESC Skill{};
 
+	if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::SKILL_1))
+	{
+		// 스킬 쿨타임은 Register_CoolTime() 함수에서 설정.
+		if (!m_pFsm->Is_ExitCoolTimeEnd(CPlayer::SKILL_1))
+			return;
+
+		m_iNextState = CPlayer::PLAYER_STATE::SKILL_1;
+		m_iNextAnimIdx = m_pPlayer->Find_AnimationIndex(TEXT("CIRCULATE_PURGE"));
+		/* DIR 딱히 상관없을듯. */
+		// ACTORDIR dir = m_pPlayer->Calculate_Direction();
+
+		Skill.iAnimation_Idx = m_iNextAnimIdx;
+		m_pFsm->Change_State(m_iNextState, &Skill);
+	}
 
 	
 

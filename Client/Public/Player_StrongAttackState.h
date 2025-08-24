@@ -7,9 +7,6 @@ NS_BEGIN(Client)
 class CPlayer_StrongAttackState final : public CPlayerState
 {
 public:
-
-
-public:
 	typedef struct tagPlayerStrongAttackEnterDesc
 	{
 		_uint iAnimation_Idx = {};

@@ -99,6 +99,8 @@
 #include "Player_AttackState.h"
 #include "Player_GuardState.h"
 #include "Player_DamageState.h"
+#include "Player_FirstSkillState.h"
+#include "Player_SecondSkillState.h"
 
 
 

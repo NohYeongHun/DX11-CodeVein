@@ -250,6 +250,8 @@
     <ClInclude Include="..\Public\Player_GuardState.h" />
     <ClInclude Include="..\Public\Player_IdleState.h" />
     <ClInclude Include="..\Public\Player_RunState.h" />
+    <ClInclude Include="..\Public\Player_FirstSkillState.h" />
+    <ClInclude Include="..\Public\Player_SecondSkillState.h" />
     <ClInclude Include="..\Public\Player_StrongAttackState.h" />
     <ClInclude Include="..\Public\Player_WalkState.h" />
     <ClInclude Include="..\Public\QueenKnight.h" />
@@ -378,6 +380,8 @@
     <ClCompile Include="..\Private\Player_GuardState.cpp" />
     <ClCompile Include="..\Private\Player_IdleState.cpp" />
     <ClCompile Include="..\Private\Player_RunState.cpp" />
+    <ClCompile Include="..\Private\Player_FirstSkillState.cpp" />
+    <ClCompile Include="..\Private\Player_SecondSkillState.cpp" />
     <ClCompile Include="..\Private\Player_StrongAttackState.cpp" />
     <ClCompile Include="..\Private\Player_WalkState.cpp" />
     <ClCompile Include="..\Private\QueenKnight.cpp" />

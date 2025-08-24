@@ -10,7 +10,7 @@ public:
 	{
 		_float fStartRatio;     
 		_float fEndRatio;       
-		_bool bIsActive;        
+		_bool bIsActive;
 	}COLLIDER_ACTIVE_INFO;
 
 public:
