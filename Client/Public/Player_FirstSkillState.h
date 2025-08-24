@@ -22,6 +22,14 @@ private:
 	explicit CPlayer_FirstSkillState();
 	virtual ~CPlayer_FirstSkillState() = default;
 
+#pragma region 해당 STATE에서만 사용하는 변수
+private:
+	_float m_fIncreaseDamage = {};
+#pragma endregion
+
+
+
+
 public:
 	// 시작 초기화
 	virtual HRESULT Initialize(_uint iStateNum, void* pArg) override;

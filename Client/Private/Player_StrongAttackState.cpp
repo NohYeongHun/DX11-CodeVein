@@ -5,14 +5,14 @@
 HRESULT CPlayer_StrongAttackState::Initialize(_uint iStateNum, void* pArg)
 {
 	if (FAILED(CPlayerState::Initialize(iStateNum, pArg)))
+	{
+		CRASH("Failed Player StrongAttackState Initialize");
 		return E_FAIL;
+	}
+		
+	Add_Collider_Info(m_pPlayer->Find_AnimationIndex(TEXT("STRONG_ATTACK1"))
+		, COLLIDER_ACTIVE_INFO{ 70.f / 230.f, 100.f / 230.f, false, 0, CPlayer::PART_WEAPON });
 
-
-	m_ColliderActiveMap.emplace(m_pPlayer->Find_AnimationIndex(TEXT("STRONG_ATTACK1"))
-		, COLLIDER_ACTIVE_INFO{ 70.f / 230.f, 100.f / 230.f, false });
-
-	//m_ColliderActiveMap.emplace(m_pPlayer->Find_AnimationIndex(TEXT("STRONG_ATTACK1"))
-	//	, COLLIDER_ACTIVE_INFO{ 50.f / 230.f, 100.f / 230.f, false });
 
 	return S_OK;
 }

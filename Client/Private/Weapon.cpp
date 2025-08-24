@@ -131,6 +131,20 @@ void CWeapon::Update_ColliderFrame(_float fTimeDelta)
 }
 #pragma endregion
 
+#pragma region 3. 데미지 증가.
+void CWeapon::Increase_Damage(_float fDamage)
+{
+    m_fAttackPower += fDamage;
+}
+
+void CWeapon::Decrease_Damage(_float fDamage)
+{
+    m_fAttackPower -= fDamage;
+}
+#pragma endregion
+
+
+
 HRESULT CWeapon::Ready_Components()
 {
     return S_OK;

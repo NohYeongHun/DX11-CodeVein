@@ -12,7 +12,7 @@ public:
 	{
 		IDLE = 0, WALK, RUN, DODGE,
 		STRONG_ATTACK, GUARD, ATTACK, DAMAGE,
-		SKILL_1,
+		SKILL_1, SKILL_2,
 		STATE_END
 	};
 
@@ -230,6 +230,11 @@ private:
 #pragma region 5. 플레이어 상태 스탯들.
 private:
 	PLAYER_STAT m_Stats = {};
+	_bool m_IsInventoryDisplay = { false };
+
+public:
+	void Increase_Damage(_float fDamage);
+	void Decrease_Damage(_float fDamage);
 #pragma endregion
 
 

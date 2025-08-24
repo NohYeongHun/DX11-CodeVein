@@ -79,6 +79,15 @@ protected:
 	_bool m_bVisible = { true };
 #pragma endregion
 
+#pragma region 3. 데미지 증가.
+
+public:
+	void Increase_Damage(_float fDamage);
+	void Decrease_Damage(_float fDamage);
+	
+#pragma endregion
+
+
 
 #pragma region 0. 기본 값들.
 protected:

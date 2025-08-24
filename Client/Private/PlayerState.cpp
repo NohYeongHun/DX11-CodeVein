@@ -1,6 +1,4 @@
-﻿#include "PlayerState.h"
-
-HRESULT CPlayerState::Initialize(_uint iStateNum, void* pArg)
+﻿HRESULT CPlayerState::Initialize(_uint iStateNum, void* pArg)
 {
     PLAYER_STATE_DESC* pDesc = static_cast<PLAYER_STATE_DESC*>(pArg);
     m_pFsm = pDesc->pFsm;
@@ -48,7 +46,10 @@ void CPlayerState::Handle_Collider_State()
 void CPlayerState::Reset_ColliderActiveInfo()
 {
     for (auto& pair : m_ColliderActiveMap)
-        pair.second.bIsActive = false;
+    {
+		for (auto& colliderInfo : pair.second)
+			colliderInfo.bIsActive = false;
+    }
 
     m_bPrevColliderState = false;
 }
@@ -56,32 +57,41 @@ void CPlayerState::Reset_ColliderActiveInfo()
 
 void CPlayerState::Update_Collider_State()
 {
-    // 현재 애니메이션의 재생 비율 가져오기
     _float fCurrentRatio = m_pModelCom->Get_Current_Ratio();
 
     auto iter = m_ColliderActiveMap.find(m_iCurAnimIdx);
     if (iter == m_ColliderActiveMap.end())
         return;
 
-    COLLIDER_ACTIVE_INFO& colliderInfo = iter->second;
-
-    _bool bShouldActive = (fCurrentRatio >= colliderInfo.fStartRatio &&
-        fCurrentRatio <= colliderInfo.fEndRatio);
-
-    if (bShouldActive != m_bPrevColliderState)
+    // 여러 콜라이더 순회 처리
+    for (auto& colliderInfo : iter->second)
     {
-        if (bShouldActive)
-        {
-            m_pPlayer->Enable_Collider(m_eColliderType);
-            colliderInfo.bIsActive = true;
-        }
-        else
-        {
-            m_pPlayer->Disable_Collider(m_eColliderType);
-            colliderInfo.bIsActive = false;
-        }
+        _bool bShouldActive = (fCurrentRatio >= colliderInfo.fStartRatio &&
+            fCurrentRatio <= colliderInfo.fEndRatio);
 
-        m_bPrevColliderState = bShouldActive;
+        _uint iColliderID = colliderInfo.iColliderID;
+        _bool bPrevState = m_PrevColliderStates[iColliderID];
+
+        if (bShouldActive != bPrevState)
+        {
+            if (!colliderInfo.bIsColliderDisable)
+            {
+                if (bShouldActive)
+                    m_pPlayer->Enable_Collider(colliderInfo.eColliderType);
+                else
+                    m_pPlayer->Disable_Collider(colliderInfo.eColliderType);
+            }
+            else // 반대 로직
+            {
+                if (bShouldActive)
+                    m_pPlayer->Disable_Collider(colliderInfo.eColliderType);
+                else
+                    m_pPlayer->Enable_Collider(colliderInfo.eColliderType);
+            }
+
+            colliderInfo.bIsActive = bShouldActive;
+            m_PrevColliderStates[iColliderID] = bShouldActive;
+        }
     }
 }
 
@@ -90,13 +100,31 @@ void CPlayerState::Force_Disable_All_Colliders()
     // 모든 콜라이더를 강제로 비활성화
     for (auto& pair : m_ColliderActiveMap)
     {
-        if (pair.second.bIsActive)
+        for (auto& colliderInfo : pair.second)
         {
-            m_pPlayer->Disable_Collider(m_eColliderType);
-            pair.second.bIsActive = false;
+            if (colliderInfo.bIsActive)
+            {
+                if (colliderInfo.bIsColliderDisable)
+                    m_pPlayer->Enable_Collider(colliderInfo.eColliderType);
+                else 
+                    m_pPlayer->Disable_Collider(colliderInfo.eColliderType);
+                colliderInfo.bIsActive = false;
+            }
         }
     }
     m_bPrevColliderState = false;
+}
+
+void CPlayerState::Add_Collider_Info(_uint iAnimIdx, const COLLIDER_ACTIVE_INFO& info)
+{
+    m_ColliderActiveMap[iAnimIdx].push_back(info);
+    m_PrevColliderStates[info.iColliderID] = false;
+}
+
+void CPlayerState::Clear_Collider_Info(_uint iAnimIdx)
+{
+    if (m_ColliderActiveMap.find(iAnimIdx) != m_ColliderActiveMap.end())
+        m_ColliderActiveMap[iAnimIdx].clear();
 }
 #pragma endregion
 

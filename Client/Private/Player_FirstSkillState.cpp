@@ -7,20 +7,33 @@ HRESULT CPlayer_FirstSkillState::Initialize(_uint iStateNum, void* pArg)
     if (FAILED(CPlayerState::Initialize(iStateNum, pArg)))
         return E_FAIL;
 
-    /* Active와 동시에 Collider ActiveMap에 넣어둡니다. */
-    m_ColliderActiveMap.emplace(m_pPlayer->Find_AnimationIndex(TEXT("CIRCULATE_PURGE"))
-        , COLLIDER_ACTIVE_INFO{ 30.f / 232.f, 140.f / 232.f, false });
+    Add_Collider_Info(m_pPlayer->Find_AnimationIndex(TEXT("CIRCULATE_PURGE"))
+        , COLLIDER_ACTIVE_INFO{ 30.f / 232.f, 40.f / 232.f, false, 0 });
+
+    Add_Collider_Info(m_pPlayer->Find_AnimationIndex(TEXT("CIRCULATE_PURGE"))
+        , COLLIDER_ACTIVE_INFO{ 50.f / 232.f, 60.f / 232.f, false, 1 });
+
+    Add_Collider_Info(m_pPlayer->Find_AnimationIndex(TEXT("CIRCULATE_PURGE"))
+        , COLLIDER_ACTIVE_INFO{ 65.f / 232.f, 75.f / 232.f, false, 2 });
+
+    Add_Collider_Info(m_pPlayer->Find_AnimationIndex(TEXT("CIRCULATE_PURGE"))
+        , COLLIDER_ACTIVE_INFO{ 110.f / 232.f, 120.f / 232.f, false, 3 });
+
+    Add_Collider_Info(m_pPlayer->Find_AnimationIndex(TEXT("CIRCULATE_PURGE"))
+        , COLLIDER_ACTIVE_INFO{ 0.f / 232.f, 230.f / 232.f, false, 1, CPlayer::PART_BODY, true });
+
+	m_fIncreaseDamage = 50.f; // 기본 공격력 증가량 설정
 
     return S_OK;
 }
 
 void CPlayer_FirstSkillState::Enter(void* pArg)
 {
+    /* 공격력 증가. */
+    m_pPlayer->Increase_Damage(m_fIncreaseDamage);
+
     FIRSTSKILL_ENTER_DESC* pDesc = static_cast<FIRSTSKILL_ENTER_DESC*>(pArg);
     CPlayerState::Enter(pDesc); // 기본 쿨타임 설정.
-
-
-
 
     m_isLoop = false;
 
@@ -52,15 +65,22 @@ void CPlayer_FirstSkillState::Enter(void* pArg)
     SKILLEXECUTE_DESC Desc{};
     Desc.iSkillPanelIdx = CHUD::SKILLPANEL::SKILL_PANEL_TOP;
     Desc.iSlotIdx = 0;
-    Desc.fSkillCoolTime = 3.f;
+    Desc.fSkillCoolTime = 5.f;
     m_pGameInstance->Publish(EventType::SKILL_EXECUTE, &Desc);
 
-    /* 쓰는 도중에 콜라이더 무시해야하나? */
+    
+    /* 기본 플레이어 공격 데미지 증가. */
+    m_pPlayer->Increase_Damage(m_fIncreaseDamage);
 }
 
 void CPlayer_FirstSkillState::Update(_float fTimeDelta)
 {
-    Handle_Input();
+    if (m_pPlayer->Is_LockOn() && m_pPlayer->Has_LockOn_Target())
+    {
+        m_pPlayer->Rotate_To_LockOn_Target(fTimeDelta, 1.f);
+    }
+
+    //Handle_Input();
     Handle_Unified_Direction_Input(fTimeDelta);
     Change_State();
     CPlayerState::Handle_Collider_State();
@@ -74,6 +94,9 @@ void CPlayer_FirstSkillState::Exit()
     {
         m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, false);
     }
+
+    // 다시 감소.
+    m_pPlayer->Decrease_Damage(m_fIncreaseDamage);
 }
 
 void CPlayer_FirstSkillState::Reset()

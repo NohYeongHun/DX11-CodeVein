@@ -8,14 +8,22 @@ HRESULT CPlayer_SecondSkillState::Initialize(_uint iStateNum, void* pArg)
         return E_FAIL;
 
     /* Active와 동시에 Collider ActiveMap에 넣어둡니다. */
-    m_ColliderActiveMap.emplace(m_pPlayer->Find_AnimationIndex(TEXT("CIRCULATE_PURGE"))
-        , COLLIDER_ACTIVE_INFO{ 30.f / 230.f, 140.f / 232.f, false });
+    Add_Collider_Info(m_pPlayer->Find_AnimationIndex(TEXT("DRAGON_LUNGE"))
+        , COLLIDER_ACTIVE_INFO{ 70.f / 289.f, 140.f / 289.f, false, 0 });
+
+    Add_Collider_Info(m_pPlayer->Find_AnimationIndex(TEXT("DRAGON_LUNGE"))
+        , COLLIDER_ACTIVE_INFO{ 0.f / 289.f, 260.f / 289.f, false, 1, CPlayer::PART_BODY, true });
+
+	m_fIncreaseDamage = 70.f; // 기본 공격력 증가량 설정
 
     return S_OK;
 }
 
 void CPlayer_SecondSkillState::Enter(void* pArg)
 {
+
+    m_pPlayer->Increase_Damage(m_fIncreaseDamage);
+
     SECONDSKILL_ENTER_DESC* pDesc = static_cast<SECONDSKILL_ENTER_DESC*>(pArg);
     CPlayerState::Enter(pDesc); // 기본 쿨타임 설정.
 
@@ -45,6 +53,12 @@ void CPlayer_SecondSkillState::Enter(void* pArg)
             m_pPlayer->Get_Transform()->Set_Quaternion(qNewRot);
         }
     }
+
+    SKILLEXECUTE_DESC Desc{};
+    Desc.iSkillPanelIdx = CHUD::SKILLPANEL::SKILL_PANEL_TOP;
+    Desc.iSlotIdx = 1;
+    Desc.fSkillCoolTime = 5.f;
+    m_pGameInstance->Publish(EventType::SKILL_EXECUTE, &Desc);
 }
 
 void CPlayer_SecondSkillState::Update(_float fTimeDelta)
@@ -63,6 +77,8 @@ void CPlayer_SecondSkillState::Exit()
     {
         m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, false);
     }
+
+    m_pPlayer->Decrease_Damage(m_fIncreaseDamage);
 }
 
 void CPlayer_SecondSkillState::Reset()
@@ -76,6 +92,28 @@ void CPlayer_SecondSkillState::Change_State()
 {
     CPlayer_IdleState::IDLE_ENTER_DESC Idle{};
     CPlayer_RunState::RUN_ENTER_DESC Run{};
+
+
+    if (m_pFsm->Is_ExitCoolTimeEnd(m_iStateNum))
+    {
+        if (m_pPlayer->Is_MovementKeyPressed())
+        {
+            m_iNextAnimIdx = m_pPlayer->Find_AnimationIndex(TEXT("RUN"));
+            m_iNextState = CPlayer::PLAYER_STATE::RUN;
+            Run.iAnimation_Idx = m_iNextAnimIdx;
+            m_pFsm->Change_State(m_iNextState, &Run);
+            return;
+        }
+       /* else
+        {
+            m_iNextAnimIdx = m_pPlayer->Find_AnimationIndex(TEXT("IDLE"));
+            Idle.iAnimation_Idx = m_iNextAnimIdx;
+            m_pFsm->Change_State(CPlayer::PLAYER_STATE::IDLE, &Idle);
+            return;
+        }*/
+    }
+
+
 
     if (m_pModelCom->Is_Finished())
     {

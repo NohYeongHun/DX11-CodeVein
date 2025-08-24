@@ -11,6 +11,11 @@ public:
 		_float fStartRatio;     
 		_float fEndRatio;       
 		_bool bIsActive;
+		_uint iColliderID = 0;  // 콜라이더 고유 식별자 추가
+		// 어떤 콜라이더인지 구분하기 위한 타입 | 기본 값 무기.
+		CPlayer::COLLIDER_PARTS eColliderType = CPlayer::PART_WEAPON; 
+		_bool bIsColliderDisable = false; // 콜라이더 비활성화 여부.
+		
 	}COLLIDER_ACTIVE_INFO;
 
 public:
@@ -26,7 +31,9 @@ protected:
 
 #pragma region COLLIDER 활성화 관련 변수
 protected:
-	unordered_map<_uint, COLLIDER_ACTIVE_INFO> m_ColliderActiveMap;
+	//unordered_map<_uint, COLLIDER_ACTIVE_INFO> m_ColliderActiveMap;
+	unordered_map<_uint, vector<COLLIDER_ACTIVE_INFO>> m_ColliderActiveMap;
+	unordered_map<_uint, _bool> m_PrevColliderStates; // 콜라이더 ID별 이전 상태
 	_bool m_bPrevColliderState = false;
 	CPlayer::COLLIDER_PARTS m_eColliderType = CPlayer::PART_WEAPON; // 기본값은 무기 충돌체
 
@@ -37,6 +44,9 @@ protected:
 	virtual void Update_Collider_State();
 	virtual void Force_Disable_All_Colliders(); // 모든 콜라이더 강제 비활성화
 
+protected:
+	void Add_Collider_Info(_uint iAnimIdx, const COLLIDER_ACTIVE_INFO& info);
+	void Clear_Collider_Info(_uint iAnimIdx);
 #pragma endregion
 
 
