@@ -187,6 +187,10 @@ HRESULT CPlayer::Render()
 
         _float fDistance = XMVectorGetX(XMVector3Length(vLockOn - vMine));
         ImGui::Text("LockOn Distance : (%.2f)", fDistance);
+
+        
+        _float fHp = dynamic_cast<CMonster*>(m_pLockOn_Target)->Get_MonsterStat().fHP;
+        ImGui::Text("LockOn HP : (%.2f)", fHp);
     }
     
 
@@ -661,6 +665,11 @@ HRESULT CPlayer::InitializeAction_ToAnimationMap()
     m_Action_AnimMap.emplace(L"STRONG_ATTACK1", PLAYER_ANIM_LS_ATK_STRONG1B);
 #pragma endregion
 
+#pragma region 3. 특수 공격. (스킬)
+    m_Action_AnimMap.emplace(L"CIRCULATE_PURGE", PLAYER_ANIM_SKILL_STRONG3);
+    m_Action_AnimMap.emplace(L"DRAGON_LUNGE", PLAYER_ANIM_SKILL_STRONG6);
+#pragma endregion
+
 
 
 #pragma region 99. 재생속도 증가.
@@ -681,10 +690,10 @@ HRESULT CPlayer::InitializeAction_ToAnimationMap()
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("DODGE_R")], 1.5f);
 
 
-    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("ATTACK1")], 2.f);
-    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("ATTACK2")], 2.f);
-    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("ATTACK3")], 2.f);
-    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("ATTACK4")], 2.f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("ATTACK1")], 1.5f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("ATTACK2")], 1.5f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("ATTACK3")], 1.5f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("ATTACK4")], 1.5f);
 
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("DAMAGE_B")], 2.f);
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("DAMAGE_F")], 2.f);
@@ -692,6 +701,7 @@ HRESULT CPlayer::InitializeAction_ToAnimationMap()
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("DAMAGE_R")], 2.f);
 
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("STRONG_ATTACK1")], 2.f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("CIRCULATE_PURGE")], 1.3f);
 #pragma endregion
 
     return S_OK;
@@ -803,7 +813,24 @@ HRESULT CPlayer::Initialize_BuffDurations()
     m_BuffDefault_Durations[BUFF_INVINCIBLE] = 1.f; // 무적 시간.
     return S_OK;
 }
+
+
+
 #pragma endregion
+
+
+#pragma region 5. 플레이어 상태 스텟 관리.
+void CPlayer::Increase_Damage(_float fDamage)
+{
+    m_pPlayerWeapon->Increase_Damage(fDamage);
+}
+
+void CPlayer::Decrease_Damage(_float fDamage)
+{
+    m_pPlayerWeapon->Decrease_Damage(fDamage);
+}
+#pragma endregion
+
 
 
 #pragma region 충돌 관리
@@ -930,7 +957,7 @@ ACTORDIR CPlayer::Calculate_Damage_Direction(CMonster* pAttacker)
 void CPlayer::HandleState(_float fTimeDelta)
 {
 
-    if (nullptr != m_pFsmCom)
+    if(!m_IsInventoryDisplay)
         m_pFsmCom->Update(fTimeDelta);
 
     // Fsm 작동 이후에 상태 값에 대한 초기화를 담당하는 Tick_BuffTimer 실행.
@@ -996,7 +1023,11 @@ void CPlayer::Update_KeyInput()
         m_KeyInput |= static_cast<uint16_t>(PLAYER_KEY::STRONG_ATTACK);
 
     if (m_pGameInstance->Get_KeyUp(DIK_I))
+    {
         m_pGameInstance->Publish<CInventory>(EventType::INVENTORY_DISPLAY, nullptr);
+        m_IsInventoryDisplay = !m_IsInventoryDisplay;
+    }
+        
 
     // 방향 계산 추가 => Player State에 추가했음. HandleInput
     //m_eCurrentDirection = Calculate_Direction();
@@ -1155,6 +1186,14 @@ HRESULT CPlayer::Ready_Fsm()
     m_pFsmCom->Add_State(CPlayer_AttackState::Create(PLAYER_STATE::ATTACK, &PlayerDesc));
     m_pFsmCom->Add_State(CPlayer_DamageState::Create(PLAYER_STATE::DAMAGE, &PlayerDesc));
 
+    // Z키
+    m_pFsmCom->Add_State(CPlayer_FirstSkillState::Create(PLAYER_STATE::SKILL_1, &PlayerDesc));
+    // X키
+    m_pFsmCom->Add_State(CPlayer_SecondSkillState::Create(PLAYER_STATE::SKILL_2, &PlayerDesc));
+    //m_pFsmCom->Add_State(CPlayer_FirstSkillState::Create(PLAYER_STATE::SKILL_1, &PlayerDesc));
+    //m_pFsmCom->Add_State(CPlayer_FirstSkillState::Create(PLAYER_STATE::SKILL_1, &PlayerDesc));
+    //m_pFsmCom->Add_State(CPlayer_FirstSkillState::Create(PLAYER_STATE::SKILL_1, &PlayerDesc));
+
     Register_CoolTime();
 
     CPlayer_IdleState::IDLE_ENTER_DESC enter{};
@@ -1178,12 +1217,16 @@ void CPlayer::Register_CoolTime()
     m_pFsmCom->Register_StateCoolTime(PLAYER_STATE::STRONG_ATTACK, 1.5f);
     m_pFsmCom->Register_StateCoolTime(PLAYER_STATE::ATTACK, 1.f);
     m_pFsmCom->Register_StateCoolTime(PLAYER_STATE::GUARD, 0.5f);
+    m_pFsmCom->Register_StateCoolTime(PLAYER_STATE::SKILL_1, 5.f);
+    m_pFsmCom->Register_StateCoolTime(PLAYER_STATE::SKILL_2, 5.f);
 
 
     m_pFsmCom->Register_StateExitCoolTime(PLAYER_STATE::IDLE, 0.f);
     m_pFsmCom->Register_StateExitCoolTime(PLAYER_STATE::WALK, 0.f);
     m_pFsmCom->Register_StateExitCoolTime(PLAYER_STATE::RUN, 0.f);
     m_pFsmCom->Register_StateExitCoolTime(PLAYER_STATE::DODGE, 0.7f);
+
+    m_pFsmCom->Register_StateExitCoolTime(PLAYER_STATE::SKILL_2, 4.f);
 
     // 총 재생 시간.
     _float fCalcDuration = m_pModelCom->Get_AnimationDuration(m_Action_AnimMap[TEXT("STRONG_ATTACK1")]) /

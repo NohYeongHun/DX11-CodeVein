@@ -19,6 +19,13 @@ private:
 public:
     virtual HRESULT Initialize(void* pArg) override;
 
+#pragma endregion
+
+#pragma region 조우 상태 초기화.
+    CBTSequence* Create_EncounterStates_ToSequence();
+
+#pragma endregion
+
 
 #pragma region 특수 상태 제어. Selector -> Buff Sequence
 private:

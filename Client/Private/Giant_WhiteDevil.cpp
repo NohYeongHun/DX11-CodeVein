@@ -89,7 +89,7 @@ HRESULT CGiant_WhiteDevil::Initialize_Clone(void* pArg)
     _vector qInitRot = XMQuaternionRotationAxis(XMVectorSet(0.f, 1.f, 0.f, 0.f), 0.0f);
     m_pTransformCom->Set_Quaternion(qInitRot);
 
-    _float3 vScale = { 1.5f, 1.5f, 1.5f };
+    _float3 vScale = { 1.2f, 1.2f, 1.2f };
     m_pTransformCom->Set_Scale(vScale);
 
     /* 현재 Object Manager에 담기 전에는 모든 Collider를 충돌 비교 하지 않습니다. */
@@ -377,7 +377,7 @@ HRESULT CGiant_WhiteDevil::InitializeAction_ToAnimationMap()
 #pragma region 콜라이더 활성화 프레임 관리.
     Add_Collider_Frame(m_Action_AnimMap[TEXT("ATTACK")], 50.f / 220.f, 70.f / 220.f, PART_WEAPON);     
     Add_Collider_Frame(m_Action_AnimMap[TEXT("COMBO_ATTACK1")], 50.f / 220.f, 70.f / 220.f, PART_WEAPON);
-    Add_Collider_Frame(m_Action_AnimMap[TEXT("COMBO_ATTACK2")], 45.f / 246.f, 80.f / 246.f, PART_WEAPON);
+    Add_Collider_Frame(m_Action_AnimMap[TEXT("COMBO_ATTACK2")], 25.f / 246.f, 70.f / 246.f, PART_WEAPON);
 #pragma endregion
 
 

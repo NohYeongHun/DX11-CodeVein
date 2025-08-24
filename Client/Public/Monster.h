@@ -355,6 +355,15 @@ protected:
     
 #pragma endregion
 
+#pragma region DEBUG 용도
+
+#ifdef _DEBUG
+    const MONSTER_STAT& Get_Stats() { return m_MonsterStat; }
+#endif // _DEBUG
+
+
+#pragma endregion
+
 
 public:
     virtual void Destroy() override;

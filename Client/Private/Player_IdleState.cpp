@@ -27,11 +27,11 @@ void CPlayer_IdleState::Enter(void* pArg)
 	m_pModelCom->Set_RootMotionRotation(true);
 	m_pModelCom->Set_RootMotionTranslate(false);
 
+	
+
 	m_iNextState = -1;
 	m_iCurAnimIdx = pDesc->iAnimation_Idx;
 	m_pModelCom->Set_Animation(m_iCurAnimIdx, m_isLoop);
-
-
 }
 
 /* State 실행 */
@@ -67,6 +67,36 @@ void CPlayer_IdleState::Change_State()
 	CPlayer_StrongAttackState::STRONG_ENTER_DESC StrongAttack{};
 	CPlayer_AttackState::ATTACK_ENTER_DESC Attack{};
 	CPlayer_GuardState::GUARD_ENTER_DESC Guard{};
+	CPlayer_FirstSkillState::FIRSTSKILL_ENTER_DESC FirstSkill{};
+	CPlayer_SecondSkillState::SECONDSKILL_ENTER_DESC SecondSkill{};
+
+	if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::SKILL_1))
+	{
+		// 스킬 쿨타임은 Register_CoolTime() 함수에서 설정.
+		if (!m_pFsm->Is_ExitCoolTimeEnd(CPlayer::SKILL_1))
+			return;
+
+		m_iNextState = CPlayer::PLAYER_STATE::SKILL_1;
+		m_iNextAnimIdx = m_pPlayer->Find_AnimationIndex(TEXT("CIRCULATE_PURGE"));
+
+		FirstSkill.iAnimation_Idx = m_iNextAnimIdx;
+		m_pFsm->Change_State(m_iNextState, &FirstSkill);
+		return;
+	}
+
+	if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::SKILL_2))
+	{
+		// 스킬 쿨타임은 Register_CoolTime() 함수에서 설정.
+		if (!m_pFsm->Is_ExitCoolTimeEnd(CPlayer::SKILL_2))
+			return;
+
+		m_iNextState = CPlayer::PLAYER_STATE::SKILL_2;
+		m_iNextAnimIdx = m_pPlayer->Find_AnimationIndex(TEXT("DRAGON_LUNGE"));
+
+		SecondSkill.iAnimation_Idx = m_iNextAnimIdx;
+		m_pFsm->Change_State(m_iNextState, &SecondSkill);
+		return;
+	}
 
 
 	

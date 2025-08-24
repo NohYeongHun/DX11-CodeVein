@@ -9,17 +9,17 @@ HRESULT CPlayer_AttackState::Initialize(_uint iStateNum, void* pArg)
 	if (FAILED(CPlayerState::Initialize(iStateNum, pArg)))
 		return E_FAIL;
 
-	m_ColliderActiveMap.emplace(m_pPlayer->Find_AnimationIndex(TEXT("ATTACK1"))
-		, COLLIDER_ACTIVE_INFO{0.f, 0.3f, false});
+	Add_Collider_Info(m_pPlayer->Find_AnimationIndex(TEXT("ATTACK1"))
+		, COLLIDER_ACTIVE_INFO{ 0.f, 0.3f, false, 0});
 
-	m_ColliderActiveMap.emplace(m_pPlayer->Find_AnimationIndex(TEXT("ATTACK2"))
-		, COLLIDER_ACTIVE_INFO{ 0.f, 0.28f, false });
+	Add_Collider_Info(m_pPlayer->Find_AnimationIndex(TEXT("ATTACK2"))
+		, COLLIDER_ACTIVE_INFO{ 0.f, 0.28f, false, 0 });
 
-	m_ColliderActiveMap.emplace(m_pPlayer->Find_AnimationIndex(TEXT("ATTACK3"))
-		, COLLIDER_ACTIVE_INFO{ 0.f, 0.25f, false });
+	Add_Collider_Info(m_pPlayer->Find_AnimationIndex(TEXT("ATTACK3"))
+		, COLLIDER_ACTIVE_INFO{ 0.f, 0.25f, false, 0 });
 
-	m_ColliderActiveMap.emplace(m_pPlayer->Find_AnimationIndex(TEXT("ATTACK4"))
-		, COLLIDER_ACTIVE_INFO{ 0.f, 0.27f, false });
+	Add_Collider_Info(m_pPlayer->Find_AnimationIndex(TEXT("ATTACK4"))
+		, COLLIDER_ACTIVE_INFO{ 0.f, 0.27f, false, 0 });
 	
 
 	return S_OK;

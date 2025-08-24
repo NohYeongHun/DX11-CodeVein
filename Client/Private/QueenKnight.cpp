@@ -105,13 +105,15 @@ HRESULT CQueenKnight::Initialize_Clone(void* pArg)
 void CQueenKnight::Priority_Update(_float fTimeDelta)
 {
     CMonster::Priority_Update(fTimeDelta);
-    if (m_pBossHpBarUI)
+
+    if (m_IsEncountered)
         m_pBossHpBarUI->Priority_Update(fTimeDelta);
+        
 }
 
 void CQueenKnight::Update(_float fTimeDelta)
 {
-    if (m_pBossHpBarUI)
+    if (m_IsEncountered)
         m_pBossHpBarUI->Update(fTimeDelta);
 
 #pragma region 테스트
@@ -136,7 +138,7 @@ void CQueenKnight::Finalize_Update(_float fTimeDelta)
 
 void CQueenKnight::Late_Update(_float fTimeDelta)
 {
-    if (m_pBossHpBarUI)
+    if (m_IsEncountered)
         m_pBossHpBarUI->Late_Update(fTimeDelta);
 
 
@@ -300,6 +302,8 @@ HRESULT CQueenKnight::Initialize_Stats()
     m_fDashMinDistance = 5.f;
     m_fDashDodgeDistance = 10.f;
     m_fDownStrikeDistance = 30.f;
+    m_fEncounterDistance = 30.f;
+
     return S_OK;
 }
 _bool CQueenKnight::Is_TargetDashRange()
@@ -377,6 +381,7 @@ HRESULT CQueenKnight::InitializeAction_ToAnimationMap()
     m_Action_AnimMap.emplace(L"RUN", AS_TStdKnight_TShieldSword_Guard_Run_F_Loop);
     m_Action_AnimMap.emplace(L"WALK", AS_TStdKnight_TShieldSword_Guard_Walk_F_Loop);
     m_Action_AnimMap.emplace(L"WALK_B", AS_TStdKnight_TShieldSword_Guard_Walk_B_Loop);
+
     // 같은 애니메이션이지만 다른 이름으로 설정해서 Node에서 사용할 수 있게함.
     m_Action_AnimMap.emplace(L"DETECT", AS_TStdKnight_TShieldSword_Guard_Run_F_Loop);
     m_Action_AnimMap.emplace(L"DOWN_START", AS_TStdKnight_TCmn_Down_P_Loop);
@@ -384,43 +389,56 @@ HRESULT CQueenKnight::InitializeAction_ToAnimationMap()
     m_Action_AnimMap.emplace(L"DEATH_NORMAL", AS_TStdKnight_TCmn_Death_N);
     m_Action_AnimMap.emplace(L"DEATH", AS_TStdKnight_TCmn_Death_N);
     
-    /* 연속 3번 공격. */
-    m_Action_AnimMap.emplace(L"PHASE_ATTACK1", AS_TStdKnight_TShieldSword_AttackShield02B_N);
-    m_Action_AnimMap.emplace(L"PHASE_ATTACK2", AS_TStdKnight_TShieldSword_AttackShield02C_N);
-    m_Action_AnimMap.emplace(L"PHASE_ATTACK3", AS_TStdKnight_TShieldSword_AttackShield02A_N);
-
     /* 낙하 애니메이션 */
     m_Action_AnimMap.emplace(L"FALL_LOOP", AS_TStdKnight_TCmn_Fall_N_Loop);
     m_Action_AnimMap.emplace(L"FALL_END", AS_TStdKnight_TCmn_Fall_N_End);
 
     /* 점프 어택. (사라졌다가 나오는 모션.) */
     m_Action_AnimMap.emplace(L"DISAPPEAR_ATTACK", AS_TStdKnight_TSword_AttackJump01_N);
+   
+    
+#pragma region 조우 애니메이션
+    // 조우 했을때
+    m_Action_AnimMap.emplace(L"ENCOUNTER", AS_TStdKnight_TCmn_NoneFightIdleCrouch_N);
+    // 조우 이전.
+    m_Action_AnimMap.emplace(L"PREV_ENCOUNTER", AS_TStdKnight_TCmn_NoneFightIdleCrouch_N_Loop);
+
+#pragma endregion
+
+
+
+#pragma region 특수 공격
+
+    /* 연속 3번 공격. */
+    m_Action_AnimMap.emplace(L"PHASE_ATTACK1", AS_TStdKnight_TShieldSword_AttackShield02B_N);
+    m_Action_AnimMap.emplace(L"PHASE_ATTACK2", AS_TStdKnight_TShieldSword_AttackShield02C_N);
+    m_Action_AnimMap.emplace(L"PHASE_ATTACK3", AS_TStdKnight_TShieldSword_AttackShield02A_N);
 
     /* 돌진 애니메이션. */
     m_Action_AnimMap.emplace(L"DODGE_B", AS_TStdKnight_TCmn_Dodge_B);
     m_Action_AnimMap.emplace(L"DASH_ATTACK_START", AS_TStdKnight_TSword_AttackSpecial03_N_Start);
     m_Action_AnimMap.emplace(L"DASH_ATTACK_LOOP", AS_TStdKnight_TSword_AttackSpecial03_N_Loop);
     m_Action_AnimMap.emplace(L"DASH_ATTACK_END", AS_TStdKnight_TSword_AttackSpecial03_N_End);
-    
 
     /* 삼연 내려찍기 패턴 */
     m_Action_AnimMap.emplace(L"DOWN_STRIKE", AS_TStdKnight_TSword_AttackJump01_N);
     m_Action_AnimMap.emplace(L"DOWN_STRIKE_SKILL", AS_TStdKnight_TSword_AttackRange01_N);
+#pragma endregion
 
+
+    
+#pragma region 재생 속도 증가.
     /* Down Strike 시 애니메이션 별 재생 구간이 다름. => Node에서 제어. */
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"DOWN_STRIKE"], 1.8f);
 
     // 250frame.
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"DOWN_STRIKE_SKILL"], 1.2f);
 
-    /* Phase Attack 1 ~ 3 */
+        /* Phase Attack 1 ~ 3 */
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"PHASE_ATTACK1"], 2.5f);
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"PHASE_ATTACK2"], 2.5f);
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"PHASE_ATTACK3"], 2.5f);
 
-    
-    /* 재생속도 증가. */
-    /* 특정 구간만 더 빠르게 없나? */
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"DODGE_B"], 2.5f);
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"DASH_ATTACK_START"], 2.5f);
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"DASH_ATTACK_END"], 4.f);
@@ -430,6 +448,9 @@ HRESULT CQueenKnight::InitializeAction_ToAnimationMap()
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"IDLE_R90"], 10.f);
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"IDLE"], 10.f);
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"ATTACK"], 1.5f);
+#pragma endregion
+
+
 
 
 #pragma region COllider 활성화 프레임 관리

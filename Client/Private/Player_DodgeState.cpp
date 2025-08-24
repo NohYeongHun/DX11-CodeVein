@@ -218,6 +218,7 @@ void CPlayer_DodgeState::Change_State()
 				}
 				
 				m_iNextState = CPlayer::PLAYER_STATE::WALK;
+				m_iNextAnimIdx = Walk.iAnimation_Idx;
 				m_pFsm->Change_State(m_iNextState, &Walk);
 			}
 			else

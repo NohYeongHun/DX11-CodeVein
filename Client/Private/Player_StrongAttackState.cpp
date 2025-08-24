@@ -1,20 +1,18 @@
-﻿#include "Player_StrongAttackState.h"
-
-CPlayer_StrongAttackState::CPlayer_StrongAttackState()
+﻿CPlayer_StrongAttackState::CPlayer_StrongAttackState()
 {
 }
 
 HRESULT CPlayer_StrongAttackState::Initialize(_uint iStateNum, void* pArg)
 {
 	if (FAILED(CPlayerState::Initialize(iStateNum, pArg)))
+	{
+		CRASH("Failed Player StrongAttackState Initialize");
 		return E_FAIL;
+	}
+		
+	Add_Collider_Info(m_pPlayer->Find_AnimationIndex(TEXT("STRONG_ATTACK1"))
+		, COLLIDER_ACTIVE_INFO{ 70.f / 230.f, 100.f / 230.f, false, 0, CPlayer::PART_WEAPON });
 
-
-	m_ColliderActiveMap.emplace(m_pPlayer->Find_AnimationIndex(TEXT("STRONG_ATTACK1"))
-		, COLLIDER_ACTIVE_INFO{ 70.f / 230.f, 100.f / 230.f, false });
-
-	//m_ColliderActiveMap.emplace(m_pPlayer->Find_AnimationIndex(TEXT("STRONG_ATTACK1"))
-	//	, COLLIDER_ACTIVE_INFO{ 50.f / 230.f, 100.f / 230.f, false });
 
 	return S_OK;
 }
@@ -100,10 +98,6 @@ void CPlayer_StrongAttackState::Change_State()
 	
 	if (m_pModelCom->Is_Finished())
 	{
-		/*m_iNextAnimIdx = PLAYER_ANIM_IDLE_SWORD;
-		Idle.iAnimation_Idx = PLAYER_ANIM_IDLE_SWORD;
-		m_pFsm->Change_State(CPlayer::PLAYER_STATE::IDLE, &Idle);*/
-
 		m_iNextAnimIdx = m_pPlayer->Find_AnimationIndex(TEXT("ATTACK1"));
 		Attack.iAnimation_Idx = m_iNextAnimIdx;
 		m_pFsm->Change_State(CPlayer::PLAYER_STATE::ATTACK, &Attack);
@@ -112,23 +106,6 @@ void CPlayer_StrongAttackState::Change_State()
 
 	if (m_pFsm->Is_ExitCoolTimeEnd(m_iStateNum))
 	{
-
-
-		//if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::STRONG_ATTACK))
-		//{
-		//	if (m_iCurAnimIdx != m_pPlayer->Find_AnimationIndex(TEXT("STRONG_ATTACK1")))
-		//		return;
-
-		//	/*if (m_iCurAnimIdx != PLAYER_ANIM_SPECIAL_LAUNCH)
-		//		return;*/
-
-		//	m_iNextAnimIdx = m_pPlayer->Find_AnimationIndex(TEXT("STRONG_ATTACK2"));
-		//	m_iNextState = CPlayer::STRONG_ATTACK;
-		//	StrongAttack.iAnimation_Idx = m_iNextAnimIdx;
-		//	m_pFsm->Change_State(m_iNextState, &StrongAttack);
-		//	return;
-		//}
-
 		if (m_pPlayer->Is_MovementKeyPressed())
 		{
 			m_iNextAnimIdx = m_pPlayer->Find_AnimationIndex(TEXT("RUN"));
@@ -137,16 +114,6 @@ void CPlayer_StrongAttackState::Change_State()
 			m_pFsm->Change_State(m_iNextState, &Run);
 			return;
 		}
-		
-		/*if (m_iCurAnimIdx == m_pPlayer->Find_AnimationIndex(TEXT("STRONG_ATTACK1")) &&
-			m_pModelCom->Get_Current_Ratio() > 0.55f)
-		{
-			m_iNextAnimIdx = m_pPlayer->Find_AnimationIndex(TEXT("ATTACK1"));
-			Attack.iAnimation_Idx = m_iNextAnimIdx;
-			m_pFsm->Change_State(CPlayer::PLAYER_STATE::ATTACK, &Attack);
-			return;
-		}*/
-
 		
 	}
 }
@@ -157,7 +124,7 @@ CPlayer_StrongAttackState* CPlayer_StrongAttackState::Create(_uint iStateNum, vo
 	CPlayer_StrongAttackState* pInstance = new CPlayer_StrongAttackState();
 	if (FAILED(pInstance->Initialize(iStateNum, pArg)))
 	{
-		MSG_BOX(TEXT("Create Failed : Player Idle State"));
+		MSG_BOX(TEXT("Create Failed : Player CPlayer_StrongAttackState"));
 		Safe_Release(pInstance);
 	}
 	return pInstance;

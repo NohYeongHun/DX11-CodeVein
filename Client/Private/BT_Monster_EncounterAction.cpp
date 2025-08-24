@@ -61,6 +61,8 @@ BT_RESULT CBT_Monster_EncounterAction::Update_Encounter(_float fTimeDelta)
     if (m_pOwner->Is_Animation_Finished())
     {
         m_eEncounterPhase = ENCOUNTER_PHASE::COMPLETED;
+        _uint iNextAnimationIdx = m_pOwner->Find_AnimationIndex(L"IDLE");
+        m_pOwner->Change_Animation_Blend(iNextAnimationIdx, false);
         m_pOwner->Set_Encountered(true);
     }
 
