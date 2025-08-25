@@ -156,9 +156,46 @@ void CMonster::Take_Damage(_float fDamage)
 }
 
 
+/* 충돌 시 */
 void CMonster::Take_Damage(_float fDamage, CGameObject* pGameObject)
 {
     m_MonsterStat.fHP -= fDamage;
+
+    
+    
+
+    CPlayerWeapon* pPlayerWeapon = dynamic_cast<CPlayerWeapon*>(pGameObject);
+    if (nullptr != pPlayerWeapon)
+    {
+        /* 1. Weapon 포지션 구하기. */
+        const _float4x4* pCombinedWorldMatrix = pPlayerWeapon->Get_CombinedWorldMatrix();
+        _vector vWeaponPosition = XMLoadFloat4(reinterpret_cast<const _float4*>(&pCombinedWorldMatrix->m[3][0]));
+
+        /* 2. 몬스터의 Bounding Sphere 정보 가져오기 */
+        CBounding_Sphere::BOUNDING_SPHERE_DESC* pDesc = static_cast<CBounding_Sphere::BOUNDING_SPHERE_DESC*>(m_pColliderCom->Get_BoundingDesc());
+        //_vector vCenter = XMLoadFloat3(&pDesc->vCenter);
+
+        /* 월드 좌표로 이동. */
+        //vCenter = XMVector4Transform(vCenter, m_pTransformCom->Get_WorldMatrix());
+        _vector vCenter = m_pTransformCom->Get_State(STATE::POSITION) + XMLoadFloat3(&pDesc->vCenter);
+        _float fRadius = pDesc->fRadius;
+
+        // 3. 몬스터 중심에서 무기 위치로의 방향 벡터를 구합니다.
+        _vector vDir = XMVectorSubtract(vWeaponPosition, vCenter);
+
+        // 4. 방향 벡터를 정규화합니다. (크기를 1로 만듦)
+        vDir = XMVector3Normalize(vDir);
+
+        // 5. 정규화된 방향 벡터에 반지름을 곱한 후, 몬스터의 중심점에 더해 표면 위의 점을 구합니다.
+        _vector vClosestPoint = XMVectorMultiplyAdd(vDir, XMVectorReplicate(fRadius), vCenter);
+
+        // 6. 공격 방향 계산 (무기에서 충돌 지점으로의 방향)
+        _vector vAttackDirection = XMVector3Normalize(XMVectorSubtract(vClosestPoint, vWeaponPosition));
+        
+        // 7. SlashUI를 hit point에서 표시
+        Show_Slash_UI_At_Position(vClosestPoint, vAttackDirection);
+    }
+    //Show_Slash_UI();
 
 }
 
@@ -937,6 +974,17 @@ void CMonster::Show_Slash_UI(_float fRotationAngle)
         m_pSlashUI->Set_Target(this);
         // 회전 각도 설정 함수 추가 필요
         m_pSlashUI->Set_Rotation(fRotationAngle);
+    }
+}
+
+void CMonster::Show_Slash_UI_At_Position(_fvector vPosition, _fvector vAttackDirection)
+{
+    if (m_pSlashUI)
+    {
+        m_pSlashUI->Set_Active(true);
+        m_pSlashUI->Set_Target(this);
+        m_pSlashUI->Set_Position(vPosition); // 월드 좌표 그대로 사용
+        m_pSlashUI->Set_Attack_Direction(vAttackDirection);
     }
 }
 

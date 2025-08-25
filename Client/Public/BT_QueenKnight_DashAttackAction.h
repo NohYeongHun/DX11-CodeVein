@@ -23,6 +23,11 @@ private:
     _float m_fAddSpeed = {};    // 추가할. 애니메이션 스피드 
     _float m_fOriginSpeed = {}; // 원본 애니메이션 스피드
 
+
+    CBounding_OBB::BOUNDING_OBB_DESC* m_OriginDesc = { nullptr };
+    _bool m_IsColliderChange = { false };
+
+
 public:
     explicit CBT_QueenKnight_DashAttackAction(class CQueenKnight* pOwner);
     virtual ~CBT_QueenKnight_DashAttackAction() = default;

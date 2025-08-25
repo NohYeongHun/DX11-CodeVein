@@ -151,7 +151,6 @@ void CCollider::Insert_ColliderObject(CGameObject* pColliderObject)
     m_ColliderObjects.insert(pColliderObject);
 }
 
-#ifdef _DEBUG
 
 void* CCollider::Get_BoundingDesc()
 {
@@ -160,19 +159,19 @@ void* CCollider::Get_BoundingDesc()
         case COLLIDER::AABB:
         {
             CBounding_AABB* pAABB = static_cast<CBounding_AABB*>(m_pBounding);
-            return static_cast<void*>(pAABB->Get_DebugDesc());
+            return static_cast<void*>(pAABB->Get_OriginDesc());
         }
 
         case COLLIDER::OBB:
         {
             CBounding_OBB* pOBB = static_cast<CBounding_OBB*>(m_pBounding);
-            return static_cast<void*>(pOBB->Get_DebugDesc());
+            return static_cast<void*>(pOBB->Get_OriginDesc());
         }
 
         case COLLIDER::SPHERE:
         {
             CBounding_Sphere* pOBB = static_cast<CBounding_Sphere*>(m_pBounding);
-            return static_cast<void*>(pOBB->Get_DebugDesc());
+            return static_cast<void*>(pOBB->Get_OriginDesc());
         }
     }
     return nullptr;
@@ -180,21 +179,18 @@ void* CCollider::Get_BoundingDesc()
 
 
 
+#pragma endregion
+
 void CCollider::Change_BoundingDesc(void* pBoundingDesc)
 {
     m_pBounding->Change_BoundingDesc(static_cast<CBounding::BOUNDING_DESC*>(pBoundingDesc));
 }
 
+
 void CCollider::Reset_Bounding()
 {
     m_pBounding->Reset_Bounding();
 }
-#endif // _DEBUG
-
-
-
-#pragma endregion
-
 
 
 #pragma region 5. 매프레임 업데이트 되는 함수

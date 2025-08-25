@@ -73,7 +73,7 @@ void CPlayer_IdleState::Change_State()
 	if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::SKILL_1))
 	{
 		// 스킬 쿨타임은 Register_CoolTime() 함수에서 설정.
-		if (!m_pFsm->Is_ExitCoolTimeEnd(CPlayer::SKILL_1))
+		if (!m_pFsm->Is_CoolTimeEnd(CPlayer::SKILL_1))
 			return;
 
 		m_iNextState = CPlayer::PLAYER_STATE::SKILL_1;
@@ -87,7 +87,7 @@ void CPlayer_IdleState::Change_State()
 	if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::SKILL_2))
 	{
 		// 스킬 쿨타임은 Register_CoolTime() 함수에서 설정.
-		if (!m_pFsm->Is_ExitCoolTimeEnd(CPlayer::SKILL_2))
+		if (!m_pFsm->Is_CoolTimeEnd(CPlayer::SKILL_2))
 			return;
 
 		m_iNextState = CPlayer::PLAYER_STATE::SKILL_2;

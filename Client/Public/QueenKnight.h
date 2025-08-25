@@ -60,6 +60,11 @@ public:
 	virtual void On_Collision_Exit(CGameObject* pOther);
 	virtual void Collider_All_Active(_bool bActive);
 
+
+public:
+	void WeaponOBB_ChangeExtents(_float3 vExtents);
+	_float3 Get_WeaponOBBExtents();
+
 #pragma endregion
 
 

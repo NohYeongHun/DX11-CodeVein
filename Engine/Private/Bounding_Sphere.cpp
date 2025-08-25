@@ -12,7 +12,7 @@ HRESULT CBounding_Sphere::Initialize(BOUNDING_DESC* pBoundingDesc)
 	BOUNDING_SPHERE_DESC* pDesc = static_cast<BOUNDING_SPHERE_DESC*>(pBoundingDesc);
 	
 #ifdef _DEBUG
-	m_DebugDesc = *pDesc;
+	m_OriginDesc = *pDesc;
 #endif // _DEBUG
 
 

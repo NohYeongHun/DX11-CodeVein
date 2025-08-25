@@ -30,9 +30,24 @@ BT_RESULT CBT_QueenKnight_DashAttackAction::Perform_Action(_float fTimeDelta)
 
 void CBT_QueenKnight_DashAttackAction::Reset()
 {
+    /* 콜라이더 원본 크기로 되돌리기. */
+    //if (m_IsColliderChange)
+    //{
+    //    CCollider* pColliderCom = dynamic_cast<CCollider*>(m_pOwner->Get_Component(L"Com_Collider"));
+    //    CBounding_OBB::BOUNDING_OBB_DESC Desc{};
+    //    Desc = *m_OriginDesc;
+    //    pColliderCom->Change_BoundingDesc(&Desc);
+    //    m_IsColliderChange = false;
+    //}
+
+    /* 원본 크기로 되돌리기. */
+    m_pOwner->WeaponOBB_ChangeExtents(m_pOwner->Get_WeaponOBBExtents());
+
     m_eAttackPhase = ATTACK_PHASE::NONE;
     m_pOwner->Reset_Collider_ActiveInfo();
     m_IsChangeSpeed = false;
+    
+
 }
 
 BT_RESULT CBT_QueenKnight_DashAttackAction::Enter_Attack(_float fTimeDelta)
@@ -52,10 +67,14 @@ BT_RESULT CBT_QueenKnight_DashAttackAction::Enter_Attack(_float fTimeDelta)
     // 1. 다음 단계로 진행
     m_eAttackPhase = ATTACK_PHASE::ROTATING;
 
+
     // 2. 버프 추가.
     m_pOwner->AddBuff(CQueenKnight::QUEEN_BUFF_DASH_ATTACK_COOLDOWN);
 
-
+    // 3. 크기 증가.
+    _float3 vExtents = m_pOwner->Get_WeaponOBBExtents();
+    m_pOwner->WeaponOBB_ChangeExtents({ 1.f, 1.f, vExtents.z });
+    
     return BT_RESULT::RUNNING;
 }
 
@@ -193,6 +212,9 @@ BT_RESULT CBT_QueenKnight_DashAttackAction::Update_LastAttack(_float fTimeDelta)
 
 BT_RESULT CBT_QueenKnight_DashAttackAction::Complete(_float fTimeDleta)
 {
+
+    m_pOwner->WeaponOBB_ChangeExtents(m_pOwner->Get_WeaponOBBExtents());
+
     return BT_RESULT::SUCCESS;
 }
 

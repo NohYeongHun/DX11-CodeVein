@@ -38,14 +38,12 @@ public:
 
 
 
-#ifdef _DEBUG
 public:
-	CBounding_OBB::BOUNDING_OBB_DESC* Get_DebugDesc() { return &m_DebugDesc; }
+	CBounding_OBB::BOUNDING_OBB_DESC* Get_OriginDesc() { return &m_OriginDesc; }
 
 private:
-	CBounding_OBB::BOUNDING_OBB_DESC m_DebugDesc = {};
+	CBounding_OBB::BOUNDING_OBB_DESC m_OriginDesc = {};
 
-#endif // DEBUG
 
 #pragma endregion
 

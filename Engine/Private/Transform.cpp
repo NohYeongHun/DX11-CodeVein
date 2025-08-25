@@ -108,13 +108,39 @@ void CTransform::Move_Direction(_vector vDir, _float fTimeDelta, CNavigation* pN
 	vPosition.y += XMVectorGetY(vMovement);
 	vPosition.z += XMVectorGetZ(vMovement);
 
-	if (nullptr == pNavigation ||
-		true == pNavigation->isMove(XMLoadFloat4(&vPosition)))
+	if (nullptr == pNavigation)
 	{
 		Set_State(STATE::POSITION, XMLoadFloat4(&vPosition));
 		m_bIsDirty = true;
 	}
-
+	else
+	{
+		_vector slideVector;
+		if (true == pNavigation->isMove(XMLoadFloat4(&vPosition), &slideVector))
+		{
+			// 정상 이동
+			Set_State(STATE::POSITION, XMLoadFloat4(&vPosition));
+			m_bIsDirty = true;
+		}
+		else
+		{
+			// 벽에 막혔을 때 슬라이딩 시도
+			_vector vCurrentPos = Get_State(STATE::POSITION);
+			
+			// 원래 이동량의 크기를 유지하면서 슬라이딩 방향으로 적용
+			_float fOriginalMoveLength = XMVectorGetX(XMVector3Length(vMovement));
+			_float fSlideStrength = 0.8f; // 슬라이딩 강도 (0.0~1.0)
+			_vector vSlideMovement = slideVector * (fOriginalMoveLength * fSlideStrength);
+			_vector vSlidePosition = vCurrentPos + vSlideMovement;
+			
+			if (true == pNavigation->isMove(vSlidePosition))
+			{
+				Set_State(STATE::POSITION, vSlidePosition);
+				m_bIsDirty = true;
+			}
+			// 슬라이딩도 안 되면 이동하지 않음
+		}
+	}
 }
 
 /* Navigation 버전 아님 */
@@ -137,11 +163,38 @@ void CTransform::Translate(_fvector vTranslate, CNavigation* pNavigation)
 	vPosition.y += XMVectorGetY(vTranslate);
 	vPosition.z += XMVectorGetZ(vTranslate);
 
-	if (nullptr == pNavigation ||
-		true == pNavigation->isMove(XMLoadFloat4(&vPosition)))
+	if (nullptr == pNavigation)
 	{
 		Set_State(STATE::POSITION, XMLoadFloat4(&vPosition));
 		m_bIsDirty = true;
+	}
+	else
+	{
+		_vector slideVector;
+		if (true == pNavigation->isMove(XMLoadFloat4(&vPosition), &slideVector))
+		{
+			// 정상 이동
+			Set_State(STATE::POSITION, XMLoadFloat4(&vPosition));
+			m_bIsDirty = true;
+		}
+		else
+		{
+			// 벽에 막혔을 때 슬라이딩 시도
+			_vector vCurrentPos = Get_State(STATE::POSITION);
+			
+			// 원래 이동량의 크기를 유지하면서 슬라이딩 방향으로 적용
+			_float fOriginalMoveLength = XMVectorGetX(XMVector3Length(vTranslate));
+			_float fSlideStrength = 0.8f; // 슬라이딩 강도 (0.0~1.0)
+			_vector vSlideMovement = slideVector * (fOriginalMoveLength * fSlideStrength);
+			_vector vSlidePosition = vCurrentPos + vSlideMovement;
+			
+			if (true == pNavigation->isMove(vSlidePosition))
+			{
+				Set_State(STATE::POSITION, vSlidePosition);
+				m_bIsDirty = true;
+			}
+			// 슬라이딩도 안 되면 이동하지 않음
+		}
 	}
 }
 

@@ -57,7 +57,7 @@ void CPlayer_SecondSkillState::Enter(void* pArg)
     SKILLEXECUTE_DESC Desc{};
     Desc.iSkillPanelIdx = CHUD::SKILLPANEL::SKILL_PANEL_TOP;
     Desc.iSlotIdx = 1;
-    Desc.fSkillCoolTime = 5.f;
+    Desc.fSkillCoolTime = m_pFsm->Get_StateCoolTime(CPlayer::SKILL_2);
     m_pGameInstance->Publish(EventType::SKILL_EXECUTE, &Desc);
 }
 

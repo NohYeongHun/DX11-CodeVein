@@ -68,14 +68,20 @@ public:
 public:
 	void* Get_BoundingDesc();
 
-public:
-	void Change_BoundingDesc(void* pBoundingDesc);
-	void Reset_Bounding();
+
+
 	
 #endif // _DEBUG
 
 public:
 	COLLIDER Get_ColliderShape() { return m_eColliderShape; }
+#pragma endregion
+
+
+#pragma region Collider 크기 변경
+public:
+	void Change_BoundingDesc(void* pBoundingDesc);
+	void Reset_Bounding();
 #pragma endregion
 
 

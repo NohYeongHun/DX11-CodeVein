@@ -194,41 +194,65 @@ _bool CSlash::World_To_Screen(_vector vWorldPos, _float& fScreenX, _float& fScre
 
 HRESULT CSlash::Bind_ShaderResources()
 {
-    // 타겟의 월드 위치 가져오기
-    _vector vTargetPos = m_pTarget->Get_Transform()->Get_State(STATE::POSITION);
-    vTargetPos = XMVectorSetY(vTargetPos, XMVectorGetY(vTargetPos) + m_fTargetRadius); // 조금 더 위로
-
-    // 카메라 위치 가져오기
-    _vector vCamPos = XMLoadFloat4(m_pGameInstance->Get_CamPosition());
-    _vector vLook = XMVector3Normalize(vTargetPos - vCamPos); // 방향 수정: 카메라에서 타겟으로
-    _vector vUp = XMVectorSet(0.f, 1.f, 0.f, 0.f);
-    _vector vRight = XMVector3Normalize(XMVector3Cross(vUp, vLook));
-    vUp = XMVector3Normalize(XMVector3Cross(vLook, vRight));
-
-//#ifdef _DEBUG
-//    ImGuiIO& io = ImGui::GetIO();
-//    ImVec2 windowPos = ImVec2(300.f, 0.f);
-//    ImVec2 windowSize = ImVec2(300.f, 300.f);
-//
-//    ImGui::SetNextWindowPos(windowPos, ImGuiCond_Once);
-//    ImGui::SetNextWindowSize(windowSize, ImGuiCond_Once);
-//
-//    ImGui::Begin("UI Debug", nullptr, ImGuiWindowFlags_NoCollapse);
-//
-//    static float vSize[3] = { 1.f, 0.2f, 0.1f};
-//    ImGui::InputFloat3("UI Size : ", vSize);
-//
-//    ImGui::End();
-//
-//#endif // _DEBUG
-
+    // 실제 렌더링 위치는 Set_Position으로 설정된 월드 좌표 사용
+    _vector vRenderPosition = m_vWorldPosition;
     
-    // 빌보드 행렬 구성 (스케일 + 회전 + 이동을 한번에)
+    // 만약 위치가 설정되지 않았다면 기존 방식 사용 (타겟 따라다니기)
+    if (XMVectorGetX(vRenderPosition) == 0.0f && XMVectorGetY(vRenderPosition) == 0.0f && XMVectorGetZ(vRenderPosition) == 0.0f)
+    {
+        vRenderPosition = m_pTarget->Get_Transform()->Get_State(STATE::POSITION);
+        vRenderPosition = XMVectorSetY(vRenderPosition, XMVectorGetY(vRenderPosition) + m_fTargetRadius);
+    }
+    else
+    {
+        // 충돌 지점에서 카메라 방향으로 약간 앞으로 이동 (콜라이더 표면에 딱 붙게)
+        _vector vCamPos = XMLoadFloat4(m_pGameInstance->Get_CamPosition());
+        _vector vCamDirection = XMVector3Normalize(vCamPos - vRenderPosition);
+        vRenderPosition = XMVectorAdd(vRenderPosition, XMVectorScale(vCamDirection, 0.1f)); // 0.1f만큼 카메라 쪽으로
+    }
+
+    // 처음 한 번만 빌보드 방향 계산 (카메라 + 공격 방향)
+    if (!m_bDirectionCalculated && !(XMVectorGetX(m_vWorldPosition) == 0.0f && XMVectorGetY(m_vWorldPosition) == 0.0f && XMVectorGetZ(m_vWorldPosition) == 0.0f))
+    {
+        // 카메라 위치 가져오기
+        _vector vCamPos = XMLoadFloat4(m_pGameInstance->Get_CamPosition());
+        _vector vLook = XMVector3Normalize(vRenderPosition - vCamPos);
+        _vector vUp = XMVectorSet(0.f, 1.f, 0.f, 0.f);
+        _vector vRight = XMVector3Normalize(XMVector3Cross(vUp, vLook));
+        vUp = XMVector3Normalize(XMVector3Cross(vLook, vRight));
+        
+        // 공격 방향에 따른 회전 각도 계산
+        _vector vAttackDir2D = XMVectorSetY(m_vAttackDirection, 0.0f); // Y축 제거
+        vAttackDir2D = XMVector3Normalize(vAttackDir2D);
+        
+        // 빌보드의 Right 벡터에 투영하여 회전 각도 계산
+        _float fRightComponent = XMVectorGetX(XMVector3Dot(vAttackDir2D, vRight));
+        _float fUpComponent = XMVectorGetX(XMVector3Dot(vAttackDir2D, vUp));
+        _float fRotationAngle = atan2f(fUpComponent, fRightComponent);
+        
+        // 회전 행렬 적용
+        _float fCos = cosf(fRotationAngle);
+        _float fSin = sinf(fRotationAngle);
+        
+        // 회전된 Right와 Up 벡터 계산하여 저장
+        m_vFixedRight = XMVectorAdd(XMVectorScale(vRight, fCos), XMVectorScale(vUp, -fSin));
+        m_vFixedUp = XMVectorAdd(XMVectorScale(vRight, fSin), XMVectorScale(vUp, fCos));
+        m_vFixedLook = vLook;
+        
+        m_bDirectionCalculated = true; // 계산 완료 표시
+    }
+
+    // 기본값 사용 (방향이 계산되지 않은 경우)
+    _vector vRight = m_vFixedRight;
+    _vector vUp = m_vFixedUp;  
+    _vector vLook = m_vFixedLook;
+
+    // 행렬 구성 (저장된 고정 방향 사용)
     _matrix matWorld;
-    matWorld.r[0] = XMVectorScale(vRight, 0.7f);
+    matWorld.r[0] = XMVectorScale(vRight, 1.4f);
     matWorld.r[1] = XMVectorScale(vUp, 0.2f);
     matWorld.r[2] = XMVectorScale(vLook, 0.1f);
-    matWorld.r[3] = XMVectorSetW(vTargetPos, 1.0f);
+    matWorld.r[3] = XMVectorSetW(vRenderPosition, 1.0f);
 
     _float4x4 g_matWorld;
     XMStoreFloat4x4(&g_matWorld, matWorld);

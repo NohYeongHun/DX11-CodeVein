@@ -12,9 +12,7 @@ HRESULT CBounding_OBB::Initialize(BOUNDING_DESC* pBoundingDesc)
 {
 	const BOUNDING_OBB_DESC* pDesc = static_cast<const BOUNDING_OBB_DESC*>(pBoundingDesc);
 
-#ifdef _DEBUG
-	m_DebugDesc = *pDesc;
-#endif // _DEBUG
+	m_OriginDesc = *pDesc;
 
 	_float4		vQuaternion = {};
 	XMStoreFloat4(&vQuaternion, XMQuaternionRotationRollPitchYaw(pDesc->vRotation.x, pDesc->vRotation.y, pDesc->vRotation.z));

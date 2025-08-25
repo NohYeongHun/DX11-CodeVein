@@ -15,17 +15,12 @@ private:
 	virtual ~CBounding_AABB() = default;
 
 
-#pragma region DEBUG 용도
-
-#ifdef _DEBUG
 public:
-	CBounding_AABB::BOUNDING_AABB_DESC* Get_DebugDesc() { return &m_DebugDesc; }
+	CBounding_AABB::BOUNDING_AABB_DESC* Get_OriginDesc() { return &m_OriginDesc; }
 
 private:
-	CBounding_AABB::BOUNDING_AABB_DESC m_DebugDesc = {};
-#endif // DEBUG
-	
-#pragma endregion
+	CBounding_AABB::BOUNDING_AABB_DESC m_OriginDesc = {};
+
 public:
 	virtual void Change_BoundingDesc(BOUNDING_DESC* pBoundingDesc) override;
 	virtual void Reset_Bounding() override;

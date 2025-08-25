@@ -77,7 +77,7 @@ HRESULT CKnightLance::Render()
 {
 
 #ifdef _DEBUG
-    //Edit_Collider(m_pColliderCom, "QueenKnight Lance");
+    Edit_Collider(m_pColliderCom, "QueenKnight Lance");
     m_pColliderCom->Render();
 #endif // _DEBUG
 
@@ -117,6 +117,16 @@ void CKnightLance::On_Collision_Exit(CGameObject* pOther)
 {
 }
 
+void CKnightLance::OBBCollider_ChangeExtents(_float3 vExtents)
+{
+    CBounding_OBB::BOUNDING_OBB_DESC* pDesc = static_cast<CBounding_OBB::BOUNDING_OBB_DESC*>(m_pColliderCom->Get_BoundingDesc());
+
+    CBounding_OBB::BOUNDING_OBB_DESC Desc{};
+    Desc = *pDesc;
+    Desc.vExtents = vExtents;
+    m_pColliderCom->Change_BoundingDesc(&Desc);
+}
+
 HRESULT CKnightLance::Ready_Components()
 {
     if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxMesh"),
@@ -141,6 +151,8 @@ HRESULT CKnightLance::Ready_Colliders()
     OBBDesc.vExtents = _float3(box.vExtents.x * 3.f, box.vExtents.y, box.vExtents.z);
     OBBDesc.vCenter = _float3(0.f, -box.vExtents.y, 0.f); // 중점.
 
+    // 원본 Extents 저장.
+    m_vOriginExtents = OBBDesc.vExtents;
 
     OBBDesc.vRotation = _float3(
         XMConvertToRadians(-95.f),  // Pitch: 아래쪽으로 기울어짐

@@ -29,7 +29,7 @@ HRESULT CPlayer_FirstSkillState::Initialize(_uint iStateNum, void* pArg)
 
     // 5. 왼쪽 위부터 중간 아래로 베기.
     Add_Collider_Info(m_pPlayer->Find_AnimationIndex(TEXT("CIRCULATE_PURGE"))
-        , COLLIDER_ACTIVE_INFO{ 0.f / 232.f, 232.f / 232.f, false, CPlayer::PART_BODY, 5 });
+        , COLLIDER_ACTIVE_INFO{ 0.f / 232.f, 200.f / 232.f, false, CPlayer::PART_BODY, 5 });
 
 	m_fIncreaseDamage = 10.f; // 기본 공격력 증가량 설정
 
@@ -40,6 +40,8 @@ void CPlayer_FirstSkillState::Enter(void* pArg)
 {
     FIRSTSKILL_ENTER_DESC* pDesc = static_cast<FIRSTSKILL_ENTER_DESC*>(pArg);
     CPlayerState::Enter(pDesc); // 기본 쿨타임 설정.
+
+    m_pModelCom->Set_RootMotionTranslate(true);
 
     m_isLoop = false;
 
@@ -68,7 +70,7 @@ void CPlayer_FirstSkillState::Enter(void* pArg)
     SKILLEXECUTE_DESC Desc{};
     Desc.iSkillPanelIdx = CHUD::SKILLPANEL::SKILL_PANEL_TOP;
     Desc.iSlotIdx = 0;
-    Desc.fSkillCoolTime = 5.f;
+    Desc.fSkillCoolTime = m_pFsm->Get_StateCoolTime(CPlayer::SKILL_1);
     m_pGameInstance->Publish(EventType::SKILL_EXECUTE, &Desc);
 
     
@@ -104,24 +106,24 @@ void CPlayer_FirstSkillState::Exit()
     
 
     // 락온 중이고 타겟과 너무 가까이 있다면 안전한 거리로 이동
-    if (m_pPlayer->Is_LockOn() && m_pPlayer->Has_LockOn_Target())
-    {
-        _vector vPlayerPos = m_pPlayer->Get_Transform()->Get_State(STATE::POSITION);
-        _vector vTargetPos = m_pPlayer->Get_LockOn_Target()->Get_Transform()->Get_State(STATE::POSITION);
-        
-        _float fDistance = XMVectorGetX(XMVector3Length(vTargetPos - vPlayerPos));
-        _float fMinSafeDistance = 2.0f; // 최소 안전 거리
-        
-        if (fDistance < fMinSafeDistance)
-        {
-            // 타겟 반대 방향으로 안전 거리만큼 이동
-            _vector vDirection = XMVector3Normalize(vPlayerPos - vTargetPos);
-            _vector vSafePos = vTargetPos + vDirection * fMinSafeDistance;
-            vSafePos = XMVectorSetY(vSafePos, XMVectorGetY(vPlayerPos)); // Y축 유지
-            
-            m_pPlayer->Get_Transform()->Set_State(STATE::POSITION, vSafePos);
-        }
-    }
+    //if (m_pPlayer->Is_LockOn() && m_pPlayer->Has_LockOn_Target())
+    //{
+    //    _vector vPlayerPos = m_pPlayer->Get_Transform()->Get_State(STATE::POSITION);
+    //    _vector vTargetPos = m_pPlayer->Get_LockOn_Target()->Get_Transform()->Get_State(STATE::POSITION);
+    //    
+    //    _float fDistance = XMVectorGetX(XMVector3Length(vTargetPos - vPlayerPos));
+    //    _float fMinSafeDistance = 2.0f; // 최소 안전 거리
+    //    
+    //    if (fDistance < fMinSafeDistance)
+    //    {
+    //        // 타겟 반대 방향으로 안전 거리만큼 이동
+    //        _vector vDirection = XMVector3Normalize(vPlayerPos - vTargetPos);
+    //        _vector vSafePos = vTargetPos + vDirection * fMinSafeDistance;
+    //        vSafePos = XMVectorSetY(vSafePos, XMVectorGetY(vPlayerPos)); // Y축 유지
+    //        
+    //        m_pPlayer->Get_Transform()->Set_State(STATE::POSITION, vSafePos);
+    //    }
+    //}
 }
 
 void CPlayer_FirstSkillState::Reset()

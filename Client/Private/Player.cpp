@@ -856,8 +856,22 @@ void CPlayer::On_Collision_Enter(CGameObject* pOther)
             // 몬스터 위치를 기반으로 피격 방향 계산 및 DamageState 전환
             Take_Damage(pWeapon->Get_AttackPower(), pMonster);
         }
+    }
 
-      
+    CMonster* pMonster = dynamic_cast<CMonster*>(pOther);
+    if (nullptr != pMonster)
+    {
+        if (m_pFsmCom->Get_CurrentState() == CPlayer::SKILL_2)
+        {
+            m_pModelCom->Set_RootMotionTranslate(false);
+            return;
+        }
+
+        if (m_pFsmCom->Get_CurrentState() == CPlayer::SKILL_1)
+        {
+            m_pModelCom->Set_RootMotionTranslate(false);
+            return;
+        }
     }
 }
 
@@ -1221,8 +1235,8 @@ void CPlayer::Register_CoolTime()
     m_pFsmCom->Register_StateCoolTime(PLAYER_STATE::STRONG_ATTACK, 1.5f);
     m_pFsmCom->Register_StateCoolTime(PLAYER_STATE::ATTACK, 1.f);
     m_pFsmCom->Register_StateCoolTime(PLAYER_STATE::GUARD, 0.5f);
-    m_pFsmCom->Register_StateCoolTime(PLAYER_STATE::SKILL_1, 5.f);
-    m_pFsmCom->Register_StateCoolTime(PLAYER_STATE::SKILL_2, 5.f);
+    m_pFsmCom->Register_StateCoolTime(PLAYER_STATE::SKILL_1, 10.f);
+    m_pFsmCom->Register_StateCoolTime(PLAYER_STATE::SKILL_2, 10.f);
 
 
     m_pFsmCom->Register_StateExitCoolTime(PLAYER_STATE::IDLE, 0.f);
@@ -1230,7 +1244,9 @@ void CPlayer::Register_CoolTime()
     m_pFsmCom->Register_StateExitCoolTime(PLAYER_STATE::RUN, 0.f);
     m_pFsmCom->Register_StateExitCoolTime(PLAYER_STATE::DODGE, 0.7f);
 
+    m_pFsmCom->Register_StateExitCoolTime(PLAYER_STATE::SKILL_1, 4.f);
     m_pFsmCom->Register_StateExitCoolTime(PLAYER_STATE::SKILL_2, 4.f);
+    //m_pFsmCom->Register_StateExitCoolTime(PLAYER_STATE::SKILL_2, 4.f);
 
     // 총 재생 시간.
     _float fCalcDuration = m_pModelCom->Get_AnimationDuration(m_Action_AnimMap[TEXT("STRONG_ATTACK1")]) /

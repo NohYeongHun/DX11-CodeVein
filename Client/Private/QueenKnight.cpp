@@ -170,7 +170,7 @@ HRESULT CQueenKnight::Render()
     // 기존 Player Debug Window
 
     ImVec2 windowSize = ImVec2(300.f, 300.f);
-    ImVec2 windowPos = ImVec2(io.DisplaySize.x - windowSize.x, windowSize.y);
+    ImVec2 windowPos = ImVec2(windowSize.x, 0.f);
     ImGui::SetNextWindowPos(windowPos, ImGuiCond_Once);
     ImGui::SetNextWindowSize(windowSize, ImGuiCond_Once);
 
@@ -190,7 +190,10 @@ HRESULT CQueenKnight::Render()
     ImGui::Text("Target Distance : (%.2f)", fDistance);
 
     ImGui::End();
+
+   
      m_pColliderCom->Render();
+
 #endif // _DEBUG
 
     if (FAILED(Ready_Render_Resources()))
@@ -272,6 +275,14 @@ void CQueenKnight::Collider_All_Active(_bool bActive)
         m_pWeapon->Deactivate_Collider();
         m_pShield->Deactivate_Collider();
     }
+}
+void CQueenKnight::WeaponOBB_ChangeExtents(_float3 vExtents)
+{
+    m_pWeapon->OBBCollider_ChangeExtents(vExtents);
+}
+_float3 CQueenKnight::Get_WeaponOBBExtents()
+{
+     return m_pWeapon->Get_OriginExtents();
 }
 #pragma endregion
 

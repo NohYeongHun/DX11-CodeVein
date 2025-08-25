@@ -191,7 +191,7 @@ void CSlaveVampire::On_Collision_Enter(CGameObject* pOther)
         if (!HasBuff(BUFF_INVINCIBLE))
         {
             // 1. 데미지를 입고.
-            Take_Damage(pPlayerWeapon->Get_AttackPower());
+            Take_Damage(pPlayerWeapon->Get_AttackPower(), pPlayerWeapon);
 
             // 2. 해당 위치에 검흔 Effect 생성?
 
@@ -371,8 +371,8 @@ HRESULT CSlaveVampire::Ready_Components(SLAVE_VAMPIRE_DSEC* pDesc)
     CBounding_Sphere::BOUNDING_SPHERE_DESC SphereDesc{};
     //SphereDesc.fRadius = max(max(box.vExtents.x, box.vExtents.y), box.vExtents.z);
     //SphereDesc.vCenter = _float3(0.f, box.vExtents.y, 0.f); // 중점.
-    SphereDesc.fRadius = 0.7f;
-    SphereDesc.vCenter = _float3(0.f, 0.7f, 0.f); // 중점.
+    SphereDesc.fRadius = 1.f;
+    SphereDesc.vCenter = _float3(0.f, 1.2f, 0.f); // 중점.
     SphereDesc.pOwner = this;
     SphereDesc.eCollisionType = CCollider::COLLISION_BODY;
     SphereDesc.eMyLayer = CCollider::MONSTER;

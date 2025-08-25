@@ -225,6 +225,21 @@ PS_OUT PS_MAIN9(PS_IN In)
     return Out;
 }
 
+PS_OUT PS_MAIN10(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+    // 텍스처 없이 검정색 오버레이만 생성
+    float2 uv = In.vTexcoord;
+    float4 baseColor = g_Texture.Sample(DefaultSampler, uv);
+    
+    Out.vColor = baseColor;
+    
+    
+
+    return Out;
+}
+
 
 technique11 DefaultTechnique
 {
@@ -308,6 +323,15 @@ technique11 DefaultTechnique
         SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
         VertexShader = compile vs_5_0 VS_MAIN();
         PixelShader = compile ps_5_0 PS_MAIN9();
+    }
+    
+    pass MonsterHitPass
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        VertexShader = compile vs_5_0 VS_MAIN();
+        PixelShader = compile ps_5_0 PS_MAIN10();
     }
 
 

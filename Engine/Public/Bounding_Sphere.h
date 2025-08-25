@@ -27,14 +27,12 @@ public:
 
 	virtual const _float3 Get_WorldCenter() override;
 
-#ifdef _DEBUG
 public:
-	CBounding_Sphere::BOUNDING_SPHERE_DESC* Get_DebugDesc() { return &m_DebugDesc; }
+	CBounding_Sphere::BOUNDING_SPHERE_DESC* Get_OriginDesc() { return &m_OriginDesc; }
 
 private:
-	CBounding_Sphere::BOUNDING_SPHERE_DESC m_DebugDesc = {};
+	CBounding_Sphere::BOUNDING_SPHERE_DESC m_OriginDesc = {};
 
-#endif // DEBUG
 
 
 public:

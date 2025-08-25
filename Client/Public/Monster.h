@@ -362,6 +362,7 @@ protected:
     HRESULT Initialize_SlashUI();
     void Show_Slash_UI();
     void Show_Slash_UI(_float fRotationAngle);
+    void Show_Slash_UI_At_Position(_fvector vPosition, _fvector vAttackDirection);
 #pragma endregion
 
 #pragma region DEBUG 용도

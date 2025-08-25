@@ -48,6 +48,11 @@ public:
 	// 충돌하면 안되는 객체들?
 private:
 
+
+	/* Weapon의 최종 행렬 가져오기. */
+public:
+	const _float4x4* Get_CombinedWorldMatrix() { return &m_CombinedWorldMatrix; }
+
 #pragma endregion
 
 

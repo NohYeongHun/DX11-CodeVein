@@ -51,6 +51,25 @@ public:
     }
     _bool Is_Active() const { return m_bActive; }
 
+    // 위치 설정
+    void Set_Position(_fvector vPosition) { 
+        m_vWorldPosition = vPosition; 
+        m_bDirectionCalculated = false; // 위치 변경 시 방향 재계산 필요
+    }
+    
+    // 로컬 위치 설정 (몬스터 기준)
+    void Set_Local_Position(_fvector vLocalPosition) { 
+        m_vLocalPosition = vLocalPosition; 
+        m_bUseLocalPosition = true; 
+    }
+    
+    // 공격 방향 설정 (회전 계산용)
+    void Set_Attack_Direction(_fvector vDirection) { m_vAttackDirection = vDirection; }
+    
+    // 타이머 리셋
+    void Reset_Timer() { m_fCurrentTime = 0.0f; m_fAnimationTime = 0.0f; }
+
+
 private:
     // 월드 좌표를 스크린 좌표로 변환
     _bool World_To_Screen(_vector vWorldPos, _float& fScreenX, _float& fScreenY);
@@ -87,6 +106,19 @@ private:
     
     // 회전 정보
     _float m_fRotationAngle = 0.0f; // Z축 회전 각도 (라디안)
+    
+    // 위치 정보
+    _vector m_vWorldPosition = XMVectorSet(0.f, 0.f, 0.f, 1.f); // 월드 좌표
+    _vector m_vLocalPosition = XMVectorSet(0.f, 0.f, 0.f, 1.f); // 몬스터 기준 로컬 좌표
+    _vector m_vAttackDirection = XMVectorSet(0.f, 0.f, 1.f, 0.f); // 월드 좌표
+    _bool m_bUseLocalPosition = false; // 로컬 좌표 사용 여부
+    
+    // 고정된 빌보드 방향 (처음 설정될 때만 계산)
+    _vector m_vFixedRight = XMVectorSet(1.f, 0.f, 0.f, 0.f);
+    _vector m_vFixedUp = XMVectorSet(0.f, 1.f, 0.f, 0.f);
+    _vector m_vFixedLook = XMVectorSet(0.f, 0.f, 1.f, 0.f);
+    _bool m_bDirectionCalculated = false; // 방향이 계산되었는지 여부
+    
 
 private:
     HRESULT Bind_ShaderResources();
