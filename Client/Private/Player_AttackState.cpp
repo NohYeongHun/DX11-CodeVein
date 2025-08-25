@@ -7,19 +7,34 @@ CPlayer_AttackState::CPlayer_AttackState()
 HRESULT CPlayer_AttackState::Initialize(_uint iStateNum, void* pArg)
 {
 	if (FAILED(CPlayerState::Initialize(iStateNum, pArg)))
+	{
+		CRASH("Failed Initialize Attack State");
 		return E_FAIL;
-
+	}
+		
 	Add_Collider_Info(m_pPlayer->Find_AnimationIndex(TEXT("ATTACK1"))
-		, COLLIDER_ACTIVE_INFO{ 0.f, 0.3f, false, 0});
+		, COLLIDER_ACTIVE_INFO{ 10.f / 133.f, 40.f / 133.f, true, CPlayer::PART_WEAPON, 0 });
 
 	Add_Collider_Info(m_pPlayer->Find_AnimationIndex(TEXT("ATTACK2"))
-		, COLLIDER_ACTIVE_INFO{ 0.f, 0.28f, false, 0 });
+		, COLLIDER_ACTIVE_INFO{ 10.f / 140.f, 40.f / 140.f, true, CPlayer::PART_WEAPON, 0 });
 
 	Add_Collider_Info(m_pPlayer->Find_AnimationIndex(TEXT("ATTACK3"))
-		, COLLIDER_ACTIVE_INFO{ 0.f, 0.25f, false, 0 });
+		, COLLIDER_ACTIVE_INFO{ 10.f / 158.f, 40.f / 158.f, true, CPlayer::PART_WEAPON, 0 });
 
 	Add_Collider_Info(m_pPlayer->Find_AnimationIndex(TEXT("ATTACK4"))
-		, COLLIDER_ACTIVE_INFO{ 0.f, 0.27f, false, 0 });
+		, COLLIDER_ACTIVE_INFO{ 10.f / 148.f, 40.f / 148.f, true, CPlayer::PART_WEAPON, 0 });
+
+	//Add_Collider_Info(m_pPlayer->Find_AnimationIndex(TEXT("ATTACK1"))
+	//	, COLLIDER_ACTIVE_INFO{ 0.f, 0.3f, false, 0});
+	//
+	//Add_Collider_Info(m_pPlayer->Find_AnimationIndex(TEXT("ATTACK2"))
+	//	, COLLIDER_ACTIVE_INFO{ 0.f, 0.28f, false, 0 });
+	//
+	//Add_Collider_Info(m_pPlayer->Find_AnimationIndex(TEXT("ATTACK3"))
+	//	, COLLIDER_ACTIVE_INFO{ 0.f, 0.25f, false, 0 });
+	//
+	//Add_Collider_Info(m_pPlayer->Find_AnimationIndex(TEXT("ATTACK4"))
+	//	, COLLIDER_ACTIVE_INFO{ 0.f, 0.27f, false, 0 });
 	
 
 	return S_OK;

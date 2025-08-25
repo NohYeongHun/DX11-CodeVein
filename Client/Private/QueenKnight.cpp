@@ -97,7 +97,9 @@ HRESULT CQueenKnight::Initialize_Clone(void* pArg)
     /* 현재 Object Manager에 담기 전에는 모든 Collider를 충돌 비교 하지 않습니다. */
     Collider_All_Active(false);
 
+    
 	m_pModelCom->Set_Animation(m_Action_AnimMap[TEXT("IDLE")], true); // 초기 애니메이션은 IDLE로 설정.
+    m_pModelCom->Set_Animation(m_Action_AnimMap[TEXT("RUN")], true);
 
     return S_OK;
 }

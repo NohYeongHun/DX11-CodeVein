@@ -96,7 +96,7 @@ HRESULT CPlayerWeapon::Render()
     static _int iColliderEnableCount = 0;
 
 
-    if (IsActive != bPrevState)
+    if (IsActive != bPrevState && IsActive)
         iColliderEnableCount++;
 
     if (IsActive)

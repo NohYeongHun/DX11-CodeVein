@@ -843,7 +843,11 @@ void CPlayer::On_Collision_Enter(CGameObject* pOther)
     if (nullptr != pWeapon)
     {
         if (HasBuff(BUFF_INVINCIBLE))
+        {
+            OutputDebugWstring(TEXT("Buff Has Invincible"));
             return;
+        }
+            
 
         // 무기의 소유자(몬스터) 가져오기
         CMonster* pMonster = dynamic_cast<CMonster*>(pWeapon->Get_Owner());

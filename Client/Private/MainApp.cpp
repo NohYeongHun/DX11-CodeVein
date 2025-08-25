@@ -157,7 +157,11 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 
 
 	if (FAILED(Ready_Prototype_ForUsageTexture()))
+	{
+		CRASH("Failed Load Usage Texture");
 		return E_FAIL;
+	}
+		
 	
 	/* Model Load */
 	if (FAILED(Ready_Prototype_ForPlayer()))
@@ -206,6 +210,15 @@ HRESULT CMainApp::Ready_Prototype_ForUsageTexture()
 		, TEXT("Prototype_Component_Texture_BossHPBar")
 		, CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Monster/QueenKnight/HPBar%d.png"), 1))))
 		return E_FAIL;
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
+		, TEXT("Prototype_Component_Texture_SlashEffectUI")
+		, CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/User/Slash/Slash%d.png"), 1))))
+	{
+		CRASH("Failed Load SlashEffect Texture");
+		return E_FAIL;
+	}
+		
 
 	return S_OK;
 }

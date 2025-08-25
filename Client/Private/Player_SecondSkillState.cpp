@@ -9,10 +9,10 @@ HRESULT CPlayer_SecondSkillState::Initialize(_uint iStateNum, void* pArg)
 
     /* Active와 동시에 Collider ActiveMap에 넣어둡니다. */
     Add_Collider_Info(m_pPlayer->Find_AnimationIndex(TEXT("DRAGON_LUNGE"))
-        , COLLIDER_ACTIVE_INFO{ 70.f / 289.f, 140.f / 289.f, false, 0 });
+        , COLLIDER_ACTIVE_INFO{ 70.f / 289.f, 140.f / 289.f,true, CPlayer::PART_WEAPON, 0 });
 
-    Add_Collider_Info(m_pPlayer->Find_AnimationIndex(TEXT("DRAGON_LUNGE"))
-        , COLLIDER_ACTIVE_INFO{ 0.f / 289.f, 260.f / 289.f, false, 1, CPlayer::PART_BODY, true });
+    //Add_Collider_Info(m_pPlayer->Find_AnimationIndex(TEXT("DRAGON_LUNGE"))
+    //    , COLLIDER_ACTIVE_INFO{ 0.f / 289.f, 260.f / 289.f, false, CPlayer::PART_BODY, 1 });
 
 	m_fIncreaseDamage = 70.f; // 기본 공격력 증가량 설정
 
@@ -21,7 +21,7 @@ HRESULT CPlayer_SecondSkillState::Initialize(_uint iStateNum, void* pArg)
 
 void CPlayer_SecondSkillState::Enter(void* pArg)
 {
-
+    m_pPlayer->AddBuff(CPlayer::BUFF_INVINCIBLE, 20.f);
     m_pPlayer->Increase_Damage(m_fIncreaseDamage);
 
     SECONDSKILL_ENTER_DESC* pDesc = static_cast<SECONDSKILL_ENTER_DESC*>(pArg);
@@ -63,6 +63,7 @@ void CPlayer_SecondSkillState::Enter(void* pArg)
 
 void CPlayer_SecondSkillState::Update(_float fTimeDelta)
 {
+    
     Handle_Input();
     Handle_Unified_Direction_Input(fTimeDelta);
     Change_State();
@@ -71,6 +72,7 @@ void CPlayer_SecondSkillState::Update(_float fTimeDelta)
 
 void CPlayer_SecondSkillState::Exit()
 {
+    m_pPlayer->RemoveBuff(CPlayer::BUFF_INVINCIBLE, true);
     // 무기 콜라이더 강제 비활성화
     Force_Disable_All_Colliders();
     if (m_iNextState != -1) // NextIndex가 있는경우 블렌딩 시작.

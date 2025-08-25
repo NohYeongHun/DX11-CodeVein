@@ -7,22 +7,31 @@ HRESULT CPlayer_FirstSkillState::Initialize(_uint iStateNum, void* pArg)
     if (FAILED(CPlayerState::Initialize(iStateNum, pArg)))
         return E_FAIL;
 
+    // 1. 앞찌르기
     Add_Collider_Info(m_pPlayer->Find_AnimationIndex(TEXT("CIRCULATE_PURGE"))
-        , COLLIDER_ACTIVE_INFO{ 30.f / 232.f, 40.f / 232.f, false, 0 });
+        , COLLIDER_ACTIVE_INFO{ 30.f / 232.f, 40.f / 232.f, true, CPlayer::PART_WEAPON, 0 });
 
+    // 2. 베기
     Add_Collider_Info(m_pPlayer->Find_AnimationIndex(TEXT("CIRCULATE_PURGE"))
-        , COLLIDER_ACTIVE_INFO{ 50.f / 232.f, 60.f / 232.f, false, 1 });
+        , COLLIDER_ACTIVE_INFO{ 50.f / 232.f, 60.f / 232.f, true, CPlayer::PART_WEAPON, 1 });
 
+    // 3. 왼쪽 아래부터 오른쪽 위로 베기
     Add_Collider_Info(m_pPlayer->Find_AnimationIndex(TEXT("CIRCULATE_PURGE"))
-        , COLLIDER_ACTIVE_INFO{ 65.f / 232.f, 75.f / 232.f, false, 2 });
+        , COLLIDER_ACTIVE_INFO{ 65.f / 232.f, 75.f / 232.f, true, CPlayer::PART_WEAPON, 2 });
 
+    // 4. 왼쪽 위부터 오른쪽 아래로 베기
     Add_Collider_Info(m_pPlayer->Find_AnimationIndex(TEXT("CIRCULATE_PURGE"))
-        , COLLIDER_ACTIVE_INFO{ 110.f / 232.f, 120.f / 232.f, false, 3 });
+        , COLLIDER_ACTIVE_INFO{ 90.f / 232.f, 100.f / 232.f, true, CPlayer::PART_WEAPON, 3 });
 
+    // 5. 왼쪽 위부터 중간 아래로 베기.
     Add_Collider_Info(m_pPlayer->Find_AnimationIndex(TEXT("CIRCULATE_PURGE"))
-        , COLLIDER_ACTIVE_INFO{ 0.f / 232.f, 230.f / 232.f, false, 1, CPlayer::PART_BODY, true });
+        , COLLIDER_ACTIVE_INFO{ 110.f / 232.f, 120.f / 232.f, true, CPlayer::PART_WEAPON, 4 });
 
-	m_fIncreaseDamage = 50.f; // 기본 공격력 증가량 설정
+    // 5. 왼쪽 위부터 중간 아래로 베기.
+    Add_Collider_Info(m_pPlayer->Find_AnimationIndex(TEXT("CIRCULATE_PURGE"))
+        , COLLIDER_ACTIVE_INFO{ 0.f / 232.f, 232.f / 232.f, false, CPlayer::PART_BODY, 5 });
+
+	m_fIncreaseDamage = 10.f; // 기본 공격력 증가량 설정
 
     return S_OK;
 }
@@ -97,6 +106,26 @@ void CPlayer_FirstSkillState::Exit()
 
     // 다시 감소.
     m_pPlayer->Decrease_Damage(m_fIncreaseDamage);
+
+    // 락온 중이고 타겟과 너무 가까이 있다면 안전한 거리로 이동
+    if (m_pPlayer->Is_LockOn() && m_pPlayer->Has_LockOn_Target())
+    {
+        _vector vPlayerPos = m_pPlayer->Get_Transform()->Get_State(STATE::POSITION);
+        _vector vTargetPos = m_pPlayer->Get_LockOn_Target()->Get_Transform()->Get_State(STATE::POSITION);
+        
+        _float fDistance = XMVectorGetX(XMVector3Length(vTargetPos - vPlayerPos));
+        _float fMinSafeDistance = 2.0f; // 최소 안전 거리
+        
+        if (fDistance < fMinSafeDistance)
+        {
+            // 타겟 반대 방향으로 안전 거리만큼 이동
+            _vector vDirection = XMVector3Normalize(vPlayerPos - vTargetPos);
+            _vector vSafePos = vTargetPos + vDirection * fMinSafeDistance;
+            vSafePos = XMVectorSetY(vSafePos, XMVectorGetY(vPlayerPos)); // Y축 유지
+            
+            m_pPlayer->Get_Transform()->Set_State(STATE::POSITION, vSafePos);
+        }
+    }
 }
 
 void CPlayer_FirstSkillState::Reset()
