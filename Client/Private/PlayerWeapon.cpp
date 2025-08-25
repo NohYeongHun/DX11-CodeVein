@@ -113,6 +113,8 @@ HRESULT CPlayerWeapon::Render()
     
     ImGui::Text("Collider Enable Count (%d)", iColliderEnableCount);
 
+    ImGui::Text("Player Weapon Damage (%.2f)", m_fAttackPower);
+
     ImGui::End();
 
     m_pColliderCom->Render();

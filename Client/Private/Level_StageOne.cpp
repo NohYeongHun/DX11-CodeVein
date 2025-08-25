@@ -1,5 +1,4 @@
-﻿#include "Level_StageOne.h"
-CLevel_StageOne::CLevel_StageOne(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿CLevel_StageOne::CLevel_StageOne(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel{ pDevice, pContext }
 {
 }
@@ -158,9 +157,9 @@ HRESULT CLevel_StageOne::Ready_Layer_Player(const _wstring& strLayerTag)
 	CPlayer::PLAYER_DESC Desc{};
 #pragma region 1. 플레이어에게 넣어줘야할 레벨 별 다른 값들.
 	Desc.eCurLevel = m_eCurLevel;
-	Desc.vPos = { 183.f, 21.f, -24.f };
+	//Desc.vPos = { 183.f, 21.f, -24.f };
 	//Desc.vPos = { 200.f, 13.f, 9.f };
-	//Desc.vPos = { 0.f, 0.f, 0.f };
+	Desc.vPos = { 0.f, 0.f, 0.f };
 #pragma endregion
 
 #pragma region 2. 게임에서 계속 들고있어야할 플레이어 값들.
@@ -291,7 +290,7 @@ HRESULT CLevel_StageOne::Ready_Layer_Monster(const _wstring& strLayerTag)
 	/*TriggerDesc = { { 250.f , 0.f, 0.f }, 200.f , TEXT("Layer_WolfDevil")
 		, TEXT("Layer_Monster") , 2, 0 };*/
 
-	//m_pGameInstance->Add_Trigger(ENUM_CLASS(m_eCurLevel), TriggerDesc);
+	m_pGameInstance->Add_Trigger(ENUM_CLASS(m_eCurLevel), TriggerDesc);
 
 	if (FAILED(Ready_Layer_GiantWhiteDevil(strLayerTag)))
 	{

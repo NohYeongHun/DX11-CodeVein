@@ -266,6 +266,7 @@
     <ClInclude Include="..\Public\SkillUI_Icon.h" />
     <ClInclude Include="..\Public\SkillUI_Panel.h" />
     <ClInclude Include="..\Public\SkillUI_Slot.h" />
+    <ClInclude Include="..\Public\Slash.h" />
     <ClInclude Include="..\Public\SlaveVampire.h" />
     <ClInclude Include="..\Public\SlaveVampireDefine.h" />
     <ClInclude Include="..\Public\SlaveVampireSword.h" />
@@ -394,6 +395,7 @@
     <ClCompile Include="..\Private\SkillUI_Icon.cpp" />
     <ClCompile Include="..\Private\SkillUI_Panel.cpp" />
     <ClCompile Include="..\Private\SkillUI_Slot.cpp" />
+    <ClCompile Include="..\Private\Slash.cpp" />
     <ClCompile Include="..\Private\SlaveVampire.cpp" />
     <ClCompile Include="..\Private\SlaveVampireSword.cpp" />
     <ClCompile Include="..\Private\SteminaBar.cpp" />

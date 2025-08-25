@@ -29,6 +29,7 @@ public:
 #pragma endregion
 
 
+
 #pragma region 1. 무기는 충돌에 대한 상태제어를 할 수 있어야한다.=> 충돌에 따라 상태가 변하기도, 수치값이 바뀌기도한다.
 public:
 	virtual void On_Collision_Enter(CGameObject* pOther);

@@ -51,6 +51,7 @@
 #include "StatusPanel.h"
 #include "LockOnUI.h"
 
+#include "Slash.h"
 
 /* ======================================= Inventory =================================== */
 #include "Inventory.h"

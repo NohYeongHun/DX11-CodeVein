@@ -27,6 +27,7 @@ public:
 
 public:
 	_bool isMove(_fvector vPosition);
+	_bool isMove(_fvector vPosition, _vector* pSlideVector); // 슬라이딩 벡터 포함 버전
 
 	
 	_vector Compute_OnCell(_fvector vPosition);

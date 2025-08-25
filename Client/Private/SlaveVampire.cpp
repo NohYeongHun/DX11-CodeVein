@@ -175,9 +175,6 @@ HRESULT CSlaveVampire::Render()
     }
     return S_OK;
 }
-
-
-
 #pragma endregion
 
 

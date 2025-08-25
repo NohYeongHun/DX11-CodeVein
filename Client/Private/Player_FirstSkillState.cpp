@@ -38,9 +38,6 @@ HRESULT CPlayer_FirstSkillState::Initialize(_uint iStateNum, void* pArg)
 
 void CPlayer_FirstSkillState::Enter(void* pArg)
 {
-    /* 공격력 증가. */
-    m_pPlayer->Increase_Damage(m_fIncreaseDamage);
-
     FIRSTSKILL_ENTER_DESC* pDesc = static_cast<FIRSTSKILL_ENTER_DESC*>(pArg);
     CPlayerState::Enter(pDesc); // 기본 쿨타임 설정.
 
@@ -50,9 +47,6 @@ void CPlayer_FirstSkillState::Enter(void* pArg)
     m_iCurAnimIdx = pDesc->iAnimation_Idx;
     m_eDir = pDesc->eDirection;
     m_pModelCom->Set_Animation(m_iCurAnimIdx, m_isLoop);
-
-    m_pModelCom->Set_RootMotionRotation(true);
-    m_pModelCom->Set_RootMotionTranslate(true);
 
     // 락온 중이면 타겟을 향해 즉시 회전
     if (m_pPlayer->Is_LockOn() && m_pPlayer->Has_LockOn_Target())
@@ -86,7 +80,7 @@ void CPlayer_FirstSkillState::Update(_float fTimeDelta)
 {
     if (m_pPlayer->Is_LockOn() && m_pPlayer->Has_LockOn_Target())
     {
-        m_pPlayer->Rotate_To_LockOn_Target(fTimeDelta, 1.f);
+        m_pPlayer->Rotate_To_LockOn_Target(fTimeDelta, 2.f);
     }
 
     //Handle_Input();
@@ -97,6 +91,9 @@ void CPlayer_FirstSkillState::Update(_float fTimeDelta)
 
 void CPlayer_FirstSkillState::Exit()
 {
+    // 다시 감소.
+    m_pPlayer->Decrease_Damage(m_fIncreaseDamage);
+
     // 무기 콜라이더 강제 비활성화
     Force_Disable_All_Colliders();
     if (m_iNextState != -1) // NextIndex가 있는경우 블렌딩 시작.
@@ -104,8 +101,7 @@ void CPlayer_FirstSkillState::Exit()
         m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, false);
     }
 
-    // 다시 감소.
-    m_pPlayer->Decrease_Damage(m_fIncreaseDamage);
+    
 
     // 락온 중이고 타겟과 너무 가까이 있다면 안전한 거리로 이동
     if (m_pPlayer->Is_LockOn() && m_pPlayer->Has_LockOn_Target())

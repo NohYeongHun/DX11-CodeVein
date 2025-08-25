@@ -217,6 +217,9 @@
     <Filter Include="02. GameObject\Monster\BT\Encounter">
       <UniqueIdentifier>{fbdfd345-7448-4d7d-bed5-0698e4356a0f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. GameObject\UI\Slash">
+      <UniqueIdentifier>{b13dc14a-57b8-4a1e-82c9-55b6739e07a2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -606,6 +609,9 @@
     <ClInclude Include="..\Public\Player_SecondSkillState.h">
       <Filter>02. GameObject\Player\State\Attack</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Slash.h">
+      <Filter>02. GameObject\UI\Slash</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -968,6 +974,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Player_SecondSkillState.cpp">
       <Filter>02. GameObject\Player\State\Attack</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Slash.cpp">
+      <Filter>02. GameObject\UI\Slash</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

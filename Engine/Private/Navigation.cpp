@@ -126,6 +126,73 @@ _bool CNavigation::isMove(_fvector vPosition)
 	}
 }
 
+_bool CNavigation::isMove(_fvector vPosition, _vector* pSlideVector)
+{
+	_vector vLocalPos = XMVector3TransformCoord(vPosition, XMMatrixInverse(nullptr, XMLoadFloat4x4(&m_WorldMatrix)));
+
+	_int iNeighborIndex = -1;
+	LINE outLine = LINE::END;
+
+	if (true == m_Cells[m_iCurrentCellIndex]->isIn(vLocalPos, &iNeighborIndex, &outLine))
+		return true;
+	else
+	{
+		if (-1 != iNeighborIndex) /* 이웃이 있으면 */
+		{
+			while (true)
+			{
+				if (-1 == iNeighborIndex)
+				{
+					// 이웃이 없어졌을 때도 슬라이딩 벡터 계산
+					if (pSlideVector && outLine != LINE::END)
+					{
+						_vector vWallNormal = m_Cells[m_iCurrentCellIndex]->Get_LineNormal(outLine);
+						_vector vMovementDir = XMVector3Normalize(vLocalPos - m_Cells[m_iCurrentCellIndex]->Get_Center());
+						
+						// 슬라이딩 벡터 = 이동방향 - (이동방향·벽노멀)×벽노멀
+						_vector vDotProduct = XMVector3Dot(vMovementDir, vWallNormal);
+						*pSlideVector = vMovementDir - XMVectorScale(vWallNormal, XMVectorGetX(vDotProduct));
+						*pSlideVector = XMVector3Normalize(*pSlideVector);
+						
+						// 월드 좌표계로 변환
+						*pSlideVector = XMVector3TransformNormal(*pSlideVector, XMLoadFloat4x4(&m_WorldMatrix));
+					}
+					return false;
+				}
+
+				if (true == m_Cells[iNeighborIndex]->isIn(vLocalPos, &iNeighborIndex))
+					break;
+			}
+
+			m_iCurrentCellIndex = iNeighborIndex;
+			return true;
+		}
+		else /* 경계에 도달. */
+		{
+			/* 이웃이 없으면 - 슬라이딩 벡터 계산 */
+			if (pSlideVector && outLine != LINE::END)
+			{
+				// 벽의 노멀 벡터 가져오기
+				_vector vWallNormal = m_Cells[m_iCurrentCellIndex]->Get_LineNormal(outLine);
+				
+				// 이동하려는 방향 계산 (현재 위치에서 셀 중심으로)
+				_vector vMovementDir = XMVector3Normalize(vLocalPos - m_Cells[m_iCurrentCellIndex]->Get_Center());
+				
+				// 슬라이딩 벡터 계산: 벽을 따라 미끄러지는 방향
+				// 공식: slideVector = movementVector - (movementVector · wallNormal) * wallNormal
+				_vector vDotProduct = XMVector3Dot(vMovementDir, vWallNormal);
+				*pSlideVector = vMovementDir - XMVectorScale(vWallNormal, XMVectorGetX(vDotProduct));
+				*pSlideVector = XMVector3Normalize(*pSlideVector);
+				
+				// 로컬 좌표계에서 월드 좌표계로 변환
+				*pSlideVector = XMVector3TransformNormal(*pSlideVector, XMLoadFloat4x4(&m_WorldMatrix));
+			}
+
+			return false;
+		}
+	}
+}
+
 // Y오프셋만 계산.
 _vector CNavigation::Compute_OnCell(_fvector vPosition)
 {

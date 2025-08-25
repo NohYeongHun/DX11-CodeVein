@@ -60,6 +60,13 @@ HRESULT CMonster::Initialize_Clone(void* pArg)
     _vector vMonsterPos = XMVectorSetW(XMLoadFloat3(&pDesc->vPos), 1.f);
     m_pTransformCom->Set_State(STATE::POSITION, vMonsterPos);
 
+    // CSlash UI 초기화 (비활성화 상태로 생성)
+    if (FAILED(Initialize_SlashUI()))
+    {
+        CRASH("Failed Initialize SlashUI");
+        return E_FAIL;
+    }
+
     return S_OK;
 }
 
@@ -71,6 +78,12 @@ void CMonster::Priority_Update(_float fTimeDelta)
 void CMonster::Update(_float fTimeDelta)
 { 
     CContainerObject::Update(fTimeDelta);
+
+    if (m_pSlashUI->Is_Active())
+    {
+        m_pSlashUI->Update(fTimeDelta);
+    }
+		
 }
 
 void CMonster::Finalize_Update(_float fTimeDelta)
@@ -93,6 +106,8 @@ void CMonster::Late_Update(_float fTimeDelta)
 {
     CContainerObject::Late_Update(fTimeDelta);
 
+    if (m_pSlashUI->Is_Active())
+        m_pSlashUI->Late_Update(fTimeDelta);
 }
 
 HRESULT CMonster::Render()
@@ -136,7 +151,17 @@ void CMonster::Take_Damage(_float fDamage)
 {
     m_MonsterStat.fHP -= fDamage;
     
+    // 몬스터가 맞을 때 CSlash UI 표시 (기본 각도 0)
+    Show_Slash_UI();
 }
+
+
+void CMonster::Take_Damage(_float fDamage, CGameObject* pGameObject)
+{
+    m_MonsterStat.fHP -= fDamage;
+
+}
+
 #pragma endregion
 
 
@@ -872,12 +897,61 @@ void CMonster::Reset_Collider_ActiveInfo()
 }
 #pragma endregion
 
+#pragma region CSlash UI 관련
+HRESULT CMonster::Initialize_SlashUI()
+{
+    CSlash::SLASHUI_DESC slashDesc{};
+    slashDesc.eCurLevel = m_eCurLevel;
+    slashDesc.pTarget = this;
+    slashDesc.fTargetRadius = 2.0f; // 몬스터 크기에 따라 조정
+
+    m_pSlashUI = dynamic_cast<CSlash*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT
+        ,ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_SlashUI"), &slashDesc));
+    
+    if (!m_pSlashUI)
+    {
+        CRASH("Failed Initialize UI");
+        return E_FAIL;
+    }
+
+    // 생성된 UI를 현재 레벨에 추가 (비활성화 상태)
+    m_pSlashUI->Set_Active(false); // 처음엔 비활성화
+
+    return S_OK;
+}
+
+void CMonster::Show_Slash_UI()
+{
+    if (m_pSlashUI)
+    {
+        m_pSlashUI->Set_Active(true);
+        m_pSlashUI->Set_Target(this);
+    }
+}
+
+void CMonster::Show_Slash_UI(_float fRotationAngle)
+{
+    if (m_pSlashUI)
+    {
+        m_pSlashUI->Set_Active(true);
+        m_pSlashUI->Set_Target(this);
+        // 회전 각도 설정 함수 추가 필요
+        m_pSlashUI->Set_Rotation(fRotationAngle);
+    }
+}
+
+
+#pragma endregion
+
 void CMonster::Destroy()
 {
     CContainerObject::Destroy();
     
     if (m_pColliderCom)
         m_pColliderCom->Set_Active(false);
+
+    if (m_pSlashUI)
+        m_pSlashUI->Set_Active(false);
 }
 
 void CMonster::Free()
@@ -888,6 +962,9 @@ void CMonster::Free()
     Safe_Release(m_pColliderCom);
     Safe_Release(m_pNavigationCom);
     Safe_Release(m_pColliderCom);
+
+    // CSlash UI 해제
+    Safe_Release(m_pSlashUI);
 
     m_pTarget = nullptr; // 상호 참조 문제.
 }

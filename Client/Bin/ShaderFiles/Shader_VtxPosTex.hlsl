@@ -19,14 +19,11 @@ struct VS_OUT
     float4 vWorldPos : TEXCOORD1;
 };
 
-/* �������̴� : ���� ��ġ�� �����̽� ��ȯ(���� -> ���� -> �� -> ����). */ 
-/*          : ������ ������ ����.(in:3��, out:2�� or 5��) */
-/*          : ���� ����(���� �ϳ��� VS_MAIN�ѹ�ȣ��) */ 
+
 VS_OUT VS_MAIN(VS_IN In)
 {
     VS_OUT Out = (VS_OUT)0;    
     
-    /* ������ ������ġ * ���� * �� * ���� */ 
         
     float4x4 matWV, matWVP;
     
@@ -40,10 +37,6 @@ VS_OUT VS_MAIN(VS_IN In)
     return Out;     
 }
 
-/* /W�� �����Ѵ�. ���������̽��� ��ȯ */
-/* ����Ʈ�� ��ȯ�ϰ�.*/
-/* �����Ͷ����� : �ȼ��� �����. */
-
 struct PS_IN
 {
     float4 vPosition : SV_POSITION;
@@ -55,9 +48,6 @@ struct PS_OUT
 {
     float4 vColor : SV_TARGET0;
 };
-
-/* ���� �ȼ� ������ ���ؼ� �ȼ� ���̴��� �����Ѵ�. */
-/* �ȼ��� ���� �����Ѵ�. */
 
 
 
@@ -72,24 +62,22 @@ PS_OUT PS_MAIN(PS_IN In)
 }
 
 
-// Texture Index�� ���� �ٸ� �ȼ� ���̴��� �����ϱ�.
 PS_OUT PS_MAIN2(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
     
     float2 uv = In.vTexcoord;
     
-    float4 baseColor = g_Texture.Sample(DefaultSampler, uv); // ���� �ؽ�ó ��
-    float4 fillerColor = float4(1, 1, 1, 1); // ���̾Ƹ�� �ȿ� ä���� ��
+    float4 baseColor = g_Texture.Sample(DefaultSampler, uv);
+    float4 fillerColor = float4(1, 1, 1, 1);
     
-    // ���̾Ƹ�� �߽�
     float2 center = float2(0.5f, 0.5f);
     float2 delta = abs(uv - center);
     bool bIsInDiamond = (delta.x + delta.y) < 0.5f;
     
     if (bIsInDiamond)
     {
-        Out.vColor = lerp(baseColor, fillerColor, 0.8f); // �ε巴�� ����
+        Out.vColor = lerp(baseColor, fillerColor, 0.8f);
     }
     else
     {
@@ -104,26 +92,22 @@ PS_OUT PS_MAIN3(PS_IN In)
     PS_OUT Out = (PS_OUT) 0;
 
     float2 uv = In.vTexcoord;
-    float4 fillerColor = float4(0, 0, 0, 1); // ���̾Ƹ�� �ȿ� ä���� ��
-    float4 baseColor = g_Texture.Sample(DefaultSampler, uv); // ���� �ؽ�ó ��
+    float4 fillerColor = float4(0, 0, 0, 1); 
+    float4 baseColor = g_Texture.Sample(DefaultSampler, uv); 
 
     
-    // ���̾Ƹ�� �߽�
     float2 center = float2(0.5f, 0.5f); 
     float2 delta = abs(uv - center);
     bool bIsInDiamond = (delta.x + delta.y) < 0.51f;
 
-    // �Ʒ��� ���� ä���
     bool bIsFillRegion = uv.y > (1.0 - g_fFillRatio); 
 
     if (bIsInDiamond && bIsFillRegion)
     {
-        // ���̾Ƹ�� �����̸鼭, ä���� �����̸�
         Out.vColor = lerp(baseColor, fillerColor, 0.8f); // �ε巴�� ����
     }
     else
     {
-        // �� �ܴ� ���� �ؽ�ó ����
         Out.vColor = baseColor;
     }
 
@@ -144,7 +128,6 @@ PS_OUT PS_MAIN4(PS_IN In)
     // Alpha Blend
     baseColor.rgb = lerp(baseColor.rgb, float3(0.0, 0.0, 0.0), saturate(g_fFade));
     
-    // �ٽ� �� ��: ������������� ���� ����
     Out.vColor = baseColor;
     
 
@@ -153,7 +136,6 @@ PS_OUT PS_MAIN4(PS_IN In)
 
 float g_fAlpha;
 
-// Logo Alpha Light ����
 PS_OUT PS_MAIN5(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
@@ -168,39 +150,37 @@ float g_fRightRatio;
 float g_fLeftRatio;
 bool g_bIncrease;
 
-// HP Bar Progress �뵵.
+// HP Bar Progress
 PS_OUT PS_MAIN6(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
 
     float2 uv = In.vTexcoord;
-    float4 fillerColor = float4(0.5, 0.5, 0.5, 1); // �پ�� ü�¿� ä���� ȸ��.
-    float4 fillerBlack = float4(0, 0, 0, 1); // �پ�� ü�¿� ä���� ȸ��.
-    float4 baseColor = g_Texture.Sample(DefaultSampler, uv); // ���� �ؽ�ó ��
+    float4 fillerColor = float4(0.5, 0.5, 0.5, 1); 
+    float4 fillerBlack = float4(0, 0, 0, 1);
+    float4 baseColor = g_Texture.Sample(DefaultSampler, uv);
 
     bool bIsFillGray = uv.x < g_fRightRatio && uv.x > g_fLeftRatio;
     bool bIsFill; 
     
     if (g_bIncrease)
-        bIsFill = uv.x > g_fLeftRatio; // uv.x�� g_fLeftRatio���� ũ�ٸ�?
+        bIsFill = uv.x > g_fLeftRatio; 
     else
-        bIsFill = uv.x > (1.0 - g_fFillRatio); // �̰� ������. => �̸� �����ع����� �Ⱥ���.
+        bIsFill = uv.x > (1.0 - g_fFillRatio); 
        
     
     
     if (bIsFill)
     {
-        // �����ؾ��Ѵٸ�?
         if (bIsFillGray)
         {
-            Out.vColor = lerp(baseColor, fillerColor, 0.8f); // �ε巴�� ����  
+            Out.vColor = lerp(baseColor, fillerColor, 0.8f); 
         }
         else
-            Out.vColor = fillerBlack; // ���� ����.
+            Out.vColor = fillerBlack; 
     }
     else
     {
-        // �� �ܴ� ���� �ؽ�ó ����
         Out.vColor = baseColor;
     }
 
@@ -284,7 +264,7 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_MAIN4();
     }
 
-    pass TitleBackGroundPass // Alpha Blend�� (Alpha ���� ����)
+    pass TitleBackGroundPass // Alpha Blend
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_Default, 0);

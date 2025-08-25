@@ -14,7 +14,7 @@ HRESULT CPlayer_SecondSkillState::Initialize(_uint iStateNum, void* pArg)
     //Add_Collider_Info(m_pPlayer->Find_AnimationIndex(TEXT("DRAGON_LUNGE"))
     //    , COLLIDER_ACTIVE_INFO{ 0.f / 289.f, 260.f / 289.f, false, CPlayer::PART_BODY, 1 });
 
-	m_fIncreaseDamage = 70.f; // 기본 공격력 증가량 설정
+	m_fIncreaseDamage = 10.f; // 기본 공격력 증가량 설정
 
     return S_OK;
 }

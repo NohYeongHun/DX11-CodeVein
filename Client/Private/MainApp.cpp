@@ -209,16 +209,7 @@ HRESULT CMainApp::Ready_Prototype_ForUsageTexture()
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
 		, TEXT("Prototype_Component_Texture_BossHPBar")
 		, CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Monster/QueenKnight/HPBar%d.png"), 1))))
-		return E_FAIL;
-
-	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
-		, TEXT("Prototype_Component_Texture_SlashEffectUI")
-		, CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/User/Slash/Slash%d.png"), 1))))
-	{
-		CRASH("Failed Load SlashEffect Texture");
-		return E_FAIL;
-	}
-		
+		return E_FAIL;	
 
 	return S_OK;
 }
@@ -325,6 +316,25 @@ HRESULT CMainApp::Ready_Prototype_HUD()
 		CLockOnUI::Create(m_pDevice, m_pContext))))
 	{
 		CRASH("Failed Load LockOn GameObject ");
+		return E_FAIL;
+	}
+#pragma endregion
+
+
+#pragma region SLASH UI
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
+		, TEXT("Prototype_Component_Texture_SlashUI")
+		, CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/User/Slash/Slash%d.png"), 1))))
+	{
+		CRASH("Failed Load SlashEffect Texture");
+		return E_FAIL;
+	}
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_SlashUI"),
+		CSlash::Create(m_pDevice, m_pContext))))
+	{
+		CRASH("Failed Load Slash GameObject ");
 		return E_FAIL;
 	}
 #pragma endregion
