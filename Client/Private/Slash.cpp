@@ -221,14 +221,15 @@ HRESULT CSlash::Bind_ShaderResources()
         _vector vRight = XMVector3Normalize(XMVector3Cross(vUp, vLook));
         vUp = XMVector3Normalize(XMVector3Cross(vLook, vRight));
         
-        // 공격 방향에 따른 회전 각도 계산
-        _vector vAttackDir2D = XMVectorSetY(m_vAttackDirection, 0.0f); // Y축 제거
-        vAttackDir2D = XMVector3Normalize(vAttackDir2D);
+        // 3D 공격 방향을 빌보드 평면에 투영하여 회전 각도 계산
+        _vector vAttackDirection3D = XMVector3Normalize(m_vAttackDirection);
         
-        // 빌보드의 Right 벡터에 투영하여 회전 각도 계산
-        _float fRightComponent = XMVectorGetX(XMVector3Dot(vAttackDir2D, vRight));
-        _float fUpComponent = XMVectorGetX(XMVector3Dot(vAttackDir2D, vUp));
-        _float fRotationAngle = atan2f(fUpComponent, fRightComponent);
+        // 빌보드 평면의 Right와 Up 벡터에 투영
+        _float fRightComponent = XMVectorGetX(XMVector3Dot(vAttackDirection3D, vRight));
+        _float fUpComponent = XMVectorGetX(XMVector3Dot(vAttackDirection3D, vUp));
+        
+        // Y축 성분만 반전 (빌보드 좌표계와 월드 좌표계 차이 보정)
+        _float fRotationAngle = atan2f(-fUpComponent, fRightComponent);
         
         // 회전 행렬 적용
         _float fCos = cosf(fRotationAngle);

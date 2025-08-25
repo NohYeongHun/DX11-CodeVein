@@ -60,6 +60,29 @@ void CPlayerWeapon::Update(_float fTimeDelta)
         XMLoadFloat4x4(m_pSocketMatrix) *
         XMLoadFloat4x4(m_pParentMatrix));
 
+    // 2. 스윙 방향 계산 (무기 팁 위치 기준)
+    _vector vCurrentPosition = XMLoadFloat4(reinterpret_cast<const _float4*>(&m_CombinedWorldMatrix.m[3][0]));
+    
+    if (!m_bFirstFrame)
+    {
+        // 슬래시 방향 계산 (이전 위치에서 현재 위치로의 벡터를 반전)
+        _vector vMovement = XMVectorSubtract(m_vPreviousPosition, vCurrentPosition);
+        _float fMovementLength = XMVectorGetX(XMVector3Length(vMovement));
+        
+        // 움직임이 충분히 클 때만 스윙 방향 업데이트
+        if (fMovementLength > 0.01f) // 임계값
+        {
+            m_vSwingDirection = XMVector3Normalize(vMovement);
+        }
+    }
+    else
+    {
+        m_bFirstFrame = false;
+    }
+    
+    // 다음 프레임을 위해 현재 위치 저장
+    m_vPreviousPosition = vCurrentPosition;
+
     // 가장 마지막 부근에 Collider Push
     Finalize_Update(fTimeDelta);
 }

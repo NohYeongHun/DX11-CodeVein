@@ -189,8 +189,15 @@ void CMonster::Take_Damage(_float fDamage, CGameObject* pGameObject)
         // 5. 정규화된 방향 벡터에 반지름을 곱한 후, 몬스터의 중심점에 더해 표면 위의 점을 구합니다.
         _vector vClosestPoint = XMVectorMultiplyAdd(vDir, XMVectorReplicate(fRadius), vCenter);
 
-        // 6. 공격 방향 계산 (무기에서 충돌 지점으로의 방향)
-        _vector vAttackDirection = XMVector3Normalize(XMVectorSubtract(vClosestPoint, vWeaponPosition));
+        // 6. 무기의 스윙 방향 사용 (실제 무기가 움직인 궤적)
+        _vector vSwingDirection = pPlayerWeapon->Get_SwingDirection();
+        _vector vAttackDirection = XMVector3Normalize(vSwingDirection);
+        
+        // 스윙 방향이 유효하지 않으면 무기 위치 기반으로 계산
+        if (XMVectorGetX(XMVector3Length(vAttackDirection)) < 0.1f)
+        {
+            vAttackDirection = XMVector3Normalize(XMVectorSubtract(vClosestPoint, vWeaponPosition));
+        }
         
         // 7. SlashUI를 hit point에서 표시
         Show_Slash_UI_At_Position(vClosestPoint, vAttackDirection);

@@ -47,11 +47,18 @@ public:
 
 	// 충돌하면 안되는 객체들?
 private:
+	// 스윙 방향 계산을 위한 변수들
+	_vector m_vPreviousPosition = XMVectorSet(0.f, 0.f, 0.f, 1.f);  // 이전 프레임 위치
+	_vector m_vSwingDirection = XMVectorSet(1.f, 0.f, 0.f, 0.f);    // 스윙 방향
+	_bool m_bFirstFrame = true;  // 첫 프레임 여부
 
 
 	/* Weapon의 최종 행렬 가져오기. */
 public:
 	const _float4x4* Get_CombinedWorldMatrix() { return &m_CombinedWorldMatrix; }
+	
+	/* 무기의 스윙 방향 가져오기 */
+	_vector Get_SwingDirection() const { return m_vSwingDirection; }
 
 #pragma endregion
 
