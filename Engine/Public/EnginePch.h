@@ -36,6 +36,8 @@
 #pragma region INSTANCING
 #include "VIBuffer_Instance.h"
 #include "VIBuffer_Rect_Instance.h"
+
+#include "VIBuffer_Point_Instance.h"
 #pragma endregion
 
 

@@ -1,20 +1,32 @@
-﻿CVIBuffer_Rect_Instance::CVIBuffer_Rect_Instance(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿#include "VIBuffer_Rect_Instance.h"
+CVIBuffer_Rect_Instance::CVIBuffer_Rect_Instance(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CVIBuffer_Instance { pDevice, pContext }
 {
 }
 
 CVIBuffer_Rect_Instance::CVIBuffer_Rect_Instance(const CVIBuffer_Rect_Instance& Prototype)
 	: CVIBuffer_Instance( Prototype )
+	, m_vPivot { Prototype.m_vPivot}
+	, m_pSpeeds {Prototype.m_pSpeeds }
+	, m_isLoop { Prototype.m_isLoop }
 {
 }
 
 HRESULT CVIBuffer_Rect_Instance::Initialize_Prototype(const INSTANCE_DESC* pDesc)
 {
+
+	const RECT_INSTANCE_DESC* pRectDesc = static_cast<const RECT_INSTANCE_DESC*>(pDesc);
+	m_vPivot = pRectDesc->vPivot;
+	m_isLoop = pRectDesc->isLoop;
+
+	m_iNumIndexPerInstance = 6;
+	m_iInstanceVertexStride = sizeof(VTXINSTANCE_PARTICLE);
+	m_iNumInstance = pRectDesc->iNumInstance;
 	m_iNumVertices = 4;
 	m_iVertexStride = sizeof(VTXPOSTEX);
 	m_iNumIndices = 6;
 	m_iIndexStride = 2;
-	m_iNumVertexBuffers = 1;
+	m_iNumVertexBuffers = 2;
 	m_eIndexFormat = DXGI_FORMAT_R16_UINT;
 	m_ePrimitiveType = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 
@@ -26,10 +38,10 @@ HRESULT CVIBuffer_Rect_Instance::Initialize_Prototype(const INSTANCE_DESC* pDesc
 	VBDesc.MiscFlags = 0;
 	VBDesc.StructureByteStride = m_iVertexStride;
 
-	VTXPOSTEX* pVertices = new VTXPOSTEX[m_iNumVertices];	
+	VTXPOSTEX* pVertices = new VTXPOSTEX[m_iNumVertices];
 
 	pVertices[0].vPosition = _float3(-0.5f, 0.5f, 0.f);
-	pVertices[0].vTexcoord = _float2(0.f, 0.f);	
+	pVertices[0].vTexcoord = _float2(0.f, 0.f);
 
 	pVertices[1].vPosition = _float3(0.5f, 0.5f, 0.f);
 	pVertices[1].vTexcoord = _float2(1.f, 0.f);
@@ -74,11 +86,40 @@ HRESULT CVIBuffer_Rect_Instance::Initialize_Prototype(const INSTANCE_DESC* pDesc
 
 	Safe_Delete_Array(pIndices);
 
-	VTXINSTANCE_PARTICLE* pInstanceVertices = new VTXINSTANCE_PARTICLE[m_iNumInstance];
+	/* 복제되는 렉트인스턴스버퍼는 각각 m_pVBInstance독립적으로 가지길 바란다. */
+	/* 실질적인 인스턴스 정점버퍼의 경우에는 사본이 생성될때 할당되게 만들어줄 것이다. */
+	/* dx11에서는 인스턴스 정점버퍼를 할당할 경우 복사해서 채워줄 정점의 데이터가 사전에 필요하다 */
+
+	/* 복사해서 채워줄 정점의 사전데이터다.(사본마다 하나씩 만들어줄 이유강벗으나가ㅓ  */
+	m_VBInstanceDesc.ByteWidth = m_iNumInstance * m_iInstanceVertexStride;
+	m_VBInstanceDesc.Usage = D3D11_USAGE_DYNAMIC;
+	m_VBInstanceDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	m_VBInstanceDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	m_VBInstanceDesc.MiscFlags = 0;
+	m_VBInstanceDesc.StructureByteStride = m_iInstanceVertexStride;
+
+	m_pInstanceVertices = new VTXINSTANCE_PARTICLE[m_iNumInstance];
+	m_pSpeeds = new _float[m_iNumInstance];
 
 	for (size_t i = 0; i < m_iNumInstance; i++)
 	{
-		/*pInstanceVertices[i].vRight = ;*/
+		VTXINSTANCE_PARTICLE* pInstanceVertices = static_cast<VTXINSTANCE_PARTICLE*>(m_pInstanceVertices);
+
+		_float		fScale = m_pGameInstance->Rand(pRectDesc->vSize.x, pRectDesc->vSize.y);
+		_float		fLifeTime = m_pGameInstance->Rand(pRectDesc->vLifeTime.x, pRectDesc->vLifeTime.y);
+		m_pSpeeds[i] = m_pGameInstance->Rand(pRectDesc->vSpeed.x, pRectDesc->vSpeed.y);
+
+		pInstanceVertices[i].vRight = _float4(fScale, 0.f, 0.f, 0.f);
+		pInstanceVertices[i].vUp = _float4(0.f, fScale, 0.f, 0.f);
+		pInstanceVertices[i].vLook = _float4(0.f, 0.f, fScale, 0.f);
+		pInstanceVertices[i].vTranslation = _float4(
+			m_pGameInstance->Rand(pRectDesc->vCenter.x - pRectDesc->vRange.x * 0.5f, pRectDesc->vCenter.x + pRectDesc->vRange.x * 0.5f),
+			m_pGameInstance->Rand(pRectDesc->vCenter.y - pRectDesc->vRange.y * 0.5f, pRectDesc->vCenter.y + pRectDesc->vRange.y * 0.5f),
+			m_pGameInstance->Rand(pRectDesc->vCenter.z - pRectDesc->vRange.z * 0.5f, pRectDesc->vCenter.z + pRectDesc->vRange.z * 0.5f),
+			1.f
+		);
+
+		pInstanceVertices[i].vLifeTime = _float2(0.f, fLifeTime);
 
 	}
 
@@ -87,8 +128,57 @@ HRESULT CVIBuffer_Rect_Instance::Initialize_Prototype(const INSTANCE_DESC* pDesc
 
 HRESULT CVIBuffer_Rect_Instance::Initialize_Clone(void* pArg)
 {
+	if (FAILED(CVIBuffer_Instance::Initialize_Clone(pArg)))
+	{
+		CRASH("Failed Clone CVIBuffer_Rect_Instance Failed");
+		return E_FAIL;
+	}
+
 	return S_OK;
 }
+
+
+#pragma region 렌더링용 효과 함수
+void CVIBuffer_Rect_Instance::Spread(_float fTimeDelta)
+{
+	D3D11_MAPPED_SUBRESOURCE	SubResource{};
+
+	VTXINSTANCE_PARTICLE* pInstanceVertices = static_cast<VTXINSTANCE_PARTICLE*>(m_pInstanceVertices);
+
+	/*m_pVB->Lock(0, 0, (void**)&pVertex, 0);*/
+
+	m_pContext->Map(m_pVBInstance, 0, D3D11_MAP_WRITE_NO_OVERWRITE, 0, &SubResource);
+
+	VTXINSTANCE_PARTICLE* pVertices = static_cast<VTXINSTANCE_PARTICLE*>(SubResource.pData);
+
+
+	for (size_t i = 0; i < m_iNumInstance; i++)
+	{
+		_vector	vMoveDir = XMVector3Normalize(XMVectorSetW(XMLoadFloat4(&pVertices[i].vTranslation) - XMLoadFloat3(&m_vPivot), 0.f));
+
+		XMStoreFloat4(&pVertices[i].vTranslation, XMLoadFloat4(&pVertices[i].vTranslation) + vMoveDir * m_pSpeeds[i] * fTimeDelta);
+		pVertices[i].vLifeTime.x += fTimeDelta;
+
+		if (true == m_isLoop)
+		{
+			if (pVertices[i].vLifeTime.x >= pVertices[i].vLifeTime.y)
+			{
+				pVertices[i].vLifeTime.x = 0.f;
+				pVertices[i].vTranslation = pInstanceVertices[i].vTranslation;
+			}
+		}
+	}
+
+	m_pContext->Unmap(m_pVBInstance, 0);
+}
+
+void CVIBuffer_Rect_Instance::Drop(_float fTimeDelta)
+{
+
+}
+#pragma endregion
+
+
 
 CVIBuffer_Rect_Instance* CVIBuffer_Rect_Instance::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const INSTANCE_DESC* pDesc)
 {
