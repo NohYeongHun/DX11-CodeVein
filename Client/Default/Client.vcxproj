@@ -241,6 +241,7 @@
     <ClInclude Include="..\Public\Map.h" />
     <ClInclude Include="..\Public\Monster.h" />
     <ClInclude Include="..\Public\MonsterTree.h" />
+    <ClInclude Include="..\Public\Particle.h" />
     <ClInclude Include="..\Public\Player.h" />
     <ClInclude Include="..\Public\PlayerDefine.h" />
     <ClInclude Include="..\Public\PlayerState.h" />
@@ -270,6 +271,7 @@
     <ClInclude Include="..\Public\SlaveVampire.h" />
     <ClInclude Include="..\Public\SlaveVampireDefine.h" />
     <ClInclude Include="..\Public\SlaveVampireSword.h" />
+    <ClInclude Include="..\Public\Snow.h" />
     <ClInclude Include="..\Public\SteminaBar.h" />
     <ClInclude Include="..\Public\Title_BackGround.h" />
     <ClInclude Include="..\Public\MainApp.h" />
@@ -373,6 +375,7 @@
     <ClCompile Include="..\Private\Map.cpp" />
     <ClCompile Include="..\Private\Monster.cpp" />
     <ClCompile Include="..\Private\MonsterTree.cpp" />
+    <ClCompile Include="..\Private\Particle.cpp" />
     <ClCompile Include="..\Private\Player.cpp" />
     <ClCompile Include="..\Private\PlayerState.cpp" />
     <ClCompile Include="..\Private\Player_AttackState.cpp" />
@@ -398,6 +401,7 @@
     <ClCompile Include="..\Private\Slash.cpp" />
     <ClCompile Include="..\Private\SlaveVampire.cpp" />
     <ClCompile Include="..\Private\SlaveVampireSword.cpp" />
+    <ClCompile Include="..\Private\Snow.cpp" />
     <ClCompile Include="..\Private\SteminaBar.cpp" />
     <ClCompile Include="..\Private\Title_BackGround.cpp" />
     <ClCompile Include="..\Private\MainApp.cpp" />

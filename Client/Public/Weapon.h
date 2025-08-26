@@ -32,7 +32,19 @@ public:
 
 public:
 	virtual void Update_Timer(_float fTimeDelta);
+
+
+public:
+	void Update_AttackDirection(_float fTimeDelta);
+
+protected:
+	// 스윙 방향 계산을 위한 변수들
+	_vector m_vPreviousPosition = XMVectorSet(0.f, 0.f, 0.f, 1.f);  // 이전 프레임 위치
+	_vector m_vSwingDirection = XMVectorSet(1.f, 0.f, 0.f, 0.f);    // 스윙 방향
+	_bool m_bFirstFrame = true;  // 첫 프레임 여부
 #pragma endregion
+
+
 
 #pragma region DEBUG 용도
 #pragma endregion
@@ -86,6 +98,7 @@ public:
 	void Decrease_Damage(_float fDamage);
 	
 #pragma endregion
+
 
 
 

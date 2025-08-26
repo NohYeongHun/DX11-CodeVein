@@ -1,4 +1,5 @@
-﻿CLevel_StageOne::CLevel_StageOne(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿#include "Level_StageOne.h"
+CLevel_StageOne::CLevel_StageOne(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel{ pDevice, pContext }
 {
 }
@@ -246,6 +247,7 @@ HRESULT CLevel_StageOne::Ready_Layer_SkyBox(const _wstring& strLayerTag)
 	return S_OK;
 }
 
+
 #pragma region 1. Monster Trigger 준비 => 몬스터들을 Trigger Manager에 담아둡니다.
 HRESULT CLevel_StageOne::Ready_Monster_Trigger()
 {
@@ -429,6 +431,15 @@ HRESULT CLevel_StageOne::Ready_Layer_GiantWhiteDevil(const _wstring& strLayerTag
 
 HRESULT CLevel_StageOne::Ready_Layer_Effect(const _wstring& strLayerTag)
 {
+	//CSnow::SNOW_DESC Desc{};
+	//Desc.eCurLevel = m_eCurLevel;
+	//if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel), strLayerTag,
+	//	ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_Snow"), &Desc)))
+	//{
+	//	CRASH("Failed Ready Layer Snow");
+	//	return E_FAIL;
+	//}
+		
 	return S_OK;
 }
 

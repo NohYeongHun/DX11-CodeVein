@@ -1,4 +1,5 @@
-﻿CSlash::CSlash(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿#include "Slash.h"
+CSlash::CSlash(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CGameObject(pDevice, pContext)
 {
 }
@@ -34,7 +35,6 @@ HRESULT CSlash::Initialize_Clone(void* pArg)
         return E_FAIL;
     }
     m_eCurLevel = pDesc->eCurLevel;
-    m_pTarget = pDesc->pTarget;
 
     // 화면 크기 가져오기
     RECT rcClient;
@@ -150,6 +150,14 @@ HRESULT CSlash::Render()
     return S_OK;
 }
 
+void CSlash::OnActivate(void* pArg)
+{
+}
+
+void CSlash::OnDeactivate()
+{
+}
+
 void CSlash::Set_Target(CGameObject* pTarget)
 {
     m_pTarget = pTarget;
@@ -164,102 +172,69 @@ void CSlash::Clear_Target()
     m_bActive = false;
 }
 
-_bool CSlash::World_To_Screen(_vector vWorldPos, _float& fScreenX, _float& fScreenY)
+void CSlash::Set_Position(_fvector vPosition)
 {
-    // 현재 카메라의 뷰/프로젝션 행렬 가져오기
-    _matrix matView = m_pGameInstance->Get_Transform_Matrix(D3DTS::VIEW);
-    _matrix matProj = m_pGameInstance->Get_Transform_Matrix(D3DTS::PROJ);
+    // 1. 그려질 곳. Position 설정.
+    m_pTransformCom->Set_State(STATE::POSITION, vPosition);
+    
+    // 2. 설정되었을 때 Camera에 따른 방향을 재계산할 필요성이 존재합니다.
+    m_bDirectionCalculated = false;
+}
 
-    // 월드 -> 뷰 공간 변환
-    _vector vViewPos = XMVector3TransformCoord(vWorldPos, matView);
+/* 무기의 공격 방향 가져오기. */
+void CSlash::Set_Hit_Direction(_fvector vDirection)
+{
+     m_vHitDirection = vDirection;
+}
 
-    // 카메라 뒤쪽에 있으면 표시하지 않음
-    if (XMVectorGetZ(vViewPos) < 0.0f)
-        return false;
 
-    // 뷰 -> 투영 공간 변환
-    _vector vProjPos = XMVector3TransformCoord(vViewPos, matProj);
+void CSlash::Rotate_Slash()
+{
+    // 이미 계산되었다면 다시 계산하지 않음
+    if (m_bDirectionCalculated)
+        return;
 
-    // NDC 좌표 -> 스크린 좌표 변환
-    fScreenX = (XMVectorGetX(vProjPos) + 1.0f) * 0.5f * m_fWinSizeX;
-    fScreenY = (1.0f - XMVectorGetY(vProjPos)) * 0.5f * m_fWinSizeY;
+    // 1. 카메라 위치 가져오기
+    _vector vCamPos = XMLoadFloat4(m_pGameInstance->Get_CamPosition());
+    _vector vSlashPos = m_pTransformCom->Get_State(STATE::POSITION);
 
-    // 화면 범위 확인 (여유를 둬서 화면 가장자리까지 표시)
-    if (fScreenX < -50.0f || fScreenX > m_fWinSizeX + 50.0f ||
-        fScreenY < -50.0f || fScreenY > m_fWinSizeY + 50.0f)
-        return false;
+    // 2. 빌보드 기본 벡터 계산 (카메라를 향하도록)
+    _vector vLook = XMVector3Normalize(vSlashPos - vCamPos);
+    _vector vUp = XMVectorSet(0.f, 1.f, 0.f, 0.f);
+    _vector vRight = XMVector3Normalize(XMVector3Cross(vUp, vLook));
+    vUp = XMVector3Normalize(XMVector3Cross(vLook, vRight));
 
-    return true;
+    // 3. 공격 방향을 빌보드 평면에 투영하여 회전 각도 계산
+    _vector vAttackDirection = XMVector3Normalize(m_vHitDirection);
+    _float fRightComponent = XMVectorGetX(XMVector3Dot(vAttackDirection, vRight));
+    _float fUpComponent = XMVectorGetX(XMVector3Dot(vAttackDirection, vUp));
+    _float fRotationAngle = atan2f(-fUpComponent, fRightComponent);
+
+    
+    // 4. Z축 회전된 Right와 Up 벡터 계산
+    _float fCos = cosf(fRotationAngle);
+    _float fSin = sinf(fRotationAngle);
+    _vector vRotatedRight = XMVectorAdd(XMVectorScale(vRight, fCos), XMVectorScale(vUp, -fSin));
+    _vector vRotatedUp = XMVectorAdd(XMVectorScale(vRight, fSin), XMVectorScale(vUp, fCos));
+    
+    // 5. TransformCom에 상태 설정 (한 번만)
+    m_pTransformCom->Set_State(STATE::RIGHT, vRotatedRight);
+    m_pTransformCom->Set_State(STATE::UP, vRotatedUp);
+    m_pTransformCom->Set_State(STATE::LOOK, vLook);
+
+    // 6. 크기 설정.
+    m_pTransformCom->Set_Scale({ 1.4f, 0.2f, 1.f });
+
+    // 7. 계산 완료 플래그 설정
+    m_bDirectionCalculated = true;
 }
 
 HRESULT CSlash::Bind_ShaderResources()
 {
-    // 실제 렌더링 위치는 Set_Position으로 설정된 월드 좌표 사용
-    _vector vRenderPosition = m_vWorldPosition;
     
-    // 만약 위치가 설정되지 않았다면 기존 방식 사용 (타겟 따라다니기)
-    if (XMVectorGetX(vRenderPosition) == 0.0f && XMVectorGetY(vRenderPosition) == 0.0f && XMVectorGetZ(vRenderPosition) == 0.0f)
-    {
-        vRenderPosition = m_pTarget->Get_Transform()->Get_State(STATE::POSITION);
-        vRenderPosition = XMVectorSetY(vRenderPosition, XMVectorGetY(vRenderPosition) + m_fTargetRadius);
-    }
-    else
-    {
-        // 충돌 지점에서 카메라 방향으로 약간 앞으로 이동 (콜라이더 표면에 딱 붙게)
-        _vector vCamPos = XMLoadFloat4(m_pGameInstance->Get_CamPosition());
-        _vector vCamDirection = XMVector3Normalize(vCamPos - vRenderPosition);
-        vRenderPosition = XMVectorAdd(vRenderPosition, XMVectorScale(vCamDirection, 0.1f)); // 0.1f만큼 카메라 쪽으로
-    }
-
-    // 처음 한 번만 빌보드 방향 계산 (카메라 + 공격 방향)
-    if (!m_bDirectionCalculated && !(XMVectorGetX(m_vWorldPosition) == 0.0f && XMVectorGetY(m_vWorldPosition) == 0.0f && XMVectorGetZ(m_vWorldPosition) == 0.0f))
-    {
-        // 카메라 위치 가져오기
-        _vector vCamPos = XMLoadFloat4(m_pGameInstance->Get_CamPosition());
-        _vector vLook = XMVector3Normalize(vRenderPosition - vCamPos);
-        _vector vUp = XMVectorSet(0.f, 1.f, 0.f, 0.f);
-        _vector vRight = XMVector3Normalize(XMVector3Cross(vUp, vLook));
-        vUp = XMVector3Normalize(XMVector3Cross(vLook, vRight));
-        
-        // 3D 공격 방향을 빌보드 평면에 투영하여 회전 각도 계산
-        _vector vAttackDirection3D = XMVector3Normalize(m_vAttackDirection);
-        
-        // 빌보드 평면의 Right와 Up 벡터에 투영
-        _float fRightComponent = XMVectorGetX(XMVector3Dot(vAttackDirection3D, vRight));
-        _float fUpComponent = XMVectorGetX(XMVector3Dot(vAttackDirection3D, vUp));
-        
-        // Y축 성분만 반전 (빌보드 좌표계와 월드 좌표계 차이 보정)
-        _float fRotationAngle = atan2f(-fUpComponent, fRightComponent);
-        
-        // 회전 행렬 적용
-        _float fCos = cosf(fRotationAngle);
-        _float fSin = sinf(fRotationAngle);
-        
-        // 회전된 Right와 Up 벡터 계산하여 저장
-        m_vFixedRight = XMVectorAdd(XMVectorScale(vRight, fCos), XMVectorScale(vUp, -fSin));
-        m_vFixedUp = XMVectorAdd(XMVectorScale(vRight, fSin), XMVectorScale(vUp, fCos));
-        m_vFixedLook = vLook;
-        
-        m_bDirectionCalculated = true; // 계산 완료 표시
-    }
-
-    // 기본값 사용 (방향이 계산되지 않은 경우)
-    _vector vRight = m_vFixedRight;
-    _vector vUp = m_vFixedUp;  
-    _vector vLook = m_vFixedLook;
-
-    // 행렬 구성 (저장된 고정 방향 사용)
-    _matrix matWorld;
-    matWorld.r[0] = XMVectorScale(vRight, 1.4f);
-    matWorld.r[1] = XMVectorScale(vUp, 0.2f);
-    matWorld.r[2] = XMVectorScale(vLook, 0.1f);
-    matWorld.r[3] = XMVectorSetW(vRenderPosition, 1.0f);
-
-    _float4x4 g_matWorld;
-    XMStoreFloat4x4(&g_matWorld, matWorld);
 
     // 쉐이더에 바인딩
-    if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &g_matWorld)))
+    if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", m_pTransformCom->Get_WorldMatrixPtr())))
     {
         CRASH("Failed Bind World Matrix LockOnUI");
         return E_FAIL;

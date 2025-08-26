@@ -42,7 +42,11 @@ HRESULT CVIBuffer_Point_Instance::Initialize_Prototype(const INSTANCE_DESC* pDes
 	VBInitialData.pSysMem = pVertices;
 
 	if (FAILED(m_pDevice->CreateBuffer(&VBDesc, &VBInitialData, &m_pVB)))
+	{
+		CRASH("Failed Create Buffer");
 		return E_FAIL;
+	}
+		
 
 	Safe_Delete_Array(pVertices);
 
@@ -124,6 +128,7 @@ HRESULT CVIBuffer_Point_Instance::Render()
 	return S_OK;
 }
 
+#pragma region 정점 버퍼를 움직여서 효과를 주는 함수들.
 void CVIBuffer_Point_Instance::Spread(_float fTimeDelta)
 {
 	D3D11_MAPPED_SUBRESOURCE	SubResource{};
@@ -159,7 +164,36 @@ void CVIBuffer_Point_Instance::Spread(_float fTimeDelta)
 
 void CVIBuffer_Point_Instance::Drop(_float fTimeDelta)
 {
+	D3D11_MAPPED_SUBRESOURCE	SubResource{};
+	VTXINSTANCE_PARTICLE* pInstanceVertices = static_cast<VTXINSTANCE_PARTICLE*>(m_pInstanceVertices);
+
+	m_pContext->Map(m_pVBInstance, 0, D3D11_MAP_WRITE_NO_OVERWRITE, 0, &SubResource);
+
+	VTXINSTANCE_PARTICLE* pVertices = static_cast<VTXINSTANCE_PARTICLE*>(SubResource.pData);
+
+	for (size_t i = 0; i < m_iNumInstance; i++)
+	{
+		_vector	vMoveDir = XMVectorSet(0.f, -1.f, 0.f, 0.f);
+
+		XMStoreFloat4(&pVertices[i].vTranslation, XMLoadFloat4(&pVertices[i].vTranslation) + vMoveDir * m_pSpeeds[i] * fTimeDelta);
+		pVertices[i].vLifeTime.x += fTimeDelta;
+
+		if (true == m_isLoop)
+		{
+			if (pVertices[i].vLifeTime.x >= pVertices[i].vLifeTime.y)
+			{
+				pVertices[i].vLifeTime.x = 0.f;
+				pVertices[i].vTranslation = pInstanceVertices[i].vTranslation;
+			}
+		}
+	}
+
+	m_pContext->Unmap(m_pVBInstance, 0);
 }
+#pragma endregion
+
+
+
 
 CVIBuffer_Point_Instance* CVIBuffer_Point_Instance::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const INSTANCE_DESC* pDesc)
 {
@@ -188,7 +222,7 @@ CComponent* CVIBuffer_Point_Instance::Clone(void* pArg)
 
 void CVIBuffer_Point_Instance::Free()
 {
-	__super::Free();
+	CVIBuffer_Instance::Free();
 
 	if (false == m_isCloned)
 		Safe_Delete_Array(m_pSpeeds);

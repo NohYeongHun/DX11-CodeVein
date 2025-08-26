@@ -8,14 +8,19 @@ vector g_vCamPosition;
 struct VS_IN
 {
     float3 vPosition : POSITION;
+    
     row_major float4x4 TransformMatrix : WORLD;
     
-    float2 vLifeTime : TEXCOORD5;
+    //float4 vRight : TEXCOORD1;
+    //float4 vUp : TEXCOORD2;
+    //float4 vLook : TEXCOORD3;
+    //float4 vTranslation : TEXCOORD4;
+    
+    float2 vLifeTime : TEXCOORD0;
 };
 
 struct VS_OUT
 {
-    // SV POSITION이 아님 => 투영 뷰 변환이 진행되지 않음. => 월드 변환만 진행 예정.
     float4 vPosition : POSITION;
     float fSize : PSIZE;
     float2 vLifeTime : TEXCOORD0;
@@ -27,7 +32,7 @@ struct VS_OUT
 VS_OUT VS_MAIN(VS_IN In)
 {
     VS_OUT Out = (VS_OUT) 0;
-    
+ 
     vector vPosition = mul(float4(In.vPosition, 1.f), In.TransformMatrix);
     
     Out.vPosition = mul(vPosition, g_WorldMatrix);
@@ -37,7 +42,6 @@ VS_OUT VS_MAIN(VS_IN In)
     return Out;
 }
 
-/* 기하 쉐이더 */
 struct GS_IN
 {
     float4 vPosition : POSITION;
@@ -51,6 +55,9 @@ struct GS_OUT
     float2 vTexcoord : TEXCOORD0;
     float2 vLifeTime : TEXCOORD1;
 };
+
+//GS_MAIN(triangle GS_IN In[3])
+//GS_MAIN(line GS_IN In[2])
 
 [maxvertexcount(6)]
 void GS_MAIN(point GS_IN In[1], inout TriangleStream<GS_OUT> Vertices)
@@ -84,7 +91,7 @@ void GS_MAIN(point GS_IN In[1], inout TriangleStream<GS_OUT> Vertices)
     Vertices.Append(Out[0]);
     Vertices.Append(Out[1]);
     Vertices.Append(Out[2]);
-    Vertices.RestartStrip(); // Stream 방식을 끊어줍니다. => List 방식으로 저장하기 위함.
+    Vertices.RestartStrip();
     
     Vertices.Append(Out[0]);
     Vertices.Append(Out[2]);
@@ -100,15 +107,18 @@ struct PS_IN
 {
     float4 vPosition : SV_POSITION;
     float2 vTexcoord : TEXCOORD0;
+    float2 vLifeTime : TEXCOORD1;
 };
 
 struct PS_OUT
 {
     float4 vColor : SV_TARGET0;
+    
 };
 
 /* 만든 픽셀 각각에 대해서 픽셀 쉐이더를 수행한다. */
 /* 픽셀의 색을 결정한다. */
+
 
 PS_OUT PS_MAIN(PS_IN In)
 {
@@ -119,13 +129,17 @@ PS_OUT PS_MAIN(PS_IN In)
     if (Out.vColor.a < 0.3f)
         discard;
     
+    Out.vColor = 1.f;
+    
     return Out;
 }
 
 
+
+
 technique11 DefaultTechnique
 {
-     /* 특정 패스를 이용해서 점정을 그려냈다. */
+    /* 특정 패스를 이용해서 점정을 그려냈다. */
     /* 하나의 모델을 그려냈다. */ 
     /* 모델의 상황에 따라 다른 쉐이딩 기법 세트(명암 + 림라이트 + 스펙큘러 + 노멀맵 + ssao )를 먹여주기위해서 */
     pass DefaultPass
@@ -138,5 +152,5 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_MAIN();
     }
 
-
+   
 }

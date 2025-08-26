@@ -160,10 +160,7 @@ void CMonster::Take_Damage(_float fDamage)
 void CMonster::Take_Damage(_float fDamage, CGameObject* pGameObject)
 {
     m_MonsterStat.fHP -= fDamage;
-
     
-    
-
     CPlayerWeapon* pPlayerWeapon = dynamic_cast<CPlayerWeapon*>(pGameObject);
     if (nullptr != pPlayerWeapon)
     {
@@ -176,7 +173,6 @@ void CMonster::Take_Damage(_float fDamage, CGameObject* pGameObject)
         //_vector vCenter = XMLoadFloat3(&pDesc->vCenter);
 
         /* 월드 좌표로 이동. */
-        //vCenter = XMVector4Transform(vCenter, m_pTransformCom->Get_WorldMatrix());
         _vector vCenter = m_pTransformCom->Get_State(STATE::POSITION) + XMLoadFloat3(&pDesc->vCenter);
         _float fRadius = pDesc->fRadius;
 
@@ -946,8 +942,6 @@ HRESULT CMonster::Initialize_SlashUI()
 {
     CSlash::SLASHUI_DESC slashDesc{};
     slashDesc.eCurLevel = m_eCurLevel;
-    slashDesc.pTarget = this;
-    slashDesc.fTargetRadius = 2.0f; // 몬스터 크기에 따라 조정
 
     m_pSlashUI = dynamic_cast<CSlash*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT
         ,ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_SlashUI"), &slashDesc));
@@ -991,7 +985,8 @@ void CMonster::Show_Slash_UI_At_Position(_fvector vPosition, _fvector vAttackDir
         m_pSlashUI->Set_Active(true);
         m_pSlashUI->Set_Target(this);
         m_pSlashUI->Set_Position(vPosition); // 월드 좌표 그대로 사용
-        m_pSlashUI->Set_Attack_Direction(vAttackDirection);
+        m_pSlashUI->Set_Hit_Direction(vAttackDirection);
+        m_pSlashUI->Rotate_Slash();
     }
 }
 

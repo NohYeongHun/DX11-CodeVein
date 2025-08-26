@@ -81,6 +81,19 @@ public:
 #pragma endregion
 
 
+#pragma region POOLING Enter Exit
+public:
+	virtual void OnActivate(void* pArg = nullptr) {}; // 오브젝트가 활성화되어 사용 준비되었을 때 호출.
+	virtual void OnDeActivate() {}; // 오브젝트가 비활성화되어 풀로 돌아갈 때 호출.
+	
+public:
+	const _bool Is_DeActivate() { return !m_IsActivate; }
+
+protected:
+	_bool m_IsActivate = { true };
+#pragma endregion
+
+
 
 protected:
 	// 기본적으로 있어야 할 것들.
@@ -100,21 +113,6 @@ protected:
 	// 부가된 것들.
 	_wstring m_strObjTag = {};
 
-
-#ifdef _DEBUG
-protected:
-	PrimitiveBatch<VertexPositionColor>* m_pBatch = { nullptr };
-	BasicEffect* m_pEffect = { nullptr };
-	ID3D11InputLayout* m_pInputLayout = { nullptr };
-	_float4 m_vColor = { 0.f, 1.f, 0.f, 1.f }; // 기본 녹색
-
-public:
-	virtual HRESULT  Initialize_Debug();
-
-public:
-	//virtual HRESULT  BoundingBoxRender(const BOUNDING_BOX& box, _matrix WorldMatrix);
-	//virtual void    Render_AABB(const BOUNDING_BOX& box);
-#endif // _DEBUG
 
 protected:
 	/*원형컴포넌트를 찾아서 복제한다. */

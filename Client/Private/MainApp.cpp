@@ -38,13 +38,24 @@ HRESULT CMainApp::Initialize_Clone()
 	EngineDesc.iNumLevels = ENUM_CLASS(LEVEL::END);
 
 	if(FAILED(m_pGameInstance->Initialize_Engine(EngineDesc, &m_pDevice, &m_pContext)))
+	{
+		CRASH("Failed Ready Initialize Engine");
 		return E_FAIL;
+	}
 
 	if (FAILED(Ready_Prototype_ForStatic()))
+	{
+		CRASH("Failed Ready Prototype For Static");
 		return E_FAIL;
+	}
+		
 
 	if (FAILED(Ready_Clone_ForStatic()))
+	{
+		CRASH("Failed Ready Clone For Static");
 		return E_FAIL;
+	}
+		
 
 	if (FAILED(Start_Level(LEVEL::LOGO)))
 		return E_FAIL;	
@@ -109,7 +120,31 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxCube"),
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxCube.hlsl"), VTXCUBE::Elements, VTXCUBE::iNumElements))))
+	{
+		CRASH("Failed Create Shader Cube");
 		return E_FAIL;
+	}
+		
+
+	/* Prototype_Component_Shader_VtxInstance_Particle */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxInstance_Particle"),
+		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxInstance_Particle.hlsl"), VTXPARTICLE::Elements, VTXPARTICLE::iNumElements))))
+	{
+		CRASH("Failed Create Shader Particle");
+		return E_FAIL;
+	}
+		
+
+	/* Prototype_Component_Shader_VtxInstance_Point_Particle */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxInstance_PointParticle"),
+		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxInstance_PointParticle.hlsl"), VTXPOINTPARTICLE::Elements, VTXPOINTPARTICLE::iNumElements))))
+	{
+		MSG_BOX(TEXT("Create Failed Point Particle Shader"));
+		CRASH("Failed Bind Shader_VtxInstance_PointParticle");
+		return E_FAIL;
+	}
+		
+
 
 
 	/* ==================================================== Other ====================================================*/

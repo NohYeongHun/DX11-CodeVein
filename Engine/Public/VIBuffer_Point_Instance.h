@@ -24,14 +24,18 @@ public:
 	virtual HRESULT Bind_Resources() override;
 	virtual HRESULT Render() override;
 
+#pragma region 정점 버퍼를 움직여서 효과를 주는 함수들
 public:
 	void Spread(_float fTimeDelta);
 	void Drop(_float fTimeDelta);
+#pragma endregion
+
+
 
 private:
-	_float3					m_vPivot = {};
+	_float3	m_vPivot = {};
 	_float* m_pSpeeds = {};
-	_bool					m_isLoop = {};
+	_bool	m_isLoop = {};
 
 public:
 	static CVIBuffer_Point_Instance* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const INSTANCE_DESC* pDesc);

@@ -9,14 +9,6 @@ public:
     typedef struct tagSlashUIDesc : public CGameObject::GAMEOBJECT_DESC
     {
         LEVEL eCurLevel = { LEVEL::END };
-        _float fX = 0.f;
-        _float fY = 0.f;
-        _float fSizeX = 300.f;   // 가로 길게
-        _float fSizeY = 12.f;    // 세로 얇게
-        class CGameObject* pTarget = { nullptr };
-        _float fTargetRadius = 1.0f;    // 타겟의 반지름 (크기 조정용)
-        _float fRotationAngle = 0.0f;   // Z축 회전 각도 (라디안)
-
     }SLASHUI_DESC;
 
 private:
@@ -31,6 +23,13 @@ public:
     virtual void Update(_float fTimeDelta);
     virtual void Late_Update(_float fTimeDelta);
     virtual HRESULT Render();
+
+#pragma region 풀링 전용 함수
+public:
+    virtual void OnActivate(void* pArg) override;
+    virtual void OnDeactivate() ;
+#pragma endregion
+
 
 public:
     // LockOn 대상 설정/해제
@@ -52,27 +51,17 @@ public:
     _bool Is_Active() const { return m_bActive; }
 
     // 위치 설정
-    void Set_Position(_fvector vPosition) { 
-        m_vWorldPosition = vPosition; 
-        m_bDirectionCalculated = false; // 위치 변경 시 방향 재계산 필요
-    }
+    void Set_Position(_fvector vPosition);
     
-    // 로컬 위치 설정 (몬스터 기준)
-    void Set_Local_Position(_fvector vLocalPosition) { 
-        m_vLocalPosition = vLocalPosition; 
-        m_bUseLocalPosition = true; 
-    }
     
     // 공격 방향 설정 (회전 계산용)
-    void Set_Attack_Direction(_fvector vDirection) { m_vAttackDirection = vDirection; }
+    void Set_Hit_Direction(_fvector vDirection);
     
     // 타이머 리셋
     void Reset_Timer() { m_fCurrentTime = 0.0f; m_fAnimationTime = 0.0f; }
 
-
-private:
-    // 월드 좌표를 스크린 좌표로 변환
-    _bool World_To_Screen(_vector vWorldPos, _float& fScreenX, _float& fScreenY);
+public:
+    void Rotate_Slash();
 
 private:
     // 컴포넌트
@@ -109,9 +98,7 @@ private:
     
     // 위치 정보
     _vector m_vWorldPosition = XMVectorSet(0.f, 0.f, 0.f, 1.f); // 월드 좌표
-    _vector m_vLocalPosition = XMVectorSet(0.f, 0.f, 0.f, 1.f); // 몬스터 기준 로컬 좌표
-    _vector m_vAttackDirection = XMVectorSet(0.f, 0.f, 1.f, 0.f); // 월드 좌표
-    _bool m_bUseLocalPosition = false; // 로컬 좌표 사용 여부
+    _vector m_vHitDirection = XMVectorSet(0.f, 0.f, 1.f, 0.f); // 월드 좌표
     
     // 고정된 빌보드 방향 (처음 설정될 때만 계산)
     _vector m_vFixedRight = XMVectorSet(1.f, 0.f, 0.f, 0.f);
@@ -119,6 +106,8 @@ private:
     _vector m_vFixedLook = XMVectorSet(0.f, 0.f, 1.f, 0.f);
     _bool m_bDirectionCalculated = false; // 방향이 계산되었는지 여부
     
+
+
 
 private:
     HRESULT Bind_ShaderResources();

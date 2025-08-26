@@ -183,6 +183,15 @@ public:
 	void Set_TargetPlayer(class CGameObject* pTargetPlayer);
 #pragma endregion
 
+#pragma region EFFECT_MANAGER
+public:
+	HRESULT Move_GameObject_ToObjectLayer(_uint iLayerLevelIndex, const _wstring& strSourTag, const _wstring& strDestTag, _uint iCount, void* pArg);
+	HRESULT Add_GameObject_ToPools(_uint iLayerLevelIndex, const _wstring& strDestTag, class CGameObject* pGameObject);
+	void	Clear(_uint iLayerLevelIndex);
+
+#pragma endregion
+
+
 #pragma region PLAYER_DATA_MANAGER
 #pragma endregion
 
@@ -211,6 +220,7 @@ private:
 	class CLight_Manager*		m_pLight_Manager = { nullptr };
 	class CCamera_Manager*		m_pCamera_Manager = { nullptr };
 	class CTrigger_Manager*		m_pTrigger_Manager = { nullptr };
+	class CEffect_Manager*		m_pEffect_Manager = { nullptr };
 	
 	_float m_fTimeDelta = {};
 

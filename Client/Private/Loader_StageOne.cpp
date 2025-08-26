@@ -66,6 +66,13 @@ HRESULT CLoader_StageOne::Loading_Resource(ID3D11Device* pDevice, ID3D11DeviceCo
 		return E_FAIL;
 	}
 
+	if (FAILED(Add_Prototype_Snow(pDevice, pContext, pGameInstance)))
+	{
+		CRASH("Create Snow Failed");
+		MSG_BOX(TEXT("Create Failed Loading : StageOne Snow"));
+		return E_FAIL;
+	}
+
 
 	return S_OK;
 }
@@ -277,6 +284,47 @@ HRESULT CLoader_StageOne::Add_Prototype_SkyBox(ID3D11Device* pDevice, ID3D11Devi
 		CRASH("Sky Box Create Failed");
 		return E_FAIL;
 	}
+
+
+	return S_OK;
+}
+
+HRESULT CLoader_StageOne::Add_Prototype_Snow(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
+{
+	/* Prototype_Component_Texture_Snow */
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level), TEXT("Prototype_Component_Texture_Snow"),
+		CTexture::Create(pDevice, pContext, TEXT("../Bin/Resources/Textures/Snow/Snow.png"), 1))))
+	{
+		CRASH("Failed Load Texture Snow");
+		return E_FAIL;
+	}
+
+	CVIBuffer_Point_Instance::POINT_INSTANCE_DESC		SnowDesc{};
+	SnowDesc.iNumInstance = 3000;
+	SnowDesc.vCenter = _float3(64.f, 20.f, 64.f);
+	SnowDesc.vRange = _float3(128.f, 1.f, 128.f);
+	SnowDesc.vSize = _float2(0.1f, 0.2f);
+	SnowDesc.vLifeTime = _float2(5.0f, 10.f);
+	SnowDesc.vPivot = _float3(0.f, 0.f, 0.f);
+	SnowDesc.vSpeed = _float2(1.5f, 3.f);
+	SnowDesc.isLoop = true;
+
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level), TEXT("Prototype_Component_Particle_Snow"),
+		CVIBuffer_Point_Instance::Create(pDevice, pContext, &SnowDesc))))
+	{
+		CRASH("Failed VIBuffer Point Instance Snow");
+		return E_FAIL;
+	}
+		
+	///* Prototype_GameObject_Snow */
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level), TEXT("Prototype_GameObject_Snow"),
+		CSnow::Create(pDevice, pContext))))
+	{
+		CRASH("Failed Create Snow Object");
+		return E_FAIL;
+	}
+		
+		
 
 
 	return S_OK;

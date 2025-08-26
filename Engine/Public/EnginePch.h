@@ -15,6 +15,8 @@
 #include "Trigger_Manager.h"
 #include "Renderer.h"
 
+#include "Effect_Manager.h"
+
 #pragma region COMPONENT
 #include "Component.h"
 

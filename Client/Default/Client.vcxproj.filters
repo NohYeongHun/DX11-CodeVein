@@ -220,6 +220,12 @@
     <Filter Include="02. GameObject\UI\Slash">
       <UniqueIdentifier>{b13dc14a-57b8-4a1e-82c9-55b6739e07a2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. GameObject\Effect">
+      <UniqueIdentifier>{d843f012-ee38-4fd8-bb5e-d556a1670c5c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Effect\Particle">
+      <UniqueIdentifier>{e52a447f-e19d-441d-8d35-15d2d0e6b97d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -612,6 +618,12 @@
     <ClInclude Include="..\Public\Slash.h">
       <Filter>02. GameObject\UI\Slash</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Particle.h">
+      <Filter>02. GameObject\Effect\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Snow.h">
+      <Filter>02. GameObject\Effect</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -977,6 +989,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\Slash.cpp">
       <Filter>02. GameObject\UI\Slash</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Particle.cpp">
+      <Filter>02. GameObject\Effect\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Snow.cpp">
+      <Filter>02. GameObject\Effect</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

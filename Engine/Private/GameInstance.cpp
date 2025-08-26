@@ -83,6 +83,11 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11De
 	if (nullptr == m_pCamera_Manager)
 		return E_FAIL;
 
+	// Effect Manager
+	m_pEffect_Manager = CEffect_Manager::Create(EngineDesc.iNumLevels);
+	if (nullptr == m_pEffect_Manager)
+		return E_FAIL;
+
 	return S_OK;
 }
 
@@ -131,7 +136,8 @@ void CGameInstance::Update_Engine(_float fTimeDelta)
 	// 9. 피킹 업데이트
 	m_pPicking->Update();
 
-	// 10. 레벨 업데이트
+
+	// 11. 레벨 업데이트
 	m_pLevel_Manager->Update(fTimeDelta);
 
 }
@@ -149,6 +155,7 @@ HRESULT CGameInstance::Clear_Resources(_uint iClearLevelID)
 	m_pCollider_Manager->Clear(iClearLevelID);
 	m_pTrigger_Manager->Clear(iClearLevelID);
 	
+	m_pEffect_Manager->Clear(iClearLevelID);
 	
 
 	return S_OK;
@@ -641,7 +648,31 @@ void CGameInstance::Set_TargetPlayer(CGameObject* pTargetPlayer)
 {
 	m_pTrigger_Manager->Set_TargetPlayer(pTargetPlayer);
 }
+
 #pragma endregion
+
+#pragma region EFFECT_MANAGER
+HRESULT CGameInstance::Move_GameObject_ToObjectLayer(_uint iLayerLevelIndex, const _wstring& strSourTag, const _wstring& strDestTag, _uint iCount, void* pArg)
+{
+	if (nullptr == m_pEffect_Manager)
+		return E_FAIL;
+
+	return m_pEffect_Manager->Move_GameObject_ToObjectLayer(iLayerLevelIndex, strSourTag, strDestTag, iCount, pArg);
+}
+HRESULT CGameInstance::Add_GameObject_ToPools(_uint iLayerLevelIndex, const _wstring& strDestTag, CGameObject* pGameObject)
+{
+	if (nullptr == m_pEffect_Manager)
+		return E_FAIL;
+
+	return m_pEffect_Manager->Add_GameObject_ToPools(iLayerLevelIndex, strDestTag, pGameObject);
+}
+void CGameInstance::Clear(_uint iLayerLevelIndex)
+{
+	m_pEffect_Manager->Clear(iLayerLevelIndex);
+}
+
+#pragma endregion
+
 
 
 
@@ -665,6 +696,7 @@ void CGameInstance::Release_Engine()
 	Safe_Release(m_pLight_Manager);
 	Safe_Release(m_pPicking);
 	Safe_Release(m_pCamera_Manager);
+	Safe_Release(m_pEffect_Manager);
 
 
 	Safe_Release(m_pInput_Device);
