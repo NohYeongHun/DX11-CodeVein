@@ -9,10 +9,10 @@ HRESULT CPlayer_SecondSkillState::Initialize(_uint iStateNum, void* pArg)
 
     /* Active와 동시에 Collider ActiveMap에 넣어둡니다. */
     Add_Collider_Info(m_pPlayer->Find_AnimationIndex(TEXT("DRAGON_LUNGE"))
-        , COLLIDER_ACTIVE_INFO{ 70.f / 289.f, 140.f / 289.f,true, CPlayer::PART_WEAPON, 0 });
+        , COLLIDER_ACTIVE_INFO{ 65.f / 289.f, 80.f / 289.f,true, CPlayer::PART_WEAPON, 0 });
 
-    //Add_Collider_Info(m_pPlayer->Find_AnimationIndex(TEXT("DRAGON_LUNGE"))
-    //    , COLLIDER_ACTIVE_INFO{ 0.f / 289.f, 260.f / 289.f, false, CPlayer::PART_BODY, 1 });
+    Add_Collider_Info(m_pPlayer->Find_AnimationIndex(TEXT("DRAGON_LUNGE"))
+        , COLLIDER_ACTIVE_INFO{ 100.f / 289.f, 130.f / 289.f,true, CPlayer::PART_WEAPON, 1 });
 
 	m_fIncreaseDamage = 10.f; // 기본 공격력 증가량 설정
 

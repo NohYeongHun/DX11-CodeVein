@@ -6,11 +6,6 @@ CSlash::CSlash(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 
 CSlash::CSlash(const CSlash& Prototype)
     : CGameObject(Prototype)
-    , m_fTargetRadius(Prototype.m_fTargetRadius)
-    , m_fRotationSpeed(Prototype.m_fRotationSpeed)
-    , m_fScaleSpeed(Prototype.m_fScaleSpeed)
-    , m_fWinSizeX(Prototype.m_fWinSizeX)
-    , m_fWinSizeY(Prototype.m_fWinSizeY)
 {
 }
 
@@ -36,33 +31,9 @@ HRESULT CSlash::Initialize_Clone(void* pArg)
     }
     m_eCurLevel = pDesc->eCurLevel;
 
-    // 화면 크기 가져오기
-    RECT rcClient;
-    GetClientRect(g_hWnd, &rcClient);
-    m_fWinSizeX = static_cast<_float>(rcClient.right - rcClient.left);
-    m_fWinSizeY = static_cast<_float>(rcClient.bottom - rcClient.top);
-
-    // 컴포넌트 추가
-    if (FAILED(Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxPosTex"),
-        TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom))))
+    if (FAILED(Ready_Components()))
     {
-        CRASH("Failed Load Shader");
-        return E_FAIL;
-    }
-
-    if (FAILED(Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_VIBuffer_Rect"),
-        TEXT("Com_VIBuffer"), reinterpret_cast<CComponent**>(&m_pVIBufferCom))))
-    {
-        CRASH("Failed Load VIBuffer");
-        return E_FAIL;
-    }
-
-
-
-    if (FAILED(Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_SlashUI"),
-        TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom))))
-    {
-        CRASH("Failed Load Texture");
+        CRASH("Failed Ready_Components");
         return E_FAIL;
     }
 
@@ -74,13 +45,13 @@ HRESULT CSlash::Initialize_Clone(void* pArg)
 
 void CSlash::Priority_Update(_float fTimeDelta)
 {
-    if (!m_bActive)
+    if (!m_IsActivate)
         return;
 }
 
 void CSlash::Update(_float fTimeDelta)
 {
-    if (!m_bActive)
+    if (!m_IsActivate)
         return;
 
     // 타이머 업데이트
@@ -89,20 +60,17 @@ void CSlash::Update(_float fTimeDelta)
     // 시간이 지나면 비활성화
     if (m_fCurrentTime >= m_fDisplayTime)
     {
-        Set_Active(false);
+        m_IsActivate = false;
+        Reset_Timer();
+        
         return;
     }
 
-    m_fAnimationTime += fTimeDelta;
-    _float fPulseX = (sinf(m_fAnimationTime * m_fScaleSpeed) + 1.0f) * 0.1f + 0.9f;
-    _float fPulseY = (sinf(m_fAnimationTime * m_fScaleSpeed * 0.5f) + 1.0f) * 0.05f + 0.95f; // Y축은 덜 움직이게
-    m_fSizeX = 250.0f * fPulseX; // 가로를 더 길게
-    m_fSizeY = 6.0f * fPulseY;   // 세로를 더 얇게, 덜 움직이게
 }
 
 void CSlash::Late_Update(_float fTimeDelta)
 {
-    if (!m_bActive)
+    if (!m_IsActivate)
         return;
 
     // UI 렌더 그룹에 추가
@@ -112,7 +80,7 @@ void CSlash::Late_Update(_float fTimeDelta)
 
 HRESULT CSlash::Render()
 {
-    if (!m_bActive)
+    if (!m_IsActivate)
     {
         // Active, Target도 아닌데 Render되고 있다면 문제가 있음.
         CRASH("Failed Render LockOnUI");
@@ -128,7 +96,7 @@ HRESULT CSlash::Render()
 
 
     // UI용 쉐이더 패스 (LockOnPass = 패스 7)
-    if (FAILED(m_pShaderCom->Begin(7)))
+    if (FAILED(m_pShaderCom->Begin(9)))
     {
         CRASH("Ready Shader Begin Failed");
         return E_FAIL;
@@ -150,45 +118,34 @@ HRESULT CSlash::Render()
     return S_OK;
 }
 
+#pragma region POOLING 전용 함수
 void CSlash::OnActivate(void* pArg)
 {
-}
-
-void CSlash::OnDeactivate()
-{
-}
-
-void CSlash::Set_Target(CGameObject* pTarget)
-{
-    m_pTarget = pTarget;
-    m_bActive = (pTarget != nullptr);
-    m_fAnimationTime = 0.0f; // 애니메이션 초기화
-    m_fCurrentTime = 0.0f;   // 타이머 초기화
-}
-
-void CSlash::Clear_Target()
-{
-    m_pTarget = nullptr;
-    m_bActive = false;
-}
-
-void CSlash::Set_Position(_fvector vPosition)
-{
-    // 1. 그려질 곳. Position 설정.
-    m_pTransformCom->Set_State(STATE::POSITION, vPosition);
-    
-    // 2. 설정되었을 때 Camera에 따른 방향을 재계산할 필요성이 존재합니다.
+    // 1. Activate하는데 필요한 값 설정
+    SLASHACTIVATE_DESC* pDesc = static_cast<SLASHACTIVATE_DESC*>(pArg);
+    m_eCurLevel = pDesc->eCurLevel;
+    m_vHitDirection = pDesc->vHitDirection;
+    m_pTransformCom->Set_State(STATE::POSITION, pDesc->vHitPosition);
+    m_fDisplayTime = pDesc->fDisPlayTime;
+    // 2. 설정되었을때 Camera에 따른 방향을 재계산할 필요성이 존재.
     m_bDirectionCalculated = false;
+    
+
+    // 3. 위치 및 회전계산.
+    Initialize_Transform();
+    m_IsActivate = true;
 }
 
-/* 무기의 공격 방향 가져오기. */
-void CSlash::Set_Hit_Direction(_fvector vDirection)
+// Deactivate시 필요한 정보가? 딱히 없을듯.
+void CSlash::OnDeActivate()
 {
-     m_vHitDirection = vDirection;
+    m_pGameInstance->Add_GameObject_ToPools(TEXT("SLASH_EFFECT"), this);
 }
+#pragma endregion
 
 
-void CSlash::Rotate_Slash()
+
+void CSlash::Initialize_Transform()
 {
     // 이미 계산되었다면 다시 계산하지 않음
     if (m_bDirectionCalculated)
@@ -223,7 +180,9 @@ void CSlash::Rotate_Slash()
     m_pTransformCom->Set_State(STATE::LOOK, vLook);
 
     // 6. 크기 설정.
-    m_pTransformCom->Set_Scale({ 1.4f, 0.2f, 1.f });
+    _float fSizeX = 1.5f + static_cast<float>(rand()) / RAND_MAX * 1.5f; // 1.5f ~ 3.f
+    _float fSizeY = 0.2f + static_cast<float>(rand()) / RAND_MAX * 0.2f; // 0.2f ~ 0.3f
+    m_pTransformCom->Set_Scale({ fSizeX, fSizeY, 1.f });
 
     // 7. 계산 완료 플래그 설정
     m_bDirectionCalculated = true;
@@ -252,14 +211,74 @@ HRESULT CSlash::Bind_ShaderResources()
         return E_FAIL;
     }
 
-    if (FAILED(m_pTextureCom->Bind_Shader_Resource(m_pShaderCom, "g_Texture", 0)))
+    if (FAILED(m_pTextureCom[TEXTURE_MASK]->Bind_Shader_Resource(m_pShaderCom, "g_MaskTexture", 0)))
     {
         CRASH("Failed Bind Texture LockOnUI");
         return E_FAIL;
     }
 
+    if (FAILED(m_pTextureCom[TEXTURE_DIFFUSE]->Bind_Shader_Resource(m_pShaderCom, "g_Texture", 0)))
+    {
+        CRASH("Failed Bind Texture LockOnUI");
+        return E_FAIL;
+    }
+
+    // 시간 진행도 계산 (0.0 ~ 1.0)
+    _float fTimeRatio = m_fCurrentTime / m_fDisplayTime;
+    
+    // 시간에 따른 스케일 감소 (1.0 -> 0.3)
+    _float fScale = 1.0f - (fTimeRatio * 0.7f);
+    
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fTimeRatio", &fTimeRatio, sizeof(_float))))
+    {
+        CRASH("Failed Bind TimeRatio");
+        return E_FAIL;
+    }
+    
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fScale", &fScale, sizeof(_float))))
+    {
+        CRASH("Failed Bind Scale");
+        return E_FAIL;
+    }
+
     return S_OK;
 }
+
+HRESULT CSlash::Ready_Components()
+{
+    // 컴포넌트 추가
+    if (FAILED(Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxPosTex"),
+        TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom))))
+    {
+        CRASH("Failed Load Shader");
+        return E_FAIL;
+    }
+
+    if (FAILED(Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_VIBuffer_Rect"),
+        TEXT("Com_VIBuffer"), reinterpret_cast<CComponent**>(&m_pVIBufferCom))))
+    {
+        CRASH("Failed Load VIBuffer");
+        return E_FAIL;
+    }
+
+
+    if (FAILED(Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_SlashEffectMask"),
+        TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom[TEXTURE_MASK]))))
+    {
+        CRASH("Failed Load Texture");
+        return E_FAIL;
+    }
+
+    if (FAILED(Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_SlashEffectDiffuse"),
+        TEXT("Com_DiffuseTexture"), reinterpret_cast<CComponent**>(&m_pTextureCom[TEXTURE_DIFFUSE]))))
+    {
+        CRASH("Failed Load Texture");
+        return E_FAIL;
+    }
+
+    return S_OK;
+}
+
 
 CSlash* CSlash::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
@@ -291,7 +310,8 @@ void CSlash::Free()
 {
     CGameObject::Free();
     Safe_Release(m_pShaderCom);
-    Safe_Release(m_pTextureCom);
+    for (auto& pTexture : m_pTextureCom)
+        Safe_Release(pTexture);
     Safe_Release(m_pVIBufferCom);
 
     

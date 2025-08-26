@@ -80,10 +80,10 @@ void CPlayer_FirstSkillState::Enter(void* pArg)
 
 void CPlayer_FirstSkillState::Update(_float fTimeDelta)
 {
-    if (m_pPlayer->Is_LockOn() && m_pPlayer->Has_LockOn_Target())
-    {
-        m_pPlayer->Rotate_To_LockOn_Target(fTimeDelta, 2.f);
-    }
+    //if (m_pPlayer->Is_LockOn() && m_pPlayer->Has_LockOn_Target())
+    //{
+    //    m_pPlayer->Rotate_To_LockOn_Target(fTimeDelta, 2.f);
+    //}
 
     //Handle_Input();
     Handle_Unified_Direction_Input(fTimeDelta);

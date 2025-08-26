@@ -6,7 +6,6 @@
 
 HRESULT CEffect_Manager::Initialize(_uint iNumLevels)
 {
-	m_pPools = new map<const _wstring, vector<CGameObject*>>[iNumLevels];
 	m_iNumLevels = iNumLevels;
 
 	return S_OK;
@@ -16,15 +15,15 @@ HRESULT CEffect_Manager::Initialize(_uint iNumLevels)
 /* SourTag => EffectManager에서 소유한 String 이름 */
 HRESULT CEffect_Manager::Move_GameObject_ToObjectLayer(_uint iLayerLevelIndex, const _wstring& strSourTag, const _wstring& strDestTag, _uint iCount, void* pArg)
 {
-	if (iCount > m_pPools[iLayerLevelIndex][strSourTag].size())
+	if (iCount > m_Pools[strSourTag].size())
 		return E_FAIL;
 
 	for (_uint i = 0; i < iCount; ++i)
 	{
 		// 1. 객체 포인터를 가져오고
-		CGameObject* pGameObject = m_pPools[iLayerLevelIndex][strSourTag].back();
+		CGameObject* pGameObject = m_Pools[strSourTag].back();
 		// 2. 제거합니다.
-		m_pPools[iLayerLevelIndex][strSourTag].pop_back();
+		m_Pools[strSourTag].pop_back();
 
 		// 3. OnActivate를 통해 활성화 상태를 만들어 줍니다.
 		pGameObject->OnActivate(pArg);
@@ -37,26 +36,27 @@ HRESULT CEffect_Manager::Move_GameObject_ToObjectLayer(_uint iLayerLevelIndex, c
 	return S_OK;
 }
 
-HRESULT CEffect_Manager::Add_GameObject_ToPools(_uint iLayerLevelIndex, const _wstring& strDestTag, CGameObject* pGameObject)
+
+HRESULT CEffect_Manager::Add_GameObject_ToPools(const _wstring& strDestTag, CGameObject* pGameObject)
 {
 	// 1. 객체를 Pool에 넣어줍니다.
-	m_pPools[iLayerLevelIndex][strDestTag].emplace_back(pGameObject);
+	m_Pools[strDestTag].emplace_back(pGameObject);
 	return S_OK;
 }
 
-void CEffect_Manager::Clear(_uint iLayerLevelIndex)
-{
-	// 1. 예외 조건 처리.
-	if (iLayerLevelIndex >= m_iNumLevels)
-		return;
-
-	// 2. Pool 객체 제거.
-	for (auto& Pair : m_pPools[iLayerLevelIndex])
-	{
-		for (auto& pGameObject : Pair.second)
-			Safe_Release(pGameObject);
-	}
-}
+//void CEffect_Manager::Clear(_uint iLayerLevelIndex)
+//{
+//	// 1. 예외 조건 처리.
+//	if (iLayerLevelIndex >= m_iNumLevels)
+//		return;
+//
+//	// 2. Pool 객체 제거.
+//	for (auto& Pair : m_Pools)
+//	{
+//		for (auto& pGameObject : Pair.second)
+//			Safe_Release(pGameObject);
+//	}
+//}
 
 void CEffect_Manager::Update()
 {
@@ -84,9 +84,15 @@ CEffect_Manager* CEffect_Manager::Create(_uint iNumLevels)
 void CEffect_Manager::Free()
 {
 	CBase::Free();
-	for (_uint i = 0; i < m_iNumLevels; ++i)
-		Clear(i);
+
+	// 2. Pool 객체 제거.
+	for (auto& Pair : m_Pools)
+	{
+		for (auto& pGameObject : Pair.second)
+			Safe_Release(pGameObject);
+	}
 	
 	Safe_Release(m_pGameInstance);
-	Safe_Delete_Array(m_pPools);
+	m_Pools.clear();
+	//Safe_Delete_Array(m_pPools);
 }

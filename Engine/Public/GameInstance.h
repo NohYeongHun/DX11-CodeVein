@@ -186,8 +186,7 @@ public:
 #pragma region EFFECT_MANAGER
 public:
 	HRESULT Move_GameObject_ToObjectLayer(_uint iLayerLevelIndex, const _wstring& strSourTag, const _wstring& strDestTag, _uint iCount, void* pArg);
-	HRESULT Add_GameObject_ToPools(_uint iLayerLevelIndex, const _wstring& strDestTag, class CGameObject* pGameObject);
-	void	Clear(_uint iLayerLevelIndex);
+	HRESULT Add_GameObject_ToPools(const _wstring& strDestTag, class CGameObject* pGameObject);
 
 #pragma endregion
 

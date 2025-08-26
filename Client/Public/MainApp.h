@@ -47,8 +47,15 @@ private:
 	HRESULT Ready_Clone_HUD(const _wstring& strLayerTag);
 	HRESULT Ready_Clone_Inventory(const _wstring& strLayerTag);
 	HRESULT Ready_Clone_SkillUI(const _wstring& strLayerTag);
+
+	
 	
 #pragma endregion
+
+#pragma region POOLING
+	HRESULT Ready_Pooling();
+#pragma endregion
+
 
 	
 	HRESULT Start_Level(LEVEL eStartLevelID);

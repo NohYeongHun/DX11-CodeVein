@@ -87,6 +87,7 @@ public:
 	virtual void OnDeActivate() {}; // 오브젝트가 비활성화되어 풀로 돌아갈 때 호출.
 	
 public:
+	void Set_Activate(_bool IsActivate) { m_IsActivate = IsActivate; }
 	const _bool Is_DeActivate() { return !m_IsActivate; }
 
 protected:

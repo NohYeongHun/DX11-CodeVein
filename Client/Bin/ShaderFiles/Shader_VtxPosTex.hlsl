@@ -2,6 +2,7 @@
 
 matrix g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 texture2D g_Texture;
+texture2D g_MaskTexture;
 
 
 float g_fFillRatio;
@@ -136,6 +137,7 @@ PS_OUT PS_MAIN4(PS_IN In)
 
 float g_fAlpha;
 
+
 PS_OUT PS_MAIN5(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
@@ -225,15 +227,50 @@ PS_OUT PS_MAIN9(PS_IN In)
     return Out;
 }
 
+float g_fTimeRatio; // 0.0 ~ 1.0 (시간 진행도)
+float g_fScale; // 스케일 팩터
+
 PS_OUT PS_MAIN10(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
 
-    // 텍스처 없이 검정색 오버레이만 생성
-    float2 uv = In.vTexcoord;
-    float4 baseColor = g_Texture.Sample(DefaultSampler, uv);
+    // UV 좌표를 중심에서 스케일링
+    float2 center = float2(0.5f, 0.5f);
+    float2 scaledUV = center + (In.vTexcoord - center) / g_fScale;
     
-    Out.vColor = baseColor;
+    // 스케일된 UV가 범위를 벗어나면 discard
+    if (scaledUV.x < 0.0f || scaledUV.x > 1.0f || scaledUV.y < 0.0f || scaledUV.y > 1.0f)
+        discard;
+
+    // 텍스처 없이 검정색 오버레이만 생성
+    vector vSourDiffuse = g_Texture.Sample(DefaultSampler, scaledUV);
+    vector vDestDiffuse = g_MaskTexture.Sample(DefaultSampler, scaledUV);
+    
+    // 소스 텍스처가 검정색이면 discard
+    if (vDestDiffuse.r < 0.1f && vDestDiffuse.g < 0.1f && vDestDiffuse.b < 0.1f)
+        discard;
+    
+    
+    vector vMask = g_MaskTexture.Sample(DefaultSampler, scaledUV);
+    vector vMtrlDiffuse = vDestDiffuse * (1.f - vMask) + vSourDiffuse * (vMask);
+    
+    //if (vDestDiffuse.r > 0.9f && vDestDiffuse.g > 0.9f && vDestDiffuse.b > 0.9f)
+    //    discard;
+    
+    
+    //vector vMask = g_MaskTexture.Sample(DefaultSampler, scaledUV);
+    //vector vMtrlDiffuse = vDestDiffuse * (vMask) + vSourDiffuse * (1 - vMask);
+    
+    // 시간에 따른 알파 페이드아웃
+    float fadeAlpha = 1.0f - g_fTimeRatio;
+    vMtrlDiffuse.a *= fadeAlpha;
+    
+    Out.vColor = vMtrlDiffuse;
+    //float2 uv = In.vTexcoord;
+    //float4 baseColor = g_MaskTexture.Sample(DefaultSampler, uv);
+    //float4 baseColor = g_Texture.Sample(DefaultSampler, uv);
+    
+    //Out.vColor = baseColor;
     
     
 

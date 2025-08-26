@@ -238,7 +238,7 @@ void CQueenKnight::On_Collision_Enter(CGameObject* pOther)
         if (!HasBuff(BUFF_INVINCIBLE))
         {
             // 1. 데미지를 입고.
-            Take_Damage(pPlayerWeapon->Get_AttackPower());
+            Take_Damage(pPlayerWeapon->Get_AttackPower(), pPlayerWeapon);
 
             // 2. 해당 위치에 검흔 Effect 생성?
 
@@ -560,6 +560,11 @@ void CQueenKnight::Take_Damage(_float fDamage)
     m_MonsterStat.fHP -= fDamage;
     Decrease_HpUI(fDamage, 0.1f);
 
+}
+void CQueenKnight::Take_Damage(_float fDamage, CGameObject* pGameObject)
+{
+    CMonster::Take_Damage(fDamage, pGameObject);
+    Decrease_HpUI(fDamage, 0.1f);
 }
 void CQueenKnight::Increase_HpUI(_float fHp, _float fTime)
 {

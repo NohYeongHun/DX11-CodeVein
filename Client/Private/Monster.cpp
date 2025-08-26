@@ -61,11 +61,11 @@ HRESULT CMonster::Initialize_Clone(void* pArg)
     m_pTransformCom->Set_State(STATE::POSITION, vMonsterPos);
 
     // CSlash UI 초기화 (비활성화 상태로 생성)
-    if (FAILED(Initialize_SlashUI()))
+    /*if (FAILED(Initialize_SlashUI()))
     {
         CRASH("Failed Initialize SlashUI");
         return E_FAIL;
-    }
+    }*/
 
     return S_OK;
 }
@@ -79,10 +79,7 @@ void CMonster::Update(_float fTimeDelta)
 { 
     CContainerObject::Update(fTimeDelta);
 
-    if (m_pSlashUI->Is_Active())
-    {
-        m_pSlashUI->Update(fTimeDelta);
-    }
+
 		
 }
 
@@ -95,19 +92,12 @@ void CMonster::Finalize_Update(_float fTimeDelta)
     {
         /* 콜라이더의 위치는 계속 업데이트 해주어야함. => 이상한 위치에 존재할 수도 있으므로.*/
         m_pColliderCom->Update(m_pTransformCom->Get_WorldMatrix());
-
-        /* 콜라이더 매니저에서 상태비교 하는거는 카메라 프러스텀을 이용해서 제어. */
-        //if (m_pGameInstance->Is_In_Camera_Frustum(m_pTransformCom->Get_State(STATE::POSITION)))
-        //    m_pGameInstance->Add_Collider_To_Manager(m_pColliderCom);
     }
 }
 
 void CMonster::Late_Update(_float fTimeDelta)
 {
     CContainerObject::Late_Update(fTimeDelta);
-
-    if (m_pSlashUI->Is_Active())
-        m_pSlashUI->Late_Update(fTimeDelta);
 }
 
 HRESULT CMonster::Render()
@@ -150,9 +140,6 @@ void CMonster::On_Collision_Exit(CGameObject* pOther)
 void CMonster::Take_Damage(_float fDamage)
 {
     m_MonsterStat.fHP -= fDamage;
-    
-    // 몬스터가 맞을 때 CSlash UI 표시 (기본 각도 0)
-    Show_Slash_UI();
 }
 
 
@@ -198,7 +185,6 @@ void CMonster::Take_Damage(_float fDamage, CGameObject* pGameObject)
         // 7. SlashUI를 hit point에서 표시
         Show_Slash_UI_At_Position(vClosestPoint, vAttackDirection);
     }
-    //Show_Slash_UI();
 
 }
 
@@ -938,56 +924,16 @@ void CMonster::Reset_Collider_ActiveInfo()
 #pragma endregion
 
 #pragma region CSlash UI 관련
-HRESULT CMonster::Initialize_SlashUI()
+void CMonster::Show_Slash_UI_At_Position(_fvector vHitPosition, _fvector vAttackDirection)
 {
-    CSlash::SLASHUI_DESC slashDesc{};
-    slashDesc.eCurLevel = m_eCurLevel;
+    // 1. 풀에서 꺼내씁니다.
+    CSlash::SLASHACTIVATE_DESC Desc{};
+    Desc.eCurLevel = m_eCurLevel;
+    Desc.vHitPosition = vHitPosition;
+    Desc.vHitDirection = vAttackDirection;
+    Desc.fDisPlayTime = 0.5f;
+    m_pGameInstance->Move_GameObject_ToObjectLayer(ENUM_CLASS(m_eCurLevel), TEXT("SLASH_EFFECT"), TEXT("Layer_Effect"), 1, &Desc);
 
-    m_pSlashUI = dynamic_cast<CSlash*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT
-        ,ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_SlashUI"), &slashDesc));
-    
-    if (!m_pSlashUI)
-    {
-        CRASH("Failed Initialize UI");
-        return E_FAIL;
-    }
-
-    // 생성된 UI를 현재 레벨에 추가 (비활성화 상태)
-    m_pSlashUI->Set_Active(false); // 처음엔 비활성화
-
-    return S_OK;
-}
-
-void CMonster::Show_Slash_UI()
-{
-    if (m_pSlashUI)
-    {
-        m_pSlashUI->Set_Active(true);
-        m_pSlashUI->Set_Target(this);
-    }
-}
-
-void CMonster::Show_Slash_UI(_float fRotationAngle)
-{
-    if (m_pSlashUI)
-    {
-        m_pSlashUI->Set_Active(true);
-        m_pSlashUI->Set_Target(this);
-        // 회전 각도 설정 함수 추가 필요
-        m_pSlashUI->Set_Rotation(fRotationAngle);
-    }
-}
-
-void CMonster::Show_Slash_UI_At_Position(_fvector vPosition, _fvector vAttackDirection)
-{
-    if (m_pSlashUI)
-    {
-        m_pSlashUI->Set_Active(true);
-        m_pSlashUI->Set_Target(this);
-        m_pSlashUI->Set_Position(vPosition); // 월드 좌표 그대로 사용
-        m_pSlashUI->Set_Hit_Direction(vAttackDirection);
-        m_pSlashUI->Rotate_Slash();
-    }
 }
 
 
@@ -1000,8 +946,6 @@ void CMonster::Destroy()
     if (m_pColliderCom)
         m_pColliderCom->Set_Active(false);
 
-    if (m_pSlashUI)
-        m_pSlashUI->Set_Active(false);
 }
 
 void CMonster::Free()
@@ -1012,9 +956,6 @@ void CMonster::Free()
     Safe_Release(m_pColliderCom);
     Safe_Release(m_pNavigationCom);
     Safe_Release(m_pColliderCom);
-
-    // CSlash UI 해제
-    Safe_Release(m_pSlashUI);
 
     m_pTarget = nullptr; // 상호 참조 문제.
 }

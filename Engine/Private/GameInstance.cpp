@@ -155,7 +155,7 @@ HRESULT CGameInstance::Clear_Resources(_uint iClearLevelID)
 	m_pCollider_Manager->Clear(iClearLevelID);
 	m_pTrigger_Manager->Clear(iClearLevelID);
 	
-	m_pEffect_Manager->Clear(iClearLevelID);
+	//m_pEffect_Manager->Clear(iClearLevelID);
 	
 
 	return S_OK;
@@ -659,17 +659,17 @@ HRESULT CGameInstance::Move_GameObject_ToObjectLayer(_uint iLayerLevelIndex, con
 
 	return m_pEffect_Manager->Move_GameObject_ToObjectLayer(iLayerLevelIndex, strSourTag, strDestTag, iCount, pArg);
 }
-HRESULT CGameInstance::Add_GameObject_ToPools(_uint iLayerLevelIndex, const _wstring& strDestTag, CGameObject* pGameObject)
+HRESULT CGameInstance::Add_GameObject_ToPools(const _wstring& strDestTag, CGameObject* pGameObject)
 {
 	if (nullptr == m_pEffect_Manager)
 		return E_FAIL;
 
-	return m_pEffect_Manager->Add_GameObject_ToPools(iLayerLevelIndex, strDestTag, pGameObject);
+	return m_pEffect_Manager->Add_GameObject_ToPools(strDestTag, pGameObject);
 }
-void CGameInstance::Clear(_uint iLayerLevelIndex)
-{
-	m_pEffect_Manager->Clear(iLayerLevelIndex);
-}
+//void CGameInstance::Clear(_uint iLayerLevelIndex)
+//{
+//	m_pEffect_Manager->Clear(iLayerLevelIndex);
+//}
 
 #pragma endregion
 

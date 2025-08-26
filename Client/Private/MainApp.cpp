@@ -57,6 +57,12 @@ HRESULT CMainApp::Initialize_Clone()
 	}
 		
 
+	if (FAILED(Ready_Pooling()))
+	{
+		CRASH("Failed Ready Pooling For Static");
+		return E_FAIL;
+	}
+
 	if (FAILED(Start_Level(LEVEL::LOGO)))
 		return E_FAIL;	
 
@@ -359,14 +365,23 @@ HRESULT CMainApp::Ready_Prototype_HUD()
 #pragma region SLASH UI
 
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
-		, TEXT("Prototype_Component_Texture_SlashUI")
+		, TEXT("Prototype_Component_Texture_SlashEffectMask")
 		, CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/User/Slash/Slash%d.png"), 1))))
 	{
 		CRASH("Failed Load SlashEffect Texture");
 		return E_FAIL;
 	}
 
-	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_SlashUI"),
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
+		, TEXT("Prototype_Component_Texture_SlashEffectDiffuse")
+		, CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/User/Slash/SlashDiffuse%d.png"), 1))))
+	{
+		CRASH("Failed Load SlashEffect Texture");
+		return E_FAIL;
+	}
+
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_SlashEffect"),
 		CSlash::Create(m_pDevice, m_pContext))))
 	{
 		CRASH("Failed Load Slash GameObject ");
@@ -571,6 +586,32 @@ HRESULT CMainApp::Ready_Clone_SkillUI(const _wstring& strLayerTag)
 }
 
 
+
+HRESULT CMainApp::Ready_Pooling()
+{
+
+	// 1. Prototype Clone 객체 생성.
+	CSlash::SLASHUI_DESC slashDesc{};
+
+	CGameObject* pGameObject = nullptr;
+
+	// 2. 추가할 개수만큼 추가. 
+	/* 3개 추가. => 풀링 제대로 되는지 테스트. */
+	for (_uint i = 0; i < 100; ++i)
+	{
+		pGameObject = dynamic_cast<CGameObject*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT
+			, ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_SlashEffect"), &slashDesc));
+		if (nullptr == pGameObject)
+		{
+			CRASH("Failed Create GameObject");
+			return E_FAIL;
+		}
+		m_pGameInstance->Add_GameObject_ToPools( TEXT("SLASH_EFFECT"), pGameObject);
+	}
+
+
+	return S_OK;
+}
 
 HRESULT CMainApp::Start_Level(LEVEL eStartLevelID)
 {

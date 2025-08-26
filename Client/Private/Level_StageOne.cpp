@@ -61,6 +61,12 @@ HRESULT CLevel_StageOne::Initialize_Clone()
 		return E_FAIL;
 	}
 
+	if (FAILED(Ready_Layer_Pooling()))
+	{
+		CRASH("Failed Ready_Layer_Pooling");
+		return E_FAIL;
+	}
+
 	if (FAILED(Ready_Events()))
 	{
 		CRASH("Failed Ready_Events");
@@ -287,7 +293,7 @@ HRESULT CLevel_StageOne::Ready_Layer_Monster(const _wstring& strLayerTag)
 	TRIGGER_MONSTER_DESC TriggerDesc{};
 
 	TriggerDesc = { { 0.f ,0.f, 0.f }, 250.f , TEXT("Layer_SlaveVampire")
-		, TEXT("Layer_Monster") , 5, 0 };
+		, TEXT("Layer_Monster") , 4, 0 };
 
 	/*TriggerDesc = { { 250.f , 0.f, 0.f }, 200.f , TEXT("Layer_WolfDevil")
 		, TEXT("Layer_Monster") , 2, 0 };*/
@@ -361,13 +367,13 @@ HRESULT CLevel_StageOne::Ready_Layer_SlaveVampire(const _wstring& strLayerTag)
 		return E_FAIL;
 	}
 
-	_float3 monsterPositionArray[5] = {
-		{ 32.f, 21.f, -46.f }, { 32.f, 21.f, -28.f }, { 50.f, 21.f, -28.f },
+	_float3 monsterPositionArray[4] = {
+		{ 32.f, 21.f, -28.f }, { 50.f, 21.f, -28.f },
 		{ 62.f, 21.f, -38.f }, { 61.f, 21.f, -38.f }
 	};
 
 
-	for (_uint i = 0; i < 5; ++i)
+	for (_uint i = 0; i < 4; ++i)
 	{
 		Desc.vPos = monsterPositionArray[i];
 		if (FAILED(m_pGameInstance->Add_GameObject_ToTrigger(ENUM_CLASS(m_eCurLevel)
@@ -423,6 +429,32 @@ HRESULT CLevel_StageOne::Ready_Layer_GiantWhiteDevil(const _wstring& strLayerTag
 
 	m_pGameInstance->Add_Trigger(ENUM_CLASS(m_eCurLevel), TriggerDesc);
 
+	return S_OK;
+}
+
+HRESULT CLevel_StageOne::Ready_Layer_Pooling()
+{
+	//// 1. Prototype Clone 객체 생성.
+	//CSlash::SLASHUI_DESC slashDesc{};
+	//slashDesc.eCurLevel = m_eCurLevel;
+
+	//CGameObject* pGameObject = nullptr;
+
+	///* 100개 추가. */
+	//for (_uint i = 0; i < 100; ++i)
+	//{
+	//	pGameObject = dynamic_cast<CGameObject*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT
+	//		, ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_SlashEffect"), &slashDesc));
+	//	if (nullptr == pGameObject)
+	//	{
+	//		CRASH("Failed Create GameObject");
+	//		return E_FAIL;
+	//	}
+	//	m_pGameInstance->Add_GameObject_ToPools(
+	//		ENUM_CLASS(m_eCurLevel), TEXT("SLASH_EFFECT"), pGameObject);
+	//}
+
+	
 	return S_OK;
 }
 
