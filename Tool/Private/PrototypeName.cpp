@@ -32,7 +32,7 @@ const MODEL_DESC Model_Prototypes[] =
 extern unsigned int Model_PrototypeSize = 1;
 
 
-// Diffuse, Gradient
+// Diffuse, Gradient, Gradient_Alpha, Mask, Noise
 const EFFECT_TEXTURE_DESC Effect_TexturePrototypes[] =
 {
 	{ TEXT("Prototype_Component_Effect_DiffuseTexture")
@@ -46,6 +46,9 @@ const EFFECT_TEXTURE_DESC Effect_TexturePrototypes[] =
 
 	//{TEXT("Prototype_Component_Texture_EffectMask")
 	//, TEXT("../Bin/Resources/Textures/Effects/Texture/Mask/Mask%d.png"), 2},
+
+	//{TEXT("Prototype_Component_Texture_EffectNoise")
+	//, TEXT("../Bin/Resources/Textures/Effects/Texture/Noise/Noise%d.png"), 2},
 };
 
 extern unsigned int Effect_TexturePrototypeSize = 3;

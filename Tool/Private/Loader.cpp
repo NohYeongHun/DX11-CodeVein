@@ -221,6 +221,31 @@ HRESULT CLoader::Loading_For_Logo_EffectTexture()
 }
 HRESULT CLoader::Loading_For_Logo_EffectParticle()
 {
+#pragma region 1. Shader 생성.
+ 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LOGO), TEXT("Prototype_Component_Shader_VtxInstance_PointParticle"),
+		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxInstance_PointParticle.hlsl")
+			, VTXPOINTPARTICLE::Elements, VTXPOINTPARTICLE::iNumElements))))
+	{
+		CRASH("Failed Load Point Particle Shader");
+		return E_FAIL;
+	}
+#pragma endregion
+
+#pragma region 2. PARTICLE OBJECT
+	if (FAILED(m_pGameInstance->Add_Prototype(
+		ENUM_CLASS(LEVEL::LOGO)
+		, TEXT("Prototype_GameObject_EffectParticle")
+		, CTool_EffectParticle::Create(m_pDevice, m_pContext))))
+	{
+		CRASH("Failed Load Effect Particle Object");
+		return E_FAIL;
+	}
+#pragma endregion
+
+		
+
+
+
 	return S_OK;
 }
 #pragma endregion

@@ -29,6 +29,17 @@ typedef struct EffectTextureDesc
 extern const EFFECT_TEXTURE_DESC Effect_TexturePrototypes[];
 extern unsigned int Effect_TexturePrototypeSize;
 
+
+typedef struct EffectParticleDesc
+{
+	const _tchar* prototypeName;
+	const _tchar* textureFilePath;
+	_uint iNumTextures;
+}EFFECT_PARTICLE_DESC;
+
+extern const EFFECT_PARTICLE_DESC Effect_ParticlePrototypes[];
+extern unsigned int Effect_ParticlePrototypeSize;
+
 #pragma endregion
 
 NS_END

@@ -1,4 +1,5 @@
-﻿CMap_Tool::CMap_Tool(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿#include "Map_Tool.h"
+CMap_Tool::CMap_Tool(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : m_pDevice { pDevice }
     , m_pDeviceContext { pContext }
     , m_pGameInstance { CGameInstance::GetInstance()}
@@ -1002,9 +1003,9 @@ void CMap_Tool::Render_Effect_TextureInspector()
             static float direction[3] = { 0.0f, 1.0f, 0.0f };
             ImGui::SliderFloat3("Direction", direction, -1.0f, 1.0f);
 
-            ImGui::SliderFloat3("Scale", (float*)&m_CurrentEffectDesc.vScale, 0.1f, 5.0f);
-            ImGui::SliderFloat("Display Time", &m_CurrentEffectDesc.fDisPlayTime, 0.1f, 5.0f);
-            ImGui::SliderInt("Shader Path", (int*)&m_CurrentEffectDesc.iShaderPath, 0, TEXTURE_SHADER_END - 1);
+            ImGui::SliderFloat3("Scale", (float*)&m_CurrentEffectTexture_Desc.vScale, 0.1f, 5.0f);
+            ImGui::SliderFloat("Display Time", &m_CurrentEffectTexture_Desc.fDisPlayTime, 0.1f, 5.0f);
+            ImGui::SliderInt("Shader Path", (int*)&m_CurrentEffectTexture_Desc.iShaderPath, 0, TEXTURE_SHADER_END - 1);
 
             // === Effect 생성 버튼 ===
             ImGui::Separator();
@@ -1020,8 +1021,8 @@ void CMap_Tool::Render_Effect_TextureInspector()
                 // UI에서 설정한 방향값 사용
                 _vector vDirection = XMVectorSet(direction[0], direction[1], direction[2], 0.0f);
 
-                Create_Effect_Texture(vDirection, vCalculatedPosition, m_CurrentEffectDesc.vScale,
-                    m_CurrentEffectDesc.fDisPlayTime, m_CurrentEffectDesc.iShaderPath);
+                Create_Effect_Texture(vDirection, vCalculatedPosition, m_CurrentEffectTexture_Desc.vScale,
+                    m_CurrentEffectTexture_Desc.fDisPlayTime, m_CurrentEffectTexture_Desc.iShaderPath);
             }
         }
 
@@ -1082,7 +1083,253 @@ void CMap_Tool::Create_Effect_Texture(const _vector& vHitDirection, const _vecto
 
 void CMap_Tool::Render_Effect_ParticleTab()
 {
+    // 선택 시 오른쪽 창에 뜨게.// 탭 내부 내용 (왼쪽 메인 영역)
+    ImGui::Text("Effect Texture List");
+    ImGui::Separator();
 
+    Render_Effect_ParticleInspector();
+}
+void CMap_Tool::Render_Effect_ParticleInspector()
+{
+    // 화면 크기 가져오기
+    ImGuiIO& io = ImGui::GetIO();
+    ImVec2 displaySize = io.DisplaySize;
+
+    // 오른쪽 창 설정
+    const float windowWidth = 500.0f;
+    const float windowHeight = displaySize.y - 50.0f;
+    const float windowX = displaySize.x - windowWidth - 10.0f;
+    const float windowY = 30.0f;
+
+    ImGui::SetNextWindowPos(ImVec2(windowX, windowY), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(windowWidth, windowHeight), ImGuiCond_FirstUseEver);
+
+    if (ImGui::Begin("Effect Texture Creator##Creator", nullptr, ImGuiWindowFlags_NoCollapse))
+    {
+        ImGui::Text("Effect Texture Creator");
+        ImGui::Separator();
+
+        // === 각 텍스처 타입별 선택 UI ===
+        const char* textureTypeNames[] = {
+            "Diffuse Texture",
+            "Gradient Texture",
+            "Gradient Alpha Texture",
+            "Mask Texture",
+            "Noise Texture"
+        };
+
+        for (_uint textureType = 0; textureType < TEXTURE_END; ++textureType)
+        {
+            if (ImGui::CollapsingHeader(textureTypeNames[textureType], ImGuiTreeNodeFlags_DefaultOpen))
+            {
+                // 해당 타입의 Prototype TextureComponent에 접근
+                if (textureType < Effect_TexturePrototypeSize)
+                {
+                    const EFFECT_TEXTURE_DESC& prototypeDesc = Effect_TexturePrototypes[textureType];
+
+                    // 사용 여부 체크박스 (고유 ID 부여)
+                    string checkboxLabel = "Use " + string(textureTypeNames[textureType]) + "##" + to_string(textureType);
+                    ImGui::Checkbox(checkboxLabel.c_str(), &m_SelectedTextures[textureType].bSelected);
+
+                    if (m_SelectedTextures[textureType].bSelected)
+                    {
+                        ImGui::Indent();
+
+                        // GameInstance에서 해당 Prototype의 TextureComponent 가져오기
+                        CTexture* pPrototypeTexture = static_cast<CTexture*>(
+                            m_pGameInstance->Get_Prototype(PROTOTYPE::COMPONENT, ENUM_CLASS(LEVEL::LOGO),
+                                prototypeDesc.prototypeName));
+
+                        if (pPrototypeTexture != nullptr)
+                        {
+                            _uint numTextures = pPrototypeTexture->Get_NumTexture(); // 이 메서드 필요
+
+                            // 텍스처 인덱스 선택 슬라이더 (고유 ID 부여)
+                            string sliderLabel = "Texture Index##" + to_string(textureType);
+                            int selectedIndex = (int)m_SelectedTextures[textureType].iSelectedIndex;
+                            if (ImGui::SliderInt(sliderLabel.c_str(), &selectedIndex, 0, numTextures - 1))
+                            {
+                                m_SelectedTextures[textureType].iSelectedIndex = selectedIndex;
+                            }
+
+                            // 텍스처 미리보기
+                            ID3D11ShaderResourceView* pSRV = pPrototypeTexture->Get_ShaderResourceView(selectedIndex);
+                            if (pSRV != nullptr)
+                            {
+                                ImVec2 previewSize(64.f, 64.0f);
+                                ImGui::Text("Preview:");
+                                ImGui::Image((ImTextureID)pSRV, previewSize);
+
+                                // 클릭으로 큰 미리보기 (고유 ID 부여)
+                                string popupLabel = "Large Preview##" + to_string(textureType);
+                                if (ImGui::IsItemClicked())
+                                {
+                                    ImGui::OpenPopup(popupLabel.c_str());
+                                }
+
+                                // 큰 미리보기 팝업
+                                if (ImGui::BeginPopup(popupLabel.c_str()))
+                                {
+                                    ImGui::Image((ImTextureID)pSRV, ImVec2(100.0f, 100.0f));
+                                    ImGui::EndPopup();
+                                }
+                            }
+                        }
+                        else
+                        {
+                            ImGui::Text("Prototype texture not found!");
+                        }
+
+                        ImGui::Unindent();
+                    }
+                }
+
+                ImGui::Separator();
+            }
+        }
+
+        // === 기본 속성 설정 ===
+        if (ImGui::CollapsingHeader("Basic Properties"))
+        {
+            // 카메라 기준 거리 설정
+            static float distance = 10.0f;
+            ImGui::SliderFloat("Distance from Camera", &distance, 1.0f, 20.0f);
+
+            // 카메라 기준 방향 설정.
+            static float direction[3] = { 0.0f, 1.0f, 0.0f };
+            ImGui::SliderFloat3("Direction", direction, -1.0f, 1.0f);
+
+            /* 변수값 넣기. */
+            static int iNumInstance = { 100 };
+            ImGui::SliderInt("NumInstance", &iNumInstance, 50, 1000);
+
+            static float Center[3] = { 0.f, 0.f, 0.f };
+            ImGui::SliderFloat3("Center", Center, 0.0f, 10.0f);
+
+            static float Range[3] = { 1.f, 1.f, 1.f };
+            ImGui::SliderFloat3("Range", Range, 0.0f, 30.0f);
+
+            static float Size[2] = { 0.1f, 0.2f };
+            ImGui::SliderFloat2("Size", Size, 0.1f, 2.f);
+
+            static float Pivot[3] = { 0.f, 0.f, 0.f};
+            ImGui::SliderFloat3("Pivot", Pivot, 0.f, 10.f);
+
+            static float Speed[2] = { 1.f, 2.f};
+            ImGui::SliderFloat2("Speed", Speed, 1.f, 10.f);
+
+            static float LifeTime[2] = {1.f, 5.f};
+            ImGui::SliderFloat2("LifeTime", LifeTime, 1.f, 10.f);
+
+            ImGui::SliderInt("Shader Path", (int*)&m_CurrentEffectParticle_Desc.iShaderPath, 0, PARTICLE_SHADER_END - 1);
+
+            ImGui::SliderInt("PARTICLE TYPE", (int*)&m_CurrentEffectParticle_Desc.eParticleType, 0, CTool_EffectParticle::END - 1);
+
+            static bool isLoop = { false };
+            ImGui::Checkbox("Is Loop", &isLoop);
+
+            ImGui::SameLine();
+            static bool isBillBoard = { false };
+            ImGui::Checkbox("Is BillBoard", &isBillBoard);
+            
+            
+
+            // === Effect 생성 버튼 ===
+            ImGui::Separator();
+            if (ImGui::Button("Create Particle", ImVec2(-1, 40)))
+            {
+                // 카메라 위치 계산
+                _vector vCamPos = XMLoadFloat4(m_pGameInstance->Get_CamPosition());
+                _vector vCamLook = XMVector3Normalize(m_pCameraTransformCom->Get_State(STATE::LOOK));
+                _vector vCalculatedPosition = XMVectorAdd(vCamPos, XMVectorScale(vCamLook, distance));
+                _vector vDirection = XMVectorSet(direction[0], direction[1], direction[2], 0.0f);
+
+                // ImGui 값들을 m_CurrentEffectParticle_Desc에 설정
+                m_CurrentEffectParticle_Desc.eCurLevel = m_eCurLevel;
+                m_CurrentEffectParticle_Desc.vPosition = vCalculatedPosition;
+                m_CurrentEffectParticle_Desc.vDirection = vDirection;
+                
+                // VIBuffer_Point_Instance용 데이터
+                m_CurrentEffectParticle_Desc.iNumInstance = iNumInstance;
+                m_CurrentEffectParticle_Desc.vCenter = _float3(Center[0], Center[1], Center[2]);
+                m_CurrentEffectParticle_Desc.vRange = _float3(Range[0], Range[1], Range[2]);
+                m_CurrentEffectParticle_Desc.vSize = _float2(Size[0], Size[1]);
+                m_CurrentEffectParticle_Desc.vPivot = _float3(Pivot[0], Pivot[1], Pivot[2]);
+                m_CurrentEffectParticle_Desc.vSpeed = _float2(Speed[0], Speed[1]);
+                m_CurrentEffectParticle_Desc.vLifeTime = _float2(LifeTime[0], LifeTime[1]);
+                m_CurrentEffectParticle_Desc.isLoop = isLoop;
+                m_CurrentEffectParticle_Desc.isBillBoard = isBillBoard;
+                
+                // 텍스처 정보 복사
+                for (_uint i = 0; i < TEXTURE_END; ++i)
+                {
+                    m_CurrentEffectParticle_Desc.useTextureCheckArray[i] = m_SelectedTextures[i].bSelected;
+                    m_CurrentEffectParticle_Desc.useTextureIndexArray[i] = m_SelectedTextures[i].iSelectedIndex;
+                }
+
+                Create_Effect_Particle();
+            }
+           
+        }
+
+        ImGui::End();
+    }
+
+}
+void CMap_Tool::Create_Effect_Particle()
+{
+    // m_CurrentEffectParticle_Desc 사용해서 파티클 생성
+    CGameObject* pEffectParticle = dynamic_cast<CGameObject*>(m_pGameInstance->Clone_Prototype(
+        PROTOTYPE::GAMEOBJECT, ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_EffectParticle"), &m_CurrentEffectParticle_Desc
+    ));
+
+    if (pEffectParticle != nullptr)
+    {
+        // 레벨에 추가 (Effect 레이어에)
+        if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(
+            ENUM_CLASS(m_eCurLevel), TEXT("Layer_Effect"), pEffectParticle)))
+        {
+            // 실패시
+            Safe_Release(pEffectParticle);
+        }
+        else
+        {
+            // 성공 시
+            
+        }
+    }
+
+    // 성공/실패 팝업
+    if (pEffectParticle != nullptr)
+    {
+        ImGui::OpenPopup("Particle Created");
+    }
+    else
+    {
+        ImGui::OpenPopup("Particle Creation Failed");
+    }
+
+    // 성공 팝업
+    if (ImGui::BeginPopup("Particle Created"))
+    {
+        ImGui::Text("Effect Particle created successfully!");
+        if (ImGui::Button("OK"))
+        {
+            ImGui::CloseCurrentPopup();
+        }
+        ImGui::EndPopup();
+    }
+
+    // 실패 팝업
+    if (ImGui::BeginPopup("Particle Creation Failed"))
+    {
+        ImGui::Text("Failed to create Effect Particle!");
+        if (ImGui::Button("OK"))
+        {
+            ImGui::CloseCurrentPopup();
+        }
+        ImGui::EndPopup();
+    }
 }
 #pragma endregion
 

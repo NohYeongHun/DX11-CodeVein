@@ -70,6 +70,7 @@ void CTool_EffectTexture::Update(_float fTimeDelta)
     m_fCurrentTime += fTimeDelta;
 
     // 시간이 지나면 비활성화
+
     if (m_fCurrentTime >= m_fDisplayTime)
     {
         m_IsActivate = false;

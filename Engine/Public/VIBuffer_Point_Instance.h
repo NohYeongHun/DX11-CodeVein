@@ -24,6 +24,9 @@ public:
 	virtual HRESULT Bind_Resources() override;
 	virtual HRESULT Render() override;
 
+public:
+	void Create_Buffer();
+
 #pragma region 정점 버퍼를 움직여서 효과를 주는 함수들
 public:
 	void Spread(_float fTimeDelta);

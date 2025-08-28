@@ -40,6 +40,12 @@ public:
 		TEXTURE_SHADER_END
 	};
 
+	enum PARTICLE_SHADERPATH
+	{
+		PARTICLE_SHADER_DEFAULT = 0,
+		PARTICLE_SHADER_END
+	};
+
 private:
 	explicit CMap_Tool(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual ~CMap_Tool() = default;
@@ -125,12 +131,27 @@ private:
 
 	void Create_Effect_Texture(const _vector& vHitDirection, const _vector& vHitPosition, 
 		const _float3& vScale, _float fDisplayTime, _uint iShaderPath);
+
+private:
+	CTool_EffectTexture::TOOLEFFECT_TEXTURE_DESC m_CurrentEffectTexture_Desc = {};
+#pragma endregion
+
+#pragma region Effect Particle
+private:
+	void Render_Effect_ParticleTab();
+	void Render_Effect_ParticleInspector();
+
+
+private:
+	void Create_Effect_Particle();
+
+private:	
+	CTool_EffectParticle::TOOLEFFECT_PARTICLE_DESC m_CurrentEffectParticle_Desc = {};
 #pragma endregion
 
 
  
-private:
-	void Render_Effect_ParticleTab();
+
 #pragma endregion
 
 
@@ -150,7 +171,7 @@ public:
 	};
 
 	SelectedTextureInfo m_SelectedTextures[TEXTURE_END] = {};
-	CTool_EffectTexture::TOOLEFFECT_TEXTURE_DESC m_CurrentEffectDesc = {};
+
 
 #pragma endregion
 

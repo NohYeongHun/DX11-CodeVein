@@ -4,12 +4,28 @@
 NS_BEGIN(Tool)
 class CTool_EffectParticle final : public CGameObject
 {
+public:
+    enum PARTICLE_TYPE
+    {
+        DROP,
+        SPREAD,
+        END
+    };
+
+    enum PARTICLE_SHADER
+    {
+        PARTICLE_SHADER_DEFAULT = 0,
+        PARTICLE_SHADER_END,
+
+    };
+    
 
 public:
     /* 동적으로 버퍼를 생성 해야함. */
     typedef struct tagToolEffectParticle: public CGameObject::GAMEOBJECT_DESC
     {
         LEVEL eCurLevel = { LEVEL::END };
+        // ========= VIBuffer_Point_Instance 용도 ============
         _uint			iNumInstance;
         _float3			vCenter;
         _float3			vRange;
@@ -18,6 +34,20 @@ public:
         _float2			vSpeed;
         _float2			vLifeTime;
         _bool			isLoop;
+
+        // ========= 객체 용도 ============
+        _vector         vPosition = {};
+        _vector         vDirection = {};
+        _bool           useTextureCheckArray[TEXTURE::TEXTURE_END]; // 사용하지 않을 Texture들 지정하기.
+        _uint           useTextureIndexArray[TEXTURE::TEXTURE_END]; // 사용할 텍스쳐 번호 지정.
+        _uint           iShaderPath = {};
+        _bool           isBillBoard = { false };
+
+        // =========== PARTICLE_TYPE ===========
+        PARTICLE_TYPE eParticleType;
+
+
+
     }TOOLEFFECT_PARTICLE_DESC;
 
 
@@ -47,14 +77,17 @@ private:
     // 컴포넌트
     class CShader* m_pShaderCom = { nullptr };
     class CTexture* m_pTextureCom[TEXTURE_END] = { nullptr };
-    class CVIBuffer_Rect* m_pVIBufferCom = { nullptr };
+    class CVIBuffer_Point_Instance* m_pVIBufferCom = { nullptr };
 
     LEVEL m_eCurLevel = { LEVEL::END };
     _bool m_bActive = false;
 
+    _bool m_isLoop = { false };
+    _bool m_isBillBoard = { false };
+
     _vector m_vHitDirection = {};
     _float3 m_vScale = {};
-    _float m_fDisplayTime = 1.0f;        // 표시 시간 (초)
+    _float m_fDisplayTime = {};        // 표시 시간 (초)
     _float m_fCurrentTime = 0.0f;        // 현재 경과 시간
     _float m_fRotationAngle = 0.0f;      // Z축 회전 각도 (라디안)
     _uint m_iShaderPath = {}; // Shader Path.
@@ -62,12 +95,15 @@ private:
     _bool  m_bDirectionCalculated = false; // 방향이 계산되었는지 여부 => 한번만 계산.
 
 
+    _uint m_iTextureIndexArray[TEXTURE_END] = {};
 
 
+    PARTICLE_TYPE m_eParticleType = { PARTICLE_TYPE::END };
 
 private:
     HRESULT Bind_ShaderResources();
-    HRESULT Ready_Components();
+    HRESULT Ready_Components(const TOOLEFFECT_PARTICLE_DESC* pDesc);
+    HRESULT Ready_VIBuffer_Point(const TOOLEFFECT_PARTICLE_DESC* pDesc);
 
 public:
     static CTool_EffectParticle* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

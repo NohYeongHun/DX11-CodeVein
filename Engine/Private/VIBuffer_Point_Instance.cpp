@@ -1,4 +1,5 @@
-﻿CVIBuffer_Point_Instance::CVIBuffer_Point_Instance(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿#include "VIBuffer_Point_Instance.h"
+CVIBuffer_Point_Instance::CVIBuffer_Point_Instance(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CVIBuffer_Instance{ pDevice, pContext }
 {
 }
@@ -126,6 +127,18 @@ HRESULT CVIBuffer_Point_Instance::Render()
 	m_pContext->DrawInstanced(1, m_iNumInstance, 0, 0);
 
 	return S_OK;
+}
+
+void CVIBuffer_Point_Instance::Create_Buffer()
+{
+	D3D11_SUBRESOURCE_DATA	InitialDesc{};
+	InitialDesc.pSysMem = m_pInstanceVertices;
+
+	if (FAILED(m_pDevice->CreateBuffer(&m_VBInstanceDesc, &InitialDesc, &m_pVBInstance)))
+	{
+		CRASH("Faile CVIBuffer_Instance Create Buffer");
+		return;
+	}
 }
 
 #pragma region 정점 버퍼를 움직여서 효과를 주는 함수들.
