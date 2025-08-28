@@ -46,7 +46,7 @@ private:
 
 #pragma region 2. 다음 레벨 전환
 private:
-	void Open_Level();
+	void Open_Level(LEVEL eLevel);
 	void Start_FadeOut();
 	void Start_FadeIn();
 

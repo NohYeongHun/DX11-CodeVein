@@ -80,7 +80,31 @@ HRESULT CLevel_GamePlay::Render()
 	return S_OK;
 }
 
+
+
+
+
 #pragma region 0. 먼저 생성되어야 하는 객체들 추가. 
+
+HRESULT CLevel_GamePlay::Ready_Layer_FadeOut(const _wstring& strLayerTag)
+{
+	CFade_Out::FADEOUT_DESC Desc{};
+	Desc.fX = g_iWinSizeX * 0.5f;
+	Desc.fY = g_iWinSizeY * 0.5f;
+	Desc.fSizeX = g_iWinSizeX;
+	Desc.fSizeY = g_iWinSizeY;
+	Desc.iTextureIndex = 0;
+
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel), strLayerTag,
+		ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_FadeOut"), &Desc)))
+	{
+		CRASH("Failed Ready Fade Out");
+		return E_FAIL;
+	}
+
+	return S_OK;
+}
+
 HRESULT CLevel_GamePlay::Ready_Lights()
 {
 	LIGHT_DESC			LightDesc{};
@@ -468,24 +492,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_SkyBoss(const _wstring& strLayerTag)
 	return S_OK;
 }
 
-HRESULT CLevel_GamePlay::Ready_Layer_FadeOut(const _wstring& strLayerTag)
-{
-	CFade_Out::FADEOUT_DESC Desc{};
-	Desc.fX = g_iWinSizeX * 0.5f;
-	Desc.fY = g_iWinSizeY * 0.5f;
-	Desc.fSizeX = g_iWinSizeX;
-	Desc.fSizeY = g_iWinSizeY;
-	Desc.iTextureIndex = 0;
 
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel), strLayerTag,
-		ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_FadeOut"), &Desc)))
-	{
-		CRASH("Failed Ready Fade Out");
-		return E_FAIL;
-	}
-		
-	return S_OK;
-}
 
 HRESULT CLevel_GamePlay::Ready_Layer_Effect(const _wstring& strLayerTag)
 {

@@ -5,6 +5,7 @@
 NS_BEGIN(Engine)
 
 using LayerTable = map<const _wstring, class CLayer*>;
+using PoolTable = map<const _wstring, vector<class CGameObject*>>;
 
 class ENGINE_DLL CGameInstance final : public CBase
 {
@@ -185,9 +186,9 @@ public:
 
 #pragma region EFFECT_MANAGER
 public:
-	HRESULT Move_GameObject_ToObjectLayer(_uint iLayerLevelIndex, const _wstring& strSourTag, const _wstring& strDestTag, _uint iCount, void* pArg);
-	HRESULT Add_GameObject_ToPools(const _wstring& strDestTag, class CGameObject* pGameObject);
-
+	HRESULT Move_GameObject_ToObjectLayer(_uint iLayerLevelIndex, const _wstring& strSourTag, const _wstring& strDestTag, _uint iCount, _uint iEffectType, void* pArg);
+	HRESULT Add_GameObject_ToPools(const _wstring& strDestTag, _uint iEffectType, class CGameObject* pGameObject);
+	const PoolTable& Export_EditPool(_uint iEffectType);
 #pragma endregion
 
 

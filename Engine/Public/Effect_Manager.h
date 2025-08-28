@@ -1,6 +1,9 @@
 ﻿#pragma once
 
 NS_BEGIN(Engine)
+
+using PoolTable = map<const _wstring, vector<class CGameObject*>>;
+
 class CEffect_Manager final : public CBase
 {
 private:
@@ -13,15 +16,25 @@ public:
 #pragma region ENGINE에 제공
 public:
 	// Pool -> ObjectManager
-	HRESULT Move_GameObject_ToObjectLayer(_uint iLayerLevelIndex, const _wstring& strSourTag, const _wstring& strDestTag, _uint iCount, void* pArg = nullptr);
+	HRESULT Move_GameObject_ToObjectLayer(_uint iLayerLevelIndex, const _wstring& strSourTag, const _wstring& strDestTag, _uint iCount, _uint iEffectType, void* pArg = nullptr);
 	// Object Manager -> Pool
 	//HRESULT Move_GameObject_ToPools(_uint iLayerLevelIndex, const _wstring& strSourTag, const _wstring& strDestTag, _uint iCount, void* pArg = nullptr);
 
 	// Pool에 추가
-	HRESULT Add_GameObject_ToPools(const _wstring& strDestTag, class CGameObject* pGameObject);
-	//void	Clear(_uint iLayerLevelIndex);
+	HRESULT Add_GameObject_ToPools(const _wstring& strDestTag, _uint iEffectType, class CGameObject* pGameObject);
 	void	Update();
+
+
+#pragma region DEBUG 용도 제공 (Effect Tool을 위한..)
+public:
+	const PoolTable& Export_EditPool(_uint iEffectType);
+
 #pragma endregion
+
+#pragma endregion
+
+
+
 
 
 private:
@@ -30,7 +43,8 @@ private:
 
 #pragma region 게임 시작 시 해당 레벨에 생성한 객체들을 모두 담아둡니다.
 private:
-	map<const _wstring, vector<class CGameObject*>> m_Pools = {};
+	//map<const _wstring, vector<class CGameObject*>> m_Pools = {};
+	PoolTable* m_pPools = {};
 	_uint m_iNumLevels = {};
 
 #pragma endregion

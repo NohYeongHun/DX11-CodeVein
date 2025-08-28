@@ -652,19 +652,24 @@ void CGameInstance::Set_TargetPlayer(CGameObject* pTargetPlayer)
 #pragma endregion
 
 #pragma region EFFECT_MANAGER
-HRESULT CGameInstance::Move_GameObject_ToObjectLayer(_uint iLayerLevelIndex, const _wstring& strSourTag, const _wstring& strDestTag, _uint iCount, void* pArg)
+HRESULT CGameInstance::Move_GameObject_ToObjectLayer(_uint iLayerLevelIndex, const _wstring& strSourTag, const _wstring& strDestTag, _uint iCount, _uint iEffectType, void* pArg)
 {
 	if (nullptr == m_pEffect_Manager)
 		return E_FAIL;
 
-	return m_pEffect_Manager->Move_GameObject_ToObjectLayer(iLayerLevelIndex, strSourTag, strDestTag, iCount, pArg);
+	return m_pEffect_Manager->Move_GameObject_ToObjectLayer(iLayerLevelIndex, strSourTag, strDestTag, iCount, iEffectType, pArg);
 }
-HRESULT CGameInstance::Add_GameObject_ToPools(const _wstring& strDestTag, CGameObject* pGameObject)
+HRESULT CGameInstance::Add_GameObject_ToPools(const _wstring& strDestTag, _uint iEffectType, CGameObject* pGameObject)
 {
 	if (nullptr == m_pEffect_Manager)
 		return E_FAIL;
 
-	return m_pEffect_Manager->Add_GameObject_ToPools(strDestTag, pGameObject);
+	return m_pEffect_Manager->Add_GameObject_ToPools(strDestTag, iEffectType, pGameObject);
+}
+const PoolTable& CGameInstance::Export_EditPool(_uint iEffectType)
+{
+	return m_pEffect_Manager->Export_EditPool(iEffectType);
+	// TODO: 여기에 return 문을 삽입합니다.
 }
 //void CGameInstance::Clear(_uint iLayerLevelIndex)
 //{

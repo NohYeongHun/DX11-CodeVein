@@ -277,6 +277,53 @@ PS_OUT PS_MAIN10(PS_IN In)
     return Out;
 }
 
+PS_OUT PS_MAIN11(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+    // UV 좌표를 중심에서 스케일링
+    float2 center = float2(0.5f, 0.5f);
+    float2 scaledUV = center + (In.vTexcoord - center) / g_fScale;
+    
+    // 스케일된 UV가 범위를 벗어나면 discard
+    if (scaledUV.x < 0.0f || scaledUV.x > 1.0f || scaledUV.y < 0.0f || scaledUV.y > 1.0f)
+        discard;
+
+    // 텍스처 없이 검정색 오버레이만 생성
+    vector vSourDiffuse = g_Texture.Sample(DefaultSampler, scaledUV);
+    vector vDestDiffuse = g_MaskTexture.Sample(DefaultSampler, scaledUV);
+    
+    // 소스 텍스처가 검정색이면 discard
+    if (vDestDiffuse.r < 0.1f && vDestDiffuse.g < 0.1f && vDestDiffuse.b < 0.1f)
+        discard;
+    
+    
+    vector vMask = g_MaskTexture.Sample(DefaultSampler, scaledUV);
+    vector vMtrlDiffuse = vDestDiffuse * (1.f - vMask) + vSourDiffuse * (vMask);
+    
+    //if (vDestDiffuse.r > 0.9f && vDestDiffuse.g > 0.9f && vDestDiffuse.b > 0.9f)
+    //    discard;
+    
+    
+    //vector vMask = g_MaskTexture.Sample(DefaultSampler, scaledUV);
+    //vector vMtrlDiffuse = vDestDiffuse * (vMask) + vSourDiffuse * (1 - vMask);
+    
+    // 시간에 따른 알파 페이드아웃
+    float fadeAlpha = 1.0f - g_fTimeRatio;
+    vMtrlDiffuse.a *= fadeAlpha;
+    
+    Out.vColor = vMtrlDiffuse;
+    //float2 uv = In.vTexcoord;
+    //float4 baseColor = g_MaskTexture.Sample(DefaultSampler, uv);
+    //float4 baseColor = g_Texture.Sample(DefaultSampler, uv);
+    
+    //Out.vColor = baseColor;
+    
+    
+
+    return Out;
+}
+
 
 technique11 DefaultTechnique
 {
@@ -371,7 +418,7 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_MAIN9();
     }
     
-    pass MonsterHitPass
+    pass MonsterLineSlashPass
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_Default, 0);
@@ -379,6 +426,16 @@ technique11 DefaultTechnique
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_MAIN10();
+    }
+
+    pass MonsterHitFlashPass
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_MAIN11();
     }
 
 

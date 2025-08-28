@@ -1,32 +1,32 @@
 ﻿#pragma once
-#include "UIObject.h"
+#include "GameObject.h"
 
 NS_BEGIN(Client)
-/* 몬스터가 소유하고 있다가 출력 되게? */
-class CSlash final : public CGameObject
+class CHitFlashEffect final : public CGameObject
 {
 public:
-    enum TEXTURE { TEXTURE_DIFFUSE, TEXTURE_MASK, TEXTURE_END };
+	enum TEXTURE { TEXTURE_DIFFUSE, TEXTURE_MASK, TEXTURE_END };
+
 
 public:
-    typedef struct tagSlashEffectDesc : public CGameObject::GAMEOBJECT_DESC
+    typedef struct tagHitFlashDesc : public CGameObject::GAMEOBJECT_DESC
     {
         LEVEL eCurLevel = { LEVEL::END };
-    }SLASHEFFECT_DESC;
+    }HITFLASH_DESC;
 
-    typedef struct tagSlashActivateDesc
+    typedef struct tagHitFlashEffectEnterDesc
     {
-        LEVEL eCurLevel = {LEVEL::END};
+        LEVEL eCurLevel = { LEVEL::END };
         _vector vHitDirection = {};
         _vector vHitPosition = {};
         _float  fDisPlayTime = {};
-        _float3 vScale = { 1.5f, 0.2f, 1.f };
-    }SLASHACTIVATE_DESC;
+        _float3 vScale = {};
+    }HITFLASHENTER_DESC;
 
 private:
-    explicit CSlash(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-    explicit CSlash(const CSlash& Prototype);
-    virtual ~CSlash() = default;
+    explicit CHitFlashEffect(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+    explicit CHitFlashEffect(const CHitFlashEffect& Prototype);
+    virtual ~CHitFlashEffect() = default;
 
 public:
     virtual HRESULT Initialize_Prototype();
@@ -40,6 +40,8 @@ public:
 public:
     virtual void OnActivate(void* pArg) override;
     virtual void OnDeActivate() override;
+
+
 #pragma endregion
 
 
@@ -49,9 +51,6 @@ public:
 
 public:
     void Initialize_Transform();
-
-public:
-    static const EFFECTTYPE EffectType = EFFECTTYPE::TEXTURE;
 
 private:
     // 컴포넌트
@@ -64,9 +63,10 @@ private:
     CGameObject* m_pTarget = { nullptr };
     _bool m_bActive = false;
 
-    
+
     // 타이머
-    _float m_fDisplayTime = 1.0f;        // 표시 시간 (초)
+    //_float m_fDisplayTime = 1.0f;        // 표시 시간 (초)
+    _float m_fDisplayTime = 10.0f;        // 테스트용 표시 시간 (초)
     _float m_fCurrentTime = 0.0f;        // 현재 경과 시간
     // 회전 정보
     _float m_fRotationAngle = 0.0f; // Z축 회전 각도 (라디안)
@@ -74,6 +74,8 @@ private:
     _vector m_vHitDirection = {};
     _float3 m_vScale = {};
 
+public:
+    static const EFFECTTYPE EffectType = EFFECTTYPE::TEXTURE;
 
 
 private:
@@ -81,7 +83,7 @@ private:
     HRESULT Ready_Components();
 
 public:
-    static CSlash* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+    static CHitFlashEffect* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
     virtual CGameObject* Clone(void* pArg) override;
     virtual void Free() override;
 };

@@ -1,32 +1,31 @@
-﻿#include "Slash.h"
-CSlash::CSlash(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
-    : CGameObject(pDevice, pContext)
+﻿CHitFlashEffect::CHitFlashEffect(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+    : CGameObject{ pDevice, pContext }
 {
 }
 
-CSlash::CSlash(const CSlash& Prototype)
+CHitFlashEffect::CHitFlashEffect(const CHitFlashEffect& Prototype)
     : CGameObject(Prototype)
 {
 }
 
-HRESULT CSlash::Initialize_Prototype()
+HRESULT CHitFlashEffect::Initialize_Prototype()
 {
     if (FAILED(CGameObject::Initialize_Prototype()))
     {
-        CRASH("Failed Initialize Prototype Slash UI");
+        CRASH("Failed Initialize Prototype CHitFlashEffect");
         return E_FAIL;
     }
 
     return S_OK;
 }
 
-HRESULT CSlash::Initialize_Clone(void* pArg)
+HRESULT CHitFlashEffect::Initialize_Clone(void* pArg)
 {
-    SLASHEFFECT_DESC* pDesc = static_cast<SLASHEFFECT_DESC*>(pArg);
+    HITFLASH_DESC* pDesc = static_cast<HITFLASH_DESC*>(pArg);
 
     if (FAILED(CGameObject::Initialize_Clone(pArg)))
     {
-        CRASH("Failed Clone SlashUI");
+        CRASH("Failed Clone CHitFlashEffect");
         return E_FAIL;
     }
     m_eCurLevel = pDesc->eCurLevel;
@@ -38,52 +37,51 @@ HRESULT CSlash::Initialize_Clone(void* pArg)
     }
 
 
-
-
     return S_OK;
 }
 
-void CSlash::Priority_Update(_float fTimeDelta)
+void CHitFlashEffect::Priority_Update(_float fTimeDelta)
 {
     if (!m_IsActivate)
         return;
+
 }
 
-void CSlash::Update(_float fTimeDelta)
+void CHitFlashEffect::Update(_float fTimeDelta)
 {
     if (!m_IsActivate)
         return;
 
     // 타이머 업데이트
     m_fCurrentTime += fTimeDelta;
-    
+
     // 시간이 지나면 비활성화
     if (m_fCurrentTime >= m_fDisplayTime)
     {
         m_IsActivate = false;
         Reset_Timer();
-        
+
         return;
     }
 
 }
 
-void CSlash::Late_Update(_float fTimeDelta)
+void CHitFlashEffect::Late_Update(_float fTimeDelta)
 {
     if (!m_IsActivate)
         return;
 
-    // UI 렌더 그룹에 추가
+
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::BLEND, this)))
         return;
+
 }
 
-HRESULT CSlash::Render()
+HRESULT CHitFlashEffect::Render()
 {
     if (!m_IsActivate)
     {
-        // Active, Target도 아닌데 Render되고 있다면 문제가 있음.
-        CRASH("Failed Render Slash");
+        CRASH("Failed Render CHitFlashEffect");
         return S_OK;
     }
 
@@ -95,8 +93,7 @@ HRESULT CSlash::Render()
     }
 
 
-    // UI용 쉐이더 패스 (LockOnPass = 패스 7)
-    if (FAILED(m_pShaderCom->Begin(9)))
+    if (FAILED(m_pShaderCom->Begin(10)))
     {
         CRASH("Ready Shader Begin Failed");
         return E_FAIL;
@@ -111,42 +108,43 @@ HRESULT CSlash::Render()
 
     if (FAILED(m_pVIBufferCom->Render()))
     {
-        CRASH("Ready Render LockOnUI Failed");
+        CRASH("Ready Render CHitFlashEffect Failed");
         return E_FAIL;
     }
 
     return S_OK;
 }
 
-#pragma region POOLING 전용 함수
-void CSlash::OnActivate(void* pArg)
+#pragma region 풀링 전용 함수.
+void CHitFlashEffect::OnActivate(void* pArg)
 {
     // 1. Activate하는데 필요한 값 설정
-    SLASHACTIVATE_DESC* pDesc = static_cast<SLASHACTIVATE_DESC*>(pArg);
+    HITFLASHENTER_DESC* pDesc = static_cast<HITFLASHENTER_DESC*>(pArg);
     m_eCurLevel = pDesc->eCurLevel;
     m_vHitDirection = pDesc->vHitDirection;
     m_pTransformCom->Set_State(STATE::POSITION, pDesc->vHitPosition);
     m_fDisplayTime = pDesc->fDisPlayTime;
+    
+
     // 2. 설정되었을때 Camera에 따른 방향을 재계산할 필요성이 존재.
     m_bDirectionCalculated = false;
     m_vScale = pDesc->vScale;
-    
+
 
     // 3. 위치 및 회전계산.
     Initialize_Transform();
     m_IsActivate = true;
 }
 
-// Deactivate시 필요한 정보가? 딱히 없을듯.
-void CSlash::OnDeActivate()
+void CHitFlashEffect::OnDeActivate()
 {
-    m_pGameInstance->Add_GameObject_ToPools(TEXT("SLASH_EFFECT"), ENUM_CLASS(CSlash::EffectType), this);
+    m_pGameInstance->Add_GameObject_ToPools(TEXT("HITFLASH_EFFECT"), ENUM_CLASS(CHitFlashEffect::EffectType), this);
 }
 #pragma endregion
 
 
 
-void CSlash::Initialize_Transform()
+void CHitFlashEffect::Initialize_Transform()
 {
     // 이미 계산되었다면 다시 계산하지 않음
     if (m_bDirectionCalculated)
@@ -168,13 +166,13 @@ void CSlash::Initialize_Transform()
     _float fUpComponent = XMVectorGetX(XMVector3Dot(vAttackDirection, vUp));
     _float fRotationAngle = atan2f(-fUpComponent, fRightComponent);
 
-    
+
     // 4. Z축 회전된 Right와 Up 벡터 계산
     _float fCos = cosf(fRotationAngle);
     _float fSin = sinf(fRotationAngle);
     _vector vRotatedRight = XMVectorAdd(XMVectorScale(vRight, fCos), XMVectorScale(vUp, -fSin));
     _vector vRotatedUp = XMVectorAdd(XMVectorScale(vRight, fSin), XMVectorScale(vUp, fCos));
-    
+
     // 5. TransformCom에 상태 설정 (한 번만)
     m_pTransformCom->Set_State(STATE::RIGHT, vRotatedRight);
     m_pTransformCom->Set_State(STATE::UP, vRotatedUp);
@@ -189,11 +187,8 @@ void CSlash::Initialize_Transform()
     m_bDirectionCalculated = true;
 }
 
-HRESULT CSlash::Bind_ShaderResources()
+HRESULT CHitFlashEffect::Bind_ShaderResources()
 {
-    
-
-    // 쉐이더에 바인딩
     if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", m_pTransformCom->Get_WorldMatrixPtr())))
     {
         CRASH("Failed Bind World Matrix LockOnUI");
@@ -220,22 +215,22 @@ HRESULT CSlash::Bind_ShaderResources()
 
     if (FAILED(m_pTextureCom[TEXTURE_DIFFUSE]->Bind_Shader_Resource(m_pShaderCom, "g_Texture", 0)))
     {
-        CRASH("Failed Bind Texture LockOnUI");
+        CRASH("Failed Bind Texture HitFlash");
         return E_FAIL;
     }
 
     // 시간 진행도 계산 (0.0 ~ 1.0)
     _float fTimeRatio = m_fCurrentTime / m_fDisplayTime;
-    
+
     // 시간에 따른 스케일 감소 (1.0 -> 0.3)
     _float fScale = 1.0f - (fTimeRatio * 0.7f);
-    
+
     if (FAILED(m_pShaderCom->Bind_RawValue("g_fTimeRatio", &fTimeRatio, sizeof(_float))))
     {
         CRASH("Failed Bind TimeRatio");
         return E_FAIL;
     }
-    
+
     if (FAILED(m_pShaderCom->Bind_RawValue("g_fScale", &fScale, sizeof(_float))))
     {
         CRASH("Failed Bind Scale");
@@ -245,7 +240,7 @@ HRESULT CSlash::Bind_ShaderResources()
     return S_OK;
 }
 
-HRESULT CSlash::Ready_Components()
+HRESULT CHitFlashEffect::Ready_Components()
 {
     // 컴포넌트 추가
     if (FAILED(Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxPosTex"),
@@ -263,57 +258,55 @@ HRESULT CSlash::Ready_Components()
     }
 
 
-    if (FAILED(Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_SlashEffectMask"),
+    if (FAILED(Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_HitFlashEffectMask"),
         TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom[TEXTURE_MASK]))))
     {
         CRASH("Failed Load Texture");
         return E_FAIL;
     }
 
-    if (FAILED(Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_SlashEffectDiffuse"),
+    if (FAILED(Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_HitFlashEffectDiffuse"),
         TEXT("Com_DiffuseTexture"), reinterpret_cast<CComponent**>(&m_pTextureCom[TEXTURE_DIFFUSE]))))
     {
         CRASH("Failed Load Texture");
         return E_FAIL;
     }
 
+
     return S_OK;
 }
 
-
-CSlash* CSlash::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+CHitFlashEffect* CHitFlashEffect::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
-    CSlash* pInstance = new CSlash(pDevice, pContext);
+    CHitFlashEffect* pInstance = new CHitFlashEffect(pDevice, pContext);
 
     if (FAILED(pInstance->Initialize_Prototype()))
     {
-        MSG_BOX(TEXT("Create Failed : CSlash"));
+        MSG_BOX(TEXT("Create Failed : CHitFlashEffect"));
         Safe_Release(pInstance);
     }
 
     return pInstance;
 }
 
-CGameObject* CSlash::Clone(void* pArg)
+CGameObject* CHitFlashEffect::Clone(void* pArg)
 {
-    CSlash* pInstance = new CSlash(*this);
+    CHitFlashEffect* pInstance = new CHitFlashEffect(*this);
 
     if (FAILED(pInstance->Initialize_Clone(pArg)))
     {
-        MSG_BOX(TEXT("Clone Failed : CSlash"));
+        MSG_BOX(TEXT("Clone Failed : CHitFlashEffect"));
         Safe_Release(pInstance);
     }
 
     return pInstance;
 }
 
-void CSlash::Free()
+void CHitFlashEffect::Free()
 {
     CGameObject::Free();
     Safe_Release(m_pShaderCom);
     for (auto& pTexture : m_pTextureCom)
         Safe_Release(pTexture);
     Safe_Release(m_pVIBufferCom);
-
-    
 }

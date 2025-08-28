@@ -17,9 +17,20 @@ public:
 		_bool bHasTriggeredStart = false; // 시작 지점에서 Enable/Disable 호출했는지
 		_bool bIsCurrentlyActive = false; // 현재 해당 구간에 있는지
 
-		
-		
 	}COLLIDER_ACTIVE_INFO;
+
+
+	typedef struct tagAnimationSpeedInfo
+	{
+		_float fStartRatio; // 1. 시작 비율
+		_float fEndRatio;	// 2. 끝 비율
+		_uint iAnimationID = 0;
+		_uint iAnimationIndex = 0;
+		_float fOriginSpeed = 1.f;
+		_float fModifySpeed = 1.f;
+		_bool bHasTriggeredStart = false; // 시작 지점에서 Enable/Disable 호출했는지
+		_bool bIsCurrentlyActive = false; // 현재 해당 구간에 있는지
+	}ANIMATION_SPEED_INFO;
 
 public:
 	typedef struct tagPlayerStateDesc : public CState::STATE_DESC
@@ -46,6 +57,18 @@ protected:
 protected:
 	void Add_Collider_Info(_uint iAnimIdx, const COLLIDER_ACTIVE_INFO& info);
 	void Clear_Collider_Info(_uint iAnimIdx);
+#pragma endregion
+
+#pragma region PLAYER 애니메이션 속도 제어 변수.
+protected:
+	virtual void Handle_AnimationSpeed_State();
+	virtual void Reset_AnimationSpeedInfo();
+
+protected:
+	void Add_AnimationSpeed_Info(_uint iAnimIdx, const ANIMATION_SPEED_INFO& info);
+
+protected:
+	unordered_map<_uint, vector<ANIMATION_SPEED_INFO>> m_AnimationSpeedMap;
 #pragma endregion
 
 

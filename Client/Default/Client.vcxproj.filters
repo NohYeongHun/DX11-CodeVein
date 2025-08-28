@@ -217,14 +217,17 @@
     <Filter Include="02. GameObject\Monster\BT\Encounter">
       <UniqueIdentifier>{fbdfd345-7448-4d7d-bed5-0698e4356a0f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02. GameObject\UI\Slash">
-      <UniqueIdentifier>{b13dc14a-57b8-4a1e-82c9-55b6739e07a2}</UniqueIdentifier>
-    </Filter>
     <Filter Include="02. GameObject\Effect">
       <UniqueIdentifier>{d843f012-ee38-4fd8-bb5e-d556a1670c5c}</UniqueIdentifier>
     </Filter>
     <Filter Include="02. GameObject\Effect\Particle">
       <UniqueIdentifier>{e52a447f-e19d-441d-8d35-15d2d0e6b97d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Levels\03. Debug">
+      <UniqueIdentifier>{7148da73-6f40-4c6a-a311-e6a766457e99}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Effect\Slash">
+      <UniqueIdentifier>{b13dc14a-57b8-4a1e-82c9-55b6739e07a2}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -616,13 +619,22 @@
       <Filter>02. GameObject\Player\State\Attack</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Slash.h">
-      <Filter>02. GameObject\UI\Slash</Filter>
+      <Filter>02. GameObject\Effect\Slash</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Particle.h">
       <Filter>02. GameObject\Effect\Particle</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Snow.h">
       <Filter>02. GameObject\Effect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Level_Debug.h">
+      <Filter>01. Levels\03. Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Loader_Debug.h">
+      <Filter>01. Levels\99. Loading\Loader\Personal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\HitFlashEffect.h">
+      <Filter>02. GameObject\Effect\Slash</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -988,13 +1000,22 @@
       <Filter>02. GameObject\Player\State\Attack</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Slash.cpp">
-      <Filter>02. GameObject\UI\Slash</Filter>
+      <Filter>02. GameObject\Effect\Slash</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Particle.cpp">
       <Filter>02. GameObject\Effect\Particle</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Snow.cpp">
       <Filter>02. GameObject\Effect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Level_Debug.cpp">
+      <Filter>01. Levels\03. Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Loader_Debug.cpp">
+      <Filter>01. Levels\99. Loading\Loader\Personal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\HitFlashEffect.cpp">
+      <Filter>02. GameObject\Effect\Slash</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

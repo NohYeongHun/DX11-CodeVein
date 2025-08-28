@@ -49,11 +49,11 @@ HRESULT CLevel_StageOne::Initialize_Clone()
 		return E_FAIL;
 	}
 
-	if (FAILED(Ready_Monster_Trigger()))
-	{
-		CRASH("Failed Ready_Layer_Trigger");
-		return E_FAIL;
-	}
+	//if (FAILED(Ready_Monster_Trigger()))
+	//{
+	//	CRASH("Failed Ready_Layer_Trigger");
+	//	return E_FAIL;
+	//}
 
 	if (FAILED(Ready_Layer_Effect(TEXT("Layer_Effect"))))
 	{
@@ -87,6 +87,13 @@ void CLevel_StageOne::Update(_float fTimeDelta)
 	{
 		// 2. FadeOut 시작
 		Start_FadeOut();
+	}
+
+	if (m_pGameInstance->Get_KeyUp(DIK_F1))
+	{
+		_uint iLevelID = m_pGameInstance->Get_CurrentLevelID();
+		m_pGameInstance->Publish<CLevel_StageOne>(EventType::OPEN_DEBUG, nullptr);
+		return;
 	}
 
 }
@@ -435,7 +442,7 @@ HRESULT CLevel_StageOne::Ready_Layer_GiantWhiteDevil(const _wstring& strLayerTag
 HRESULT CLevel_StageOne::Ready_Layer_Pooling()
 {
 	//// 1. Prototype Clone 객체 생성.
-	//CSlash::SLASHUI_DESC slashDesc{};
+	//CSlash::SLASHEFFECT_DESC slashDesc{};
 	//slashDesc.eCurLevel = m_eCurLevel;
 
 	//CGameObject* pGameObject = nullptr;
@@ -476,9 +483,9 @@ HRESULT CLevel_StageOne::Ready_Layer_Effect(const _wstring& strLayerTag)
 }
 
 #pragma region 레벨 전환
-void CLevel_StageOne::Open_Level()
+void CLevel_StageOne::Open_Level(LEVEL eLevel)
 {
-	if (FAILED(m_pGameInstance->Open_Level(static_cast<_uint>(LEVEL::LOADING), CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL::GAMEPLAY))))
+	if (FAILED(m_pGameInstance->Open_Level(static_cast<_uint>(LEVEL::LOADING), CLevel_Loading::Create(m_pDevice, m_pContext, eLevel))))
 	{
 		CRASH("Failed Open Level StageOne");
 		return;
@@ -519,10 +526,19 @@ HRESULT CLevel_StageOne::Ready_Events()
 {
 	m_pGameInstance->Subscribe(EventType::OPEN_GAMEPAY, Get_ID(), [this](void* pData)
 		{
-			this->Open_Level();
+			this->Open_Level(LEVEL::GAMEPLAY);
 		});
 
 	m_Events.emplace_back(EventType::OPEN_GAMEPAY, Get_ID());
+
+	m_pGameInstance->Subscribe(EventType::OPEN_DEBUG, Get_ID(), [this](void* pData)
+		{
+			this->Open_Level(LEVEL::DEBUG);
+		});
+
+	m_Events.emplace_back(EventType::OPEN_DEBUG, Get_ID());
+
+
 
 	return S_OK;
 }

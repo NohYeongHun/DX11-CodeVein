@@ -203,6 +203,7 @@
     <ClInclude Include="..\Public\Giant_WhiteDevil.h" />
     <ClInclude Include="..\public\Giant_WhiteDevilDefine.h" />
     <ClInclude Include="..\Public\Giant_WhiteDevilTree.h" />
+    <ClInclude Include="..\Public\HitFlashEffect.h" />
     <ClInclude Include="..\Public\HPBar.h" />
     <ClInclude Include="..\Public\HUD.h" />
     <ClInclude Include="..\Public\imconfig.h" />
@@ -225,11 +226,13 @@
     <ClInclude Include="..\Public\Inventory_Panel.h" />
     <ClInclude Include="..\Public\KnightLance.h" />
     <ClInclude Include="..\Public\KnightShield.h" />
+    <ClInclude Include="..\Public\Level_Debug.h" />
     <ClInclude Include="..\Public\Level_GamePlay.h" />
     <ClInclude Include="..\Public\Level_Loading.h" />
     <ClInclude Include="..\Public\Level_Logo.h" />
     <ClInclude Include="..\Public\Level_StageOne.h" />
     <ClInclude Include="..\Public\Loader.h" />
+    <ClInclude Include="..\Public\Loader_Debug.h" />
     <ClInclude Include="..\Public\Loader_GamePlay.h" />
     <ClInclude Include="..\Public\Loader_Logo.h" />
     <ClInclude Include="..\Public\Loader_Personal.h" />
@@ -339,6 +342,7 @@
     <ClCompile Include="..\Private\Fade_Out.cpp" />
     <ClCompile Include="..\Private\Giant_WhiteDevil.cpp" />
     <ClCompile Include="..\Private\Giant_WhiteDevilTree.cpp" />
+    <ClCompile Include="..\Private\HitFlashEffect.cpp" />
     <ClCompile Include="..\Private\HPBar.cpp" />
     <ClCompile Include="..\Private\HUD.cpp" />
     <ClCompile Include="..\Private\imgui.cpp" />
@@ -359,11 +363,13 @@
     <ClCompile Include="..\Private\Inventory_Panel.cpp" />
     <ClCompile Include="..\Private\KnightLance.cpp" />
     <ClCompile Include="..\Private\KnightShield.cpp" />
+    <ClCompile Include="..\Private\Level_Debug.cpp" />
     <ClCompile Include="..\Private\Level_GamePlay.cpp" />
     <ClCompile Include="..\Private\Level_Loading.cpp" />
     <ClCompile Include="..\Private\Level_Logo.cpp" />
     <ClCompile Include="..\Private\Level_StageOne.cpp" />
     <ClCompile Include="..\Private\Loader.cpp" />
+    <ClCompile Include="..\Private\Loader_Debug.cpp" />
     <ClCompile Include="..\Private\Loader_GamePlay.cpp" />
     <ClCompile Include="..\Private\Loader_Logo.cpp" />
     <ClCompile Include="..\Private\Loader_Personal.cpp" />

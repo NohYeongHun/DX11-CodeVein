@@ -445,7 +445,7 @@ HRESULT CQueenKnight::InitializeAction_ToAnimationMap()
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"DOWN_STRIKE"], 1.8f);
 
     // 250frame.
-    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"DOWN_STRIKE_SKILL"], 1.2f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"DOWN_STRIKE_SKILL"], 1.5f);
 
         /* Phase Attack 1 ~ 3 */
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"PHASE_ATTACK1"], 2.5f);

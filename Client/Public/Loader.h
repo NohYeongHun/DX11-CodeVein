@@ -47,12 +47,14 @@ private:
 	CLoader_Logo m_cLoader_Logo;
 	CLoader_StageOne m_cLoader_StatgeOne;
 	CLoader_GamePlay m_cLoader_GamePlay;
+	CLoader_Debug m_cLoader_Debug;
 	
 	
 private:
 	HRESULT Loading_For_Logo_Level();
 	HRESULT Loading_For_StageOne_Level();
 	HRESULT Loading_For_GamePlay_Level();
+	HRESULT Loading_For_Debug_Level();
 	
 
 

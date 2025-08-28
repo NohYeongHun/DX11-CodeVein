@@ -161,69 +161,98 @@ void CPlayer::Late_Update(_float fTimeDelta)
 
 HRESULT CPlayer::Render()
 {
-#ifdef _DEBUG
-    ImGuiIO& io = ImGui::GetIO();
-
-    // 기존 Player Debug Window
-    ImVec2 windowPos = ImVec2(10.f, io.DisplaySize.y - 350.f);
-    ImVec2 windowSize = ImVec2(300.f, 300.f);
-
-    ImGui::SetNextWindowPos(windowPos, ImGuiCond_Once);
-    ImGui::SetNextWindowSize(windowSize, ImGuiCond_Once);
-
-    ImGui::Begin("Player Debug", nullptr, ImGuiWindowFlags_NoCollapse);
-
-    _float3 vPos = {};
-    _vector vMine = m_pTransformCom->Get_State(STATE::POSITION);
-    XMStoreFloat3(&vPos, vMine);
-    ImGui::Text("Player Pos: (%.2f, %.2f, %.2f)", vPos.x, vPos.y, vPos.z);
-
-    if (m_pLockOn_Target)
-    {
-        _float3 vLockOnPos = {};
-        _vector vLockOn = m_pLockOn_Target->Get_Transform()->Get_State(STATE::POSITION);
-        XMStoreFloat3(&vLockOnPos, vLockOn);
-        ImGui::Text("LockOn Target Pos: (%.2f, %.2f, %.2f)", vLockOnPos.x, vLockOnPos.y, vLockOnPos.z);
-
-        _float fDistance = XMVectorGetX(XMVector3Length(vLockOn - vMine));
-        ImGui::Text("LockOn Distance : (%.2f)", fDistance);
-
-        
-        _float fHp = dynamic_cast<CMonster*>(m_pLockOn_Target)->Get_MonsterStat().fHP;
-        ImGui::Text("LockOn HP : (%.2f)", fHp);
-    }
-    
-
-    // === Navigation Debug UI 추가 ===
-    ImGui::Separator();
-    ImGui::Text("=== Navigation Debug ===");
-
-    if (m_pNavigationCom)
-    {
-        _int cellCount = m_pNavigationCom->Get_CellCount();
-        ImGui::Text("Total Cells: %d", cellCount);
-
-        // 현재 플레이어가 어떤 Cell에 있는지 확인
-        _int currentCell = m_pNavigationCom->Find_Cell_By_Position(vPos);
-        ImGui::Text("Current Cell: %d", currentCell);
-
-        // Cell별 정보 표시
-        //static bool showAllCells = false;
-        //ImGui::Checkbox("Show All Cells Info", &showAllCells);
-    }
-    else
-    {
-        ImGui::Text("Navigation Component: NULL");
-    }
-
-    ImGui::End();
-
-    // Navigation 렌더링
-    if (m_pNavigationCom)
-        m_pNavigationCom->Render();
-
-    m_pColliderCom->Render();
-#endif // _DEBUG
+//#ifdef _DEBUG
+//    ImGuiIO& io = ImGui::GetIO();
+//
+//    // 기존 Player Debug Window
+//    ImVec2 windowPos = ImVec2(10.f, io.DisplaySize.y - 350.f);
+//    ImVec2 windowSize = ImVec2(300.f, 300.f);
+//
+//    ImGui::SetNextWindowPos(windowPos, ImGuiCond_Once);
+//    ImGui::SetNextWindowSize(windowSize, ImGuiCond_Once);
+//
+//    ImGui::Begin("Player Debug", nullptr, ImGuiWindowFlags_NoCollapse);
+//
+//    _float3 vPos = {};
+//    _vector vMine = m_pTransformCom->Get_State(STATE::POSITION);
+//    XMStoreFloat3(&vPos, vMine);
+//    ImGui::Text("Player Pos: (%.2f, %.2f, %.2f)", vPos.x, vPos.y, vPos.z);
+//
+//    if (m_pLockOn_Target)
+//    {
+//        _float3 vLockOnPos = {};
+//        _vector vLockOn = m_pLockOn_Target->Get_Transform()->Get_State(STATE::POSITION);
+//        XMStoreFloat3(&vLockOnPos, vLockOn);
+//        ImGui::Text("LockOn Target Pos: (%.2f, %.2f, %.2f)", vLockOnPos.x, vLockOnPos.y, vLockOnPos.z);
+//
+//        _float fDistance = XMVectorGetX(XMVector3Length(vLockOn - vMine));
+//        ImGui::Text("LockOn Distance : (%.2f)", fDistance);
+//
+//        
+//        _float fHp = dynamic_cast<CMonster*>(m_pLockOn_Target)->Get_MonsterStat().fHP;
+//        ImGui::Text("LockOn HP : (%.2f)", fHp);
+//    }
+//    
+//    
+//    // ==== Player Anim Debug 추가 ====
+//    _uint iAnimationIdx = m_pModelCom->Get_CurrentAnimationIndex();
+//    ImGui::Separator();
+//    ImGui::Text("=== Player Animation Idx ====");
+//
+//    ImGui::Text("Cur Anim Idx : %d", iAnimationIdx);
+//    ImGui::Text("Cur Anim Speed : (%.2f)", m_pModelCom->Get_AnimSpeed(iAnimationIdx));
+//
+//
+//    // === Navigation Debug UI 추가 ===
+//    ImGui::Separator();
+//    ImGui::Text("=== Navigation Debug ===");
+//
+//    if (m_pNavigationCom)
+//    {
+//        _int cellCount = m_pNavigationCom->Get_CellCount();
+//        ImGui::Text("Total Cells: %d", cellCount);
+//
+//        // 현재 플레이어가 어떤 Cell에 있는지 확인
+//        _int currentCell = m_pNavigationCom->Find_Cell_By_Position(vPos);
+//        ImGui::Text("Current Cell: %d", currentCell);
+//
+//        // Cell별 정보 표시
+//        //static bool showAllCells = false;
+//        //ImGui::Checkbox("Show All Cells Info", &showAllCells);
+//    }
+//    else
+//    {
+//        ImGui::Text("Navigation Component: NULL");
+//    }
+//
+//    ImGui::Separator();
+//    ImGui::Text("=== Camera Pos ===");
+//
+//    _float3 vCamPos = { };
+//    XMStoreFloat3(&vCamPos, XMLoadFloat4(m_pGameInstance->Get_CamPosition()));
+//
+//    if (m_isLockOn)
+//    {
+//        ImGui::Separator();
+//        ImGui::Text("Lock On Camera Pos : (%.2f, %.2f, %.2f)", vCamPos.x, vCamPos.y, vCamPos.z);
+//    }
+//    else
+//    {
+//        ImGui::Separator();
+//        ImGui::Text("Normal Camera Pos : (%.2f, %.2f, %.2f)", vCamPos.x, vCamPos.y, vCamPos.z);
+//    }
+//
+//
+//
+//
+//    ImGui::End();
+//
+//    // Navigation 렌더링
+//    if (m_pNavigationCom)
+//        m_pNavigationCom->Render();
+//
+//    m_pColliderCom->Render();
+//#endif // _DEBUG
 
     if (FAILED(Ready_Render_Resources()))
     {
@@ -346,7 +375,6 @@ void CPlayer::Move_By_Camera_Direction_8Way(ACTORDIR eDir, _float fTimeDelta, _f
     m_pTransformCom->Set_Quaternion(qNewRot);
 
     // 9. 이동 적용
-    //m_pTransformCom->Move_Direction(vMoveDir, fTimeDelta * fSpeed);
     m_pTransformCom->Move_Direction(vMoveDir, fTimeDelta * fSpeed, m_pNavigationCom);
 }
 
@@ -701,7 +729,8 @@ HRESULT CPlayer::InitializeAction_ToAnimationMap()
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("DAMAGE_R")], 2.f);
 
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("STRONG_ATTACK1")], 2.f);
-    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("CIRCULATE_PURGE")], 1.3f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("CIRCULATE_PURGE")], 1.f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("DRAGON_LUNGE")], 1.5f);
 #pragma endregion
 
     return S_OK;
@@ -1208,9 +1237,7 @@ HRESULT CPlayer::Ready_Fsm()
     m_pFsmCom->Add_State(CPlayer_FirstSkillState::Create(PLAYER_STATE::SKILL_1, &PlayerDesc));
     // X키
     m_pFsmCom->Add_State(CPlayer_SecondSkillState::Create(PLAYER_STATE::SKILL_2, &PlayerDesc));
-    //m_pFsmCom->Add_State(CPlayer_FirstSkillState::Create(PLAYER_STATE::SKILL_1, &PlayerDesc));
-    //m_pFsmCom->Add_State(CPlayer_FirstSkillState::Create(PLAYER_STATE::SKILL_1, &PlayerDesc));
-    //m_pFsmCom->Add_State(CPlayer_FirstSkillState::Create(PLAYER_STATE::SKILL_1, &PlayerDesc));
+
 
     Register_CoolTime();
 

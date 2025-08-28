@@ -132,7 +132,7 @@ BT_RESULT CBT_QueenKnight_DownStrikeAction::Update_Ascend(_float fTimeDelta)
         vTargetLook = XMVectorSetY(vTargetLook, 0.f);
 
         // 후방으로 4.f 길이만큼 이동.
-        vTargetPos -= vTargetLook * 4.f;
+        vTargetPos += vTargetLook * 4.f;
 
         // 목표 하강 지점 (플레이어 머리 위측)
         XMStoreFloat3(&m_vDesecndTarget, vTargetPos);
@@ -179,8 +179,6 @@ BT_RESULT CBT_QueenKnight_DownStrikeAction::Update_Hang(_float fTimeDelta)
             // 목표 지점에 도착했으므로 공격 페이즈로 전환
             if (m_pOwner->Get_CurrentAnimationRatio() >= m_fAttack_StartRatio)
             {
-                m_pOwner->Disable_Collider(CQueenKnight::PART_BODY);
-
                 m_eAttackPhase = ATTACK_PHASE::DESCEND;
                 m_pOwner->Set_Visible(true);
                 m_pOwner->RemoveBuff(CMonster::BUFF_NAVIGATION_OFF, true);
@@ -191,7 +189,7 @@ BT_RESULT CBT_QueenKnight_DownStrikeAction::Update_Hang(_float fTimeDelta)
     {
         if (m_pOwner->Get_CurrentAnimationRatio() >= m_fAttack_StartRatio)
         {
-            m_pOwner->Disable_Collider(CQueenKnight::PART_BODY);
+            //m_pOwner->Disable_Collider(CQueenKnight::PART_BODY);
 
             // 1. 공격 시작 애니메이션에 페이즈 변경.
             m_eAttackPhase = ATTACK_PHASE::DESCEND;
@@ -214,7 +212,7 @@ BT_RESULT CBT_QueenKnight_DownStrikeAction::Update_Descend(_float fTimeDelta)
     {
         m_eAttackPhase = ATTACK_PHASE::COMPLETED;
 
-        m_pOwner->Enable_Collider(CQueenKnight::PART_BODY);
+        //m_pOwner->Enable_Collider(CQueenKnight::PART_BODY);
 
         // 1. 애니메이션 전환.
         _uint iNextAnimationIdx = m_pOwner->Find_AnimationIndex(L"IDLE");

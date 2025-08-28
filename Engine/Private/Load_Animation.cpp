@@ -33,6 +33,7 @@ void CLoad_Animation::Update_TransformationMatrices(const vector<class CLoad_Bon
 {
     m_fCurrentTrackPosition += m_fTickPerSecond * m_fAnimSpeed * fTimeDelta;
 
+    
     if (blendDesc.isBlending)
     {
         Blend_Update_TransformationMatrices(Bones, isLoop, pFinished, blendDesc, fTimeDelta);

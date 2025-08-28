@@ -7,6 +7,7 @@ HRESULT CPlayer_FirstSkillState::Initialize(_uint iStateNum, void* pArg)
     if (FAILED(CPlayerState::Initialize(iStateNum, pArg)))
         return E_FAIL;
 
+#pragma region 콜라이더 관리.
     // 1. 앞찌르기
     Add_Collider_Info(m_pPlayer->Find_AnimationIndex(TEXT("CIRCULATE_PURGE"))
         , COLLIDER_ACTIVE_INFO{ 30.f / 232.f, 40.f / 232.f, true, CPlayer::PART_WEAPON, 0 });
@@ -30,6 +31,27 @@ HRESULT CPlayer_FirstSkillState::Initialize(_uint iStateNum, void* pArg)
     // 5. 왼쪽 위부터 중간 아래로 베기.
     Add_Collider_Info(m_pPlayer->Find_AnimationIndex(TEXT("CIRCULATE_PURGE"))
         , COLLIDER_ACTIVE_INFO{ 0.f / 232.f, 200.f / 232.f, false, CPlayer::PART_BODY, 5 });
+#pragma endregion
+
+#pragma region 애니메이션 스피드 제어
+    _float fOriginSpeed = m_pModelCom->Get_AnimSpeed(m_pPlayer->Find_AnimationIndex(TEXT("CIRCULATE_PURGE")));
+    // 앞 찌르기
+    Add_AnimationSpeed_Info(m_pPlayer->Find_AnimationIndex(TEXT("CIRCULATE_PURGE"))
+        , ANIMATION_SPEED_INFO{1.f / 232.f, 40.f / 232.f, 0, m_pPlayer->Find_AnimationIndex(TEXT("CIRCULATE_PURGE"))
+        , fOriginSpeed, 2.f});
+
+    // 회전 공격 
+    Add_AnimationSpeed_Info(m_pPlayer->Find_AnimationIndex(TEXT("CIRCULATE_PURGE"))
+        , ANIMATION_SPEED_INFO{ 41.f / 232.f, 120.f / 232.f, 0, m_pPlayer->Find_AnimationIndex(TEXT("CIRCULATE_PURGE"))
+        , fOriginSpeed, 1.5f });
+
+    // 끝.
+    Add_AnimationSpeed_Info(m_pPlayer->Find_AnimationIndex(TEXT("CIRCULATE_PURGE"))
+        , ANIMATION_SPEED_INFO{ 121.f / 232.f, 232.f / 232.f, 0, m_pPlayer->Find_AnimationIndex(TEXT("CIRCULATE_PURGE"))
+        , fOriginSpeed, 1.8f });
+
+#pragma endregion
+
 
 	m_fIncreaseDamage = 10.f; // 기본 공격력 증가량 설정
 
@@ -80,15 +102,12 @@ void CPlayer_FirstSkillState::Enter(void* pArg)
 
 void CPlayer_FirstSkillState::Update(_float fTimeDelta)
 {
-    //if (m_pPlayer->Is_LockOn() && m_pPlayer->Has_LockOn_Target())
-    //{
-    //    m_pPlayer->Rotate_To_LockOn_Target(fTimeDelta, 2.f);
-    //}
 
     //Handle_Input();
     Handle_Unified_Direction_Input(fTimeDelta);
     Change_State();
     CPlayerState::Handle_Collider_State();
+    CPlayerState::Handle_AnimationSpeed_State();
 }
 
 void CPlayer_FirstSkillState::Exit()
@@ -98,32 +117,14 @@ void CPlayer_FirstSkillState::Exit()
 
     // 무기 콜라이더 강제 비활성화
     Force_Disable_All_Colliders();
+
+    // 애니메이션 맵 정상화
+    Reset_AnimationSpeedInfo();
+
     if (m_iNextState != -1) // NextIndex가 있는경우 블렌딩 시작.
     {
         m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, false);
     }
-
-    
-
-    // 락온 중이고 타겟과 너무 가까이 있다면 안전한 거리로 이동
-    //if (m_pPlayer->Is_LockOn() && m_pPlayer->Has_LockOn_Target())
-    //{
-    //    _vector vPlayerPos = m_pPlayer->Get_Transform()->Get_State(STATE::POSITION);
-    //    _vector vTargetPos = m_pPlayer->Get_LockOn_Target()->Get_Transform()->Get_State(STATE::POSITION);
-    //    
-    //    _float fDistance = XMVectorGetX(XMVector3Length(vTargetPos - vPlayerPos));
-    //    _float fMinSafeDistance = 2.0f; // 최소 안전 거리
-    //    
-    //    if (fDistance < fMinSafeDistance)
-    //    {
-    //        // 타겟 반대 방향으로 안전 거리만큼 이동
-    //        _vector vDirection = XMVector3Normalize(vPlayerPos - vTargetPos);
-    //        _vector vSafePos = vTargetPos + vDirection * fMinSafeDistance;
-    //        vSafePos = XMVectorSetY(vSafePos, XMVectorGetY(vPlayerPos)); // Y축 유지
-    //        
-    //        m_pPlayer->Get_Transform()->Set_State(STATE::POSITION, vSafePos);
-    //    }
-    //}
 }
 
 void CPlayer_FirstSkillState::Reset()

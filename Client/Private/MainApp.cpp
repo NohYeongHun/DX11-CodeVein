@@ -48,6 +48,13 @@ HRESULT CMainApp::Initialize_Clone()
 		CRASH("Failed Ready Prototype For Static");
 		return E_FAIL;
 	}
+
+	if (FAILED(Ready_Prototype_Effect()))
+	{
+		CRASH("Failed Ready Prototype For Static");
+		return E_FAIL;
+	}
+		
 		
 
 	if (FAILED(Ready_Clone_ForStatic()))
@@ -66,12 +73,22 @@ HRESULT CMainApp::Initialize_Clone()
 	if (FAILED(Start_Level(LEVEL::LOGO)))
 		return E_FAIL;	
 
+	//if (FAILED(Start_Level(LEVEL::DEBUG)))
+	//	return E_FAIL;
+
 	return S_OK;
 }
 
 void CMainApp::Update(_float fTimeDelta)
 {
 	m_pGameInstance->Update_Engine(fTimeDelta);
+
+	/*if (m_pGameInstance->Get_KeyUp(DIK_F1))
+	{
+		_uint iLevelID = m_pGameInstance->Get_CurrentLevelID();
+		if (iLevelID != ENUM_CLASS(LEVEL::DEBUG) && iLevelID != ENUM_CLASS(LEVEL::LOADING))
+			Start_Level(LEVEL::DEBUG);
+	}*/
 }
 
 HRESULT CMainApp::Render()
@@ -221,6 +238,8 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 		return E_FAIL;
 
 
+
+
 	//. 자주 사용하는 얘들 모아둔다.
 	if (FAILED(Ready_Prototype_Fonts()))
 		return E_FAIL;
@@ -357,34 +376,6 @@ HRESULT CMainApp::Ready_Prototype_HUD()
 		CLockOnUI::Create(m_pDevice, m_pContext))))
 	{
 		CRASH("Failed Load LockOn GameObject ");
-		return E_FAIL;
-	}
-#pragma endregion
-
-
-#pragma region SLASH UI
-
-	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
-		, TEXT("Prototype_Component_Texture_SlashEffectMask")
-		, CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/User/Slash/Slash%d.png"), 1))))
-	{
-		CRASH("Failed Load SlashEffect Texture");
-		return E_FAIL;
-	}
-
-	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
-		, TEXT("Prototype_Component_Texture_SlashEffectDiffuse")
-		, CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/User/Slash/SlashDiffuse%d.png"), 1))))
-	{
-		CRASH("Failed Load SlashEffect Texture");
-		return E_FAIL;
-	}
-
-
-	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_SlashEffect"),
-		CSlash::Create(m_pDevice, m_pContext))))
-	{
-		CRASH("Failed Load Slash GameObject ");
 		return E_FAIL;
 	}
 #pragma endregion
@@ -585,13 +576,73 @@ HRESULT CMainApp::Ready_Clone_SkillUI(const _wstring& strLayerTag)
 	return S_OK;
 }
 
+HRESULT CMainApp::Ready_Prototype_Effect()
+{
+#pragma region SLASH UI
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
+		, TEXT("Prototype_Component_Texture_SlashEffectMask")
+		, CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Effects/Slash/Slash%d.png"), 1))))
+	{
+		CRASH("Failed Load SlashEffect Texture");
+		return E_FAIL;
+	}
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
+		, TEXT("Prototype_Component_Texture_SlashEffectDiffuse")
+		, CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Effects/Slash/SlashDiffuse%d.png"), 1))))
+	{
+		CRASH("Failed Load SlashEffect Texture");
+		return E_FAIL;
+	}
+
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_SlashEffect"),
+		CSlash::Create(m_pDevice, m_pContext))))
+	{
+		CRASH("Failed Load Slash GameObject ");
+		return E_FAIL;
+	}
+#pragma endregion
+
+#pragma region HITFLASTH EFFECT
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
+		, TEXT("Prototype_Component_Texture_HitFlashEffectMask")
+		, CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Effects/HitFlash/HitFlashMask%d.png"), 1))))
+	{
+		CRASH("Failed Load SlashEffect Texture");
+		return E_FAIL;
+	}
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
+		, TEXT("Prototype_Component_Texture_HitFlashEffectDiffuse")
+		, CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Effects/HitFlash/HitFlashDiffuse%d.png"), 1))))
+	{
+		CRASH("Failed Load SlashEffect Texture");
+		return E_FAIL;
+	}
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_HitEffect"),
+		CHitFlashEffect::Create(m_pDevice, m_pContext))))
+	{
+		CRASH("Failed Load HItFlashEffect GameObject ");
+		return E_FAIL;
+	}
+#pragma endregion
+
+
+
+	return S_OK;
+}
+
 
 
 HRESULT CMainApp::Ready_Pooling()
 {
 
+#pragma region TEXTURE 타입.
 	// 1. Prototype Clone 객체 생성.
-	CSlash::SLASHUI_DESC slashDesc{};
+	CSlash::SLASHEFFECT_DESC slashDesc{};
 
 	CGameObject* pGameObject = nullptr;
 
@@ -606,17 +657,37 @@ HRESULT CMainApp::Ready_Pooling()
 			CRASH("Failed Create GameObject");
 			return E_FAIL;
 		}
-		m_pGameInstance->Add_GameObject_ToPools( TEXT("SLASH_EFFECT"), pGameObject);
+		m_pGameInstance->Add_GameObject_ToPools(TEXT("SLASH_EFFECT"), ENUM_CLASS(CSlash::EffectType), pGameObject);
 	}
 
+	CHitFlashEffect::HITFLASH_DESC HitFlashDesc{};
+	for (_uint i = 0; i < 100; ++i)
+	{
+		pGameObject = dynamic_cast<CGameObject*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT
+			, ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_HitEffect"), &HitFlashDesc));
+		if (nullptr == pGameObject)
+		{
+			CRASH("Failed Create HitFlashGameObject");
+			return E_FAIL;
+		}
+		m_pGameInstance->Add_GameObject_ToPools(TEXT("HITFLASH_EFFECT"), ENUM_CLASS(CHitFlashEffect::EffectType), pGameObject);
+	}
+
+#pragma endregion
+
+	
 
 	return S_OK;
 }
 
 HRESULT CMainApp::Start_Level(LEVEL eStartLevelID)
 {
- 	if (FAILED(m_pGameInstance->Open_Level(static_cast<_uint>(LEVEL::LOADING), CLevel_Loading::Create(m_pDevice, m_pContext, eStartLevelID))))
+	if (FAILED(m_pGameInstance->Open_Level(static_cast<_uint>(LEVEL::LOADING), CLevel_Loading::Create(m_pDevice, m_pContext, eStartLevelID))))
+	{
+		CRASH("Failed Start Level");
 		return E_FAIL;
+	}
+		
 
 	return S_OK;
 }

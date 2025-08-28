@@ -59,8 +59,27 @@ void CCamera_Free::Update(_float fTimeDelta)
 		m_pTransformCom->Go_Right(fTimeDelta);
 	}
 
+	if (m_pGameInstance->Get_KeyPress(DIK_W))
+	{
+		m_pTransformCom->Go_Straight(fTimeDelta);
+	}
 
-	if (m_pGameInstance->Get_MouseKeyPress(MOUSEKEYSTATE::LB))
+	if (m_pGameInstance->Get_KeyPress(DIK_S))
+	{
+		m_pTransformCom->Go_Backward(fTimeDelta);
+	}
+
+	if (m_pGameInstance->Get_KeyPress(DIK_A))
+	{
+		m_pTransformCom->Go_Left(fTimeDelta);
+	}
+	if (m_pGameInstance->Get_KeyPress(DIK_D))
+	{
+		m_pTransformCom->Go_Right(fTimeDelta);
+	}
+
+
+	if (m_pGameInstance->Get_KeyPress(DIK_Q))
 	{
 		_long MouseMoveX = m_pGameInstance->Get_DIMouseMove(MOUSEMOVESTATE::X);
 		_long MouseMoveY = m_pGameInstance->Get_DIMouseMove(MOUSEMOVESTATE::Y);

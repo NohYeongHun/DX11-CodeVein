@@ -9,7 +9,7 @@ namespace Client
 	const unsigned int			g_iWinSizeX = 1920;
 	const unsigned int			g_iWinSizeY = 1080;
 
-	enum class LEVEL { STATIC, LOADING, LOGO, STAGEONE, GAMEPLAY, END };
+	enum class LEVEL { STATIC, LOADING, LOGO, STAGEONE, GAMEPLAY, DEBUG, END };
 
 	// Player용 키 비트플래그 (최대 16개)
 	enum class PLAYER_KEY : uint16_t

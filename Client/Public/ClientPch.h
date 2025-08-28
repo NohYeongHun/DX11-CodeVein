@@ -15,6 +15,8 @@
 #include "Loader_Personal.h"
 #include "Loader_StageOne.h"
 #include "Loader_GamePlay.h"
+
+#include "Loader_Debug.h"
 #include "Loader.h"
 #pragma endregion
 
@@ -23,6 +25,7 @@
 #include "Level_Logo.h"
 #include "Level_StageOne.h"
 #include "Level_GamePlay.h"
+#include "Level_Debug.h"
 #pragma endregion
 
 
@@ -58,7 +61,7 @@
 #include "StatusPanel.h"
 #include "LockOnUI.h"
 
-#include "Slash.h"
+
 
 /* ======================================= Inventory =================================== */
 #include "Inventory.h"
@@ -109,6 +112,13 @@
 #include "Player_DamageState.h"
 #include "Player_FirstSkillState.h"
 #include "Player_SecondSkillState.h"
+
+
+
+#pragma region Effect
+#include "Slash.h"
+#include "HitFlashEffect.h"
+#pragma endregion
 
 
 

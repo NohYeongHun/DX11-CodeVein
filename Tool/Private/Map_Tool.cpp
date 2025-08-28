@@ -54,9 +54,6 @@ HRESULT CMap_Tool::Initialize(LEVEL eLevel)
         CRASH("Failed Create Picking Manager");
         return E_FAIL;
     }
-
-    
-        
     
     if (FAILED(Ready_Imgui()))
         return E_FAIL;
