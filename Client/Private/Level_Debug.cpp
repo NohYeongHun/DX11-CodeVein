@@ -6,6 +6,8 @@ CLevel_Debug::CLevel_Debug(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 
 HRESULT CLevel_Debug::Initialize_Clone()
 {
+	m_pPoolTable = new PoolTable[ENUM_CLASS(EFFECTTYPE::END)];
+
 	if (FAILED(Ready_Lights()))
 	{
 		CRASH("Failed Light");
@@ -30,6 +32,8 @@ HRESULT CLevel_Debug::Initialize_Clone()
 	//	return E_FAIL;
 	//}
 
+	
+
 	/* 현재 레벨을 구성해주기 위한 객체들을 생성한다. */
 	if (FAILED(Ready_Layer_Camera(TEXT("Layer_Camera"))))
 	{
@@ -37,11 +41,11 @@ HRESULT CLevel_Debug::Initialize_Clone()
 		return E_FAIL;
 	}
 
-	if (FAILED(Ready_Layer_SkyBox(TEXT("Layer_SkyBox"))))
-	{
-		CRASH("Failed Ready_Layer_SkyBox");
-		return E_FAIL;
-	}
+	//if (FAILED(Ready_Layer_SkyBox(TEXT("Layer_SkyBox"))))
+	//{
+	//	CRASH("Failed Ready_Layer_SkyBox");
+	//	return E_FAIL;
+	//}
 
 	if (FAILED(Ready_Layer_Effect(TEXT("Layer_Effect"))))
 	{
@@ -100,7 +104,8 @@ HRESULT CLevel_Debug::Render()
 
 		if (ImGui::BeginTabItem("Effect Particle"))
 		{
-
+			Render_Effect_ParticleTab();
+			ImGui::EndTabItem();
 		}
 
 
@@ -504,10 +509,38 @@ void CLevel_Debug::Create_SlashEffect()
 #pragma region Effect Particle
 void CLevel_Debug::Render_Effect_ParticleTab()
 {
+	/* 여기서 선택. => Render_Effect_Texture와 동일. */
+	ImGui::BeginChild("left pane", ImVec2(500, 0), true);
+
+	static int iSelectedIndex = -1;
+	_uint id = 0;
+	_uint iEffectType = ENUM_CLASS(EFFECTTYPE::PARTICLE);
+
+	// m_PoolTable을 이용해서 선택 가능한 이펙트 리스트 표시
+	for (auto& pair : m_pPoolTable[iEffectType])
+	{
+		const wstring& tagW = pair.first;
+		string effectName = WString_ToString(tagW);
+
+		if (ImGui::Selectable(effectName.c_str(), id == iSelectedIndex))
+		{
+			iSelectedIndex = id;
+			m_wSelected_EffectTag = tagW;
+			m_Selected_EffectTag = effectName;
+		}
+		id++;
+	}
+
+	// 선택된 이펙트가 있을 때 Inspector 창 표시
+	if (iSelectedIndex >= 0 && iSelectedIndex < m_pPoolTable[iEffectType].size())
+		Render_Effect_ParticleInspector();
+
+	ImGui::EndChild();
 }
 
 void CLevel_Debug::Render_Effect_ParticleInspector()
 {
+	/* 선택된 객체를 어떻게 표현할지 오른쪽 창에 나타내기.*/
 }
 #pragma endregion
 
@@ -517,22 +550,6 @@ void CLevel_Debug::Render_Effect_ParticleInspector()
 
 
 #pragma region 헬퍼 함수
-void CLevel_Debug::Render_ParticleTab(EFFECTTYPE eEffectType)
-{
-	ImGui::BeginChild("Middle pane", ImVec2(500, 0), true);
-
-	_uint iEffectType = ENUM_CLASS(eEffectType);
-	for (auto itLayer = m_pPoolTable[iEffectType].begin(); itLayer != m_pPoolTable[iEffectType].end(); ++itLayer)
-	{
-		// 1. PoolTable에서 현재 생성할 이름 가져오기. 
-		const wstring& tagW = itLayer->first;
-
-
-	}
-
-	ImGui::EndChild();
-
-}
 string CLevel_Debug::WString_ToString(const wstring& ws)
 {
 	if (ws.empty()) return {};
@@ -599,4 +616,5 @@ CLevel_Debug* CLevel_Debug::Create(ID3D11Device* pDevice, ID3D11DeviceContext* p
 void CLevel_Debug::Free()
 {
 	CLevel::Free();
+	Safe_Delete_Array(m_pPoolTable);
 }

@@ -33,6 +33,13 @@ public:
 		END
 	};
 
+	enum TEXTURE_SHADERPATH
+	{
+		TEXTURE_SHADER_DEFAULT = 0,
+		TEXTURE_SHADER_LINESLASH = 1,
+		TEXTURE_SHADER_END
+	};
+
 private:
 	explicit CMap_Tool(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual ~CMap_Tool() = default;
@@ -100,8 +107,6 @@ private:
 	_int m_iCellIndex = { 0 };
 #pragma endregion
 
-
-	
 	void Render_SaveLoad();
 	void Render_Debug_Window();
 #pragma region Create Mode
@@ -111,6 +116,23 @@ public:
 
 
 
+#pragma region EFFECT TOOL
+
+#pragma region Effect Texture
+private:
+	void Render_Effect_TextureTab();
+	void Render_Effect_TextureInspector();
+
+	void Create_Effect_Texture(const _vector& vHitDirection, const _vector& vHitPosition, 
+		const _float3& vScale, _float fDisplayTime, _uint iShaderPath);
+#pragma endregion
+
+
+ 
+private:
+	void Render_Effect_ParticleTab();
+#pragma endregion
+
 
 #pragma region Map Tool의 기능들
 public:
@@ -119,6 +141,17 @@ public:
 
 	string WString_ToString(const wstring& ws);
 	void SelectObject(class CGameObject* pObj);
+
+	// 텍스처 선택을 위한 변수들
+	struct SelectedTextureInfo
+	{
+		_bool bSelected = false;
+		_uint iSelectedIndex = 0;  // 선택된 텍스처 인덱스
+	};
+
+	SelectedTextureInfo m_SelectedTextures[TEXTURE_END] = {};
+	CTool_EffectTexture::TOOLEFFECT_TEXTURE_DESC m_CurrentEffectDesc = {};
+
 #pragma endregion
 
 
@@ -155,6 +188,9 @@ private:
 
 
 
+
+
+
 #pragma region 공통
 private:
 	MODEL_PICKING_INFO m_ModelPickingDesc = {};
@@ -169,7 +205,7 @@ private:
 	class CLayer* m_pSelectedLayer = { nullptr };
 	TOOLMODE m_eToolMode = { TOOLMODE::CREATE }; // 상태 저장.
 
-	LEVEL m_eCurLevel = {};
+	LEVEL m_eCurLevel = { };
 	_float m_Interval = 1.f;
 	_float3 m_vInterval = {};
 

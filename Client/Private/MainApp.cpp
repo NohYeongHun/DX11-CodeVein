@@ -70,11 +70,11 @@ HRESULT CMainApp::Initialize_Clone()
 		return E_FAIL;
 	}
 
-	if (FAILED(Start_Level(LEVEL::LOGO)))
-		return E_FAIL;	
+	//if (FAILED(Start_Level(LEVEL::LOGO)))
+	//	return E_FAIL;	
 
-	//if (FAILED(Start_Level(LEVEL::DEBUG)))
-	//	return E_FAIL;
+	if (FAILED(Start_Level(LEVEL::DEBUG)))
+		return E_FAIL;
 
 	return S_OK;
 }
@@ -631,6 +631,15 @@ HRESULT CMainApp::Ready_Prototype_Effect()
 #pragma endregion
 
 
+#pragma region PARTICLE
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Particle"),
+		CParticle::Create(m_pDevice, m_pContext))))
+	{
+		CRASH("Failed Load HItFlashEffect GameObject ");
+		return E_FAIL;
+	}
+#pragma endregion
+
 
 	return S_OK;
 }
@@ -675,7 +684,21 @@ HRESULT CMainApp::Ready_Pooling()
 
 #pragma endregion
 
-	
+#pragma region PARTICLE 타입 => 디버그 용도. 
+	for (_uint i = 0; i < 100; ++i)
+	{
+		pGameObject = dynamic_cast<CGameObject*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT
+			, ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Particle"), &HitFlashDesc));
+		if (nullptr == pGameObject)
+		{
+			CRASH("Failed Create Particle GameObject");
+			return E_FAIL;
+		}
+		m_pGameInstance->Add_GameObject_ToPools(TEXT("Particle_EFFECT"), ENUM_CLASS(EFFECTTYPE::PARTICLE), pGameObject);
+	}
+
+#pragma endregion
+
 
 	return S_OK;
 }

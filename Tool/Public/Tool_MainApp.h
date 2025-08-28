@@ -25,9 +25,10 @@ private:
 
 private:
 	HRESULT Ready_Prototype_ForStatic();
+	HRESULT Ready_Prototype_Effect();
 	HRESULT Ready_Fonts(); // Font_Manager에 Font를 추가한다.
 	HRESULT Ready_Console();
-
+	
 	HRESULT Start_Level(LEVEL eStartLevelID);
 
 

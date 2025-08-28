@@ -45,12 +45,16 @@ void CHitFlashEffect::Priority_Update(_float fTimeDelta)
     if (!m_IsActivate)
         return;
 
+    CGameObject::Priority_Update(fTimeDelta);
+
 }
 
 void CHitFlashEffect::Update(_float fTimeDelta)
 {
     if (!m_IsActivate)
         return;
+
+    CGameObject::Update(fTimeDelta);
 
     // 타이머 업데이트
     m_fCurrentTime += fTimeDelta;
@@ -71,6 +75,7 @@ void CHitFlashEffect::Late_Update(_float fTimeDelta)
     if (!m_IsActivate)
         return;
 
+    CGameObject::Late_Update(fTimeDelta);
 
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::BLEND, this)))
         return;

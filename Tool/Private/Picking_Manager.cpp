@@ -1,6 +1,4 @@
-﻿#include "Picking_Manager.h"
-
-CPicking_Manager::CPicking_Manager()
+﻿CPicking_Manager::CPicking_Manager()
 	: m_pGameInstance{ CGameInstance::GetInstance() }
 {
 	Safe_AddRef(m_pGameInstance);

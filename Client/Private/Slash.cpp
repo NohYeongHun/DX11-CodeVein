@@ -44,15 +44,19 @@ HRESULT CSlash::Initialize_Clone(void* pArg)
 }
 
 void CSlash::Priority_Update(_float fTimeDelta)
-{
+{   
     if (!m_IsActivate)
         return;
+
+    CGameObject::Priority_Update(fTimeDelta);
 }
 
 void CSlash::Update(_float fTimeDelta)
 {
     if (!m_IsActivate)
         return;
+
+    CGameObject::Update(fTimeDelta);
 
     // 타이머 업데이트
     m_fCurrentTime += fTimeDelta;
@@ -66,12 +70,15 @@ void CSlash::Update(_float fTimeDelta)
         return;
     }
 
+    
 }
 
 void CSlash::Late_Update(_float fTimeDelta)
 {
     if (!m_IsActivate)
         return;
+
+    CGameObject::Late_Update(fTimeDelta);
 
     // UI 렌더 그룹에 추가
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::BLEND, this)))
@@ -244,6 +251,7 @@ HRESULT CSlash::Bind_ShaderResources()
 
     return S_OK;
 }
+
 
 HRESULT CSlash::Ready_Components()
 {

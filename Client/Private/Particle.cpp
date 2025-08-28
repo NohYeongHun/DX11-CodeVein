@@ -63,7 +63,6 @@ HRESULT CParticle::Render()
         CRASH("Failed Bind Resources");
         return E_FAIL;
     }
-        
 
     m_pShaderCom->Begin(1);
 
@@ -76,7 +75,7 @@ HRESULT CParticle::Render()
 
 HRESULT CParticle::Ready_Components()
 {
-    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(m_eCurLevel), TEXT("Prototype_Component_Shader_VtxInstance_Particle"),
+    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxInstance_Particle"),
         TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom), nullptr)))
     {
         CRASH("Failed Ready Shader");

@@ -49,6 +49,11 @@ private:
 	HRESULT Loading_For_Logo_Level();
 	HRESULT Loading_For_GamePlay_Level();
 
+private:
+	HRESULT Loading_For_Logo_Effect();
+	HRESULT Loading_For_Logo_EffectTexture();
+	HRESULT Loading_For_Logo_EffectParticle();
+
 
 
 public:

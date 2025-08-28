@@ -186,6 +186,9 @@
     <ClInclude Include="..\Public\Player.h" />
     <ClInclude Include="..\Public\PrototypeName.h" />
     <ClInclude Include="..\Public\Tool_Bone.h" />
+    <ClInclude Include="..\Public\Tool_EffectMesh.h" />
+    <ClInclude Include="..\Public\Tool_EffectParticle.h" />
+    <ClInclude Include="..\Public\Tool_EffectTexture.h" />
     <ClInclude Include="..\Public\Tool_Mesh.h" />
     <ClInclude Include="..\Public\Tool_MeshMaterial.h" />
     <ClInclude Include="..\Public\Tool_Model.h" />
@@ -224,6 +227,9 @@
     <ClCompile Include="..\Private\Player.cpp" />
     <ClCompile Include="..\Private\PrototypeName.cpp" />
     <ClCompile Include="..\Private\Tool_Bone.cpp" />
+    <ClCompile Include="..\Private\Tool_EffectMesh.cpp" />
+    <ClCompile Include="..\Private\Tool_EffectParticle.cpp" />
+    <ClCompile Include="..\Private\Tool_EffectTexture.cpp" />
     <ClCompile Include="..\Private\Tool_Mesh.cpp" />
     <ClCompile Include="..\Private\Tool_MeshMaterial.cpp" />
     <ClCompile Include="..\Private\Tool_Model.cpp" />

@@ -11,6 +11,8 @@ namespace Tool
 
 	//enum class LEVEL { STATIC, LOADING, LOGO, GAMEPLAY, END };
 
+	// PrototypeName.cpp와 연계되어있음.
+	enum TEXTURE { TEXTURE_DIFFUSE, TEXTURE_GRADIENT, TEXTURE_GRADIENT_ALPHA, TEXTURE_MASK, TEXTURE_NOISE, TEXTURE_END };
 }
 
 extern HWND g_hWnd;
