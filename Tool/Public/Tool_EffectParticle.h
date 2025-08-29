@@ -78,8 +78,8 @@ private:
     // 컴포넌트
     class CShader* m_pShaderCom = { nullptr };
     class CTexture* m_pTextureCom[TEXTURE_END] = { nullptr };
-    //class CVIBuffer_Point_Instance* m_pVIBufferCom = { nullptr };
-    class CVIBuffer_PointDir_Instance* m_pVIBufferCom = { nullptr };
+    class CVIBuffer_Point_Instance* m_pVIBufferCom = { nullptr };
+    //class CVIBuffer_PointDir_Instance* m_pVIBufferCom = { nullptr };
 
     LEVEL m_eCurLevel = { LEVEL::END };
     _bool m_bActive = false;
