@@ -69,17 +69,7 @@ void CTool_EffectParticle::Update(_float fTimeDelta)
 
 #pragma region 파티클 타입 에 따른 업데이트
 
-    if (m_eParticleType == PARTICLE_TYPE::DROP)
-    {
-        m_pVIBufferCom->Drop(fTimeDelta);
-    }
-    else if (m_eParticleType == PARTICLE_TYPE::SPREAD)
-    {
-        m_pVIBufferCom->Spread(fTimeDelta);
-    }
-        
-
-    //m_pVIBufferCom->Update(fTimeDelta);
+    m_pVIBufferCom->Update(fTimeDelta);
 #pragma endregion
 
 
@@ -268,7 +258,7 @@ HRESULT CTool_EffectParticle::Ready_Components(const TOOLEFFECT_PARTICLE_DESC* p
     /* 나머지 컴포넌트 채우기. */
 
 #pragma region 1. Shader 초기화
-    if (FAILED(Add_Component(ENUM_CLASS(m_eCurLevel), TEXT("Prototype_Component_Shader_VtxInstance_PointParticle"),
+    if (FAILED(Add_Component(ENUM_CLASS(m_eCurLevel), TEXT("Prototype_Component_Shader_VtxInstance_PointDirParticle"),
         TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom))))
     {
         CRASH("Failed Load Shader");
@@ -326,7 +316,7 @@ HRESULT CTool_EffectParticle::Ready_Components(const TOOLEFFECT_PARTICLE_DESC* p
 
 HRESULT CTool_EffectParticle::Ready_VIBuffer_Point(const TOOLEFFECT_PARTICLE_DESC* pDesc)
 {
-    CVIBuffer_Point_Instance::POINT_INSTANCE_DESC PointDesc{};
+    CVIBuffer_PointDir_Instance::POINTDIR_INSTANCE_DESC PointDesc{};
     PointDesc.vPivot = pDesc->vPivot;
     PointDesc.vSpeed = pDesc->vSpeed;
     PointDesc.iNumInstance = pDesc->iNumInstance;
@@ -335,18 +325,42 @@ HRESULT CTool_EffectParticle::Ready_VIBuffer_Point(const TOOLEFFECT_PARTICLE_DES
     PointDesc.vSize = pDesc->vSize;
     PointDesc.vLifeTime = pDesc->vLifeTime;
     PointDesc.isLoop = pDesc->isLoop;
-    //XMStoreFloat3(&PointDesc.vDir, pDesc->vDirection);
+    XMStoreFloat3(&PointDesc.vDir, pDesc->vDirection);
 
-    m_pVIBufferCom = CVIBuffer_Point_Instance::Create(m_pDevice, m_pContext, &PointDesc);
+    m_pVIBufferCom = CVIBuffer_PointDir_Instance::Create(m_pDevice, m_pContext, &PointDesc);
     if (nullptr == m_pVIBufferCom)
     {
-        CRASH("Failed Create VIBuffer Point Instance");
+        CRASH("Failed Create VIBuffer PointDir Instance");
         return E_FAIL;
     }
 
     m_pVIBufferCom->Create_Buffer();
 
     return S_OK;
+}
+
+void CTool_EffectParticle::CreateParticleEffect(_float3 vPosition, _float3 vDirection, _float fLifeTime)
+{
+    if (m_pVIBufferCom)
+    {
+        m_pVIBufferCom->PrepareParticle(vPosition, vDirection, fLifeTime);
+    }
+}
+
+void CTool_EffectParticle::CreateParticleBurst(_float3 vCenterPosition, _float3 vBaseDirection, _float fLifeTime)
+{
+    if (m_pVIBufferCom)
+    {
+        m_pVIBufferCom->CreateAllParticles(vCenterPosition, vBaseDirection, fLifeTime);
+    }
+}
+
+void CTool_EffectParticle::CreateBurstEffect(_float3 vGatherPoint, _float3 vUpDirection, _float fGatherTime, _float fBurstTime, _float fTotalLifeTime)
+{
+    if (m_pVIBufferCom)
+    {
+        m_pVIBufferCom->CreateBurstParticles(vGatherPoint, vUpDirection, fGatherTime, fBurstTime, fTotalLifeTime);
+    }
 }
 
 CTool_EffectParticle* CTool_EffectParticle::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

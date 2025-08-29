@@ -78,6 +78,7 @@ HRESULT CVIBuffer_PointDir_Instance::Initialize_Prototype(const INSTANCE_DESC* p
         pInstanceVertices[i].vLook = _float4(0.f, 0.f, fScale, 0.f);
         pInstanceVertices[i].vTranslation = _float4( 0.f, 0.f, 0.f, 1.f);
         pInstanceVertices[i].vLifeTime = _float2(0.f, fLifeTime);
+        pInstanceVertices[i].vDir = _float3(0.f, 0.f, 0.f);
         pInstanceVertices[i].fSpeed = fSpeed;
     }
 
@@ -145,10 +146,17 @@ void CVIBuffer_PointDir_Instance::Update(_float fTimeDelta)
         m_ReadyparticleIndices.pop();
         _uint index = info.first;
         ParticleVertexInfo particleInfo = info.second;
+        
         pVertices[index].vDir = particleInfo.dir;
         pVertices[index].vTranslation = _float4(particleInfo.pos.x, particleInfo.pos.y, particleInfo.pos.z, 1.f);
         pVertices[index].vLifeTime.x = 0.f;
         pVertices[index].vLifeTime.y = particleInfo.lifeTime;
+        
+        // 추가 정보를 Right, Up, Look 벡터에 임시 저장 (w 컴포넌트 활용)
+        pVertices[index].vRight.w = particleInfo.fBurstTime;     // 터지는 시간
+        pVertices[index].vUp = _float4(particleInfo.initialPos.x, particleInfo.initialPos.y, particleInfo.initialPos.z, 0.f);  // 초기 위치
+        pVertices[index].vLook = _float4(particleInfo.burstDir.x, particleInfo.burstDir.y, particleInfo.burstDir.z, 0.f);     // 터질 방향
+        
         m_LiveParticleIndices.emplace_back(index);
     }
 
@@ -164,12 +172,49 @@ void CVIBuffer_PointDir_Instance::Update(_float fTimeDelta)
         }
         else
         {
-            // Update
-            _float3 dir = pVertices[*it].vDir;
-            _vector vMoveDir = XMVectorSet(dir.x, dir.y, dir.z, 0.f);
-
-            XMStoreFloat4(&pVertices[*it].vTranslation,
-                XMLoadFloat4(&pVertices[*it].vTranslation) + vMoveDir * fTimeDelta);
+            // 단계별 파티클 동작
+            _uint index = *it;
+            _float currentTime = pVertices[index].vLifeTime.x;
+            _float burstTime = pVertices[index].vRight.w;  // 터지는 시간
+            _float totalLifeTime = pVertices[index].vLifeTime.y;
+            
+            if (currentTime < burstTime)
+            {
+                // 1단계: 구 형태를 유지하면서 Direction 방향으로 이동
+                _float3 initialPos = {pVertices[index].vUp.x, pVertices[index].vUp.y, pVertices[index].vUp.z};
+                _float3 direction = pVertices[index].vDir;  // Direction 방향 
+                _float speed = pVertices[index].fSpeed;
+                
+                // 초기 구 형태 위치에서 Direction 방향으로 이동 (구 형태 유지)
+                _float3 currentPos = {
+                    initialPos.x + direction.x * currentTime * speed,  // Direction X 방향으로 이동
+                    initialPos.y + direction.y * currentTime * speed,  // Direction Y 방향으로 이동  
+                    initialPos.z + direction.z * currentTime * speed   // Direction Z 방향으로 이동
+                };
+                
+                pVertices[index].vTranslation = _float4(currentPos.x, currentPos.y, currentPos.z, 1.f);
+            }
+            else if (currentTime < totalLifeTime)
+            {
+                // 2단계: 터져서 방사형으로 퍼져나감
+                _float3 burstDir = {pVertices[index].vLook.x, pVertices[index].vLook.y, pVertices[index].vLook.z};
+                _float speed = pVertices[index].fSpeed;
+                _float burstElapsedTime = currentTime - burstTime;
+                
+                // 터진 시점의 위치에서 방사형으로 퍼짐
+                _float3 initialPos = {pVertices[index].vUp.x, pVertices[index].vUp.y, pVertices[index].vUp.z};
+                _float burstStartY = initialPos.y + burstTime * speed;  // 터진 시점의 높이
+                
+                _float3 burstStartPos = {initialPos.x, burstStartY, initialPos.z};
+                
+                // 방사형으로 퍼져나가는 위치 계산
+                _vector vBurstMove = XMVectorSet(burstDir.x, burstDir.y, burstDir.z, 0.f);
+                _vector vBurstStart = XMLoadFloat3(&burstStartPos);
+                
+                XMStoreFloat4(&pVertices[index].vTranslation,
+                    vBurstStart + vBurstMove * speed * burstElapsedTime * 2.0f);  // 2배 속도로 퍼짐
+            }
+            
             ++it;
         }
     }
@@ -211,6 +256,94 @@ void CVIBuffer_PointDir_Instance::PrepareParticle(_float3 vPos, _float3 vDir, _f
     info.pos = vPos;
     info.lifeTime = fLifeTime;
     m_ReadyparticleIndices.emplace(make_pair(index, info));
+}
+
+void CVIBuffer_PointDir_Instance::CreateAllParticles(_float3 vCenterPos, _float3 vBaseDir, _float fLifeTime)
+{
+    // 모든 Dead 파티클을 한번에 활성화
+    while (!m_DeadParticleIndices.empty())
+    {
+        _uint index = m_DeadParticleIndices.front();
+        m_DeadParticleIndices.pop();
+        
+        // 각 파티클마다 약간씩 다른 위치와 방향 생성
+        _float3 randomOffset = {
+            static_cast<_float>(rand() % 200 - 100) / 100.0f * 2.0f,  // -2.0f ~ 2.0f
+            static_cast<_float>(rand() % 200 - 100) / 100.0f * 2.0f,
+            static_cast<_float>(rand() % 200 - 100) / 100.0f * 2.0f
+        };
+        
+        _float3 randomDir = {
+            vBaseDir.x + static_cast<_float>(rand() % 100 - 50) / 100.0f,
+            vBaseDir.y + static_cast<_float>(rand() % 100 - 50) / 100.0f,
+            vBaseDir.z + static_cast<_float>(rand() % 100 - 50) / 100.0f
+        };
+        
+        _float3 particlePos = {
+            vCenterPos.x + randomOffset.x,
+            vCenterPos.y + randomOffset.y,
+            vCenterPos.z + randomOffset.z
+        };
+        
+        // 방향 정규화
+        _vector vNormalizedDir = XMVector3Normalize(XMLoadFloat3(&randomDir));
+        _float3 normalizedDir;
+        XMStoreFloat3(&normalizedDir, vNormalizedDir);
+        
+        ParticleVertexInfo info{};
+        info.pos = particlePos;
+        info.dir = normalizedDir;
+        info.lifeTime = fLifeTime + static_cast<_float>(rand() % 100) / 100.0f; // 약간의 생명시간 변화
+        
+        m_ReadyparticleIndices.emplace(make_pair(index, info));
+    }
+}
+
+void CVIBuffer_PointDir_Instance::CreateBurstParticles(_float3 vGatherPoint, _float3 vUpDir, _float fGatherTime, _float fBurstTime, _float fTotalLifeTime)
+{
+    // 모든 Dead 파티클을 한번에 활성화
+    while (!m_DeadParticleIndices.empty())
+    {
+        _uint index = m_DeadParticleIndices.front();
+        m_DeadParticleIndices.pop();
+
+        // 각 파티클마다 다른 초기 위치 (흩어진 시작점)
+        _float3 randomStartOffset = {
+        static_cast<_float>(rand() % 200 - 100) / 100.0f * 3.0f,  // -3.0f ~ 3.0f
+        static_cast<_float>(rand() % 200 - 100) / 100.0f * 3.0f,
+        static_cast<_float>(rand() % 200 - 100) / 100.0f * 3.0f
+        };
+
+        _float3 startPos = {
+        vGatherPoint.x + randomStartOffset.x,
+        vGatherPoint.y + randomStartOffset.y,
+        vGatherPoint.z + randomStartOffset.z
+        };
+        // 터질 때의 랜덤 방향 (구형으로 퍼짐)
+        _float3 burstDir = {
+        static_cast<_float>(rand() % 200 - 100) / 100.0f,  // -1.0f ~ 1.0f
+        static_cast<_float>(rand() % 200 - 100) / 100.0f,
+        static_cast<_float>(rand() % 200 - 100) / 100.0f
+        };
+        // 방향 정규화
+        _vector vNormalizedBurst = XMVector3Normalize(XMLoadFloat3(&burstDir));
+        XMStoreFloat3(&burstDir, vNormalizedBurst);
+
+        // 위쪽 방향 정규화
+        _vector vNormalizedUp = XMVector3Normalize(XMLoadFloat3(&vUpDir));
+        _float3 upDir;
+        XMStoreFloat3(&upDir, vNormalizedUp);
+
+        ParticleVertexInfo info{};
+        info.pos = startPos;                    // 시작 위치 (흩어진 곳)
+        info.dir = vUpDir;                      // 지정한 Direction 방향으로 이동
+        info.initialPos = startPos;             // 초기 위치 저장
+        info.burstDir = burstDir;               // 터질 때 방향
+        info.fBurstTime = fBurstTime;           // 터지는 시간
+        info.lifeTime = fTotalLifeTime;         // 전체 생명시간
+
+        m_ReadyparticleIndices.emplace(make_pair(index, info));
+    }
 }
 
 CVIBuffer_PointDir_Instance* CVIBuffer_PointDir_Instance::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const INSTANCE_DESC* pDesc)

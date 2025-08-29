@@ -72,14 +72,21 @@ public:
 
 
 public:
+    // 파티클 생성 함수들
+    void CreateParticleEffect(_float3 vPosition, _float3 vDirection, _float fLifeTime = 3.0f);
+    void CreateParticleBurst(_float3 vCenterPosition, _float3 vBaseDirection, _float fLifeTime = 3.0f);
+    void CreateBurstEffect(_float3 vGatherPoint, _float3 vUpDirection, _float fGatherTime = 1.5f, _float fBurstTime = 2.0f, _float fTotalLifeTime = 5.0f);
+    CVIBuffer_PointDir_Instance* Get_VIBuffer() { return m_pVIBufferCom; }
+
+public:
     static const EFFECTTYPE EffectType = EFFECTTYPE::PARTICLE;
 
 private:
     // 컴포넌트
     class CShader* m_pShaderCom = { nullptr };
     class CTexture* m_pTextureCom[TEXTURE_END] = { nullptr };
-    class CVIBuffer_Point_Instance* m_pVIBufferCom = { nullptr };
-    //class CVIBuffer_PointDir_Instance* m_pVIBufferCom = { nullptr };
+    //class CVIBuffer_Point_Instance* m_pVIBufferCom = { nullptr };
+    class CVIBuffer_PointDir_Instance* m_pVIBufferCom = { nullptr };
 
     LEVEL m_eCurLevel = { LEVEL::END };
     _bool m_bActive = false;

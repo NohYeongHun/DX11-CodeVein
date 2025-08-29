@@ -145,6 +145,7 @@ private:
 
 private:
 	void Create_Effect_Particle();
+	void Create_Burst_Effect_Particle();
 
 private:	
 	CTool_EffectParticle::TOOLEFFECT_PARTICLE_DESC m_CurrentEffectParticle_Desc = {};

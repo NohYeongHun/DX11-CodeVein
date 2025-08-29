@@ -6,6 +6,9 @@ struct ParticleVertexInfo
 	_float3 pos;
 	_float3 dir;
 	_float lifeTime;
+	_float3 initialPos;     // 초기 위치 (모이는 지점)
+	_float3 burstDir;       // 터질 때의 방향
+	_float fBurstTime;      // 터지는 시간
 };
 
 
@@ -40,6 +43,10 @@ public:
 #pragma region POOLING
 public:
 	void PrepareParticle(_float3 vPos, _float3 vDir, _float fLifeTime);
+	void CreateAllParticles(_float3 vCenterPos, _float3 vBaseDir, _float fLifeTime = 3.0f);
+	void CreateBurstParticles(_float3 vGatherPoint, _float3 vUpDir, _float fGatherTime, _float fBurstTime, _float fTotalLifeTime);
+	_uint Get_LiveParticleCount() const { return static_cast<_uint>(m_LiveParticleIndices.size()); }
+	_uint Get_DeadParticleCount() const { return static_cast<_uint>(m_DeadParticleIndices.size()); }
 
 private:
 	queue<_uint> m_DeadParticleIndices;
