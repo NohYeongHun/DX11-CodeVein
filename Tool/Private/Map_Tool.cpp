@@ -1213,7 +1213,7 @@ void CMap_Tool::Render_Effect_ParticleInspector()
             ImGui::SliderFloat2("Size", Size, 0.1f, 2.f);
 
             static float Pivot[3] = { 0.f, 0.f, 0.f};
-            ImGui::SliderFloat3("Pivot", Pivot, 0.f, 10.f);
+            ImGui::SliderFloat3("Pivot", Pivot, -1.f, 1.f);
 
             static float Speed[2] = { 1.f, 2.f};
             ImGui::SliderFloat2("Speed", Speed, 1.f, 10.f);

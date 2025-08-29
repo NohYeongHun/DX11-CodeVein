@@ -1,5 +1,4 @@
-﻿#include "VIBuffer_Point_Instance.h"
-CVIBuffer_Point_Instance::CVIBuffer_Point_Instance(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿CVIBuffer_Point_Instance::CVIBuffer_Point_Instance(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CVIBuffer_Instance{ pDevice, pContext }
 {
 }
@@ -80,9 +79,7 @@ HRESULT CVIBuffer_Point_Instance::Initialize_Prototype(const INSTANCE_DESC* pDes
 		);
 
 		pInstanceVertices[i].vLifeTime = _float2(0.f, fLifeTime);
-
 	}
-
 	return S_OK;
 }
 

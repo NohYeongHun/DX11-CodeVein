@@ -40,6 +40,7 @@
 #include "VIBuffer_Rect_Instance.h"
 
 #include "VIBuffer_Point_Instance.h"
+#include "VIBuffer_PointDir_Instance.h"
 #pragma endregion
 
 

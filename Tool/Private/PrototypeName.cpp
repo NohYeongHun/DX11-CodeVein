@@ -44,13 +44,13 @@ const EFFECT_TEXTURE_DESC Effect_TexturePrototypes[] =
 	{TEXT("Prototype_Component_Effect_GradientAlphaTexture") 
 	, TEXT("../Bin/Resources/Textures/Effects/Texture/Gradient/Gradient_A%d.png"), 1},
 
-	//{TEXT("Prototype_Component_Texture_EffectMask")
-	//, TEXT("../Bin/Resources/Textures/Effects/Texture/Mask/Mask%d.png"), 2},
+	{TEXT("Prototype_Component_Texture_EffectMask")
+	, TEXT("../Bin/Resources/Textures/Effects/Texture/Mask/Mask%d.png"), 16},
 
 	//{TEXT("Prototype_Component_Texture_EffectNoise")
 	//, TEXT("../Bin/Resources/Textures/Effects/Texture/Noise/Noise%d.png"), 2},
 };
 
-extern unsigned int Effect_TexturePrototypeSize = 3;
+extern unsigned int Effect_TexturePrototypeSize = 4;
 
 NS_END

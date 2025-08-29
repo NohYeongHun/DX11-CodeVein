@@ -93,7 +93,7 @@ void CMainApp::Update(_float fTimeDelta)
 
 HRESULT CMainApp::Render()
 {
-	_float4		vClearColor = _float4(0.0f, 0.0f, 1.f, 1.f);
+	_float4		vClearColor = _float4(0.0f, 0.0f, 0.f, 1.f);
 	
 	// bool Return;
 

@@ -229,6 +229,14 @@ HRESULT CLoader::Loading_For_Logo_EffectParticle()
 		CRASH("Failed Load Point Particle Shader");
 		return E_FAIL;
 	}
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LOGO), TEXT("Prototype_Component_Shader_VtxInstance_PointDirParticle"),
+		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxInstance_PointDirParticle.hlsl")
+			,VTXPOINTDIRPARTICLE::Elements, VTXPOINTDIRPARTICLE::iNumElements))))
+	{
+		CRASH("Failed Load PointDirection Particle Shader");
+		return E_FAIL;
+	}
 #pragma endregion
 
 #pragma region 2. PARTICLE OBJECT

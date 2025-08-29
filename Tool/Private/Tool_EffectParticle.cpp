@@ -69,7 +69,7 @@ void CTool_EffectParticle::Update(_float fTimeDelta)
 
 #pragma region 파티클 타입 에 따른 업데이트
 
-    if (m_eParticleType == PARTICLE_TYPE::DROP)
+    /*if (m_eParticleType == PARTICLE_TYPE::DROP)
     {
         m_pVIBufferCom->Drop(fTimeDelta);
     }
@@ -77,7 +77,9 @@ void CTool_EffectParticle::Update(_float fTimeDelta)
     {
         m_pVIBufferCom->Spread(fTimeDelta);
     }
-        
+        */
+
+    m_pVIBufferCom->Update(fTimeDelta);
 #pragma endregion
 
 
@@ -324,17 +326,18 @@ HRESULT CTool_EffectParticle::Ready_Components(const TOOLEFFECT_PARTICLE_DESC* p
 
 HRESULT CTool_EffectParticle::Ready_VIBuffer_Point(const TOOLEFFECT_PARTICLE_DESC* pDesc)
 {
-    CVIBuffer_Point_Instance::POINT_INSTANCE_DESC PointDesc{};
+    CVIBuffer_PointDir_Instance::POINTDIR_INSTANCE_DESC PointDesc{};
+    PointDesc.vPivot = pDesc->vPivot;
+    PointDesc.vSpeed = pDesc->vSpeed;
     PointDesc.iNumInstance = pDesc->iNumInstance;
     PointDesc.vCenter = pDesc->vCenter;
     PointDesc.vRange = pDesc->vRange;
     PointDesc.vSize = pDesc->vSize;
-    PointDesc.vPivot = pDesc->vPivot;
-    PointDesc.vSpeed = pDesc->vSpeed;
     PointDesc.vLifeTime = pDesc->vLifeTime;
     PointDesc.isLoop = pDesc->isLoop;
+    XMStoreFloat3(&PointDesc.vDir, pDesc->vDirection);
 
-    m_pVIBufferCom = CVIBuffer_Point_Instance::Create(m_pDevice, m_pContext, &PointDesc);
+    m_pVIBufferCom = CVIBuffer_PointDir_Instance::Create(m_pDevice, m_pContext, &PointDesc);
     if (nullptr == m_pVIBufferCom)
     {
         CRASH("Failed Create VIBuffer Point Instance");
