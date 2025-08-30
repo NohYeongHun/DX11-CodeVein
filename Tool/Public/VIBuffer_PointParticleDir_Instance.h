@@ -53,9 +53,9 @@ public:
 #pragma region 1. PARTICLE_TYPE에 따른 다른 형태의 파티클 업데이트 설정.
 public:
 	void Update(_float fTimeDelta);
-	void Default_Update(VTXINSTANCEDIR_PARTICLE* pVertices, _float fTimeDelta);
-	void QueenKnightWarp_Update(VTXINSTANCEDIR_PARTICLE* pVertices, _float fTimeDelta);
-	void BossExplosion_Update(VTXINSTANCEDIR_PARTICLE* pVertices, _float fTimeDelta);
+	void Default_Update(VTXINSTANCEPOINTDIR_PARTICLE* pVertices, _float fTimeDelta);
+	void QueenKnightWarp_Update(VTXINSTANCEPOINTDIR_PARTICLE* pVertices, _float fTimeDelta);
+	void BossExplosion_Update(VTXINSTANCEPOINTDIR_PARTICLE* pVertices, _float fTimeDelta);
 
 public:
 	void CreateAllParticles(_float3 vCenterPos, _float3 vBaseDir, _float fLifeTime = 3.0f);

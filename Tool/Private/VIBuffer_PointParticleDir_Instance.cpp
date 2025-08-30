@@ -23,7 +23,7 @@ HRESULT CVIBuffer_PointParticleDir_Instance::Initialize_Prototype(const INSTANCE
     m_vLifeTime = pPointDirDesc->vLifeTime; // LifeTime 범위 저장
     m_eParticleType = pPointDirDesc->eParticleType;
 
-    m_iInstanceVertexStride = sizeof(VTXINSTANCEDIR_PARTICLE);
+    m_iInstanceVertexStride = sizeof(VTXINSTANCEPOINTDIR_PARTICLE);
     m_iNumInstance = pPointDirDesc->iNumInstance;
 
 #pragma region 1. 기본 VERTEX 생성
@@ -65,11 +65,11 @@ HRESULT CVIBuffer_PointParticleDir_Instance::Initialize_Prototype(const INSTANCE
     m_VBInstanceDesc.StructureByteStride = m_iInstanceVertexStride;
 
 
-    m_pInstanceVertices = new VTXINSTANCEDIR_PARTICLE[m_iNumInstance];
+    m_pInstanceVertices = new VTXINSTANCEPOINTDIR_PARTICLE[m_iNumInstance];
 
     for (size_t i = 0; i < m_iNumInstance; i++)
     {
-        VTXINSTANCEDIR_PARTICLE* pInstanceVertices = static_cast<VTXINSTANCEDIR_PARTICLE*>(m_pInstanceVertices);
+        VTXINSTANCEPOINTDIR_PARTICLE* pInstanceVertices = static_cast<VTXINSTANCEPOINTDIR_PARTICLE*>(m_pInstanceVertices);
 
         _float		fScale = m_pGameInstance->Rand(pPointDirDesc->vSize.x, pPointDirDesc->vSize.y);
         _float		fLifeTime = m_pGameInstance->Rand(pPointDirDesc->vLifeTime.x, pPointDirDesc->vLifeTime.y);
@@ -83,6 +83,7 @@ HRESULT CVIBuffer_PointParticleDir_Instance::Initialize_Prototype(const INSTANCE
         pInstanceVertices[i].vLifeTime = _float2(0.f, fLifeTime);
         pInstanceVertices[i].vDir = _float3(0.f, 0.f, 0.f);
         pInstanceVertices[i].fDirSpeed = fDirSpeed;
+        pInstanceVertices[i].iMaskTextureIndex = i % 16; // 0-15 순환
     }
 
     for (_uint i = 0; i < pPointDirDesc->iNumInstance; i++)
@@ -157,10 +158,10 @@ void CVIBuffer_PointParticleDir_Instance::Update(_float fTimeDelta)
 {
     D3D11_MAPPED_SUBRESOURCE SubResource{};
 
-    auto pInstanceVertices = static_cast<VTXINSTANCEDIR_PARTICLE*>(m_pInstanceVertices);
+    auto pInstanceVertices = static_cast<VTXINSTANCEPOINTDIR_PARTICLE*>(m_pInstanceVertices);
 
     m_pContext->Map(m_pVBInstance, 0, D3D11_MAP_WRITE_NO_OVERWRITE, 0, &SubResource);
-    auto pVertices = static_cast<VTXINSTANCEDIR_PARTICLE*>(SubResource.pData);
+    auto pVertices = static_cast<VTXINSTANCEPOINTDIR_PARTICLE*>(SubResource.pData);
 
     switch (m_eParticleType)
     {
@@ -183,7 +184,7 @@ void CVIBuffer_PointParticleDir_Instance::Update(_float fTimeDelta)
 
 }
 
-void CVIBuffer_PointParticleDir_Instance::Default_Update(VTXINSTANCEDIR_PARTICLE* pVertices, _float fTimeDelta)
+void CVIBuffer_PointParticleDir_Instance::Default_Update(VTXINSTANCEPOINTDIR_PARTICLE* pVertices, _float fTimeDelta)
 {
     while (!m_ReadyparticleIndices.empty())
     {
@@ -271,7 +272,7 @@ void CVIBuffer_PointParticleDir_Instance::Default_Update(VTXINSTANCEDIR_PARTICLE
     }
 }
 
-void CVIBuffer_PointParticleDir_Instance::QueenKnightWarp_Update(VTXINSTANCEDIR_PARTICLE* pVertices, _float fTimeDelta)
+void CVIBuffer_PointParticleDir_Instance::QueenKnightWarp_Update(VTXINSTANCEPOINTDIR_PARTICLE* pVertices, _float fTimeDelta)
 {
     m_fDebugTime += fTimeDelta;
     OutputDebugWstring(TEXT("QueenKnight Warp Particle"));
@@ -347,7 +348,7 @@ void CVIBuffer_PointParticleDir_Instance::QueenKnightWarp_Update(VTXINSTANCEDIR_
 
 }
 
-void CVIBuffer_PointParticleDir_Instance::BossExplosion_Update(VTXINSTANCEDIR_PARTICLE* pVertices, _float fTimeDelta)
+void CVIBuffer_PointParticleDir_Instance::BossExplosion_Update(VTXINSTANCEPOINTDIR_PARTICLE* pVertices, _float fTimeDelta)
 {
     while (!m_ReadyparticleIndices.empty())
     {

@@ -200,6 +200,18 @@ namespace Engine
 		float		fDirSpeed;
 	}VTXINSTANCEDIR_PARTICLE;
 
+	typedef struct tagVertexInstancePointDirectionParticle
+	{
+		XMFLOAT4	vRight;
+		XMFLOAT4	vUp;
+		XMFLOAT4	vLook;
+		XMFLOAT4	vTranslation;
+		XMFLOAT2	vLifeTime;
+		XMFLOAT3	vDir;
+		float		fDirSpeed;
+		unsigned int iMaskTextureIndex;
+	}VTXINSTANCEPOINTDIR_PARTICLE;
+
 	typedef struct tagVertexParticle
 	{
 		static const unsigned int	iNumElements = { 7 };
@@ -233,7 +245,7 @@ namespace Engine
 
 	typedef struct tagVertexPointDirParticle
 	{
-		static const unsigned int	iNumElements = { 8 };
+		static const unsigned int	iNumElements = { 9 };
 		static constexpr D3D11_INPUT_ELEMENT_DESC	Elements[iNumElements] = {
 			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 
@@ -244,7 +256,8 @@ namespace Engine
 
 			{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 1, 64, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
 			{ "TEXCOORD", 1, DXGI_FORMAT_R32G32B32_FLOAT, 1, 72, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
-			{ "TEXCOORD", 2, DXGI_FORMAT_R32_FLOAT, 1, 84, D3D11_INPUT_PER_INSTANCE_DATA, 1 }
+			{ "TEXCOORD", 2, DXGI_FORMAT_R32_FLOAT, 1, 84, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+			{ "TEXINDEX", 0, DXGI_FORMAT_R32_UINT, 1, 88, D3D11_INPUT_PER_INSTANCE_DATA, 1 }
 		};
 	}VTXPOINTDIRPARTICLE;
 #pragma endregion

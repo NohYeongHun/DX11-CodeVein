@@ -28,7 +28,7 @@ struct VS_IN
     float2 vLifeTime : TEXCOORD0;
     float3 vDir : TEXCOORD1;
     float  fSpeed : TEXCOORD2;
-    
+    uint iMaskTextureIndex : TEXINDEX0;
 };
 
 struct VS_OUT
@@ -38,6 +38,7 @@ struct VS_OUT
     float2 vLifeTime : TEXCOORD0;
     float3 vDir : TEXCOORD1;
     float  fSpeed : TEXCOORD2;
+    uint iMaskTextureIndex : TEXINDEX0;
 };
 
 /* 정점쉐이더 : 정점 위치의 스페이스 변환(로컬 -> 월드 -> 뷰 -> 투영). */ 
@@ -54,6 +55,7 @@ VS_OUT VS_MAIN(VS_IN In)
     Out.vLifeTime = In.vLifeTime;
     Out.vDir = mul(In.vDir, In.fSpeed);
     Out.fSpeed = In.fSpeed;
+    Out.iMaskTextureIndex = In.iMaskTextureIndex;
     
     return Out;
 }
@@ -65,6 +67,7 @@ struct GS_IN
     float2 vLifeTime : TEXCOORD0;
     float3 vDir : TEXCOORD1;
     float  fSpeed : TEXCOORD2;
+    uint iMaskTextureIndex : TEXINDEX0;
 };
 
 struct GS_OUT
@@ -72,6 +75,7 @@ struct GS_OUT
     float4 vPosition : SV_POSITION;
     float2 vTexcoord : TEXCOORD0;
     float2 vLifeTime : TEXCOORD1;
+    uint iMaskTextureIndex : TEXINDEX0;
 };
 
 //GS_MAIN(triangle GS_IN In[3])
@@ -101,18 +105,22 @@ void GS_Stretched_Billboard_MAIN(point GS_IN In[1], inout TriangleStream<GS_OUT>
     Out[0].vPosition = mul(In[0].vPosition + vRight + vUp, matVP);
     Out[0].vTexcoord = float2(0.f, 0.f);
     Out[0].vLifeTime = In[0].vLifeTime;
+    Out[0].iMaskTextureIndex = In[0].iMaskTextureIndex;
 
     Out[1].vPosition = mul(In[0].vPosition - vRight + vUp, matVP);
     Out[1].vTexcoord = float2(1.f, 0.f);
     Out[1].vLifeTime = In[0].vLifeTime;
+    Out[1].iMaskTextureIndex = In[0].iMaskTextureIndex;
 
     Out[2].vPosition = mul(In[0].vPosition - vRight - vUp, matVP);
     Out[2].vTexcoord = float2(1.f, 1.f);
     Out[2].vLifeTime = In[0].vLifeTime;
+    Out[2].iMaskTextureIndex = In[0].iMaskTextureIndex;
 
     Out[3].vPosition = mul(In[0].vPosition + vRight - vUp, matVP);
     Out[3].vTexcoord = float2(0.f, 1.f);
     Out[3].vLifeTime = In[0].vLifeTime;
+    Out[3].iMaskTextureIndex = In[0].iMaskTextureIndex;
 
     Vertices.Append(Out[0]);
     Vertices.Append(Out[1]);
@@ -134,6 +142,7 @@ struct PS_IN
     float4 vPosition : SV_POSITION;
     float2 vTexcoord : TEXCOORD0;
     float2 vLifeTime : TEXCOORD1;
+    uint iMaskTextureIndex : TEXINDEX0;
 };
 
 struct PS_OUT
@@ -162,14 +171,63 @@ PS_OUT PS_DIFFUSE_MASK_MAIN(PS_IN In)
     
     //Out.vColor = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
     
-    // 결합된 좌표를 Sample 함수의 두 번째 인자로 전달
     vector vSourDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
-    vector vDestDiffuse = g_MaskTextures[0].Sample(DefaultSampler, In.vTexcoord);
+    vector vDestDiffuse = float4(0, 0, 0, 1);
+    vector vMask = float4(0, 0, 0, 0);
+    
+    // 동적 인덱싱을 조건문으로 처리
+    if (In.iMaskTextureIndex == 0) {
+        vDestDiffuse = g_MaskTextures[0].Sample(DefaultSampler, In.vTexcoord);
+        vMask = g_MaskTextures[0].Sample(DefaultSampler, In.vTexcoord);
+    } else if (In.iMaskTextureIndex == 1) {
+        vDestDiffuse = g_MaskTextures[1].Sample(DefaultSampler, In.vTexcoord);
+        vMask = g_MaskTextures[1].Sample(DefaultSampler, In.vTexcoord);
+    } else if (In.iMaskTextureIndex == 2) {
+        vDestDiffuse = g_MaskTextures[2].Sample(DefaultSampler, In.vTexcoord);
+        vMask = g_MaskTextures[2].Sample(DefaultSampler, In.vTexcoord);
+    } else if (In.iMaskTextureIndex == 3) {
+        vDestDiffuse = g_MaskTextures[3].Sample(DefaultSampler, In.vTexcoord);
+        vMask = g_MaskTextures[3].Sample(DefaultSampler, In.vTexcoord);
+    } else if (In.iMaskTextureIndex == 4) {
+        vDestDiffuse = g_MaskTextures[4].Sample(DefaultSampler, In.vTexcoord);
+        vMask = g_MaskTextures[4].Sample(DefaultSampler, In.vTexcoord);
+    } else if (In.iMaskTextureIndex == 5) {
+        vDestDiffuse = g_MaskTextures[5].Sample(DefaultSampler, In.vTexcoord);
+        vMask = g_MaskTextures[5].Sample(DefaultSampler, In.vTexcoord);
+    } else if (In.iMaskTextureIndex == 6) {
+        vDestDiffuse = g_MaskTextures[6].Sample(DefaultSampler, In.vTexcoord);
+        vMask = g_MaskTextures[6].Sample(DefaultSampler, In.vTexcoord);
+    } else if (In.iMaskTextureIndex == 7) {
+        vDestDiffuse = g_MaskTextures[7].Sample(DefaultSampler, In.vTexcoord);
+        vMask = g_MaskTextures[7].Sample(DefaultSampler, In.vTexcoord);
+    } else if (In.iMaskTextureIndex == 8) {
+        vDestDiffuse = g_MaskTextures[8].Sample(DefaultSampler, In.vTexcoord);
+        vMask = g_MaskTextures[8].Sample(DefaultSampler, In.vTexcoord);
+    } else if (In.iMaskTextureIndex == 9) {
+        vDestDiffuse = g_MaskTextures[9].Sample(DefaultSampler, In.vTexcoord);
+        vMask = g_MaskTextures[9].Sample(DefaultSampler, In.vTexcoord);
+    } else if (In.iMaskTextureIndex == 10) {
+        vDestDiffuse = g_MaskTextures[10].Sample(DefaultSampler, In.vTexcoord);
+        vMask = g_MaskTextures[10].Sample(DefaultSampler, In.vTexcoord);
+    } else if (In.iMaskTextureIndex == 11) {
+        vDestDiffuse = g_MaskTextures[11].Sample(DefaultSampler, In.vTexcoord);
+        vMask = g_MaskTextures[11].Sample(DefaultSampler, In.vTexcoord);
+    } else if (In.iMaskTextureIndex == 12) {
+        vDestDiffuse = g_MaskTextures[12].Sample(DefaultSampler, In.vTexcoord);
+        vMask = g_MaskTextures[12].Sample(DefaultSampler, In.vTexcoord);
+    } else if (In.iMaskTextureIndex == 13) {
+        vDestDiffuse = g_MaskTextures[13].Sample(DefaultSampler, In.vTexcoord);
+        vMask = g_MaskTextures[13].Sample(DefaultSampler, In.vTexcoord);
+    } else if (In.iMaskTextureIndex == 14) {
+        vDestDiffuse = g_MaskTextures[14].Sample(DefaultSampler, In.vTexcoord);
+        vMask = g_MaskTextures[14].Sample(DefaultSampler, In.vTexcoord);
+    } else if (In.iMaskTextureIndex == 15) {
+        vDestDiffuse = g_MaskTextures[15].Sample(DefaultSampler, In.vTexcoord);
+        vMask = g_MaskTextures[15].Sample(DefaultSampler, In.vTexcoord);
+    }
 
     if (vDestDiffuse.r < 0.1f && vDestDiffuse.g < 0.1f && vDestDiffuse.b < 0.1f)
         discard;
-
-    vector vMask = g_MaskTextures[0].Sample(DefaultSampler, In.vTexcoord);
     vector vMtrlDiffuse = vDestDiffuse * (1.f - vMask) + vSourDiffuse * (vMask);
 
     float fadeAlpha = 1.0f - g_fTimeRatio;
