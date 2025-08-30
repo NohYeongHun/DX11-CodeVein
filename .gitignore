@@ -29,6 +29,9 @@ EngineSDK/
 !Client/Bin/ShaderFiles/
 !Client/Bin/ShaderFiles/**
 
+!Tool/Bin/ShaderFiles/
+!Tool/Bin/ShaderFiles/**
+
 !*.hlsl
 
 # User-specific files (MonoDevelop/Xamarin Studio)

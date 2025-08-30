@@ -210,7 +210,13 @@ HRESULT CTool_EffectParticle::Bind_ShaderResources()
             break;
             case TEXTURE::TEXTURE_MASK:
             {
-                if (FAILED(m_pTextureCom[TEXTURE_MASK]->Bind_Shader_Resource(m_pShaderCom, "g_MaskTexture", m_iTextureIndexArray[i])))
+                /*if (FAILED(m_pTextureCom[TEXTURE_MASK]->Bind_Shader_Resources(m_pShaderCom, "g_MaskTextures", m_iTextureIndexArray[i])))
+                {
+                    CRASH("Failed Bind Texture Gradient Texture Mask");
+                    return E_FAIL;
+                }*/
+
+                if (FAILED(m_pTextureCom[TEXTURE_MASK]->Bind_Shader_Resources(m_pShaderCom, "g_MaskTextures")))
                 {
                     CRASH("Failed Bind Texture Gradient Texture Mask");
                     return E_FAIL;
