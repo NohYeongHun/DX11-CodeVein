@@ -5,18 +5,18 @@ NS_BEGIN(Tool)
 class CTool_EffectParticle final : public CGameObject
 {
 public:
-    enum PARTICLE_TYPE
+    enum PARTICLE_TYPE : _uint
     {
-        DROP,
-        SPREAD,
-        END
+        PARTICLE_TYPE_DEFAULT = 0 ,
+        PARTICLE_TYPE_QUEEN_WARP = 1,
+        PARTICLE_TYPE_BOSS_EXPLOSION = 2,
+        PARTICLE_TYPE_END
     };
 
     enum PARTICLE_SHADER
     {
         PARTICLE_SHADER_DEFAULT = 0,
         PARTICLE_SHADER_END,
-
     };
     
 
@@ -74,9 +74,10 @@ public:
 public:
     // 파티클 생성 함수들
     void CreateParticleEffect(_float3 vPosition, _float3 vDirection, _float fLifeTime = 3.0f);
-    void CreateParticleBurst(_float3 vCenterPosition, _float3 vBaseDirection, _float fLifeTime = 3.0f);
+    void CreateDefault_Particle(_float3 vCenterPosition, _float3 vBaseDirection, _float fLifeTime = 3.0f);
     void CreateBurstEffect(_float3 vGatherPoint, _float3 vUpDirection, _float fGatherTime = 1.5f, _float fBurstTime = 2.0f, _float fTotalLifeTime = 5.0f);
-    CVIBuffer_PointDir_Instance* Get_VIBuffer() { return m_pVIBufferCom; }
+    void Create_QueenKnightWarpEffect(const PARTICLE_INIT_INFO particleInitInfo);
+    void Create_BossExplosionParticle(_float3 vCenterPos, _float fRadius, _float fGatherTime, _float fExplosionTime, _float fTotalLifeTime);
 
 public:
     static const EFFECTTYPE EffectType = EFFECTTYPE::PARTICLE;
@@ -86,7 +87,7 @@ private:
     class CShader* m_pShaderCom = { nullptr };
     class CTexture* m_pTextureCom[TEXTURE_END] = { nullptr };
     //class CVIBuffer_Point_Instance* m_pVIBufferCom = { nullptr };
-    class CVIBuffer_PointDir_Instance* m_pVIBufferCom = { nullptr };
+    class CVIBuffer_PointParticleDir_Instance* m_pVIBufferCom = { nullptr };
 
     LEVEL m_eCurLevel = { LEVEL::END };
     _bool m_bActive = false;
@@ -107,7 +108,7 @@ private:
     _uint m_iTextureIndexArray[TEXTURE_END] = {};
 
 
-    PARTICLE_TYPE m_eParticleType = { PARTICLE_TYPE::END };
+    PARTICLE_TYPE m_eParticleType = { PARTICLE_TYPE::PARTICLE_TYPE_END };
 
 private:
     HRESULT Bind_ShaderResources();

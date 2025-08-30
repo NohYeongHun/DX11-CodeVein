@@ -94,6 +94,9 @@
     <Filter Include="02. GameObject\Effect\Mesh">
       <UniqueIdentifier>{69f710cc-9542-4ac0-8228-704fddcbab0b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="03. Component\VIBuffer">
+      <UniqueIdentifier>{c9f24af1-9ddc-44cd-a0f9-a2eca450d429}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -222,6 +225,9 @@
     <ClInclude Include="..\Public\Tool_EffectParticle.h">
       <Filter>02. GameObject\Effect\Particle</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\VIBuffer_PointParticleDir_Instance.h">
+      <Filter>03. Component\VIBuffer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="small.ico">
@@ -333,6 +339,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Tool_EffectParticle.cpp">
       <Filter>02. GameObject\Effect\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\VIBuffer_PointParticleDir_Instance.cpp">
+      <Filter>03. Component\VIBuffer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

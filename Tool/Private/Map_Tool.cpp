@@ -1,5 +1,4 @@
-﻿#include "Map_Tool.h"
-CMap_Tool::CMap_Tool(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿CMap_Tool::CMap_Tool(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : m_pDevice { pDevice }
     , m_pDeviceContext { pContext }
     , m_pGameInstance { CGameInstance::GetInstance()}
@@ -1223,7 +1222,7 @@ void CMap_Tool::Render_Effect_ParticleInspector()
 
             ImGui::SliderInt("Shader Path", (int*)&m_CurrentEffectParticle_Desc.iShaderPath, 0, PARTICLE_SHADER_END - 1);
 
-            ImGui::SliderInt("PARTICLE TYPE", (int*)&m_CurrentEffectParticle_Desc.eParticleType, 0, CTool_EffectParticle::END - 1);
+            ImGui::SliderInt("PARTICLE TYPE", (int*)&m_CurrentEffectParticle_Desc.eParticleType, 0, CTool_EffectParticle::PARTICLE_TYPE_END - 1);
 
             static bool isLoop = { false };
             ImGui::Checkbox("Is Loop", &isLoop);
@@ -1271,7 +1270,7 @@ void CMap_Tool::Render_Effect_ParticleInspector()
             }
             
             ImGui::SameLine();
-            if (ImGui::Button("Create Burst Effect", ImVec2(150, 40)))
+            if (ImGui::Button("Create QueenKnightWarp Effect", ImVec2(150, 40)))
             {
                 // 버스트 효과용 파티클 생성
                 _vector vCamPos = XMLoadFloat4(m_pGameInstance->Get_CamPosition());
@@ -1302,7 +1301,39 @@ void CMap_Tool::Render_Effect_ParticleInspector()
                     m_CurrentEffectParticle_Desc.useTextureIndexArray[i] = m_SelectedTextures[i].iSelectedIndex;
                 }
 
-                Create_Burst_Effect_Particle();
+                Create_QueenKnightWarp_Effect_Particle();
+            }
+
+            // 보스 폭발 파티클 생성 버튼
+            if (ImGui::Button("Create Boss Explosion Particle"))
+            {
+                _vector vCamPos = XMLoadFloat4(m_pGameInstance->Get_CamPosition());
+                _vector vCamLook = XMVector3Normalize(m_pCameraTransformCom->Get_State(STATE::LOOK));
+                _vector vCalculatedPosition = XMVectorAdd(vCamPos, XMVectorScale(vCamLook, distance));
+                _vector vDirection = XMVectorSet(direction[0], direction[1], direction[2], 0.0f);
+
+                // 현재 설정된 값들 사용
+                m_CurrentEffectParticle_Desc.iNumInstance = iNumInstance;
+                m_CurrentEffectParticle_Desc.vCenter = _float3(Center[0], Center[1], Center[2]);
+                m_CurrentEffectParticle_Desc.vRange = _float3(Range[0], Range[1], Range[2]);
+                m_CurrentEffectParticle_Desc.vSize = _float2(Size[0], Size[1]);
+                m_CurrentEffectParticle_Desc.vPivot = _float3(Pivot[0], Pivot[1], Pivot[2]);
+                m_CurrentEffectParticle_Desc.vSpeed = _float2(Speed[0], Speed[1]);
+                m_CurrentEffectParticle_Desc.vLifeTime = _float2(LifeTime[0], LifeTime[1]);
+                m_CurrentEffectParticle_Desc.vPosition = vCalculatedPosition;
+                m_CurrentEffectParticle_Desc.vDirection = vDirection;
+                m_CurrentEffectParticle_Desc.eCurLevel = m_eCurLevel;
+                m_CurrentEffectParticle_Desc.isLoop = isLoop;
+                m_CurrentEffectParticle_Desc.isBillBoard = isBillBoard;
+                
+                // 텍스처 정보 복사
+                for (_uint i = 0; i < TEXTURE_END; ++i)
+                {
+                    m_CurrentEffectParticle_Desc.useTextureCheckArray[i] = m_SelectedTextures[i].bSelected;
+                    m_CurrentEffectParticle_Desc.useTextureIndexArray[i] = m_SelectedTextures[i].iSelectedIndex;
+                }
+
+                Create_BossExplosion_Effect_Particle();
             }
            
         }
@@ -1342,7 +1373,81 @@ void CMap_Tool::Create_Effect_Particle()
                 
                 _float lifeTime = (m_CurrentEffectParticle_Desc.vLifeTime.x + m_CurrentEffectParticle_Desc.vLifeTime.y) * 0.5f;
                 
-                pParticleEffect->CreateParticleBurst(centerPos, baseDir, lifeTime);
+                pParticleEffect->CreateDefault_Particle(centerPos, baseDir, lifeTime);
+            }
+        }
+    }
+
+    // 성공/실패 팝업
+    if (pEffectParticle != nullptr)
+    {
+        ImGui::OpenPopup("Particle Created");
+    }
+    else
+    {
+        ImGui::OpenPopup("Particle Creation Failed");
+    }
+
+    // 성공 팝업
+    if (ImGui::BeginPopup("Particle Created"))
+    {
+        ImGui::Text("Effect Particle created successfully!");
+        if (ImGui::Button("OK"))
+        {
+            ImGui::CloseCurrentPopup();
+        }
+        ImGui::EndPopup();
+    }
+
+    // 실패 팝업
+    if (ImGui::BeginPopup("Particle Creation Failed"))
+    {
+        ImGui::Text("Failed to create Effect Particle!");
+        if (ImGui::Button("OK"))
+        {
+            ImGui::CloseCurrentPopup();
+        }
+        ImGui::EndPopup();
+    }
+}
+
+void CMap_Tool::Create_QueenKnightWarp_Effect_Particle()
+{
+    // m_CurrentEffectParticle_Desc 사용해서 파티클 생성
+    CGameObject* pEffectParticle = dynamic_cast<CGameObject*>(m_pGameInstance->Clone_Prototype(
+        PROTOTYPE::GAMEOBJECT, ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_EffectParticle"), &m_CurrentEffectParticle_Desc
+    ));
+
+    if (pEffectParticle != nullptr)
+    {
+        // 레벨에 추가 (Effect 레이어에)
+        if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(
+            ENUM_CLASS(m_eCurLevel), TEXT("Layer_Effect"), pEffectParticle)))
+        {
+            // 실패시
+            Safe_Release(pEffectParticle);
+        }
+        else
+        {
+            // 성공 시 - 모든 파티클 인스턴스를 한번에 생성
+            CTool_EffectParticle* pParticleEffect = dynamic_cast<CTool_EffectParticle*>(pEffectParticle);
+            if (pParticleEffect)
+            {
+                // UI에서 설정한 값들 사용
+                _float3 centerPos = m_CurrentEffectParticle_Desc.vCenter;
+
+                _vector vDir = m_CurrentEffectParticle_Desc.vDirection;
+                _float3 baseDir;
+                XMStoreFloat3(&baseDir, vDir);
+
+                _float lifeTime = m_CurrentEffectParticle_Desc.vLifeTime.y;
+                
+                PARTICLE_INIT_INFO particleInitInfo = {};
+                particleInitInfo.pos = centerPos;
+                particleInitInfo.dir = baseDir;
+                particleInitInfo.lifeTime = lifeTime;
+
+                pParticleEffect->Create_QueenKnightWarpEffect(particleInitInfo);
             }
         }
     }
@@ -1468,43 +1573,7 @@ HRESULT CMap_Tool::Ready_Imgui()
     return S_OK;
 }
 
-void CMap_Tool::Create_Burst_Effect_Particle()
-{
-    // m_CurrentEffectParticle_Desc 사용해서 파티클 생성
-    CGameObject* pEffectParticle = dynamic_cast<CGameObject*>(m_pGameInstance->Clone_Prototype(
-        PROTOTYPE::GAMEOBJECT, ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_EffectParticle"), &m_CurrentEffectParticle_Desc
-    ));
 
-    if (pEffectParticle != nullptr)
-    {
-        // 레벨에 추가 (Effect 레이어에)
-        if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(
-            ENUM_CLASS(m_eCurLevel), TEXT("Layer_Effect"), pEffectParticle)))
-        {
-            // 실패시
-            Safe_Release(pEffectParticle);
-        }
-        else
-        {
-            // 성공 시 - 버스트 효과 생성
-            CTool_EffectParticle* pParticleEffect = dynamic_cast<CTool_EffectParticle*>(pEffectParticle);
-            if (pParticleEffect)
-            {
-                // UI에서 설정한 값들 사용
-                _float3 gatherPoint = m_CurrentEffectParticle_Desc.vCenter;
-                // UI에서 설정한 Direction 사용
-                _vector vDirection = m_CurrentEffectParticle_Desc.vDirection;
-                _float3 direction;
-                XMStoreFloat3(&direction, vDirection);
-                _float gatherTime = 1.5f;   // 1.5초 동안 모임
-                _float burstTime = 2.0f;    // 2초에 터짐
-                _float totalLifeTime = 5.0f; // 총 5초 생명
-                
-                pParticleEffect->CreateBurstEffect(gatherPoint, direction, gatherTime, burstTime, totalLifeTime);
-            }
-        }
-    }
-}
 
 HRESULT CMap_Tool::Ready_Events()
 {
@@ -1558,4 +1627,49 @@ void CMap_Tool::Free()
     Safe_Release(m_pGameInstance);
     Safe_Release(m_pDeviceContext);
     Safe_Release(m_pDevice);
+}
+
+void CMap_Tool::Create_BossExplosion_Effect_Particle()
+{
+    // m_CurrentEffectParticle_Desc 사용해서 파티클 생성
+    CGameObject* pEffectParticle = dynamic_cast<CGameObject*>(m_pGameInstance->Clone_Prototype(
+        PROTOTYPE::GAMEOBJECT, ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_EffectParticle"), &m_CurrentEffectParticle_Desc
+    ));
+
+    if (pEffectParticle != nullptr)
+    {
+        // 레벨에 추가 (Effect 레이어에)
+        if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(
+            ENUM_CLASS(m_eCurLevel), TEXT("Layer_Effect"), pEffectParticle)))
+        {
+            // 실패시
+            Safe_Release(pEffectParticle);
+        }
+        else
+        {
+            // 성공 시 - 보스 폭발 파티클 생성
+            CTool_EffectParticle* pParticleEffect = dynamic_cast<CTool_EffectParticle*>(pEffectParticle);
+            if (pParticleEffect)
+            {
+                // UI에서 설정한 값들 사용
+                _float3 centerPos = m_CurrentEffectParticle_Desc.vCenter;
+                _float fRadius = min(min(m_CurrentEffectParticle_Desc.vRange.x, m_CurrentEffectParticle_Desc.vRange.y), m_CurrentEffectParticle_Desc.vRange.z); // vRange에서 반지름
+                _float fGatherTime = 1.5f; // 응집 시간
+                _float fExplosionTime = 2.0f; // 폭발 시작 시간
+                _float fTotalLifeTime = m_CurrentEffectParticle_Desc.vLifeTime.y; // 받아온 LifeTime의 최대값
+
+                pParticleEffect->Create_BossExplosionParticle(centerPos, fRadius, fGatherTime, fExplosionTime, fTotalLifeTime);
+            }
+        }
+    }
+
+    // 성공/실패 팝업
+    if (pEffectParticle != nullptr)
+    {
+        ImGui::OpenPopup("Boss Explosion Particle Created");
+    }
+    else
+    {
+        ImGui::OpenPopup("Boss Explosion Particle Creation Failed");
+    }
 }

@@ -197,7 +197,7 @@ namespace Engine
 		XMFLOAT4	vTranslation;
 		XMFLOAT2	vLifeTime;
 		XMFLOAT3	vDir;
-		float		fSpeed;
+		float		fDirSpeed;
 	}VTXINSTANCEDIR_PARTICLE;
 
 	typedef struct tagVertexParticle

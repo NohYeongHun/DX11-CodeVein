@@ -1,4 +1,5 @@
-﻿CTool_EffectParticle::CTool_EffectParticle(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿#include "Tool_EffectParticle.h"
+CTool_EffectParticle::CTool_EffectParticle(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CGameObject{ pDevice, pContext }
 {
 }
@@ -31,12 +32,11 @@ HRESULT CTool_EffectParticle::Initialize_Clone(void* pArg)
    
 
 #pragma region 값 채우기.
-    m_fDisplayTime = pDesc->vLifeTime.y + 1.f;
+    m_fDisplayTime = pDesc->vLifeTime.y;
     m_isLoop = pDesc->isLoop;
     m_eParticleType = pDesc->eParticleType;
     m_iShaderPath = pDesc->iShaderPath;
     m_isBillBoard = pDesc->isBillBoard;
-    m_eParticleType = pDesc->eParticleType;
 
     /* 사용할 텍스쳐의 인덱스를 지정해줍니다. */
     for (_uint i = 0; i < TEXTURE::TEXTURE_END; ++i)
@@ -316,7 +316,7 @@ HRESULT CTool_EffectParticle::Ready_Components(const TOOLEFFECT_PARTICLE_DESC* p
 
 HRESULT CTool_EffectParticle::Ready_VIBuffer_Point(const TOOLEFFECT_PARTICLE_DESC* pDesc)
 {
-    CVIBuffer_PointDir_Instance::POINTDIR_INSTANCE_DESC PointDesc{};
+    CVIBuffer_PointParticleDir_Instance::PARTICLEPOINTDIR_INSTANCE_DESC PointDesc{};
     PointDesc.vPivot = pDesc->vPivot;
     PointDesc.vSpeed = pDesc->vSpeed;
     PointDesc.iNumInstance = pDesc->iNumInstance;
@@ -325,9 +325,11 @@ HRESULT CTool_EffectParticle::Ready_VIBuffer_Point(const TOOLEFFECT_PARTICLE_DES
     PointDesc.vSize = pDesc->vSize;
     PointDesc.vLifeTime = pDesc->vLifeTime;
     PointDesc.isLoop = pDesc->isLoop;
+    PointDesc.eParticleType = static_cast<CVIBuffer_PointParticleDir_Instance::PARTICLE_TYPE>(pDesc->eParticleType);
+    
     XMStoreFloat3(&PointDesc.vDir, pDesc->vDirection);
 
-    m_pVIBufferCom = CVIBuffer_PointDir_Instance::Create(m_pDevice, m_pContext, &PointDesc);
+    m_pVIBufferCom = CVIBuffer_PointParticleDir_Instance::Create(m_pDevice, m_pContext, &PointDesc);
     if (nullptr == m_pVIBufferCom)
     {
         CRASH("Failed Create VIBuffer PointDir Instance");
@@ -339,15 +341,8 @@ HRESULT CTool_EffectParticle::Ready_VIBuffer_Point(const TOOLEFFECT_PARTICLE_DES
     return S_OK;
 }
 
-void CTool_EffectParticle::CreateParticleEffect(_float3 vPosition, _float3 vDirection, _float fLifeTime)
-{
-    if (m_pVIBufferCom)
-    {
-        m_pVIBufferCom->PrepareParticle(vPosition, vDirection, fLifeTime);
-    }
-}
 
-void CTool_EffectParticle::CreateParticleBurst(_float3 vCenterPosition, _float3 vBaseDirection, _float fLifeTime)
+void CTool_EffectParticle::CreateDefault_Particle(_float3 vCenterPosition, _float3 vBaseDirection, _float fLifeTime)
 {
     if (m_pVIBufferCom)
     {
@@ -360,6 +355,22 @@ void CTool_EffectParticle::CreateBurstEffect(_float3 vGatherPoint, _float3 vUpDi
     if (m_pVIBufferCom)
     {
         m_pVIBufferCom->CreateBurstParticles(vGatherPoint, vUpDirection, fGatherTime, fBurstTime, fTotalLifeTime);
+    }
+}
+
+void CTool_EffectParticle::Create_QueenKnightWarpEffect(const PARTICLE_INIT_INFO particleInitInfo)
+{
+    if (m_pVIBufferCom)
+    {
+        m_pVIBufferCom->Create_QueenKnightWarpParticle(particleInitInfo);
+    }
+}
+
+void CTool_EffectParticle::Create_BossExplosionParticle(_float3 vCenterPos, _float fRadius, _float fGatherTime, _float fExplosionTime, _float fTotalLifeTime)
+{
+    if (m_pVIBufferCom)
+    {
+        m_pVIBufferCom->Create_BossExplosionParticle(vCenterPos, fRadius, fGatherTime, fExplosionTime, fTotalLifeTime);
     }
 }
 

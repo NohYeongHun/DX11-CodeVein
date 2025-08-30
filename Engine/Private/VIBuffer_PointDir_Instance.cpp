@@ -79,7 +79,7 @@ HRESULT CVIBuffer_PointDir_Instance::Initialize_Prototype(const INSTANCE_DESC* p
         pInstanceVertices[i].vTranslation = _float4( 0.f, 0.f, 0.f, 1.f);
         pInstanceVertices[i].vLifeTime = _float2(0.f, fLifeTime);
         pInstanceVertices[i].vDir = _float3(0.f, 0.f, 0.f);
-        pInstanceVertices[i].fSpeed = fSpeed;
+        pInstanceVertices[i].fDirSpeed = fSpeed;
     }
 
     for (_uint i = 0; i < pPointDirDesc->iNumInstance; i++)
@@ -178,14 +178,20 @@ void CVIBuffer_PointDir_Instance::Update(_float fTimeDelta)
             _float burstTime = pVertices[index].vRight.w;  // 터지는 시간
             _float totalLifeTime = pVertices[index].vLifeTime.y;
             
-            if (currentTime < burstTime)
+            if (burstTime == 0.0f || currentTime < burstTime)
             {
-                // 1단계: 구 형태를 유지하면서 Direction 방향으로 이동
+                // PrepareParticle로 생성된 파티클 또는 1단계: Direction 방향으로 이동
                 _float3 initialPos = {pVertices[index].vUp.x, pVertices[index].vUp.y, pVertices[index].vUp.z};
                 _float3 direction = pVertices[index].vDir;  // Direction 방향 
-                _float speed = pVertices[index].fSpeed;
+                _float speed = pVertices[index].fDirSpeed;
                 
-                // 초기 구 형태 위치에서 Direction 방향으로 이동 (구 형태 유지)
+                // burstTime이 0이면 초기 위치는 현재 Translation 위치 사용
+                if (burstTime == 0.0f)
+                {
+                    initialPos = _float3(pVertices[index].vTranslation.x, pVertices[index].vTranslation.y, pVertices[index].vTranslation.z);
+                }
+                
+                // Direction 방향으로 이동
                 _float3 currentPos = {
                     initialPos.x + direction.x * currentTime * speed,  // Direction X 방향으로 이동
                     initialPos.y + direction.y * currentTime * speed,  // Direction Y 방향으로 이동  
@@ -198,7 +204,7 @@ void CVIBuffer_PointDir_Instance::Update(_float fTimeDelta)
             {
                 // 2단계: 터져서 방사형으로 퍼져나감
                 _float3 burstDir = {pVertices[index].vLook.x, pVertices[index].vLook.y, pVertices[index].vLook.z};
-                _float speed = pVertices[index].fSpeed;
+                _float speed = pVertices[index].fDirSpeed;
                 _float burstElapsedTime = currentTime - burstTime;
                 
                 // 터진 시점의 위치에서 방사형으로 퍼짐
@@ -255,6 +261,9 @@ void CVIBuffer_PointDir_Instance::PrepareParticle(_float3 vPos, _float3 vDir, _f
     info.dir = pointDir;
     info.pos = vPos;
     info.lifeTime = fLifeTime;
+    info.initialPos = vPos;        // 초기 위치 저장
+    info.fBurstTime = 0.0f;        // PrepareParticle은 burstTime 없음
+    info.burstDir = _float3(0,0,0); // 기본값
     m_ReadyparticleIndices.emplace(make_pair(index, info));
 }
 

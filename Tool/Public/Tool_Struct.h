@@ -40,7 +40,12 @@ typedef struct tagModelCreateDesc
 	_float3 vScale = {};
 }MODEL_CREATE_DESC;
 
-
+typedef struct ParticleInitInfo
+{
+	_float3 pos;
+	_float3 dir;
+	_float lifeTime;
+}PARTICLE_INIT_INFO;
 
 
 
