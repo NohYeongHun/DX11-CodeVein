@@ -1,4 +1,5 @@
-﻿CBT_QueenKnight_DownStrikeAction::CBT_QueenKnight_DownStrikeAction(CQueenKnight* pOwner)
+﻿/* 모두 수정 필요. */
+CBT_QueenKnight_DownStrikeAction::CBT_QueenKnight_DownStrikeAction(CQueenKnight* pOwner)
     : m_pOwner{ pOwner }
 {
     m_strTag = L"CBT_QueenKnight_DownStrikeAction";
@@ -71,6 +72,8 @@ BT_RESULT CBT_QueenKnight_DownStrikeAction::Enter_Attack(_float fTimeDelta)
     m_pOwner->Change_Animation_Blend(iNextAnimationIdx, false, 0.1f, true, true, true);
 
 
+    
+
     return BT_RESULT::RUNNING;
 }
 
@@ -93,14 +96,17 @@ BT_RESULT CBT_QueenKnight_DownStrikeAction::Update_Ready(_float fTimeDelta)
 
         // 4. 목표 위치 지정.
         _vector vOwnerPos = m_pOwner->Get_Transform()->Get_State(STATE::POSITION);
-        vOwnerPos.m128_f32[1] += 10.f;
+        vOwnerPos.m128_f32[1] += 20.f;
 
         XMStoreFloat3(&m_vAscendTarget, vOwnerPos);
 
         m_pOwner->RotateTurn_ToTarget();
 
         // 5. 렌더링 끄기.
-        m_pOwner->Set_Visible(false);
+        //m_pOwner->Set_Visible(false);
+
+        // 3. Effect 생성
+        m_pOwner->Create_QueenKnightWarp_Effect_Particle({ 0.f, 1.f, 0.f });
     }
 
     return BT_RESULT::RUNNING;
@@ -195,7 +201,7 @@ BT_RESULT CBT_QueenKnight_DownStrikeAction::Update_Hang(_float fTimeDelta)
             m_eAttackPhase = ATTACK_PHASE::DESCEND;
 
             // 2. 목표 하강지점 도착했으므로 렌더링 켜기
-            m_pOwner->Set_Visible(true);
+            //m_pOwner->Set_Visible(true);
 
             // 3. Navigation Off 해제. => 다시 Navigation을 타게 만듭니다.
             m_pOwner->RemoveBuff(CMonster::BUFF_NAVIGATION_OFF, true);

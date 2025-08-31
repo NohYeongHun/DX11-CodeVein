@@ -27,7 +27,7 @@ struct VS_IN
     row_major float4x4 TransformMatrix : WORLD;
     float2 vLifeTime : TEXCOORD0;
     float3 vDir : TEXCOORD1;
-    float  fSpeed : TEXCOORD2;
+    float fSpeed : TEXCOORD2;
     uint iMaskTextureIndex : TEXINDEX0;
 };
 
@@ -37,7 +37,7 @@ struct VS_OUT
     float fSize : PSIZE;
     float2 vLifeTime : TEXCOORD0;
     float3 vDir : TEXCOORD1;
-    float  fSpeed : TEXCOORD2;
+    float fSpeed : TEXCOORD2;
     uint iMaskTextureIndex : TEXINDEX0;
 };
 
@@ -50,7 +50,7 @@ VS_OUT VS_MAIN(VS_IN In)
  
     vector vPosition = mul(float4(In.vPosition, 1.f), In.TransformMatrix);
     
-    Out.vPosition = mul(vPosition, g_WorldMatrix);
+    Out.vPosition = mul(vPosition, g_WorldMatrix); // 객체의 월드 Matrix 곱해줌.
     Out.fSize = length(In.TransformMatrix._11_12_13);
     Out.vLifeTime = In.vLifeTime;
     Out.vDir = mul(In.vDir, In.fSpeed);
@@ -66,7 +66,7 @@ struct GS_IN
     float fSize : PSIZE;
     float2 vLifeTime : TEXCOORD0;
     float3 vDir : TEXCOORD1;
-    float  fSpeed : TEXCOORD2;
+    float fSpeed : TEXCOORD2;
     uint iMaskTextureIndex : TEXINDEX0;
 };
 
@@ -91,7 +91,7 @@ void GS_Stretched_Billboard_MAIN(point GS_IN In[1], inout TriangleStream<GS_OUT>
     float3 vDir = normalize(In[0].vDir);
 
     float speed = In[0].fSpeed; // 개별 속도값 사용
-    float stretchScale = In[0].fSize * (1.0f + speed * 0.2f); // 0.1f는 보정값 너무 길게 늘어나면 수정 필요 
+    float stretchScale = In[0].fSize * (1.0f + speed * 0.3f); // 0.1f는 보정값 너무 길게 늘어나면 수정 필요 
     //늘어지는 효과
 
     // 속도 방향을 Up으로 사용
@@ -165,6 +165,14 @@ PS_OUT PS_MAIN(PS_IN In)
     return Out;
 }
 
+PS_OUT PS_DEBUG_MAIN(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+    Out.vColor = float4(1.f, 0.f, 0.f, 1.f);
+    
+    return Out;
+}
+
 PS_OUT PS_DIFFUSE_MASK_MAIN(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
@@ -176,52 +184,83 @@ PS_OUT PS_DIFFUSE_MASK_MAIN(PS_IN In)
     vector vMask = float4(0, 0, 0, 0);
     
     // 동적 인덱싱을 조건문으로 처리
-    if (In.iMaskTextureIndex == 0) {
+    if (In.iMaskTextureIndex == 0)
+    {
         vDestDiffuse = g_MaskTextures[0].Sample(DefaultSampler, In.vTexcoord);
         vMask = g_MaskTextures[0].Sample(DefaultSampler, In.vTexcoord);
-    } else if (In.iMaskTextureIndex == 1) {
+    }
+    else if (In.iMaskTextureIndex == 1)
+    {
         vDestDiffuse = g_MaskTextures[1].Sample(DefaultSampler, In.vTexcoord);
         vMask = g_MaskTextures[1].Sample(DefaultSampler, In.vTexcoord);
-    } else if (In.iMaskTextureIndex == 2) {
+    }
+    else if (In.iMaskTextureIndex == 2)
+    {
         vDestDiffuse = g_MaskTextures[2].Sample(DefaultSampler, In.vTexcoord);
         vMask = g_MaskTextures[2].Sample(DefaultSampler, In.vTexcoord);
-    } else if (In.iMaskTextureIndex == 3) {
+    }
+    else if (In.iMaskTextureIndex == 3)
+    {
         vDestDiffuse = g_MaskTextures[3].Sample(DefaultSampler, In.vTexcoord);
         vMask = g_MaskTextures[3].Sample(DefaultSampler, In.vTexcoord);
-    } else if (In.iMaskTextureIndex == 4) {
+    }
+    else if (In.iMaskTextureIndex == 4)
+    {
         vDestDiffuse = g_MaskTextures[4].Sample(DefaultSampler, In.vTexcoord);
         vMask = g_MaskTextures[4].Sample(DefaultSampler, In.vTexcoord);
-    } else if (In.iMaskTextureIndex == 5) {
+    }
+    else if (In.iMaskTextureIndex == 5)
+    {
         vDestDiffuse = g_MaskTextures[5].Sample(DefaultSampler, In.vTexcoord);
         vMask = g_MaskTextures[5].Sample(DefaultSampler, In.vTexcoord);
-    } else if (In.iMaskTextureIndex == 6) {
+    }
+    else if (In.iMaskTextureIndex == 6)
+    {
         vDestDiffuse = g_MaskTextures[6].Sample(DefaultSampler, In.vTexcoord);
         vMask = g_MaskTextures[6].Sample(DefaultSampler, In.vTexcoord);
-    } else if (In.iMaskTextureIndex == 7) {
+    }
+    else if (In.iMaskTextureIndex == 7)
+    {
         vDestDiffuse = g_MaskTextures[7].Sample(DefaultSampler, In.vTexcoord);
         vMask = g_MaskTextures[7].Sample(DefaultSampler, In.vTexcoord);
-    } else if (In.iMaskTextureIndex == 8) {
+    }
+    else if (In.iMaskTextureIndex == 8)
+    {
         vDestDiffuse = g_MaskTextures[8].Sample(DefaultSampler, In.vTexcoord);
         vMask = g_MaskTextures[8].Sample(DefaultSampler, In.vTexcoord);
-    } else if (In.iMaskTextureIndex == 9) {
+    }
+    else if (In.iMaskTextureIndex == 9)
+    {
         vDestDiffuse = g_MaskTextures[9].Sample(DefaultSampler, In.vTexcoord);
         vMask = g_MaskTextures[9].Sample(DefaultSampler, In.vTexcoord);
-    } else if (In.iMaskTextureIndex == 10) {
+    }
+    else if (In.iMaskTextureIndex == 10)
+    {
         vDestDiffuse = g_MaskTextures[10].Sample(DefaultSampler, In.vTexcoord);
         vMask = g_MaskTextures[10].Sample(DefaultSampler, In.vTexcoord);
-    } else if (In.iMaskTextureIndex == 11) {
+    }
+    else if (In.iMaskTextureIndex == 11)
+    {
         vDestDiffuse = g_MaskTextures[11].Sample(DefaultSampler, In.vTexcoord);
         vMask = g_MaskTextures[11].Sample(DefaultSampler, In.vTexcoord);
-    } else if (In.iMaskTextureIndex == 12) {
+    }
+    else if (In.iMaskTextureIndex == 12)
+    {
         vDestDiffuse = g_MaskTextures[12].Sample(DefaultSampler, In.vTexcoord);
         vMask = g_MaskTextures[12].Sample(DefaultSampler, In.vTexcoord);
-    } else if (In.iMaskTextureIndex == 13) {
+    }
+    else if (In.iMaskTextureIndex == 13)
+    {
         vDestDiffuse = g_MaskTextures[13].Sample(DefaultSampler, In.vTexcoord);
         vMask = g_MaskTextures[13].Sample(DefaultSampler, In.vTexcoord);
-    } else if (In.iMaskTextureIndex == 14) {
+    }
+    else if (In.iMaskTextureIndex == 14)
+    {
         vDestDiffuse = g_MaskTextures[14].Sample(DefaultSampler, In.vTexcoord);
         vMask = g_MaskTextures[14].Sample(DefaultSampler, In.vTexcoord);
-    } else if (In.iMaskTextureIndex == 15) {
+    }
+    else if (In.iMaskTextureIndex == 15)
+    {
         vDestDiffuse = g_MaskTextures[15].Sample(DefaultSampler, In.vTexcoord);
         vMask = g_MaskTextures[15].Sample(DefaultSampler, In.vTexcoord);
     }
@@ -267,6 +306,16 @@ technique11 DefaultTechnique
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = compile gs_5_0 GS_Stretched_Billboard_MAIN();
         PixelShader = compile ps_5_0 PS_DIFFUSE_MASK_MAIN();
+    }
+
+    pass DebugPass
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = compile gs_5_0 GS_Stretched_Billboard_MAIN();
+        PixelShader = compile ps_5_0 PS_DEBUG_MAIN();
     }
 
    

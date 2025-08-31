@@ -1,29 +1,29 @@
-﻿CTool_EffectParticle::CTool_EffectParticle(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿CEffectParticle::CEffectParticle(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CGameObject{ pDevice, pContext }
 {
 }
 
-CTool_EffectParticle::CTool_EffectParticle(const CTool_EffectTexture& Prototype)
+CEffectParticle::CEffectParticle(const CEffectParticle& Prototype)
     : CGameObject(Prototype)
 {
 }
 
-HRESULT CTool_EffectParticle::Initialize_Prototype()
+HRESULT CEffectParticle::Initialize_Prototype()
 {
     if (FAILED(CGameObject::Initialize_Prototype()))
     {
-        CRASH("Failed Clone CTool_EffectParticle");
+        CRASH("Failed Clone CEffectParticle");
         return E_FAIL;
     }
     return S_OK;
 }
 
-HRESULT CTool_EffectParticle::Initialize_Clone(void* pArg)
+HRESULT CEffectParticle::Initialize_Clone(void* pArg)
 {
-    TOOLEFFECT_PARTICLE_DESC* pDesc = static_cast<TOOLEFFECT_PARTICLE_DESC*>(pArg);
+    EFFECT_PARTICLE_DESC* pDesc = static_cast<EFFECT_PARTICLE_DESC*>(pArg);
     if (FAILED(CGameObject::Initialize_Clone(pDesc)))
     {
-        CRASH("Failed Clone CTool_EffectParticle");
+        CRASH("Failed Clone CEffectParticle");
         return E_FAIL;
     }
 
@@ -35,6 +35,8 @@ HRESULT CTool_EffectParticle::Initialize_Clone(void* pArg)
     m_isLoop = pDesc->isLoop;
     m_eParticleType = pDesc->eParticleType;
     m_iShaderPath = pDesc->iShaderPath;
+    //m_iShaderPath = 2;
+    
     m_isBillBoard = pDesc->isBillBoard;
 
     /* 사용할 텍스쳐의 인덱스를 지정해줍니다. */
@@ -42,26 +44,26 @@ HRESULT CTool_EffectParticle::Initialize_Clone(void* pArg)
         m_iTextureIndexArray[i] = pDesc->useTextureIndexArray[i];
 
 
-    // 위치 설정. => 생성당시 한번만 설정하면 안될거 같은데?
-    m_pTransformCom->Set_State(STATE::POSITION, pDesc->vPosition);
+    // 위치 설정.
+    // m_pTransformCom->Set_State(STATE::POSITION, pDesc->vPosition);
 #pragma endregion
 
 
     if (FAILED(Ready_Components(pDesc)))
     {
-        CRASH("Failed Clone CTool_EffectParticle");
+        CRASH("Failed Clone CEffectParticle");
         return E_FAIL;
     }
         
     return S_OK;
 }
 
-void CTool_EffectParticle::Priority_Update(_float fTimeDelta)
+void CEffectParticle::Priority_Update(_float fTimeDelta)
 {
     CGameObject::Priority_Update(fTimeDelta);
 }
 
-void CTool_EffectParticle::Update(_float fTimeDelta)
+void CEffectParticle::Update(_float fTimeDelta)
 {
     CGameObject::Update(fTimeDelta);
 
@@ -76,8 +78,11 @@ void CTool_EffectParticle::Update(_float fTimeDelta)
     // 타이머 업데이트
     m_fCurrentTime += fTimeDelta;
 
-    // 시간이 지나면 비활성화
-    if (m_fCurrentTime >= m_fDisplayTime)
+    // 활성 파티클 수 확인
+    _uint liveParticleCount = m_pVIBufferCom->Get_LiveParticleCount();
+    
+    // 모든 파티클이 죽었거나 시간이 지나면 비활성화
+    if (liveParticleCount == 0 || m_fCurrentTime >= m_fDisplayTime)
     {
         // Loop면 다시 시작.
         if (m_isLoop)
@@ -87,7 +92,7 @@ void CTool_EffectParticle::Update(_float fTimeDelta)
         else
         {
             m_IsActivate = false;
-            Set_Destroy(true);
+            Reset_Timer(); // 타이머 초기화.
             return;
         }
     }
@@ -96,26 +101,29 @@ void CTool_EffectParticle::Update(_float fTimeDelta)
     
 }
 
-void CTool_EffectParticle::Late_Update(_float fTimeDelta)
+void CEffectParticle::Late_Update(_float fTimeDelta)
 {
     CGameObject::Late_Update(fTimeDelta);
 
-    if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::NONBLEND, this)))
+    // 활성화된 상태에서만 렌더링
+    if (m_IsActivate)
     {
-        CRASH("Failed Add RenderGroup");
-        return;
+        if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::NONBLEND, this)))
+        {
+            CRASH("Failed Add RenderGroup");
+            return;
+        }
     }
-
 }
 
-HRESULT CTool_EffectParticle::Render()
+HRESULT CEffectParticle::Render()
 {
 #ifdef _DEBUG
     ImGuiIO& io = ImGui::GetIO();
 
     // 기존 Player Debug Window
 
-    ImVec2 windowSize = ImVec2(300.f, 300.f);
+    ImVec2 windowSize = ImVec2(300.f, 00.f);
     ImVec2 windowPos = ImVec2(0.f, 0.f);
     ImGui::SetNextWindowPos(windowPos, ImGuiCond_Once);
     ImGui::SetNextWindowSize(windowSize, ImGuiCond_Once);
@@ -126,42 +134,74 @@ HRESULT CTool_EffectParticle::Render()
     _float3 vPos = {};
     XMStoreFloat3(&vPos, m_pTransformCom->Get_State(STATE::POSITION));
     ImGui::Text("POS : (%.2f, %.2f, %.2f)", vPos.x, vPos.y, vPos.z);
+    
+    ImGui::Text("IsActivate : %s", m_IsActivate ? "TRUE" : "FALSE");
+    ImGui::Text("ParticleType : %d", m_eParticleType);
+    ImGui::Text("ShaderPath : %d", m_iShaderPath);
+    ImGui::Text("CurrentTime : %.2f / %.2f", m_fCurrentTime, m_fDisplayTime);
+    
+    if (m_pVIBufferCom)
+    {
+        ImGui::Text("VIBuffer : Valid");
+        // 파티클 인스턴스 수 확인 (VIBuffer 클래스에 getter가 있다면)
+        ImGui::Text("Active Particles: %d", m_pVIBufferCom->Get_LiveParticleCount());
+
+
+    }
+    else
+    {
+        ImGui::Text("VIBuffer : NULL");
+    }
 
     ImGui::End();
+    
 
 #endif // _DEBUG
 
-
-    if (FAILED(Bind_ShaderResources()))
+    HRESULT hr;
+    
+    hr = Bind_ShaderResources();
+    if (FAILED(hr))
     {
         CRASH("Failed Bind Shader Resources");
         return E_FAIL;
     }
-        
-
-    if (FAILED(m_pShaderCom->Begin(m_iShaderPath)))
+    
+    hr = m_pShaderCom->Begin(m_iShaderPath);
+    //hr = m_pShaderCom->Begin(m_iShaderPath);
+    if (FAILED(hr))
     {
         CRASH("Failed Shader Begin Failed");
         return E_FAIL;
     }
 
-
-    if (FAILED(m_pVIBufferCom->Bind_Resources()))
+    hr = m_pVIBufferCom->Bind_Resources();
+    if (FAILED(hr))
     {
         CRASH("Failed Bind_Resources Failed");
         return E_FAIL;
     }
 
-    if (FAILED(m_pVIBufferCom->Render()))
+    hr = m_pVIBufferCom->Render();
+    if (FAILED(hr))
     {
         CRASH("Failed Render Failed");
         return E_FAIL;
     }
 
+    // 셰이더 상태 정리
+    //m_pShaderCom->End();
+    
+    // Geometry Shader 해제
+    m_pContext->GSSetShader(nullptr, nullptr, 0);
+    
+    // 추가 렌더 상태 정리 (필요시)
+    // m_pContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
     return S_OK;
 }
 
-HRESULT CTool_EffectParticle::Bind_ShaderResources()
+HRESULT CEffectParticle::Bind_ShaderResources()
 {
 
 #pragma region 행렬 바인딩
@@ -273,8 +313,9 @@ HRESULT CTool_EffectParticle::Bind_ShaderResources()
     return S_OK;
 }
 
-HRESULT CTool_EffectParticle::Ready_Components(const TOOLEFFECT_PARTICLE_DESC* pDesc)
+HRESULT CEffectParticle::Ready_Components(const EFFECT_PARTICLE_DESC* pDesc)
 {
+
     /* 1. VIBuffer Point 생성. */
     if (FAILED(Ready_VIBuffer_Point(pDesc)))
     {
@@ -285,7 +326,7 @@ HRESULT CTool_EffectParticle::Ready_Components(const TOOLEFFECT_PARTICLE_DESC* p
     /* 나머지 컴포넌트 채우기. */
 
 #pragma region 1. Shader 초기화
-    if (FAILED(Add_Component(ENUM_CLASS(m_eCurLevel), TEXT("Prototype_Component_Shader_VtxInstance_PointDirParticle"),
+    if (FAILED(Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxInstance_PointDirParticle"),
         TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom))))
     {
         CRASH("Failed Load Shader");
@@ -326,7 +367,7 @@ HRESULT CTool_EffectParticle::Ready_Components(const TOOLEFFECT_PARTICLE_DESC* p
                 break;
             }
 
-            if (FAILED(CGameObject::Add_Component(ENUM_CLASS(m_eCurLevel), Effect_TexturePrototypes[i].prototypeName
+            if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), Effect_TexturePrototypes[i].prototypeName
                 , strTextureTag, reinterpret_cast<CComponent**>(&m_pTextureCom[i]))))
             {
                 CRASH("Failed LoadTexture");
@@ -341,7 +382,7 @@ HRESULT CTool_EffectParticle::Ready_Components(const TOOLEFFECT_PARTICLE_DESC* p
     return S_OK;
 }
 
-HRESULT CTool_EffectParticle::Ready_VIBuffer_Point(const TOOLEFFECT_PARTICLE_DESC* pDesc)
+HRESULT CEffectParticle::Ready_VIBuffer_Point(const EFFECT_PARTICLE_DESC* pDesc)
 {
     CVIBuffer_PointParticleDir_Instance::PARTICLEPOINTDIR_INSTANCE_DESC PointDesc{};
     PointDesc.vPivot = pDesc->vPivot;
@@ -353,6 +394,8 @@ HRESULT CTool_EffectParticle::Ready_VIBuffer_Point(const TOOLEFFECT_PARTICLE_DES
     PointDesc.vLifeTime = pDesc->vLifeTime;
     PointDesc.isLoop = pDesc->isLoop;
     PointDesc.eParticleType = static_cast<CVIBuffer_PointParticleDir_Instance::PARTICLE_TYPE>(pDesc->eParticleType);
+
+    m_fDisplayTime = PointDesc.vLifeTime.y + 1.0f;  // 개별 파티클보다 1초 더 길게
     
     XMStoreFloat3(&PointDesc.vDir, pDesc->vDirection);
 
@@ -369,7 +412,7 @@ HRESULT CTool_EffectParticle::Ready_VIBuffer_Point(const TOOLEFFECT_PARTICLE_DES
 }
 
 
-void CTool_EffectParticle::CreateDefault_Particle(_float3 vCenterPosition, _float3 vBaseDirection, _float fLifeTime)
+void CEffectParticle::CreateDefault_Particle(_float3 vCenterPosition, _float3 vBaseDirection, _float fLifeTime)
 {
     if (m_pVIBufferCom)
     {
@@ -377,7 +420,7 @@ void CTool_EffectParticle::CreateDefault_Particle(_float3 vCenterPosition, _floa
     }
 }
 
-void CTool_EffectParticle::CreateBurstEffect(_float3 vGatherPoint, _float3 vUpDirection, _float fGatherTime, _float fBurstTime, _float fTotalLifeTime)
+void CEffectParticle::CreateBurstEffect(_float3 vGatherPoint, _float3 vUpDirection, _float fGatherTime, _float fBurstTime, _float fTotalLifeTime)
 {
     if (m_pVIBufferCom)
     {
@@ -385,7 +428,7 @@ void CTool_EffectParticle::CreateBurstEffect(_float3 vGatherPoint, _float3 vUpDi
     }
 }
 
-void CTool_EffectParticle::Create_QueenKnightWarpEffect(const PARTICLE_INIT_INFO particleInitInfo)
+void CEffectParticle::Create_QueenKnightWarpEffect(const PARTICLE_INIT_INFO particleInitInfo)
 {
     if (m_pVIBufferCom)
     {
@@ -393,7 +436,7 @@ void CTool_EffectParticle::Create_QueenKnightWarpEffect(const PARTICLE_INIT_INFO
     }
 }
 
-void CTool_EffectParticle::Create_BossExplosionParticle(_float3 vCenterPos, _float fRadius, _float fGatherTime, _float fExplosionTime, _float fTotalLifeTime)
+void CEffectParticle::Create_BossExplosionParticle(_float3 vCenterPos, _float fRadius, _float fGatherTime, _float fExplosionTime, _float fTotalLifeTime)
 {
     if (m_pVIBufferCom)
     {
@@ -401,33 +444,75 @@ void CTool_EffectParticle::Create_BossExplosionParticle(_float3 vCenterPos, _flo
     }
 }
 
-CTool_EffectParticle* CTool_EffectParticle::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+
+#pragma region POOLING에서 꺼내질때 필요한 작업 정의 
+void CEffectParticle::OnActivate(void* pArg)
 {
-    CTool_EffectParticle* pInstance = new CTool_EffectParticle(pDevice, pContext);
+    EFFECTPARTICLE_ENTER_DESC* pDesc = static_cast<EFFECTPARTICLE_ENTER_DESC*>(pArg);
+
+    // 1. 위치 지정. => WorldMatrix용
+    m_pTransformCom->Set_State(STATE::POSITION, pDesc->vStartPos);
+
+    // 2. 활성화 상태로 설정
+    m_IsActivate = true;
+    Reset_Timer(); // 타이머 초기화
+    
+    const PARTICLE_INIT_INFO& particleInit = pDesc->particleInitInfo;
+
+    // 2. 타입에 맞는 Create 함수 호출
+    switch (m_eParticleType)
+    {
+    case PARTICLE_TYPE_DEFAULT:
+        m_pVIBufferCom->CreateAllParticles(particleInit.pos, particleInit.dir, particleInit.lifeTime);
+        break;
+    case PARTICLE_TYPE_QUEEN_WARP:
+        m_pVIBufferCom->Create_QueenKnightWarpParticle(particleInit);
+        break;
+
+    case PARTICLE_TYPE_BOSS_EXPLOSION:
+        m_pVIBufferCom->Create_BossExplosionParticle(particleInit.pos, particleInit.fRadius, particleInit.fGatherTime
+            , particleInit.fExplositionTime, particleInit.lifeTime);
+        break;
+
+    }
+
+}
+
+void CEffectParticle::OnDeActivate()
+{
+    // Activate할때 적용함.
+    m_pGameInstance->Add_GameObject_ToPools(TEXT("QUEENKNIGHT_WARP"), ENUM_CLASS(CHitFlashEffect::EffectType), this);
+}
+
+#pragma endregion
+
+CEffectParticle* CEffectParticle::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+{
+    CEffectParticle* pInstance = new CEffectParticle(pDevice, pContext);
 
     if (FAILED(pInstance->Initialize_Prototype()))
     {
-        MSG_BOX(TEXT("Failed to Created : CTool_EffectParticle"));
+        MSG_BOX(TEXT("Failed to Created : CEffectParticle"));
         Safe_Release(pInstance);
     }
 
     return pInstance;
 }
 
-CGameObject* CTool_EffectParticle::Clone(void* pArg)
+CGameObject* CEffectParticle::Clone(void* pArg)
 {
-    CTool_EffectParticle* pInstance = new CTool_EffectParticle(*this);
+    CEffectParticle* pInstance = new CEffectParticle(*this);
 
     if (FAILED(pInstance->Initialize_Clone(pArg)))
     {
-        MSG_BOX(TEXT("Clone Failed : CTool_EffectParticle"));
+        MSG_BOX(TEXT("Clone Failed : CEffectParticle"));
         Safe_Release(pInstance);
     }
 
     return pInstance;
 }
 
-void CTool_EffectParticle::Free()
+void CEffectParticle::Free()
 {
     CGameObject::Free();
     Safe_Release(m_pShaderCom);

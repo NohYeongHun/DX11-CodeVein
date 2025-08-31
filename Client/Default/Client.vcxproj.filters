@@ -229,6 +229,12 @@
     <Filter Include="02. GameObject\Effect\Slash">
       <UniqueIdentifier>{b13dc14a-57b8-4a1e-82c9-55b6739e07a2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="03. Component">
+      <UniqueIdentifier>{d4e0a876-9119-4c0d-9873-0fe1e40f6121}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03. Component\VIBuffer">
+      <UniqueIdentifier>{dfe6beb9-ac73-4f2a-828a-6a92324b4b5f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -621,9 +627,6 @@
     <ClInclude Include="..\Public\Slash.h">
       <Filter>02. GameObject\Effect\Slash</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Particle.h">
-      <Filter>02. GameObject\Effect\Particle</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\Snow.h">
       <Filter>02. GameObject\Effect</Filter>
     </ClInclude>
@@ -635,6 +638,18 @@
     </ClInclude>
     <ClInclude Include="..\Public\HitFlashEffect.h">
       <Filter>02. GameObject\Effect\Slash</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\VIBuffer_PointParticleDir_Instance.h">
+      <Filter>03. Component\VIBuffer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\EffectParticle.h">
+      <Filter>02. GameObject\Effect\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Particle.h">
+      <Filter>02. GameObject\Effect\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\PrototypeName.h">
+      <Filter>99. Defines</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1002,9 +1017,6 @@
     <ClCompile Include="..\Private\Slash.cpp">
       <Filter>02. GameObject\Effect\Slash</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Particle.cpp">
-      <Filter>02. GameObject\Effect\Particle</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\Snow.cpp">
       <Filter>02. GameObject\Effect</Filter>
     </ClCompile>
@@ -1016,6 +1028,18 @@
     </ClCompile>
     <ClCompile Include="..\Private\HitFlashEffect.cpp">
       <Filter>02. GameObject\Effect\Slash</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\VIBuffer_PointParticleDir_Instance.cpp">
+      <Filter>03. Component\VIBuffer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\EffectParticle.cpp">
+      <Filter>02. GameObject\Effect\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Particle.cpp">
+      <Filter>02. GameObject\Effect\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\PrototypeName.cpp">
+      <Filter>99. Defines</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1038,6 +1062,9 @@
       <Filter>96. ShaderFiles</Filter>
     </FxCompile>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxInstance_PointParticle.hlsl">
+      <Filter>96. ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxInstance_PointDirParticle.hlsl">
       <Filter>96. ShaderFiles</Filter>
     </FxCompile>
   </ItemGroup>

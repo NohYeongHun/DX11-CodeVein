@@ -64,9 +64,11 @@ public:
 
 #pragma region DEBUG용도 함수.
 
-#ifdef _DEBUG
 public:
 	void* Get_BoundingDesc();
+
+#ifdef _DEBUG
+
 
 
 

@@ -34,6 +34,7 @@ namespace Client
 		NONE = 0
 	};
 
+	enum TEXTURE { TEXTURE_DIFFUSE, TEXTURE_GRADIENT, TEXTURE_GRADIENT_ALPHA, TEXTURE_MASK, TEXTURE_NOISE, TEXTURE_END };
 
 	/* 애니메이션 바뀌더라도 이값만 바꾸게 */
 	/*enum PLAYER_ANIMATION_KEY
@@ -59,6 +60,20 @@ namespace Client
 		_float fMoveSpeed;
 		_float fRotationSpeed;
 	}MONSTER_STAT;
+
+	typedef struct ParticleInitInfo
+	{
+		_float3 pos;
+		_float3 dir;
+		_float lifeTime;
+		_float fRadius = { 0.f };
+		_float fGatherTime = { 0.f };
+		_float fExplositionTime = { 0.f };
+	}PARTICLE_INIT_INFO;
+
+	
+
+
 
 }
 

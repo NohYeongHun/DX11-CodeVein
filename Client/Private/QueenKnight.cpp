@@ -1,6 +1,4 @@
-﻿#include "QueenKnight.h"
-
-CQueenKnight::CQueenKnight(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿CQueenKnight::CQueenKnight(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CMonster(pDevice, pContext)
 {
 }
@@ -76,7 +74,13 @@ HRESULT CQueenKnight::Initialize_Clone(void* pArg)
 
     if (FAILED(Ready_BehaviorTree()))
     {
-        CRASH("Failed Ready BehaviourTree WolfDevil");
+        CRASH("Failed Ready BehaviourTree QueenKnight");
+        return E_FAIL;
+    }
+
+    if (FAILED(Ready_Effects(pDesc)))
+    {
+        CRASH("Failed Ready Effects QueenKnight");
         return E_FAIL;
     }
 
@@ -127,8 +131,6 @@ void CQueenKnight::Update(_float fTimeDelta)
 
     // 하위 객체들 움직임 제어는 Tree 제어 이후에
     CMonster::Update(fTimeDelta);
-
-
 
     Finalize_Update(fTimeDelta);
 }
@@ -501,13 +503,15 @@ HRESULT CQueenKnight::Initialize_BuffDurations()
     
     
     // 10 초마다 해당 페이즈 시퀀스 공격 반복
-    m_BuffDefault_Durations[QUEEN_BUFF_PHASE_ATTACK_COOLDOWN] = 10.f;
+    //m_BuffDefault_Durations[QUEEN_BUFF_PHASE_ATTACK_COOLDOWN] = 10.f;
+    m_BuffDefault_Durations[QUEEN_BUFF_PHASE_ATTACK_COOLDOWN] = 999.f;
 
     // 20초마다 돌진 공격 시퀀스 반복.
-    m_BuffDefault_Durations[QUEEN_BUFF_DASH_ATTACK_COOLDOWN] = 20.f; // 돌진 공격 쿨타임.
+    m_BuffDefault_Durations[QUEEN_BUFF_DASH_ATTACK_COOLDOWN] = 999.f; // 돌진 공격 쿨타임.
+    //m_BuffDefault_Durations[QUEEN_BUFF_DASH_ATTACK_COOLDOWN] = 20.f; // 돌진 공격 쿨타임.
 
     // 25초마다 내려찍기 공격 시퀀스 반복.
-    m_BuffDefault_Durations[QUEEN_BUFF_DOWN_TRIPLE_STRIKE_COOLDOWN] = 25.f; // 세번 연속 내려찍기 공격 쿨타임.
+    m_BuffDefault_Durations[QUEEN_BUFF_DOWN_TRIPLE_STRIKE_COOLDOWN] = 5.f; // 세번 연속 내려찍기 공격 쿨타임.
 
     return S_OK;
 }
@@ -623,6 +627,23 @@ void CQueenKnight::Set_Visible(_bool bVisible)
     m_pShield->Set_Visible(m_bVisible);
 }
 
+
+
+
+#pragma endregion
+
+#pragma region 9. Effect 객체 제어
+void CQueenKnight::Create_QueenKnightWarp_Effect_Particle(_float3 vDir)
+{
+
+    CEffectParticle::EFFECTPARTICLE_ENTER_DESC Desc{};
+    Desc.vStartPos = m_pTransformCom->Get_State(STATE::POSITION); // 몬스터 현재위치로 생성.
+    Desc.particleInitInfo.lifeTime = 5.f;
+    Desc.particleInitInfo.dir = vDir;
+    m_pGameInstance->Move_GameObject_ToObjectLayer(ENUM_CLASS(m_eCurLevel)
+        , TEXT("QUEENKNIGHT_WARP"), TEXT("Layer_Effect"), 2, ENUM_CLASS(CEffectParticle::EffectType), &Desc);
+
+}
 
 #pragma endregion
 
@@ -762,6 +783,16 @@ HRESULT CQueenKnight::Ready_PartObjects()
     return S_OK;
 }
 
+#pragma region Effect 생성
+HRESULT CQueenKnight::Ready_Effects(QUEENKNIGHT_DESC* pDesc)
+{
+        
+    return S_OK;
+}
+#pragma endregion
+
+
+
 HRESULT CQueenKnight::Ready_Render_Resources()
 {
     if (FAILED(m_pTransformCom->Bind_Shader_Resource(m_pShaderCom, "g_WorldMatrix")))
@@ -794,6 +825,8 @@ HRESULT CQueenKnight::Ready_Render_Resources()
 
     return S_OK;
 }
+
+
 
 
 

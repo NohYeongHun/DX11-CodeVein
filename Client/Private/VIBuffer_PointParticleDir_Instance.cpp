@@ -5,8 +5,8 @@
 
 CVIBuffer_PointParticleDir_Instance::CVIBuffer_PointParticleDir_Instance(const CVIBuffer_PointParticleDir_Instance& Prototype)
     : CVIBuffer_Instance(Prototype)
-    , m_vPivot { Prototype.m_vPivot }
-    , m_isLoop { Prototype.m_isLoop }
+    , m_vPivot{ Prototype.m_vPivot }
+    , m_isLoop{ Prototype.m_isLoop }
 {
 }
 
@@ -21,6 +21,7 @@ HRESULT CVIBuffer_PointParticleDir_Instance::Initialize_Prototype(const INSTANCE
     m_vDir = pPointDirDesc->vDir;
     m_vRange = pPointDirDesc->vRange;  // 부모 INSTANCE_DESC에서 가져옴
     m_vLifeTime = pPointDirDesc->vLifeTime; // LifeTime 범위 저장
+    m_vSpeed = pPointDirDesc->vSpeed;
     m_eParticleType = pPointDirDesc->eParticleType;
 
     m_iInstanceVertexStride = sizeof(VTXINSTANCEPOINTDIR_PARTICLE);
@@ -131,6 +132,7 @@ HRESULT CVIBuffer_PointParticleDir_Instance::Bind_Resources()
 
 HRESULT CVIBuffer_PointParticleDir_Instance::Render()
 {
+    OutputDebugWstring(TEXT("CVIBuffer_PointParticleDir_Instance::Render() - DrawInstanced Called"));
     m_pContext->DrawInstanced(1, m_iNumInstance, 0, 0);
     return S_OK;
 }
@@ -274,9 +276,11 @@ void CVIBuffer_PointParticleDir_Instance::Default_Update(VTXINSTANCEPOINTDIR_PAR
 
 void CVIBuffer_PointParticleDir_Instance::QueenKnightWarp_Update(VTXINSTANCEPOINTDIR_PARTICLE* pVertices, _float fTimeDelta)
 {
-    m_fDebugTime += fTimeDelta;
-    OutputDebugWstring(TEXT("QueenKnight Warp Particle"));
-    OutPutDebugFloat(m_fDebugTime);
+#ifdef _DEBUG
+    //m_fDebugTime += fTimeDelta;
+    //OutputDebugWstring(TEXT("QueenKnight Warp Particle"));
+    //OutPutDebugFloat(m_fDebugTime);
+#endif
 
     // 1. Ready Queue에 있는 파티클을 Live Queue로 한 번에 모두 옮깁니다.
     //    파티클 생성 함수에서 큐에 추가된 파티클들을 업데이트 루프로 가져옵니다.
@@ -320,7 +324,7 @@ void CVIBuffer_PointParticleDir_Instance::QueenKnightWarp_Update(VTXINSTANCEPOIN
             _float3 direction = pVertices[index].vDir;
             _float speed = pVertices[index].fDirSpeed;
 
-            
+
             // 여기서 fDirSpeed 값이 0인지 확인
             if (fabsf(speed) <= 0.01f)
             {
@@ -399,7 +403,7 @@ void CVIBuffer_PointParticleDir_Instance::BossExplosion_Update(VTXINSTANCEPOINTD
                 // 1단계: 응집 단계 - 중심으로 천천히 모여들기
                 _float gatherProgress = currentTime / explosionTime; // 0~1
                 _float3 initialPos = { pVertices[index].vTranslation.x, pVertices[index].vTranslation.y, pVertices[index].vTranslation.z };
-                
+
                 // 처음 위치에서 중심으로 점진적 이동 (자기장에 끌려가는 효과)
                 _float attractionForce = 2.0f * gatherProgress; // 점진적으로 증가하는 인력
                 _float3 toCenterVector = {
@@ -407,7 +411,7 @@ void CVIBuffer_PointParticleDir_Instance::BossExplosion_Update(VTXINSTANCEPOINTD
                     centerPos.y - initialPos.y,
                     centerPos.z - initialPos.z
                 };
-                
+
                 currentPos = {
                     initialPos.x + toCenterVector.x * attractionForce * fTimeDelta,
                     initialPos.y + toCenterVector.y * attractionForce * fTimeDelta,
@@ -418,13 +422,13 @@ void CVIBuffer_PointParticleDir_Instance::BossExplosion_Update(VTXINSTANCEPOINTD
             {
                 // 2단계: 폭발 단계 - 중심에서 바깥쪽으로 급속 확산
                 _float explosionProgress = (currentTime - explosionTime) / (totalLifeTime - explosionTime); // 0~1
-                
+
                 // 폭발 속도 (시간에 따라 점진적으로 증가)
                 _float explosionSpeed = baseSpeed * (1.0f + explosionProgress * 10.0f); // 최대 11배까지 증가
-                
+
                 // 폭발 시작점에서 현재까지의 거리
                 _float explosionDistance = explosionSpeed * (currentTime - explosionTime);
-                
+
                 // 중심에서 폭발 방향으로 이동
                 currentPos = {
                     centerPos.x + explosionDir.x * explosionDistance,
@@ -624,8 +628,8 @@ void CVIBuffer_PointParticleDir_Instance::Create_QueenKnightWarpParticle(const P
         _float behaviorType = static_cast<_float>(rand()) / RAND_MAX;
         info.burstDir = _float3(particleInitInfo.dir.x, particleInitInfo.dir.y, particleInitInfo.dir.z);
         info.fBurstTime = behaviorType;
-        _float randomSpeed = 1.0f + static_cast<_float>(rand()) / RAND_MAX * 2.0f;
-        info.fRandomSpeed = randomSpeed; // <--- VTXINSTANCEDIR_PARTICLE에 speed 변수가 있다면 이 변수를 활용하세요.
+        _float randomSpeed = m_vSpeed.x + static_cast<_float>(rand()) / RAND_MAX * (m_vSpeed.y - m_vSpeed.x);
+        info.fRandomSpeed = randomSpeed;
 
         m_ReadyparticleIndices.emplace(make_pair(index, info));
     }
@@ -644,29 +648,29 @@ void CVIBuffer_PointParticleDir_Instance::Create_BossExplosionParticle(_float3 v
         _float u = static_cast<_float>(rand()) / RAND_MAX * 2.0f - 1.0f; // -1 ~ 1
         _float theta = static_cast<_float>(rand()) / RAND_MAX * 2.0f * XM_PI; // 0 ~ 2π
         _float sqrtOneMinusU2 = sqrtf(1.0f - u * u);
-        
+
         // 구형 표면의 단위 벡터
         _float3 sphereDirection = {
             sqrtOneMinusU2 * cosf(theta),
             u,
             sqrtOneMinusU2 * sinf(theta)
         };
-        
+
         // 구형 표면 위의 초기 위치
         _float3 initialPos = {
             vCenterPos.x + sphereDirection.x * fRadius,
             vCenterPos.y + sphereDirection.y * fRadius,
             vCenterPos.z + sphereDirection.z * fRadius
         };
-        
+
         // 폭발 방향 (중심에서 바깥쪽으로)
         _vector vExplosionDir = XMVector3Normalize(XMLoadFloat3(&sphereDirection));
         _float3 explosionDir;
         XMStoreFloat3(&explosionDir, vExplosionDir);
-        
+
         // 초기 속력 (매우 낮게 시작)
         _float initialSpeed = 0.5f + static_cast<_float>(rand()) / RAND_MAX * 0.5f; // 0.5 ~ 1.0
-        
+
         ParticleVertexInfo info{};
         info.pos = initialPos;
         info.dir = explosionDir; // 폭발 방향

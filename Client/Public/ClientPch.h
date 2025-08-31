@@ -30,13 +30,14 @@
 
 
 #pragma region COMPONENT
-
+#include "VIBuffer_PointParticleDir_Instance.h"
 #pragma endregion
 
 #pragma region EFFECT
 
 #include "Particle.h"
 #include "Snow.h"
+#include "EffectParticle.h"
 #pragma endregion
 
 
@@ -213,6 +214,15 @@
 
 
 /* ======================================== DEBUG 용도 ===================================== */
+
+
+#pragma region Effect 이미지
+
+
+#include "PrototypeName.h"
+
+#pragma endregion
+
 
 #ifdef _DEBUG
 #include "Client_Debug.h"

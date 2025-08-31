@@ -138,6 +138,19 @@ public:
 	virtual void Set_Visible(_bool bVisible) override ;
 #pragma endregion
 
+#pragma region 9. Effect 객체 정의용 변수.
+
+
+public:
+	void Create_QueenKnightWarp_Effect_Particle(_float3 vDir);
+
+private:
+	//CEffectParticle::EFFECTPARTICLE_ENTER_DESC m_EffectParticleEnterDesc = {};
+
+
+#pragma endregion
+
+
 #pragma region 0. 기본 함수들 정의
 private:
 	class CKnightLance* m_pWeapon = { nullptr };
@@ -149,7 +162,9 @@ private:
 	HRESULT Ready_Navigations();
 	HRESULT Ready_BehaviorTree();
 	HRESULT Ready_PartObjects();
+	HRESULT Ready_Effects(QUEENKNIGHT_DESC* pDesc);
 	HRESULT Ready_Render_Resources();
+	
 	
 
 public:

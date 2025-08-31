@@ -1,8 +1,7 @@
 ﻿#pragma once
-#include "GameObject.h"
 
-NS_BEGIN(Tool)
-class CTool_EffectParticle final : public CGameObject
+NS_BEGIN(Client)
+class CEffectParticle final : public CGameObject
 {
 public:
     enum PARTICLE_TYPE : _uint
@@ -19,10 +18,17 @@ public:
         PARTICLE_SHADER_END,
     };
     
+public:
+    typedef struct tagEffectParticleEnterDesc
+    {
+        // 시작 위치
+        _vector vStartPos = {};
+        PARTICLE_INIT_INFO particleInitInfo;
+    }EFFECTPARTICLE_ENTER_DESC;
 
 public:
     /* 동적으로 버퍼를 생성 해야함. */
-    typedef struct tagToolEffectParticle: public CGameObject::GAMEOBJECT_DESC
+    typedef struct tagEffectParticle: public CGameObject::GAMEOBJECT_DESC
     {
         LEVEL eCurLevel = { LEVEL::END };
         // ========= VIBuffer_Point_Instance 용도 ============
@@ -43,16 +49,21 @@ public:
         _uint           iShaderPath = {};
         _bool           isBillBoard = { false };
 
+        // 대상 객체의 TransformMatrix 필요할 듯.
+
 
         // =========== PARTICLE_TYPE ===========
         PARTICLE_TYPE eParticleType;
-    }TOOLEFFECT_PARTICLE_DESC;
+
+
+
+    }EFFECT_PARTICLE_DESC;
 
 
 private:
-    explicit CTool_EffectParticle(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-    explicit CTool_EffectParticle(const CTool_EffectTexture& Prototype);
-    virtual ~CTool_EffectParticle() = default;
+    explicit CEffectParticle(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+    explicit CEffectParticle(const CEffectParticle& Prototype);
+    virtual ~CEffectParticle() = default;
 
 public:
     virtual HRESULT Initialize_Prototype();
@@ -77,6 +88,13 @@ public:
 
 public:
     static const EFFECTTYPE EffectType = EFFECTTYPE::PARTICLE;
+
+#pragma region POOLING
+public:
+    virtual void OnActivate(void* pArg) override;
+    virtual void OnDeActivate() override;
+#pragma endregion
+
 
 private:
     // 컴포넌트
@@ -108,11 +126,11 @@ private:
 
 private:
     HRESULT Bind_ShaderResources();
-    HRESULT Ready_Components(const TOOLEFFECT_PARTICLE_DESC* pDesc);
-    HRESULT Ready_VIBuffer_Point(const TOOLEFFECT_PARTICLE_DESC* pDesc);
+    HRESULT Ready_Components(const EFFECT_PARTICLE_DESC* pDesc);
+    HRESULT Ready_VIBuffer_Point(const EFFECT_PARTICLE_DESC* pDesc);
 
 public:
-    static CTool_EffectParticle* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+    static CEffectParticle* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
     virtual CGameObject* Clone(void* pArg) override;
     virtual void Free() override;
 };
