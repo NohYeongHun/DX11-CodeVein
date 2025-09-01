@@ -49,15 +49,21 @@ HRESULT CLevel_StageOne::Initialize_Clone()
 		return E_FAIL;
 	}
 
-	if (FAILED(Ready_Monster_Trigger()))
-	{
-		CRASH("Failed Ready_Layer_Trigger");
-		return E_FAIL;
-	}
+	//if (FAILED(Ready_Monster_Trigger()))
+	//{
+	//	CRASH("Failed Ready_Layer_Trigger");
+	//	return E_FAIL;
+	//}
 
 	if (FAILED(Ready_Layer_Effect(TEXT("Layer_Effect"))))
 	{
 		CRASH("Failed Ready_Layer_Effect");
+		return E_FAIL;
+	}
+
+	if (FAILED(Ready_Layer_Pooling()))
+	{
+		CRASH("Failed Ready_Layer_Pooling");
 		return E_FAIL;
 	}
 
@@ -81,6 +87,13 @@ void CLevel_StageOne::Update(_float fTimeDelta)
 	{
 		// 2. FadeOut 시작
 		Start_FadeOut();
+	}
+
+	if (m_pGameInstance->Get_KeyUp(DIK_F1))
+	{
+		_uint iLevelID = m_pGameInstance->Get_CurrentLevelID();
+		m_pGameInstance->Publish<CLevel_StageOne>(EventType::OPEN_DEBUG, nullptr);
+		return;
 	}
 
 }
@@ -158,9 +171,9 @@ HRESULT CLevel_StageOne::Ready_Layer_Player(const _wstring& strLayerTag)
 	CPlayer::PLAYER_DESC Desc{};
 #pragma region 1. 플레이어에게 넣어줘야할 레벨 별 다른 값들.
 	Desc.eCurLevel = m_eCurLevel;
-	Desc.vPos = { 183.f, 21.f, -24.f };
+	//Desc.vPos = { 183.f, 21.f, -24.f };
 	//Desc.vPos = { 200.f, 13.f, 9.f };
-	//Desc.vPos = { 0.f, 0.f, 0.f };
+	Desc.vPos = { 0.f, 0.f, 0.f };
 #pragma endregion
 
 #pragma region 2. 게임에서 계속 들고있어야할 플레이어 값들.
@@ -247,6 +260,7 @@ HRESULT CLevel_StageOne::Ready_Layer_SkyBox(const _wstring& strLayerTag)
 	return S_OK;
 }
 
+
 #pragma region 1. Monster Trigger 준비 => 몬스터들을 Trigger Manager에 담아둡니다.
 HRESULT CLevel_StageOne::Ready_Monster_Trigger()
 {
@@ -286,12 +300,12 @@ HRESULT CLevel_StageOne::Ready_Layer_Monster(const _wstring& strLayerTag)
 	TRIGGER_MONSTER_DESC TriggerDesc{};
 
 	TriggerDesc = { { 0.f ,0.f, 0.f }, 250.f , TEXT("Layer_SlaveVampire")
-		, TEXT("Layer_Monster") , 5, 0 };
+		, TEXT("Layer_Monster") , 4, 0 };
 
 	/*TriggerDesc = { { 250.f , 0.f, 0.f }, 200.f , TEXT("Layer_WolfDevil")
 		, TEXT("Layer_Monster") , 2, 0 };*/
 
-	//m_pGameInstance->Add_Trigger(ENUM_CLASS(m_eCurLevel), TriggerDesc);
+	m_pGameInstance->Add_Trigger(ENUM_CLASS(m_eCurLevel), TriggerDesc);
 
 	if (FAILED(Ready_Layer_GiantWhiteDevil(strLayerTag)))
 	{
@@ -360,13 +374,13 @@ HRESULT CLevel_StageOne::Ready_Layer_SlaveVampire(const _wstring& strLayerTag)
 		return E_FAIL;
 	}
 
-	_float3 monsterPositionArray[5] = {
-		{ 32.f, 21.f, -46.f }, { 32.f, 21.f, -28.f }, { 50.f, 21.f, -28.f },
+	_float3 monsterPositionArray[4] = {
+		{ 32.f, 21.f, -28.f }, { 50.f, 21.f, -28.f },
 		{ 62.f, 21.f, -38.f }, { 61.f, 21.f, -38.f }
 	};
 
 
-	for (_uint i = 0; i < 5; ++i)
+	for (_uint i = 0; i < 4; ++i)
 	{
 		Desc.vPos = monsterPositionArray[i];
 		if (FAILED(m_pGameInstance->Add_GameObject_ToTrigger(ENUM_CLASS(m_eCurLevel)
@@ -425,18 +439,53 @@ HRESULT CLevel_StageOne::Ready_Layer_GiantWhiteDevil(const _wstring& strLayerTag
 	return S_OK;
 }
 
+HRESULT CLevel_StageOne::Ready_Layer_Pooling()
+{
+	//// 1. Prototype Clone 객체 생성.
+	//CSlash::SLASHEFFECT_DESC slashDesc{};
+	//slashDesc.eCurLevel = m_eCurLevel;
+
+	//CGameObject* pGameObject = nullptr;
+
+	///* 100개 추가. */
+	//for (_uint i = 0; i < 100; ++i)
+	//{
+	//	pGameObject = dynamic_cast<CGameObject*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT
+	//		, ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_SlashEffect"), &slashDesc));
+	//	if (nullptr == pGameObject)
+	//	{
+	//		CRASH("Failed Create GameObject");
+	//		return E_FAIL;
+	//	}
+	//	m_pGameInstance->Add_GameObject_ToPools(
+	//		ENUM_CLASS(m_eCurLevel), TEXT("SLASH_EFFECT"), pGameObject);
+	//}
+
+	
+	return S_OK;
+}
+
 #pragma endregion
 
 
 HRESULT CLevel_StageOne::Ready_Layer_Effect(const _wstring& strLayerTag)
 {
+	//CSnow::SNOW_DESC Desc{};
+	//Desc.eCurLevel = m_eCurLevel;
+	//if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel), strLayerTag,
+	//	ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_Snow"), &Desc)))
+	//{
+	//	CRASH("Failed Ready Layer Snow");
+	//	return E_FAIL;
+	//}
+		
 	return S_OK;
 }
 
 #pragma region 레벨 전환
-void CLevel_StageOne::Open_Level()
+void CLevel_StageOne::Open_Level(LEVEL eLevel)
 {
-	if (FAILED(m_pGameInstance->Open_Level(static_cast<_uint>(LEVEL::LOADING), CLevel_Loading::Create(m_pDevice, m_pContext, LEVEL::GAMEPLAY))))
+	if (FAILED(m_pGameInstance->Open_Level(static_cast<_uint>(LEVEL::LOADING), CLevel_Loading::Create(m_pDevice, m_pContext, eLevel))))
 	{
 		CRASH("Failed Open Level StageOne");
 		return;
@@ -477,10 +526,19 @@ HRESULT CLevel_StageOne::Ready_Events()
 {
 	m_pGameInstance->Subscribe(EventType::OPEN_GAMEPAY, Get_ID(), [this](void* pData)
 		{
-			this->Open_Level();
+			this->Open_Level(LEVEL::GAMEPLAY);
 		});
 
 	m_Events.emplace_back(EventType::OPEN_GAMEPAY, Get_ID());
+
+	m_pGameInstance->Subscribe(EventType::OPEN_DEBUG, Get_ID(), [this](void* pData)
+		{
+			this->Open_Level(LEVEL::DEBUG);
+		});
+
+	m_Events.emplace_back(EventType::OPEN_DEBUG, Get_ID());
+
+
 
 	return S_OK;
 }

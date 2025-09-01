@@ -1,4 +1,5 @@
-﻿CGiant_WhiteDevil::CGiant_WhiteDevil(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿#include "Giant_WhiteDevil.h"
+CGiant_WhiteDevil::CGiant_WhiteDevil(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CMonster{ pDevice, pContext }
 {
 }
@@ -239,7 +240,7 @@ void CGiant_WhiteDevil::On_Collision_Enter(CGameObject* pOther)
         if (!HasBuff(BUFF_INVINCIBLE))
         {
             // 1. 데미지를 입고.
-            Take_Damage(pPlayerWeapon->Get_AttackPower());
+            Take_Damage(pPlayerWeapon->Get_AttackPower(), pPlayerWeapon);
 
             // 2. 해당 위치에 검흔 Effect 생성?
 
@@ -446,8 +447,15 @@ void CGiant_WhiteDevil::Disable_Collider(_uint iType)
 #pragma region 7. 보스몹 UI 관리.
 void CGiant_WhiteDevil::Take_Damage(_float fDamage)
 {
-    m_MonsterStat.fHP -= fDamage;
+    CMonster::Take_Damage(fDamage);
     Decrease_HpUI(fDamage, 0.1f);
+}
+
+void CGiant_WhiteDevil::Take_Damage(_float fDamage, CGameObject* pGameObject)
+{
+    CMonster::Take_Damage(fDamage, pGameObject);
+    Decrease_HpUI(fDamage, 0.1f);
+        
 }
 
 void CGiant_WhiteDevil::Increase_HpUI(_float fHp, _float fTime)

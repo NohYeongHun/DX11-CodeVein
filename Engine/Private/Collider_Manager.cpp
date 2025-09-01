@@ -241,6 +241,40 @@ void CCollider_Manager::Handle_Collision_By_Type(CCollider* pLeft, CCollider* pR
 }
 
 // 충돌 했을때 BODY 타입인것들 끼리 Sliding Vector 계산
+//void CCollider_Manager::Handle_SlidingVector(CCollider* pLeft, CCollider* pRight, CGameObject* pLeftOwner, CGameObject* pRightOwner)
+//{
+//	// 1. 충돌 방향 벡터 계산
+//	_vector vCollisionNormal = Calculate_ColliderNormal(pLeft, pRight);
+//
+//	// 2. 각 객체의 이동 벡터 계산 => 이전 프레임 위치를 Transform에서 계산해서 가지고 있습니다.
+//	_vector vRightVelocity = pRightOwner->Get_Transform()->Get_Velocity();
+//	_vector vLeftVelocity = pLeftOwner->Get_Transform()->Get_Velocity();
+//
+//	// 3. 관통 깊이 계산 => 구 고정. Body 타입은 무조건 구로만 생성.
+//	_float fPenetrationValue = Calculate_PenetrationDepthSpehre(pLeft, pRight);
+//
+//	// 4. 분리 벡터 계산
+//	_vector vSeparationVector = vCollisionNormal * fPenetrationValue;
+//	_vector vLeftSepartation = vSeparationVector * (- 1.f);
+//	_vector vRightSepartation = vSeparationVector * 0.f;
+//
+//	// 5. 위치 보정 적용 => 적용시 Naviagtion 고려.
+//	pLeftOwner->Get_Transform()->Translate(vLeftSepartation
+//		, pLeftOwner->Get_Navigation());
+//	pRightOwner->Get_Transform()->Translate(vRightSepartation
+//		, pRightOwner->Get_Navigation());
+//
+//	// 6. 슬라이딩 벡터 계산.
+//	_vector vSlidingVector = Calculate_SlidingVector(vLeftVelocity, vCollisionNormal);
+//
+//	_float fSlidingSpeed = XMVectorGetX(XMVector3Length(vLeftVelocity)) * 0.4f; // 원래 속도의 40%
+//	_vector vSlidingMovement = vSlidingVector * fSlidingSpeed;
+//
+//	// 7. 슬라이딩 이동 적용 (벽을 따라 미끄러지기)
+//	pLeftOwner->Get_Transform()->Translate(vSlidingMovement, pLeftOwner->Get_Navigation());
+//	
+//}
+
 void CCollider_Manager::Handle_SlidingVector(CCollider* pLeft, CCollider* pRight, CGameObject* pLeftOwner, CGameObject* pRightOwner)
 {
 	// 1. 충돌 방향 벡터 계산
@@ -255,7 +289,7 @@ void CCollider_Manager::Handle_SlidingVector(CCollider* pLeft, CCollider* pRight
 
 	// 4. 분리 벡터 계산
 	_vector vSeparationVector = vCollisionNormal * fPenetrationValue;
-	_vector vLeftSepartation = vSeparationVector * (- 1.f);
+	_vector vLeftSepartation = vSeparationVector * (-1.f);
 	_vector vRightSepartation = vSeparationVector * 0.f;
 
 	// 5. 위치 보정 적용 => 적용시 Naviagtion 고려.
@@ -264,15 +298,20 @@ void CCollider_Manager::Handle_SlidingVector(CCollider* pLeft, CCollider* pRight
 	pRightOwner->Get_Transform()->Translate(vRightSepartation
 		, pRightOwner->Get_Navigation());
 
-	// 6. 슬라이딩 벡터 계산.
-	_vector vSlidingVector = Calculate_SlidingVector(vLeftVelocity, vCollisionNormal);
+	// 6. 양쪽 객체의 슬라이딩 벡터 계산
+	_vector vLeftSlidingVector = Calculate_SlidingVector(vLeftVelocity, vCollisionNormal);
+	_vector vRightSlidingVector = Calculate_SlidingVector(vRightVelocity, -vCollisionNormal); // 반대 방향 노멀
 
-	_float fSlidingSpeed = XMVectorGetX(XMVector3Length(vLeftVelocity)) * 0.4f; // 원래 속도의 40%
-	_vector vSlidingMovement = vSlidingVector * fSlidingSpeed;
+	_float fLeftSlidingSpeed = XMVectorGetX(XMVector3Length(vLeftVelocity)) * 0.4f;
+	_float fRightSlidingSpeed = XMVectorGetX(XMVector3Length(vRightVelocity)) * 0.4f;
 
-	// 7. 슬라이딩 이동 적용 (벽을 따라 미끄러지기)
-	pLeftOwner->Get_Transform()->Translate(vSlidingMovement, pLeftOwner->Get_Navigation());
-	
+	_vector vLeftSlidingMovement = vLeftSlidingVector * fLeftSlidingSpeed;
+	_vector vRightSlidingMovement = vRightSlidingVector * fRightSlidingSpeed;
+
+	// 7. 양쪽 객체 모두 슬라이딩 이동 적용 (서로 스쳐지나가도록)
+	pLeftOwner->Get_Transform()->Translate(vLeftSlidingMovement, pLeftOwner->Get_Navigation());
+	pRightOwner->Get_Transform()->Translate(vRightSlidingMovement, pRightOwner->Get_Navigation());
+
 }
 
 // 1. 충돌 방향 벡터 계산 => vLeft -> vRight 방향.

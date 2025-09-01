@@ -26,6 +26,8 @@ namespace Engine
 
 	enum class COLLIDERSHAPE { NONE = 0, AABB, OBB, SPHERE, CAPSULE, END };
 
+	enum class EFFECTTYPE { TEXTURE, PARTICLE, MESH, END };
+
 	// 콜라이더 타입 별로 배열에 담을 것.
 	enum class COLLIDERLAYER : uint32_t {
 		  NONE = 0

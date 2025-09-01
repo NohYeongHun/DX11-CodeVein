@@ -217,6 +217,24 @@
     <Filter Include="02. GameObject\Monster\BT\Encounter">
       <UniqueIdentifier>{fbdfd345-7448-4d7d-bed5-0698e4356a0f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. GameObject\Effect">
+      <UniqueIdentifier>{d843f012-ee38-4fd8-bb5e-d556a1670c5c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Effect\Particle">
+      <UniqueIdentifier>{e52a447f-e19d-441d-8d35-15d2d0e6b97d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Levels\03. Debug">
+      <UniqueIdentifier>{7148da73-6f40-4c6a-a311-e6a766457e99}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Effect\Slash">
+      <UniqueIdentifier>{b13dc14a-57b8-4a1e-82c9-55b6739e07a2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03. Component">
+      <UniqueIdentifier>{d4e0a876-9119-4c0d-9873-0fe1e40f6121}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03. Component\VIBuffer">
+      <UniqueIdentifier>{dfe6beb9-ac73-4f2a-828a-6a92324b4b5f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -606,6 +624,33 @@
     <ClInclude Include="..\Public\Player_SecondSkillState.h">
       <Filter>02. GameObject\Player\State\Attack</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Slash.h">
+      <Filter>02. GameObject\Effect\Slash</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Snow.h">
+      <Filter>02. GameObject\Effect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Level_Debug.h">
+      <Filter>01. Levels\03. Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Loader_Debug.h">
+      <Filter>01. Levels\99. Loading\Loader\Personal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\HitFlashEffect.h">
+      <Filter>02. GameObject\Effect\Slash</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\VIBuffer_PointParticleDir_Instance.h">
+      <Filter>03. Component\VIBuffer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\EffectParticle.h">
+      <Filter>02. GameObject\Effect\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Particle.h">
+      <Filter>02. GameObject\Effect\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\PrototypeName.h">
+      <Filter>99. Defines</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -969,6 +1014,33 @@
     <ClCompile Include="..\Private\Player_SecondSkillState.cpp">
       <Filter>02. GameObject\Player\State\Attack</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Slash.cpp">
+      <Filter>02. GameObject\Effect\Slash</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Snow.cpp">
+      <Filter>02. GameObject\Effect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Level_Debug.cpp">
+      <Filter>01. Levels\03. Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Loader_Debug.cpp">
+      <Filter>01. Levels\99. Loading\Loader\Personal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\HitFlashEffect.cpp">
+      <Filter>02. GameObject\Effect\Slash</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\VIBuffer_PointParticleDir_Instance.cpp">
+      <Filter>03. Component\VIBuffer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\EffectParticle.cpp">
+      <Filter>02. GameObject\Effect\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Particle.cpp">
+      <Filter>02. GameObject\Effect\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\PrototypeName.cpp">
+      <Filter>99. Defines</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxMesh.hlsl">
@@ -984,6 +1056,15 @@
       <Filter>96. ShaderFiles</Filter>
     </FxCompile>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxCube.hlsl">
+      <Filter>96. ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxInstance_Particle.hlsl">
+      <Filter>96. ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxInstance_PointParticle.hlsl">
+      <Filter>96. ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxInstance_PointDirParticle.hlsl">
       <Filter>96. ShaderFiles</Filter>
     </FxCompile>
   </ItemGroup>

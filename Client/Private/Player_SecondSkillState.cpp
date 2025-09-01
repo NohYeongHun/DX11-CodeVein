@@ -7,21 +7,43 @@ HRESULT CPlayer_SecondSkillState::Initialize(_uint iStateNum, void* pArg)
     if (FAILED(CPlayerState::Initialize(iStateNum, pArg)))
         return E_FAIL;
 
+#pragma region 콜라이더 관리
     /* Active와 동시에 Collider ActiveMap에 넣어둡니다. */
     Add_Collider_Info(m_pPlayer->Find_AnimationIndex(TEXT("DRAGON_LUNGE"))
-        , COLLIDER_ACTIVE_INFO{ 70.f / 289.f, 140.f / 289.f, false, 0 });
+        , COLLIDER_ACTIVE_INFO{ 65.f / 289.f, 80.f / 289.f,true, CPlayer::PART_WEAPON, 0 });
 
     Add_Collider_Info(m_pPlayer->Find_AnimationIndex(TEXT("DRAGON_LUNGE"))
-        , COLLIDER_ACTIVE_INFO{ 0.f / 289.f, 260.f / 289.f, false, 1, CPlayer::PART_BODY, true });
+        , COLLIDER_ACTIVE_INFO{ 100.f / 289.f, 130.f / 289.f,true, CPlayer::PART_WEAPON, 1 });
 
-	m_fIncreaseDamage = 70.f; // 기본 공격력 증가량 설정
+    m_fIncreaseDamage = 10.f; // 기본 공격력 증가량 설정
+#pragma endregion
+
+
+
+
+#pragma region 애니메이션 스피드 제어
+    _float fOriginSpeed = m_pModelCom->Get_AnimSpeed(m_pPlayer->Find_AnimationIndex(TEXT("DRAGON_LUNGE")));
+    Add_AnimationSpeed_Info(m_pPlayer->Find_AnimationIndex(TEXT("DRAGON_LUNGE"))
+        , ANIMATION_SPEED_INFO{ 0.f / 289.f, 70.f / 289.f, 0, m_pPlayer->Find_AnimationIndex(TEXT("DRAGON_LUNGE"))
+        , fOriginSpeed, 1.5f });
+
+    Add_AnimationSpeed_Info(m_pPlayer->Find_AnimationIndex(TEXT("DRAGON_LUNGE"))
+        , ANIMATION_SPEED_INFO{ 71.f / 289.f, 120.f / 289.f, 0, m_pPlayer->Find_AnimationIndex(TEXT("DRAGON_LUNGE"))
+        , fOriginSpeed, 1.7f });
+
+    Add_AnimationSpeed_Info(m_pPlayer->Find_AnimationIndex(TEXT("DRAGON_LUNGE"))
+        , ANIMATION_SPEED_INFO{ 121.f / 289.f, 289.f / 289.f, 0, m_pPlayer->Find_AnimationIndex(TEXT("DRAGON_LUNGE"))
+        , fOriginSpeed, 2.f });
+
+
+#pragma endregion
 
     return S_OK;
 }
 
 void CPlayer_SecondSkillState::Enter(void* pArg)
 {
-
+    m_pPlayer->AddBuff(CPlayer::BUFF_INVINCIBLE, 20.f);
     m_pPlayer->Increase_Damage(m_fIncreaseDamage);
 
     SECONDSKILL_ENTER_DESC* pDesc = static_cast<SECONDSKILL_ENTER_DESC*>(pArg);
@@ -57,22 +79,31 @@ void CPlayer_SecondSkillState::Enter(void* pArg)
     SKILLEXECUTE_DESC Desc{};
     Desc.iSkillPanelIdx = CHUD::SKILLPANEL::SKILL_PANEL_TOP;
     Desc.iSlotIdx = 1;
-    Desc.fSkillCoolTime = 5.f;
+    Desc.fSkillCoolTime = m_pFsm->Get_StateCoolTime(CPlayer::SKILL_2);
     m_pGameInstance->Publish(EventType::SKILL_EXECUTE, &Desc);
 }
 
 void CPlayer_SecondSkillState::Update(_float fTimeDelta)
 {
+    
     Handle_Input();
     Handle_Unified_Direction_Input(fTimeDelta);
     Change_State();
+    // 콜라이더 맵 관리.
     CPlayerState::Handle_Collider_State();
+    // 스피드 관리
+    CPlayerState::Handle_AnimationSpeed_State();
 }
 
 void CPlayer_SecondSkillState::Exit()
 {
+    m_pPlayer->RemoveBuff(CPlayer::BUFF_INVINCIBLE, true);
     // 무기 콜라이더 강제 비활성화
     Force_Disable_All_Colliders();
+
+    // 애니메이션 맵 정상화
+    Reset_AnimationSpeedInfo();
+
     if (m_iNextState != -1) // NextIndex가 있는경우 블렌딩 시작.
     {
         m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, false);
@@ -94,8 +125,9 @@ void CPlayer_SecondSkillState::Change_State()
     CPlayer_RunState::RUN_ENTER_DESC Run{};
 
 
-    if (m_pFsm->Is_ExitCoolTimeEnd(m_iStateNum))
+    if (m_pModelCom->Get_Current_Ratio() >= (240.f / 289.f))
     {
+        /* 240 ~ 250 중간에 Run키 누르면. 탈출. */
         if (m_pPlayer->Is_MovementKeyPressed())
         {
             m_iNextAnimIdx = m_pPlayer->Find_AnimationIndex(TEXT("RUN"));
@@ -104,15 +136,17 @@ void CPlayer_SecondSkillState::Change_State()
             m_pFsm->Change_State(m_iNextState, &Run);
             return;
         }
-       /* else
+
+        /* 250 넘었으면 강제 탈출. */
+        if (m_pModelCom->Get_Current_Ratio() >= (250.f / 289.f))
         {
             m_iNextAnimIdx = m_pPlayer->Find_AnimationIndex(TEXT("IDLE"));
             Idle.iAnimation_Idx = m_iNextAnimIdx;
             m_pFsm->Change_State(CPlayer::PLAYER_STATE::IDLE, &Idle);
             return;
-        }*/
+        }
+            
     }
-
 
 
     if (m_pModelCom->Is_Finished())

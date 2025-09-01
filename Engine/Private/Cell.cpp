@@ -63,6 +63,25 @@ _bool CCell::isIn(_fvector vPosition, _int* pNeighborIndex)
 	return true;
 }
 
+_bool CCell::isIn(_fvector vPosition, _int* pNeighborIndex, LINE* pOutLine)
+{
+	for (_uint i = 0; i < ENUM_CLASS(LINE::END); ++i)
+	{
+		_vector	vDir = XMVector3Normalize(vPosition - XMVectorSetW(XMLoadFloat3(&m_vPoints[i]), 1.f));
+		_vector vNormal = XMVector3Normalize(XMLoadFloat3(&m_vNormals[i]));
+
+		if (0 < XMVectorGetX(XMVector3Dot(vDir, vNormal)))
+		{
+			*pNeighborIndex = m_iNeighborIndices[i];
+			*pOutLine = static_cast<LINE>(i); // 벗어난 경계선 정보 저장
+
+			return false;
+		}
+	}
+
+	return true;
+}
+
 _bool CCell::Compare_Points(_fvector vSourPoint, _fvector vDestPoint)
 {
 	if (true == XMVector3Equal(XMLoadFloat3(&m_vPoints[ENUM_CLASS(CELLPOINT::A)]), vSourPoint))

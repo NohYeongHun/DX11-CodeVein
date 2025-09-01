@@ -32,6 +32,13 @@ public:
 	virtual void On_Collision_Stay(CGameObject* pOther);
 	virtual void On_Collision_Exit(CGameObject* pOther);
 
+
+public:
+	void OBBCollider_ChangeExtents(_float3 vExtents);
+	const _float3 Get_OriginExtents() { return m_vOriginExtents; }
+
+private:
+	_float3 m_vOriginExtents = {};
 #pragma endregion
 
 

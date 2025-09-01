@@ -60,6 +60,11 @@ public:
 	virtual void On_Collision_Exit(CGameObject* pOther);
 	virtual void Collider_All_Active(_bool bActive);
 
+
+public:
+	void WeaponOBB_ChangeExtents(_float3 vExtents);
+	_float3 Get_WeaponOBBExtents();
+
 #pragma endregion
 
 
@@ -110,6 +115,7 @@ public:
 #pragma region 7. 보스몹 체력 UI 관리
 public:
 	virtual void Take_Damage(_float fDamage) override;
+	virtual void Take_Damage(_float fDamage, CGameObject* pGameObject) override;
 
 	virtual void Increase_HpUI(_float fHp, _float fTime) override;
 	virtual void Decrease_HpUI(_float fHp, _float fTime) override;
@@ -132,6 +138,19 @@ public:
 	virtual void Set_Visible(_bool bVisible) override ;
 #pragma endregion
 
+#pragma region 9. Effect 객체 정의용 변수.
+
+
+public:
+	void Create_QueenKnightWarp_Effect_Particle(_float3 vDir);
+
+private:
+	//CEffectParticle::EFFECTPARTICLE_ENTER_DESC m_EffectParticleEnterDesc = {};
+
+
+#pragma endregion
+
+
 #pragma region 0. 기본 함수들 정의
 private:
 	class CKnightLance* m_pWeapon = { nullptr };
@@ -143,7 +162,9 @@ private:
 	HRESULT Ready_Navigations();
 	HRESULT Ready_BehaviorTree();
 	HRESULT Ready_PartObjects();
+	HRESULT Ready_Effects(QUEENKNIGHT_DESC* pDesc);
 	HRESULT Ready_Render_Resources();
+	
 	
 
 public:

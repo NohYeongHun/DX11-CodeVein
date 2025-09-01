@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include "Component.h"
 
@@ -16,9 +16,9 @@ public:
 	virtual HRESULT Initialize_Clone(void* pArg);
 
 public:
-	/* ÁØºñµÈ ÀÚ¿øÀ» ÀÌ¿ëÇÏ¿© ¾î¶°ÇÑ ±â´É(·»´õ¸µ)À» ¼öÇàÇÏ±âÀ§ÇÏ¿© ÀÚ¿øÀ» ÀåÄ¡¿¡ ¹ÙÀÎµùÇÑ´Ù. */
-	HRESULT Bind_Resources();
-	HRESULT Render();
+	/* ì¤€ë¹„ëœ ìì›ì„ ì´ìš©í•˜ì—¬ ì–´ë– í•œ ê¸°ëŠ¥(ë Œë”ë§)ì„ ìˆ˜í–‰í•˜ê¸°ìœ„í•˜ì—¬ ìì›ì„ ì¥ì¹˜ì— ë°”ì¸ë”©í•œë‹¤. */
+	virtual HRESULT Bind_Resources();
+	virtual HRESULT Render();
 
 protected:
 	ID3D11Buffer*	m_pVB = { nullptr };

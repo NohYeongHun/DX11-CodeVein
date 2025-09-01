@@ -21,13 +21,17 @@
 #Client/Bin/Resources
 
 Client/Bin/**
-Tool/Bin/
+Tool/Bin/**
 Engine/Bin/
 EngineSDK/
 
 !Client/Bin/
 !Client/Bin/ShaderFiles/
 !Client/Bin/ShaderFiles/**
+
+!Tool/Bin/
+!Tool/Bin/ShaderFiles/
+!Tool/Bin/ShaderFiles/**
 
 !*.hlsl
 

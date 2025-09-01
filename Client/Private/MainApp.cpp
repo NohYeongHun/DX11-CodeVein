@@ -1,8 +1,4 @@
-﻿
-#include "MainApp.h"
-
-
-CMainApp::CMainApp()
+﻿CMainApp::CMainApp()
 	: m_pGameInstance{ CGameInstance::GetInstance() }
 {
 	Safe_AddRef(m_pGameInstance);
@@ -38,16 +34,47 @@ HRESULT CMainApp::Initialize_Clone()
 	EngineDesc.iNumLevels = ENUM_CLASS(LEVEL::END);
 
 	if(FAILED(m_pGameInstance->Initialize_Engine(EngineDesc, &m_pDevice, &m_pContext)))
+	{
+		CRASH("Failed Ready Initialize Engine");
 		return E_FAIL;
+	}
 
 	if (FAILED(Ready_Prototype_ForStatic()))
+	{
+		CRASH("Failed Ready Prototype For Static");
 		return E_FAIL;
+	}
+
+	if (FAILED(Ready_Prototype_Effect()))
+	{
+		CRASH("Failed Ready Prototype For Static");
+		return E_FAIL;
+	}
+		
+		
 
 	if (FAILED(Ready_Clone_ForStatic()))
+	{
+		CRASH("Failed Ready Clone For Static");
+		return E_FAIL;
+	}
+		
+
+	if (FAILED(Ready_Pooling()))
+	{
+		CRASH("Failed Ready Pooling For Static");
+		return E_FAIL;
+	}
+
+
+	if (FAILED(Start_Level(LEVEL::GAMEPLAY)))
 		return E_FAIL;
 
-	if (FAILED(Start_Level(LEVEL::LOGO)))
-		return E_FAIL;	
+	/* 원본 if (FAILED(Start_Level(LEVEL::LOGO)))
+		return E_FAIL;	*/
+
+	//if (FAILED(Start_Level(LEVEL::DEBUG)))
+	//	return E_FAIL;
 
 	return S_OK;
 }
@@ -55,11 +82,18 @@ HRESULT CMainApp::Initialize_Clone()
 void CMainApp::Update(_float fTimeDelta)
 {
 	m_pGameInstance->Update_Engine(fTimeDelta);
+
+	/*if (m_pGameInstance->Get_KeyUp(DIK_F1))
+	{
+		_uint iLevelID = m_pGameInstance->Get_CurrentLevelID();
+		if (iLevelID != ENUM_CLASS(LEVEL::DEBUG) && iLevelID != ENUM_CLASS(LEVEL::LOADING))
+			Start_Level(LEVEL::DEBUG);
+	}*/
 }
 
 HRESULT CMainApp::Render()
 {
-	_float4		vClearColor = _float4(0.0f, 0.0f, 1.f, 1.f);
+	_float4		vClearColor = _float4(0.0f, 0.0f, 0.f, 1.f);
 	
 	// bool Return;
 
@@ -109,7 +143,31 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxCube"),
 		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxCube.hlsl"), VTXCUBE::Elements, VTXCUBE::iNumElements))))
+	{
+		CRASH("Failed Create Shader Cube");
 		return E_FAIL;
+	}
+		
+
+	/* Prototype_Component_Shader_VtxInstance_Particle */
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxInstance_Particle"),
+		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxInstance_Particle.hlsl"), VTXPARTICLE::Elements, VTXPARTICLE::iNumElements))))
+	{
+		CRASH("Failed Create Shader Particle");
+		return E_FAIL;
+	}
+		
+
+	///* Prototype_Component_Shader_VtxInstance_Point_Particle */
+	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxInstance_PointParticle"),
+	//	CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxInstance_PointParticle.hlsl"), VTXPOINTPARTICLE::Elements, VTXPOINTPARTICLE::iNumElements))))
+	//{
+	//	MSG_BOX(TEXT("Create Failed Point Particle Shader"));
+	//	CRASH("Failed Bind Shader_VtxInstance_PointParticle");
+	//	return E_FAIL;
+	//}
+		
+
 
 
 	/* ==================================================== Other ====================================================*/
@@ -157,7 +215,11 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 
 
 	if (FAILED(Ready_Prototype_ForUsageTexture()))
+	{
+		CRASH("Failed Load Usage Texture");
 		return E_FAIL;
+	}
+		
 	
 	/* Model Load */
 	if (FAILED(Ready_Prototype_ForPlayer()))
@@ -174,6 +236,8 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 
 	if (FAILED(Ready_Prototype_BossUI()))
 		return E_FAIL;
+
+
 
 
 	//. 자주 사용하는 얘들 모아둔다.
@@ -205,7 +269,7 @@ HRESULT CMainApp::Ready_Prototype_ForUsageTexture()
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
 		, TEXT("Prototype_Component_Texture_BossHPBar")
 		, CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Monster/QueenKnight/HPBar%d.png"), 1))))
-		return E_FAIL;
+		return E_FAIL;	
 
 	return S_OK;
 }
@@ -512,12 +576,224 @@ HRESULT CMainApp::Ready_Clone_SkillUI(const _wstring& strLayerTag)
 	return S_OK;
 }
 
+HRESULT CMainApp::Ready_Prototype_Effect()
+{
+#pragma region SLASH UI
 
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
+		, TEXT("Prototype_Component_Texture_SlashEffectMask")
+		, CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Effects/Texture/Slash/Slash%d.png"), 1))))
+	{
+		CRASH("Failed Load SlashEffect Texture");
+		return E_FAIL;
+	}
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
+		, TEXT("Prototype_Component_Texture_SlashEffectDiffuse")
+		, CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Effects/Texture/Slash/SlashDiffuse%d.png"), 1))))
+	{
+		CRASH("Failed Load SlashEffect Texture");
+		return E_FAIL;
+	}
+
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_SlashEffect"),
+		CSlash::Create(m_pDevice, m_pContext))))
+	{
+		CRASH("Failed Load Slash GameObject ");
+		return E_FAIL;
+	}
+#pragma endregion
+
+#pragma region HITFLASTH EFFECT
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
+		, TEXT("Prototype_Component_Texture_HitFlashEffectMask")
+		, CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Effects/Texture/HitFlash/HitFlashMask%d.png"), 1))))
+	{
+		CRASH("Failed Load SlashEffect Texture");
+		return E_FAIL;
+	}
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
+		, TEXT("Prototype_Component_Texture_HitFlashEffectDiffuse")
+		, CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Effects/Texture/HitFlash/HitFlashDiffuse%d.png"), 1))))
+	{
+		CRASH("Failed Load SlashEffect Texture");
+		return E_FAIL;
+	}
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_HitEffect"),
+		CHitFlashEffect::Create(m_pDevice, m_pContext))))
+	{
+		CRASH("Failed Load HItFlashEffect GameObject ");
+		return E_FAIL;
+	}
+#pragma endregion
+
+
+#pragma region PARTICLE
+
+
+
+#pragma region TEXTURE OBJECT
+
+	// 0. Texture 종류별 생성.
+	for (_uint i = 0; i < Effect_TexturePrototypeSize; ++i)
+	{
+		if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
+			, Effect_TexturePrototypes[i].prototypeName
+			, CTexture::Create(m_pDevice, m_pContext, Effect_TexturePrototypes[i].textureFilePath
+				, Effect_TexturePrototypes[i].iNumTextures))))
+		{
+			CRASH("Failed Load Effect Texture");
+			return E_FAIL;
+		}
+	}
+#pragma endregion
+
+#pragma region 1. Shader 생성.
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxInstance_PointParticle"),
+		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxInstance_PointParticle.hlsl")
+			, VTXPOINTPARTICLE::Elements, VTXPOINTPARTICLE::iNumElements))))
+	{
+		CRASH("Failed Load Point Particle Shader");
+		return E_FAIL;
+	}
+
+	// 실제 사용하는 VIBuffer
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxInstance_PointDirParticle"),
+		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxInstance_PointDirParticle.hlsl")
+			, VTXPOINTDIRPARTICLE::Elements, VTXPOINTDIRPARTICLE::iNumElements))))
+	{
+		CRASH("Failed Load PointDirection Particle Shader");
+		return E_FAIL;
+	}
+#pragma endregion
+
+#pragma region 2. PARTICLE OBJECT
+	if (FAILED(m_pGameInstance->Add_Prototype(
+		ENUM_CLASS(LEVEL::STATIC)
+		, TEXT("Prototype_GameObject_EffectParticle")
+		, CEffectParticle::Create(m_pDevice, m_pContext))))
+	{
+		CRASH("Failed Load Effect Particle Object");
+		return E_FAIL;
+	}
+#pragma endregion
+
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Particle"),
+		CParticle::Create(m_pDevice, m_pContext))))
+	{
+		CRASH("Failed Load Effect Particle GameObject ");
+		return E_FAIL;
+	}
+#pragma endregion
+
+
+	return S_OK;
+}
+
+
+
+HRESULT CMainApp::Ready_Pooling()
+{
+	 
+#pragma region TEXTURE 타입.
+	// 1. Prototype Clone 객체 생성.
+	CSlash::SLASHEFFECT_DESC slashDesc{};
+
+	CGameObject* pGameObject = nullptr;
+
+	// 2. 추가할 개수만큼 추가. 
+	/* 3개 추가. => 풀링 제대로 되는지 테스트. */
+	for (_uint i = 0; i < 100; ++i)
+	{
+		pGameObject = dynamic_cast<CGameObject*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT
+			, ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_SlashEffect"), &slashDesc));
+		if (nullptr == pGameObject)
+		{
+			CRASH("Failed Create GameObject");
+			return E_FAIL;
+		}
+		m_pGameInstance->Add_GameObject_ToPools(TEXT("SLASH_EFFECT"), ENUM_CLASS(CSlash::EffectType), pGameObject);
+	}
+
+	CHitFlashEffect::HITFLASH_DESC HitFlashDesc{};
+	for (_uint i = 0; i < 100; ++i)
+	{
+		pGameObject = dynamic_cast<CGameObject*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT
+			, ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_HitEffect"), &HitFlashDesc));
+		if (nullptr == pGameObject)
+		{
+			CRASH("Failed Create HitFlashGameObject");
+			return E_FAIL;
+		}
+		m_pGameInstance->Add_GameObject_ToPools(TEXT("HITFLASH_EFFECT"), ENUM_CLASS(CHitFlashEffect::EffectType), pGameObject);
+	}
+
+#pragma endregion
+
+#pragma region PARTICLE 타입 => 디버그 용도. 
+	//for (_uint i = 0; i < 100; ++i)
+	//{
+	//	pGameObject = dynamic_cast<CGameObject*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT
+	//		, ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Particle"), &HitFlashDesc));
+	//	if (nullptr == pGameObject)
+	//	{
+	//		CRASH("Failed Create Particle GameObject");
+	//		return E_FAIL;
+	//	}
+	//	m_pGameInstance->Add_GameObject_ToPools(TEXT("Particle_EFFECT"), ENUM_CLASS(EFFECTTYPE::PARTICLE), pGameObject);
+	//}
+
+	CEffectParticle::EFFECT_PARTICLE_DESC ParticleDesc{};
+	ParticleDesc.iShaderPath = 1;
+	ParticleDesc.eParticleType = CEffectParticle::PARTICLE_TYPE_QUEEN_WARP;
+	//ParticleDesc.eParticleType = CEffectParticle::PARTICLE_TYPE_BOSS_EXPLOSION;
+	ParticleDesc.iNumInstance = 400;
+	ParticleDesc.vCenter = { 0.f, 0.f, 0.f };
+	ParticleDesc.vRange = { 6.f, 6.f, 3.f };
+	ParticleDesc.vSpeed = { 3.f, 6.f };
+	ParticleDesc.vSize = { 0.1f, 0.11f };
+	ParticleDesc.vLifeTime = { 5.f, 6.f };
+	ParticleDesc.isLoop = false;
+	ParticleDesc.isBillBoard = true;
+
+	
+	ParticleDesc.useTextureCheckArray[TEXTURE::TEXTURE_DIFFUSE] = true;
+	ParticleDesc.useTextureIndexArray[TEXTURE::TEXTURE_DIFFUSE] = 1;
+	ParticleDesc.useTextureCheckArray[TEXTURE::TEXTURE_MASK] = true;
+	ParticleDesc.useTextureIndexArray[TEXTURE::TEXTURE_MASK] = 0;
+
+	ParticleDesc.useTextureCheckArray[TEXTURE::TEXTURE_GRADIENT] = false;
+	ParticleDesc.useTextureCheckArray[TEXTURE::TEXTURE_GRADIENT_ALPHA] = false;
+	ParticleDesc.useTextureCheckArray[TEXTURE::TEXTURE_NOISE] = false;
+
+	/* Particle Init Info 설정으로 Pool에서 사용할때마다. 값을 채워줍니다. */
+	for (_uint i = 0; i < 200; ++i)
+	{
+		pGameObject = dynamic_cast<CGameObject*>(m_pGameInstance->Clone_Prototype(
+			PROTOTYPE::GAMEOBJECT, ENUM_CLASS(LEVEL::STATIC)
+			, TEXT("Prototype_GameObject_EffectParticle"), &ParticleDesc
+		));
+		m_pGameInstance->Add_GameObject_ToPools(TEXT("QUEENKNIGHT_WARP"), ENUM_CLASS(CEffectParticle::EffectType), pGameObject);
+	}
+
+#pragma endregion
+
+
+	return S_OK;
+}
 
 HRESULT CMainApp::Start_Level(LEVEL eStartLevelID)
 {
- 	if (FAILED(m_pGameInstance->Open_Level(static_cast<_uint>(LEVEL::LOADING), CLevel_Loading::Create(m_pDevice, m_pContext, eStartLevelID))))
+	if (FAILED(m_pGameInstance->Open_Level(static_cast<_uint>(LEVEL::LOADING), CLevel_Loading::Create(m_pDevice, m_pContext, eStartLevelID))))
+	{
+		CRASH("Failed Start Level");
 		return E_FAIL;
+	}
+		
 
 	return S_OK;
 }

@@ -115,6 +115,7 @@ public:
 public:
     // 무기 및 스킬과 충돌 시 받는 데미지 처리.
     virtual void Take_Damage(_float fDamage); 
+    virtual void Take_Damage(_float fDamage, CGameObject* pGameObject); 
     virtual void Collider_Part_Active(_uint iPartType, _bool bActive) {};
     virtual void Collider_All_Active(_bool bActive) {};
 
@@ -353,6 +354,11 @@ protected:
 
     _float m_fOffsetY = {};
     
+#pragma endregion
+
+#pragma region CSlash UI 관련
+protected:
+    void Show_Slash_UI_At_Position(_fvector vHitPosition, _fvector vAttackDirection);
 #pragma endregion
 
 #pragma region DEBUG 용도

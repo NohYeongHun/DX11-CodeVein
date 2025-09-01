@@ -106,6 +106,11 @@ HRESULT CRenderer::Render_Blend()
         return static_cast<CBlendObject*>(pSour)->Get_Depth() > static_cast<CBlendObject*>(pDest)->Get_Depth();
     });*/
 
+    m_RenderObjects[ENUM_CLASS(RENDERGROUP::BLEND)].sort([](CGameObject* pSour, CGameObject* pDest)->_bool
+    {
+        return pSour->Get_CamDistance() > pDest->Get_CamDistance();
+    });
+
     for (auto& pRenderObject : m_RenderObjects[ENUM_CLASS(RENDERGROUP::BLEND)])
     {
         if (nullptr != pRenderObject)

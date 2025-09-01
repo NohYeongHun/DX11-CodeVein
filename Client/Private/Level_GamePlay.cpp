@@ -80,7 +80,31 @@ HRESULT CLevel_GamePlay::Render()
 	return S_OK;
 }
 
+
+
+
+
 #pragma region 0. 먼저 생성되어야 하는 객체들 추가. 
+
+HRESULT CLevel_GamePlay::Ready_Layer_FadeOut(const _wstring& strLayerTag)
+{
+	CFade_Out::FADEOUT_DESC Desc{};
+	Desc.fX = g_iWinSizeX * 0.5f;
+	Desc.fY = g_iWinSizeY * 0.5f;
+	Desc.fSizeX = g_iWinSizeX;
+	Desc.fSizeY = g_iWinSizeY;
+	Desc.iTextureIndex = 0;
+
+	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel), strLayerTag,
+		ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_FadeOut"), &Desc)))
+	{
+		CRASH("Failed Ready Fade Out");
+		return E_FAIL;
+	}
+
+	return S_OK;
+}
+
 HRESULT CLevel_GamePlay::Ready_Lights()
 {
 	LIGHT_DESC			LightDesc{};
@@ -134,8 +158,8 @@ HRESULT CLevel_GamePlay::Ready_Layer_Player(const _wstring& strLayerTag)
 	CPlayer::PLAYER_DESC Desc{};
 #pragma region 1. 플레이어에게 넣어줘야할 레벨 별 다른 값들.
 	Desc.eCurLevel = m_eCurLevel;
-	Desc.vPos = { 270.f, 0.f, 0.f };
-	//Desc.vPos = { 100.f, 0.f, 0.f };
+	//Desc.vPos = { 270.f, 0.f, 0.f };
+	Desc.vPos = { 70.f, 0.f, 0.f };
 #pragma endregion
 
 #pragma region 2. 게임에서 계속 들고있어야할 플레이어 값들.
@@ -288,13 +312,13 @@ HRESULT CLevel_GamePlay::Ready_Layer_Monster(const _wstring& strLayerTag)
 	TriggerDesc = { { 250.f , 0.f, 0.f }, 50.f , TEXT("Layer_WolfDevil")
 		, TEXT("Layer_Monster") , 2, 0 };
 	
-	m_pGameInstance->Add_Trigger(ENUM_CLASS(m_eCurLevel), TriggerDesc);
+	//m_pGameInstance->Add_Trigger(ENUM_CLASS(m_eCurLevel), TriggerDesc);
 	
 	// 두 번째 트리거: SlaveVampire
 	TriggerDesc = { { 200.f , 0.f, 0.f }, 50.f , TEXT("Layer_SlaveVampire")
 		, TEXT("Layer_Monster") , 2, 0 };
 	
-	m_pGameInstance->Add_Trigger(ENUM_CLASS(m_eCurLevel), TriggerDesc);
+	//m_pGameInstance->Add_Trigger(ENUM_CLASS(m_eCurLevel), TriggerDesc);
 
 	/* 다 같은 Monster 레이어에 추가하기. */
 	if (FAILED(Ready_Layer_QueenKnight(strLayerTag)))
@@ -468,24 +492,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_SkyBoss(const _wstring& strLayerTag)
 	return S_OK;
 }
 
-HRESULT CLevel_GamePlay::Ready_Layer_FadeOut(const _wstring& strLayerTag)
-{
-	CFade_Out::FADEOUT_DESC Desc{};
-	Desc.fX = g_iWinSizeX * 0.5f;
-	Desc.fY = g_iWinSizeY * 0.5f;
-	Desc.fSizeX = g_iWinSizeX;
-	Desc.fSizeY = g_iWinSizeY;
-	Desc.iTextureIndex = 0;
 
-	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel), strLayerTag,
-		ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_FadeOut"), &Desc)))
-	{
-		CRASH("Failed Ready Fade Out");
-		return E_FAIL;
-	}
-		
-	return S_OK;
-}
 
 HRESULT CLevel_GamePlay::Ready_Layer_Effect(const _wstring& strLayerTag)
 {

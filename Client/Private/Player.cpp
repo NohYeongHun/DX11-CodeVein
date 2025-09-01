@@ -193,6 +193,15 @@ HRESULT CPlayer::Render()
         ImGui::Text("LockOn HP : (%.2f)", fHp);
     }
     
+    
+    // ==== Player Anim Debug 추가 ====
+    _uint iAnimationIdx = m_pModelCom->Get_CurrentAnimationIndex();
+    ImGui::Separator();
+    ImGui::Text("=== Player Animation Idx ====");
+
+    ImGui::Text("Cur Anim Idx : %d", iAnimationIdx);
+    ImGui::Text("Cur Anim Speed : (%.2f)", m_pModelCom->Get_AnimSpeed(iAnimationIdx));
+
 
     // === Navigation Debug UI 추가 ===
     ImGui::Separator();
@@ -215,6 +224,26 @@ HRESULT CPlayer::Render()
     {
         ImGui::Text("Navigation Component: NULL");
     }
+
+    ImGui::Separator();
+    ImGui::Text("=== Camera Pos ===");
+
+    _float3 vCamPos = { };
+    XMStoreFloat3(&vCamPos, XMLoadFloat4(m_pGameInstance->Get_CamPosition()));
+
+    if (m_isLockOn)
+    {
+        ImGui::Separator();
+        ImGui::Text("Lock On Camera Pos : (%.2f, %.2f, %.2f)", vCamPos.x, vCamPos.y, vCamPos.z);
+    }
+    else
+    {
+        ImGui::Separator();
+        ImGui::Text("Normal Camera Pos : (%.2f, %.2f, %.2f)", vCamPos.x, vCamPos.y, vCamPos.z);
+    }
+
+
+
 
     ImGui::End();
 
@@ -346,7 +375,6 @@ void CPlayer::Move_By_Camera_Direction_8Way(ACTORDIR eDir, _float fTimeDelta, _f
     m_pTransformCom->Set_Quaternion(qNewRot);
 
     // 9. 이동 적용
-    //m_pTransformCom->Move_Direction(vMoveDir, fTimeDelta * fSpeed);
     m_pTransformCom->Move_Direction(vMoveDir, fTimeDelta * fSpeed, m_pNavigationCom);
 }
 
@@ -701,7 +729,8 @@ HRESULT CPlayer::InitializeAction_ToAnimationMap()
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("DAMAGE_R")], 2.f);
 
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("STRONG_ATTACK1")], 2.f);
-    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("CIRCULATE_PURGE")], 1.3f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("CIRCULATE_PURGE")], 1.f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("DRAGON_LUNGE")], 1.5f);
 #pragma endregion
 
     return S_OK;
@@ -843,7 +872,11 @@ void CPlayer::On_Collision_Enter(CGameObject* pOther)
     if (nullptr != pWeapon)
     {
         if (HasBuff(BUFF_INVINCIBLE))
+        {
+            OutputDebugWstring(TEXT("Buff Has Invincible"));
             return;
+        }
+            
 
         // 무기의 소유자(몬스터) 가져오기
         CMonster* pMonster = dynamic_cast<CMonster*>(pWeapon->Get_Owner());
@@ -852,8 +885,22 @@ void CPlayer::On_Collision_Enter(CGameObject* pOther)
             // 몬스터 위치를 기반으로 피격 방향 계산 및 DamageState 전환
             Take_Damage(pWeapon->Get_AttackPower(), pMonster);
         }
+    }
 
-      
+    CMonster* pMonster = dynamic_cast<CMonster*>(pOther);
+    if (nullptr != pMonster)
+    {
+        if (m_pFsmCom->Get_CurrentState() == CPlayer::SKILL_2)
+        {
+            m_pModelCom->Set_RootMotionTranslate(false);
+            return;
+        }
+
+        if (m_pFsmCom->Get_CurrentState() == CPlayer::SKILL_1)
+        {
+            m_pModelCom->Set_RootMotionTranslate(false);
+            return;
+        }
     }
 }
 
@@ -1190,9 +1237,7 @@ HRESULT CPlayer::Ready_Fsm()
     m_pFsmCom->Add_State(CPlayer_FirstSkillState::Create(PLAYER_STATE::SKILL_1, &PlayerDesc));
     // X키
     m_pFsmCom->Add_State(CPlayer_SecondSkillState::Create(PLAYER_STATE::SKILL_2, &PlayerDesc));
-    //m_pFsmCom->Add_State(CPlayer_FirstSkillState::Create(PLAYER_STATE::SKILL_1, &PlayerDesc));
-    //m_pFsmCom->Add_State(CPlayer_FirstSkillState::Create(PLAYER_STATE::SKILL_1, &PlayerDesc));
-    //m_pFsmCom->Add_State(CPlayer_FirstSkillState::Create(PLAYER_STATE::SKILL_1, &PlayerDesc));
+
 
     Register_CoolTime();
 
@@ -1217,8 +1262,8 @@ void CPlayer::Register_CoolTime()
     m_pFsmCom->Register_StateCoolTime(PLAYER_STATE::STRONG_ATTACK, 1.5f);
     m_pFsmCom->Register_StateCoolTime(PLAYER_STATE::ATTACK, 1.f);
     m_pFsmCom->Register_StateCoolTime(PLAYER_STATE::GUARD, 0.5f);
-    m_pFsmCom->Register_StateCoolTime(PLAYER_STATE::SKILL_1, 5.f);
-    m_pFsmCom->Register_StateCoolTime(PLAYER_STATE::SKILL_2, 5.f);
+    m_pFsmCom->Register_StateCoolTime(PLAYER_STATE::SKILL_1, 10.f);
+    m_pFsmCom->Register_StateCoolTime(PLAYER_STATE::SKILL_2, 10.f);
 
 
     m_pFsmCom->Register_StateExitCoolTime(PLAYER_STATE::IDLE, 0.f);
@@ -1226,7 +1271,9 @@ void CPlayer::Register_CoolTime()
     m_pFsmCom->Register_StateExitCoolTime(PLAYER_STATE::RUN, 0.f);
     m_pFsmCom->Register_StateExitCoolTime(PLAYER_STATE::DODGE, 0.7f);
 
+    m_pFsmCom->Register_StateExitCoolTime(PLAYER_STATE::SKILL_1, 4.f);
     m_pFsmCom->Register_StateExitCoolTime(PLAYER_STATE::SKILL_2, 4.f);
+    //m_pFsmCom->Register_StateExitCoolTime(PLAYER_STATE::SKILL_2, 4.f);
 
     // 총 재생 시간.
     _float fCalcDuration = m_pModelCom->Get_AnimationDuration(m_Action_AnimMap[TEXT("STRONG_ATTACK1")]) /

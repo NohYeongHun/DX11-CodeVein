@@ -62,6 +62,8 @@ void CWeapon::Finalize_Update(_float fTimeDelta)
         _matrix WorldMatrix = XMLoadFloat4x4(&m_CombinedWorldMatrix);
         m_pColliderCom->Update(WorldMatrix);
     }
+
+    Update_AttackDirection(fTimeDelta);
 }
 
 void CWeapon::Late_Update(_float fTimeDelta)
@@ -78,6 +80,33 @@ HRESULT CWeapon::Render()
 void CWeapon::Update_Timer(_float fTimeDelta)
 {
     Update_ColliderFrame(fTimeDelta);
+}
+
+/* Transform의 Prev Position을 사용할 수 없음 => 오로지 부모뼈에 의해서만 위치가 이동하기 때문. */
+void CWeapon::Update_AttackDirection(_float fTimeDelta)
+{
+    // 1. 스윙 방향 계산 (무기 팁 위치 기준)
+    _vector vCurrentPosition = XMLoadFloat4(reinterpret_cast<const _float4*>(&m_CombinedWorldMatrix.m[3][0]));
+
+    if (!m_bFirstFrame)
+    {
+        // 슬래시 방향 계산 (이전 위치에서 현재 위치로의 벡터를 반전)
+        _vector vMovement = XMVectorSubtract(m_vPreviousPosition, vCurrentPosition);
+        _float fMovementLength = XMVectorGetX(XMVector3Length(vMovement));
+
+        // 움직임이 충분히 클 때만 스윙 방향 업데이트
+        if (fMovementLength > 0.01f) // 임계값
+        {
+            m_vSwingDirection = XMVector3Normalize(vMovement);
+        }
+    }
+    else
+    {
+        m_bFirstFrame = false;
+    }
+
+    // 다음 프레임을 위해 현재 위치 저장
+    m_vPreviousPosition = vCurrentPosition;
 }
 
 #pragma region 1. 무기는 충돌에 대한 상태제어를 할 수 있어야한다.=> 충돌에 따라 상태가 변하기도, 수치값이 바뀌기도한다.

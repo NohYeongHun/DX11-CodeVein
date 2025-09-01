@@ -29,6 +29,7 @@ public:
 #pragma endregion
 
 
+
 #pragma region 1. 무기는 충돌에 대한 상태제어를 할 수 있어야한다.=> 충돌에 따라 상태가 변하기도, 수치값이 바뀌기도한다.
 public:
 	virtual void On_Collision_Enter(CGameObject* pOther);
@@ -44,8 +45,12 @@ public:
 public:
 	virtual void Update_ColliderFrame(_float fTimeDelta);
 
-	// 충돌하면 안되는 객체들?
-private:
+	/* Weapon의 최종 행렬 가져오기. */
+public:
+	const _float4x4* Get_CombinedWorldMatrix() { return &m_CombinedWorldMatrix; }
+	
+	/* 무기의 스윙 방향 가져오기 */
+	_vector Get_SwingDirection() const { return m_vSwingDirection; }
 
 #pragma endregion
 

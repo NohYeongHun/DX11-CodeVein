@@ -21,6 +21,7 @@ enum class EventType : _uint
 	SKILLINFO_SKILL_CHANGE = 16,
 	/* Map Tool */
 	SELECTED_MODEL = 17,
+	OPEN_DEBUG = 18,
 	EVENT_END
 };
 

@@ -15,6 +15,8 @@
 #include "Loader_Personal.h"
 #include "Loader_StageOne.h"
 #include "Loader_GamePlay.h"
+
+#include "Loader_Debug.h"
 #include "Loader.h"
 #pragma endregion
 
@@ -23,12 +25,21 @@
 #include "Level_Logo.h"
 #include "Level_StageOne.h"
 #include "Level_GamePlay.h"
+#include "Level_Debug.h"
 #pragma endregion
 
 
 #pragma region COMPONENT
-
+#include "VIBuffer_PointParticleDir_Instance.h"
 #pragma endregion
+
+#pragma region EFFECT
+
+#include "Particle.h"
+#include "Snow.h"
+#include "EffectParticle.h"
+#pragma endregion
+
 
 
 #pragma region GAMEOBJECT
@@ -50,6 +61,7 @@
 #include "SteminaBar.h"
 #include "StatusPanel.h"
 #include "LockOnUI.h"
+
 
 
 /* ======================================= Inventory =================================== */
@@ -101,6 +113,13 @@
 #include "Player_DamageState.h"
 #include "Player_FirstSkillState.h"
 #include "Player_SecondSkillState.h"
+
+
+
+#pragma region Effect
+#include "Slash.h"
+#include "HitFlashEffect.h"
+#pragma endregion
 
 
 
@@ -195,6 +214,15 @@
 
 
 /* ======================================== DEBUG 용도 ===================================== */
+
+
+#pragma region Effect 이미지
+
+
+#include "PrototypeName.h"
+
+#pragma endregion
+
 
 #ifdef _DEBUG
 #include "Client_Debug.h"

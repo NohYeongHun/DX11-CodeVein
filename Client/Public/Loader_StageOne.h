@@ -29,6 +29,8 @@ private:
 
     HRESULT Add_Prototype_SkyBox(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance);
 
+    HRESULT Add_Prototype_Snow(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance);
+
 };
 NS_END
 

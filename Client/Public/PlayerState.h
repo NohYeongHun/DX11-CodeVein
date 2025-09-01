@@ -8,15 +8,29 @@ class CPlayerState abstract : public CState
 public:
 	typedef struct tagColliderActiveInfo
 	{
-		_float fStartRatio;     
-		_float fEndRatio;       
-		_bool bIsActive;
-		_uint iColliderID = 0;  // 콜라이더 고유 식별자 추가
-		// 어떤 콜라이더인지 구분하기 위한 타입 | 기본 값 무기.
-		CPlayer::COLLIDER_PARTS eColliderType = CPlayer::PART_WEAPON; 
-		_bool bIsColliderDisable = false; // 콜라이더 비활성화 여부.
-		
+		_float fStartRatio;  // 1. 시작 비율
+		_float fEndRatio;    // 2. 끝 비율
+		_bool bShouldEnable = true; // 3. true: Enable, false: Disable (해당 구간에서 콜라이더를 활성화할지 비활성화할지)
+		CPlayer::COLLIDER_PARTS eColliderType = CPlayer::PART_WEAPON; // 4. 어떤 콜라이더 타입을 제어할지
+		_uint iColliderID = 0;  // 5. 콜라이더 고유 식별자 (같은 타입의 여러 구간 구분용)
+		// 내부 상태 관리 (매 프레임 중복 호출 방지)
+		_bool bHasTriggeredStart = false; // 시작 지점에서 Enable/Disable 호출했는지
+		_bool bIsCurrentlyActive = false; // 현재 해당 구간에 있는지
+
 	}COLLIDER_ACTIVE_INFO;
+
+
+	typedef struct tagAnimationSpeedInfo
+	{
+		_float fStartRatio; // 1. 시작 비율
+		_float fEndRatio;	// 2. 끝 비율
+		_uint iAnimationID = 0;
+		_uint iAnimationIndex = 0;
+		_float fOriginSpeed = 1.f;
+		_float fModifySpeed = 1.f;
+		_bool bHasTriggeredStart = false; // 시작 지점에서 Enable/Disable 호출했는지
+		_bool bIsCurrentlyActive = false; // 현재 해당 구간에 있는지
+	}ANIMATION_SPEED_INFO;
 
 public:
 	typedef struct tagPlayerStateDesc : public CState::STATE_DESC
@@ -31,11 +45,7 @@ protected:
 
 #pragma region COLLIDER 활성화 관련 변수
 protected:
-	//unordered_map<_uint, COLLIDER_ACTIVE_INFO> m_ColliderActiveMap;
 	unordered_map<_uint, vector<COLLIDER_ACTIVE_INFO>> m_ColliderActiveMap;
-	unordered_map<_uint, _bool> m_PrevColliderStates; // 콜라이더 ID별 이전 상태
-	_bool m_bPrevColliderState = false;
-	CPlayer::COLLIDER_PARTS m_eColliderType = CPlayer::PART_WEAPON; // 기본값은 무기 충돌체
 
 
 protected:
@@ -47,6 +57,18 @@ protected:
 protected:
 	void Add_Collider_Info(_uint iAnimIdx, const COLLIDER_ACTIVE_INFO& info);
 	void Clear_Collider_Info(_uint iAnimIdx);
+#pragma endregion
+
+#pragma region PLAYER 애니메이션 속도 제어 변수.
+protected:
+	virtual void Handle_AnimationSpeed_State();
+	virtual void Reset_AnimationSpeedInfo();
+
+protected:
+	void Add_AnimationSpeed_Info(_uint iAnimIdx, const ANIMATION_SPEED_INFO& info);
+
+protected:
+	unordered_map<_uint, vector<ANIMATION_SPEED_INFO>> m_AnimationSpeedMap;
 #pragma endregion
 
 
@@ -79,7 +101,6 @@ protected:
 	_uint m_iNextAnimIdx = {}; // 다음 애니메이션 인덱스 => PlayerDefine.h에 정의.
 	_uint m_iCurAnimIdx = {};  // 현재 애니메이션 인덱스  => PlayerDefine.h에 정의
 	_int m_iNextState = {};  // 다음 State => Player에 정의
-
 
 protected:
 	uint16_t m_KeyInput = {};

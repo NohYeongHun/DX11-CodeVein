@@ -47,6 +47,7 @@ public:
 
 private:
 	ACTORDIR			   m_eDir = { ACTORDIR::END };
+	_bool m_bPrevInvincible = {};
 	
 
 public:

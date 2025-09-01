@@ -2,6 +2,20 @@
 #include "EnginePch.h"
 #include "Tool_Defines.h"
 
+#pragma region PARTCILE COMPONENT
+#include "VIBuffer_PointParticleDir_Instance.h"
+#pragma endregion
+
+#pragma region EFFECT
+#include "Tool_EffectMesh.h"
+#include "Tool_EffectTexture.h"
+#include "Tool_EffectParticle.h"
+
+#pragma endregion
+
+
+
+
 #pragma region TOOL 관련
 #include "PrototypeName.h"
 #include "Picking_Manager.h"
@@ -49,7 +63,10 @@
 #include "Map.h"
 #include "Camera_Free.h"
 #include "Player.h"
+
 #pragma endregion
+
+
 
 
 

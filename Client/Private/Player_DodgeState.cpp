@@ -108,7 +108,7 @@ void CPlayer_DodgeState::Handle_Invincible_Buff()
 
 	_bool bShouldInvincible = (fCurrentRatio >= fInvincibleStart && fCurrentRatio <= fInvincibleEnd);
 
-	if (bShouldInvincible != m_bPrevColliderState)
+	if (bShouldInvincible != m_bPrevInvincible)
 	{
 		if (bShouldInvincible)
 		{
@@ -121,7 +121,7 @@ void CPlayer_DodgeState::Handle_Invincible_Buff()
 			m_pPlayer->RemoveBuff(CPlayer::BUFF_INVINCIBLE, true);
 		}
 
-		m_bPrevColliderState = bShouldInvincible;
+		m_bPrevInvincible = bShouldInvincible;
 	}
 }
 

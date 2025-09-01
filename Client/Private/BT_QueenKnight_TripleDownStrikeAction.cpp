@@ -27,10 +27,6 @@ BT_RESULT CBT_QueenKnight_TripleDownStrikeAction::Perform_Action(_float fTimeDel
     {
     case ATTACK_PHASE::NONE:
         return Enter_Attack(fTimeDelta);
-    //case ATTACK_PHASE::READY:
-    //    return Update_Ready(fTimeDelta);
-    //case ATTACK_PHASE::ASCEND:
-    //    return Update_Ascend(fTimeDelta);
     case ATTACK_PHASE::WAIT_TELEPORT:
         return Update_WaitTeleport(fTimeDelta);
     case ATTACK_PHASE::TELEPORT:

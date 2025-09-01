@@ -113,6 +113,12 @@ void CLayer::Priority_Update(_float fTimeDelta)
 			//Safe_Release(*iter); // 이걸 안하는 건데..
 			iter = m_GameObjects.erase(iter);
 		}
+		else if ((*iter)->Is_DeActivate())
+		{
+			// 풀로 뺍니다.
+			(*iter)->OnDeActivate();
+			iter = m_GameObjects.erase(iter);
+		}
 		else
 			++iter;
 	}

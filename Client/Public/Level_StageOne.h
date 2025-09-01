@@ -35,12 +35,18 @@ private:
 	HRESULT Ready_Layer_GiantWhiteDevil(const _wstring& strLayerTag);
 #pragma endregion
 
+#pragma region 풀링 준비.
+private:
+	HRESULT Ready_Layer_Pooling();
+#pragma endregion
+
+
 private:
 	HRESULT Ready_Layer_Effect(const _wstring& strLayerTag);
 
 #pragma region 2. 다음 레벨 전환
 private:
-	void Open_Level();
+	void Open_Level(LEVEL eLevel);
 	void Start_FadeOut();
 	void Start_FadeIn();
 

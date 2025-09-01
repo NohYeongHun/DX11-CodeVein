@@ -50,6 +50,16 @@ private:
 	
 #pragma endregion
 
+#pragma region EFFECT
+	HRESULT Ready_Prototype_Effect();
+#pragma endregion
+
+
+#pragma region POOLING
+	HRESULT Ready_Pooling();
+#pragma endregion
+
+
 	
 	HRESULT Start_Level(LEVEL eStartLevelID);
 

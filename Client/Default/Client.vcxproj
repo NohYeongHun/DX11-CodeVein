@@ -199,10 +199,12 @@
     <ClInclude Include="..\Public\ClientPch.h" />
     <ClInclude Include="..\Public\Client_Debug.h" />
     <ClInclude Include="..\Public\Client_Defines.h" />
+    <ClInclude Include="..\Public\EffectParticle.h" />
     <ClInclude Include="..\Public\Fade_Out.h" />
     <ClInclude Include="..\Public\Giant_WhiteDevil.h" />
     <ClInclude Include="..\public\Giant_WhiteDevilDefine.h" />
     <ClInclude Include="..\Public\Giant_WhiteDevilTree.h" />
+    <ClInclude Include="..\Public\HitFlashEffect.h" />
     <ClInclude Include="..\Public\HPBar.h" />
     <ClInclude Include="..\Public\HUD.h" />
     <ClInclude Include="..\Public\imconfig.h" />
@@ -225,11 +227,13 @@
     <ClInclude Include="..\Public\Inventory_Panel.h" />
     <ClInclude Include="..\Public\KnightLance.h" />
     <ClInclude Include="..\Public\KnightShield.h" />
+    <ClInclude Include="..\Public\Level_Debug.h" />
     <ClInclude Include="..\Public\Level_GamePlay.h" />
     <ClInclude Include="..\Public\Level_Loading.h" />
     <ClInclude Include="..\Public\Level_Logo.h" />
     <ClInclude Include="..\Public\Level_StageOne.h" />
     <ClInclude Include="..\Public\Loader.h" />
+    <ClInclude Include="..\Public\Loader_Debug.h" />
     <ClInclude Include="..\Public\Loader_GamePlay.h" />
     <ClInclude Include="..\Public\Loader_Logo.h" />
     <ClInclude Include="..\Public\Loader_Personal.h" />
@@ -241,6 +245,7 @@
     <ClInclude Include="..\Public\Map.h" />
     <ClInclude Include="..\Public\Monster.h" />
     <ClInclude Include="..\Public\MonsterTree.h" />
+    <ClInclude Include="..\Public\Particle.h" />
     <ClInclude Include="..\Public\Player.h" />
     <ClInclude Include="..\Public\PlayerDefine.h" />
     <ClInclude Include="..\Public\PlayerState.h" />
@@ -254,6 +259,7 @@
     <ClInclude Include="..\Public\Player_SecondSkillState.h" />
     <ClInclude Include="..\Public\Player_StrongAttackState.h" />
     <ClInclude Include="..\Public\Player_WalkState.h" />
+    <ClInclude Include="..\Public\PrototypeName.h" />
     <ClInclude Include="..\Public\QueenKnight.h" />
     <ClInclude Include="..\Public\QueenKnightDefine.h" />
     <ClInclude Include="..\Public\QueenKnightTree.h" />
@@ -266,9 +272,11 @@
     <ClInclude Include="..\Public\SkillUI_Icon.h" />
     <ClInclude Include="..\Public\SkillUI_Panel.h" />
     <ClInclude Include="..\Public\SkillUI_Slot.h" />
+    <ClInclude Include="..\Public\Slash.h" />
     <ClInclude Include="..\Public\SlaveVampire.h" />
     <ClInclude Include="..\Public\SlaveVampireDefine.h" />
     <ClInclude Include="..\Public\SlaveVampireSword.h" />
+    <ClInclude Include="..\Public\Snow.h" />
     <ClInclude Include="..\Public\SteminaBar.h" />
     <ClInclude Include="..\Public\Title_BackGround.h" />
     <ClInclude Include="..\Public\MainApp.h" />
@@ -279,6 +287,7 @@
     <ClInclude Include="..\Public\Terrain.h" />
     <ClInclude Include="..\Public\Title.h" />
     <ClInclude Include="..\Public\TitleText.h" />
+    <ClInclude Include="..\Public\VIBuffer_PointParticleDir_Instance.h" />
     <ClInclude Include="..\Public\Weapon.h" />
     <ClInclude Include="..\Public\WhiteLargeHalberd.h" />
     <ClInclude Include="..\Public\WolfDevil.h" />
@@ -336,6 +345,7 @@
     <ClCompile Include="..\Private\Fade_Out.cpp" />
     <ClCompile Include="..\Private\Giant_WhiteDevil.cpp" />
     <ClCompile Include="..\Private\Giant_WhiteDevilTree.cpp" />
+    <ClCompile Include="..\Private\HitFlashEffect.cpp" />
     <ClCompile Include="..\Private\HPBar.cpp" />
     <ClCompile Include="..\Private\HUD.cpp" />
     <ClCompile Include="..\Private\imgui.cpp" />
@@ -356,11 +366,13 @@
     <ClCompile Include="..\Private\Inventory_Panel.cpp" />
     <ClCompile Include="..\Private\KnightLance.cpp" />
     <ClCompile Include="..\Private\KnightShield.cpp" />
+    <ClCompile Include="..\Private\Level_Debug.cpp" />
     <ClCompile Include="..\Private\Level_GamePlay.cpp" />
     <ClCompile Include="..\Private\Level_Loading.cpp" />
     <ClCompile Include="..\Private\Level_Logo.cpp" />
     <ClCompile Include="..\Private\Level_StageOne.cpp" />
     <ClCompile Include="..\Private\Loader.cpp" />
+    <ClCompile Include="..\Private\Loader_Debug.cpp" />
     <ClCompile Include="..\Private\Loader_GamePlay.cpp" />
     <ClCompile Include="..\Private\Loader_Logo.cpp" />
     <ClCompile Include="..\Private\Loader_Personal.cpp" />
@@ -372,6 +384,7 @@
     <ClCompile Include="..\Private\Map.cpp" />
     <ClCompile Include="..\Private\Monster.cpp" />
     <ClCompile Include="..\Private\MonsterTree.cpp" />
+    <ClCompile Include="..\Private\Particle.cpp" />
     <ClCompile Include="..\Private\Player.cpp" />
     <ClCompile Include="..\Private\PlayerState.cpp" />
     <ClCompile Include="..\Private\Player_AttackState.cpp" />
@@ -384,6 +397,7 @@
     <ClCompile Include="..\Private\Player_SecondSkillState.cpp" />
     <ClCompile Include="..\Private\Player_StrongAttackState.cpp" />
     <ClCompile Include="..\Private\Player_WalkState.cpp" />
+    <ClCompile Include="..\Private\PrototypeName.cpp" />
     <ClCompile Include="..\Private\QueenKnight.cpp" />
     <ClCompile Include="..\Private\QueenKnightTree.cpp" />
     <ClCompile Include="..\Private\Sky.cpp" />
@@ -394,8 +408,10 @@
     <ClCompile Include="..\Private\SkillUI_Icon.cpp" />
     <ClCompile Include="..\Private\SkillUI_Panel.cpp" />
     <ClCompile Include="..\Private\SkillUI_Slot.cpp" />
+    <ClCompile Include="..\Private\Slash.cpp" />
     <ClCompile Include="..\Private\SlaveVampire.cpp" />
     <ClCompile Include="..\Private\SlaveVampireSword.cpp" />
+    <ClCompile Include="..\Private\Snow.cpp" />
     <ClCompile Include="..\Private\SteminaBar.cpp" />
     <ClCompile Include="..\Private\Title_BackGround.cpp" />
     <ClCompile Include="..\Private\MainApp.cpp" />
@@ -406,6 +422,8 @@
     <ClCompile Include="..\Private\Terrain.cpp" />
     <ClCompile Include="..\Private\Title.cpp" />
     <ClCompile Include="..\Private\TitleText.cpp" />
+    <ClCompile Include="..\Private\EffectParticle.cpp" />
+    <ClCompile Include="..\Private\VIBuffer_PointParticleDir_Instance.cpp" />
     <ClCompile Include="..\Private\Weapon.cpp" />
     <ClCompile Include="..\Private\WhiteLargeHalberd.cpp" />
     <ClCompile Include="..\Private\WolfDevil.cpp" />
@@ -422,6 +440,9 @@
   <ItemGroup>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxAnimMesh.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxCube.hlsl" />
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxInstance_Particle.hlsl" />
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxInstance_PointDirParticle.hlsl" />
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxInstance_PointParticle.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxMesh.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxNorTex.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPosTex.hlsl" />

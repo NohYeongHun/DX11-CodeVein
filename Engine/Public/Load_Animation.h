@@ -47,7 +47,11 @@ public:
 	_float Get_AnimSpeed() { return m_fAnimSpeed; }
 
 private:
-	_float m_fAnimSpeed = { 1.f };
+	_float m_fAnimSpeed = { 1.f }; // 기본 스피드.
+
+// 특정 구간만 속도를 증가하는 변수?
+private:
+
 #pragma endregion
 
 

@@ -30,9 +30,15 @@ public:
 	HRESULT Initialize(const _float3* pPoints, _int iIndex);
 
 	_bool isIn(_fvector vPosition, _int* pNeighborIndex);
+	_bool isIn(_fvector vPosition, _int* pNeighborIndex, LINE* pOutLine); // 벗어난 경계선 정보 포함
 
 	_bool Compare_Points(_fvector vSourPoint, _fvector vDestPoint);
 	_float Compute_Height(_fvector vLocalPos);
+
+	// 경계선 노멀 벡터 가져오기 (슬라이딩용)
+	_vector Get_LineNormal(LINE eLine) const {
+		return XMLoadFloat3(&m_vNormals[ENUM_CLASS(eLine)]);
+	}
 
 public:
 	_vector Get_Center();

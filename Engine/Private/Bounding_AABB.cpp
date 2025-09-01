@@ -16,7 +16,7 @@ HRESULT CBounding_AABB::Initialize(BOUNDING_DESC* pBoundingDesc)
 	BOUNDING_AABB_DESC* pDesc = static_cast<BOUNDING_AABB_DESC*>(pBoundingDesc);
 	
 #ifdef _DEBUG
-	m_DebugDesc = *pDesc;
+	m_OriginDesc = *pDesc;
 #endif // _DEBUG
 
 	

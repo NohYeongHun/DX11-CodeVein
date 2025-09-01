@@ -1,6 +1,4 @@
-﻿#include "QueenKnight.h"
-
-CQueenKnight::CQueenKnight(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿CQueenKnight::CQueenKnight(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CMonster(pDevice, pContext)
 {
 }
@@ -76,7 +74,13 @@ HRESULT CQueenKnight::Initialize_Clone(void* pArg)
 
     if (FAILED(Ready_BehaviorTree()))
     {
-        CRASH("Failed Ready BehaviourTree WolfDevil");
+        CRASH("Failed Ready BehaviourTree QueenKnight");
+        return E_FAIL;
+    }
+
+    if (FAILED(Ready_Effects(pDesc)))
+    {
+        CRASH("Failed Ready Effects QueenKnight");
         return E_FAIL;
     }
 
@@ -97,7 +101,9 @@ HRESULT CQueenKnight::Initialize_Clone(void* pArg)
     /* 현재 Object Manager에 담기 전에는 모든 Collider를 충돌 비교 하지 않습니다. */
     Collider_All_Active(false);
 
+    
 	m_pModelCom->Set_Animation(m_Action_AnimMap[TEXT("IDLE")], true); // 초기 애니메이션은 IDLE로 설정.
+    m_pModelCom->Set_Animation(m_Action_AnimMap[TEXT("RUN")], true);
 
     return S_OK;
 }
@@ -125,8 +131,6 @@ void CQueenKnight::Update(_float fTimeDelta)
 
     // 하위 객체들 움직임 제어는 Tree 제어 이후에
     CMonster::Update(fTimeDelta);
-
-
 
     Finalize_Update(fTimeDelta);
 }
@@ -168,7 +172,7 @@ HRESULT CQueenKnight::Render()
     // 기존 Player Debug Window
 
     ImVec2 windowSize = ImVec2(300.f, 300.f);
-    ImVec2 windowPos = ImVec2(io.DisplaySize.x - windowSize.x, windowSize.y);
+    ImVec2 windowPos = ImVec2(windowSize.x, 0.f);
     ImGui::SetNextWindowPos(windowPos, ImGuiCond_Once);
     ImGui::SetNextWindowSize(windowSize, ImGuiCond_Once);
 
@@ -187,8 +191,33 @@ HRESULT CQueenKnight::Render()
     _float fDistance = XMVectorGetX(XMVector3Length(vDistance));
     ImGui::Text("Target Distance : (%.2f)", fDistance);
 
+    ImGui::Separator();
+
+    _uint iIndex = m_pModelCom->Get_CurrentAnimationIndex();
+    
+    ImGui::Text("Current Animation Index : %d ", iIndex);
+
+
+    _wstring strAnimIndex = TEXT("Current Animation Index : ") + to_wstring(iIndex) + TEXT("\n");
+    OutputDebugWstring(strAnimIndex);
+
+    _float fCurrentAnimSpeed = m_pModelCom->Get_AnimSpeed(iIndex);
+    ImGui::InputFloat("Anim Speed", &fCurrentAnimSpeed);
+    ImGui::Separator();
+
+    if (ImGui::Button("Apply"))
+    {
+        m_pModelCom->Set_AnimSpeed(iIndex, fCurrentAnimSpeed);
+    }
+    
+
+   
+
     ImGui::End();
+
+   
      m_pColliderCom->Render();
+
 #endif // _DEBUG
 
     if (FAILED(Ready_Render_Resources()))
@@ -233,7 +262,7 @@ void CQueenKnight::On_Collision_Enter(CGameObject* pOther)
         if (!HasBuff(BUFF_INVINCIBLE))
         {
             // 1. 데미지를 입고.
-            Take_Damage(pPlayerWeapon->Get_AttackPower());
+            Take_Damage(pPlayerWeapon->Get_AttackPower(), pPlayerWeapon);
 
             // 2. 해당 위치에 검흔 Effect 생성?
 
@@ -270,6 +299,14 @@ void CQueenKnight::Collider_All_Active(_bool bActive)
         m_pWeapon->Deactivate_Collider();
         m_pShield->Deactivate_Collider();
     }
+}
+void CQueenKnight::WeaponOBB_ChangeExtents(_float3 vExtents)
+{
+    m_pWeapon->OBBCollider_ChangeExtents(vExtents);
+}
+_float3 CQueenKnight::Get_WeaponOBBExtents()
+{
+     return m_pWeapon->Get_OriginExtents();
 }
 #pragma endregion
 
@@ -362,7 +399,8 @@ HRESULT CQueenKnight::InitializeAction_ToAnimationMap()
     m_pModelCom->Set_RootMotionRotation(true);
     m_pModelCom->Set_RootMotionTranslate(true);
 
-    m_Action_AnimMap.emplace(L"IDLE", AS_TStdKnight_TLSword_Idle_N_Loop);
+    m_Action_AnimMap.emplace(L"IDLE", AS_TStdKnight_TLanceGCS_Idle_N_Loop);
+    //m_Action_AnimMap.emplace(L"IDLE", AS_TStdKnight_TLSword_Idle_N_Loop);
     m_Action_AnimMap.emplace(L"IDLE_L180", AS_TStdKnight_TShieldSword_Guard_IdleTurn_L180);
     m_Action_AnimMap.emplace(L"IDLE_L90", AS_TStdKnight_TShieldSword_Guard_IdleTurn_L90);
     m_Action_AnimMap.emplace(L"IDLE_R180", AS_TStdKnight_TShieldSword_Guard_IdleTurn_R180);
@@ -370,28 +408,41 @@ HRESULT CQueenKnight::InitializeAction_ToAnimationMap()
     m_Action_AnimMap.emplace(L"GUARDHIT", AS_TStdKnight_TShieldSword_GuardHit01_N);
     m_Action_AnimMap.emplace(L"DAMAGE", AS_TStdKnight_TCmn_Damage01_BR);
     m_Action_AnimMap.emplace(L"HIT", AS_TStdKnight_TCmn_Damage01_BR);
-    m_Action_AnimMap.emplace(L"ATTACK", AS_TStdKnight_TLSword_AttackNormal01_N);
+
+
+    /*m_Action_AnimMap.emplace(L"ATTACK", AS_TStdKnight_TLSword_AttackNormal01_N);
     m_Action_AnimMap.emplace(L"ATTACK1", AS_TStdKnight_TLSword_AttackNormal01_N);
     m_Action_AnimMap.emplace(L"ATTACK2", AS_TStdKnight_TLSword_AttackNormal02_N);
-    m_Action_AnimMap.emplace(L"ATTACK3", AS_TStdKnight_TLSword_AttackNormal03_N);
+    m_Action_AnimMap.emplace(L"ATTACK3", AS_TStdKnight_TLSword_AttackNormal03_N);*/
+
+    m_Action_AnimMap.emplace(L"ATTACK", AS_TStdKnight_TLanceGCS_AttackNormal01_N);
+    m_Action_AnimMap.emplace(L"ATTACK1", AS_TStdKnight_TLanceGCS_AttackNormal01_N);
+    m_Action_AnimMap.emplace(L"ATTACK2", AS_TStdKnight_TLanceGCS_AttackNormal02_N);
+    m_Action_AnimMap.emplace(L"ATTACK3", AS_TStdKnight_TLanceGCS_AttackNormal02_N_Combo);
 
     // 중간에 사라지게 해서 플레이어 위에서 나타나서 아래로 내다꼽게.
     m_Action_AnimMap.emplace(L"ATTACK_JUMP", AS_TStdKnight_TSword_AttackJump01_N);
 
-    m_Action_AnimMap.emplace(L"RUN", AS_TStdKnight_TShieldSword_Guard_Run_F_Loop);
-    m_Action_AnimMap.emplace(L"WALK", AS_TStdKnight_TShieldSword_Guard_Walk_F_Loop);
-    m_Action_AnimMap.emplace(L"WALK_B", AS_TStdKnight_TShieldSword_Guard_Walk_B_Loop);
+    //m_Action_AnimMap.emplace(L"RUN", AS_TStdKnight_TShieldSword_Guard_Run_F_Loop);
+    //m_Action_AnimMap.emplace(L"WALK", AS_TStdKnight_TShieldSword_Guard_Walk_F_Loop);
+    //m_Action_AnimMap.emplace(L"WALK_B", AS_TStdKnight_TShieldSword_Guard_Walk_B_Loop);
+
+    m_Action_AnimMap.emplace(L"RUN", AS_TStdKnight_TLanceGCS_Run_F_Loop);
+    //m_Action_AnimMap.emplace(L"WALK", AS_TStdKnight_TShieldSword_Guard_Walk_F_Loop);
+    m_Action_AnimMap.emplace(L"WALK_B", AS_TStdKnight_TLanceGCS_Guard_Walk_B_Loop);
 
     // 같은 애니메이션이지만 다른 이름으로 설정해서 Node에서 사용할 수 있게함.
-    m_Action_AnimMap.emplace(L"DETECT", AS_TStdKnight_TShieldSword_Guard_Run_F_Loop);
+    //m_Action_AnimMap.emplace(L"DETECT", AS_TStdKnight_TShieldSword_Guard_Run_F_Loop);
+    m_Action_AnimMap.emplace(L"DETECT", AS_TStdKnight_TLanceGCS_Run_F_Loop);
     m_Action_AnimMap.emplace(L"DOWN_START", AS_TStdKnight_TCmn_Down_P_Loop);
     m_Action_AnimMap.emplace(L"DOWN_END", AS_TStdKnight_TCmn_Down_P_End);
-    m_Action_AnimMap.emplace(L"DEATH_NORMAL", AS_TStdKnight_TCmn_Death_N);
-    m_Action_AnimMap.emplace(L"DEATH", AS_TStdKnight_TCmn_Death_N);
+    m_Action_AnimMap.emplace(L"DEATH_NORMAL", AS_TStdKnight_TLanceGCS_Death_N);
+    m_Action_AnimMap.emplace(L"DEATH", AS_TStdKnight_TLanceGCS_Death_N);
     
-    /* 낙하 애니메이션 */
-    m_Action_AnimMap.emplace(L"FALL_LOOP", AS_TStdKnight_TCmn_Fall_N_Loop);
-    m_Action_AnimMap.emplace(L"FALL_END", AS_TStdKnight_TCmn_Fall_N_End);
+    /* 워프 애니메이션. */
+    m_Action_AnimMap.emplace(L"WARP_START", AS_TStdKnight_TLanceGCS_AttackWarp_Start);
+    m_Action_AnimMap.emplace(L"WARP_END", AS_TStdKnight_TLanceGCS_AttackWarp_End01);
+    m_Action_AnimMap.emplace(L"WARP_JUMP_ATTACK", AS_TStdKnight_TLanceGCS_AttackWarpJump01_N);
 
     /* 점프 어택. (사라졌다가 나오는 모션.) */
     m_Action_AnimMap.emplace(L"DISAPPEAR_ATTACK", AS_TStdKnight_TSword_AttackJump01_N);
@@ -428,13 +479,22 @@ HRESULT CQueenKnight::InitializeAction_ToAnimationMap()
 
     
 #pragma region 재생 속도 증가.
+
+    /* 삼연 내려찍기 */
     /* Down Strike 시 애니메이션 별 재생 구간이 다름. => Node에서 제어. */
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"DOWN_STRIKE"], 1.8f);
 
     // 250frame.
-    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"DOWN_STRIKE_SKILL"], 1.2f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"DOWN_STRIKE_SKILL"], 1.5f);
 
-        /* Phase Attack 1 ~ 3 */
+
+    //m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"WARP_START"], 1.5f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"WARP_START"], 1.2f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"WARP_END"], 1.5f);
+    //m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"WARP_END"], 1.5f);
+
+
+    /* Phase Attack 1 ~ 3 */
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"PHASE_ATTACK1"], 2.5f);
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"PHASE_ATTACK2"], 2.5f);
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"PHASE_ATTACK3"], 2.5f);
@@ -458,11 +518,15 @@ HRESULT CQueenKnight::InitializeAction_ToAnimationMap()
     Add_Collider_Frame(m_Action_AnimMap[TEXT("DASH_ATTACK_START")], 100.f / 136.f, 136.f / 136.f, PART_WEAPON);     // Dash Attack
     Add_Collider_Frame(m_Action_AnimMap[TEXT("DASH_ATTACK_END")], 0.f / 130.f, 100.f / 130.f, PART_WEAPON);     // Dash Attack
 
+
+    Add_Collider_Frame(m_Action_AnimMap[TEXT("WARP_END")], 20.f / 137.f, 40.f / 137.f, PART_WEAPON);     // Dash Attack
+
     // 공격 프레임 60 ~ 100프레임.1
     Add_Collider_Frame(m_Action_AnimMap[TEXT("DOWN_STRIKE")], 60.f / 224.f, 85.f / 224.f, PART_WEAPON);     // Dash Attack
+    
 
 
-    Add_Collider_Frame(m_Action_AnimMap[TEXT("ATTACK")], 40.f / 156.f, 60.f / 156.f, PART_WEAPON);       // Weapon attack
+    Add_Collider_Frame(m_Action_AnimMap[TEXT("ATTACK")], 40.f / 195.f, 70.f / 195.f, PART_WEAPON);       // Weapon attack
     Add_Collider_Frame(m_Action_AnimMap[TEXT("PHASE_ATTACK1")], 40.f / 180.f, 80.f / 180.f, PART_WEAPON);// Weapon attack
     Add_Collider_Frame(m_Action_AnimMap[TEXT("PHASE_ATTACK2")], 40.f / 180.f, 80.f / 180.f, PART_WEAPON);// Weapon attack
     Add_Collider_Frame(m_Action_AnimMap[TEXT("PHASE_ATTACK3")], 40.f / 180.f, 80.f / 180.f, PART_WEAPON);// Weapon attack
@@ -489,12 +553,14 @@ HRESULT CQueenKnight::Initialize_BuffDurations()
     
     // 10 초마다 해당 페이즈 시퀀스 공격 반복
     m_BuffDefault_Durations[QUEEN_BUFF_PHASE_ATTACK_COOLDOWN] = 10.f;
+    //m_BuffDefault_Durations[QUEEN_BUFF_PHASE_ATTACK_COOLDOWN] = 999.f;
 
     // 20초마다 돌진 공격 시퀀스 반복.
+    //m_BuffDefault_Durations[QUEEN_BUFF_DASH_ATTACK_COOLDOWN] = 999.f; // 돌진 공격 쿨타임.
     m_BuffDefault_Durations[QUEEN_BUFF_DASH_ATTACK_COOLDOWN] = 20.f; // 돌진 공격 쿨타임.
 
     // 25초마다 내려찍기 공격 시퀀스 반복.
-    m_BuffDefault_Durations[QUEEN_BUFF_DOWN_TRIPLE_STRIKE_COOLDOWN] = 25.f; // 세번 연속 내려찍기 공격 쿨타임.
+    m_BuffDefault_Durations[QUEEN_BUFF_DOWN_TRIPLE_STRIKE_COOLDOWN] = 30.f; // 세번 연속 내려찍기 공격 쿨타임.
 
     return S_OK;
 }
@@ -547,6 +613,11 @@ void CQueenKnight::Take_Damage(_float fDamage)
     m_MonsterStat.fHP -= fDamage;
     Decrease_HpUI(fDamage, 0.1f);
 
+}
+void CQueenKnight::Take_Damage(_float fDamage, CGameObject* pGameObject)
+{
+    CMonster::Take_Damage(fDamage, pGameObject);
+    Decrease_HpUI(fDamage, 0.1f);
 }
 void CQueenKnight::Increase_HpUI(_float fHp, _float fTime)
 {
@@ -605,6 +676,23 @@ void CQueenKnight::Set_Visible(_bool bVisible)
     m_pShield->Set_Visible(m_bVisible);
 }
 
+
+
+
+#pragma endregion
+
+#pragma region 9. Effect 객체 제어
+void CQueenKnight::Create_QueenKnightWarp_Effect_Particle(_float3 vDir)
+{
+
+    CEffectParticle::EFFECTPARTICLE_ENTER_DESC Desc{};
+    Desc.vStartPos = m_pTransformCom->Get_State(STATE::POSITION); // 몬스터 현재위치로 생성.
+    Desc.particleInitInfo.lifeTime = 5.f;
+    Desc.particleInitInfo.dir = vDir;
+    m_pGameInstance->Move_GameObject_ToObjectLayer(ENUM_CLASS(m_eCurLevel)
+        , TEXT("QUEENKNIGHT_WARP"), TEXT("Layer_Effect"), 2, ENUM_CLASS(CEffectParticle::EffectType), &Desc);
+
+}
 
 #pragma endregion
 
@@ -744,6 +832,16 @@ HRESULT CQueenKnight::Ready_PartObjects()
     return S_OK;
 }
 
+#pragma region Effect 생성
+HRESULT CQueenKnight::Ready_Effects(QUEENKNIGHT_DESC* pDesc)
+{
+        
+    return S_OK;
+}
+#pragma endregion
+
+
+
 HRESULT CQueenKnight::Ready_Render_Resources()
 {
     if (FAILED(m_pTransformCom->Bind_Shader_Resource(m_pShaderCom, "g_WorldMatrix")))
@@ -776,6 +874,8 @@ HRESULT CQueenKnight::Ready_Render_Resources()
 
     return S_OK;
 }
+
+
 
 
 

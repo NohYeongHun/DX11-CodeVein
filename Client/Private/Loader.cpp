@@ -56,6 +56,9 @@ HRESULT CLoader::Loading()
 	case LEVEL::STAGEONE:
 		hr = Loading_For_StageOne_Level();
 		break;
+	case LEVEL::DEBUG:
+		hr = Loading_For_Debug_Level();
+		break;
 	}
 
 	if (FAILED(hr))
@@ -79,30 +82,6 @@ HRESULT CLoader::Loading_For_Logo_Level()
 		.Loading_Resource(m_pDevice, m_pContext, m_pGameInstance)))
 		return E_FAIL;
 
-	for (_uint i = 0; i < 99999; i++)
-	{
-		int a = 10;
-	}
-	for (_uint i = 0; i < 99999; i++)
-	{
-		int a = 10;
-	}
-	for (_uint i = 0; i < 99999; i++)
-	{
-		int a = 10;
-	}
-	for (_uint i = 0; i < 99999; i++)
-	{
-		int a = 10;
-	}
-	for (_uint i = 0; i < 99999; i++)
-	{
-		int a = 10;
-	}
-	for (_uint i = 0; i < 99999; i++)
-	{
-		int a = 10;
-	}
 	lstrcpy(m_szLoadingText, TEXT("로고 레벨 로딩이 완료되었습니다."));
 
 	m_isFinished = true;
@@ -142,6 +121,21 @@ HRESULT CLoader::Loading_For_GamePlay_Level()
 
 	m_isFinished = true;
 
+	return S_OK;
+}
+HRESULT CLoader::Loading_For_Debug_Level()
+{
+	lstrcpy(m_szLoadingText, TEXT("Debug 레벨을 로딩중입니다."));
+
+	if (FAILED(m_cLoader_Debug
+		.Loading_Resource(m_pDevice, m_pContext, m_pGameInstance)))
+		return E_FAIL;
+
+
+
+	lstrcpy(m_szLoadingText, TEXT("Debug 레벨 로딩이 완료되었습니다."));
+
+	m_isFinished = true;
 	return S_OK;
 }
 CLoader* CLoader::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, LEVEL eNextLevelID)

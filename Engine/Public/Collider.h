@@ -64,18 +64,26 @@ public:
 
 #pragma region DEBUG용도 함수.
 
-#ifdef _DEBUG
 public:
 	void* Get_BoundingDesc();
 
-public:
-	void Change_BoundingDesc(void* pBoundingDesc);
-	void Reset_Bounding();
+#ifdef _DEBUG
+
+
+
+
 	
 #endif // _DEBUG
 
 public:
 	COLLIDER Get_ColliderShape() { return m_eColliderShape; }
+#pragma endregion
+
+
+#pragma region Collider 크기 변경
+public:
+	void Change_BoundingDesc(void* pBoundingDesc);
+	void Reset_Bounding();
 #pragma endregion
 
 

@@ -59,7 +59,7 @@ void CTool_MainApp::Update(_float fTimeDelta)
 HRESULT CTool_MainApp::Render()
 {
 	
-	_float4		vClearColor = _float4(0.f, 0.f, 1.f, 1.f);
+	_float4		vClearColor = _float4(0.f, 0.f, 0.f, 1.f);
 
 	m_pGameInstance->Render_Begin(&vClearColor);
 	
@@ -78,8 +78,6 @@ HRESULT CTool_MainApp::Render()
 
 HRESULT CTool_MainApp::Ready_Prototype_ForStatic()
 {
-	
-
 	//m_pMapTool = CMap_Tool::Create(m_pDevice, m_pContext);
 
 	/* ==================================================== Shader ====================================================*/
@@ -123,6 +121,16 @@ HRESULT CTool_MainApp::Ready_Prototype_ForStatic()
 	return S_OK;
 }
 
+#pragma region EFFECT
+HRESULT CTool_MainApp::Ready_Prototype_Effect()
+{
+
+	return S_OK;
+}
+#pragma endregion
+
+
+
 
 /* Font Rendering */
 HRESULT CTool_MainApp::Ready_Fonts()
@@ -132,8 +140,7 @@ HRESULT CTool_MainApp::Ready_Fonts()
 			TEXT("HUD_TEXT")
 			, TEXT("../../Resources/Font/CodeVein.spritefont"))))
 		return E_FAIL;
-
-
+	
 	/*if (FAILED(m_pGameInstance
 		->Load_Font(
 			TEXT("HUD_TEXT")

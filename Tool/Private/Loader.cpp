@@ -1,5 +1,4 @@
-﻿
-CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿CLoader::CLoader(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: m_pDevice{ pDevice }
 	, m_pContext { pContext }
 	, m_pGameInstance { CGameInstance::GetInstance() }
@@ -70,61 +69,11 @@ HRESULT CLoader::Loading_For_Logo_Level()
 
 
 
-#pragma region MAP
-	// 1. Model 로딩.
-
-	// Map Prototype 생성.
-	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LOGO)
-	//	, TEXT("Prototype_Component_Model_Map")
-	//	, CTool_Model::Create(m_pDevice, m_pContext, MODELTYPE::NONANIM, PreTransformMatrix, "../Bin/Resources/Models/Map/BossMap/BossMap.glb"))))
-	//	return E_FAIL;
-	//
-	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LOGO)
-	//	, TEXT("Prototype_GameObject_Map")
-	//	, CMap::Create(m_pDevice, m_pContext))))
-	//	return E_FAIL;
-
-	_matrix		PreTransformMatrix = XMMatrixIdentity();
-
-	/* Prototype_Component_Model */
-	PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
-
-	// Player Prototype 생성.
-	/*if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LOGO)
-		, TEXT("Prototype_GameObject_Player")
-		, CPlayer::Create(m_pDevice, m_pContext))))
-		return E_FAIL;*/
-
-	//_matrix		PreTransformMatrix = XMMatrixIdentity();
-
-	///* Prototype_Component_Model */
-	//PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
-
-	//if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
-	//	, TEXT("MapPart_CircleFloor")
-	//	, CTool_Model::Create(m_pDevice, m_pContext, MODELTYPE::STATIC, PreTransformMatrix, "../Bin/Resources/Models/Map/BossMap/CircleFloor.fbx", "textures/CircleFloor/"))))
-	//	return E_FAIL;
-
-
-
-#pragma endregion
-
-#pragma region PLAYER
-	/* Prototype_Component_Model */
-	/*PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XMConvertToRadians(180.0f));
-
-	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
-		, TEXT("Prototype_Component_Model_Player")
-		, CTool_Model::Create(m_pDevice, m_pContext, MODELTYPE::ANIM, PreTransformMatrix, "../Bin/Resources/Models/Player/Player.fbx", ))))
-		return E_FAIL;*/
-
-#pragma endregion
-
 
 
 #pragma region MAP PART
 // Map Prototype 생성.
-	PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XM_PI);
+	_matrix PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XM_PI);
 
 	for (_uint i = 0; i < Model_PrototypeSize; ++i)
 	{
@@ -168,7 +117,11 @@ HRESULT CLoader::Loading_For_Logo_Level()
 		return E_FAIL;
 #pragma endregion
 
-	
+	if(FAILED(Loading_For_Logo_Effect()))
+	{
+		CRASH("Failed Load Effect");
+		return E_FAIL;
+	}
 	
 	lstrcpy(m_szLoadingText, TEXT("로고 레벨 로딩이 완료되었습니다."));
 
@@ -190,6 +143,121 @@ HRESULT CLoader::Loading_For_GamePlay_Level()
 
 	return S_OK;
 }
+
+#pragma region EFFECT
+HRESULT CLoader::Loading_For_Logo_Effect()
+{
+	// 1. 타입별로 필요한 객체들 생성. Shader, Texture 등등.
+	if (FAILED(Loading_For_Logo_EffectTexture()))
+	{
+		CRASH("Load Effect Texture Failed");
+		return E_FAIL;
+	}
+
+#pragma region PARTICLE
+	if (FAILED(Loading_For_Logo_EffectParticle()))
+	{
+		CRASH("Load Effect Logo Effect Particle");
+		return E_FAIL;
+	}
+#pragma endregion
+
+
+	return S_OK;
+}
+HRESULT CLoader::Loading_For_Logo_EffectTexture()
+{
+
+#pragma region 1. 공통 사용할 Texture 생성.
+
+	for (_uint i = 0; i < Effect_TexturePrototypeSize; ++i)
+	{
+		if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LOGO)
+			, Effect_TexturePrototypes[i].prototypeName
+			, CTexture::Create(m_pDevice, m_pContext, Effect_TexturePrototypes[i].textureFilePath
+				, Effect_TexturePrototypes[i].iNumTextures))))
+		{
+			CRASH("Failed Load Effect Texture");
+			return E_FAIL;
+		}
+	}
+#pragma endregion
+
+#pragma region 2. Shader 생성
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LOGO), TEXT("Prototype_Component_Shader_VtxPosTex"),
+		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxPosTex.hlsl"), VTXPOSTEX::Elements, VTXPOSTEX::iNumElements))))
+	{
+		CRASH("Failed Load Effect Shader");
+		return E_FAIL;
+	}
+#pragma endregion
+
+#pragma region 3. VIBuffer 생성
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LOGO), TEXT("Prototype_Component_VIBuffer_Rect"),
+		CVIBuffer_Rect::Create(m_pDevice, m_pContext))))
+	{
+		CRASH("Failed Load Effect VIBuffer")
+			return E_FAIL;
+	}
+#pragma endregion
+
+
+#pragma region TEXTURE OBJECT
+
+	// 0. Object 종류별 생성.
+	if (FAILED(m_pGameInstance->Add_Prototype(
+		ENUM_CLASS(LEVEL::LOGO)
+		, TEXT("Prototype_GameObject_EffectTexture")
+		, CTool_EffectTexture::Create(m_pDevice, m_pContext))))
+	{
+		CRASH("Failed Load Effect Texture Object");
+		return E_FAIL;
+	}
+#pragma endregion
+
+
+	return S_OK;
+}
+HRESULT CLoader::Loading_For_Logo_EffectParticle()
+{
+#pragma region 1. Shader 생성.
+ 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LOGO), TEXT("Prototype_Component_Shader_VtxInstance_PointParticle"),
+		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxInstance_PointParticle.hlsl")
+			, VTXPOINTPARTICLE::Elements, VTXPOINTPARTICLE::iNumElements))))
+	{
+		CRASH("Failed Load Point Particle Shader");
+		return E_FAIL;
+	}
+
+ 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::LOGO), TEXT("Prototype_Component_Shader_VtxInstance_PointDirParticle"),
+		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxInstance_PointDirParticle.hlsl")
+			,VTXPOINTDIRPARTICLE::Elements, VTXPOINTDIRPARTICLE::iNumElements))))
+	{
+		CRASH("Failed Load PointDirection Particle Shader");
+		return E_FAIL;
+	}
+#pragma endregion
+
+#pragma region 2. PARTICLE OBJECT
+	if (FAILED(m_pGameInstance->Add_Prototype(
+		ENUM_CLASS(LEVEL::LOGO)
+		, TEXT("Prototype_GameObject_EffectParticle")
+		, CTool_EffectParticle::Create(m_pDevice, m_pContext))))
+	{
+		CRASH("Failed Load Effect Particle Object");
+		return E_FAIL;
+	}
+#pragma endregion
+
+		
+
+
+
+	return S_OK;
+}
+#pragma endregion
+
+
 CLoader* CLoader::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, LEVEL eNextLevelID)
 {
 	CLoader* pInstance = new CLoader(pDevice, pContext);

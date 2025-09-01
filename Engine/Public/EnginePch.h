@@ -15,6 +15,8 @@
 #include "Trigger_Manager.h"
 #include "Renderer.h"
 
+#include "Effect_Manager.h"
+
 #pragma region COMPONENT
 #include "Component.h"
 
@@ -36,6 +38,9 @@
 #pragma region INSTANCING
 #include "VIBuffer_Instance.h"
 #include "VIBuffer_Rect_Instance.h"
+
+#include "VIBuffer_Point_Instance.h"
+#include "VIBuffer_PointDir_Instance.h"
 #pragma endregion
 
 

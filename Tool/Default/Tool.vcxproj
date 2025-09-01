@@ -186,6 +186,9 @@
     <ClInclude Include="..\Public\Player.h" />
     <ClInclude Include="..\Public\PrototypeName.h" />
     <ClInclude Include="..\Public\Tool_Bone.h" />
+    <ClInclude Include="..\Public\Tool_EffectMesh.h" />
+    <ClInclude Include="..\Public\Tool_EffectParticle.h" />
+    <ClInclude Include="..\Public\Tool_EffectTexture.h" />
     <ClInclude Include="..\Public\Tool_Mesh.h" />
     <ClInclude Include="..\Public\Tool_MeshMaterial.h" />
     <ClInclude Include="..\Public\Tool_Model.h" />
@@ -194,6 +197,7 @@
     <ClInclude Include="..\Public\ToolPch.h" />
     <ClInclude Include="..\Public\Tool_Defines.h" />
     <ClInclude Include="..\Public\Tool_Struct.h" />
+    <ClInclude Include="..\Public\VIBuffer_PointParticleDir_Instance.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
@@ -224,6 +228,9 @@
     <ClCompile Include="..\Private\Player.cpp" />
     <ClCompile Include="..\Private\PrototypeName.cpp" />
     <ClCompile Include="..\Private\Tool_Bone.cpp" />
+    <ClCompile Include="..\Private\Tool_EffectMesh.cpp" />
+    <ClCompile Include="..\Private\Tool_EffectParticle.cpp" />
+    <ClCompile Include="..\Private\Tool_EffectTexture.cpp" />
     <ClCompile Include="..\Private\Tool_Mesh.cpp" />
     <ClCompile Include="..\Private\Tool_MeshMaterial.cpp" />
     <ClCompile Include="..\Private\Tool_Model.cpp" />
@@ -233,6 +240,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="..\Private\VIBuffer_PointParticleDir_Instance.cpp" />
     <ClCompile Include="Tool.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -248,6 +256,9 @@
   <ItemGroup>
     <FxCompile Include="..\Bin\ShaderFiles\Engine_Shader_Cell.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxAnimMesh.hlsl" />
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxInstance_Particle.hlsl" />
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxInstance_PointDirParticle.hlsl" />
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxInstance_PointParticle.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxMesh.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxNorTex.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPosTex.hlsl" />

@@ -82,6 +82,21 @@
     <Filter Include="01. Level\01. Logo\00. Tool\Picking">
       <UniqueIdentifier>{b084554d-d4ef-486d-bc83-abf136926670}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. GameObject\Effect">
+      <UniqueIdentifier>{1c19524c-e819-4989-a80f-dafbab17f921}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Effect\Texture">
+      <UniqueIdentifier>{e1052041-5561-447a-a3dc-3cd63e2712b0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Effect\Particle">
+      <UniqueIdentifier>{f9dd38d9-227e-476c-b07a-275fb706b5a5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Effect\Mesh">
+      <UniqueIdentifier>{69f710cc-9542-4ac0-8228-704fddcbab0b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="03. Component\VIBuffer">
+      <UniqueIdentifier>{c9f24af1-9ddc-44cd-a0f9-a2eca450d429}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -201,6 +216,18 @@
     <ClInclude Include="..\Public\Picking_Manager.h">
       <Filter>01. Level\01. Logo\00. Tool\Picking</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Tool_EffectMesh.h">
+      <Filter>02. GameObject\Effect\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Tool_EffectTexture.h">
+      <Filter>02. GameObject\Effect\Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Tool_EffectParticle.h">
+      <Filter>02. GameObject\Effect\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\VIBuffer_PointParticleDir_Instance.h">
+      <Filter>03. Component\VIBuffer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="small.ico">
@@ -304,6 +331,18 @@
     <ClCompile Include="..\Private\Picking_Manager.cpp">
       <Filter>01. Level\01. Logo\00. Tool\Picking</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\Tool_EffectMesh.cpp">
+      <Filter>02. GameObject\Effect\Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Tool_EffectTexture.cpp">
+      <Filter>02. GameObject\Effect\Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Tool_EffectParticle.cpp">
+      <Filter>02. GameObject\Effect\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\VIBuffer_PointParticleDir_Instance.cpp">
+      <Filter>03. Component\VIBuffer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Tool.rc">
@@ -329,6 +368,15 @@
       <Filter>96. ShaderFiles</Filter>
     </FxCompile>
     <FxCompile Include="..\Bin\ShaderFiles\Engine_Shader_Cell.hlsl">
+      <Filter>96. ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxInstance_PointParticle.hlsl">
+      <Filter>96. ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxInstance_Particle.hlsl">
+      <Filter>96. ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxInstance_PointDirParticle.hlsl">
       <Filter>96. ShaderFiles</Filter>
     </FxCompile>
   </ItemGroup>

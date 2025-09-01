@@ -78,21 +78,8 @@ void CPlayer::Late_Update(_float fTimeDelta)
 
 HRESULT CPlayer::Render()
 {
-    //if (ImGui::IsWindowAppearing())              // 또는 static bool once=true;
-    //{
-    //    ImGui::SetNextWindowPos({ 100, 100 }, ImGuiCond_Appearing);
-    //    ImGui::SetNextWindowSize({ 460, 240 }, ImGuiCond_Appearing); // ← 원하는 픽셀
-    //}
 
-    //string str = "Player Transform [" + to_string(Get_ID()) + ']';
-    //ImGui::Begin(str.c_str());
-    //_float4 vPosition = {};
-    //XMStoreFloat4(&vPosition, m_pTransformCom->Get_State(STATE::POSITION));
 
-    //ImGui::InputFloat("X : ", &vPosition.x);
-    //ImGui::InputFloat("Y : ", &vPosition.y);
-    //ImGui::InputFloat("Z : ", &vPosition.z);
-    //ImGui::End();
 
 
     if (FAILED(Ready_Render_Resources()))

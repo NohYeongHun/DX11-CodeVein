@@ -77,6 +77,17 @@ namespace Engine
 
 	}VTXPOS;
 
+	typedef struct tagVertexPoint
+	{
+		XMFLOAT3		vPosition;
+		XMFLOAT2		vPSize;
+
+		static const unsigned int	iNumElements = { 2 };
+		static constexpr D3D11_INPUT_ELEMENT_DESC	Elements[iNumElements] = {
+			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+			{ "PSIZE", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		};
+	}VTXPOINT;
 
 	typedef struct tagVertexPositionTexcoord
 	{
@@ -135,52 +146,6 @@ namespace Engine
 		};
 	}VTXMESH;
 
-#pragma region PARTICLE INSTANCE STRUCTS
-	typedef struct tagVertexInstanceMesh
-	{
-		XMFLOAT4	vRight;
-		XMFLOAT4	vUp;
-		XMFLOAT4	vLook;
-		XMFLOAT4	vTranslation;
-	}VTXINSTANCE_MESH;
-
-	typedef struct tagVertexInstanceParticle
-	{
-		XMFLOAT4	vRight;
-		XMFLOAT4	vUp;
-		XMFLOAT4	vLook;
-		XMFLOAT4	vTranslation;
-
-		XMFLOAT2	vLifeTime;
-	}VTXINSTANCE_PARTICLE;
-
-	typedef struct tagVertexParticle
-	{
-		static const unsigned int	iNumElements = { 6 };
-		static constexpr D3D11_INPUT_ELEMENT_DESC	Elements[iNumElements] = {
-			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-			{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-
-			{ "TEXCOORD", 1, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 0, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
-			{ "TEXCOORD", 2, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 16, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
-			{ "TEXCOORD", 3, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 32, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
-			{ "TEXCOORD", 4, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 48, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
-		};
-	}VTXPARTICLE;
-#pragma endregion
-
-	
-
-	/* KEYFRAME에 대한 정보. */
-	typedef struct tagKeyFrame
-	{
-		XMFLOAT3	vScale;
-		XMFLOAT4	vRotation;
-		XMFLOAT3	vTranslation;
-
-		float		fTrackPosition;
-	}KEYFRAME;
-
 	typedef struct tagVertexAnimMesh
 	{
 		XMFLOAT3		vPosition;
@@ -203,6 +168,111 @@ namespace Engine
 			{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 80, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		};
 	}VTXANIMMESH;
+
+#pragma region PARTICLE INSTANCE STRUCTS
+	typedef struct tagVertexInstanceMesh
+	{
+		XMFLOAT4	vRight;
+		XMFLOAT4	vUp;
+		XMFLOAT4	vLook;
+		XMFLOAT4	vTranslation;
+	}VTXINSTANCE_MESH;
+
+	typedef struct tagVertexInstanceParticle
+	{
+		XMFLOAT4	vRight;
+		XMFLOAT4	vUp;
+		XMFLOAT4	vLook;
+		XMFLOAT4	vTranslation;
+
+		XMFLOAT2	vLifeTime;
+	}VTXINSTANCE_PARTICLE;
+
+
+	typedef struct tagVertexInstanceDirectionParticle
+	{
+		XMFLOAT4	vRight;
+		XMFLOAT4	vUp;
+		XMFLOAT4	vLook;
+		XMFLOAT4	vTranslation;
+		XMFLOAT2	vLifeTime;
+		XMFLOAT3	vDir;
+		float		fDirSpeed;
+	}VTXINSTANCEDIR_PARTICLE;
+
+	typedef struct tagVertexInstancePointDirectionParticle
+	{
+		XMFLOAT4	vRight;
+		XMFLOAT4	vUp;
+		XMFLOAT4	vLook;
+		XMFLOAT4	vTranslation;
+		XMFLOAT2	vLifeTime;
+		XMFLOAT3	vDir;
+		float		fDirSpeed;
+		unsigned int iMaskTextureIndex;
+	}VTXINSTANCEPOINTDIR_PARTICLE;
+
+	typedef struct tagVertexParticle
+	{
+		static const unsigned int	iNumElements = { 7 };
+		static constexpr D3D11_INPUT_ELEMENT_DESC	Elements[iNumElements] = {
+			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+			{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+
+			{ "TEXCOORD", 1, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 0, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+			{ "TEXCOORD", 2, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 16, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+			{ "TEXCOORD", 3, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 32, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+			{ "TEXCOORD", 4, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 48, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+			{ "TEXCOORD", 5, DXGI_FORMAT_R32G32_FLOAT, 1, 64, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+		};
+	}VTXPARTICLE;
+
+	typedef struct tagVertexPointParticle
+	{
+		static const unsigned int	iNumElements = { 6 };
+		static constexpr D3D11_INPUT_ELEMENT_DESC	Elements[iNumElements] = {
+			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+
+			{ "WORLD", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 0, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+			{ "WORLD", 1, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 16, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+			{ "WORLD", 2, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 32, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+			{ "WORLD", 3, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 48, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+
+			{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 1, 64, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+		};
+	}VTXPOINTPARTICLE;
+
+
+	typedef struct tagVertexPointDirParticle
+	{
+		static const unsigned int	iNumElements = { 9 };
+		static constexpr D3D11_INPUT_ELEMENT_DESC	Elements[iNumElements] = {
+			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+
+			{ "WORLD", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 0, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+			{ "WORLD", 1, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 16, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+			{ "WORLD", 2, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 32, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+			{ "WORLD", 3, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, 48, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+
+			{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 1, 64, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+			{ "TEXCOORD", 1, DXGI_FORMAT_R32G32B32_FLOAT, 1, 72, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+			{ "TEXCOORD", 2, DXGI_FORMAT_R32_FLOAT, 1, 84, D3D11_INPUT_PER_INSTANCE_DATA, 1 },
+			{ "TEXINDEX", 0, DXGI_FORMAT_R32_UINT, 1, 88, D3D11_INPUT_PER_INSTANCE_DATA, 1 }
+		};
+	}VTXPOINTDIRPARTICLE;
+#pragma endregion
+
+	
+
+	/* KEYFRAME에 대한 정보. */
+	typedef struct tagKeyFrame
+	{
+		XMFLOAT3	vScale;
+		XMFLOAT4	vRotation;
+		XMFLOAT3	vTranslation;
+
+		float		fTrackPosition;
+	}KEYFRAME;
 
 
 	typedef struct ScopedTimer {
