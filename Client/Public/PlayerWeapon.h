@@ -62,6 +62,9 @@ public:
 private:
 	class CSwordTrail* m_pTrailWeapon_Effect = { nullptr };
 
+	_float4x4* m_pWeaponTrailStart_SocketMatrix = {};
+	_float4x4* m_pWeaponTrailEnd_SocketMatrix = {};
+
 	_float3					m_vPointUp = {};
 	_float3					m_vPointDown = {};
 #pragma endregion

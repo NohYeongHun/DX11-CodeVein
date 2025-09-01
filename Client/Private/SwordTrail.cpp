@@ -81,7 +81,7 @@ HRESULT CSwordTrail::Render()
     //Edit_Collider(m_pColliderCom, "Player Weapon");
     ImGuiIO& io = ImGui::GetIO();
     ImVec2 windowPos = ImVec2(0.f, 300.f);
-    ImVec2 windowSize = ImVec2(300.f, 300.f);
+    ImVec2 windowSize = ImVec2(00.f, 300.f);
 
     ImGui::SetNextWindowPos(windowPos, ImGuiCond_Once);
     ImGui::SetNextWindowSize(windowSize, ImGuiCond_Once);
@@ -167,9 +167,10 @@ HRESULT CSwordTrail::Bind_ShaderResources()
 	if (nullptr == m_pShaderCom)
 		return E_FAIL;
 
-	if (FAILED(m_pTransformCom->Bind_Shader_Resource(m_pShaderCom, "g_WorldMatrix")))
+	// 트레일 정점은 이미 월드 좌표계로 변환된 상태이므로 단위 행렬 사용
+	if (FAILED(m_pTransformCom->Bind_Shader_Resource(m_pShaderCom,"g_WorldMatrix")))
 	{
-		CRASH("Failed Connet WorldMatrix");
+		CRASH("Failed Bind Identity WorldMatrix");
 		return E_FAIL;
 	}
 

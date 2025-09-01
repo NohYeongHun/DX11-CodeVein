@@ -1,5 +1,4 @@
-﻿#include "PlayerWeapon.h"
-CPlayerWeapon::CPlayerWeapon(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿CPlayerWeapon::CPlayerWeapon(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CWeapon{ pDevice, pContext }
 {
 
@@ -22,7 +21,11 @@ HRESULT CPlayerWeapon::Initialize_Clone(void* pArg)
     PLAYER_WEAPON_DESC* pDesc = static_cast<PLAYER_WEAPON_DESC*>(pArg);
     //m_pParentState = pDesc->pState;
     if (FAILED(CWeapon::Initialize_Clone(pDesc)))
+    {
+        CRASH("Failed Clone CWeapon");
         return E_FAIL;
+    }
+        
 
     if (FAILED(Ready_Components()))
     {
@@ -41,9 +44,18 @@ HRESULT CPlayerWeapon::Initialize_Clone(void* pArg)
         CRASH("Failed Ready_Effects");
         return E_FAIL;
     }
+
+    // * m_vPointUp, m_vPointDown으로 하드코딩 하는게 아니라 Socket 월드 위치 가져오기.
+
         
     m_vPointUp = _float3(0.5f, 0.5f, -0.4f);
     m_vPointDown = _float3(0.5f, 0.5f, -1.5f);
+
+    m_pWeaponTrailStart_SocketMatrix = m_pModelCom->Get_BoneMatrix("TrailStartSocket");
+    m_pWeaponTrailEnd_SocketMatrix = m_pModelCom->Get_BoneMatrix("TrailEndSocket");
+
+    //m_vPointUp = _float3(0.0f, 0.0f, 0.f);
+    //m_vPointDown = _float3(0.0f, 0.0f, 0.f);
 
     /*m_pTransformCom->Scaling(_float3(0.1f, 0.1f, 0.1f));
     m_pTransformCom->Rotation(XMVectorSet(0.f, 1.f, 0.f, 0.f), XMConvertToRadians(90.0f));
@@ -98,47 +110,36 @@ void CPlayerWeapon::Late_Update(_float fTimeDelta)
 HRESULT CPlayerWeapon::Render()
 {
 
-//#ifdef _DEBUG
-//    //Edit_Collider(m_pColliderCom, "Player Weapon");
-//    ImGuiIO& io = ImGui::GetIO();
-//    ImVec2 windowPos = ImVec2(10.f, io.DisplaySize.y - 650.f);
-//    ImVec2 windowSize = ImVec2(300.f, 300.f);
-//
-//    ImGui::SetNextWindowPos(windowPos, ImGuiCond_Once);
-//    ImGui::SetNextWindowSize(windowSize, ImGuiCond_Once);
-//
-//    ImGui::Begin("Player Weapon Debug", nullptr, ImGuiWindowFlags_NoCollapse);
-//
-//    static _bool bPrevState = false;
-//    _bool IsActive = m_pColliderCom->Is_Active();
-//
-//    static _int iColliderEnableCount = 0;
-//
-//
-//    if (IsActive != bPrevState && IsActive)
-//        iColliderEnableCount++;
-//
-//    if (IsActive)
-//    {
-//        ImGui::Text("Weapon Collider Is Enable");
-//        bPrevState = true;
-//    }
-//    else
-//    {
-//        ImGui::Text("Weapon Collider Is Disable");
-//        bPrevState = false;
-//    }
-//
-//    
-//    ImGui::Text("Collider Enable Count (%d)", iColliderEnableCount);
-//
-//    ImGui::Text("Player Weapon Damage (%.2f)", m_fAttackPower);
-//
-//
-//    ImGui::End();
-//
-//    m_pColliderCom->Render();
-//#endif // _DEBUG
+#ifdef _DEBUG
+    //Edit_Collider(m_pColliderCom, "Player Weapon");
+    ImGuiIO& io = ImGui::GetIO();
+    ImVec2 windowPos = ImVec2(10.f, io.DisplaySize.y - 650.f);
+    ImVec2 windowSize = ImVec2(300.f, 300.f);
+
+    ImGui::SetNextWindowPos(windowPos, ImGuiCond_Once);
+    ImGui::SetNextWindowSize(windowSize, ImGuiCond_Once);
+
+    ImGui::Begin("Player Weapon Debug", nullptr, ImGuiWindowFlags_NoCollapse);
+
+
+    static float vPointUp[3] = { 0.f, 0.f, 0.f };
+    static float vPointDown[3] = { 0.f, 0.f, 0.f };
+    ImGui::InputFloat3("Point Up : ", vPointUp);
+    ImGui::InputFloat3("Point Down : ", vPointDown);
+
+    if(ImGui::Button("Apply"))
+    {
+        m_vPointUp = { vPointUp[0], vPointUp[1], vPointUp[2] };
+        m_vPointDown = { vPointDown[0], vPointDown[1], vPointDown[2] };
+    }
+
+
+
+
+    ImGui::End();
+
+    m_pColliderCom->Render();
+#endif // _DEBUG
 
     if (FAILED(Bind_ShaderResources()))
     {
