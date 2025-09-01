@@ -36,7 +36,7 @@ HRESULT CKnightShield::Initialize(void* pArg)
     }
         
 
-    m_pTransformCom->Add_Rotation(XMConvertToRadians(180.f), 0.f, -90.f);
+    //m_pTransformCom->Add_Rotation(XMConvertToRadians(180.f), 0.f, -90.f);
 
     return S_OK;
 }
@@ -73,6 +73,24 @@ void CKnightShield::Late_Update(_float fTimeDelta)
 HRESULT CKnightShield::Render()
 {
 #ifdef _DEBUG
+    ImGuiIO& io = ImGui::GetIO();
+
+    // 기존 Player Debug Window
+
+    ImVec2 windowSize = ImVec2(300.f, 300.f);
+    ImVec2 windowPos = ImVec2(600.f, 0.f);
+    ImGui::SetNextWindowPos(windowPos, ImGuiCond_Once);
+    ImGui::SetNextWindowSize(windowSize, ImGuiCond_Once);
+
+    string strDebug = "QueenKnight Shield Debug";
+    ImGui::Begin(strDebug.c_str(), nullptr, ImGuiWindowFlags_NoCollapse);
+
+    static _float fPitch = { 0.f }, fYaw = { 0.f }, fRoll = { 0.f };
+
+    //m_pTransformCom->Add_Rotation();
+
+    ImGui::End();
+
     //Edit_Collider(m_pColliderCom, "QueenKnight Shield");
     m_pColliderCom->Render();
 #endif // _DEBUG

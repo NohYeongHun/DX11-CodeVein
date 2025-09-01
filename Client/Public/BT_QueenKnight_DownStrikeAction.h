@@ -37,6 +37,9 @@ private:
     _float m_fJump_StartRatio = {};
     _float m_fJump_EndRatio = {};
 
+    _float m_fAttackReady_StartRatio = {};
+    _float m_fAttackReady_EndRatio = {};
+
     _float m_fAttack_StartRatio = {};
     _float m_fAttack_EndRatio = {};
 
@@ -55,7 +58,6 @@ public:
 
 private:
     BT_RESULT Enter_Attack(_float fTimeDelta);
-    BT_RESULT Update_Ready(_float fTimeDelta);
     BT_RESULT Update_Ascend(_float fTimeDelta);
     BT_RESULT Update_Hang(_float fTimeDelta);
     BT_RESULT Update_Descend(_float fTimeDelta);

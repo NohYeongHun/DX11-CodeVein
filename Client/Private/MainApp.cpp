@@ -750,10 +750,11 @@ HRESULT CMainApp::Ready_Pooling()
 	CEffectParticle::EFFECT_PARTICLE_DESC ParticleDesc{};
 	ParticleDesc.iShaderPath = 1;
 	ParticleDesc.eParticleType = CEffectParticle::PARTICLE_TYPE_QUEEN_WARP;
-	ParticleDesc.iNumInstance = 500;
+	//ParticleDesc.eParticleType = CEffectParticle::PARTICLE_TYPE_BOSS_EXPLOSION;
+	ParticleDesc.iNumInstance = 400;
 	ParticleDesc.vCenter = { 0.f, 0.f, 0.f };
-	ParticleDesc.vRange = { 4.f, 4.f, 4.f };
-	ParticleDesc.vSpeed = { 4.f, 7.f };
+	ParticleDesc.vRange = { 6.f, 6.f, 3.f };
+	ParticleDesc.vSpeed = { 3.f, 6.f };
 	ParticleDesc.vSize = { 0.1f, 0.11f };
 	ParticleDesc.vLifeTime = { 5.f, 6.f };
 	ParticleDesc.isLoop = false;
@@ -770,7 +771,7 @@ HRESULT CMainApp::Ready_Pooling()
 	ParticleDesc.useTextureCheckArray[TEXTURE::TEXTURE_NOISE] = false;
 
 	/* Particle Init Info 설정으로 Pool에서 사용할때마다. 값을 채워줍니다. */
-	for (_uint i = 0; i < 10; ++i)
+	for (_uint i = 0; i < 200; ++i)
 	{
 		pGameObject = dynamic_cast<CGameObject*>(m_pGameInstance->Clone_Prototype(
 			PROTOTYPE::GAMEOBJECT, ENUM_CLASS(LEVEL::STATIC)

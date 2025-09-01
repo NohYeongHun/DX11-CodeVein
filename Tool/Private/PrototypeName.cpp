@@ -36,16 +36,16 @@ extern unsigned int Model_PrototypeSize = 1;
 const EFFECT_TEXTURE_DESC Effect_TexturePrototypes[] =
 {
 	{ TEXT("Prototype_Component_Effect_DiffuseTexture")
-	, TEXT("../Bin/Resources/Textures/Effects/Texture/Diffuse/Diffuse%d.png"), 2},
+	, TEXT("../Bin/Resources/Textures/Effects/Particle/Diffuse/Diffuse%d.png"), 2},
 
 	{TEXT("Prototype_Component_Effect_GradientTexture") 
-	, TEXT("../Bin/Resources/Textures/Effects/Texture/Gradient/Gradient%d.png"), 2},
+	, TEXT("../Bin/Resources/Textures/Effects/Particle/Gradient/Gradient%d.png"), 2},
 
 	{TEXT("Prototype_Component_Effect_GradientAlphaTexture") 
-	, TEXT("../Bin/Resources/Textures/Effects/Texture/Gradient/Gradient_A%d.png"), 1},
+	, TEXT("../Bin/Resources/Textures/Effects/Particle/Gradient/Gradient_A%d.png"), 1},
 
 	{TEXT("Prototype_Component_Texture_EffectMask")
-	, TEXT("../Bin/Resources/Textures/Effects/Texture/Mask/Mask%d.png"), 16},
+	, TEXT("../Bin/Resources/Textures/Effects/Particle/Mask/Mask%d.png"), 16},
 
 	//{TEXT("Prototype_Component_Texture_EffectNoise")
 	//, TEXT("../Bin/Resources/Textures/Effects/Texture/Noise/Noise%d.png"), 2},

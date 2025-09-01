@@ -403,7 +403,7 @@ void CLoad_Model::Handle_RootMotion(_float fTimeDelta)
 
 		// 0. 뼈의 이동 구하기.
 		_vector vLocalTranslate = vNewRootPos - XMLoadFloat4(&m_vOldPos);
-		vLocalTranslate = XMVectorSetY(vLocalTranslate, 0.f); // Y축 제거
+		//vLocalTranslate = XMVectorSetY(vLocalTranslate, 0.f); // Y축 제거
 
 		if (m_BlendDesc.isBlending)
 		{
