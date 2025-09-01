@@ -34,6 +34,7 @@
 #include "VIBuffer_Rect.h"
 #include "VIBuffer_Terrain.h"
 #include "VIBuffer_Cube.h"
+#include "VIBuffer_SwordTrail.h"
 
 #pragma region INSTANCING
 #include "VIBuffer_Instance.h"

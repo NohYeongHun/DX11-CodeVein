@@ -17,7 +17,7 @@ HRESULT CPlayerWeapon::Initialize_Prototype()
     return S_OK;
 }
 
-HRESULT CPlayerWeapon::Initialize(void* pArg)
+HRESULT CPlayerWeapon::Initialize_Clone(void* pArg)
 {
     PLAYER_WEAPON_DESC* pDesc = static_cast<PLAYER_WEAPON_DESC*>(pArg);
     //m_pParentState = pDesc->pState;
@@ -35,7 +35,15 @@ HRESULT CPlayerWeapon::Initialize(void* pArg)
         CRASH("Failed Ready_Colliders");
         return E_FAIL;
     }
+
+    if (FAILED(Ready_Effects()))
+    {
+        CRASH("Failed Ready_Effects");
+        return E_FAIL;
+    }
         
+    m_vPointUp = _float3(0.5f, 0.5f, -0.4f);
+    m_vPointDown = _float3(0.5f, 0.5f, -1.5f);
 
     /*m_pTransformCom->Scaling(_float3(0.1f, 0.1f, 0.1f));
     m_pTransformCom->Rotation(XMVectorSet(0.f, 1.f, 0.f, 0.f), XMConvertToRadians(90.0f));
@@ -62,18 +70,27 @@ void CPlayerWeapon::Update(_float fTimeDelta)
 
     
 
+
     // 가장 마지막 부근에 Collider Push
     Finalize_Update(fTimeDelta);
 }
 
 void CPlayerWeapon::Finalize_Update(_float fTimeDelta)
 {
+    _matrix SocketMatrix = XMLoadFloat4x4(&m_CombinedWorldMatrix);
+    TarilWeapon_Update(SocketMatrix);
+
+    m_pTrailWeapon_Effect->Update(fTimeDelta);
+
     CWeapon::Finalize_Update(fTimeDelta);
 }
 
 void CPlayerWeapon::Late_Update(_float fTimeDelta)
 {
     CWeapon::Late_Update(fTimeDelta);
+
+    m_pTrailWeapon_Effect->Late_Update(fTimeDelta);
+
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::NONBLEND, this)))
         return;
 }
@@ -189,6 +206,11 @@ void CPlayerWeapon::Update_ColliderFrame(_float fTimeDelta)
 
 #pragma endregion
 
+void CPlayerWeapon::TarilWeapon_Update(_matrix WeaponSocketMatrix)
+{
+    m_pTrailWeapon_Effect->Update_Trail_Point(m_vPointDown, m_vPointUp, WeaponSocketMatrix);
+}
+
 HRESULT CPlayerWeapon::Ready_Components()
 {
     if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxMesh"),
@@ -245,6 +267,27 @@ HRESULT CPlayerWeapon::Ready_Colliders()
     return S_OK;
 }
 
+HRESULT CPlayerWeapon::Ready_Effects()
+{
+    CSwordTrail::SWORDTRAIL_DESC Desc{};
+    Desc.eCurLevel = m_eCurLevel;
+    Desc.fSpeedPerSec = 5.f;
+    Desc.fRotationPerSec = XMConvertToRadians(1.0f);
+    
+
+;    m_pTrailWeapon_Effect = dynamic_cast<CSwordTrail*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT,
+        ENUM_CLASS(LEVEL::STATIC)
+        , TEXT("Prototype_GameObject_SwordTrail"), &Desc));
+
+    if (nullptr == m_pTrailWeapon_Effect)
+    {
+        CRASH("Failed Create TrailWeapon Effect");
+        return E_FAIL;
+    }
+        
+    return S_OK;
+}
+
 HRESULT CPlayerWeapon::Bind_ShaderResources()
 {
     if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &m_CombinedWorldMatrix)))
@@ -291,7 +334,7 @@ CGameObject* CPlayerWeapon::Clone(void* pArg)
 {
     CPlayerWeapon* pInstance = new CPlayerWeapon(*this);
 
-    if (FAILED(pInstance->Initialize(pArg)))
+    if (FAILED(pInstance->Initialize_Clone(pArg)))
     {
         MSG_BOX(TEXT("Failed to Created : CWeapon"));
         Safe_Release(pInstance);
@@ -303,4 +346,5 @@ CGameObject* CPlayerWeapon::Clone(void* pArg)
 void CPlayerWeapon::Free()
 {
     CWeapon::Free();
+    Safe_Release(m_pTrailWeapon_Effect);
 }

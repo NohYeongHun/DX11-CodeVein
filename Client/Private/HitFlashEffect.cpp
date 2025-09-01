@@ -196,31 +196,31 @@ HRESULT CHitFlashEffect::Bind_ShaderResources()
 {
     if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", m_pTransformCom->Get_WorldMatrixPtr())))
     {
-        CRASH("Failed Bind World Matrix LockOnUI");
+        CRASH("Failed Bind World Matrix CHitFlashEffect");
         return E_FAIL;
     }
 
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance->Get_Transform_Float4x4(D3DTS::VIEW))))
     {
-        CRASH("Failed Bind View Matrix LockOnUI");
+        CRASH("Failed Bind View Matrix CHitFlashEffect");
         return E_FAIL;
     }
 
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_Transform_Float4x4(D3DTS::PROJ))))
     {
-        CRASH("Failed Bind Proj Matrix LockOnUI");
+        CRASH("Failed Bind Proj Matrix CHitFlashEffect");
         return E_FAIL;
     }
 
     if (FAILED(m_pTextureCom[TEXTURE_MASK]->Bind_Shader_Resource(m_pShaderCom, "g_MaskTexture", 0)))
     {
-        CRASH("Failed Bind Texture LockOnUI");
+        CRASH("Failed Bind Texture CHitFlashEffect");
         return E_FAIL;
     }
 
     if (FAILED(m_pTextureCom[TEXTURE_DIFFUSE]->Bind_Shader_Resource(m_pShaderCom, "g_Texture", 0)))
     {
-        CRASH("Failed Bind Texture HitFlash");
+        CRASH("Failed Bind Texture CHitFlashEffect");
         return E_FAIL;
     }
 

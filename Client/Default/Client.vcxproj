@@ -278,6 +278,7 @@
     <ClInclude Include="..\Public\SlaveVampireSword.h" />
     <ClInclude Include="..\Public\Snow.h" />
     <ClInclude Include="..\Public\SteminaBar.h" />
+    <ClInclude Include="..\Public\SwordTrail.h" />
     <ClInclude Include="..\Public\Title_BackGround.h" />
     <ClInclude Include="..\Public\MainApp.h" />
     <ClInclude Include="..\Public\Skill_Icon.h" />
@@ -413,6 +414,7 @@
     <ClCompile Include="..\Private\SlaveVampireSword.cpp" />
     <ClCompile Include="..\Private\Snow.cpp" />
     <ClCompile Include="..\Private\SteminaBar.cpp" />
+    <ClCompile Include="..\Private\SwordTrail.cpp" />
     <ClCompile Include="..\Private\Title_BackGround.cpp" />
     <ClCompile Include="..\Private\MainApp.cpp" />
     <ClCompile Include="..\Private\Skill_Icon.cpp" />
@@ -440,6 +442,7 @@
   <ItemGroup>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxAnimMesh.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxCube.hlsl" />
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxEffectTrail.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxInstance_Particle.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxInstance_PointDirParticle.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxInstance_PointParticle.hlsl" />

@@ -6,6 +6,11 @@
 namespace Engine
 {
 
+	typedef struct tagFaceIndices
+	{
+		unsigned long		_0, _1, _2;
+	}FACEINDICES;
+
 	typedef struct tagEngineDesc
 	{
 		HINSTANCE		hInst;
@@ -101,6 +106,7 @@ namespace Engine
 		};
 
 	}VTXPOSTEX;
+
 
 	typedef struct tagVertexCube
 	{
