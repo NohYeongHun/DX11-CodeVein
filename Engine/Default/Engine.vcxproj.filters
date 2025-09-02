@@ -217,6 +217,12 @@
     <Filter Include="01. Utility\03. Component\VIBuffer\Trail">
       <UniqueIdentifier>{6182b189-3be2-4ec3-b344-3d82fb04d3a7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01. Utility\13. RenderTargets">
+      <UniqueIdentifier>{4beef273-16ac-4257-9f36-290ed56029ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\13. RenderTargets\Manager">
+      <UniqueIdentifier>{b4520a85-ed44-4543-a8d4-4b5249fe5faa}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Timer.cpp">
@@ -440,6 +446,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\VIBuffer_SwordTrail.cpp">
       <Filter>01. Utility\03. Component\VIBuffer\Trail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\RenderTarget.cpp">
+      <Filter>01. Utility\13. RenderTargets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Target_Manager.cpp">
+      <Filter>01. Utility\13. RenderTargets\Manager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -691,6 +703,12 @@
     </ClInclude>
     <ClInclude Include="..\Public\VIBuffer_SwordTrail.h">
       <Filter>01. Utility\03. Component\VIBuffer\Trail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\RenderTarget.h">
+      <Filter>01. Utility\13. RenderTargets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Target_Manager.h">
+      <Filter>01. Utility\13. RenderTargets\Manager</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

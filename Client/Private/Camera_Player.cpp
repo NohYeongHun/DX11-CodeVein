@@ -219,6 +219,9 @@ void CCamera_Player::Handle_Mouse_Input(_float fTimeDelta, _float fSensitivityMu
 	{
 		m_fTargetPitch = XMConvertToRadians(m_fDefaultPitch);
 	}
+	
+	if (m_bInventoryMode)
+		return;
 
 	if (PtInRect(&rcClient, ptMouse))
 	{

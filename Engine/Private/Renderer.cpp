@@ -1,12 +1,11 @@
-﻿#include "Renderer.h"
-#include "GameObject.h"
-
-CRenderer::CRenderer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿CRenderer::CRenderer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : m_pDevice { pDevice }
     , m_pContext { pContext }
+    , m_pGameInstance {CGameInstance::GetInstance()}
 {
     Safe_AddRef(m_pDevice);
     Safe_AddRef(m_pContext);
+    Safe_AddRef(m_pGameInstance);
 
 }
 
@@ -14,6 +13,28 @@ HRESULT CRenderer::Initialize_Clone()
 {
     /*if (FAILED(Ready_Render_State()))
         return E_FAIL;*/
+
+    // Render Target 초기화
+    _uint       iNumViewports = { 1 };
+    D3D11_VIEWPORT      ViewportDesc{};
+
+    m_pContext->RSGetViewports(&iNumViewports, &ViewportDesc);
+
+    /* For.Target_Diffuse */
+    if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_Diffuse"), ViewportDesc.Width, ViewportDesc.Height, DXGI_FORMAT_R8G8B8A8_UNORM, _float4(1.f, 1.f, 1.f, 1.f))))
+    {
+        CRASH("Failed Add RenderTarget Diffuse");
+        return E_FAIL;
+    }
+        
+
+    if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_GameObjects"), TEXT("Target_Diffuse"))))
+    {
+        CRASH("Failed Add Target Diffuse MRT OBjects");
+        return E_FAIL;
+    }
+        
+
 
     return S_OK;
 }
@@ -47,28 +68,6 @@ HRESULT CRenderer::Draw()
     return S_OK;
 }
 
-HRESULT CRenderer::Apply_BlendeState()
-{
-    float blendFactor[4] = { 0.f, 0.f, 0.f, 0.f }; // 특별한 경우가 아니라면 0
-    UINT sampleMask = 0xffffffff;
-
-    m_pContext->OMSetBlendState(m_pAlphaBlend, blendFactor, sampleMask);
-    return S_OK;
-}
-
-HRESULT CRenderer::Apply_DepthStencilOff()
-{
-    m_pContext->OMSetDepthStencilState(m_pDepthOff, 0);
-    return S_OK;
-}
-
-HRESULT CRenderer::Apply_DefaultStates()
-{
-    m_pContext->OMSetBlendState(nullptr, nullptr, 0xffffffff); // 기본 블렌드
-    m_pContext->OMSetDepthStencilState(m_pDepthOn, 0);
-    return S_OK;
-}
-
 HRESULT CRenderer::Render_Priority()
 {
     for (auto& pRenderObject : m_RenderObjects[ENUM_CLASS(RENDERGROUP::PRIORITY)])
@@ -86,6 +85,11 @@ HRESULT CRenderer::Render_Priority()
 
 HRESULT CRenderer::Render_NonBlend()
 {
+
+    /* Diffuse + Normal */
+    //if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_GameObjects"))))
+    //    return E_FAIL;
+
     for (auto& pRenderObject : m_RenderObjects[ENUM_CLASS(RENDERGROUP::NONBLEND)])
     {
         if (nullptr != pRenderObject)
@@ -95,6 +99,11 @@ HRESULT CRenderer::Render_NonBlend()
     }
 
     m_RenderObjects[ENUM_CLASS(RENDERGROUP::NONBLEND)].clear();
+
+    // 후처리 쉐이딩.
+    //if (FAILED(m_pGameInstance->End_MRT()))
+    //    return E_FAIL;
+
 
     return S_OK;
 }
@@ -219,6 +228,7 @@ void CRenderer::Free()
     Safe_Release(m_pDepthOn);
     Safe_Release(m_pDepthOff);
 
+    Safe_Release(m_pGameInstance);
     Safe_Release(m_pDevice);
     Safe_Release(m_pContext);
 

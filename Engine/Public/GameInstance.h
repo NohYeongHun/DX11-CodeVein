@@ -86,9 +86,6 @@ public:
 #pragma region RENDERER
 public:
 	HRESULT Add_RenderGroup(RENDERGROUP eRenderGroup, class CGameObject* pRenderObject);
-	HRESULT Apply_BlendeState();
-	HRESULT Apply_DepthStencilOff();
-	HRESULT Apply_DefaultStates();
 #pragma endregion
 //
 #pragma region TIMER_MANAGER
@@ -196,6 +193,15 @@ public:
 #pragma endregion
 
 
+#pragma region TARGET_MANAGER
+public:
+	HRESULT Add_RenderTarget(const _wstring& strTargetTag, _uint iSizeX, _uint iSizeY, DXGI_FORMAT ePixelFormat, const _float4& vClearColor);
+	HRESULT Add_MRT(const _wstring& strMRTTag, const _wstring& strTargetTag);
+	HRESULT Begin_MRT(const _wstring& strMRTTag);
+	HRESULT End_MRT();
+#pragma endregion
+
+
 //
 //#pragma region PICKING 
 //	void Transform_Picking_ToLocalSpace(class CTransform* pTransformCom);
@@ -221,6 +227,8 @@ private:
 	class CCamera_Manager*		m_pCamera_Manager = { nullptr };
 	class CTrigger_Manager*		m_pTrigger_Manager = { nullptr };
 	class CEffect_Manager*		m_pEffect_Manager = { nullptr };
+	class CTarget_Manager*		m_pTarget_Manager = { nullptr };
+	
 	
 	_float m_fTimeDelta = {};
 

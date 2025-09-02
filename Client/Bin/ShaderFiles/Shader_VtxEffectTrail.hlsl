@@ -82,13 +82,27 @@ PS_OUT PS_TRAIL(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
 
-    vector texColor = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
+    //vector texColor = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
     
-    // Diffuse 텍스처의 색상을 그대로 사용
-    Out.vDiffuse.rgb = texColor.rgb;
-    Out.vDiffuse.a = texColor.a * g_fAlpha;
+    //// Diffuse 텍스처의 색상을 그대로 사용
+    //Out.vDiffuse.rgb = texColor.rgb;
+    //Out.vDiffuse.a = texColor.a * g_fAlpha;
     
-    if (Out.vDiffuse.a <= 0.01f)
+    //if (Out.vDiffuse.a <= 0.01f)
+    //    discard;
+    
+    Out.vDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
+    Out.vDiffuse.a = Out.vDiffuse.r;
+
+    vector GetColorBack = g_ColorBack / 255.f;
+    vector GetColorFront = g_ColorFront / 255.f;
+
+    //Out.vDiffuse.rgb = GetColorBack.rgb * (1 - Out.vDiffuse.r) + GetColorFront.rgb * Out.vDiffuse.r;
+
+    Out.vDiffuse.rgb = float3(0.f, 0.f, 0.f);
+    
+    Out.vDiffuse.a *= g_fAlpha;
+    if (Out.vDiffuse.a <= 0.0f)
         discard;
 
     return Out;

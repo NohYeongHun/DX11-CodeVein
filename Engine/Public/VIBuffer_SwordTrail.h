@@ -19,16 +19,18 @@ private:
 	virtual ~CVIBuffer_SwordTrail() = default;
 
 private:
-	_int		m_iLimitPointCount = 30;
-	list<_float3>		m_TrailPoint;
+	static constexpr _uint MAX_TRAIL_POINTS = 30;
+	static constexpr _uint INTERPOLATION_SEGMENTS = 10;
+	static constexpr _float INTERPOLATION_RANGE = 20.f;
+	
+	list<_float3>	m_TrailPoints;
+	_uint		m_CurrentPointCount = 0;
+	_uint		m_NumIndicesPerPrimitive = {};
 
-	_uint		m_iEndIndex = 0;
-	_uint		m_iCatmullRomCount = 0;
-	_uint		m_iVtxCount = 0;
-	_uint		m_iCatmullRomIndex[4] = { 0 };
-	_uint		m_iNumIndicesPerPrimitive = {};
-
-public:
+private:
+	HRESULT UpdateVertexBuffer();
+	HRESULT ApplyInterpolation(VTXPOSTEX* pVertices, const vector<_vector>& positions);
+	void SetTextureCoordinates(VTXPOSTEX* pVertices, _uint pointCount);
 
 public:
 	virtual HRESULT Initialize_Prototype();

@@ -77,7 +77,7 @@ HRESULT CKnightLance::Render()
 {
 
 #ifdef _DEBUG
-    Edit_Collider(m_pColliderCom, "QueenKnight Lance");
+    //Edit_Collider(m_pColliderCom, "QueenKnight Lance");
     m_pColliderCom->Render();
 #endif // _DEBUG
 

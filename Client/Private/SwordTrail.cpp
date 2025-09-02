@@ -131,13 +131,13 @@ void CSwordTrail::Update_Trail_Point(_float3 vPointDown, _float3 vPointUp, _fmat
 	m_vPoint_Up = vPointUp;
 
 	XMStoreFloat4x4(&m_WeaponMatrix, WeaponMatrix);
-}
+} 
 
 HRESULT CSwordTrail::Ready_Components(SWORDTRAIL_DESC* pDesc)
 {
 	m_eCurLevel = pDesc->eCurLevel;
 	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC)
-		, TEXT("Prototype_Component_Texture_SwordTrail")
+		, TEXT("Prototype_Component_Texture_TrailSword")
 		,TEXT("Com_Texture")
 	, reinterpret_cast<CComponent**>(&m_pTextureCom))))
 	{

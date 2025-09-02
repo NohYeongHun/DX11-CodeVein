@@ -57,7 +57,7 @@ public:
 
 #pragma region TRAIL
 public:
-	void TarilWeapon_Update(_matrix WeaponSocketMatrix);
+	void TrailWeapon_Update(_matrix WeaponSocketMatrix);
 
 private:
 	class CSwordTrail* m_pTrailWeapon_Effect = { nullptr };

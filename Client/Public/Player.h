@@ -237,6 +237,12 @@ public:
 	void Decrease_Damage(_float fDamage);
 #pragma endregion
 
+#pragma region 무기 TRAIL ON /OFF
+public:
+	void SetTrail_Visible(_bool bTrail);
+
+#pragma endregion
+
 
 
 #pragma region Player 기본 상태 값

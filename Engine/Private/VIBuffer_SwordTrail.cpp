@@ -19,7 +19,7 @@ HRESULT CVIBuffer_SwordTrail::Initialize_Clone(void* pArg)
 {
 
 	m_iVertexStride = sizeof(VTXPOSTEX);
-	m_iNumVertices = m_iLimitPointCount * 2;
+	m_iNumVertices = MAX_TRAIL_POINTS * 2;
 	m_iNumVertexBuffers = 1;
 	m_eIndexFormat = DXGI_FORMAT_R32_UINT;
 	m_ePrimitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
@@ -53,8 +53,8 @@ HRESULT CVIBuffer_SwordTrail::Initialize_Clone(void* pArg)
 	Safe_Delete_Array(pVertices);
 
 	m_iIndexStride = sizeof(_ushort);
-	m_iNumIndices = m_iLimitPointCount * 2 - 2;
-	m_iNumIndicesPerPrimitive = 3;
+	m_iNumIndices = (MAX_TRAIL_POINTS - 1) * 2 * 3; // (쿼드 수) * (삼각형 2개) * (인덱스 3개)
+	m_NumIndicesPerPrimitive = 3;
 
 	D3D11_BUFFER_DESC		IBDesc{};
 	IBDesc.ByteWidth = m_iNumIndices * m_iIndexStride;
@@ -65,38 +65,26 @@ HRESULT CVIBuffer_SwordTrail::Initialize_Clone(void* pArg)
 	IBDesc.StructureByteStride = m_iIndexStride;
 
 
-	FACEINDICES* pIndices = new FACEINDICES[m_iNumIndices];
-	_uint quadIndex = 0;
+	FACEINDICES* pIndices = new FACEINDICES[m_iNumIndices / 3];
+	_uint triangleIndex = 0;
 
-	for (_uint iIndex = 0; iIndex < m_iNumIndices; iIndex += 2)
+	for (_uint quadIndex = 0; quadIndex < MAX_TRAIL_POINTS - 1; quadIndex++)
 	{
 		_uint baseVertex = quadIndex * 2;  // 각 Quad의 시작 정점
 
 		// 첫 번째 삼각형: (0, 2, 1)
-		pIndices[iIndex]._0 = baseVertex;         // 왼쪽 아래
-		pIndices[iIndex]._1 = baseVertex + 2;     // 오른쪽 아래  
-		pIndices[iIndex]._2 = baseVertex + 1;     // 왼쪽 위
+		pIndices[triangleIndex]._0 = baseVertex;         // 왼쪽 아래
+		pIndices[triangleIndex]._1 = baseVertex + 2;     // 오른쪽 아래  
+		pIndices[triangleIndex]._2 = baseVertex + 1;     // 왼쪽 위
+		triangleIndex++;
 
 		// 두 번째 삼각형: (1, 2, 3)
-		pIndices[iIndex + 1]._0 = baseVertex + 1; // 왼쪽 위
-		pIndices[iIndex + 1]._1 = baseVertex + 2; // 오른쪽 아래
-		pIndices[iIndex + 1]._2 = baseVertex + 3; // 오른쪽 위
-
-		quadIndex++;
+		pIndices[triangleIndex]._0 = baseVertex + 1; // 왼쪽 위
+		pIndices[triangleIndex]._1 = baseVertex + 2; // 오른쪽 아래
+		pIndices[triangleIndex]._2 = baseVertex + 3; // 오른쪽 위
+		triangleIndex++;
 	}
 
-	/*FACEINDICES32* pIndices = new FACEINDICES32[m_iNumIndices];
-
-	for (_uint iIndex = 0; iIndex < m_iNumIndices; iIndex += 2)
-	{
-		pIndices[iIndex]._0 = iIndex + 3;
-		pIndices[iIndex]._1 = iIndex + 1;
-		pIndices[iIndex]._2 = iIndex;
-
-		pIndices[iIndex + 1]._0 = iIndex + 2;
-		pIndices[iIndex + 1]._1 = iIndex + 3;
-		pIndices[iIndex + 1]._2 = iIndex;
-	}*/
 
 	D3D11_SUBRESOURCE_DATA	IBInitialData{};
 	IBInitialData.pSysMem = pIndices;
@@ -110,8 +98,12 @@ HRESULT CVIBuffer_SwordTrail::Initialize_Clone(void* pArg)
 
 HRESULT CVIBuffer_SwordTrail::Render()
 {
+	if (m_CurrentPointCount < 4) return S_OK; // 최소 2개 쿼드 필요
 	
-	m_pContext->DrawIndexed(m_iNumIndicesPerPrimitive * m_iNumIndices, 0, 0);
+	_uint actualQuadCount = (m_CurrentPointCount / 2) - 1; // 실제 쿼드 개수
+	_uint actualIndexCount = actualQuadCount * 6; // 쿼드당 인덱스 6개
+	
+	m_pContext->DrawIndexed(actualIndexCount, 0, 0);
 
 	return S_OK;
 }
@@ -147,14 +139,14 @@ HRESULT CVIBuffer_SwordTrail::Update(TRAILPOINT TrailPoint)
 
 	if (!isnan(PointDown.x))
 	{
-		m_TrailPoint.push_back(PointDown);
-		m_TrailPoint.push_back(PointUp);
+		m_TrailPoints.push_back(PointDown);
+		m_TrailPoints.push_back(PointUp);
 	}
 
-	if (m_TrailPoint.size() > m_iLimitPointCount)
+	if (m_TrailPoints.size() > MAX_TRAIL_POINTS)
 	{
-		m_TrailPoint.pop_front();
-		m_TrailPoint.pop_front();
+		m_TrailPoints.pop_front();
+		m_TrailPoints.pop_front();
 	}
 
 	D3D11_MAPPED_SUBRESOURCE		SubResource;
@@ -163,14 +155,14 @@ HRESULT CVIBuffer_SwordTrail::Update(TRAILPOINT TrailPoint)
 
 	VTXPOSTEX* pVertices = (VTXPOSTEX*)SubResource.pData;
 
-	auto TrailPointIter = m_TrailPoint.begin();
+	auto TrailPointIter = m_TrailPoints.begin();
 
 	_vector		vPos[50];
 
-	for (_uint iIndex = 0; iIndex < m_TrailPoint.size(); iIndex += 2)
+	for (_uint iIndex = 0; iIndex < m_TrailPoints.size(); iIndex += 2)
 	{
 		vPos[iIndex] = XMVectorSetW(XMLoadFloat3(&(*TrailPointIter)), 1.f);
-		_float fUCoord = (_float)(iIndex / 2) / (_float)((m_TrailPoint.size() / 2) - 1);
+		_float fUCoord = (_float)(iIndex / 2) / (_float)((m_TrailPoints.size() / 2) - 1);
 		_float2 vTexCoord = _float2(fUCoord, 1.f);
 		XMStoreFloat3(&pVertices[iIndex].vPosition, XMLoadFloat3(&(*TrailPointIter)));
 		XMStoreFloat2(&pVertices[iIndex].vTexcoord, XMLoadFloat2(&vTexCoord));
@@ -189,48 +181,14 @@ HRESULT CVIBuffer_SwordTrail::Update(TRAILPOINT TrailPoint)
 
 #pragma region 보간
 
-	m_iCatmullRomCount = m_TrailPoint.size();
-	if (m_iCatmullRomCount < 2)
-		goto Unmaping;
-
-	XMVECTOR vec;
-	_float3	 vCat[80];
-
-	if (m_TrailPoint.size() >= m_iLimitPointCount) //트레일갯수 다 채워졌을때
+	m_CurrentPointCount = m_TrailPoints.size();
+	if (m_CurrentPointCount >= 2 && m_TrailPoints.size() >= MAX_TRAIL_POINTS)
 	{
-		_float4 vCatPos = { 0.f,0.f ,0.f ,0.f };
-		_float3 vTrailPos = {};
-		_float3 vTempPos = {};
-
-		//소드 트레일의 윗부분 보간
-		for (_int i = 19; i >= 10; i--) //보간 구간은 10으로 잡는다
-		{
-			vec = XMVectorCatmullRom(vPos[10], vPos[11], vPos[19], vPos[18], _float((i - 10) / 20.f));
-			XMStoreFloat4(&vCatPos, vec);
-			
-			vTrailPos = _float3(vCatPos.x, vCatPos.y, vCatPos.z);
-			XMStoreFloat3(&pVertices[(m_iLimitPointCount - 1 - i) * 2 + 1].vPosition, XMLoadFloat3(&vTrailPos));
-			XMStoreFloat3(&vCat[(m_iLimitPointCount - 1 - i) * 2 + 1], XMLoadFloat3(&vTrailPos));
-		}
-
-		//소드 트레일의 아랫부분 보간
-		for (_int i = 19; i >= 10; i--) //보간 구간은 10으로 잡는다
-		{
-			
-
-			vec = XMVectorCatmullRom(vPos[11], vPos[10], vPos[18], vPos[19], _float((i - 10) / 20.f));
-			XMStoreFloat4(&vCatPos, vec);
-			vTempPos = _float3(vCatPos.x, vCatPos.y, vCatPos.z);
-			XMStoreFloat3(&pVertices[(m_iLimitPointCount - 1 - i) * 2].vPosition, XMLoadFloat3(&vTempPos));
-			XMStoreFloat3(&vCat[(m_iLimitPointCount - 1 - i) * 2], XMLoadFloat3(&vTempPos));
-		}
+		ApplyInterpolation(pVertices, vector<_vector>(vPos, vPos + m_CurrentPointCount));
 	}
 
+#pragma endregion
 
-#pragma endregion 전체 구간 보간
-
-
-	Unmaping :
 	m_pContext->Unmap(m_pVB, 0);
 
 	return S_OK;
@@ -260,6 +218,43 @@ CComponent* CVIBuffer_SwordTrail::Clone(void* pArg)
 	}
 
 	return pInstance;
+}
+
+HRESULT CVIBuffer_SwordTrail::ApplyInterpolation(VTXPOSTEX* pVertices, const vector<_vector>& positions)
+{
+	if (positions.size() < 4) return S_OK;
+
+	const _uint startIndex = INTERPOLATION_SEGMENTS;
+	const _uint endIndex = startIndex + INTERPOLATION_SEGMENTS;
+	const _float invRange = 1.0f / INTERPOLATION_RANGE;
+
+	// 상단 트레일 보간
+	for (_uint i = 0; i < INTERPOLATION_SEGMENTS; ++i)
+	{
+		_float t = static_cast<_float>(i) * invRange;
+		_vector interpolatedPos = XMVectorCatmullRom(
+			positions[startIndex], positions[startIndex + 1],
+			positions[endIndex - 1], positions[endIndex - 2], t
+		);
+
+		_uint vertexIndex = (MAX_TRAIL_POINTS - 1 - (endIndex - 1 - i)) * 2 + 1;
+		XMStoreFloat3(&pVertices[vertexIndex].vPosition, interpolatedPos);
+	}
+
+	// 하단 트레일 보간
+	for (_uint i = 0; i < INTERPOLATION_SEGMENTS; ++i)
+	{
+		_float t = static_cast<_float>(i) * invRange;
+		_vector interpolatedPos = XMVectorCatmullRom(
+			positions[startIndex + 1], positions[startIndex],
+			positions[endIndex - 2], positions[endIndex - 1], t
+		);
+
+		_uint vertexIndex = (MAX_TRAIL_POINTS - 1 - (endIndex - 1 - i)) * 2;
+		XMStoreFloat3(&pVertices[vertexIndex].vPosition, interpolatedPos);
+	}
+
+	return S_OK;
 }
 
 void CVIBuffer_SwordTrail::Free()

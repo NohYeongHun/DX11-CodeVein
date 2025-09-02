@@ -58,10 +58,8 @@ protected:
 	void Update_Transform();
 
 	HRESULT Begin();
-	HRESULT Begin_Blend();
 
 	HRESULT End();
-	HRESULT Blend_End();
 
 
 public:

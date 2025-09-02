@@ -7,6 +7,11 @@
 #include "Event_Manager.h"
 #pragma endregion
 
+#pragma region RENDER TARGET
+#include "RenderTarget.h"
+#include "Target_Manager.h"
+#pragma endregion
+
 #include "GameInstance.h"
 #include "Timer.h"
 #include "Timer_Manager.h"

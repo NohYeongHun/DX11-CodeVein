@@ -710,13 +710,15 @@ HRESULT CMainApp::Ready_Prototype_Effect()
 		
 
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
-		, TEXT("Prototype_Component_Texture_SwordTrail")
+		, TEXT("Prototype_Component_Texture_TrailSword")
 		, CTexture::Create(m_pDevice, m_pContext
 			, TEXT("../Bin/Resources/Textures/Effects/Texture/Trail/TraillSword%d.png"), 1))))
 	{
 		CRASH("Failed Load Effect SwordTrail Texture");
 		return E_FAIL;
 	}
+
+
 
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
 		, TEXT("Prototype_GameObject_SwordTrail"),

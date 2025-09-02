@@ -702,6 +702,7 @@ HRESULT CPlayer::InitializeAction_ToAnimationMap()
 
 #pragma region 99. 재생속도 증가.
     /* 재생 속도 증가*/
+#pragma region  이동 애니메이션
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("RUN")], 1.5f);
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("RUN_B")], 1.5f);
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("RUN_F")], 1.5f);
@@ -716,21 +717,38 @@ HRESULT CPlayer::InitializeAction_ToAnimationMap()
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("DODGE_FR")], 1.5f);
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("DODGE_L")], 1.5f);
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("DODGE_R")], 1.5f);
+#pragma endregion
 
 
-    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("ATTACK1")], 1.5f);
+
+#pragma region 공격 애니메이션
+    /*m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("ATTACK1")], 1.5f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("ATTACK2")], 1.5f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("ATTACK3")], 1.5f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("ATTACK4")], 1.5f);*/
+
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("ATTACK1")],1.5f);
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("ATTACK2")], 1.5f);
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("ATTACK3")], 1.5f);
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("ATTACK4")], 1.5f);
 
-    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("DAMAGE_B")], 2.f);
-    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("DAMAGE_F")], 2.f);
-    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("DAMAGE_L")], 2.f);
-    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("DAMAGE_R")], 2.f);
 
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("STRONG_ATTACK1")], 2.f);
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("CIRCULATE_PURGE")], 1.f);
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("DRAGON_LUNGE")], 1.5f);
+#pragma endregion
+
+
+
+#pragma region HIT 애니메이션
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("DAMAGE_B")], 2.f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("DAMAGE_F")], 2.f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("DAMAGE_L")], 2.f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("DAMAGE_R")], 2.f);
+#pragma endregion
+
+
+
 #pragma endregion
 
     return S_OK;
@@ -858,7 +876,17 @@ void CPlayer::Decrease_Damage(_float fDamage)
 {
     m_pPlayerWeapon->Decrease_Damage(fDamage);
 }
+
 #pragma endregion
+
+#pragma region 6. TRAIL 관리
+
+void CPlayer::SetTrail_Visible(_bool bTrail)
+{
+    m_pPlayerWeapon->Set_Trail(bTrail);
+}
+#pragma endregion
+
 
 
 
@@ -1073,6 +1101,7 @@ void CPlayer::Update_KeyInput()
     {
         m_pGameInstance->Publish<CInventory>(EventType::INVENTORY_DISPLAY, nullptr);
         m_IsInventoryDisplay = !m_IsInventoryDisplay;
+        m_pPlayerCamera->Set_InventroyMode(m_IsInventoryDisplay);
     }
         
 
@@ -1281,7 +1310,7 @@ void CPlayer::Register_CoolTime()
     m_pFsmCom->Register_StateExitCoolTime(PLAYER_STATE::STRONG_ATTACK
         , fCalcDuration * 0.6f / m_pModelCom->Get_AnimSpeed(m_Action_AnimMap[TEXT("STRONG_ATTACK1")]));
 
-    m_pFsmCom->Register_StateExitCoolTime(PLAYER_STATE::ATTACK, 0.7f);
+    m_pFsmCom->Register_StateExitCoolTime(PLAYER_STATE::ATTACK, 0.8f);
     m_pFsmCom->Register_StateExitCoolTime(PLAYER_STATE::GUARD, 0.4f);
 }
 
