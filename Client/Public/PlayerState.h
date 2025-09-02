@@ -32,6 +32,18 @@ public:
 		_bool bIsCurrentlyActive = false; // 현재 해당 구간에 있는지
 	}ANIMATION_SPEED_INFO;
 
+	typedef struct tagTrailInfo
+	{
+		_float fStartRatio; // 1. 시작 비율
+		_float fEndRatio;	// 2. 끝 비율
+		_uint iAnimationIndex = 0; // 3. 지정할 애니메이션 인덱스
+		_bool bTriggerVisible = false; // 4. 해당 이벤트가 Off용인지 On 용도인지. => 기본 Off
+		_bool bHasTriggeredStart = false; // 5. 시작 지점에서 Enable/Disable 호출했는지
+		_bool bIsCurrentlyActive = false; // 6. 현재 해당 구간에 있는지
+		std::function<void(void*)> events = nullptr; // 7. 특정 이벤트
+		
+	}TRAIL_ACTIVE_INFO;
+
 public:
 	typedef struct tagPlayerStateDesc : public CState::STATE_DESC
 	{
@@ -70,6 +82,20 @@ protected:
 protected:
 	unordered_map<_uint, vector<ANIMATION_SPEED_INFO>> m_AnimationSpeedMap;
 #pragma endregion
+
+#pragma region TRAIL 제어 변수.
+
+protected:
+	virtual void Handle_AnimationTrail_State();
+	virtual void Reset_AnimationTrailInfo();
+
+protected:
+	void Add_AnimationTrail_Info(_uint iAnimIdx, const TRAIL_ACTIVE_INFO& info);
+
+protected:
+	unordered_map<_uint, vector<TRAIL_ACTIVE_INFO>> m_AnimationTrailMap;
+#pragma endregion
+
 
 
 #pragma region LOCK ON

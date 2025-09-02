@@ -7,6 +7,11 @@
 #include "Event_Manager.h"
 #pragma endregion
 
+#pragma region RENDER TARGET
+#include "RenderTarget.h"
+#include "Target_Manager.h"
+#pragma endregion
+
 #include "GameInstance.h"
 #include "Timer.h"
 #include "Timer_Manager.h"
@@ -34,6 +39,7 @@
 #include "VIBuffer_Rect.h"
 #include "VIBuffer_Terrain.h"
 #include "VIBuffer_Cube.h"
+#include "VIBuffer_SwordTrail.h"
 
 #pragma region INSTANCING
 #include "VIBuffer_Instance.h"

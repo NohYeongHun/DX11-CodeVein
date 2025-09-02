@@ -37,7 +37,7 @@ CTool_Model::CTool_Model(const CTool_Model& Prototype)
 HRESULT CTool_Model::Initialize_Prototype(MODELTYPE eModelType, _fmatrix PreTransformMatrix, const _char* pModelFilePath, const _char* pTextureFolderPath)
 {
 
-	_uint iFlag = { aiProcess_ConvertToLeftHanded | aiProcessPreset_TargetRealtime_Fast };
+	_uint iFlag = { aiProcess_ConvertToLeftHanded | aiProcessPreset_TargetRealtime_Fast  };
 
 	m_ModelType = eModelType;
 

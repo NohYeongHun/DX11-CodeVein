@@ -100,6 +100,14 @@ private:
 	// 4. LockOn UI 관리
 	void Update_LockOn_UI(_float fTimeDelta);
 
+
+public:
+	void Set_InventroyMode(_bool bInventoryMode) { m_bInventoryMode = bInventoryMode; }
+
+private:
+	// 인벤토리 키면 회전 멈추기
+	_bool m_bInventoryMode = { false };
+
 private:
 	class CMonster* m_pLockOnTarget = { nullptr };// LockOn 타겟
 	class CLockOnUI* m_pLockOnUI = { nullptr };   // LockOn UI
@@ -113,6 +121,7 @@ private:
 	// 락온 해제시 부드러운 전환용
 	_float m_fTransitionTime = {};       // 전환 진행 시간
 	_float m_fTransitionStartYaw = {};   // 전환 시작시 Yaw
+
 
 #pragma endregion
 

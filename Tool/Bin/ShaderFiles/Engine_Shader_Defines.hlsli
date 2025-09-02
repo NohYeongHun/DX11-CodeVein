@@ -53,6 +53,13 @@ DepthStencilState DSS_UI
     DepthFunc = LESS_EQUAL;
 };
 
+DepthStencilState DSS_WeightBlend
+{
+    DepthEnable = TRUE;
+    DepthWriteMask = ZERO;
+    DepthFunc = LESS_EQUAL;
+};
+
 BlendState BS_Default
 {
     BlendEnable[0] = false;
@@ -67,4 +74,24 @@ BlendState BS_AlphaBlend
     SrcBlend = SRC_ALPHA;
     DestBlend = INV_SRC_ALPHA;
     BlendOp = Add;    
+};
+
+
+BlendState BS_Blend_Inv
+{
+    BlendEnable[0] = TRUE;
+    BlendOp[0] = Add;
+    SrcBlend[0] = DEST_COLOR;
+    DestBlend[0] = ZERO;
+    SrcBlendAlpha[0] = INV_SRC_ALPHA;
+    DestBlendAlpha[0] = SRC_ALPHA;
+};
+
+
+BlendState BS_WeightBlend_Client
+{
+    BlendEnable[0] = TRUE;
+    BlendOp[0] = Add;
+    SrcBlend[0] = ONE;
+    DestBlend[0] = ONE;
 };

@@ -20,10 +20,6 @@ public:
 #pragma region ENGINE에 제공
 	HRESULT Add_RenderGroup(RENDERGROUP eRenderGroup, class CGameObject* pRenderObject);
 	HRESULT Draw();
-
-	HRESULT Apply_BlendeState();
-	HRESULT Apply_DepthStencilOff();
-	HRESULT Apply_DefaultStates();
 #pragma endregion
 
 	
@@ -31,6 +27,7 @@ public:
 private:
 	ID3D11Device*							m_pDevice = { nullptr };
 	ID3D11DeviceContext*					m_pContext = { nullptr };
+	class CGameInstance* m_pGameInstance = { nullptr };
 
 	list<class CGameObject*>				m_RenderObjects[ENUM_CLASS(RENDERGROUP::END)];
 

@@ -198,8 +198,11 @@ HRESULT CLevel_GamePlay::Ready_Layer_Camera(const _wstring& strLayerTag)
 	CameraPlayerDesc.fSpeedPerSec = 10.f;
 	CameraPlayerDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 	CameraPlayerDesc.fMouseSensor = 0.8f;
-	CameraPlayerDesc.vTargetOffset = { 0.f, 1.7f, -3.3f, 0.f };
-	CameraPlayerDesc.vLockOnOffset = { 0.f, 1.7f, -3.3f, 0.f };
+	//CameraPlayerDesc.vTargetOffset = { 0.f, 1.7f, -3.3f, 0.f };
+	//CameraPlayerDesc.vLockOnOffset = { 0.f, 1.7f, -3.3f, 0.f };
+
+	CameraPlayerDesc.vTargetOffset = { 0.f, 1.7f, -4.3f, 0.f };
+	CameraPlayerDesc.vLockOnOffset = { 0.f, 1.7f, -4.3f, 0.f };
 	CameraPlayerDesc.eCurLevel = m_eCurLevel;
 
 	list<CGameObject*> pGameObjects = m_pGameInstance->Get_Layer(ENUM_CLASS(m_eCurLevel), TEXT("Layer_Player"))->Get_GameObjects();

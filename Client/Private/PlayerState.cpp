@@ -1,5 +1,4 @@
-﻿#include "PlayerState.h"
-HRESULT CPlayerState::Initialize(_uint iStateNum, void* pArg)
+﻿HRESULT CPlayerState::Initialize(_uint iStateNum, void* pArg)
 {
     PLAYER_STATE_DESC* pDesc = static_cast<PLAYER_STATE_DESC*>(pArg);
     m_pFsm = pDesc->pFsm;
@@ -187,6 +186,60 @@ void CPlayerState::Reset_AnimationSpeedInfo()
 void CPlayerState::Add_AnimationSpeed_Info(_uint iAnimIdx, const ANIMATION_SPEED_INFO& info)
 {
     m_AnimationSpeedMap[iAnimIdx].emplace_back(info);
+}
+void CPlayerState::Handle_AnimationTrail_State()
+{
+    // 1. 현재 Frame Ratio를 가져옵니다.
+    _float fCurrentRatio = m_pModelCom->Get_Current_Ratio();
+
+    // 2. 현재 애니메이션 인덱스의 Speed 정보를 가져옵니다.
+    auto iter = m_AnimationTrailMap.find(m_iCurAnimIdx);
+    if (iter == m_AnimationTrailMap.end())
+        return;
+
+    // 3. 각 애니메이션 정보를 순회하며 시작 / 끝 지점에서만 처리.
+    for (auto& animTrailInfo : iter->second)
+    {
+        _bool bInRange = (fCurrentRatio >= animTrailInfo.fStartRatio &&
+            fCurrentRatio <= animTrailInfo.fEndRatio);
+
+        // 구간에 진입했을 때 (시작 지점)
+        if (bInRange && !animTrailInfo.bIsCurrentlyActive)
+        {
+            // 시작 지점에서 한번만 호출. 
+            if (!animTrailInfo.bHasTriggeredStart)
+            {
+                m_pPlayer->SetTrail_Visible(animTrailInfo.bTriggerVisible);
+                animTrailInfo.bHasTriggeredStart = true;
+            }
+            animTrailInfo.bIsCurrentlyActive = true;
+        }
+        // 구간에서 벗어났을 때 (끝 지점)
+        else if (!bInRange && animTrailInfo.bIsCurrentlyActive)
+        {
+            m_pPlayer->SetTrail_Visible(!animTrailInfo.bTriggerVisible);
+            animTrailInfo.bIsCurrentlyActive = false;
+            animTrailInfo.bHasTriggeredStart = false; // 다음 사이클을 위해 리셋.
+        }
+    }
+}
+void CPlayerState::Reset_AnimationTrailInfo()
+{
+    for (auto& pair : m_AnimationTrailMap)
+    {
+        for (auto& animTrailInfo : pair.second)
+        {
+            animTrailInfo.bHasTriggeredStart = false;
+            animTrailInfo.bIsCurrentlyActive = false;
+            
+        }
+    }
+    m_pPlayer->SetTrail_Visible(false); // 기본 False;
+}
+void CPlayerState::Add_AnimationTrail_Info(_uint iAnimIdx, const TRAIL_ACTIVE_INFO& info)
+{
+    m_AnimationTrailMap[iAnimIdx].emplace_back(info);
+    
 }
 #pragma endregion
 

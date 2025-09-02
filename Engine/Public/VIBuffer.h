@@ -33,6 +33,8 @@ protected:
 	D3D_PRIMITIVE_TOPOLOGY	m_ePrimitiveType = {};
 
 
+
+
 public:
 	virtual CComponent* Clone(void* pArg) = 0;
 	virtual void Free();

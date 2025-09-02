@@ -50,8 +50,10 @@ public:
 		return m_iCurrentAnimIndex;
 	}
 
+	const _float Get_TrackPosition(_uint iAnimIndex) { return m_Animations[iAnimIndex]->Get_CurrentTrackPosition(); }
+	const _float Get_Duration(_uint iAnimIndex) { return m_Animations[iAnimIndex]->Get_Duration(); }
 	const _float Get_CurrentTrackPosition() { return m_Animations[m_iCurrentAnimIndex]->Get_CurrentTrackPosition(); }
-	const _float Get_Duration() { return m_Animations[m_iCurrentAnimIndex]->Get_Duration(); }
+	const _float Get_CurrentDuration() { return m_Animations[m_iCurrentAnimIndex]->Get_Duration(); }
 	const _float Get_AnimationDuration(_uint iAnimIndex) { return m_Animations[iAnimIndex]->Get_Duration(); }
 	const _float Get_AnimationTickPersecond(_uint iAnimIndex) { return m_Animations[iAnimIndex]->Get_TickPerSecond(); }
 	void Set_CurrentTrackPosition(_float fTrackPosition) { m_Animations[m_iCurrentAnimIndex]->Set_CurrentTrackPosition(fTrackPosition); }

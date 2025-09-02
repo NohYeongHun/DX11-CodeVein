@@ -87,8 +87,13 @@ public:
 	void Set_Visible(_bool isVisible) { m_bVisible = isVisible; }
 	_bool Is_Visible() { return m_bVisible; }
 
+
+
 protected:
 	_bool m_bVisible = { true };
+	
+
+
 #pragma endregion
 
 #pragma region 3. 데미지 증가.
@@ -98,6 +103,16 @@ public:
 	void Decrease_Damage(_float fDamage);
 	
 #pragma endregion
+
+#pragma region 4. TRAIL 설정.
+
+public:
+	void Set_Trail(_bool isTrail) { m_bTrail = isTrail;  }
+
+protected:
+	_bool m_bTrail = { false };
+#pragma endregion
+
 
 
 

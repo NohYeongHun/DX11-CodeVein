@@ -86,7 +86,7 @@ BT_RESULT CBT_QueenKnight_DownStrikeAction::Enter_Attack(_float fTimeDelta)
 
     // 4. 목표 위치 지정.
     _vector vOwnerPos = m_pOwner->Get_Transform()->Get_State(STATE::POSITION);
-    vOwnerPos.m128_f32[1] += 10.f;
+    vOwnerPos.m128_f32[1] += 20.f;
     XMStoreFloat3(&m_vAscendTarget, vOwnerPos);
 
     m_pOwner->Disable_Collider(CQueenKnight::PART_BODY);
@@ -104,11 +104,11 @@ BT_RESULT CBT_QueenKnight_DownStrikeAction::Update_Ascend(_float fTimeDelta)
 
     if (vOwnerPos.m128_f32[1] <= m_vAscendTarget.y && m_pOwner->Get_CurrentAnimationRatio() >= m_fJump_StartRatio)
     {
-        m_pOwner->Move_Direction({ 0.f, 1.f, 0.f }, fTimeDelta * 0.3f);
+        m_pOwner->Move_Direction({ 0.f, 1.f, 0.f }, fTimeDelta * 0.2f);
     }
 
     // 1. 목표 높이까지 도달했는지 확인. 아니면 위로 이동.
-    if (m_pOwner->Is_Animation_Finished())
+    if (m_pOwner->Is_Animation_Finished() && vOwnerPos.m128_f32[1] >= m_vAscendTarget.y)
     {
         // 2. 높이를 유지한 채로 순간이동 페이즈로 진입.
         m_eAttackPhase = ATTACK_PHASE::HANG;
@@ -167,7 +167,7 @@ BT_RESULT CBT_QueenKnight_DownStrikeAction::Update_Hang(_float fTimeDelta)
         // 목표 Y 위치보다 높을 때만 하강
         if (XMVectorGetY(vOwnerPos) > XMVectorGetY(vTargetPos))
         {
-            m_pOwner->Move_Direction({ 0.f, -1.f, 0.f }, fTimeDelta * 0.5f);
+            m_pOwner->Move_Direction({ 0.f, -1.f, 0.f }, fTimeDelta * 0.7f);
         }
         else
         {

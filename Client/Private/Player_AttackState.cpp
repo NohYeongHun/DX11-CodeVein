@@ -1,6 +1,4 @@
-﻿#include "Player_AttackState.h"
-
-CPlayer_AttackState::CPlayer_AttackState()
+﻿CPlayer_AttackState::CPlayer_AttackState()
 {
 }
 
@@ -12,6 +10,7 @@ HRESULT CPlayer_AttackState::Initialize(_uint iStateNum, void* pArg)
 		return E_FAIL;
 	}
 		
+#pragma region Collider Info
 	Add_Collider_Info(m_pPlayer->Find_AnimationIndex(TEXT("ATTACK1"))
 		, COLLIDER_ACTIVE_INFO{ 10.f / 133.f, 40.f / 133.f, true, CPlayer::PART_WEAPON, 0 });
 
@@ -23,18 +22,26 @@ HRESULT CPlayer_AttackState::Initialize(_uint iStateNum, void* pArg)
 
 	Add_Collider_Info(m_pPlayer->Find_AnimationIndex(TEXT("ATTACK4"))
 		, COLLIDER_ACTIVE_INFO{ 10.f / 148.f, 40.f / 148.f, true, CPlayer::PART_WEAPON, 0 });
+#pragma endregion
 
-	//Add_Collider_Info(m_pPlayer->Find_AnimationIndex(TEXT("ATTACK1"))
-	//	, COLLIDER_ACTIVE_INFO{ 0.f, 0.3f, false, 0});
-	//
-	//Add_Collider_Info(m_pPlayer->Find_AnimationIndex(TEXT("ATTACK2"))
-	//	, COLLIDER_ACTIVE_INFO{ 0.f, 0.28f, false, 0 });
-	//
-	//Add_Collider_Info(m_pPlayer->Find_AnimationIndex(TEXT("ATTACK3"))
-	//	, COLLIDER_ACTIVE_INFO{ 0.f, 0.25f, false, 0 });
-	//
-	//Add_Collider_Info(m_pPlayer->Find_AnimationIndex(TEXT("ATTACK4"))
-	//	, COLLIDER_ACTIVE_INFO{ 0.f, 0.27f, false, 0 });
+#pragma region Animation Trail Info
+	Add_AnimationTrail_Info(m_pPlayer->Find_AnimationIndex(TEXT("ATTACK1"))
+		, TRAIL_ACTIVE_INFO{ 0.f / 133.f, 30.f / 133.f
+		, m_pPlayer->Find_AnimationIndex(TEXT("ATTACK1")), true } );
+	
+	Add_AnimationTrail_Info(m_pPlayer->Find_AnimationIndex(TEXT("ATTACK2"))
+		, TRAIL_ACTIVE_INFO{ 3.f / 140.f, 30.f / 140.f
+		, m_pPlayer->Find_AnimationIndex(TEXT("ATTACK2")), true });
+	
+	Add_AnimationTrail_Info(m_pPlayer->Find_AnimationIndex(TEXT("ATTACK3"))
+		, TRAIL_ACTIVE_INFO{ 0.f / 158.f, 30.f / 158.f
+		, m_pPlayer->Find_AnimationIndex(TEXT("ATTACK3")), true });
+	
+	Add_AnimationTrail_Info(m_pPlayer->Find_AnimationIndex(TEXT("ATTACK4"))
+		, TRAIL_ACTIVE_INFO{ 15.f / 148.f, 35.f / 148.f
+		, m_pPlayer->Find_AnimationIndex(TEXT("ATTACK4")), true });
+#pragma endregion
+
 	
 
 	return S_OK;
@@ -91,6 +98,7 @@ void CPlayer_AttackState::Update(_float fTimeDelta)
 	Change_State(fTimeDelta);
 
 	CPlayerState::Handle_Collider_State();
+	CPlayerState::Handle_AnimationTrail_State();
 	
 }
 
@@ -100,6 +108,9 @@ void CPlayer_AttackState::Exit()
 	// 무기 콜라이더 강제 비활성화
 	Force_Disable_All_Colliders();
 	
+	// Trail Event 정보 초기화
+	Reset_AnimationTrailInfo();
+
 	if (m_iNextState != -1)
 	{
 		m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, false);

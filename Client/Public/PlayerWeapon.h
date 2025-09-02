@@ -18,7 +18,7 @@ private:
 
 public:
 	virtual HRESULT Initialize_Prototype();
-	virtual HRESULT Initialize(void* pArg);
+	virtual HRESULT Initialize_Clone(void* pArg);
 	virtual void Priority_Update(_float fTimeDelta);
 	virtual void Update(_float fTimeDelta);
 	virtual void Finalize_Update(_float fTimeDelta);
@@ -48,12 +48,26 @@ public:
 	/* Weapon의 최종 행렬 가져오기. */
 public:
 	const _float4x4* Get_CombinedWorldMatrix() { return &m_CombinedWorldMatrix; }
-	
+
 	/* 무기의 스윙 방향 가져오기 */
 	_vector Get_SwingDirection() const { return m_vSwingDirection; }
 
 #pragma endregion
 
+
+#pragma region TRAIL
+public:
+	void TrailWeapon_Update(_matrix WeaponSocketMatrix);
+
+private:
+	class CSwordTrail* m_pTrailWeapon_Effect = { nullptr };
+
+	_float4x4* m_pWeaponTrailStart_SocketMatrix = {};
+	_float4x4* m_pWeaponTrailEnd_SocketMatrix = {};
+
+	_float3					m_vPointUp = {};
+	_float3					m_vPointDown = {};
+#pragma endregion
 
 
 #pragma region 0. 기본 값들
@@ -64,6 +78,7 @@ public:
 private:
 	HRESULT Ready_Components();
 	HRESULT Ready_Colliders();
+	HRESULT Ready_Effects();
 	HRESULT Bind_ShaderResources();
 
 public:

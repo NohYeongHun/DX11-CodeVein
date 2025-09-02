@@ -211,6 +211,9 @@ HRESULT CLevel_StageOne::Ready_Layer_Camera(const _wstring& strLayerTag)
 	CameraPlayerDesc.fSpeedPerSec = 10.f;
 	CameraPlayerDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 	CameraPlayerDesc.fMouseSensor = 0.8f;
+	//CameraPlayerDesc.vTargetOffset = { 0.f, 1.6f, -3.f, 0.f };
+	//CameraPlayerDesc.vLockOnOffset = { 0.f, 1.6f, -3.f, 0.f };
+
 	CameraPlayerDesc.vTargetOffset = { 0.f, 1.6f, -3.f, 0.f };
 	CameraPlayerDesc.vLockOnOffset = { 0.f, 1.6f, -3.f, 0.f };
 	CameraPlayerDesc.eCurLevel = m_eCurLevel;

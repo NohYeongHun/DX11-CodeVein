@@ -38,6 +38,7 @@
 #include "Particle.h"
 #include "Snow.h"
 #include "EffectParticle.h"
+#include "SwordTrail.h"
 #pragma endregion
 
 

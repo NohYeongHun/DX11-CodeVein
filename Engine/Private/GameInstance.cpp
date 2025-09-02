@@ -36,6 +36,11 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11De
 	if (nullptr == m_pTrigger_Manager)
 		return E_FAIL;
 
+	// TargetManager 생성.
+	m_pTarget_Manager = CTarget_Manager::Create(*ppDevice, *ppContext);
+	if (nullptr == m_pTarget_Manager)
+		return E_FAIL;
+
 	m_pRenderer = CRenderer::Create(*ppDevice, *ppContext);
 	if (nullptr == m_pRenderer)
 		return E_FAIL;
@@ -397,21 +402,6 @@ HRESULT CGameInstance::Add_RenderGroup(RENDERGROUP eRenderGroup, CGameObject* pR
 	return m_pRenderer->Add_RenderGroup(eRenderGroup, pRenderObject);
 }
 
-HRESULT CGameInstance::Apply_BlendeState()
-{
-	return m_pRenderer->Apply_BlendeState();
-}
-
-HRESULT CGameInstance::Apply_DepthStencilOff()
-{
-	return m_pRenderer->Apply_DepthStencilOff();
-}
-
-HRESULT CGameInstance::Apply_DefaultStates()
-{
-	return m_pRenderer->Apply_DefaultStates();
-}
-
 
 #pragma endregion
 
@@ -671,14 +661,27 @@ const PoolTable& CGameInstance::Export_EditPool(_uint iEffectType)
 	return m_pEffect_Manager->Export_EditPool(iEffectType);
 	// TODO: 여기에 return 문을 삽입합니다.
 }
-//void CGameInstance::Clear(_uint iLayerLevelIndex)
-//{
-//	m_pEffect_Manager->Clear(iLayerLevelIndex);
-//}
 
 #pragma endregion
 
-
+#pragma region TARGET_MANAGER
+HRESULT CGameInstance::Add_RenderTarget(const _wstring& strTargetTag, _uint iSizeX, _uint iSizeY, DXGI_FORMAT ePixelFormat, const _float4& vClearColor)
+{
+	return m_pTarget_Manager->Add_RenderTarget(strTargetTag, iSizeX, iSizeY, ePixelFormat, vClearColor);
+}
+HRESULT CGameInstance::Add_MRT(const _wstring& strMRTTag, const _wstring& strTargetTag)
+{
+	return m_pTarget_Manager->Add_MRT(strMRTTag, strTargetTag);
+}
+HRESULT CGameInstance::Begin_MRT(const _wstring& strMRTTag)
+{
+	return m_pTarget_Manager->Begin_MRT(strMRTTag);
+}
+HRESULT CGameInstance::End_MRT()
+{
+	return m_pTarget_Manager->End_MRT();
+}
+#pragma endregion
 
 
 void CGameInstance::Release_Engine()
@@ -687,6 +690,7 @@ void CGameInstance::Release_Engine()
 
 	
 	Safe_Release(m_pTimer_Manager);
+	Safe_Release(m_pTarget_Manager);
 	Safe_Release(m_pRenderer);
 	Safe_Release(m_pCollider_Manager);
 	Safe_Release(m_pTrigger_Manager);
@@ -702,6 +706,7 @@ void CGameInstance::Release_Engine()
 	Safe_Release(m_pPicking);
 	Safe_Release(m_pCamera_Manager);
 	Safe_Release(m_pEffect_Manager);
+	
 
 
 	Safe_Release(m_pInput_Device);

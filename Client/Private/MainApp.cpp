@@ -690,6 +690,66 @@ HRESULT CMainApp::Ready_Prototype_Effect()
 	}
 #pragma endregion
 
+#pragma region TRAIL
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_Effect"),
+		CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Shader_VtxEffectTrail.hlsl")
+			, VTXPOSTEX::Elements, VTXPOSTEX::iNumElements))))
+	{
+		CRASH("Failed Load Point Effect Shader");
+		return E_FAIL;
+	}
+
+	/*For.Prototype_Component_VIBuffer_Swordtrail*/
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_VIBuffer_SwordTrail"),
+		CVIBuffer_SwordTrail::Create(m_pDevice, m_pContext))))
+	{
+		CRASH("Failed Load SowrdTrail VIBuffer");
+		return E_FAIL;
+	}
+		
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
+		, TEXT("Prototype_Component_Texture_TrailSword")
+		, CTexture::Create(m_pDevice, m_pContext
+			, TEXT("../Bin/Resources/Textures/Effects/Texture/Trail/TraillSword%d.png"), 1))))
+	{
+		CRASH("Failed Load Effect SwordTrail Texture");
+		return E_FAIL;
+	}
+
+	// 슬래시 디테일 텍스처 등록
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
+		, TEXT("Prototype_Component_Texture_TrailSlash")
+		, CTexture::Create(m_pDevice, m_pContext
+			, TEXT("../Bin/Resources/Textures/Effects/Texture/Trail/TraillSlash%d.png"), 2))))
+	{
+		CRASH("Failed Load Effect TrailSlash Texture");
+		return E_FAIL;
+	}
+
+	// 발광 효과 텍스처 등록  
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
+		, TEXT("Prototype_Component_Texture_TrailGlow")
+		, CTexture::Create(m_pDevice, m_pContext
+			, TEXT("../Bin/Resources/Textures/Effects/Texture/Trail/Trail_SpWeapon%d.png"), 1))))
+	{
+		CRASH("Failed Load Effect TrailGlow Texture");
+		return E_FAIL;
+	}
+
+
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
+		, TEXT("Prototype_GameObject_SwordTrail"),
+		CSwordTrail::Create(m_pDevice, m_pContext))))
+	{
+		CRASH("Failed Load SwordTrail Object");
+		return E_FAIL;
+	}
+		
+#pragma endregion
+
 
 	return S_OK;
 }
