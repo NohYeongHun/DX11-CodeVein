@@ -1,6 +1,4 @@
-﻿#include "KnightLance.h"
-
-CKnightLance::CKnightLance(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿CKnightLance::CKnightLance(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CWeapon(pDevice, pContext)
 {
 }
@@ -34,6 +32,10 @@ HRESULT CKnightLance::Initialize(void* pArg)
         CRASH("Failed Ready_Components");
         return E_FAIL;
     }
+
+    m_vPointUp = _float3(0.f, 0.f, 0.f);
+    m_vPointDown = _float3(0.f, 0.f, 1.85f);
+
 
     /*m_pTransformCom->Scaling(_float3(0.1f, 0.1f, 0.1f));
     m_pTransformCom->Rotation(XMVectorSet(0.f, 1.f, 0.f, 0.f), XMConvertToRadians(90.0f));
@@ -127,6 +129,11 @@ void CKnightLance::OBBCollider_ChangeExtents(_float3 vExtents)
     m_pColliderCom->Change_BoundingDesc(&Desc);
 }
 
+void CKnightLance::TrailWeapon_Update(_matrix WeaponSocketMatrix)
+{
+    m_pTrailWeapon_Effect->Update_Trail_Point(m_vPointDown, m_vPointUp, WeaponSocketMatrix);
+}
+
 HRESULT CKnightLance::Ready_Components()
 {
     if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxMesh"),
@@ -177,6 +184,27 @@ HRESULT CKnightLance::Ready_Colliders()
     /* 생성과 동시에 등록 */
     m_pGameInstance->Add_Collider_To_Manager(m_pColliderCom, ENUM_CLASS(m_eCurLevel));
 
+    return S_OK;
+}
+
+HRESULT CKnightLance::Ready_Effects()
+{
+
+    CSwordTrail::SWORDTRAIL_DESC Desc{};
+    Desc.eCurLevel = m_eCurLevel;
+    Desc.fSpeedPerSec = 5.f;
+    Desc.fRotationPerSec = XMConvertToRadians(1.0f);
+
+
+    m_pTrailWeapon_Effect = dynamic_cast<CSwordTrail*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT,
+        ENUM_CLASS(LEVEL::STATIC)
+        , TEXT("Prototype_GameObject_SwordTrail"), &Desc));
+
+    if (nullptr == m_pTrailWeapon_Effect)
+    {
+        CRASH("Failed Create TrailWeapon Effect");
+        return E_FAIL;
+    }
     return S_OK;
 }
 
@@ -238,4 +266,5 @@ CGameObject* CKnightLance::Clone(void* pArg)
 void CKnightLance::Free()
 {
     CWeapon::Free();
+    Safe_Release(m_pTrailWeapon_Effect);
 }

@@ -26,19 +26,19 @@ HRESULT CPlayer_AttackState::Initialize(_uint iStateNum, void* pArg)
 
 #pragma region Animation Trail Info
 	Add_AnimationTrail_Info(m_pPlayer->Find_AnimationIndex(TEXT("ATTACK1"))
-		, TRAIL_ACTIVE_INFO{ 13.f / 133.f, 30.f / 133.f
+		, TRAIL_ACTIVE_INFO{ 0.f / 133.f, 30.f / 133.f
 		, m_pPlayer->Find_AnimationIndex(TEXT("ATTACK1")), true } );
-
+	
 	Add_AnimationTrail_Info(m_pPlayer->Find_AnimationIndex(TEXT("ATTACK2"))
 		, TRAIL_ACTIVE_INFO{ 3.f / 140.f, 30.f / 140.f
 		, m_pPlayer->Find_AnimationIndex(TEXT("ATTACK2")), true });
-
+	
 	Add_AnimationTrail_Info(m_pPlayer->Find_AnimationIndex(TEXT("ATTACK3"))
-		, TRAIL_ACTIVE_INFO{ 3.f / 158.f, 30.f / 158.f
+		, TRAIL_ACTIVE_INFO{ 0.f / 158.f, 30.f / 158.f
 		, m_pPlayer->Find_AnimationIndex(TEXT("ATTACK3")), true });
-
+	
 	Add_AnimationTrail_Info(m_pPlayer->Find_AnimationIndex(TEXT("ATTACK4"))
-		, TRAIL_ACTIVE_INFO{ 20.f / 148.f, 35.f / 148.f
+		, TRAIL_ACTIVE_INFO{ 15.f / 148.f, 35.f / 148.f
 		, m_pPlayer->Find_AnimationIndex(TEXT("ATTACK4")), true });
 #pragma endregion
 
@@ -108,7 +108,7 @@ void CPlayer_AttackState::Exit()
 	// 무기 콜라이더 강제 비활성화
 	Force_Disable_All_Colliders();
 	
-	// Trail 콜라이더 정보 초기화
+	// Trail Event 정보 초기화
 	Reset_AnimationTrailInfo();
 
 	if (m_iNextState != -1)

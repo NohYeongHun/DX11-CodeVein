@@ -722,10 +722,10 @@ HRESULT CPlayer::InitializeAction_ToAnimationMap()
 
 
 #pragma region 공격 애니메이션
-    /*m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("ATTACK1")], 1.5f);
-    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("ATTACK2")], 1.5f);
-    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("ATTACK3")], 1.5f);
-    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("ATTACK4")], 1.5f);*/
+    //m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("ATTACK1")], 0.7f);
+    //m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("ATTACK2")], 0.7f);
+    //m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("ATTACK3")], 0.7f);
+    //m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("ATTACK4")], 0.7f);
 
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("ATTACK1")],1.5f);
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[TEXT("ATTACK2")], 1.5f);

@@ -13,6 +13,14 @@ public:
 
 	}TRAILPOINT;
 
+#ifdef _DEBUG
+public:
+	_uint Get_CurrentPoint() { return m_CurrentPointCount; }
+#endif // _DEBUG
+
+
+
+
 private:
 	CVIBuffer_SwordTrail(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CVIBuffer_SwordTrail(const CVIBuffer_SwordTrail& Prototype);
@@ -28,9 +36,8 @@ private:
 	_uint		m_NumIndicesPerPrimitive = {};
 
 private:
-	HRESULT UpdateVertexBuffer();
 	HRESULT ApplyInterpolation(VTXPOSTEX* pVertices, const vector<_vector>& positions);
-	void SetTextureCoordinates(VTXPOSTEX* pVertices, _uint pointCount);
+
 
 public:
 	virtual HRESULT Initialize_Prototype();

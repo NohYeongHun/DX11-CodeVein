@@ -718,6 +718,26 @@ HRESULT CMainApp::Ready_Prototype_Effect()
 		return E_FAIL;
 	}
 
+	// 슬래시 디테일 텍스처 등록
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
+		, TEXT("Prototype_Component_Texture_TrailSlash")
+		, CTexture::Create(m_pDevice, m_pContext
+			, TEXT("../Bin/Resources/Textures/Effects/Texture/Trail/TraillSlash%d.png"), 2))))
+	{
+		CRASH("Failed Load Effect TrailSlash Texture");
+		return E_FAIL;
+	}
+
+	// 발광 효과 텍스처 등록  
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
+		, TEXT("Prototype_Component_Texture_TrailGlow")
+		, CTexture::Create(m_pDevice, m_pContext
+			, TEXT("../Bin/Resources/Textures/Effects/Texture/Trail/Trail_SpWeapon%d.png"), 1))))
+	{
+		CRASH("Failed Load Effect TrailGlow Texture");
+		return E_FAIL;
+	}
+
 
 
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)

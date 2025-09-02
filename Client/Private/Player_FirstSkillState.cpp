@@ -28,10 +28,32 @@ HRESULT CPlayer_FirstSkillState::Initialize(_uint iStateNum, void* pArg)
     Add_Collider_Info(m_pPlayer->Find_AnimationIndex(TEXT("CIRCULATE_PURGE"))
         , COLLIDER_ACTIVE_INFO{ 110.f / 232.f, 120.f / 232.f, true, CPlayer::PART_WEAPON, 4 });
 
-    // 5. 왼쪽 위부터 중간 아래로 베기.
+
     Add_Collider_Info(m_pPlayer->Find_AnimationIndex(TEXT("CIRCULATE_PURGE"))
-        , COLLIDER_ACTIVE_INFO{ 0.f / 232.f, 200.f / 232.f, false, CPlayer::PART_BODY, 5 });
+        , COLLIDER_ACTIVE_INFO{ 0.f / 232.f, 230.f / 232.f, false, CPlayer::PART_BODY, 0 });
+
+
 #pragma endregion
+
+#pragma region Animation Trail Info
+    Add_AnimationTrail_Info(m_pPlayer->Find_AnimationIndex(TEXT("CIRCULATE_PURGE"))
+        , TRAIL_ACTIVE_INFO{ 30.f / 232.f, 45.f / 232.f
+        , m_pPlayer->Find_AnimationIndex(TEXT("CIRCULATE_PURGE")), true });
+
+    Add_AnimationTrail_Info(m_pPlayer->Find_AnimationIndex(TEXT("CIRCULATE_PURGE"))
+        , TRAIL_ACTIVE_INFO{ 48.f / 232.f, 60.f / 232.f
+        , m_pPlayer->Find_AnimationIndex(TEXT("CIRCULATE_PURGE")), true });
+
+    Add_AnimationTrail_Info(m_pPlayer->Find_AnimationIndex(TEXT("CIRCULATE_PURGE"))
+        , TRAIL_ACTIVE_INFO{ 65.f / 232.f, 105.f / 232.f
+        , m_pPlayer->Find_AnimationIndex(TEXT("CIRCULATE_PURGE")), true });
+
+    Add_AnimationTrail_Info(m_pPlayer->Find_AnimationIndex(TEXT("CIRCULATE_PURGE"))
+        , TRAIL_ACTIVE_INFO{ 108.f / 232.f, 120.f / 232.f
+        , m_pPlayer->Find_AnimationIndex(TEXT("CIRCULATE_PURGE")), true });
+#pragma endregion
+
+
 
 #pragma region 애니메이션 스피드 제어
     _float fOriginSpeed = m_pModelCom->Get_AnimSpeed(m_pPlayer->Find_AnimationIndex(TEXT("CIRCULATE_PURGE")));
@@ -51,6 +73,8 @@ HRESULT CPlayer_FirstSkillState::Initialize(_uint iStateNum, void* pArg)
         , fOriginSpeed, 1.8f });
 
 #pragma endregion
+
+
 
 
 	m_fIncreaseDamage = 10.f; // 기본 공격력 증가량 설정
@@ -108,6 +132,7 @@ void CPlayer_FirstSkillState::Update(_float fTimeDelta)
     Change_State();
     CPlayerState::Handle_Collider_State();
     CPlayerState::Handle_AnimationSpeed_State();
+    CPlayerState::Handle_AnimationTrail_State();
 }
 
 void CPlayer_FirstSkillState::Exit()
@@ -120,6 +145,9 @@ void CPlayer_FirstSkillState::Exit()
 
     // 애니메이션 맵 정상화
     Reset_AnimationSpeedInfo();
+
+    // Trail Event 정보 초기화
+    Reset_AnimationTrailInfo();
 
     if (m_iNextState != -1) // NextIndex가 있는경우 블렌딩 시작.
     {

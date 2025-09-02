@@ -47,10 +47,23 @@ private:
 private:
 	//_uint* m_pParentState = { nullptr };
 
+#pragma region 1. WEAPON TRAIL
+public:
+	void TrailWeapon_Update(_matrix WeaponSocketMatrix);
+
+private:
+	class CSwordTrail* m_pTrailWeapon_Effect = { nullptr };
+	_float3 m_vPointUp = {};
+	_float3 m_vPointDown = {};
+
+#pragma endregion
+
+
 
 private:
 	HRESULT Ready_Components();
 	HRESULT Ready_Colliders();
+	HRESULT Ready_Effects();
 	HRESULT Bind_ShaderResources();
 
 public:

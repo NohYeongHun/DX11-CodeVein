@@ -1,6 +1,4 @@
-﻿#include "VIBuffer_SwordTrail.h"
-
-CVIBuffer_SwordTrail::CVIBuffer_SwordTrail(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿CVIBuffer_SwordTrail::CVIBuffer_SwordTrail(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CVIBuffer{ pDevice, pContext }
 {
 }
@@ -21,7 +19,7 @@ HRESULT CVIBuffer_SwordTrail::Initialize_Clone(void* pArg)
 	m_iVertexStride = sizeof(VTXPOSTEX);
 	m_iNumVertices = MAX_TRAIL_POINTS * 2;
 	m_iNumVertexBuffers = 1;
-	m_eIndexFormat = DXGI_FORMAT_R32_UINT;
+	m_eIndexFormat = DXGI_FORMAT_R16_UINT;
 	m_ePrimitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 
 	D3D11_BUFFER_DESC		VBDesc{};
@@ -98,11 +96,14 @@ HRESULT CVIBuffer_SwordTrail::Initialize_Clone(void* pArg)
 
 HRESULT CVIBuffer_SwordTrail::Render()
 {
-	if (m_CurrentPointCount < 4) return S_OK; // 최소 2개 쿼드 필요
+	if (m_CurrentPointCount < 2) return S_OK; // 최소 1개 쿼드 필요 (2개 정점)
 	
 	_uint actualQuadCount = (m_CurrentPointCount / 2) - 1; // 실제 쿼드 개수
+	if (actualQuadCount == 0) return S_OK; // 쿼드가 없으면 렌더링 안함
+	
 	_uint actualIndexCount = actualQuadCount * 6; // 쿼드당 인덱스 6개
 	
+
 	m_pContext->DrawIndexed(actualIndexCount, 0, 0);
 
 	return S_OK;
@@ -151,7 +152,8 @@ HRESULT CVIBuffer_SwordTrail::Update(TRAILPOINT TrailPoint)
 
 	D3D11_MAPPED_SUBRESOURCE		SubResource;
 
-	m_pContext->Map(m_pVB, 0, D3D11_MAP_WRITE_NO_OVERWRITE, 0, &SubResource);
+	//m_pContext->Map(m_pVB, 0, D3D11_MAP_WRITE_NO_OVERWRITE, 0, &SubResource);
+	m_pContext->Map(m_pVB, 0, D3D11_MAP_WRITE_DISCARD, 0, &SubResource);
 
 	VTXPOSTEX* pVertices = (VTXPOSTEX*)SubResource.pData;
 
@@ -236,6 +238,7 @@ HRESULT CVIBuffer_SwordTrail::ApplyInterpolation(VTXPOSTEX* pVertices, const vec
 			positions[startIndex], positions[startIndex + 1],
 			positions[endIndex - 1], positions[endIndex - 2], t
 		);
+
 
 		_uint vertexIndex = (MAX_TRAIL_POINTS - 1 - (endIndex - 1 - i)) * 2 + 1;
 		XMStoreFloat3(&pVertices[vertexIndex].vPosition, interpolatedPos);

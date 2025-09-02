@@ -51,8 +51,8 @@ HRESULT CPlayerWeapon::Initialize_Clone(void* pArg)
     m_vPointUp = _float3(0.f, 0.f, 0.f);
     m_vPointDown = _float3(0.f, 0.f, 1.85f);
 
-    m_pWeaponTrailStart_SocketMatrix = m_pModelCom->Get_BoneMatrix("TrailStartSocket");
-    m_pWeaponTrailEnd_SocketMatrix = m_pModelCom->Get_BoneMatrix("TrailEndSocket");
+    //m_pWeaponTrailStart_SocketMatrix = m_pModelCom->Get_BoneMatrix("TrailStartSocket");
+    //m_pWeaponTrailEnd_SocketMatrix = m_pModelCom->Get_BoneMatrix("TrailEndSocket");
 
     //m_vPointUp = _float3(0.0f, 0.0f, 0.f);
     //m_vPointDown = _float3(0.0f, 0.0f, 0.f);
@@ -110,7 +110,8 @@ void CPlayerWeapon::Late_Update(_float fTimeDelta)
 
     // Trail이 켜질때만 넣기.
     if (m_bTrail)
-        m_pTrailWeapon_Effect->Late_Update(fTimeDelta);
+          m_pTrailWeapon_Effect->Late_Update(fTimeDelta);
+    //m_pTrailWeapon_Effect->Late_Update(fTimeDelta);
 
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::NONBLEND, this)))
         return;
@@ -140,10 +141,6 @@ HRESULT CPlayerWeapon::Render()
         m_vPointUp = { vPointUp[0], vPointUp[1], vPointUp[2] };
         m_vPointDown = { vPointDown[0], vPointDown[1], vPointDown[2] };
     }
-
-
-    
-
 
     ImGui::End();
 

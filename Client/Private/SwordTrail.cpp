@@ -42,20 +42,24 @@ HRESULT CSwordTrail::Initialize_Clone(void* pArg)
     }
         
 	m_eCurLevel = pDesc->eCurLevel;
-    m_iShaderID = 0;
+    m_iShaderID = 2; // StretchTrail 패스 사용 (Ribbon Trail)
 
 	CPlayer* pPlayer = dynamic_cast<CPlayer*>(pDesc->pTarget);
 
-	m_vColorFront = { 102, 255, 255, 255 };
-	m_vColorBack = { 12, 76, 255, 255 };
-	m_fAlpha = 1.f;
+	// 색상은 텍스처 원본을 사용하므로 더 이상 필요하지 않음
+	// m_vColorFront = { 102, 255, 255, 255 };
+	// m_vColorBack = { 12, 76, 255, 255 };
+	m_fAlpha = 1.2f; // 기본 알파값 증가
 
     
     return S_OK;
-}
+} 
 
 void CSwordTrail::Update(_float fTimeDelta)
 {
+    // 시간 누적 (Ribbon Trail용)
+    m_fTime += fTimeDelta;
+    
     CVIBuffer_SwordTrail::TRAILPOINT TrailPointDesc;
 
     TrailPointDesc.vPointUp = m_vPoint_Up;
@@ -77,7 +81,7 @@ HRESULT CSwordTrail::Render()
 		nullptr == m_pVIBufferCom)
 		return E_FAIL;
 
-	#ifdef _DEBUG
+#ifdef _DEBUG
     //Edit_Collider(m_pColliderCom, "Player Weapon");
     ImGuiIO& io = ImGui::GetIO();
     ImVec2 windowPos = ImVec2(0.f, 300.f);
@@ -91,6 +95,8 @@ HRESULT CSwordTrail::Render()
 	static _float TrailPos[3] = { m_WeaponMatrix.m[3][0], m_WeaponMatrix.m[3][1], m_WeaponMatrix.m[3][2] };
 
 	ImGui::Text("Trail Pos : (%.2f, %.2f, %.2f)", TrailPos[0], TrailPos[1], TrailPos[2]);
+
+	ImGui::Text("Current Cell Count : %d", m_pVIBufferCom->Get_CurrentPoint());
 
     ImGui::End();
 
@@ -136,12 +142,34 @@ void CSwordTrail::Update_Trail_Point(_float3 vPointDown, _float3 vPointUp, _fmat
 HRESULT CSwordTrail::Ready_Components(SWORDTRAIL_DESC* pDesc)
 {
 	m_eCurLevel = pDesc->eCurLevel;
+	
+	// 기본 검 궤적 텍스처 (TraillSword0)
 	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC)
 		, TEXT("Prototype_Component_Texture_TrailSword")
-		,TEXT("Com_Texture")
-	, reinterpret_cast<CComponent**>(&m_pTextureCom))))
+		,TEXT("Com_BaseTexture")
+	, reinterpret_cast<CComponent**>(&m_pBaseTexture))))
 	{
-		CRASH("Failed Create Texture Sword Trail");
+		CRASH("Failed Create Base Texture Sword Trail");
+		return E_FAIL;
+	}
+
+	// 슬래시 디테일 텍스처 (TraillSlash0)
+	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC)
+		, TEXT("Prototype_Component_Texture_TrailSlash")
+		,TEXT("Com_DetailTexture")
+	, reinterpret_cast<CComponent**>(&m_pDetailTexture))))
+	{
+		CRASH("Failed Create Detail Texture Sword Trail");
+		return E_FAIL;
+	}
+
+	// 발광 효과 텍스처 (Trail_SpWeapon0)
+	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC)
+		, TEXT("Prototype_Component_Texture_TrailGlow")
+		,TEXT("Com_GlowTexture")
+	, reinterpret_cast<CComponent**>(&m_pGlowTexture))))
+	{
+		CRASH("Failed Create Glow Texture Sword Trail");
 		return E_FAIL;
 	}
 
@@ -186,21 +214,47 @@ HRESULT CSwordTrail::Bind_ShaderResources()
 		return E_FAIL;
 	}
 
-	// Diffuse 맥여줄 예정.
-	if (FAILED(m_pTextureCom->Bind_Shader_Resource(m_pShaderCom, "g_DiffuseTexture", 0)))
+	// SP_Weapon 텍스처를 리본 트레일로 사용
+	if (FAILED(m_pGlowTexture->Bind_Shader_Resource(m_pShaderCom, "g_GlowTexture", 0)))
 	{
-		CRASH("Failed Create Shader Resource");
+		CRASH("Failed Bind SP_Weapon Texture as GlowTexture");
 		return E_FAIL;
 	}
 
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_ColorBack", &m_vColorBack, sizeof(_vector))))
+	if (FAILED(m_pBaseTexture->Bind_Shader_Resource(m_pShaderCom, "g_BaseTexture", 0)))
 	{
+		CRASH("Failed Bind SP_Weapon Texture as GlowTexture");
 		return E_FAIL;
 	}
-		
 
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_ColorFront", &m_vColorFront, sizeof(_vector))))
+	// Ribbon Trail 파라미터 바인딩
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_Time", &m_fTime, sizeof(_float))))
 	{
+		CRASH("Failed Bind Time");
+		return E_FAIL;
+	}
+	
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_ScrollSpeed", &m_fScrollSpeed, sizeof(_float))))
+	{
+		CRASH("Failed Bind Scroll Speed");
+		return E_FAIL;
+	}
+	
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_FadePower", &m_fFadePower, sizeof(_float))))
+	{
+		CRASH("Failed Bind Fade Power");
+		return E_FAIL;
+	}
+	
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_Intensity", &m_fIntensity, sizeof(_float))))
+	{
+		CRASH("Failed Bind Intensity");
+		return E_FAIL;
+	}
+	
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_TrailColor", &m_vTrailColor, sizeof(_vector))))
+	{
+		CRASH("Failed Bind Trail Color");
 		return E_FAIL;
 	}
 		
@@ -246,6 +300,7 @@ void CSwordTrail::Free()
 	CGameObject::Free();
 	Safe_Release(m_pVIBufferCom);
 	Safe_Release(m_pShaderCom);
-	Safe_Release(m_pTextureCom);
-
+	Safe_Release(m_pBaseTexture);
+	Safe_Release(m_pDetailTexture);
+	Safe_Release(m_pGlowTexture);
 }
