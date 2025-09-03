@@ -199,6 +199,11 @@ public:
 	HRESULT Add_MRT(const _wstring& strMRTTag, const _wstring& strTargetTag);
 	HRESULT Begin_MRT(const _wstring& strMRTTag);
 	HRESULT End_MRT();
+
+#ifdef _DEBUG
+	HRESULT Ready_RT_Debug(const _wstring& strTargetTag, _float fX, _float fY, _float fSizeX, _float fSizeY);
+	HRESULT Render_RT_Debug(class CShader* pShader, class CVIBuffer_Rect* pVIBuffer);
+#endif
 #pragma endregion
 
 

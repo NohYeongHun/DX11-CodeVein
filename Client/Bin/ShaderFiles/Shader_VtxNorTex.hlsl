@@ -70,6 +70,12 @@ struct PS_OUT
     
 };
 
+struct PS_DEFFERD_OUT
+{
+    float4 vDiffuse : SV_TARGET0;
+    float4 vNormal : SV_TARGET1;
+};
+
 /* 만든 픽셀 각각에 대해서 픽셀 쉐이더를 수행한다. */
 /* 픽셀의 색을 결정한다. */
 
@@ -93,6 +99,38 @@ PS_OUT PS_MAIN(PS_IN In)
     
     return Out;
 }
+
+//PS_DEFFERD_OUT PS_DEFFERED_MAIN(PS_IN In)
+//{
+//    PS_DEFFERD_OUT Out = (PS_DEFFERD_OUT) 0;
+    
+//    vector vSourDiffuse = g_DiffuseTexture[0].Sample(DefaultSampler, In.vTexcoord * 50.f);
+//    vector vDestDiffuse = g_DiffuseTexture[1].Sample(DefaultSampler, In.vTexcoord * 50.f);
+    
+//    vector vMask = g_MaskTexture.Sample(PointSampler, In.vTexcoord);
+//    vector vBrush = 0.f;
+    
+//    if (g_vBrushPos.x - g_fRange < In.vWorldPos.x && In.vWorldPos.x <= g_vBrushPos.x + g_fRange &&
+//        g_vBrushPos.z - g_fRange < In.vWorldPos.z && In.vWorldPos.z <= g_vBrushPos.z + g_fRange)
+//    {
+//        float2 vTexcoord;
+        
+//        vTexcoord.x = (In.vWorldPos.x - (g_vBrushPos.x - g_fRange)) / (2.f * g_fRange);
+//        vTexcoord.y = ((g_vBrushPos.z + g_fRange) - In.vWorldPos.z) / (2.f * g_fRange);
+        
+//        vBrush = g_BrushTexture.Sample(DefaultSampler, vTexcoord);
+//    }
+    
+//    vector vMtrlDiffuse = vDestDiffuse * vMask.r + vSourDiffuse * (1.f - vMask.r) + vBrush;
+    
+//    Out.vDiffuse = vMtrlDiffuse;
+    
+//    /* In.vNormal(-1 ~ 1) -> Out.vNormal(0 ~ 1) */
+//    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+//    // vector      vNormalDesc = g_NormalTexture.Sample();
+//    // vector vNormal = vector(vNormalDesc.xyz * 2.f - 1.f, 0.f);    
+//    return Out;
+//}
 
 technique11 DefaultTechnique
 {

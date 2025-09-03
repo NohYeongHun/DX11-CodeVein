@@ -120,34 +120,34 @@ void CPlayerWeapon::Late_Update(_float fTimeDelta)
 HRESULT CPlayerWeapon::Render()
 {
 
-#ifdef _DEBUG
-    ImGuiIO& io = ImGui::GetIO();
-    ImVec2 windowPos = ImVec2(0.f, 0.f);
-    ImVec2 windowSize = ImVec2(300.f, 300.f);
-
-    ImGui::SetNextWindowPos(windowPos, ImGuiCond_Once);
-    ImGui::SetNextWindowSize(windowSize, ImGuiCond_Once);
-
-    ImGui::Begin("Player Weapon Debug", nullptr, ImGuiWindowFlags_NoCollapse);
-
-
-    static float vPointUp[3] = { m_vPointUp.x, m_vPointUp.y, m_vPointUp.z };
-    static float vPointDown[3] = { m_vPointDown.x, m_vPointDown.y, m_vPointDown.z };
-    ImGui::InputFloat3("Point Up : ", vPointUp);
-    ImGui::InputFloat3("Point Down : ", vPointDown);
-
-    if(ImGui::Button("Apply"))
-    {
-        m_vPointUp = { vPointUp[0], vPointUp[1], vPointUp[2] };
-        m_vPointDown = { vPointDown[0], vPointDown[1], vPointDown[2] };
-    }
-
-    ImGui::End();
-
-
-    //Edit_Collider(m_pColliderCom, "OBB");
-    m_pColliderCom->Render();
-#endif // _DEBUG
+//#ifdef _DEBUG
+//    ImGuiIO& io = ImGui::GetIO();
+//    ImVec2 windowPos = ImVec2(0.f, 0.f);
+//    ImVec2 windowSize = ImVec2(300.f, 300.f);
+//
+//    ImGui::SetNextWindowPos(windowPos, ImGuiCond_Once);
+//    ImGui::SetNextWindowSize(windowSize, ImGuiCond_Once);
+//
+//    ImGui::Begin("Player Weapon Debug", nullptr, ImGuiWindowFlags_NoCollapse);
+//
+//
+//    static float vPointUp[3] = { m_vPointUp.x, m_vPointUp.y, m_vPointUp.z };
+//    static float vPointDown[3] = { m_vPointDown.x, m_vPointDown.y, m_vPointDown.z };
+//    ImGui::InputFloat3("Point Up : ", vPointUp);
+//    ImGui::InputFloat3("Point Down : ", vPointDown);
+//
+//    if(ImGui::Button("Apply"))
+//    {
+//        m_vPointUp = { vPointUp[0], vPointUp[1], vPointUp[2] };
+//        m_vPointDown = { vPointDown[0], vPointDown[1], vPointDown[2] };
+//    }
+//
+//    ImGui::End();
+//
+//
+//    //Edit_Collider(m_pColliderCom, "OBB");
+//    m_pColliderCom->Render();
+//#endif // _DEBUG
 
     if (FAILED(Bind_ShaderResources()))
     {

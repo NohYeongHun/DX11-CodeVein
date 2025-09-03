@@ -1,4 +1,5 @@
-﻿CRenderer::CRenderer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿#include "Renderer.h"
+CRenderer::CRenderer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : m_pDevice { pDevice }
     , m_pContext { pContext }
     , m_pGameInstance {CGameInstance::GetInstance()}
@@ -9,10 +10,8 @@
 
 }
 
-HRESULT CRenderer::Initialize_Clone()
+HRESULT CRenderer::Initialize()
 {
-    /*if (FAILED(Ready_Render_State()))
-        return E_FAIL;*/
 
     // Render Target 초기화
     _uint       iNumViewports = { 1 };
@@ -20,20 +19,75 @@ HRESULT CRenderer::Initialize_Clone()
 
     m_pContext->RSGetViewports(&iNumViewports, &ViewportDesc);
 
+#pragma region 후처리 쉐이딩 Render Target 추가.
     /* For.Target_Diffuse */
     if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_Diffuse"), ViewportDesc.Width, ViewportDesc.Height, DXGI_FORMAT_R8G8B8A8_UNORM, _float4(1.f, 1.f, 1.f, 1.f))))
     {
         CRASH("Failed Add RenderTarget Diffuse");
         return E_FAIL;
     }
-        
 
-    if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_GameObjects"), TEXT("Target_Diffuse"))))
+    /* For.Target_Normal */
+    if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_Normal"), ViewportDesc.Width, ViewportDesc.Height, DXGI_FORMAT_R16G16B16A16_UNORM, _float4(1.f, 1.f, 1.f, 1.f))))
     {
-        CRASH("Failed Add Target Diffuse MRT OBjects");
+        CRASH("Failed Add RenderTarget Normal");
         return E_FAIL;
     }
-        
+
+    /* For.Target_Shade */
+    if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_Shade"), ViewportDesc.Width, ViewportDesc.Height, DXGI_FORMAT_R16G16B16A16_UNORM, _float4(1.f, 1.f, 1.f, 1.f))))
+    {
+        CRASH("Failed Add RenderTarget Shade");
+        return E_FAIL;
+    }
+
+    /* For.MRT_GameObjects : 게임 오브젝트들의 정보를 저장받기위한 타겟들 */
+    if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_GameObjects"), TEXT("Target_Diffuse"))))
+        return E_FAIL;
+
+    if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_GameObjects"), TEXT("Target_Normal"))))
+        return E_FAIL;
+
+    /* For.MRT_LightAcc : 빛들의 연산 결과를 누적한다. */
+    if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_LightAcc"), TEXT("Target_Shade"))))
+        return E_FAIL;
+
+#pragma endregion
+
+
+    m_pVIBuffer = CVIBuffer_Rect::Create(m_pDevice, m_pContext);
+    if (nullptr == m_pVIBuffer)
+        return E_FAIL;
+
+    m_pShader = CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Engine_Shader_Deferred.hlsl"), VTXPOSTEX::Elements, VTXPOSTEX::iNumElements);
+    if (nullptr == m_pShader)
+        return E_FAIL;
+
+    XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
+    XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH(ViewportDesc.Width, ViewportDesc.Height, 0.f, 1.f));
+
+#pragma region DEBUGING 용도 Render Target 화면 추가
+#ifdef _DEBUG
+    if (FAILED(m_pGameInstance->Ready_RT_Debug(TEXT("Target_Diffuse"), 150.0f, 150.0f, 300.f, 300.f)))
+    {
+        CRASH("Faield Target Diffuse Ready");
+        return E_FAIL;
+    }
+
+    if (FAILED(m_pGameInstance->Ready_RT_Debug(TEXT("Target_Normal"), 150.0f, 450.0f, 300.f, 300.f)))
+    {
+        CRASH("Faield Target Normal Ready");
+        return E_FAIL;
+    }
+
+    if (FAILED(m_pGameInstance->Ready_RT_Debug(TEXT("Target_Shade"), 450.0f, 150.0f, 300.f, 300.f)))
+    {
+        CRASH("Faield Target Shade Ready");
+        return E_FAIL;
+    }
+#endif
+#pragma endregion
+
 
 
     return S_OK;
@@ -65,6 +119,13 @@ HRESULT CRenderer::Draw()
     if (FAILED(Render_StaticUI()))
         return E_FAIL;
 
+#ifdef _DEBUG
+    // 후처리 쉐이딩 텍스쳐 화면을 보기 위한 Debug 화면.
+    if (FAILED(Render_Debug()))
+        return E_FAIL;
+#endif // _DEBUG
+
+
     return S_OK;
 }
 
@@ -86,9 +147,25 @@ HRESULT CRenderer::Render_Priority()
 HRESULT CRenderer::Render_NonBlend()
 {
 
+
+    //for (auto& pRenderObject : m_RenderObjects[ENUM_CLASS(RENDERGROUP::NONBLEND)])
+    //{
+    //    if (nullptr != pRenderObject)
+    //        pRenderObject->Render();
+
+    //    Safe_Release(pRenderObject);
+    //}
+
+    //m_RenderObjects[ENUM_CLASS(RENDERGROUP::NONBLEND)].clear();
+
+    // 후처리 쉐이딩.
     /* Diffuse + Normal */
-    //if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_GameObjects"))))
-    //    return E_FAIL;
+    if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_GameObjects"))))
+    {
+        CRASH("Failed Begin MRT_GameObjects");
+        return E_FAIL;
+    }
+        
 
     for (auto& pRenderObject : m_RenderObjects[ENUM_CLASS(RENDERGROUP::NONBLEND)])
     {
@@ -100,9 +177,8 @@ HRESULT CRenderer::Render_NonBlend()
 
     m_RenderObjects[ENUM_CLASS(RENDERGROUP::NONBLEND)].clear();
 
-    // 후처리 쉐이딩.
-    //if (FAILED(m_pGameInstance->End_MRT()))
-    //    return E_FAIL;
+    if (FAILED(m_pGameInstance->End_MRT()))
+        return E_FAIL;
 
 
     return S_OK;
@@ -110,11 +186,7 @@ HRESULT CRenderer::Render_NonBlend()
 
 HRESULT CRenderer::Render_Blend()
 {
-  /*  m_RenderObjects[ENUM_CLASS(RENDERGROUP::RG_BLEND)].sort([](CGameObject* pSour, CGameObject* pDest)->_bool 
-    {
-        return static_cast<CBlendObject*>(pSour)->Get_Depth() > static_cast<CBlendObject*>(pDest)->Get_Depth();
-    });*/
-
+  
     m_RenderObjects[ENUM_CLASS(RENDERGROUP::BLEND)].sort([](CGameObject* pSour, CGameObject* pDest)->_bool
     {
         return pSour->Get_CamDistance() > pDest->Get_CamDistance();
@@ -135,6 +207,7 @@ HRESULT CRenderer::Render_Blend()
 
 HRESULT CRenderer::Render_UI()
 {
+
     for (auto& pRenderObject : m_RenderObjects[ENUM_CLASS(RENDERGROUP::UI)])
     {
         if (nullptr != pRenderObject)
@@ -163,46 +236,29 @@ HRESULT CRenderer::Render_StaticUI()
     return S_OK;
 }
 
-HRESULT CRenderer::Ready_Render_State()
+#ifdef _DEBUG
+
+HRESULT CRenderer::Render_Debug()
 {
-    // AlphaBlend 생성 
-    D3D11_BLEND_DESC blendDesc = {};
-    blendDesc.RenderTarget[0].BlendEnable = TRUE;
-    blendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
-    blendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
-    blendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
-    blendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
-    blendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
-    blendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+    if (FAILED(m_pShader->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix)))
+        return E_FAIL;
 
-    blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+    if (FAILED(m_pShader->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
+        return E_FAIL;
 
-    m_pDevice->CreateBlendState(&blendDesc, &m_pAlphaBlend);
-
-    // Depth Stencil 끄기
-    D3D11_DEPTH_STENCIL_DESC dsDesc = {};
-    dsDesc.DepthEnable = FALSE;  // 깊이 비교 X
-    dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
-
-    m_pDevice->CreateDepthStencilState(&dsDesc, &m_pDepthOff);
-
-    // Depth Stencil 켜기
-    D3D11_DEPTH_STENCIL_DESC desc = {};
-    desc.DepthEnable = TRUE;
-    desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-    desc.DepthFunc = D3D11_COMPARISON_LESS;
-    desc.StencilEnable = FALSE;
-
-    m_pDevice->CreateDepthStencilState(&desc, &m_pDepthOn);
+    m_pGameInstance->Render_RT_Debug(m_pShader, m_pVIBuffer);
 
     return S_OK;
 }
+
+#endif
+
 
 CRenderer* CRenderer::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
     CRenderer* pInstance = new CRenderer(pDevice, pContext);
 
-    if (FAILED(pInstance->Initialize_Clone()))
+    if (FAILED(pInstance->Initialize()))
     {
         MSG_BOX(TEXT("Failed to Created : CRenderer"));
         Safe_Release(pInstance);
@@ -224,9 +280,8 @@ void CRenderer::Free()
         m_RenderObjects[i].clear();
     }
 
-    Safe_Release(m_pAlphaBlend);
-    Safe_Release(m_pDepthOn);
-    Safe_Release(m_pDepthOff);
+    Safe_Release(m_pShader);
+    Safe_Release(m_pVIBuffer);
 
     Safe_Release(m_pGameInstance);
     Safe_Release(m_pDevice);

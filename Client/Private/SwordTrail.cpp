@@ -81,26 +81,26 @@ HRESULT CSwordTrail::Render()
 		nullptr == m_pVIBufferCom)
 		return E_FAIL;
 
-#ifdef _DEBUG
-    //Edit_Collider(m_pColliderCom, "Player Weapon");
-    ImGuiIO& io = ImGui::GetIO();
-    ImVec2 windowPos = ImVec2(0.f, 300.f);
-    ImVec2 windowSize = ImVec2(00.f, 300.f);
-
-    ImGui::SetNextWindowPos(windowPos, ImGuiCond_Once);
-    ImGui::SetNextWindowSize(windowSize, ImGuiCond_Once);
-
-    ImGui::Begin("Player Weapon Trail Debug", nullptr, ImGuiWindowFlags_NoCollapse);
-	
-	static _float TrailPos[3] = { m_WeaponMatrix.m[3][0], m_WeaponMatrix.m[3][1], m_WeaponMatrix.m[3][2] };
-
-	ImGui::Text("Trail Pos : (%.2f, %.2f, %.2f)", TrailPos[0], TrailPos[1], TrailPos[2]);
-
-	ImGui::Text("Current Cell Count : %d", m_pVIBufferCom->Get_CurrentPoint());
-
-    ImGui::End();
-
-#endif // _DEBUG
+//#ifdef _DEBUG
+//    //Edit_Collider(m_pColliderCom, "Player Weapon");
+//    ImGuiIO& io = ImGui::GetIO();
+//    ImVec2 windowPos = ImVec2(0.f, 300.f);
+//    ImVec2 windowSize = ImVec2(00.f, 300.f);
+//
+//    ImGui::SetNextWindowPos(windowPos, ImGuiCond_Once);
+//    ImGui::SetNextWindowSize(windowSize, ImGuiCond_Once);
+//
+//    ImGui::Begin("Player Weapon Trail Debug", nullptr, ImGuiWindowFlags_NoCollapse);
+//	
+//	static _float TrailPos[3] = { m_WeaponMatrix.m[3][0], m_WeaponMatrix.m[3][1], m_WeaponMatrix.m[3][2] };
+//
+//	ImGui::Text("Trail Pos : (%.2f, %.2f, %.2f)", TrailPos[0], TrailPos[1], TrailPos[2]);
+//
+//	ImGui::Text("Current Cell Count : %d", m_pVIBufferCom->Get_CurrentPoint());
+//
+//    ImGui::End();
+//
+//#endif // _DEBUG
 
 
 

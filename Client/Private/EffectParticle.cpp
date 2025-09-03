@@ -193,7 +193,7 @@ HRESULT CEffectParticle::Render()
     //m_pShaderCom->End();
     
     // Geometry Shader 해제
-    m_pContext->GSSetShader(nullptr, nullptr, 0);
+    //m_pContext->GSSetShader(nullptr, nullptr, 0);
     
     // 추가 렌더 상태 정리 (필요시)
     // m_pContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);

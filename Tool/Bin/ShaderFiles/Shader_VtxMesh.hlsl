@@ -188,6 +188,7 @@ technique11 DefaultTechnique
         SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 
         VertexShader = compile vs_5_0 VS_MAIN();
+
         PixelShader = compile ps_5_0 PS_MAIN();
     }
 

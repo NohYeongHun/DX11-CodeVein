@@ -20,6 +20,12 @@ public:
 	HRESULT End_MRT();
 #pragma endregion
 
+#ifdef _DEBUG
+public:
+	HRESULT Ready_Debug(const _wstring& strTargetTag, _float fX, _float fY, _float fSizeX, _float fSizeY);
+	HRESULT Render(class CShader* pShader, class CVIBuffer_Rect* pVIBuffer);
+#endif // _DEBUG
+
 
 
 

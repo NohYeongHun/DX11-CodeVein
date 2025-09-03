@@ -74,7 +74,7 @@ BT_RESULT CBT_QueenKnight_DownStrikeAction::Enter_Attack(_float fTimeDelta)
 
     //m_pOwner->Change_Animation_Blend(iNextAnimationIdx, false, 0.2f, true, true, true);
     m_pOwner->Change_Animation_NonBlend(iNextAnimationIdx, false);
-
+    m_pOwner->RotateTurn_ToTargetYaw();
 
     // 2. 다음 단계 진행
     m_eAttackPhase = ATTACK_PHASE::ASCEND;

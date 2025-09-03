@@ -49,7 +49,7 @@ VS_OUT VS_MAIN(VS_IN In)
     matWVP = mul(matWV, g_ProjMatrix);
     
     Out.vPosition = mul(float4(In.vPosition, 1.f), matWVP);
-    Out.vNormal = mul(float4(In.vNormal, 0.f), g_WorldMatrix);
+    Out.vNormal = normalize(mul(float4(In.vNormal, 0.f), g_WorldMatrix));
     Out.vTexcoord = In.vTexcoord;
     Out.vWorldPos = mul(float4(In.vPosition, 1.f), g_WorldMatrix);
     
@@ -75,6 +75,12 @@ struct PS_OUT
     
 };
 
+struct PS_BACKBUFFER_OUT
+{
+    float4 vDiffuse : SV_TARGET0;
+    float4 vNormal : SV_TARGET1;
+};
+
 /* 만든 픽셀 각각에 대해서 픽셀 쉐이더를 수행한다. */
 /* 픽셀의 색을 결정한다. */
 
@@ -96,8 +102,6 @@ PS_OUT PS_MAIN(PS_IN In)
     
     Out.vColor = (g_vLightDiffuse * vMtrlDiffuse) * saturate(fShade + (g_vLightAmbient * g_vMtrlAmbient)) +
                     (g_vLightSpecular * g_vMtrlSpecular) * fSpecular;
-    
-    
     
     return Out;
 }
@@ -126,6 +130,21 @@ PS_OUT PS_MAIN2(PS_IN In)
     return Out;
 }
 
+PS_BACKBUFFER_OUT PS_DEFFERED_OUT(PS_IN In)
+{
+    PS_BACKBUFFER_OUT Out = (PS_BACKBUFFER_OUT) 0;
+    
+    vector vMtrlDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
+    
+    if (vMtrlDiffuse.a < 0.3f)
+        discard;
+    
+    Out.vDiffuse = vMtrlDiffuse;
+    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+    
+    return Out;
+}
+
 technique11 DefaultTechnique
 {
     /* 특정 패스를 이용해서 점정을 그려냈다. */
@@ -139,7 +158,8 @@ technique11 DefaultTechnique
 
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
-        PixelShader = compile ps_5_0 PS_MAIN();
+        //PixelShader = compile ps_5_0 PS_MAIN();
+        PixelShader = compile ps_5_0 PS_DEFFERED_OUT();
     }
 
     pass SkyPass // 하늘 전용 패스

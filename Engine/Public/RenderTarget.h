@@ -12,6 +12,13 @@ public:
 
 public:
 	HRESULT Initialize(_uint iSizeX, _uint iSizeY, DXGI_FORMAT ePixelFormat, const _float4& vClearColor);
+	void Clear();
+
+#ifdef _DEBUG
+public:
+	HRESULT Ready_Debug(_float fX, _float fY, _float fSizeX, _float fSizeY);
+	HRESULT Render(class CShader* pShader, class CVIBuffer_Rect* pVIBuffer);
+#endif
 
 #pragma region RENDER TARGET의 소유
 private:
@@ -24,6 +31,14 @@ private:
 private:
 	_float4 m_vClearColor = {};
 #pragma endregion
+
+#ifdef _DEBUG
+private:
+	_float4x4 m_WorldMatrix = {};
+
+
+#endif 
+
 
 public:
 	static CRenderTarget* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, _uint iSizeX, _uint iSizeY, DXGI_FORMAT ePixelFormat, const _float4& vClearColor);

@@ -61,6 +61,8 @@ HRESULT CTarget_Manager::Begin_MRT(const _wstring& strMRTTag)
 
 	for (auto& pRenderTarget : *pMRTList)
 	{
+		// 그리기 전 Clear
+		pRenderTarget->Clear();
 		RenderTargets[iNumRenderTargets++] = pRenderTarget->Get_RTV();
 	}
 
@@ -78,6 +80,37 @@ HRESULT CTarget_Manager::End_MRT()
 
 	return S_OK;
 }
+
+#ifdef _DEBUG
+HRESULT CTarget_Manager::Ready_Debug(const _wstring& strTargetTag, _float fX, _float fY, _float fSizeX, _float fSizeY)
+{
+	CRenderTarget* pRenderTarget = Find_RenderTarget(strTargetTag);
+	if (nullptr == pRenderTarget)
+	{
+		CRASH("Failed Ready Debug");
+		return E_FAIL;
+	}
+		
+
+	return  pRenderTarget->Ready_Debug(fX, fY, fSizeX, fSizeY);
+}
+
+HRESULT CTarget_Manager::Render(CShader* pShader, CVIBuffer_Rect* pVIBuffer)
+{
+	for (auto& Pair : m_MRTs)
+	{
+		for (auto& pRenderTarget : Pair.second)
+		{
+			if (nullptr != pRenderTarget)
+				pRenderTarget->Render(pShader, pVIBuffer);
+		}
+	}
+
+	return S_OK;
+}
+#endif // _DEBUG
+
+
 
 CRenderTarget* CTarget_Manager::Find_RenderTarget(const _wstring& strTargetTag)
 {
