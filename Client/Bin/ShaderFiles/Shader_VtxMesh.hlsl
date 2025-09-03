@@ -158,8 +158,8 @@ technique11 DefaultTechnique
 
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
-        //PixelShader = compile ps_5_0 PS_MAIN();
-        PixelShader = compile ps_5_0 PS_DEFFERED_OUT();
+        PixelShader = compile ps_5_0 PS_MAIN();
+        //PixelShader = compile ps_5_0 PS_DEFFERED_OUT();
     }
 
     pass SkyPass // 하늘 전용 패스

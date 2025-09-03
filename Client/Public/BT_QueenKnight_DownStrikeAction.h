@@ -34,6 +34,10 @@ private:
     _float m_fReady_StartRatio = {};
     _float m_fReady_EndRatio = {};
 
+    _float m_fDissolve_StartRatio = {};
+    _float m_fDissolve_EndRatio = {};
+    _bool m_bDissolveCheck = { false };
+
     _float m_fJump_StartRatio = {};
     _float m_fJump_EndRatio = {};
 
@@ -45,6 +49,8 @@ private:
 
     // 목표 상승 지점.
     _float3 m_vAscendTarget = {};
+    // 상승 보간 지점.
+    _float3 m_vAscendInterPolationTarget = {};
     // 목표 하강 지점.
     _float3 m_vDesecndTarget = {};
 

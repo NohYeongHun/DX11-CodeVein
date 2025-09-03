@@ -144,6 +144,33 @@ public:
 public:
 	void Create_QueenKnightWarp_Effect_Particle(_float3 vDir);
 
+public:
+	void Start_Dissolve(); // Dissolve 재생.
+	void ReverseStart_Dissolve(); // Dissolve 역재생.
+	void End_Dissolve();
+	void ReverseEnd_Dissolve();
+
+	const _bool Is_Dissolve() { return m_IsDissolve; }
+	const _bool Is_ReverseDessolve() { return m_IsReverseDissolve;  }
+
+private:
+	_uint m_iShaderPath = {};
+	_float m_fDissolveTime = {};
+	_float m_fEndDissolveTime = {};
+
+	_float m_fReverseDissolveTime = {};
+	_float m_fEndReverseDissolveTime = {};
+
+	_bool m_IsDissolve = { false };
+	_bool m_IsReverseDissolve = { false };
+
+
+private:
+	class CTexture* m_pDissolveTexture = { nullptr };
+
+
+
+
 private:
 	//CEffectParticle::EFFECTPARTICLE_ENTER_DESC m_EffectParticleEnterDesc = {};
 
@@ -173,6 +200,15 @@ public:
 	virtual void Destroy();
 	virtual void Free() override;
 #pragma endregion
+
+
+#ifdef _DEBUG
+private:
+	void ImGui_Render();
+#endif // _DEBUG
+
+
+
 
 
 };

@@ -128,6 +128,28 @@ void CKnightShield::On_Collision_Exit(CGameObject* pOther)
 {
 }
 
+#pragma region EFFECT
+void CKnightShield::Start_Dissolve()
+{
+    m_fDissolveTime = 0.f;
+    m_iShaderPath = static_cast<_uint>(MESH_SHADERPATH::DISSOLVE);
+}
+
+void CKnightShield::ReverseStart_Dissolve()
+{
+    m_fDissolveTime = 0.f;
+    m_iShaderPath = static_cast<_uint>(MESH_SHADERPATH::DISSOLVE_REVERSE);
+}
+
+void CKnightShield::End_Dissolve()
+{
+    m_fDissolveTime = 0.f;
+    m_iShaderPath = static_cast<_uint>(MESH_SHADERPATH::DEFAULT);
+}
+#pragma endregion
+
+
+
 HRESULT CKnightShield::Ready_Components()
 {
     if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxMesh"),

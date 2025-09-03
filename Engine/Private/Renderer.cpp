@@ -121,8 +121,8 @@ HRESULT CRenderer::Draw()
 
 #ifdef _DEBUG
     // 후처리 쉐이딩 텍스쳐 화면을 보기 위한 Debug 화면.
-    if (FAILED(Render_Debug()))
-        return E_FAIL;
+    /*if (FAILED(Render_Debug()))
+        return E_FAIL;*/
 #endif // _DEBUG
 
 
@@ -148,19 +148,19 @@ HRESULT CRenderer::Render_NonBlend()
 {
 
 
-    //for (auto& pRenderObject : m_RenderObjects[ENUM_CLASS(RENDERGROUP::NONBLEND)])
-    //{
-    //    if (nullptr != pRenderObject)
-    //        pRenderObject->Render();
+    for (auto& pRenderObject : m_RenderObjects[ENUM_CLASS(RENDERGROUP::NONBLEND)])
+    {
+        if (nullptr != pRenderObject)
+            pRenderObject->Render();
 
-    //    Safe_Release(pRenderObject);
-    //}
+        Safe_Release(pRenderObject);
+    }
 
-    //m_RenderObjects[ENUM_CLASS(RENDERGROUP::NONBLEND)].clear();
+    m_RenderObjects[ENUM_CLASS(RENDERGROUP::NONBLEND)].clear();
 
     // 후처리 쉐이딩.
     /* Diffuse + Normal */
-    if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_GameObjects"))))
+ /*   if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_GameObjects"))))
     {
         CRASH("Failed Begin MRT_GameObjects");
         return E_FAIL;
@@ -178,7 +178,7 @@ HRESULT CRenderer::Render_NonBlend()
     m_RenderObjects[ENUM_CLASS(RENDERGROUP::NONBLEND)].clear();
 
     if (FAILED(m_pGameInstance->End_MRT()))
-        return E_FAIL;
+        return E_FAIL;*/
 
 
     return S_OK;

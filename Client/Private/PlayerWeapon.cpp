@@ -46,23 +46,13 @@ HRESULT CPlayerWeapon::Initialize_Clone(void* pArg)
     }
 
     // * m_vPointUp, m_vPointDown으로 하드코딩 하는게 아니라 Socket 월드 위치 가져오기.
-
-        
     m_vPointUp = _float3(0.f, 0.f, 0.f);
     m_vPointDown = _float3(0.f, 0.f, 1.85f);
 
-    //m_pWeaponTrailStart_SocketMatrix = m_pModelCom->Get_BoneMatrix("TrailStartSocket");
-    //m_pWeaponTrailEnd_SocketMatrix = m_pModelCom->Get_BoneMatrix("TrailEndSocket");
-
-    //m_vPointUp = _float3(0.0f, 0.0f, 0.f);
-    //m_vPointDown = _float3(0.0f, 0.0f, 0.f);
 
     m_pTransformCom->Add_Rotation(XMConvertToRadians(0.f)
         , XMConvertToRadians(180.f)
         , XMConvertToRadians(0.f));
-    //m_pTransformCom->Scaling(_float3(0.1f, 0.1f, 0.1f));
-    //m_pTransformCom->Rotation(XMVectorSet(0.f, 1.f, 0.f, 0.f), XMConvertToRadians(90.0f));
-    //m_pTransformCom->Set_State(STATE::POSITION, XMVectorSet(0.8f, 0.f, 0.f, 1.f));
 
     return S_OK;
 }
@@ -92,9 +82,8 @@ void CPlayerWeapon::Update(_float fTimeDelta)
 
 void CPlayerWeapon::Finalize_Update(_float fTimeDelta)
 {
+    // 잠시 Trail 해제.
     _matrix SocketMatrix = XMLoadFloat4x4(&m_CombinedWorldMatrix);
-
-
     // Trail Visible이 False더라도 정점의 위치는 계속 업데이트 되어야함 => 그래야 그려질때 안이상함.
     TrailWeapon_Update(SocketMatrix);
     m_pTrailWeapon_Effect->Update(fTimeDelta);
@@ -108,46 +97,21 @@ void CPlayerWeapon::Late_Update(_float fTimeDelta)
 {
     CWeapon::Late_Update(fTimeDelta);
 
+    if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::NONBLEND, this)))
+        return;
+
     // Trail이 켜질때만 넣기.
     if (m_bTrail)
           m_pTrailWeapon_Effect->Late_Update(fTimeDelta);
-    //m_pTrailWeapon_Effect->Late_Update(fTimeDelta);
-
-    if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::NONBLEND, this)))
-        return;
 }
 
 HRESULT CPlayerWeapon::Render()
 {
+#ifdef _DEBUG
+    //ImGui_Render();
+#endif // _DEBUG
 
-//#ifdef _DEBUG
-//    ImGuiIO& io = ImGui::GetIO();
-//    ImVec2 windowPos = ImVec2(0.f, 0.f);
-//    ImVec2 windowSize = ImVec2(300.f, 300.f);
-//
-//    ImGui::SetNextWindowPos(windowPos, ImGuiCond_Once);
-//    ImGui::SetNextWindowSize(windowSize, ImGuiCond_Once);
-//
-//    ImGui::Begin("Player Weapon Debug", nullptr, ImGuiWindowFlags_NoCollapse);
-//
-//
-//    static float vPointUp[3] = { m_vPointUp.x, m_vPointUp.y, m_vPointUp.z };
-//    static float vPointDown[3] = { m_vPointDown.x, m_vPointDown.y, m_vPointDown.z };
-//    ImGui::InputFloat3("Point Up : ", vPointUp);
-//    ImGui::InputFloat3("Point Down : ", vPointDown);
-//
-//    if(ImGui::Button("Apply"))
-//    {
-//        m_vPointUp = { vPointUp[0], vPointUp[1], vPointUp[2] };
-//        m_vPointDown = { vPointDown[0], vPointDown[1], vPointDown[2] };
-//    }
-//
-//    ImGui::End();
-//
-//
-//    //Edit_Collider(m_pColliderCom, "OBB");
-//    m_pColliderCom->Render();
-//#endif // _DEBUG
+    
 
     if (FAILED(Bind_ShaderResources()))
     {
@@ -286,7 +250,7 @@ HRESULT CPlayerWeapon::Ready_Effects()
     Desc.eCurLevel = m_eCurLevel;
     Desc.fSpeedPerSec = 5.f;
     Desc.fRotationPerSec = XMConvertToRadians(1.0f);
-    
+    Desc.eDiffuseType = TRAIL_DIFFUSE::SWORD;
 
 ;    m_pTrailWeapon_Effect = dynamic_cast<CSwordTrail*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT,
         ENUM_CLASS(LEVEL::STATIC)
@@ -361,3 +325,37 @@ void CPlayerWeapon::Free()
     CWeapon::Free();
     Safe_Release(m_pTrailWeapon_Effect);
 }
+
+#ifdef _DEBUG
+
+
+
+void CPlayerWeapon::ImGui_Render()
+{
+    ImGuiIO& io = ImGui::GetIO();
+    ImVec2 windowPos = ImVec2(0.f, 0.f);
+    ImVec2 windowSize = ImVec2(300.f, 300.f);
+
+    ImGui::SetNextWindowPos(windowPos, ImGuiCond_Once);
+    ImGui::SetNextWindowSize(windowSize, ImGuiCond_Once);
+
+    ImGui::Begin("Player Weapon Debug", nullptr, ImGuiWindowFlags_NoCollapse);
+
+
+    static float vPointUp[3] = { m_vPointUp.x, m_vPointUp.y, m_vPointUp.z };
+    static float vPointDown[3] = { m_vPointDown.x, m_vPointDown.y, m_vPointDown.z };
+    ImGui::InputFloat3("Point Up : ", vPointUp);
+    ImGui::InputFloat3("Point Down : ", vPointDown);
+
+    if(ImGui::Button("Apply"))
+    {
+        m_vPointUp = { vPointUp[0], vPointUp[1], vPointUp[2] };
+        m_vPointDown = { vPointDown[0], vPointDown[1], vPointDown[2] };
+    }
+
+    ImGui::End();
+
+    //Edit_Collider(m_pColliderCom, "OBB");
+    m_pColliderCom->Render();
+}
+#endif // _DEBUG

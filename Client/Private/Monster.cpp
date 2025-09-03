@@ -430,6 +430,15 @@ void CMonster::Tick_BuffTimers(_float fTimeDelta)
 
 }
 
+// 현재 시간 반환.
+const _float CMonster::Get_BuffTime(uint32_t buffFlag)
+{
+    auto iter = m_BuffTimers.find(buffFlag);
+    if (iter == m_BuffTimers.end())
+        return 0.f;
+    return iter->second;;
+}
+
 #pragma endregion
 
 

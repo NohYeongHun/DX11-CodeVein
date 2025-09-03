@@ -52,11 +52,22 @@ namespace Engine
 		return dwRefCnt;
 	}
 
-	// <, > 연산을 지원하는 자료형만 가능합니다.
+	// 값 범위 고정
 	template<typename T>
 	constexpr T Clamp(T value, T minV, T maxV)
 	{
 		return (value < minV) ? minV : (value > maxV) ? maxV : value;
+	}
+
+
+	// Min Max 범위로 고정.
+	template<typename T>
+	constexpr T Normalize(T value, T minInput, T maxInput)
+	{
+		if (maxInput == minInput) return T(0);
+
+		// 입력값을 0~1 범위로 정규화
+		return (value - minInput) / (maxInput - minInput);
 	}
 
 

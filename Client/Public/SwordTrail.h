@@ -8,6 +8,7 @@ public:
 	{
 		LEVEL eCurLevel;
 		CGameObject* pTarget = { nullptr };
+		TRAIL_DIFFUSE eDiffuseType = {};
 	}SWORDTRAIL_DESC;
 private:
 	CSwordTrail(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -37,6 +38,7 @@ private:
 	class CShader* m_pShaderCom = { nullptr };
 	// 멀티 텍스처 시스템
 	class CTexture* m_pBaseTexture = { nullptr };      // 기본 검 궤적
+	_uint			m_iBaseTextureIndex = {};
 	class CTexture* m_pDetailTexture = { nullptr };    // 슬래시 디테일
 	class CTexture* m_pGlowTexture = { nullptr };      // 발광 효과
 	_vector	m_vColorBack = XMVectorSet(1.f, 1.f, 1.f, 1.f);
@@ -61,10 +63,19 @@ private:
 	_float			m_fIntensity = 2.0f;           // 전체 강도 (더 높임)
 	_vector			m_vTrailColor = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f); // 원본 색상 유지
 
+	
+
 public:
 	static CSwordTrail* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	virtual CGameObject* Clone(void* pArg = nullptr);
 	virtual void Free() override;
+
+#ifdef _DEBUG
+private:
+	void ImGui_Render();
+#endif // _DEBUG
+
+
 };
 NS_END
 

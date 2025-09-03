@@ -239,6 +239,7 @@ public:
 
 public:
     void Tick_BuffTimers(_float fTimeDelta);
+    const _float Get_BuffTime(uint32_t buffFlag);
 
 public:
     virtual HRESULT Initialize_BuffDurations() PURE;

@@ -1,4 +1,5 @@
-﻿CQueenKnight::CQueenKnight(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿#include "QueenKnight.h"
+CQueenKnight::CQueenKnight(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CMonster(pDevice, pContext)
 {
 }
@@ -90,6 +91,22 @@ HRESULT CQueenKnight::Initialize_Clone(void* pArg)
         return E_FAIL;
     }
 
+#ifdef _DEBUG
+    // 테스트
+    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Dissolve"),
+        TEXT("Com_Dissolve"), reinterpret_cast<CComponent**>(&m_pDissolveTexture), nullptr)))
+    {
+        CRASH("Failed Load DissolveTexture");
+        return E_FAIL;
+    }
+    m_fEndDissolveTime = 2.f;
+    m_fEndReverseDissolveTime = 2.f;
+        
+
+#endif // _DEBUG
+
+
+
     _vector qInitRot = XMQuaternionRotationAxis(XMVectorSet(0.f, 1.f, 0.f, 0.f), 0.0f);
     m_pTransformCom->Set_Quaternion(qInitRot);
 
@@ -138,6 +155,33 @@ void CQueenKnight::Update(_float fTimeDelta)
 void CQueenKnight::Finalize_Update(_float fTimeDelta)
 {
     CMonster::Finalize_Update(fTimeDelta);
+
+    // 디버그 용도
+    if (m_pGameInstance->Get_KeyUp(DIK_1))
+        Start_Dissolve();
+
+
+    if (Is_Dissolve())
+    {
+        m_fDissolveTime += fTimeDelta * 2.f;
+
+        if (m_fDissolveTime >= m_fEndDissolveTime)
+        {
+            End_Dissolve();
+        }
+    }
+
+    if (Is_ReverseDessolve())
+    {
+        m_fReverseDissolveTime -= fTimeDelta * 2.f;
+
+        if (m_fReverseDissolveTime <= 0.f)
+        {
+            ReverseEnd_Dissolve();
+        }
+    }
+
+    
 }
 
 void CQueenKnight::Late_Update(_float fTimeDelta)
@@ -161,64 +205,17 @@ void CQueenKnight::Late_Update(_float fTimeDelta)
             return;
     }
     
+
+    
+
     CMonster::Late_Update(fTimeDelta);
 }
 
 HRESULT CQueenKnight::Render()
 {
-//#ifdef _DEBUG
-//    ImGuiIO& io = ImGui::GetIO();
-//
-//    // 기존 Player Debug Window
-//
-//    ImVec2 windowSize = ImVec2(300.f, 300.f);
-//    ImVec2 windowPos = ImVec2(windowSize.x, 0.f);
-//    ImGui::SetNextWindowPos(windowPos, ImGuiCond_Once);
-//    ImGui::SetNextWindowSize(windowSize, ImGuiCond_Once);
-//
-//    string strDebug = "QueenKnight Debug";
-//    ImGui::Begin(strDebug.c_str(), nullptr, ImGuiWindowFlags_NoCollapse);
-//    ImGui::Text("HP : (%.2f)", m_MonsterStat.fHP);
-//    ImGui::Text("MAX HP : (%.2f)", m_MonsterStat.fMaxHP);
-//
-//    _float3 vPos = {};
-//    XMStoreFloat3(&vPos, m_pTransformCom->Get_State(STATE::POSITION));
-//    ImGui::Text("POS : (%.2f, %.2f, %.2f)", vPos.x, vPos.y, vPos.z);
-//
-//    _vector vMyPos =  m_pTransformCom->Get_State(STATE::POSITION);
-//    _vector vTargetPos = m_pTarget->Get_Transform()->Get_State(STATE::POSITION);
-//    _vector vDistance = vTargetPos - vMyPos;
-//    _float fDistance = XMVectorGetX(XMVector3Length(vDistance));
-//    ImGui::Text("Target Distance : (%.2f)", fDistance);
-//
-//    ImGui::Separator();
-//
-//    _uint iIndex = m_pModelCom->Get_CurrentAnimationIndex();
-//    
-//    ImGui::Text("Current Animation Index : %d ", iIndex);
-//
-//
-//    _wstring strAnimIndex = TEXT("Current Animation Index : ") + to_wstring(iIndex) + TEXT("\n");
-//    OutputDebugWstring(strAnimIndex);
-//
-//    _float fCurrentAnimSpeed = m_pModelCom->Get_AnimSpeed(iIndex);
-//    ImGui::InputFloat("Anim Speed", &fCurrentAnimSpeed);
-//    ImGui::Separator();
-//
-//    if (ImGui::Button("Apply"))
-//    {
-//        m_pModelCom->Set_AnimSpeed(iIndex, fCurrentAnimSpeed);
-//    }
-//    
-//
-//   
-//
-//    ImGui::End();
-//
-//   
-//     m_pColliderCom->Render();
-//
-//#endif // _DEBUG
+#ifdef _DEBUG
+    ImGui_Render();
+#endif // _DEBUG
 
     if (FAILED(Ready_Render_Resources()))
     {
@@ -235,7 +232,7 @@ HRESULT CQueenKnight::Render()
         if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
             CRASH("Ready Bone Matrices Failed");
 
-        if (FAILED(m_pShaderCom->Begin(0)))
+        if (FAILED(m_pShaderCom->Begin(m_iShaderPath)))
             CRASH("Ready Shader Begin Failed");
 
         if (FAILED(m_pModelCom->Render(i)))
@@ -490,7 +487,8 @@ HRESULT CQueenKnight::InitializeAction_ToAnimationMap()
 
     //m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"WARP_START"], 1.5f);
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"WARP_START"], 1.2f);
-    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"WARP_END"], 1.5f);
+    //m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"WARP_END"], 1.5f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"WARP_END"], 1.2f);
     //m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"WARP_END"], 1.5f);
 
 
@@ -694,6 +692,42 @@ void CQueenKnight::Create_QueenKnightWarp_Effect_Particle(_float3 vDir)
 
 }
 
+// Dissolve 진행.
+void CQueenKnight::Start_Dissolve()
+{
+    m_IsDissolve = true;
+    m_iShaderPath = static_cast<_uint>(ANIMESH_SHADERPATH::DISSOLVE);
+    m_pWeapon->Start_Dissolve();
+    m_pShield->Start_Dissolve();
+}
+
+void CQueenKnight::ReverseStart_Dissolve()
+{
+    m_IsReverseDissolve = true;
+    m_fReverseDissolveTime = m_fEndReverseDissolveTime;
+    m_iShaderPath = static_cast<_uint>(ANIMESH_SHADERPATH::DISSOLVE_REVERSE);
+    m_pWeapon->ReverseStart_Dissolve();
+    m_pShield->ReverseStart_Dissolve();
+}
+
+void CQueenKnight::End_Dissolve()
+{
+    m_IsDissolve = false;
+    m_fDissolveTime = 0.f;
+    m_iShaderPath = static_cast<_uint>(ANIMESH_SHADERPATH::DEFAULT);
+    m_pWeapon->End_Dissolve();
+    m_pShield->End_Dissolve();
+}
+
+void CQueenKnight::ReverseEnd_Dissolve()
+{
+    m_IsReverseDissolve = false;
+    m_fReverseDissolveTime = 0.f;
+    m_iShaderPath = static_cast<_uint>(ANIMESH_SHADERPATH::DEFAULT);
+    //m_pWeapon->ReverseStart_Dissolve();
+    //m_pShield->ReverseStart_Dissolve();
+}
+
 #pragma endregion
 
 
@@ -853,6 +887,32 @@ HRESULT CQueenKnight::Ready_Render_Resources()
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_Transform_Float4x4(D3DTS::PROJ))))
         return E_FAIL;
 
+    if (FAILED(m_pDissolveTexture->Bind_Shader_Resource(m_pShaderCom, "g_DissolveTexture", 2)))
+    {
+        CRASH("Failed Dissolve Texture");
+        return E_FAIL;
+    }
+
+    
+    // Clamp 0 ~ 1 사이로 전달
+
+    _float fDissolveTime = Normalize(m_fDissolveTime, 0.f, m_fEndDissolveTime);
+
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fDissolveTime", &fDissolveTime, sizeof(_float))))
+    {
+        CRASH("Failed Dissolve Texture");
+        return E_FAIL;
+    }
+
+    _float fReverseDissolveTime = Normalize(m_fReverseDissolveTime, 0.f, m_fEndReverseDissolveTime);
+
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fReverseDissolveTime", &fReverseDissolveTime, sizeof(_float))))
+    {
+        CRASH("Failed Dissolve Texture");
+        return E_FAIL;
+    }
+
+
     const LIGHT_DESC* pLightDesc = m_pGameInstance->Get_LightDesc(0);
     if (nullptr == pLightDesc)
         return E_FAIL;
@@ -917,7 +977,66 @@ void CQueenKnight::Free()
     Safe_Release(m_pWeapon);
     Safe_Release(m_pShield);
     Safe_Release(m_pTree);
+    Safe_Release(m_pDissolveTexture);
 }
+
+
 #pragma endregion
 
+void CQueenKnight::ImGui_Render()
+{
+    //#ifdef _DEBUG
+//    ImGuiIO& io = ImGui::GetIO();
+//
+//    // 기존 Player Debug Window
+//
+//    ImVec2 windowSize = ImVec2(300.f, 300.f);
+//    ImVec2 windowPos = ImVec2(windowSize.x, 0.f);
+//    ImGui::SetNextWindowPos(windowPos, ImGuiCond_Once);
+//    ImGui::SetNextWindowSize(windowSize, ImGuiCond_Once);
+//
+//    string strDebug = "QueenKnight Debug";
+//    ImGui::Begin(strDebug.c_str(), nullptr, ImGuiWindowFlags_NoCollapse);
+//    ImGui::Text("HP : (%.2f)", m_MonsterStat.fHP);
+//    ImGui::Text("MAX HP : (%.2f)", m_MonsterStat.fMaxHP);
+//
+//    _float3 vPos = {};
+//    XMStoreFloat3(&vPos, m_pTransformCom->Get_State(STATE::POSITION));
+//    ImGui::Text("POS : (%.2f, %.2f, %.2f)", vPos.x, vPos.y, vPos.z);
+//
+//    _vector vMyPos =  m_pTransformCom->Get_State(STATE::POSITION);
+//    _vector vTargetPos = m_pTarget->Get_Transform()->Get_State(STATE::POSITION);
+//    _vector vDistance = vTargetPos - vMyPos;
+//    _float fDistance = XMVectorGetX(XMVector3Length(vDistance));
+//    ImGui::Text("Target Distance : (%.2f)", fDistance);
+//
+//    ImGui::Separator();
+//
+//    _uint iIndex = m_pModelCom->Get_CurrentAnimationIndex();
+//    
+//    ImGui::Text("Current Animation Index : %d ", iIndex);
+//
+//
+//    _wstring strAnimIndex = TEXT("Current Animation Index : ") + to_wstring(iIndex) + TEXT("\n");
+//    OutputDebugWstring(strAnimIndex);
+//
+//    _float fCurrentAnimSpeed = m_pModelCom->Get_AnimSpeed(iIndex);
+//    ImGui::InputFloat("Anim Speed", &fCurrentAnimSpeed);
+//    ImGui::Separator();
+//
+//    if (ImGui::Button("Apply"))
+//    {
+//        m_pModelCom->Set_AnimSpeed(iIndex, fCurrentAnimSpeed);
+//    }
+//    
+//
+//   
+//
+//    ImGui::End();
+//
+//   
+//     m_pColliderCom->Render();
+//
+//#endif // _DEBUG
 
+}

@@ -65,8 +65,8 @@ private:
 	_float4x4* m_pWeaponTrailStart_SocketMatrix = {};
 	_float4x4* m_pWeaponTrailEnd_SocketMatrix = {};
 
-	_float3					m_vPointUp = {};
-	_float3					m_vPointDown = {};
+	_float3	m_vPointUp = {};
+	_float3	m_vPointDown = {};
 #pragma endregion
 
 
@@ -87,6 +87,11 @@ public:
 	virtual void Free() override;
 #pragma endregion
 
+
+#ifdef _DEBUG
+private:
+	void ImGui_Render(); // 디버그용 함수.
+#endif // _DEBUG
 
 
 };

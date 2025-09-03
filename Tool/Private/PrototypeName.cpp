@@ -13,10 +13,10 @@ const MODEL_DESC Model_Prototypes[] =
 	//{ MODELTYPE::NONANIM,  TEXT("MapPart_BossStageType1"),        "../Bin/Resources/Models/Map/BossMap/BossMapType1.fbx",        "textures/BossStage/" },
 	//{ MODELTYPE::ANIM,  TEXT("Prototype_Component_Model_Player"), "../Bin/Resources/Models/Player/Player.fbx",        "textures/"},
 	//{ MODELTYPE::ANIM,  TEXT("Prototype_Component_Model_SkyBoss"), "../Bin/Resources/Models/SkyBoss/SkyBoss.fbx",        "textures/"},
-	{ MODELTYPE::NONANIM,  TEXT("Prototype_Component_Model_Sword"), "../Bin/Resources/Models/Weapon/Player/Sword.fbx",        "textures/"},
+	//{ MODELTYPE::NONANIM,  TEXT("Prototype_Component_Model_Sword"), "../Bin/Resources/Models/Weapon/Player/Sword.fbx",        "textures/"},
 	//{ MODELTYPE::ANIM,  TEXT("Prototype_Component_Model_WolfDevil"), "../Bin/Resources/Models/WolfDevil/WolfDevil.fbx",        "textures/"},
 	//{ MODELTYPE::ANIM,  TEXT("Prototype_Component_Model_BlackKnight"), "../Bin/Resources/Models/BlackKnight/BlackKnight.fbx",        "textures/"},
-	//{ MODELTYPE::ANIM,  TEXT("Prototype_Component_Model_GodChildLance"), "../Bin/Resources/Models/Weapon/GodsChildServant/GodChildLance.fbx",        "textures/"},
+	{ MODELTYPE::ANIM,  TEXT("Prototype_Component_Model_GodChildLance"), "../Bin/Resources/Models/Weapon/GodsChildServant/GodChildLance.fbx",        "textures/"},
 	//{ MODELTYPE::ANIM,  TEXT("Prototype_Component_Model_GodChildShield"), "../Bin/Resources/Models/Weapon/GodsChildServant/GodChildShield.fbx",        "textures/"}	
 	//{ MODELTYPE::ANIM,  TEXT("Prototype_Component_Model_QueenKnight"), "../Bin/Resources/Models/QueenKnight/QueenKnight.fbx",        "textures/"},
 	//{ MODELTYPE::ANIM,  TEXT("Prototype_Component_Model_SlaveVampire"), "../Bin/Resources/Models/SlaveVampire/SlaveVampire.fbx",        "textures/"},
