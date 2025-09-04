@@ -117,8 +117,8 @@ protected:
 public:
 	void Set_DissolveTime(_float fDissolveTime);
 	void Set_ReverseDissolveTime(_float fDissolveTime);
-	void Start_Dissolve(); // Dissolve 재생.
-	void ReverseStart_Dissolve(); // Dissolve 역재생.
+	void Start_Dissolve(_float fDuration = 0.f); // Dissolve 재생.
+	void ReverseStart_Dissolve(_float fDuration = 0.f); // Dissolve 역재생.
 	void End_Dissolve();
 
 protected:

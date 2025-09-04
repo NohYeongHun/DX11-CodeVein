@@ -292,6 +292,7 @@ void CSwordTrail::Free()
 	Safe_Release(m_pGlowTexture);
 }
 
+#ifdef _DEBUG
 void CSwordTrail::ImGui_Render()
 {
     //Edit_Collider(m_pColliderCom, "Player Weapon");
@@ -313,3 +314,4 @@ void CSwordTrail::ImGui_Render()
     ImGui::End();
 
 }
+#endif

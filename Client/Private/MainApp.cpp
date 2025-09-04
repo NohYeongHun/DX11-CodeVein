@@ -10,17 +10,17 @@ HRESULT CMainApp::Initialize_Clone()
 //	AllocConsole();
 //#endif // DEBUG
 
-	AllocConsole();
+	//AllocConsole();
 
-	// 표준 출력, 에러, 입력 핸들을 콘솔에 연결
-	FILE* fp;
+	//// 표준 출력, 에러, 입력 핸들을 콘솔에 연결
+	//FILE* fp;
 
-	freopen_s(&fp, "CONOUT$", "w", stdout); // std::cout
-	freopen_s(&fp, "CONOUT$", "w", stderr); // std::cerr
-	freopen_s(&fp, "CONIN$", "r", stdin);   // std::cin
+	//freopen_s(&fp, "CONOUT$", "w", stdout); // std::cout
+	//freopen_s(&fp, "CONOUT$", "w", stderr); // std::cerr
+	//freopen_s(&fp, "CONIN$", "r", stdin);   // std::cin
 
-	// 콘솔 버퍼 동기화
-	std::ios::sync_with_stdio(true);
+	//// 콘솔 버퍼 동기화
+	//std::ios::sync_with_stdio(true);
 
 	
 	
@@ -877,7 +877,7 @@ void CMainApp::Free()
 {
 	CBase::Free();
 
-	FreeConsole();
+	//FreeConsole();
 
 
 

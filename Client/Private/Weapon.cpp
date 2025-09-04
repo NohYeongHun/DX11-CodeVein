@@ -186,14 +186,20 @@ void CWeapon::Set_ReverseDissolveTime(_float fDissolveTime)
     m_fMaxReverseDissolveTime = fDissolveTime;
 }
 
-void CWeapon::Start_Dissolve()
+void CWeapon::Start_Dissolve(_float fDuration)
 {
+    if (fDuration != 0.f)
+        m_fMaxDissolveTime = fDuration;
+
     m_fCurDissolveTime = 0.f;
     m_bDissolve = true;
     m_iShaderPath = static_cast<_uint>(MESH_SHADERPATH::DISSOLVE);
 }
-void CWeapon::ReverseStart_Dissolve()
+void CWeapon::ReverseStart_Dissolve(_float fDuration)
 {
+    if (fDuration != 0.f)
+        m_fMaxReverseDissolveTime = fDuration;
+
     m_fCurDissolveTime = m_fMaxReverseDissolveTime;
     m_bReverseDissolve = true;
     m_iShaderPath = static_cast<_uint>(MESH_SHADERPATH::DISSOLVE);

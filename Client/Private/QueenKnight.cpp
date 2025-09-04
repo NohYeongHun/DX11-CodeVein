@@ -286,8 +286,11 @@ void CQueenKnight::Update_AI(_float fTimeDelta)
     Tick_BuffTimers(fTimeDelta);
 
     /* Bind 용 Dissolve Time 계산.*/
+    //if (HasBuff(CMonster::BUFF_DISSOLVE))
+    //m_fCurDissolveTime = Get_DefaultBuffTime(BUFF_DISSOLVE) - Get_BuffTime(BUFF_DISSOLVE); // 점차 보내는 값이 증가.
+
     if (HasBuff(CMonster::BUFF_DISSOLVE))
-        m_fCurDissolveTime = Get_DefaultBuffTime(BUFF_DISSOLVE) - Get_BuffTime(BUFF_DISSOLVE); // 점차 보내는 값이 증가.
+        m_fCurDissolveTime = m_fMaxDissolveTime - Get_BuffTime(BUFF_DISSOLVE); // 점차 보내는 값이 증가.
     else if (HasBuff(CMonster::BUFF_REVERSEDISSOLVE))
         m_fCurDissolveTime = Get_BuffTime(BUFF_REVERSEDISSOLVE); // 점차 값이 감소.
     else
@@ -410,6 +413,7 @@ HRESULT CQueenKnight::InitializeAction_ToAnimationMap()
     /* 워프 애니메이션. */
     m_Action_AnimMap.emplace(L"WARP_START", AS_TStdKnight_TLanceGCS_AttackWarp_Start);
     m_Action_AnimMap.emplace(L"WARP_END", AS_TStdKnight_TLanceGCS_AttackWarp_End01);
+    m_Action_AnimMap.emplace(L"WARP_SKILL", AS_TStdKnight_TLanceGCS_AttackWarp_End02);
     m_Action_AnimMap.emplace(L"WARP_JUMP_ATTACK", AS_TStdKnight_TLanceGCS_AttackWarpJump01_N);
 
     /* 점프 어택. (사라졌다가 나오는 모션.) */
@@ -457,9 +461,10 @@ HRESULT CQueenKnight::InitializeAction_ToAnimationMap()
 
 
     //m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"WARP_START"], 1.5f);
-    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"WARP_START"], 1.2f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"WARP_START"], 1.8f);
     //m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"WARP_END"], 1.5f);
-    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"WARP_END"], 1.2f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"WARP_END"], 1.6f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"WARP_SKILL"], 1.8f);
     //m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"WARP_END"], 1.5f);
 
 
@@ -501,7 +506,17 @@ HRESULT CQueenKnight::InitializeAction_ToAnimationMap()
 #pragma endregion
 
 #pragma region TRAIL 활성화 프레임 관리.
+    Add_Trail_Frame(m_Action_AnimMap[TEXT("WARP_END")], 17.f / 136.f, 50.f / 136.f, PART_WEAPON);     // Dash Attack
     //Add_Trail_Frame(m_Action_AnimMap[TEXT("WARP_END")], 20.f / 137.f, 40.f / 137.f, PART_WEAPON);     // Dash Attack
+    //Add_Trail_Frame(m_Action_AnimMap[TEXT("WARP_END")], 20.f / 137.f, 40.f / 137.f, PART_WEAPON);     // Dash Attack
+
+    Add_Trail_Frame(m_Action_AnimMap[TEXT("PHASE_ATTACK1")], 20.f / 180.f, 80.f / 180.f, PART_WEAPON);// Weapon attack
+    Add_Trail_Frame(m_Action_AnimMap[TEXT("PHASE_ATTACK2")], 20.f / 180.f, 80.f / 180.f, PART_WEAPON);// Weapon attack
+    Add_Trail_Frame(m_Action_AnimMap[TEXT("PHASE_ATTACK3")], 20.f / 180.f, 80.f / 180.f, PART_WEAPON);// Weapon attack
+
+    Add_Trail_Frame(m_Action_AnimMap[TEXT("ATTACK")], 30.f / 195.f, 70.f / 195.f, PART_WEAPON);       // Weapon attack
+
+    Add_Trail_Frame(m_Action_AnimMap[TEXT("ENCOUNTER")], 80.f / 180.f, 130.f / 180.f, PART_WEAPON);// Weapon attack
 #pragma endregion
 
 
@@ -528,12 +543,12 @@ HRESULT CQueenKnight::Initialize_BuffDurations()
     m_BuffDefault_Durations[QUEEN_BUFF_PHASE_ATTACK_COOLDOWN] = 10.f;
 
     // Dissovle 타임.
-    m_BuffDefault_Durations[BUFF_DISSOLVE] = 1.3f;
+    m_BuffDefault_Durations[BUFF_DISSOLVE] = 1.f;
     m_BuffDefault_Durations[BUFF_REVERSEDISSOLVE] = 0.5f;
     // 무기의 Dissolve 타임도 지정.
-    m_pWeapon->Set_DissolveTime(1.3f);
+    m_pWeapon->Set_DissolveTime(1.f);
     m_pWeapon->Set_ReverseDissolveTime(0.3f);
-    m_pShield->Set_DissolveTime(1.3f);
+    m_pShield->Set_DissolveTime(1.f);
     m_pShield->Set_ReverseDissolveTime(0.3f);
 
 
@@ -679,24 +694,32 @@ void CQueenKnight::Create_QueenKnightWarp_Effect_Particle(_float3 vDir)
 }
 
 // Dissolve 진행.
-void CQueenKnight::Start_Dissolve()
+void CQueenKnight::Start_Dissolve(_float fDuration)
 {
-    AddBuff(BUFF_DISSOLVE);
+    if(fDuration == 0.f)
+        AddBuff(BUFF_DISSOLVE);
+
+    AddBuff(BUFF_DISSOLVE, fDuration);
+    m_fMaxDissolveTime = Get_BuffTime(BUFF_DISSOLVE);
     m_fCurDissolveTime = 0.f;
-    m_fMaxDissovleTime = Get_DefaultBuffTime(BUFF_DISSOLVE);
+    //m_fCurDissolveTime = m_fMaxDissovleTime;
+    
     m_iShaderPath = static_cast<_uint>(ANIMESH_SHADERPATH::DISSOLVE);
-    m_pWeapon->Start_Dissolve();
-    m_pShield->Start_Dissolve();
+    m_pWeapon->Start_Dissolve(fDuration);
+    m_pShield->Start_Dissolve(fDuration);
 }
 
 
-void CQueenKnight::ReverseStart_Dissolve()
+void CQueenKnight::ReverseStart_Dissolve(_float fDuration)
 {
-    AddBuff(BUFF_REVERSEDISSOLVE);
-    m_fMaxDissovleTime = Get_DefaultBuffTime(BUFF_DISSOLVE);
+    if (fDuration == 0.f)
+        AddBuff(BUFF_REVERSEDISSOLVE);
+
+    AddBuff(BUFF_REVERSEDISSOLVE, fDuration);
+    m_fMaxDissolveTime = Get_DefaultBuffTime(BUFF_DISSOLVE);
     m_iShaderPath = static_cast<_uint>(ANIMESH_SHADERPATH::DISSOLVE);
-    m_pWeapon->ReverseStart_Dissolve();
-    m_pShield->ReverseStart_Dissolve();
+    m_pWeapon->ReverseStart_Dissolve(fDuration);
+    m_pShield->ReverseStart_Dissolve(fDuration);
 }
 
 void CQueenKnight::End_Dissolve()
@@ -908,7 +931,7 @@ HRESULT CQueenKnight::Bind_Shader_Resource()
         return E_FAIL;
     }
     
-    _float fDissolveTime = normalize(m_fCurDissolveTime, 0.f, m_fMaxDissovleTime);
+    _float fDissolveTime = normalize(m_fCurDissolveTime, 0.f, m_fMaxDissolveTime);
     
     if (FAILED(m_pShaderCom->Bind_RawValue("g_fDissolveTime", &fDissolveTime, sizeof(_float))))
     {

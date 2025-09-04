@@ -10,13 +10,13 @@ class CBT_QueenKnight_TripleDownStrikeAction final : public CBTAction
 public:
     enum class ATTACK_PHASE : _ubyte
     {
-        NONE,           // 초기 상태
-        READY,          // Attack 상태.
-        ASCEND,         // 상승
-        WAIT_TELEPORT,  // 상승 후 대기 (텔레포트 전)
-        TELEPORT,       // 맵 중앙으로 텔레포트
-        SKILL,          // 스킬.
-        COMPLETED       // IDLE로 변환되어야 함.
+        NONE,       // 초기 상태
+        READY,      // Attack 상태.
+        ASCEND,     // 상승
+        HANG,       // 캐릭터 머리위로 이동.
+        DESCEND,    // 하강.
+        SKILL,      // 스킬 페이즈.
+        COMPLETED   // IDLE로 변환되어야 함.
     };
 
 private:
@@ -31,10 +31,26 @@ private:
     _float m_fOriginSpeed = {}; // 원본 애니메이션 스피드
 
 
+#pragma region 점프 관리.
 private:
-    // 애니메이션 Ratio 조절
+    // 애니메이션 DownStrike Ratio 조절
+    _float m_fReady_StartRatio = {};
+    _float m_fReady_EndRatio = {};
+
+    _float m_fDissolve_StartRatio = {};
+    _float m_fDissolve_EndRatio = {};
+
+    _bool m_bDissolveCheck = { false };
+
     _float m_fJump_StartRatio = {};
     _float m_fJump_EndRatio = {};
+
+    _float m_fAttack_StartRatio = {};
+    _float m_fAttack_EndRatio = {};
+
+#pragma endregion
+
+
 
     // 총 250 프레임.
     _float m_fSkill_StartRatio = {} ;
@@ -42,6 +58,8 @@ private:
 
     // 목표 상승 지점.
     _float3 m_vAscendTarget = {};
+    // 상승 보간 지점.
+    _float3 m_vAscendInterPolationTarget = {};
     // 목표 하강 지점.
     _float3 m_vDesecndTarget = {};
 
@@ -59,10 +77,9 @@ public:
 
 private:
     BT_RESULT Enter_Attack(_float fTimeDelta);
-    BT_RESULT Update_Ready(_float fTimeDelta);
     BT_RESULT Update_Ascend(_float fTimeDelta);
-    BT_RESULT Update_WaitTeleport(_float fTimeDelta);
-    BT_RESULT Update_Teleport(_float fTimeDelta);
+    BT_RESULT Update_Hang(_float fTimeDelta);
+    BT_RESULT Update_Descend(_float fTimeDelta);
     BT_RESULT Update_Skill(_float fTimeDelta);
 
 public:

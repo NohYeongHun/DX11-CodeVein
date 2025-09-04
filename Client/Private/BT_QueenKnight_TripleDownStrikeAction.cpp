@@ -1,4 +1,5 @@
-﻿
+﻿#include "BT_QueenKnight_TripleDownStrikeAction.h"
+
 CBT_QueenKnight_TripleDownStrikeAction::CBT_QueenKnight_TripleDownStrikeAction(CQueenKnight* pOwner)
     : m_pOwner{ pOwner }
 {
@@ -6,14 +7,19 @@ CBT_QueenKnight_TripleDownStrikeAction::CBT_QueenKnight_TripleDownStrikeAction(C
 
     /* 공격 애니메이션이 총 3단계로 나뉨 */
 
-    // 1. 점프하는 판정
-    m_fJump_StartRatio = 40.f / 224.f;
-    m_fJump_EndRatio = 50.f / 224.f;
+     // 1. WARP_START
+    m_fReady_StartRatio = 0.f / 80.f;
+    m_fReady_EndRatio = 54.f / 80.f;
 
-    // 4. 공격 프레임.
-    m_fSkill_StartRatio = 125.f / 250.f;
-    m_fSKill_EndRatio = 160.f / 250.f;
+    // 2. 점프하는 판정 => 해당 시간 동안 디졸브
+    m_fJump_StartRatio = 55.f / 80.f;
+    m_fJump_EndRatio = 80.f / 80.f;
 
+
+    m_fAttack_StartRatio = 21.f / 261.f;
+    m_fAttack_EndRatio = 40.f / 261.f;
+
+    m_vDesecndTarget = { 1.f, 1.f, 1.f };
 
 }
 
@@ -27,29 +33,37 @@ BT_RESULT CBT_QueenKnight_TripleDownStrikeAction::Perform_Action(_float fTimeDel
     {
     case ATTACK_PHASE::NONE:
         return Enter_Attack(fTimeDelta);
-    case ATTACK_PHASE::WAIT_TELEPORT:
-        return Update_WaitTeleport(fTimeDelta);
-    case ATTACK_PHASE::TELEPORT:
-        return Update_Teleport(fTimeDelta);
-    case ATTACK_PHASE::SKILL:
-        return Update_Skill(fTimeDelta);
+    case ATTACK_PHASE::ASCEND:
+        return Update_Ascend(fTimeDelta);
+    case ATTACK_PHASE::HANG:
+        return Update_Hang(fTimeDelta);
+    case ATTACK_PHASE::DESCEND:
+        return Update_Descend(fTimeDelta);
     case ATTACK_PHASE::COMPLETED:
         return BT_RESULT::SUCCESS;
     }
+
     return BT_RESULT::FAILURE;
 }
 
 void CBT_QueenKnight_TripleDownStrikeAction::Reset()
 {
     m_eAttackPhase = ATTACK_PHASE::NONE;
+
     m_pOwner->RemoveBuff(CMonster::BUFF_NAVIGATION_OFF, true);
     m_pOwner->Reset_Collider_ActiveInfo();
     m_pOwner->Set_Visible(true);
     m_IsChangeSpeed = false;
+    m_bDissolveCheck = false;
+
+    m_pOwner->Set_Animation_Speed(m_pOwner->Find_AnimationIndex(L"WARP_END"), 1.2f);
+
+    m_pOwner->End_Dissolve();
 
     // 위치 변수들을 명확히 초기화
     m_vAscendTarget = _float3{ 0.f, 0.f, 0.f };
-    m_vDesecndTarget = _float3{ 0.f, 0.f, 0.f };
+    // 목표 하강 지점.
+    m_vDesecndTarget = _float3{ 1.f, 1.f, 1.f };
     
     // 시간 변수 초기화
     m_fWaitTime = 0.f;
@@ -63,133 +77,179 @@ BT_RESULT CBT_QueenKnight_TripleDownStrikeAction::Enter_Attack(_float fTimeDelta
         CRASH("Failed Tree Attack Enter Logic");
     }
 
-    // 1. 다음 단계로 진행 => 플레이어 머리 위에서 내려찍는 거라. 회전이 굳이 필요는 없다?
-    //m_eAttackPhase = ATTACK_PHASE::READY;
-    //m_eAttackPhase = ATTACK_PHASE::WAIT_TELEPORT;
-    m_eAttackPhase = ATTACK_PHASE::WAIT_TELEPORT;
+    // 1. 애니메이션 전환.
+    _uint iNextAnimationIdx = m_pOwner->Find_AnimationIndex(L"WARP_START");
 
-    // 2. 애니메이션 전환.
-    /*_uint iNextAnimationIdx = m_pOwner->Find_AnimationIndex(L"DOWN_STRIKE");
-    m_pOwner->Change_Animation_Blend(iNextAnimationIdx, false, 0.1f, true, true, true);*/
+    //m_pOwner->Change_Animation_Blend(iNextAnimationIdx, false, 0.2f, true, true, true);
+    m_pOwner->Change_Animation_NonBlend(iNextAnimationIdx, false);
+    m_pOwner->RotateTurn_ToTargetYaw();
 
-    _uint iNextAnimationIdx = m_pOwner->Find_AnimationIndex(L"IDLE");
-    m_pOwner->Change_Animation_Blend(iNextAnimationIdx, false, 0.1f, true, true, true);
+    // 2. 다음 단계 진행
+    m_eAttackPhase = ATTACK_PHASE::ASCEND;
 
-    _vector vCenterPos = XMVectorSet(1.f, 2.f, 1.f, 1.f);
-    m_pOwner->Get_Transform()->Set_State(STATE::POSITION, vCenterPos);
-    
-    m_pOwner->NearCell_Translate();
-    
-    m_pOwner->Set_Visible(false);
 
-    return BT_RESULT::RUNNING;
-}
 
-BT_RESULT CBT_QueenKnight_TripleDownStrikeAction::Update_Ready(_float fTimeDelta)
-{
-    m_pOwner->RotateTurn_ToTargetYaw(fTimeDelta);
+    // 3. Navigation 끄기
+    m_pOwner->AddBuff(CMonster::BUFF_NAVIGATION_OFF, 10.f);
 
-    if (m_pOwner->Get_CurrentAnimationRatio() >= m_fJump_StartRatio)
-    {
-        // 1. Phase 전환
-        m_eAttackPhase = ATTACK_PHASE::ASCEND;
+    // 4. 목표 위치 지정.
+    _vector vOwnerPos = m_pOwner->Get_Transform()->Get_State(STATE::POSITION);
+    vOwnerPos.m128_f32[1] += 30.f;
+    XMStoreFloat3(&m_vAscendTarget, vOwnerPos);
 
-        // 2. 애니메이션 전환.
-        _uint iNextAnimationIdx = m_pOwner->Find_AnimationIndex(L"FALL_LOOP");
-        m_pOwner->Change_Animation_Blend(iNextAnimationIdx, false, 0.1f, true, true, true);
-
-        // 3. Navigation 끄기
-        //m_pOwner->AddBuff(CMonster::BUFF_NAVIGATION_OFF, 10.f);
-
-        // 4. 목표 위치 지정.
-        _vector vOwnerPos = m_pOwner->Get_Transform()->Get_State(STATE::POSITION);
-        vOwnerPos.m128_f32[1] += 10.f;
-
-        XMStoreFloat3(&m_vAscendTarget, vOwnerPos);
-
-        m_pOwner->RotateTurn_ToTarget();
-
-        // 5. 렌더링 끄기.
-        m_pOwner->Set_Visible(false);
-    }
+    m_pOwner->Disable_Collider(CQueenKnight::PART_BODY);
 
     return BT_RESULT::RUNNING;
 }
+
 
 BT_RESULT CBT_QueenKnight_TripleDownStrikeAction::Update_Ascend(_float fTimeDelta)
 {
     _vector vOwnerPos = m_pOwner->Get_Transform()->Get_State(STATE::POSITION);
+    _float fCurrentRatio = m_pOwner->Get_CurrentAnimationRatio();
+
+    if (!m_bDissolveCheck && !m_pOwner->HasBuff(CMonster::BUFF_DISSOLVE) && fCurrentRatio >= m_fDissolve_StartRatio)
+    {
+        // 디졸브 시작.
+        m_bDissolveCheck = true; // 이미 Dissolve가 발생했는지?
+        m_pOwner->Start_Dissolve(1.f);
+        //m_pOwner->AddBuff(CMonster::BUFF_DISSOLVE);
+
+        // 시점과 운동 방향 변경 필요. => 운동 방향은 몬스터 중앙에서 시작해서 위로 퍼져나감.
+        m_pOwner->Create_QueenKnightWarp_Effect_Particle({ 0.f, 1.f, 0.f });
+    }
+
+    if (vOwnerPos.m128_f32[1] <= m_vAscendTarget.y && fCurrentRatio >= m_fJump_StartRatio)
+    {
+        m_pOwner->Move_Direction({ 0.f, 1.f, 0.f }, fTimeDelta * 0.5f);
+    }
+
+   /* if (m_bDissolveCheck && !m_pOwner->HasBuff(CMonster::BUFF_DISSOLVE))
+    {
+        m_pOwner->Set_Visible(false);
+    }*/
 
     // 1. 목표 높이까지 도달했는지 확인. 아니면 위로 이동.
-    if (vOwnerPos.m128_f32[1] <= m_vAscendTarget.y)
+    if (m_pOwner->Is_Animation_Finished() && vOwnerPos.m128_f32[1] >= m_vAscendTarget.y)
     {
-        m_pOwner->Move_Direction({ 0.f, 1.f, 0.f }, fTimeDelta * 0.3f);
+        // 2. 높이를 유지한 채로 순간이동 페이즈로 진입.
+        m_eAttackPhase = ATTACK_PHASE::HANG;
+
+        // 4. 순간이동 페이즈에 진입할때 Player 머리 위로 위치 이동. => 이게 부자연스러운데..
+        _float vPosY = vOwnerPos.m128_f32[1];
+
+        /// 타겟 포스가 아니라. 맵 중앙.
+
+        _vector vTargetPos = XMVectorSetY(XMLoadFloat3(&m_vDesecndTarget), vPosY);
+
+        m_pOwner->Get_Transform()->Set_State(STATE::POSITION, vTargetPos);
+        
+        // 5. 애니메이션 전환.
+        _uint iNextAnimationIdx = m_pOwner->Find_AnimationIndex(L"WARP_SKILL");
+
+        m_pOwner->Change_Animation_Blend(iNextAnimationIdx, false, 0.1f, true, true, true);
+
+        m_pOwner->RotateTurn_ToTargetYaw();
+
+
+        m_bDissolveCheck = false;
+    }
+
+    // DISSOLVE가 끝나면 Reverse Dissolv 시작.
+    if (!m_bDissolveCheck && !m_pOwner->HasBuff(CMonster::BUFF_DISSOLVE))
+    {
+        // 시야에 켜기.
+
+        // 2. 목표 하강지점 도착했으므로 렌더링 켜기 (시야에서 나타남)
+        m_pOwner->ReverseStart_Dissolve(0.3f);
+    }
+
+    return BT_RESULT::RUNNING;
+}
+
+BT_RESULT CBT_QueenKnight_TripleDownStrikeAction::Update_Hang(_float fTimeDelta)
+{
+    // DISSOLVE가 끝나면 Reverse Dissolv 시작.
+    //if (!m_bDissolveCheck && !m_pOwner->HasBuff(CMonster::BUFF_DISSOLVE))
+    //{
+    //    // 시야에 켜기.
+
+    //    // 2. 목표 하강지점 도착했으므로 렌더링 켜기 (시야에서 나타남)
+    //    m_pOwner->ReverseStart_Dissolve(0.3f);
+    //}
+
+    // 1. 현재 위치
+    _vector vOwnerPos = m_pOwner->Get_Transform()->Get_State(STATE::POSITION);
+    _vector vTargetPos = XMLoadFloat3(&m_vDesecndTarget);
+
+    // 2. Y축 거리만 확인 (수평 거리는 이미 텔레포트로 도착했음)
+    _float fYDistance = abs(XMVectorGetY(vOwnerPos) - XMVectorGetY(vTargetPos));
+
+    _float fCurrentRatio = m_pOwner->Get_CurrentAnimationRatio();
+
+    if (fYDistance >= 1.f)  // Y축 거리가 0.5 이상일 때만 하강
+    {
+        // 목표 Y 위치보다 높을 때만 하강
+        if (XMVectorGetY(vOwnerPos) > XMVectorGetY(vTargetPos))
+        {
+            m_pOwner->Move_Direction({ 0.f, -1.f, 0.f }, fTimeDelta * 0.7f);
+        }
+        else
+        {
+            // 목표 지점에 도착했으므로 공격 페이즈로 전환
+            if (m_pOwner->Get_CurrentAnimationRatio() >= m_fAttack_StartRatio)
+            {
+                m_eAttackPhase = ATTACK_PHASE::DESCEND;
+                m_pOwner->Set_Animation_Speed(m_pOwner->Find_AnimationIndex(L"WARP_SKILL"), 1.6f);
+                m_pOwner->RemoveBuff(CMonster::BUFF_NAVIGATION_OFF, true);
+            }
+        }
     }
     else
     {
-        // 2. 상승 완료 후 대기 페이즈로 전환
-        m_eAttackPhase = ATTACK_PHASE::WAIT_TELEPORT;
-        
-        // 3. 대기 시간 초기화
-        m_fWaitTime = 0.f;
-    }
+        if (fCurrentRatio >= m_fAttack_StartRatio)
+        {
+            // 1. 공격 시작 애니메이션에 페이즈 변경.
+            m_eAttackPhase = ATTACK_PHASE::DESCEND;
 
+            // 2. 목표 하강지점 도착했으므로 렌더링 켜기 (시야에서 나타남)
+            m_pOwner->Set_Animation_Speed(m_pOwner->Find_AnimationIndex(L"WARP_SKILL"), 1.6f);
+            // 3. Navigation Off 해제. => 다시 Navigation을 타게 만듭니다.
+            m_pOwner->RemoveBuff(CMonster::BUFF_NAVIGATION_OFF, true);
 
-    return BT_RESULT::RUNNING;
-}
-
-// 상승 후 대기
-BT_RESULT CBT_QueenKnight_TripleDownStrikeAction::Update_WaitTeleport(_float fTimeDelta)
-{
-    // 대기 시간 증가
-    m_fWaitTime += fTimeDelta;
-
-    // 지정된 시간이 지나면 텔레포트 페이즈로 전환
-    if (m_fWaitTime >= m_fMaxWaitTime)
-    {
-        m_eAttackPhase = ATTACK_PHASE::TELEPORT;
+        }
     }
 
     return BT_RESULT::RUNNING;
 }
 
-// 맵 중앙으로 텔레포트
-BT_RESULT CBT_QueenKnight_TripleDownStrikeAction::Update_Teleport(_float fTimeDelta)
-{
-    // 1. 맵 중앙으로 이동 (1.f, 1.f, 1.f)
-    // 1. 애니메이션 전환
-    _uint iNextAnimationIdx = m_pOwner->Find_AnimationIndex(L"DOWN_STRIKE_SKILL");
-    m_pOwner->Change_Animation_Blend(iNextAnimationIdx, false, 0.1f, true, true, true);
-
-    // 2. 맵 중앙으로 이동한 후 Visible 활성화
-    m_pOwner->Set_Visible(true);
-
-    // 3. 다음 페이즈로 전환
-    m_eAttackPhase = ATTACK_PHASE::SKILL;
-
-    return BT_RESULT::RUNNING;
-}
-
-
-
-BT_RESULT CBT_QueenKnight_TripleDownStrikeAction::Update_Skill(_float fTimeDelta)
+BT_RESULT CBT_QueenKnight_TripleDownStrikeAction::Update_Descend(_float fTimeDelta)
 {
     if (m_pOwner->Is_Animation_Finished())
     {
         m_eAttackPhase = ATTACK_PHASE::COMPLETED;
-
-        // 1. 애니메이션 전환.
+        m_pOwner->Enable_Collider(CQueenKnight::PART_BODY);
+        m_pOwner->RemoveBuff(CMonster::BUFF_NAVIGATION_OFF, true);
         _uint iNextAnimationIdx = m_pOwner->Find_AnimationIndex(L"IDLE");
-        m_pOwner->Change_Animation_Blend(iNextAnimationIdx, false, 0.1f, true, true, false);
 
-        // 2. 쿨타임 제어
+        //m_pOwner->Change_Animation_Blend(iNextAnimationIdx, false, 0.1f, true, true, false);
+        m_pOwner->Change_Animation_NonBlend(iNextAnimationIdx, false);
+
         m_pOwner->AddBuff(CQueenKnight::QUEEN_BUFF_DOWN_TRIPLE_STRIKE_COOLDOWN);
-
-        m_pOwner->RotateTurn_ToTarget();
     }
+
 
     return BT_RESULT::RUNNING;
 }
+
+BT_RESULT CBT_QueenKnight_TripleDownStrikeAction::Update_Skill(_float fTimeDelta)
+{
+    return BT_RESULT::RUNNING;
+}
+
+
+
+
 
 
 CBT_QueenKnight_TripleDownStrikeAction* CBT_QueenKnight_TripleDownStrikeAction::Create(CQueenKnight* pOwner)
