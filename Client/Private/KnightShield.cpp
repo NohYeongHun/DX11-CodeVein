@@ -1,6 +1,4 @@
-﻿#include "KnightShield.h"
-
-CKnightShield::CKnightShield(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿CKnightShield::CKnightShield(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CWeapon(pDevice, pContext)
 {
 }
@@ -55,6 +53,7 @@ void CKnightShield::Update(_float fTimeDelta)
         XMLoadFloat4x4(m_pSocketMatrix) *
         XMLoadFloat4x4(m_pParentMatrix));
 
+    CWeapon::Update_Timer(fTimeDelta);
     CWeapon::Finalize_Update(fTimeDelta);
 }
 
@@ -64,7 +63,7 @@ void CKnightShield::Late_Update(_float fTimeDelta)
 
     if (Is_Visible())
     {
-        if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::BLEND, this)))
+        if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::NONBLEND, this)))
             return;
     }
     
@@ -72,28 +71,28 @@ void CKnightShield::Late_Update(_float fTimeDelta)
 
 HRESULT CKnightShield::Render()
 {
-#ifdef _DEBUG
-    ImGuiIO& io = ImGui::GetIO();
-
-    // 기존 Player Debug Window
-
-    ImVec2 windowSize = ImVec2(300.f, 300.f);
-    ImVec2 windowPos = ImVec2(600.f, 0.f);
-    ImGui::SetNextWindowPos(windowPos, ImGuiCond_Once);
-    ImGui::SetNextWindowSize(windowSize, ImGuiCond_Once);
-
-    string strDebug = "QueenKnight Shield Debug";
-    ImGui::Begin(strDebug.c_str(), nullptr, ImGuiWindowFlags_NoCollapse);
-
-    static _float fPitch = { 0.f }, fYaw = { 0.f }, fRoll = { 0.f };
-
-    //m_pTransformCom->Add_Rotation();
-
-    ImGui::End();
-
-    //Edit_Collider(m_pColliderCom, "QueenKnight Shield");
-    m_pColliderCom->Render();
-#endif // _DEBUG
+//#ifdef _DEBUG
+//    ImGuiIO& io = ImGui::GetIO();
+//
+//    // 기존 Player Debug Window
+//
+//    ImVec2 windowSize = ImVec2(300.f, 300.f);
+//    ImVec2 windowPos = ImVec2(600.f, 0.f);
+//    ImGui::SetNextWindowPos(windowPos, ImGuiCond_Once);
+//    ImGui::SetNextWindowSize(windowSize, ImGuiCond_Once);
+//
+//    string strDebug = "QueenKnight Shield Debug";
+//    ImGui::Begin(strDebug.c_str(), nullptr, ImGuiWindowFlags_NoCollapse);
+//
+//    static _float fPitch = { 0.f }, fYaw = { 0.f }, fRoll = { 0.f };
+//
+//    //m_pTransformCom->Add_Rotation();
+//
+//    ImGui::End();
+//
+//    //Edit_Collider(m_pColliderCom, "QueenKnight Shield");
+//    m_pColliderCom->Render();
+//#endif // _DEBUG
 
     if (FAILED(Bind_ShaderResources()))
     {
@@ -108,7 +107,7 @@ HRESULT CKnightShield::Render()
         if (FAILED(m_pModelCom->Bind_Materials(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE, 0)))
             return E_FAIL;
 
-        m_pShaderCom->Begin(0);
+        m_pShaderCom->Begin(m_iShaderPath);
 
         m_pModelCom->Render(i);
     }
@@ -127,6 +126,8 @@ void CKnightShield::On_Collision_Stay(CGameObject* pOther)
 void CKnightShield::On_Collision_Exit(CGameObject* pOther)
 {
 }
+
+
 
 HRESULT CKnightShield::Ready_Components()
 {
@@ -147,6 +148,16 @@ HRESULT CKnightShield::Ready_Components()
         CRASH("Failed Load Model")
         return E_FAIL;
     }
+
+
+    // Dissolve Texture
+    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Dissolve"),
+        TEXT("Com_Dissolve"), reinterpret_cast<CComponent**>(&m_pDissolveTexture), nullptr)))
+    {
+        CRASH("Failed Load DissolveTexture");
+        return E_FAIL;
+    }
+
 
     return S_OK;
 }
@@ -190,7 +201,25 @@ HRESULT CKnightShield::Bind_ShaderResources()
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_Transform_Float4x4(D3DTS::PROJ))))
         return E_FAIL;
 
-    const LIGHT_DESC* pLightDesc = m_pGameInstance->Get_LightDesc(0);
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
+        return E_FAIL;
+
+    if (FAILED(m_pDissolveTexture->Bind_Shader_Resource(m_pShaderCom, "g_DissolveTexture", 0)))
+        return E_FAIL;
+
+    _float fDissolveTime = {};
+    if (m_bDissolve)
+        fDissolveTime = normalize(m_fCurDissolveTime, 0.f, m_fMaxDissolveTime);
+    else if (m_bReverseDissolve)
+        fDissolveTime = normalize(m_fCurDissolveTime, 0.f, m_fMaxReverseDissolveTime);
+
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fDissolveTime", &fDissolveTime, sizeof(_float))))
+    {
+        CRASH("Failed Dissolve Texture");
+        return E_FAIL;
+    }
+
+    /*const LIGHT_DESC* pLightDesc = m_pGameInstance->Get_LightDesc(0);
     if (nullptr == pLightDesc)
         return E_FAIL;
 
@@ -201,9 +230,8 @@ HRESULT CKnightShield::Bind_ShaderResources()
     if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightAmbient", &pLightDesc->vAmbient, sizeof(_float4))))
         return E_FAIL;
     if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightSpecular", &pLightDesc->vSpecular, sizeof(_float4))))
-        return E_FAIL;
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
-        return E_FAIL;
+        return E_FAIL;*/
+    
 
     return S_OK;
 }

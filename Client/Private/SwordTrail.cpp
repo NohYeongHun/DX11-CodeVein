@@ -1,4 +1,5 @@
-﻿
+﻿#include "SwordTrail.h"
+
 CSwordTrail::CSwordTrail(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CGameObject{pDevice, pContext }
 {
@@ -43,6 +44,7 @@ HRESULT CSwordTrail::Initialize_Clone(void* pArg)
         
 	m_eCurLevel = pDesc->eCurLevel;
     m_iShaderID = 2; // StretchTrail 패스 사용 (Ribbon Trail)
+	m_iBaseTextureIndex = static_cast<_uint>(pDesc->eDiffuseType);
 
 	CPlayer* pPlayer = dynamic_cast<CPlayer*>(pDesc->pTarget);
 
@@ -82,25 +84,10 @@ HRESULT CSwordTrail::Render()
 		return E_FAIL;
 
 #ifdef _DEBUG
-    //Edit_Collider(m_pColliderCom, "Player Weapon");
-    ImGuiIO& io = ImGui::GetIO();
-    ImVec2 windowPos = ImVec2(0.f, 300.f);
-    ImVec2 windowSize = ImVec2(00.f, 300.f);
-
-    ImGui::SetNextWindowPos(windowPos, ImGuiCond_Once);
-    ImGui::SetNextWindowSize(windowSize, ImGuiCond_Once);
-
-    ImGui::Begin("Player Weapon Trail Debug", nullptr, ImGuiWindowFlags_NoCollapse);
-	
-	static _float TrailPos[3] = { m_WeaponMatrix.m[3][0], m_WeaponMatrix.m[3][1], m_WeaponMatrix.m[3][2] };
-
-	ImGui::Text("Trail Pos : (%.2f, %.2f, %.2f)", TrailPos[0], TrailPos[1], TrailPos[2]);
-
-	ImGui::Text("Current Cell Count : %d", m_pVIBufferCom->Get_CurrentPoint());
-
-    ImGui::End();
-
+	//ImGui_Render();
 #endif // _DEBUG
+
+
 
 
 
@@ -221,7 +208,7 @@ HRESULT CSwordTrail::Bind_ShaderResources()
 		return E_FAIL;
 	}
 
-	if (FAILED(m_pBaseTexture->Bind_Shader_Resource(m_pShaderCom, "g_BaseTexture", 0)))
+	if (FAILED(m_pBaseTexture->Bind_Shader_Resource(m_pShaderCom, "g_BaseTexture", m_iBaseTextureIndex)))
 	{
 		CRASH("Failed Bind SP_Weapon Texture as GlowTexture");
 		return E_FAIL;
@@ -303,4 +290,26 @@ void CSwordTrail::Free()
 	Safe_Release(m_pBaseTexture);
 	Safe_Release(m_pDetailTexture);
 	Safe_Release(m_pGlowTexture);
+}
+
+void CSwordTrail::ImGui_Render()
+{
+    //Edit_Collider(m_pColliderCom, "Player Weapon");
+    ImGuiIO& io = ImGui::GetIO();
+    ImVec2 windowPos = ImVec2(0.f, 300.f);
+    ImVec2 windowSize = ImVec2(00.f, 300.f);
+
+    ImGui::SetNextWindowPos(windowPos, ImGuiCond_Once);
+    ImGui::SetNextWindowSize(windowSize, ImGuiCond_Once);
+
+    ImGui::Begin("Sword Trail Debug", nullptr, ImGuiWindowFlags_NoCollapse);
+	
+	static _float TrailPos[3] = { m_WeaponMatrix.m[3][0], m_WeaponMatrix.m[3][1], m_WeaponMatrix.m[3][2] };
+
+	ImGui::Text("Trail Pos : (%.2f, %.2f, %.2f)", TrailPos[0], TrailPos[1], TrailPos[2]);
+
+	ImGui::Text("Current Cell Count : %d", m_pVIBufferCom->Get_CurrentPoint());
+
+    ImGui::End();
+
 }

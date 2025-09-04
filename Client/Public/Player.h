@@ -289,6 +289,7 @@ private:
 
 
 
+
 private:
 	HRESULT Ready_Components(PLAYER_DESC* pDesc);
 	HRESULT Ready_Colliders(PLAYER_DESC* pDesc);
@@ -303,6 +304,12 @@ public:
 	virtual CGameObject* Clone(void* pArg) override;
 	virtual void Destroy();
 	virtual void Free() override;
+
+
+#ifdef _DEBUG
+private:
+	void ImGui_Render(); // 디버그용 함수.
+#endif // _DEBUG
 
 };
 NS_END

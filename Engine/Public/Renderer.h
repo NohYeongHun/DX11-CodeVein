@@ -15,7 +15,7 @@ private:
 	virtual ~CRenderer() = default;
 
 public:
-	HRESULT Initialize_Clone();
+	HRESULT Initialize();
 
 #pragma region ENGINE에 제공
 	HRESULT Add_RenderGroup(RENDERGROUP eRenderGroup, class CGameObject* pRenderObject);
@@ -31,23 +31,43 @@ private:
 
 	list<class CGameObject*>				m_RenderObjects[ENUM_CLASS(RENDERGROUP::END)];
 
-#pragma region BlendState 설정.
-	ID3D11BlendState* m_pAlphaBlend = nullptr;
-	ID3D11DepthStencilState* m_pDepthOff = nullptr;
-	ID3D11DepthStencilState* m_pDepthOn = nullptr;
 
+#pragma region 장면 캡쳐(직교 투영 텍스쳐)를 만들기 위해 소유해야할 것들.
+private:
+	class CShader* m_pShader = { nullptr };
+	class CVIBuffer_Rect* m_pVIBuffer = { nullptr };
+
+
+	_float4x4 m_WorldMatrix{}, m_ViewMatrix{}, m_ProjMatrix{};
 #pragma endregion
+
+
+#pragma region DEBUG용도 COMPONENT의 RenderGroup을 담아놓을 컨테이너
+
+#ifdef _DEBUG
+private:
+	list <class CComponent*> m_DebugComponent;
+#endif // _DEBUG
+
+private:
+	HRESULT Render_Debug();
+#pragma endregion
+
+
 
 
 private:
 	HRESULT Render_Priority();
 	HRESULT Render_NonBlend();
+	HRESULT Render_Lights();
+	HRESULT Render_Combined();
+	HRESULT Render_NonLight();
 	HRESULT Render_Blend();
 	HRESULT Render_UI();
 	HRESULT Render_StaticUI();
 
-private:
-	HRESULT Ready_Render_State();
+	
+
 
 public:
 	static CRenderer* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

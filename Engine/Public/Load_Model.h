@@ -65,6 +65,7 @@ public:
 	}
 
 	_float4x4* Get_BoneMatrix(const _char* pBoneName);
+	const _float4x4* Get_LocalBoneMatrix(const _char* pBoneName);
 
 	_uint Get_CurrentFrame();
 

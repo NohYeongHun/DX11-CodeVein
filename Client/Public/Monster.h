@@ -35,6 +35,7 @@ public:
         BUFF_DEAD = 1 << 27,
         BUFF_CORPSE = 1 << 28, // 거의 마지막에만 사용할듯?
         BUFF_DISSOLVE = 1 << 29,
+        BUFF_REVERSEDISSOLVE = 1 << 30,
         BUFF_END
     };
 
@@ -67,6 +68,7 @@ public:
             : fStartRatio(start), fEndRatio(end), iPartType(part), bIsActive(false) {}
     }MONSTER_COLLIDER_FRAME;
 
+
     // 하나의 애니메이션에서 여러 Part, 여러 타이밍의 콜라이더 제어
     typedef struct tagMonsterColliderControl
     {
@@ -76,6 +78,26 @@ public:
         
         tagMonsterColliderControl() {}
     }MONSTER_COLLIDER_CONTROL;
+
+    typedef struct tagMonsterTrailFrame
+    {
+        _float fStartRatio;
+        _float fEndRatio;
+        _uint iPartType;        // 어떤 Part 타입을 제어할 것인가?
+        _bool bIsActive;
+        tagMonsterTrailFrame() : fStartRatio(0.0f), fEndRatio(0.0f), iPartType(0), bIsActive(false) {}
+        tagMonsterTrailFrame(_float start, _float end, _uint part)
+            : fStartRatio(start), fEndRatio(end), iPartType(part), bIsActive(false) {}
+    }MONSTER_TRAIL_FRAME;
+
+    typedef struct tagMonsterTrailControl
+    {
+        vector<MONSTER_TRAIL_FRAME> vecTrailFrames;  // 여러 콜라이더 구간들
+        unordered_map<_uint, _uint> partCurrentIndex;      // Part별 현재 처리 중인 인덱스
+        unordered_map<_uint, _bool> partProcessed;         // Part별 모든 처리 완료 여부
+
+        tagMonsterTrailControl() {}
+    }MONSTER_TRAIL_CONTROL;
 
 #pragma region 기본 함수들
 protected:
@@ -103,6 +125,23 @@ public:
     _float Get_TargetDistance();
 #pragma endregion
 
+
+#pragma region - 몬스터 Trail에 대한 상태 제어.
+public:
+    virtual void Trail_Part_Active(_uint iPartType, _bool bActive) {};
+    // Trail 상태 제어 함수들
+    void Add_Trail_Frame(_uint iAnimationIndex, _float fStartRatio, _float fEndRatio, _uint iPartType);
+    void Handle_Trail_State();
+    void Reset_Trail_ActiveInfo();
+
+    virtual void Enable_Trail(_uint iPartType) {};
+    virtual void Disable_Trail(_uint iPartType) {};
+    
+protected:
+    // 통합된 Trail 제어 시스템
+    unordered_map<_uint, MONSTER_TRAIL_CONTROL> m_TrailControlMap; // 애니메이션별 Trail 제어
+    unordered_map<_uint, _bool> m_PartPrevTrailState; // Part별 Trail 상태.
+#pragma endregion
 
 
 #pragma region 0. 몬스터는 충돌에 대한 상태제어를 할 수 있어야한다. => 충돌에 따라 상태가 변하기도, 수치값이 바뀌기도한다.
@@ -143,16 +182,6 @@ public:
 	// 콜라이더 상태 제어 함수들
 	void Handle_Collider_State();
 	void Reset_Collider_ActiveInfo();
-	
-	// 편의 함수들 - 기존 Add_Attack_Frame 호환성 유지
-	void Add_Attack_Frame(_uint iAnimationIndex, _float fStartRatio, _float fEndRatio) {
-		Add_Collider_Frame(iAnimationIndex, fStartRatio, fEndRatio, 0); // 기본값은 0번 Part
-	}
-	
-	// 기존 Handle_Attack_Collider_State 호환성 유지
-	void Handle_Attack_Collider_State() { Handle_Collider_State(); }
-	void Reset_Attack_ActiveInfo() { Reset_Collider_ActiveInfo(); }
-
 #pragma endregion
 
 
@@ -239,6 +268,8 @@ public:
 
 public:
     void Tick_BuffTimers(_float fTimeDelta);
+    const _float Get_BuffTime(uint32_t buffFlag);
+    const _float Get_DefaultBuffTime(uint32_t buffFlag);
 
 public:
     virtual HRESULT Initialize_BuffDurations() PURE;

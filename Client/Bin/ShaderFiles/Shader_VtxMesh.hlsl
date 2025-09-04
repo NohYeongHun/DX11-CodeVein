@@ -10,8 +10,16 @@ vector g_vCamPosition;
 
 /*재질*/
 texture2D g_DiffuseTexture;
+
+/*재질*/
+texture2D g_DissolveTexture;
+
 vector g_vMtrlAmbient = 1.f;
 vector g_vMtrlSpecular = 1.f;
+
+
+// 시간.
+float g_fDissolveTime;
 
 
 
@@ -25,6 +33,15 @@ struct VS_IN
     float4 vBlendWeight : BLENDWEIGHT;
     float2 vTexcoord : TEXCOORD0;
 };
+
+//struct VS_IN
+//{
+//    float3 vPosition : POSITION;
+//    float3 vNormal : NORMAL;
+//    float3 vTangent : TANGENT;
+//    float3 vBinormal : BINORMAL;
+//    float2 vTexcoord : TEXCOORD0;
+//};
 
 struct VS_OUT
 {
@@ -49,7 +66,7 @@ VS_OUT VS_MAIN(VS_IN In)
     matWVP = mul(matWV, g_ProjMatrix);
     
     Out.vPosition = mul(float4(In.vPosition, 1.f), matWVP);
-    Out.vNormal = mul(float4(In.vNormal, 0.f), g_WorldMatrix);
+    Out.vNormal = normalize(mul(float4(In.vNormal, 0.f), g_WorldMatrix));
     Out.vTexcoord = In.vTexcoord;
     Out.vWorldPos = mul(float4(In.vPosition, 1.f), g_WorldMatrix);
     
@@ -60,7 +77,16 @@ VS_OUT VS_MAIN(VS_IN In)
 /* 뷰포트로 변환하고.*/
 /* 래스터라이즈 : 픽셀을 만든다. */
 
-struct PS_IN
+//struct PS_IN
+//{
+//    float4 vPosition : SV_POSITION;
+//    float4 vNormal : NORMAL;
+//    float2 vTexcoord : TEXCOORD0;
+//    float4 vWorldPos : TEXCOORD1;
+
+//};
+
+struct PS_BACKBUFFER_IN
 {
     float4 vPosition : SV_POSITION;
     float4 vNormal : NORMAL;
@@ -69,59 +95,75 @@ struct PS_IN
 
 };
 
-struct PS_OUT
+//struct PS_OUT
+//{
+//    float4 vColor : SV_TARGET0;
+//};
+
+struct PS_OUT_BACKBUFFER
 {
-    float4 vColor : SV_TARGET0;
-    
+    float4 vDiffuse : SV_TARGET0;
+    float4 vNormal : SV_TARGET1;
 };
 
 /* 만든 픽셀 각각에 대해서 픽셀 쉐이더를 수행한다. */
 /* 픽셀의 색을 결정한다. */
 
 
-PS_OUT PS_MAIN(PS_IN In)
-{
-    PS_OUT Out = (PS_OUT) 0;
+//PS_OUT PS_MAIN(PS_IN In)
+//{
+//    PS_OUT Out = (PS_OUT) 0;
     
+    
+//    vector vMtrlDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
+    
+//    float fShade = max(dot(normalize(g_vLightDir) * -1.f, normalize(In.vNormal)), 0.f);
+    
+//    /*슬라이딩 이야기했다*/
+//    vector vReflect = reflect(normalize(g_vLightDir), normalize(In.vNormal));
+//    vector vLook = In.vWorldPos - g_vCamPosition;
+    
+//    float fSpecular = pow(max(dot(normalize(vLook) * -1.f, normalize(vReflect)), 0.f), 50.0f);
+    
+//    Out.vColor = (g_vLightDiffuse * vMtrlDiffuse) * saturate(fShade + (g_vLightAmbient * g_vMtrlAmbient)) +
+//                    (g_vLightSpecular * g_vMtrlSpecular) * fSpecular;
+    
+//    return Out;
+//}
+
+PS_OUT_BACKBUFFER PS_DEFFERED_OUT(PS_BACKBUFFER_IN In)
+{
+    PS_OUT_BACKBUFFER Out = (PS_OUT_BACKBUFFER) 0;
     
     vector vMtrlDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
     
-    float fShade = max(dot(normalize(g_vLightDir) * -1.f, normalize(In.vNormal)), 0.f);
+    if (vMtrlDiffuse.a < 0.3f)
+        discard;
     
-    /*슬라이딩 이야기했다*/
-    vector vReflect = reflect(normalize(g_vLightDir), normalize(In.vNormal));
-    vector vLook = In.vWorldPos - g_vCamPosition;
-    
-    float fSpecular = pow(max(dot(normalize(vLook) * -1.f, normalize(vReflect)), 0.f), 50.0f);
-    
-    Out.vColor = (g_vLightDiffuse * vMtrlDiffuse) * saturate(fShade + (g_vLightAmbient * g_vMtrlAmbient)) +
-                    (g_vLightSpecular * g_vMtrlSpecular) * fSpecular;
-    
-    
+    Out.vDiffuse = vMtrlDiffuse;
+    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
     
     return Out;
 }
 
-
-PS_OUT PS_MAIN2(PS_IN In)
+PS_OUT_BACKBUFFER PS_DEFFERED_DISSOLVE_MAIN(PS_BACKBUFFER_IN In)
 {
-    PS_OUT Out = (PS_OUT) 0;
-    
+    PS_OUT_BACKBUFFER Out = (PS_OUT_BACKBUFFER) 0;
     
     vector vMtrlDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
+    vector vMtrlDissolve = g_DissolveTexture.Sample(DefaultSampler, In.vTexcoord);
     
-    float fShade = max(dot(normalize(g_vLightDir) * -1.f, normalize(In.vNormal)), 0.f);
     
-    /*슬라이딩 이야기했다*/
-    vector vReflect = reflect(normalize(g_vLightDir), normalize(In.vNormal));
-    vector vLook = In.vWorldPos - g_vCamPosition;
+    if (vMtrlDiffuse.a < 0.3f)
+        discard;
     
-    float fSpecular = pow(max(dot(normalize(vLook) * -1.f, normalize(vReflect)), 0.f), 50.0f);
     
-    Out.vColor = (g_vLightDiffuse * vMtrlDiffuse) * saturate(fShade + (g_vLightAmbient * g_vMtrlAmbient)) +
-                    (g_vLightSpecular * g_vMtrlSpecular) * fSpecular;
+    Out.vDiffuse = vMtrlDiffuse;
+    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
     
-    Out.vColor = float4(Out.vColor.rgb, 1.0f);
+    // 안에 숫자가 0이되면 안그린다.
+    
+    clip(vMtrlDissolve.r - g_fDissolveTime);
     
     return Out;
 }
@@ -135,23 +177,37 @@ technique11 DefaultTechnique
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_Default, 0);
-        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
-        PixelShader = compile ps_5_0 PS_MAIN();
+        //PixelShader = compile ps_5_0 PS_MAIN();
+        PixelShader = compile ps_5_0 PS_DEFFERED_OUT();
     }
-
-    pass SkyPass // 하늘 전용 패스
+    
+    pass DessolvePass
     {
-        SetRasterizerState(RS_Cull_CCW);
-        SetDepthStencilState(DSS_None, 0);
-        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
-        PixelShader = compile ps_5_0 PS_MAIN2();
+        //PixelShader = compile ps_5_0 PS_DISSOLVE_MAIN();
+        PixelShader = compile ps_5_0 PS_DEFFERED_DISSOLVE_MAIN();
+
     }
+
+    //pass SkyPass // 하늘 전용 패스
+    //{
+    //    SetRasterizerState(RS_Cull_CCW);
+    //    SetDepthStencilState(DSS_None, 0);
+    //    SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+    //    VertexShader = compile vs_5_0 VS_MAIN();
+    //    GeometryShader = NULL;
+    //    PixelShader = compile ps_5_0 PS_MAIN2();
+    //}
 
     ///* 모델의 상황에 따라 다른 쉐이딩 기법 세트(블렌딩 + 디스토션  )를 먹여주기위해서 */
     //pass DefaultPass1

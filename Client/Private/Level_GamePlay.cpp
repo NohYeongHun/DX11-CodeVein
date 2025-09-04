@@ -159,7 +159,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_Player(const _wstring& strLayerTag)
 #pragma region 1. 플레이어에게 넣어줘야할 레벨 별 다른 값들.
 	Desc.eCurLevel = m_eCurLevel;
 	//Desc.vPos = { 270.f, 0.f, 0.f };
-	Desc.vPos = { 70.f, 0.f, 0.f };
+	Desc.vPos = { 40.f, 0.f, 0.f };
 #pragma endregion
 
 #pragma region 2. 게임에서 계속 들고있어야할 플레이어 값들.
@@ -192,15 +192,12 @@ HRESULT CLevel_GamePlay::Ready_Layer_Camera(const _wstring& strLayerTag)
 	CCamera_Player::CAMERA_PLAYER_DESC CameraPlayerDesc{};
 	CameraPlayerDesc.vEye = _float4(0.f, 10.f, -20.f, 1.f);
 	CameraPlayerDesc.vAt = _float4(0.f, 0.f, 0.f, 1.f);
-	CameraPlayerDesc.fFovy = XMConvertToRadians(60.0f);
+	CameraPlayerDesc.fFovy = XMConvertToRadians(50.0f);
 	CameraPlayerDesc.fNear = 0.1f;
 	CameraPlayerDesc.fFar = 500.f;
 	CameraPlayerDesc.fSpeedPerSec = 10.f;
 	CameraPlayerDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 	CameraPlayerDesc.fMouseSensor = 0.8f;
-	//CameraPlayerDesc.vTargetOffset = { 0.f, 1.7f, -3.3f, 0.f };
-	//CameraPlayerDesc.vLockOnOffset = { 0.f, 1.7f, -3.3f, 0.f };
-
 	CameraPlayerDesc.vTargetOffset = { 0.f, 1.7f, -4.3f, 0.f };
 	CameraPlayerDesc.vLockOnOffset = { 0.f, 1.7f, -4.3f, 0.f };
 	CameraPlayerDesc.eCurLevel = m_eCurLevel;

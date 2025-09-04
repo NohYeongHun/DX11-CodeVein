@@ -15,10 +15,17 @@ public:
 #pragma region ENGINE에 제공
 public:
 	HRESULT Add_RenderTarget(const _wstring& strTargetTag, _uint iSizeX, _uint iSizeY, DXGI_FORMAT ePixelFormat, const _float4& vClearColor);
+	HRESULT Bind_ShaderResource(const _wstring& strTargetTag, class CShader* pShader, const _char* pConstantName);
 	HRESULT Add_MRT(const _wstring& strMRTTag, const _wstring& strTargetTag);
 	HRESULT Begin_MRT(const _wstring& strMRTTag);
 	HRESULT End_MRT();
 #pragma endregion
+
+#ifdef _DEBUG
+public:
+	HRESULT Ready_Debug(const _wstring& strTargetTag, _float fX, _float fY, _float fSizeX, _float fSizeY);
+	HRESULT Render(class CShader* pShader, class CVIBuffer_Rect* pVIBuffer);
+#endif // _DEBUG
 
 
 

@@ -247,7 +247,7 @@ void CGraphic_Device::Free()
 
 
 #if defined(DEBUG) || defined(_DEBUG)
-	ID3D11Debug* d3dDebug;
+	ID3D11Debug* d3dDebug = nullptr;
 	HRESULT hr = m_pDevice->QueryInterface(__uuidof(ID3D11Debug), reinterpret_cast<void**>(&d3dDebug));
 	if (SUCCEEDED(hr))
 	{
@@ -261,9 +261,9 @@ void CGraphic_Device::Free()
 		OutputDebugStringW(L"                                                                    D3D11 Live Object ref Count Checker END \r ");
 		OutputDebugStringW(L"----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- \r ");
 	}
-	if (d3dDebug != nullptr)            d3dDebug->Release();
+	if (d3dDebug != nullptr)            
+		d3dDebug->Release();
 #endif
-
 
 	Safe_Release(m_pDevice);
 }

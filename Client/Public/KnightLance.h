@@ -17,11 +17,12 @@ private:
 	virtual ~CKnightLance() = default;
 
 public:
-	virtual HRESULT Initialize_Prototype();
-	virtual HRESULT Initialize(void* pArg);
-	virtual void Priority_Update(_float fTimeDelta);
-	virtual void Update(_float fTimeDelta);
-	virtual void Late_Update(_float fTimeDelta);
+	virtual HRESULT Initialize_Prototype() override;
+	virtual HRESULT Initialize_Clone(void* pArg) override ;
+	virtual void Priority_Update(_float fTimeDelta) override;
+	virtual void Update(_float fTimeDelta) override;
+	virtual void Late_Update(_float fTimeDelta) override;
+	virtual void Finalize_Update(_float fTimeDelta) override;
 	virtual HRESULT Render();
 #pragma endregion
 
@@ -58,6 +59,9 @@ private:
 
 #pragma endregion
 
+#pragma region 2. EFFECT
+
+#pragma endregion
 
 
 private:
@@ -71,6 +75,14 @@ public:
 	virtual CGameObject* Clone(void* pArg) override;
 	virtual void Free() override;
 #pragma endregion
+
+
+
+#ifdef _DEBUG
+private:
+	void ImGui_Render();
+
+#endif // _DEBUG
 
 };
 NS_END

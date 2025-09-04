@@ -26,7 +26,6 @@ public:
 		QUEEN_BUFF_PHASE_ATTACK_COOLDOWN = 1 << 7, // 페이즈 마다 다른 공격 시퀀스 => 쿨타임 존재
 		QUEEN_BUFF_DASH_ATTACK_COOLDOWN = 1 << 8, // 돌진 공격 시퀀스 => 쿨타임 존재.
 		QUEEN_BUFF_DOWN_TRIPLE_STRIKE_COOLDOWN = 1 << 9, // Down Strike 시퀀스 => 쿨타임 존재.
-		QUEEN_BUFF_END = 1 << 30
 	};
 
 public:
@@ -60,6 +59,9 @@ public:
 	virtual void On_Collision_Exit(CGameObject* pOther);
 	virtual void Collider_All_Active(_bool bActive);
 
+
+public:
+	virtual void Reset_Part_Colliders() override;
 
 public:
 	void WeaponOBB_ChangeExtents(_float3 vExtents);
@@ -144,6 +146,36 @@ public:
 public:
 	void Create_QueenKnightWarp_Effect_Particle(_float3 vDir);
 
+public:
+	void Start_Dissolve(); // Dissolve 재생.
+	void ReverseStart_Dissolve(); // Dissolve 역재생
+	void End_Dissolve();
+
+
+public:
+	virtual void Enable_Trail(_uint iPartType) override;
+	virtual void Disable_Trail(_uint iPartType) override;
+
+private:
+	_uint m_iShaderPath = {};
+	_float m_fDissolveTime = {};
+
+	_float m_fMaxDissovleTime = {};
+	_float m_fCurDissolveTime = {};
+
+	_float m_fReverseDissolveTime = {};
+	_float m_fEndReverseDissolveTime = {};
+
+	_bool m_IsDissolve = { false };
+	_bool m_IsReverseDissolve = { false };
+
+
+private:
+	class CTexture* m_pDissolveTexture = { nullptr };
+
+
+
+
 private:
 	//CEffectParticle::EFFECTPARTICLE_ENTER_DESC m_EffectParticleEnterDesc = {};
 
@@ -163,7 +195,7 @@ private:
 	HRESULT Ready_BehaviorTree();
 	HRESULT Ready_PartObjects();
 	HRESULT Ready_Effects(QUEENKNIGHT_DESC* pDesc);
-	HRESULT Ready_Render_Resources();
+	HRESULT Bind_Shader_Resource();
 	
 	
 
@@ -173,6 +205,15 @@ public:
 	virtual void Destroy();
 	virtual void Free() override;
 #pragma endregion
+
+
+#ifdef _DEBUG
+private:
+	void ImGui_Render();
+#endif // _DEBUG
+
+
+
 
 
 };

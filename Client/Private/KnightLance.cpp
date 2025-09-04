@@ -13,7 +13,7 @@ HRESULT CKnightLance::Initialize_Prototype()
     return S_OK;
 }
 
-HRESULT CKnightLance::Initialize(void* pArg)
+HRESULT CKnightLance::Initialize_Clone(void* pArg)
 {
     KNIGHT_LANCE_DESC* pDesc = static_cast<KNIGHT_LANCE_DESC*>(pArg);
 
@@ -33,8 +33,16 @@ HRESULT CKnightLance::Initialize(void* pArg)
         return E_FAIL;
     }
 
-    m_vPointUp = _float3(0.f, 0.f, 0.f);
-    m_vPointDown = _float3(0.f, 0.f, 1.85f);
+    if (FAILED(Ready_Effects()))
+    {
+        CRASH("Failed Ready_Effects");
+        return E_FAIL;
+    }
+
+    m_vPointUp = _float3(0.f, 0.5f, 0.f);
+    m_vPointDown = _float3(0.f, -3.5f, 0.f);
+
+    m_bTrail = true;
 
 
     /*m_pTransformCom->Scaling(_float3(0.1f, 0.1f, 0.1f));
@@ -60,27 +68,43 @@ void CKnightLance::Update(_float fTimeDelta)
         XMLoadFloat4x4(m_pSocketMatrix) *
         XMLoadFloat4x4(m_pParentMatrix));
 
-    CWeapon::Finalize_Update(fTimeDelta);
+    Finalize_Update(fTimeDelta);
 }
 
 void CKnightLance::Late_Update(_float fTimeDelta)
 {
     CWeapon::Late_Update(fTimeDelta);
 
+
     if (Is_Visible())
     {
-        if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::BLEND, this)))
+        if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::NONBLEND, this)))
             return;
     }
-    
+
+    if (m_bTrail)
+        m_pTrailWeapon_Effect->Late_Update(fTimeDelta);
+}
+
+void CKnightLance::Finalize_Update(_float fTimeDelta)
+{
+    _matrix SocketMatrix = XMLoadFloat4x4(&m_CombinedWorldMatrix);
+
+
+    // Trail Visible이 False더라도 정점의 위치는 계속 업데이트 되어야함 => 그래야 그려질때 안이상함.
+    TrailWeapon_Update(SocketMatrix);
+    m_pTrailWeapon_Effect->Update(fTimeDelta);
+
+    CWeapon::Update_Timer(fTimeDelta);
+    CWeapon::Finalize_Update(fTimeDelta);
 }
 
 HRESULT CKnightLance::Render()
 {
 
 #ifdef _DEBUG
-    //Edit_Collider(m_pColliderCom, "QueenKnight Lance");
-    m_pColliderCom->Render();
+    ImGui_Render();
+
 #endif // _DEBUG
 
     if (FAILED(Bind_ShaderResources()))
@@ -89,7 +113,6 @@ HRESULT CKnightLance::Render()
         return E_FAIL;
     }
 
-
     _uint           iNumMeshes = m_pModelCom->Get_NumMeshes();
 
     for (_uint i = 0; i < iNumMeshes; i++)
@@ -97,7 +120,7 @@ HRESULT CKnightLance::Render()
         if (FAILED(m_pModelCom->Bind_Materials(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE, 0)))
             return E_FAIL;
 
-        m_pShaderCom->Begin(0);
+        m_pShaderCom->Begin(m_iShaderPath);
 
         m_pModelCom->Render(i);
     }
@@ -147,6 +170,24 @@ HRESULT CKnightLance::Ready_Components()
         TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom), &Desc)))
         return E_FAIL;
 
+
+    // Dissolve Texture
+    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Dissolve"),
+        TEXT("Com_Dissolve"), reinterpret_cast<CComponent**>(&m_pDissolveTexture), nullptr)))
+    {
+        CRASH("Failed Load DissolveTexture");
+        return E_FAIL;
+    }
+
+    //if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Dissolve"),
+    //    TEXT("Com_Dissolve"), reinterpret_cast<CComponent**>(&m_pDissolveTexture), nullptr)))
+    //{
+    //    CRASH("Failed Load DissolveTexture");
+    //    return E_FAIL;
+    //}
+    // 증가 했다가 ~ 감소 했다가
+
+
     return S_OK;
 }
 
@@ -194,6 +235,8 @@ HRESULT CKnightLance::Ready_Effects()
     Desc.eCurLevel = m_eCurLevel;
     Desc.fSpeedPerSec = 5.f;
     Desc.fRotationPerSec = XMConvertToRadians(1.0f);
+    Desc.eDiffuseType = TRAIL_DIFFUSE::THICK_BLOOD;
+
 
 
     m_pTrailWeapon_Effect = dynamic_cast<CSwordTrail*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT,
@@ -219,23 +262,28 @@ HRESULT CKnightLance::Bind_ShaderResources()
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_Transform_Float4x4(D3DTS::PROJ))))
         return E_FAIL;
 
-    const LIGHT_DESC* pLightDesc = m_pGameInstance->Get_LightDesc(0);
-    if (nullptr == pLightDesc)
-        return E_FAIL;
-
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDir", &pLightDesc->vDirection, sizeof(_float4))))
-        return E_FAIL;
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDiffuse", &pLightDesc->vDiffuse, sizeof(_float4))))
-        return E_FAIL;
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightAmbient", &pLightDesc->vAmbient, sizeof(_float4))))
-        return E_FAIL;
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightSpecular", &pLightDesc->vSpecular, sizeof(_float4))))
-        return E_FAIL;
     if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
         return E_FAIL;
 
+    if (FAILED(m_pDissolveTexture->Bind_Shader_Resource(m_pShaderCom, "g_DissolveTexture", 0)))
+        return E_FAIL;
+
+    _float fDissolveTime = {};
+    if (m_bDissolve)
+        fDissolveTime = normalize(m_fCurDissolveTime, 0.f, m_fMaxDissolveTime);
+    else if(m_bReverseDissolve)
+        fDissolveTime = normalize(m_fCurDissolveTime, 0.f, m_fMaxReverseDissolveTime);
+
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fDissolveTime", &fDissolveTime, sizeof(_float))))
+    {
+        CRASH("Failed Dissolve Texture");
+        return E_FAIL;
+    }
+
+
     return S_OK;
 }
+
 
 CKnightLance* CKnightLance::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
@@ -254,7 +302,7 @@ CGameObject* CKnightLance::Clone(void* pArg)
 {
     CKnightLance* pInstance = new CKnightLance(*this);
 
-    if (FAILED(pInstance->Initialize(pArg)))
+    if (FAILED(pInstance->Initialize_Clone(pArg)))
     {
         MSG_BOX(TEXT("Failed to Created : CKnightSword"));
         Safe_Release(pInstance);
@@ -267,4 +315,51 @@ void CKnightLance::Free()
 {
     CWeapon::Free();
     Safe_Release(m_pTrailWeapon_Effect);
+    //Safe_Release(m_pDissolveTexture);
 }
+
+
+
+
+
+#ifdef _DEBUG
+void CKnightLance::ImGui_Render()
+{
+    //Edit_Collider(m_pColliderCom, "QueenKnight Lance");
+
+    ImGuiIO& io = ImGui::GetIO();
+    ImVec2 windowPos = ImVec2(0.f, 0.f);
+    ImVec2 windowSize = ImVec2(300.f, 300.f);
+
+    ImGui::SetNextWindowPos(windowPos, ImGuiCond_Once);
+    ImGui::SetNextWindowSize(windowSize, ImGuiCond_Once);
+
+    ImGui::Begin("QueenKnight Weapon Debug", nullptr, ImGuiWindowFlags_NoCollapse);
+
+    ImGui::Text("Weapon Pos (%.2f, %.2f, %.2f)", m_CombinedWorldMatrix.m[3][0]
+    , m_CombinedWorldMatrix.m[3][1], m_CombinedWorldMatrix.m[3][2]);
+
+    static float vPointUp[3] = { m_vPointUp.x, m_vPointUp.y, m_vPointUp.z };
+    static float vPointDown[3] = { m_vPointDown.x, m_vPointDown.y, m_vPointDown.z };
+    ImGui::InputFloat3("Point Up : ", vPointUp);
+    ImGui::InputFloat3("Point Down : ", vPointDown);
+
+    _bool bActive = m_pColliderCom->Is_Active();
+    if (bActive)
+        ImGui::Text("Knight Lance Active ");
+
+    if (ImGui::Button("Apply"))
+    {
+        m_vPointUp = { vPointUp[0], vPointUp[1], vPointUp[2] };
+        m_vPointDown = { vPointDown[0], vPointDown[1], vPointDown[2] };
+    }
+
+    
+
+    ImGui::End();
+
+    m_pColliderCom->Render();
+}
+#endif // _DEBUG
+
+

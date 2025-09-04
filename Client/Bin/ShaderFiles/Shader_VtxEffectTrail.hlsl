@@ -190,22 +190,17 @@ PS_OUT PS_STRETCH_TRAIL(PS_IN In)
     PS_OUT Out = (PS_OUT) 0;
     
     // 1. UV 스크롤 (시간 기반) - 리본이 잡아당겨지는 효과
-    float2 scrollUV = In.vTexcoord;
-    scrollUV.x += g_Time * g_ScrollSpeed; // U 방향으로 스크롤
-    ////scrollUV.x += g_Time * g_ScrollSpeed; // U 방향으로 스크롤
+    //float2 scrollUV = In.vTexcoord;
+    //scrollUV.x += g_Time * g_ScrollSpeed; // U 방향으로 스크롤
+    //float4 weaponColor = g_BaseTexture.Sample(DefaultSampler, scrollUV);
+    //Out.vDiffuse = weaponColor;
     
-    //
-    // 2. SP_Weapon 텍스처 샘플링 (GlowTexture 사용)
-    //float4 weaponColor = g_GlowTexture.Sample(DefaultSampler, scrollUV);
-    //float4 weaponColor = g_GlowTexture.Sample(DefaultSampler, scrollUV);
-    float4 weaponColor = g_BaseTexture.Sample(DefaultSampler, scrollUV);
-    //
-    //// 5. SP_Weapon 텍스처의 원본 색상을 그대로 사용 (리본 형태로)
-    //weaponColor.rgb = float3(1.f, 0.f, 0.f);
-    Out.vDiffuse = weaponColor;
     
-    //Out.vDiffuse = float4(0.f, 0.f, 0.f, 1.f);
-    
+    Out.vDiffuse = g_BaseTexture.Sample(DefaultSampler, In.vTexcoord);
+    if (Out.vDiffuse.a <= 0.01f)
+        discard;
+    //Out.vDiffuse.rgb = float3(0.f, 0.f, 0.f);
+    //Out.vDiffuse.a = 1.f;
     return Out;
 }
 
@@ -239,7 +234,7 @@ technique11 DefaultTechnique
         SetRasterizerState(RS_Default);
         SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 1.f), 0xffffffff);
         //SetDepthStencilState(DSS_WeightBlend, 0);
-        SetDepthStencilState(DSS_None, 0);
+        SetDepthStencilState(DSS_WeightBlend, 0);
 
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;

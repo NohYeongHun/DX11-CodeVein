@@ -9,13 +9,21 @@ vector g_vLightSpecular = vector(1.f, 1.f, 1.f, 1.f);
 
 vector g_vCamPosition;
 
-/*ÀçÁú*/
+/*ì¬ì§ˆ*/
 texture2D g_DiffuseTexture;
+/*ì¬ì§ˆ*/
+texture2D g_DissolveTexture;
+
+// ì‹œê°„.
+float g_fDissolveTime;
+float g_fReverseDissolveTime;
+
 vector g_vMtrlAmbient = 1.f;
 vector g_vMtrlSpecular = 1.f;
 
-/* ¸ğµ¨ ÀüÃ¼ »À±âÁØ(x) */
-/* Æ¯Á¤ ¸Ş½Ã¿¡ ¿µÇâ¤·¸£ ÁÖ´Â »Àµé */
+
+/* ëª¨ë¸ ì „ì²´ ë¼ˆê¸°ì¤€(x) */
+/* íŠ¹ì • ë©”ì‹œì— ì˜í–¥ã…‡ë¥´ ì£¼ëŠ” ë¼ˆë“¤ */
 matrix g_BoneMatrices[512];
 
 
@@ -36,17 +44,16 @@ struct VS_OUT
     float4 vNormal : NORMAL;
     float2 vTexcoord : TEXCOORD0;
     float4 vWorldPos : TEXCOORD1;
-    float4 vProjPos : TEXCOORD2;
 };
 
-/* Á¤Á¡½¦ÀÌ´õ : Á¤Á¡ À§Ä¡ÀÇ ½ºÆäÀÌ½º º¯È¯(·ÎÄÃ -> ¿ùµå -> ºä -> Åõ¿µ). */ 
-/*          : Á¤Á¡ÀÇ ±¸¼ºÀ» º¯°æ.(in:3°³, out:2°³ or 5°³) */
-/*          : Á¤Á¡ ´ÜÀ§(Á¤Á¡ ÇÏ³ª´ç VS_MAINÇÑ¹øÈ£Ãâ) */ 
+/* ì •ì ì‰ì´ë” : ì •ì  ìœ„ì¹˜ì˜ ìŠ¤í˜ì´ìŠ¤ ë³€í™˜(ë¡œì»¬ -> ì›”ë“œ -> ë·° -> íˆ¬ì˜). */ 
+/*          : ì •ì ì˜ êµ¬ì„±ì„ ë³€ê²½.(in:3ê°œ, out:2ê°œ or 5ê°œ) */
+/*          : ì •ì  ë‹¨ìœ„(ì •ì  í•˜ë‚˜ë‹¹ VS_MAINí•œë²ˆí˜¸ì¶œ) */ 
 VS_OUT VS_MAIN(VS_IN In)
 {
     VS_OUT Out = (VS_OUT) 0;
     
-    /* Á¤Á¡ÀÇ ·ÎÄÃÀ§Ä¡ * ¿ùµå * ºä * Åõ¿µ */ 
+    /* ì •ì ì˜ ë¡œì»¬ìœ„ì¹˜ * ì›”ë“œ * ë·° * íˆ¬ì˜ */ 
     
     float fWeightW = 1.f - (In.vBlendWeight.x + In.vBlendWeight.y + In.vBlendWeight.z);
     
@@ -65,16 +72,16 @@ VS_OUT VS_MAIN(VS_IN In)
     matWVP = mul(matWV, g_ProjMatrix);
     
     Out.vPosition = mul(vPosition, matWVP);
-    Out.vNormal = mul(vNormal, g_WorldMatrix);
+    Out.vNormal = normalize(mul(vNormal, g_WorldMatrix));
     Out.vTexcoord = In.vTexcoord;
     Out.vWorldPos = mul(vPosition, g_WorldMatrix);
     
     return Out;
 }
 
-/* /WÀ» ¼öÇàÇÑ´Ù. Åõ¿µ½ºÆäÀÌ½º·Î º¯È¯ */
-/* ºäÆ÷Æ®·Î º¯È¯ÇÏ°í.*/
-/* ·¡½ºÅÍ¶óÀÌÁî : ÇÈ¼¿À» ¸¸µç´Ù. */
+/* /Wì„ ìˆ˜í–‰í•œë‹¤. íˆ¬ì˜ìŠ¤í˜ì´ìŠ¤ë¡œ ë³€í™˜ */
+/* ë·°í¬íŠ¸ë¡œ ë³€í™˜í•˜ê³ .*/
+/* ë˜ìŠ¤í„°ë¼ì´ì¦ˆ : í”½ì…€ì„ ë§Œë“ ë‹¤. */
 
 struct PS_IN
 {
@@ -90,38 +97,168 @@ struct PS_OUT
     
 };
 
-/* ¸¸µç ÇÈ¼¿ °¢°¢¿¡ ´ëÇØ¼­ ÇÈ¼¿ ½¦ÀÌ´õ¸¦ ¼öÇàÇÑ´Ù. */
-/* ÇÈ¼¿ÀÇ »öÀ» °áÁ¤ÇÑ´Ù. */
-
-
-PS_OUT PS_MAIN(PS_IN In)
+struct PS_OUT_BACKBUFFER
 {
-    PS_OUT Out = (PS_OUT) 0;
+    float4 vDiffuse : SV_TARGET0;
+    float4 vNormal : SV_TARGET1;
+};
+
+/* ë§Œë“  í”½ì…€ ê°ê°ì— ëŒ€í•´ì„œ í”½ì…€ ì‰ì´ë”ë¥¼ ìˆ˜í–‰í•œë‹¤. */
+/* í”½ì…€ì˜ ìƒ‰ì„ ê²°ì •í•œë‹¤. */
+
+
+//PS_OUT PS_MAIN(PS_IN In)
+//{
+//    PS_OUT Out = (PS_OUT) 0;
+    
+//    vector vMtrlDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
+    
+//    vector vMtrlDissolve = g_DissolveTexture.Sample(DefaultSampler, In.vTexcoord);
+    
+//    if (vMtrlDiffuse.a < 0.3f)
+//        discard;
+    
+//    float fShade = max(dot(normalize(g_vLightDir) * -1.f, normalize(In.vNormal)), 0.f);
+    
+//    /*ìŠ¬ë¼ì´ë”© ì´ì•¼ê¸°í–ˆë‹¤*/
+//    vector vReflect = reflect(normalize(g_vLightDir), normalize(In.vNormal));
+//    vector vLook = In.vWorldPos - g_vCamPosition;
+    
+//    float fSpecular = pow(max(dot(normalize(vLook) * -1.f, normalize(vReflect)), 0.f), 50.0f);
+    
+//    Out.vColor = (g_vLightDiffuse * vMtrlDiffuse) * saturate(fShade + (g_vLightAmbient * g_vMtrlAmbient)) +
+//                    (g_vLightSpecular * g_vMtrlSpecular) * fSpecular;
+    
+//    return Out;
+//}
+
+
+
+//PS_OUT PS_DISSOLVE_MAIN(PS_IN In)
+//{
+//    PS_OUT Out = (PS_OUT) 0;
+    
+//    vector vMtrlDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
+//    vector vMtrlDissolve = g_DissolveTexture.Sample(DefaultSampler, In.vTexcoord);
+    
+    
+//    if (vMtrlDiffuse.a < 0.3f)
+//        discard;
+    
+//    float fShade = max(dot(normalize(g_vLightDir) * -1.f, normalize(In.vNormal)), 0.f);
+    
+//    /*ìŠ¬ë¼ì´ë”© ì´ì•¼ê¸°í–ˆë‹¤*/
+//    vector vReflect = reflect(normalize(g_vLightDir), normalize(In.vNormal));
+//    vector vLook = In.vWorldPos - g_vCamPosition;
+    
+//    float fSpecular = pow(max(dot(normalize(vLook) * -1.f, normalize(vReflect)), 0.f), 50.0f);
+    
+//    Out.vColor = (g_vLightDiffuse * vMtrlDiffuse) * saturate(fShade + (g_vLightAmbient * g_vMtrlAmbient)) +
+//                    (g_vLightSpecular * g_vMtrlSpecular) * fSpecular;
+    
+//    // ì•ˆì— ìˆ«ìê°€ 0ì´ë˜ë©´ ì•ˆê·¸ë¦°ë‹¤.
+//    clip(vMtrlDissolve.r - g_fDissolveTime);
+    
+    
+//    return Out;
+//}
+
+//PS_OUT PS_REVERSE_DISSOLVE_MAIN(PS_IN In)
+//{
+//    PS_OUT Out = (PS_OUT) 0;
+    
+//    vector vMtrlDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
+//    vector vMtrlDissolve = g_DissolveTexture.Sample(DefaultSampler, In.vTexcoord);
+    
+    
+//    if (vMtrlDiffuse.a < 0.3f)
+//        discard;
+    
+//    float fShade = max(dot(normalize(g_vLightDir) * -1.f, normalize(In.vNormal)), 0.f);
+    
+//    /*ìŠ¬ë¼ì´ë”© ì´ì•¼ê¸°í–ˆë‹¤*/
+//    vector vReflect = reflect(normalize(g_vLightDir), normalize(In.vNormal));
+//    vector vLook = In.vWorldPos - g_vCamPosition;
+    
+//    float fSpecular = pow(max(dot(normalize(vLook) * -1.f, normalize(vReflect)), 0.f), 50.0f);
+    
+//    Out.vColor = (g_vLightDiffuse * vMtrlDiffuse) * saturate(fShade + (g_vLightAmbient * g_vMtrlAmbient)) +
+//                    (g_vLightSpecular * g_vMtrlSpecular) * fSpecular;
+    
+    
+//    // ì ì°¨ ë³´ì´ê²Œ. g_fDissovleTimeì´ ì²˜ìŒì— 1ë¡œì˜¤ê³ , ì ì°¨ 0ìœ¼ë¡œ ë³€ê²½ë˜ë©´ì„œ ë³´ì´ê²Œí•˜ë©´ ë ë“¯?
+//    clip(vMtrlDissolve.r - g_fReverseDissolveTime);
+    
+    
+//    return Out;
+//}
+
+// Deffered Renderging ì‚¬ìš© ì‹œ
+PS_OUT_BACKBUFFER PS_DEFFERED_MAIN(PS_IN In)
+{
+    PS_OUT_BACKBUFFER Out = (PS_OUT_BACKBUFFER) 0;
     
     vector vMtrlDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
     
     if (vMtrlDiffuse.a < 0.3f)
         discard;
     
-    float fShade = max(dot(normalize(g_vLightDir) * -1.f, normalize(In.vNormal)), 0.f);
-    
-    /*½½¶óÀÌµù ÀÌ¾ß±âÇß´Ù*/
-    vector vReflect = reflect(normalize(g_vLightDir), normalize(In.vNormal));
-    vector vLook = In.vWorldPos - g_vCamPosition;
-    
-    float fSpecular = pow(max(dot(normalize(vLook) * -1.f, normalize(vReflect)), 0.f), 50.0f);
-    
-    Out.vColor = (g_vLightDiffuse * vMtrlDiffuse) * saturate(fShade + (g_vLightAmbient * g_vMtrlAmbient)) +
-                    (g_vLightSpecular * g_vMtrlSpecular) * fSpecular;
+    Out.vDiffuse = vMtrlDiffuse;
+    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
     
     return Out;
 }
 
+PS_OUT_BACKBUFFER PS_DEFFERED_DISSOLVE_MAIN(PS_IN In)
+{
+    PS_OUT_BACKBUFFER Out = (PS_OUT_BACKBUFFER) 0;
+    
+    vector vMtrlDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
+    vector vMtrlDissolve = g_DissolveTexture.Sample(DefaultSampler, In.vTexcoord);
+    
+    
+    if (vMtrlDiffuse.a < 0.3f)
+        discard;
+    
+    
+    Out.vDiffuse = vMtrlDiffuse;
+    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+    
+    // ì•ˆì— ìˆ«ìê°€ 0ì´ë˜ë©´ ì•ˆê·¸ë¦°ë‹¤.
+    
+    clip(vMtrlDissolve.r - g_fDissolveTime);
+    
+    
+    return Out;
+}
+
+//PS_OUT_BACKBUFFER PS_DEFFERED_REVERSE_DISSOLVE_MAIN(PS_IN In)
+//{
+//    PS_OUT_BACKBUFFER Out = (PS_OUT_BACKBUFFER) 0;
+    
+//    vector vMtrlDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
+//    vector vMtrlDissolve = g_DissolveTexture.Sample(DefaultSampler, In.vTexcoord);
+    
+//    if (vMtrlDiffuse.a < 0.3f)
+//        discard;
+    
+//    Out.vDiffuse = vMtrlDiffuse;
+//    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+    
+//    // ì ì°¨ ë³´ì´ê²Œ. g_fDissovleTimeì´ ì²˜ìŒì— 1ë¡œì˜¤ê³ , ì ì°¨ 0ìœ¼ë¡œ ë³€ê²½ë˜ë©´ì„œ ë³´ì´ê²Œí•˜ë©´ ë ë“¯?
+//    clip(vMtrlDissolve.r - g_fReverseDissolveTime);
+    
+    
+//    return Out;
+//}
+
+
+
 technique11 DefaultTechnique
 {
-    /* Æ¯Á¤ ÆĞ½º¸¦ ÀÌ¿ëÇØ¼­ Á¡Á¤À» ±×·Á³Â´Ù. */
-    /* ÇÏ³ªÀÇ ¸ğµ¨À» ±×·Á³Â´Ù. */ 
-    /* ¸ğµ¨ÀÇ »óÈ²¿¡ µû¶ó ´Ù¸¥ ½¦ÀÌµù ±â¹ı ¼¼Æ®(¸í¾Ï + ¸²¶óÀÌÆ® + ½ºÆåÅ§·¯ + ³ë¸Ö¸Ê + ssao )¸¦ ¸Ô¿©ÁÖ±âÀ§ÇØ¼­ */
+    /* íŠ¹ì • íŒ¨ìŠ¤ë¥¼ ì´ìš©í•´ì„œ ì ì •ì„ ê·¸ë ¤ëƒˆë‹¤. */
+    /* í•˜ë‚˜ì˜ ëª¨ë¸ì„ ê·¸ë ¤ëƒˆë‹¤. */ 
+    /* ëª¨ë¸ì˜ ìƒí™©ì— ë”°ë¼ ë‹¤ë¥¸ ì‰ì´ë”© ê¸°ë²• ì„¸íŠ¸(ëª…ì•” + ë¦¼ë¼ì´íŠ¸ + ìŠ¤í™í˜ëŸ¬ + ë…¸ë©€ë§µ + ssao )ë¥¼ ë¨¹ì—¬ì£¼ê¸°ìœ„í•´ì„œ */
     pass DefaultPass
     {
         SetRasterizerState(RS_Default);
@@ -130,22 +267,21 @@ technique11 DefaultTechnique
 
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
-        PixelShader = compile ps_5_0 PS_MAIN();
+        //PixelShader = compile ps_5_0 PS_MAIN();
+        PixelShader = compile ps_5_0 PS_DEFFERED_MAIN();
     }
+    
+    pass DessolvePass
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 
-    ///* ¸ğµ¨ÀÇ »óÈ²¿¡ µû¶ó ´Ù¸¥ ½¦ÀÌµù ±â¹ı ¼¼Æ®(ºí·»µù + µğ½ºÅä¼Ç  )¸¦ ¸Ô¿©ÁÖ±âÀ§ÇØ¼­ */
-    //pass DefaultPass1
-    //{
-    //    VertexShader = compile vs_5_0 VS_MAIN1();
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        //PixelShader = compile ps_5_0 PS_DISSOLVE_MAIN();
+        PixelShader = compile ps_5_0 PS_DEFFERED_DISSOLVE_MAIN();
 
-    //}
-
-    ///* Á¤Á¡ÀÇ Á¤º¸¿¡ µû¶ó ½¦ÀÌ´õ ÆÄÀÏÀ» ÀÛ¼ºÇÑ´Ù. */
-    ///* Á¤Á¡ÀÇ Á¤º¸°¡ °°Áö¸¸ ¿ÏÀüÈ÷ ´Ù¸¥ Ãë±ŞÀ» ÇÏ´À ¤¤°´Ã¼³ª ¸ğµ¨À» ±×¸®´Â ¹æ½Ä -> ·»´õ¸µ¹æ½Ä¿¡ Â÷ÀÌ°¡ »ı±æ ¼ö ÀÖ´Ù. */ 
-    //pass DefaultPass1
-    //{
-    //    VertexShader = compile vs_5_0 VS_MAIN1();
-
-    //}
-
+    }
+   
 }

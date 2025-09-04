@@ -152,6 +152,7 @@ public:
 	public:
 		const LIGHT_DESC* Get_LightDesc(_uint iIndex) const;
 		HRESULT Add_Light(const LIGHT_DESC& LightDesc);
+		HRESULT Render_Lights(class CShader* pShader, class CVIBuffer_Rect* pVIBuffer);
 #pragma endregion
 
 #pragma region PICKING
@@ -199,6 +200,12 @@ public:
 	HRESULT Add_MRT(const _wstring& strMRTTag, const _wstring& strTargetTag);
 	HRESULT Begin_MRT(const _wstring& strMRTTag);
 	HRESULT End_MRT();
+	HRESULT Bind_RT_ShaderResource(const _wstring& strTargetTag, class CShader* pShader, const _char* pConstantName);
+
+#ifdef _DEBUG
+	HRESULT Ready_RT_Debug(const _wstring& strTargetTag, _float fX, _float fY, _float fSizeX, _float fSizeY);
+	HRESULT Render_RT_Debug(class CShader* pShader, class CVIBuffer_Rect* pVIBuffer);
+#endif
 #pragma endregion
 
 

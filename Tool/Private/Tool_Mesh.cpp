@@ -331,6 +331,7 @@ HRESULT CTool_Mesh::Ready_Vertices_For_NonAnim(const aiMesh* pAIMesh, _fmatrix P
 		memcpy(&pVertices[i].vTangent, &pAIMesh->mTangents[i], sizeof(_float3));
 		memcpy(&pVertices[i].vBinormal, &pAIMesh->mBitangents[i], sizeof(_float3));
 		memcpy(&pVertices[i].vTexcoord, &pAIMesh->mTextureCoords[0][i], sizeof(_float2));
+		
 
 		/* 충돌 확인용 Vertex Position 설정. */
 		m_vecPositions.push_back(pVertices[i].vPosition);

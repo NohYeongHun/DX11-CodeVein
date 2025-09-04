@@ -50,6 +50,7 @@ using namespace DirectX;
 #include <variant>
 #include <sstream>
 #include <any>
+#include <cmath>
 using namespace std;
 
 

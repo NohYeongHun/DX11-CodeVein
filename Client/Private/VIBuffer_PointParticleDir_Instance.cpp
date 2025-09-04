@@ -132,7 +132,7 @@ HRESULT CVIBuffer_PointParticleDir_Instance::Bind_Resources()
 
 HRESULT CVIBuffer_PointParticleDir_Instance::Render()
 {
-    OutputDebugWstring(TEXT("CVIBuffer_PointParticleDir_Instance::Render() - DrawInstanced Called"));
+    //OutputDebugWstring(TEXT("CVIBuffer_PointParticleDir_Instance::Render() - DrawInstanced Called"));
     m_pContext->DrawInstanced(1, m_iNumInstance, 0, 0);
     return S_OK;
 }

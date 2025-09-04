@@ -49,11 +49,11 @@ HRESULT CLevel_StageOne::Initialize_Clone()
 		return E_FAIL;
 	}
 
-	//if (FAILED(Ready_Monster_Trigger()))
-	//{
-	//	CRASH("Failed Ready_Layer_Trigger");
-	//	return E_FAIL;
-	//}
+	if (FAILED(Ready_Monster_Trigger()))
+	{
+		CRASH("Failed Ready_Layer_Trigger");
+		return E_FAIL;
+	}
 
 	if (FAILED(Ready_Layer_Effect(TEXT("Layer_Effect"))))
 	{
@@ -205,14 +205,12 @@ HRESULT CLevel_StageOne::Ready_Layer_Camera(const _wstring& strLayerTag)
 	CCamera_Player::CAMERA_PLAYER_DESC CameraPlayerDesc{};
 	CameraPlayerDesc.vEye = _float4(0.f, 10.f, -20.f, 1.f);
 	CameraPlayerDesc.vAt = _float4(0.f, 0.f, 0.f, 1.f);
-	CameraPlayerDesc.fFovy = XMConvertToRadians(60.0f);
+	CameraPlayerDesc.fFovy = XMConvertToRadians(50.0f);
 	CameraPlayerDesc.fNear = 0.1f;
 	CameraPlayerDesc.fFar = 500.f;
 	CameraPlayerDesc.fSpeedPerSec = 10.f;
 	CameraPlayerDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 	CameraPlayerDesc.fMouseSensor = 0.8f;
-	//CameraPlayerDesc.vTargetOffset = { 0.f, 1.6f, -3.f, 0.f };
-	//CameraPlayerDesc.vLockOnOffset = { 0.f, 1.6f, -3.f, 0.f };
 
 	CameraPlayerDesc.vTargetOffset = { 0.f, 1.6f, -3.f, 0.f };
 	CameraPlayerDesc.vLockOnOffset = { 0.f, 1.6f, -3.f, 0.f };

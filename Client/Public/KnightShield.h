@@ -37,7 +37,10 @@ public:
 
 
 #pragma region 0. 기본 값들
-private:
+
+
+
+
 
 
 private:

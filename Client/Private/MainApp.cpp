@@ -44,14 +44,12 @@ HRESULT CMainApp::Initialize_Clone()
 		CRASH("Failed Ready Prototype For Static");
 		return E_FAIL;
 	}
-
+	
 	if (FAILED(Ready_Prototype_Effect()))
 	{
 		CRASH("Failed Ready Prototype For Static");
 		return E_FAIL;
 	}
-		
-		
 
 	if (FAILED(Ready_Clone_ForStatic()))
 	{
@@ -59,7 +57,7 @@ HRESULT CMainApp::Initialize_Clone()
 		return E_FAIL;
 	}
 		
-
+	
 	if (FAILED(Ready_Pooling()))
 	{
 		CRASH("Failed Ready Pooling For Static");
@@ -70,8 +68,9 @@ HRESULT CMainApp::Initialize_Clone()
 	if (FAILED(Start_Level(LEVEL::GAMEPLAY)))
 		return E_FAIL;
 
-	/* 원본 if (FAILED(Start_Level(LEVEL::LOGO)))
-		return E_FAIL;	*/
+	// 원본
+	//if (FAILED(Start_Level(LEVEL::LOGO)))
+	//	return E_FAIL;
 
 	//if (FAILED(Start_Level(LEVEL::DEBUG)))
 	//	return E_FAIL;
@@ -82,13 +81,6 @@ HRESULT CMainApp::Initialize_Clone()
 void CMainApp::Update(_float fTimeDelta)
 {
 	m_pGameInstance->Update_Engine(fTimeDelta);
-
-	/*if (m_pGameInstance->Get_KeyUp(DIK_F1))
-	{
-		_uint iLevelID = m_pGameInstance->Get_CurrentLevelID();
-		if (iLevelID != ENUM_CLASS(LEVEL::DEBUG) && iLevelID != ENUM_CLASS(LEVEL::LOADING))
-			Start_Level(LEVEL::DEBUG);
-	}*/
 }
 
 HRESULT CMainApp::Render()
@@ -578,6 +570,17 @@ HRESULT CMainApp::Ready_Clone_SkillUI(const _wstring& strLayerTag)
 
 HRESULT CMainApp::Ready_Prototype_Effect()
 {
+#pragma region DISSOLVE
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
+		, TEXT("Prototype_Component_Texture_Dissolve")
+		, CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Effects/Texture/Noise/Noise%d.png"), 4))))
+	{
+		CRASH("Failed Load Dissolve Texture");
+		return E_FAIL;
+	}
+#pragma endregion
+
+
 #pragma region SLASH UI
 
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
@@ -712,7 +715,7 @@ HRESULT CMainApp::Ready_Prototype_Effect()
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
 		, TEXT("Prototype_Component_Texture_TrailSword")
 		, CTexture::Create(m_pDevice, m_pContext
-			, TEXT("../Bin/Resources/Textures/Effects/Texture/Trail/TraillSword%d.png"), 1))))
+			, TEXT("../Bin/Resources/Textures/Effects/Texture/Trail/TraillSword%d.png"), 3))))
 	{
 		CRASH("Failed Load Effect SwordTrail Texture");
 		return E_FAIL;
@@ -747,7 +750,6 @@ HRESULT CMainApp::Ready_Prototype_Effect()
 		CRASH("Failed Load SwordTrail Object");
 		return E_FAIL;
 	}
-		
 #pragma endregion
 
 
