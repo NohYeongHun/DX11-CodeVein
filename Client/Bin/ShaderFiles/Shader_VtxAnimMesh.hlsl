@@ -132,21 +132,7 @@ PS_OUT PS_MAIN(PS_IN In)
     return Out;
 }
 
-// Deffered Renderging 사용 시
-//PS_OUT_BACKBUFFER PS_DEFFERED_MAIN(PS_IN In)
-//{
-//    PS_OUT_BACKBUFFER Out = (PS_OUT_BACKBUFFER) 0;
-    
-//    vector vMtrlDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
-    
-//    if (vMtrlDiffuse.a < 0.3f)
-//        discard;
-    
-//    Out.vDiffuse = vMtrlDiffuse;
-//    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
-    
-//    return Out;
-//}
+
 
 PS_OUT PS_DISSOLVE_MAIN(PS_IN In)
 {
@@ -207,6 +193,68 @@ PS_OUT PS_REVERSE_DISSOLVE_MAIN(PS_IN In)
     return Out;
 }
 
+// Deffered Renderging 사용 시
+PS_OUT_BACKBUFFER PS_DEFFERED_MAIN(PS_IN In)
+{
+    PS_OUT_BACKBUFFER Out = (PS_OUT_BACKBUFFER) 0;
+    
+    vector vMtrlDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
+    
+    if (vMtrlDiffuse.a < 0.3f)
+        discard;
+    
+    Out.vDiffuse = vMtrlDiffuse;
+    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+    
+    return Out;
+}
+
+PS_OUT_BACKBUFFER PS_DEFFERED_DISSOLVE_MAIN(PS_IN In)
+{
+    PS_OUT_BACKBUFFER Out = (PS_OUT_BACKBUFFER) 0;
+    
+    vector vMtrlDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
+    vector vMtrlDissolve = g_DissolveTexture.Sample(DefaultSampler, In.vTexcoord);
+    
+    
+    if (vMtrlDiffuse.a < 0.3f)
+        discard;
+    
+    
+    Out.vDiffuse = vMtrlDiffuse;
+    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+    
+    // 안에 숫자가 0이되면 안그린다.
+    clip(vMtrlDissolve.r - g_fDissolveTime);
+    
+    
+    return Out;
+}
+
+PS_OUT_BACKBUFFER PS_DEFFERED_REVERSE_DISSOLVE_MAIN(PS_IN In)
+{
+    PS_OUT_BACKBUFFER Out = (PS_OUT_BACKBUFFER) 0;
+    
+    vector vMtrlDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
+    vector vMtrlDissolve = g_DissolveTexture.Sample(DefaultSampler, In.vTexcoord);
+    
+    
+    if (vMtrlDiffuse.a < 0.3f)
+        discard;
+    
+    
+    Out.vDiffuse = vMtrlDiffuse;
+    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+    
+    // 점차 보이게. g_fDissovleTime이 처음에 1로오고, 점차 0으로 변경되면서 보이게하면 될듯?
+    clip(vMtrlDissolve.r - g_fReverseDissolveTime);
+    
+    
+    return Out;
+}
+
+
+
 technique11 DefaultTechnique
 {
     /* 특정 패스를 이용해서 점정을 그려냈다. */
@@ -220,8 +268,8 @@ technique11 DefaultTechnique
 
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
-        PixelShader = compile ps_5_0 PS_MAIN();
-        //PixelShader = compile ps_5_0 PS_DEFFERED_MAIN();
+        //PixelShader = compile ps_5_0 PS_MAIN();
+        PixelShader = compile ps_5_0 PS_DEFFERED_MAIN();
     }
     
     pass DessolvePass
@@ -232,7 +280,9 @@ technique11 DefaultTechnique
 
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
-        PixelShader = compile ps_5_0 PS_DISSOLVE_MAIN();
+        //PixelShader = compile ps_5_0 PS_DISSOLVE_MAIN();
+        PixelShader = compile ps_5_0 PS_DEFFERED_DISSOLVE_MAIN();
+
     }
 
     pass ReverseDessolvePass
@@ -243,7 +293,9 @@ technique11 DefaultTechnique
 
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
-        PixelShader = compile ps_5_0 PS_REVERSE_DISSOLVE_MAIN();
+        //PixelShader = compile ps_5_0 PS_REVERSE_DISSOLVE_MAIN();
+        PixelShader = compile ps_5_0 PS_DEFFERED_REVERSE_DISSOLVE_MAIN();
+
     }
 
 

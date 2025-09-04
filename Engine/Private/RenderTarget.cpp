@@ -55,6 +55,12 @@ HRESULT CRenderTarget::Initialize(_uint iSizeX, _uint iSizeY, DXGI_FORMAT ePixel
     return S_OK;
 }
 
+HRESULT CRenderTarget::Bind_ShaderResource(CShader* pShader, const _char* pConstantName)
+{
+    // Render Target이 가지고있는 Shader Resource View를 전달받은 매개변수 Shader에 바인딩합니다.
+    return pShader->Bind_SRV(pConstantName, m_pSRV);
+}
+
 /* RTV View를 Clear() 함. */
 void CRenderTarget::Clear()
 {
@@ -114,9 +120,13 @@ CRenderTarget* CRenderTarget::Create(ID3D11Device* pDevice, ID3D11DeviceContext*
 void CRenderTarget::Free()
 {
     CBase::Free();
-    Safe_Release(m_pTexture2D);
-    Safe_Release(m_pRTV);
-    Safe_Release(m_pSRV);
     Safe_Release(m_pDevice);
     Safe_Release(m_pContext);
+
+    Safe_Release(m_pSRV);
+    Safe_Release(m_pRTV);
+    Safe_Release(m_pTexture2D);
+    
+    
+    
 }

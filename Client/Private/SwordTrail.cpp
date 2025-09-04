@@ -84,7 +84,7 @@ HRESULT CSwordTrail::Render()
 		return E_FAIL;
 
 #ifdef _DEBUG
-	ImGui_Render();
+	//ImGui_Render();
 #endif // _DEBUG
 
 

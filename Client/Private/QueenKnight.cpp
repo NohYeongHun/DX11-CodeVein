@@ -1,5 +1,4 @@
-﻿#include "QueenKnight.h"
-CQueenKnight::CQueenKnight(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿CQueenKnight::CQueenKnight(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CMonster(pDevice, pContext)
 {
 }
@@ -201,7 +200,7 @@ void CQueenKnight::Late_Update(_float fTimeDelta)
     if (Is_Visible())
     {
         // 보이는 상태일 때만 렌더 그룹에 추가
-        if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::BLEND, this)))
+        if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::NONBLEND, this)))
             return;
     }
     
@@ -214,7 +213,8 @@ void CQueenKnight::Late_Update(_float fTimeDelta)
 HRESULT CQueenKnight::Render()
 {
 #ifdef _DEBUG
-    ImGui_Render();
+    //ImGui_Render();
+    m_pColliderCom->Render();
 #endif // _DEBUG
 
     if (FAILED(Ready_Render_Resources()))
@@ -912,8 +912,14 @@ HRESULT CQueenKnight::Ready_Render_Resources()
         return E_FAIL;
     }
 
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
+    {
+        CRASH("Failed Bind CamPosition");
+        return E_FAIL;
+    }
+        
 
-    const LIGHT_DESC* pLightDesc = m_pGameInstance->Get_LightDesc(0);
+    /*const LIGHT_DESC* pLightDesc = m_pGameInstance->Get_LightDesc(0);
     if (nullptr == pLightDesc)
         return E_FAIL;
 
@@ -927,10 +933,9 @@ HRESULT CQueenKnight::Ready_Render_Resources()
         return E_FAIL;
 
     if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightSpecular", &pLightDesc->vSpecular, sizeof(_float4))))
-        return E_FAIL;
+        return E_FAIL;*/
 
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
-        return E_FAIL;
+    
 
     return S_OK;
 }
@@ -983,60 +988,53 @@ void CQueenKnight::Free()
 
 #pragma endregion
 
+#ifdef _DEBUG
 void CQueenKnight::ImGui_Render()
 {
-    //#ifdef _DEBUG
-//    ImGuiIO& io = ImGui::GetIO();
-//
-//    // 기존 Player Debug Window
-//
-//    ImVec2 windowSize = ImVec2(300.f, 300.f);
-//    ImVec2 windowPos = ImVec2(windowSize.x, 0.f);
-//    ImGui::SetNextWindowPos(windowPos, ImGuiCond_Once);
-//    ImGui::SetNextWindowSize(windowSize, ImGuiCond_Once);
-//
-//    string strDebug = "QueenKnight Debug";
-//    ImGui::Begin(strDebug.c_str(), nullptr, ImGuiWindowFlags_NoCollapse);
-//    ImGui::Text("HP : (%.2f)", m_MonsterStat.fHP);
-//    ImGui::Text("MAX HP : (%.2f)", m_MonsterStat.fMaxHP);
-//
-//    _float3 vPos = {};
-//    XMStoreFloat3(&vPos, m_pTransformCom->Get_State(STATE::POSITION));
-//    ImGui::Text("POS : (%.2f, %.2f, %.2f)", vPos.x, vPos.y, vPos.z);
-//
-//    _vector vMyPos =  m_pTransformCom->Get_State(STATE::POSITION);
-//    _vector vTargetPos = m_pTarget->Get_Transform()->Get_State(STATE::POSITION);
-//    _vector vDistance = vTargetPos - vMyPos;
-//    _float fDistance = XMVectorGetX(XMVector3Length(vDistance));
-//    ImGui::Text("Target Distance : (%.2f)", fDistance);
-//
-//    ImGui::Separator();
-//
-//    _uint iIndex = m_pModelCom->Get_CurrentAnimationIndex();
-//    
-//    ImGui::Text("Current Animation Index : %d ", iIndex);
-//
-//
-//    _wstring strAnimIndex = TEXT("Current Animation Index : ") + to_wstring(iIndex) + TEXT("\n");
-//    OutputDebugWstring(strAnimIndex);
-//
-//    _float fCurrentAnimSpeed = m_pModelCom->Get_AnimSpeed(iIndex);
-//    ImGui::InputFloat("Anim Speed", &fCurrentAnimSpeed);
-//    ImGui::Separator();
-//
-//    if (ImGui::Button("Apply"))
-//    {
-//        m_pModelCom->Set_AnimSpeed(iIndex, fCurrentAnimSpeed);
-//    }
-//    
-//
-//   
-//
-//    ImGui::End();
-//
-//   
-//     m_pColliderCom->Render();
-//
-//#endif // _DEBUG
 
+    ImGuiIO& io = ImGui::GetIO();
+
+    // 기존 Player Debug Window
+
+    ImVec2 windowSize = ImVec2(300.f, 300.f);
+    ImVec2 windowPos = ImVec2(windowSize.x, 0.f);
+    ImGui::SetNextWindowPos(windowPos, ImGuiCond_Once);
+    ImGui::SetNextWindowSize(windowSize, ImGuiCond_Once);
+
+    string strDebug = "QueenKnight Debug";
+    ImGui::Begin(strDebug.c_str(), nullptr, ImGuiWindowFlags_NoCollapse);
+    ImGui::Text("HP : (%.2f)", m_MonsterStat.fHP);
+    ImGui::Text("MAX HP : (%.2f)", m_MonsterStat.fMaxHP);
+
+    _float3 vPos = {};
+    XMStoreFloat3(&vPos, m_pTransformCom->Get_State(STATE::POSITION));
+    ImGui::Text("POS : (%.2f, %.2f, %.2f)", vPos.x, vPos.y, vPos.z);
+
+    _vector vMyPos =  m_pTransformCom->Get_State(STATE::POSITION);
+    _vector vTargetPos = m_pTarget->Get_Transform()->Get_State(STATE::POSITION);
+    _vector vDistance = vTargetPos - vMyPos;
+    _float fDistance = XMVectorGetX(XMVector3Length(vDistance));
+    ImGui::Text("Target Distance : (%.2f)", fDistance);
+
+    ImGui::Separator();
+
+    _uint iIndex = m_pModelCom->Get_CurrentAnimationIndex();
+    
+    ImGui::Text("Current Animation Index : %d ", iIndex);
+
+
+    _wstring strAnimIndex = TEXT("Current Animation Index : ") + to_wstring(iIndex) + TEXT("\n");
+    OutputDebugWstring(strAnimIndex);
+
+    _float fCurrentAnimSpeed = m_pModelCom->Get_AnimSpeed(iIndex);
+    ImGui::InputFloat("Anim Speed", &fCurrentAnimSpeed);
+    ImGui::Separator();
+
+    if (ImGui::Button("Apply"))
+    {
+        m_pModelCom->Set_AnimSpeed(iIndex, fCurrentAnimSpeed);
+    }
+
+    ImGui::End();
 }
+#endif // _DEBUG

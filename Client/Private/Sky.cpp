@@ -109,12 +109,6 @@ HRESULT CSky::Render()
     }*/
 #pragma endregion
 
-
-  
-
-
-    
-
     return S_OK;
 }
 
@@ -135,19 +129,10 @@ HRESULT CSky::Ready_Components(SKY_DESC* pDesc)
         return E_FAIL;
     }
      
-
-    //if (FAILED(CGameObject::Add_Component(ENUM_CLASS(m_eCurLevel), TEXT("Prototype_Component_Texture_Sky"),
-    //    TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom), nullptr)))
-    //{
-
-    //    CRASH("Failed Add Sky Texture");
-    //    return E_FAIL;
-    //}
-
     if (FAILED(CGameObject::Add_Component(ENUM_CLASS(m_eCurLevel), pDesc->PrototypeTag,
         TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom), nullptr)))
     {
-
+    
         CRASH("Failed Add Sky Texture");
         return E_FAIL;
     }
@@ -155,6 +140,15 @@ HRESULT CSky::Ready_Components(SKY_DESC* pDesc)
 
 
 #pragma region MODEL
+//    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(m_eCurLevel), TEXT("Prototype_Component_Texture_Sky"),
+//    TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom), nullptr)))
+//{
+//
+//    CRASH("Failed Add Sky Texture");
+//    return E_FAIL;
+//}
+
+
    /* if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxMesh"),
     TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom), nullptr)))
     return E_FAIL;
@@ -174,9 +168,6 @@ HRESULT CSky::Ready_Components(SKY_DESC* pDesc)
 #pragma endregion
 
         
-
-
-
     return S_OK;
 }
 
@@ -212,8 +203,6 @@ HRESULT CSky::Bind_ShaderResources()
     if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
         return E_FAIL;*/
 #pragma endregion
-
-   
 
     if (FAILED(m_pTransformCom->Bind_Shader_Resource(m_pShaderCom, "g_WorldMatrix")))
         return E_FAIL;

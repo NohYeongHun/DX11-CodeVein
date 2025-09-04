@@ -200,10 +200,13 @@ HRESULT CLoad_Mesh::Initialize_Vertex_For_Anim(std::ifstream& ifs)
 
 	// 5. 채워넣은 데이터로 값 채워넣기.	
 	m_iVertexStride = sizeof(VTXANIMMESH);
-	m_iNumVertices = info.iVertexCount;
+	//m_iVertexStride = sizeof(VTXMESH);
+
 	m_iMaterialIndex = info.iMarterialIndex;
+	m_iNumVertices = info.iVertexCount;
 	m_iNumIndices = info.iIndicesCount;
-	m_iNumBones = info.iBoneCount;
+
+	m_iNumBones = info.iBoneCount; // 사용 안함.
 	m_iIndexStride = 4;
 	m_iNumVertexBuffers = 1;
 	m_eIndexFormat = DXGI_FORMAT_R32_UINT;
@@ -211,13 +214,19 @@ HRESULT CLoad_Mesh::Initialize_Vertex_For_Anim(std::ifstream& ifs)
 
 
 	/* 6. Vertices 정의 */
+	
 	VTXANIMMESH* pVertices = new VTXANIMMESH[m_iNumVertices];
+
+	//VTXMESH* pMeshVerticies = new VTXMESH[m_iNumVertices];
 
 	// 7. 정보 채워넣기.
 	for (_uint i = 0; i < m_iNumVertices; i++)
 	{
+		
+
 		// 모델 생성시 Transform 설정.
 		memcpy(&pVertices[i].vPosition, &info.vertices[i].vPosition, sizeof(_float3));
+		XMStoreFloat3(&info.vertices[i].vNormal, XMVector3Normalize(XMLoadFloat3(&info.vertices[i].vNormal)));
 		memcpy(&pVertices[i].vNormal, &info.vertices[i].vNormal, sizeof(_float3));
 		memcpy(&pVertices[i].vTangent, &info.vertices[i].vTangent, sizeof(_float3));
 		memcpy(&pVertices[i].vBinormal, &info.vertices[i].vBinormal, sizeof(_float3));
@@ -226,6 +235,15 @@ HRESULT CLoad_Mesh::Initialize_Vertex_For_Anim(std::ifstream& ifs)
 		memcpy(&pVertices[i].vTexcoord, &info.vertices[i].vTexcoord, sizeof(_float2));
 	}
 
+	// 8. 다시 채워넣기.
+	/*for (_uint i = 0; i < m_iNumVertices; i++)
+	{
+		memcpy(&pVertices[i].vPosition, &info.vertices[i].vPosition, sizeof(_float3));
+		memcpy(&pVertices[i].vNormal, &info.vertices[i].vNormal, sizeof(_float3));
+		memcpy(&pVertices[i].vTangent, &info.vertices[i].vTangent, sizeof(_float3));
+		memcpy(&pVertices[i].vBinormal, &info.vertices[i].vBinormal, sizeof(_float3));
+		memcpy(&pVertices[i].vTexcoord, &info.vertices[i].vBinormal, sizeof(_float3));
+	}*/
 
 	//m_iNumVertices = meshVectorSize;
 

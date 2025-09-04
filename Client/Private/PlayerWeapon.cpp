@@ -109,6 +109,7 @@ HRESULT CPlayerWeapon::Render()
 {
 #ifdef _DEBUG
     //ImGui_Render();
+    m_pColliderCom->Render();
 #endif // _DEBUG
 
     
@@ -276,7 +277,10 @@ HRESULT CPlayerWeapon::Bind_ShaderResources()
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_Transform_Float4x4(D3DTS::PROJ))))
         return E_FAIL;
 
-    const LIGHT_DESC* pLightDesc = m_pGameInstance->Get_LightDesc(0);
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
+        return E_FAIL;
+
+    /*const LIGHT_DESC* pLightDesc = m_pGameInstance->Get_LightDesc(0);
     if (nullptr == pLightDesc)
         return E_FAIL;
 
@@ -287,9 +291,8 @@ HRESULT CPlayerWeapon::Bind_ShaderResources()
     if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightAmbient", &pLightDesc->vAmbient, sizeof(_float4))))
         return E_FAIL;
     if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightSpecular", &pLightDesc->vSpecular, sizeof(_float4))))
-        return E_FAIL;
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
-        return E_FAIL;
+        return E_FAIL;*/
+    
 
     return S_OK;
 }
@@ -356,6 +359,5 @@ void CPlayerWeapon::ImGui_Render()
     ImGui::End();
 
     //Edit_Collider(m_pColliderCom, "OBB");
-    m_pColliderCom->Render();
 }
 #endif // _DEBUG

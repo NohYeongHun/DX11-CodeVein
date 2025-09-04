@@ -49,11 +49,11 @@ HRESULT CLevel_StageOne::Initialize_Clone()
 		return E_FAIL;
 	}
 
-	//if (FAILED(Ready_Monster_Trigger()))
-	//{
-	//	CRASH("Failed Ready_Layer_Trigger");
-	//	return E_FAIL;
-	//}
+	if (FAILED(Ready_Monster_Trigger()))
+	{
+		CRASH("Failed Ready_Layer_Trigger");
+		return E_FAIL;
+	}
 
 	if (FAILED(Ready_Layer_Effect(TEXT("Layer_Effect"))))
 	{

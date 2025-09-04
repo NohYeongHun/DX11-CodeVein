@@ -81,7 +81,7 @@ void CSlash::Late_Update(_float fTimeDelta)
     CGameObject::Late_Update(fTimeDelta);
 
     // UI 렌더 그룹에 추가
-    if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::BLEND, this)))
+    if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::NONLIGHT, this)))
         return;
 }
 

@@ -108,7 +108,7 @@ void CEffectParticle::Late_Update(_float fTimeDelta)
     // 활성화된 상태에서만 렌더링
     if (m_IsActivate)
     {
-        if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::NONBLEND, this)))
+        if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::NONLIGHT, this)))
         {
             CRASH("Failed Add RenderGroup");
             return;
