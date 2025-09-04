@@ -1,5 +1,4 @@
-﻿#include "KnightLance.h"
-CKnightLance::CKnightLance(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿CKnightLance::CKnightLance(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CWeapon(pDevice, pContext)
 {
 }
@@ -96,6 +95,7 @@ void CKnightLance::Finalize_Update(_float fTimeDelta)
     TrailWeapon_Update(SocketMatrix);
     m_pTrailWeapon_Effect->Update(fTimeDelta);
 
+    CWeapon::Update_Timer(fTimeDelta);
     CWeapon::Finalize_Update(fTimeDelta);
 }
 
@@ -103,7 +103,7 @@ HRESULT CKnightLance::Render()
 {
 
 #ifdef _DEBUG
-    //ImGui_Render();
+    ImGui_Render();
 
 #endif // _DEBUG
 
@@ -113,7 +113,6 @@ HRESULT CKnightLance::Render()
         return E_FAIL;
     }
 
-
     _uint           iNumMeshes = m_pModelCom->Get_NumMeshes();
 
     for (_uint i = 0; i < iNumMeshes; i++)
@@ -121,7 +120,7 @@ HRESULT CKnightLance::Render()
         if (FAILED(m_pModelCom->Bind_Materials(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE, 0)))
             return E_FAIL;
 
-        m_pShaderCom->Begin(0);
+        m_pShaderCom->Begin(m_iShaderPath);
 
         m_pModelCom->Render(i);
     }
@@ -170,6 +169,24 @@ HRESULT CKnightLance::Ready_Components()
     if (FAILED(CGameObject::Add_Component(ENUM_CLASS(m_eCurLevel), TEXT("Prototype_Component_Model_GodChildLance"),
         TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom), &Desc)))
         return E_FAIL;
+
+
+    // Dissolve Texture
+    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Dissolve"),
+        TEXT("Com_Dissolve"), reinterpret_cast<CComponent**>(&m_pDissolveTexture), nullptr)))
+    {
+        CRASH("Failed Load DissolveTexture");
+        return E_FAIL;
+    }
+
+    //if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Dissolve"),
+    //    TEXT("Com_Dissolve"), reinterpret_cast<CComponent**>(&m_pDissolveTexture), nullptr)))
+    //{
+    //    CRASH("Failed Load DissolveTexture");
+    //    return E_FAIL;
+    //}
+    // 증가 했다가 ~ 감소 했다가
+
 
     return S_OK;
 }
@@ -220,12 +237,6 @@ HRESULT CKnightLance::Ready_Effects()
     Desc.fRotationPerSec = XMConvertToRadians(1.0f);
     Desc.eDiffuseType = TRAIL_DIFFUSE::THICK_BLOOD;
 
-    //m_pMatrixArray[0] = m_pModelCom->Get_LocalBoneMatrix("TrailStartSocket");
-    //m_pMatrixArray[1] = m_pModelCom->Get_LocalBoneMatrix("TrailStartSocket_end");
-    //m_pMatrixArray[2] = m_pModelCom->Get_LocalBoneMatrix("TrailEndSocket");
-    //m_pMatrixArray[3] = m_pModelCom->Get_LocalBoneMatrix("TrailEndSocket_end");
-
-    
 
 
     m_pTrailWeapon_Effect = dynamic_cast<CSwordTrail*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT,
@@ -254,22 +265,25 @@ HRESULT CKnightLance::Bind_ShaderResources()
     if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
         return E_FAIL;
 
-    //const LIGHT_DESC* pLightDesc = m_pGameInstance->Get_LightDesc(0);
-    //if (nullptr == pLightDesc)
-    //    return E_FAIL;
-    //
-    //if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDir", &pLightDesc->vDirection, sizeof(_float4))))
-    //    return E_FAIL;
-    //if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDiffuse", &pLightDesc->vDiffuse, sizeof(_float4))))
-    //    return E_FAIL;
-    //if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightAmbient", &pLightDesc->vAmbient, sizeof(_float4))))
-    //    return E_FAIL;
-    //if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightSpecular", &pLightDesc->vSpecular, sizeof(_float4))))
-    //    return E_FAIL;
-    
+    if (FAILED(m_pDissolveTexture->Bind_Shader_Resource(m_pShaderCom, "g_DissolveTexture", 0)))
+        return E_FAIL;
+
+    _float fDissolveTime = {};
+    if (m_bDissolve)
+        fDissolveTime = normalize(m_fCurDissolveTime, 0.f, m_fMaxDissolveTime);
+    else if(m_bReverseDissolve)
+        fDissolveTime = normalize(m_fCurDissolveTime, 0.f, m_fMaxReverseDissolveTime);
+
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fDissolveTime", &fDissolveTime, sizeof(_float))))
+    {
+        CRASH("Failed Dissolve Texture");
+        return E_FAIL;
+    }
+
 
     return S_OK;
 }
+
 
 CKnightLance* CKnightLance::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
@@ -301,27 +315,10 @@ void CKnightLance::Free()
 {
     CWeapon::Free();
     Safe_Release(m_pTrailWeapon_Effect);
+    //Safe_Release(m_pDissolveTexture);
 }
 
-#pragma region EFFECT
-void CKnightLance::Start_Dissolve()
-{
-    m_fDissolveTime = 0.f;
-    m_iShaderPath = static_cast<_uint>(MESH_SHADERPATH::DISSOLVE);
-}
 
-void CKnightLance::ReverseStart_Dissolve()
-{
-    m_fDissolveTime = 0.f;
-    m_iShaderPath = static_cast<_uint>(MESH_SHADERPATH::DISSOLVE_REVERSE);
-}
-
-void CKnightLance::End_Dissolve()
-{
-    m_fDissolveTime = 0.f;
-    m_iShaderPath = static_cast<_uint>(MESH_SHADERPATH::DEFAULT);
-}
-#pragma endregion
 
 
 
@@ -347,17 +344,17 @@ void CKnightLance::ImGui_Render()
     ImGui::InputFloat3("Point Up : ", vPointUp);
     ImGui::InputFloat3("Point Down : ", vPointDown);
 
+    _bool bActive = m_pColliderCom->Is_Active();
+    if (bActive)
+        ImGui::Text("Knight Lance Active ");
+
     if (ImGui::Button("Apply"))
     {
         m_vPointUp = { vPointUp[0], vPointUp[1], vPointUp[2] };
         m_vPointDown = { vPointDown[0], vPointDown[1], vPointDown[2] };
     }
 
-    //static float vTrailStartPos[3] = { m_pMatrixArray[0]->m[3][0], m_pMatrixArray[0]->m[3][1], m_pMatrixArray[0]->m[3][2] };
-    //static float vTrailEndPos[3] = { m_pMatrixArray[2]->m[3][0], m_pMatrixArray[2]->m[3][1], m_pMatrixArray[2]->m[3][2] };
-    //
-    //ImGui::Text("Weapon Trail End Pos (%.2f, %.2f, %.2f)", vTrailEndPos[0],
-    //    vTrailEndPos[1], vTrailEndPos[2]);
+    
 
     ImGui::End();
 

@@ -10,8 +10,16 @@ vector g_vCamPosition;
 
 /*재질*/
 texture2D g_DiffuseTexture;
+
+/*재질*/
+texture2D g_DissolveTexture;
+
 vector g_vMtrlAmbient = 1.f;
 vector g_vMtrlSpecular = 1.f;
+
+
+// 시간.
+float g_fDissolveTime;
 
 
 
@@ -92,7 +100,7 @@ struct PS_BACKBUFFER_IN
 //    float4 vColor : SV_TARGET0;
 //};
 
-struct PS_BACKBUFFER_OUT
+struct PS_OUT_BACKBUFFER
 {
     float4 vDiffuse : SV_TARGET0;
     float4 vNormal : SV_TARGET1;
@@ -123,23 +131,39 @@ struct PS_BACKBUFFER_OUT
 //    return Out;
 //}
 
-PS_BACKBUFFER_OUT PS_DEFFERED_OUT(PS_BACKBUFFER_IN In)
+PS_OUT_BACKBUFFER PS_DEFFERED_OUT(PS_BACKBUFFER_IN In)
 {
-    PS_BACKBUFFER_OUT Out = (PS_BACKBUFFER_OUT) 0;
+    PS_OUT_BACKBUFFER Out = (PS_OUT_BACKBUFFER) 0;
     
     vector vMtrlDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
     
     if (vMtrlDiffuse.a < 0.3f)
         discard;
     
-    
-    //Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
-    
-    //Out.vDiffuse = float4(abs(In.vNormal.xyz), 1.0f);
-    //Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
     Out.vDiffuse = vMtrlDiffuse;
     Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
-    //Out.vNormal = (1.f, 1.f, 1.f, 1.f);
+    
+    return Out;
+}
+
+PS_OUT_BACKBUFFER PS_DEFFERED_DISSOLVE_MAIN(PS_BACKBUFFER_IN In)
+{
+    PS_OUT_BACKBUFFER Out = (PS_OUT_BACKBUFFER) 0;
+    
+    vector vMtrlDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
+    vector vMtrlDissolve = g_DissolveTexture.Sample(DefaultSampler, In.vTexcoord);
+    
+    
+    if (vMtrlDiffuse.a < 0.3f)
+        discard;
+    
+    
+    Out.vDiffuse = vMtrlDiffuse;
+    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+    
+    // 안에 숫자가 0이되면 안그린다.
+    
+    clip(vMtrlDissolve.r - g_fDissolveTime);
     
     return Out;
 }
@@ -159,6 +183,19 @@ technique11 DefaultTechnique
         GeometryShader = NULL;
         //PixelShader = compile ps_5_0 PS_MAIN();
         PixelShader = compile ps_5_0 PS_DEFFERED_OUT();
+    }
+    
+    pass DessolvePass
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        //PixelShader = compile ps_5_0 PS_DISSOLVE_MAIN();
+        PixelShader = compile ps_5_0 PS_DEFFERED_DISSOLVE_MAIN();
+
     }
 
     //pass SkyPass // 하늘 전용 패스

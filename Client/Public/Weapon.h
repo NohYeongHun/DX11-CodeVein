@@ -113,6 +113,27 @@ protected:
 	_bool m_bTrail = { false };
 #pragma endregion
 
+#pragma region 5. DISSOLVE 처리
+public:
+	void Set_DissolveTime(_float fDissolveTime);
+	void Set_ReverseDissolveTime(_float fDissolveTime);
+	void Start_Dissolve(); // Dissolve 재생.
+	void ReverseStart_Dissolve(); // Dissolve 역재생.
+	void End_Dissolve();
+
+protected:
+	_bool m_bDissolve = { false };
+	_bool m_bReverseDissolve = { false };
+	class CTexture* m_pDissolveTexture = { nullptr };
+	_uint m_iShaderPath = {};
+	_float m_fCurDissolveTime = {};
+	_float m_fMaxDissolveTime = {};
+	_float m_fMaxReverseDissolveTime = {};
+
+protected:
+	void Update_DissolveFrame(_float fTimeDelta);
+
+#pragma endregion
 
 
 

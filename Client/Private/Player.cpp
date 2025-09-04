@@ -80,7 +80,6 @@ HRESULT CPlayer::Initialize_Clone(void* pArg)
         CRASH("Failed Ready_Colliders");
         return E_FAIL;
     }
-
   
 
     if (FAILED(Ready_Navigations()))

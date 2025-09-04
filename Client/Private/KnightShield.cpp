@@ -1,6 +1,4 @@
-﻿#include "KnightShield.h"
-
-CKnightShield::CKnightShield(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿CKnightShield::CKnightShield(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CWeapon(pDevice, pContext)
 {
 }
@@ -55,6 +53,7 @@ void CKnightShield::Update(_float fTimeDelta)
         XMLoadFloat4x4(m_pSocketMatrix) *
         XMLoadFloat4x4(m_pParentMatrix));
 
+    CWeapon::Update_Timer(fTimeDelta);
     CWeapon::Finalize_Update(fTimeDelta);
 }
 
@@ -108,7 +107,7 @@ HRESULT CKnightShield::Render()
         if (FAILED(m_pModelCom->Bind_Materials(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE, 0)))
             return E_FAIL;
 
-        m_pShaderCom->Begin(0);
+        m_pShaderCom->Begin(m_iShaderPath);
 
         m_pModelCom->Render(i);
     }
@@ -127,26 +126,6 @@ void CKnightShield::On_Collision_Stay(CGameObject* pOther)
 void CKnightShield::On_Collision_Exit(CGameObject* pOther)
 {
 }
-
-#pragma region EFFECT
-void CKnightShield::Start_Dissolve()
-{
-    m_fDissolveTime = 0.f;
-    m_iShaderPath = static_cast<_uint>(MESH_SHADERPATH::DISSOLVE);
-}
-
-void CKnightShield::ReverseStart_Dissolve()
-{
-    m_fDissolveTime = 0.f;
-    m_iShaderPath = static_cast<_uint>(MESH_SHADERPATH::DISSOLVE_REVERSE);
-}
-
-void CKnightShield::End_Dissolve()
-{
-    m_fDissolveTime = 0.f;
-    m_iShaderPath = static_cast<_uint>(MESH_SHADERPATH::DEFAULT);
-}
-#pragma endregion
 
 
 
@@ -169,6 +148,16 @@ HRESULT CKnightShield::Ready_Components()
         CRASH("Failed Load Model")
         return E_FAIL;
     }
+
+
+    // Dissolve Texture
+    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Dissolve"),
+        TEXT("Com_Dissolve"), reinterpret_cast<CComponent**>(&m_pDissolveTexture), nullptr)))
+    {
+        CRASH("Failed Load DissolveTexture");
+        return E_FAIL;
+    }
+
 
     return S_OK;
 }
@@ -214,6 +203,21 @@ HRESULT CKnightShield::Bind_ShaderResources()
 
     if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
         return E_FAIL;
+
+    if (FAILED(m_pDissolveTexture->Bind_Shader_Resource(m_pShaderCom, "g_DissolveTexture", 0)))
+        return E_FAIL;
+
+    _float fDissolveTime = {};
+    if (m_bDissolve)
+        fDissolveTime = normalize(m_fCurDissolveTime, 0.f, m_fMaxDissolveTime);
+    else if (m_bReverseDissolve)
+        fDissolveTime = normalize(m_fCurDissolveTime, 0.f, m_fMaxReverseDissolveTime);
+
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fDissolveTime", &fDissolveTime, sizeof(_float))))
+    {
+        CRASH("Failed Dissolve Texture");
+        return E_FAIL;
+    }
 
     /*const LIGHT_DESC* pLightDesc = m_pGameInstance->Get_LightDesc(0);
     if (nullptr == pLightDesc)

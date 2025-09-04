@@ -107,91 +107,91 @@ struct PS_OUT_BACKBUFFER
 /* 픽셀의 색을 결정한다. */
 
 
-PS_OUT PS_MAIN(PS_IN In)
-{
-    PS_OUT Out = (PS_OUT) 0;
+//PS_OUT PS_MAIN(PS_IN In)
+//{
+//    PS_OUT Out = (PS_OUT) 0;
     
-    vector vMtrlDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
+//    vector vMtrlDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
     
-    vector vMtrlDissolve = g_DissolveTexture.Sample(DefaultSampler, In.vTexcoord);
+//    vector vMtrlDissolve = g_DissolveTexture.Sample(DefaultSampler, In.vTexcoord);
     
-    if (vMtrlDiffuse.a < 0.3f)
-        discard;
+//    if (vMtrlDiffuse.a < 0.3f)
+//        discard;
     
-    float fShade = max(dot(normalize(g_vLightDir) * -1.f, normalize(In.vNormal)), 0.f);
+//    float fShade = max(dot(normalize(g_vLightDir) * -1.f, normalize(In.vNormal)), 0.f);
     
-    /*슬라이딩 이야기했다*/
-    vector vReflect = reflect(normalize(g_vLightDir), normalize(In.vNormal));
-    vector vLook = In.vWorldPos - g_vCamPosition;
+//    /*슬라이딩 이야기했다*/
+//    vector vReflect = reflect(normalize(g_vLightDir), normalize(In.vNormal));
+//    vector vLook = In.vWorldPos - g_vCamPosition;
     
-    float fSpecular = pow(max(dot(normalize(vLook) * -1.f, normalize(vReflect)), 0.f), 50.0f);
+//    float fSpecular = pow(max(dot(normalize(vLook) * -1.f, normalize(vReflect)), 0.f), 50.0f);
     
-    Out.vColor = (g_vLightDiffuse * vMtrlDiffuse) * saturate(fShade + (g_vLightAmbient * g_vMtrlAmbient)) +
-                    (g_vLightSpecular * g_vMtrlSpecular) * fSpecular;
+//    Out.vColor = (g_vLightDiffuse * vMtrlDiffuse) * saturate(fShade + (g_vLightAmbient * g_vMtrlAmbient)) +
+//                    (g_vLightSpecular * g_vMtrlSpecular) * fSpecular;
     
-    return Out;
-}
+//    return Out;
+//}
 
 
 
-PS_OUT PS_DISSOLVE_MAIN(PS_IN In)
-{
-    PS_OUT Out = (PS_OUT) 0;
+//PS_OUT PS_DISSOLVE_MAIN(PS_IN In)
+//{
+//    PS_OUT Out = (PS_OUT) 0;
     
-    vector vMtrlDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
-    vector vMtrlDissolve = g_DissolveTexture.Sample(DefaultSampler, In.vTexcoord);
-    
-    
-    if (vMtrlDiffuse.a < 0.3f)
-        discard;
-    
-    float fShade = max(dot(normalize(g_vLightDir) * -1.f, normalize(In.vNormal)), 0.f);
-    
-    /*슬라이딩 이야기했다*/
-    vector vReflect = reflect(normalize(g_vLightDir), normalize(In.vNormal));
-    vector vLook = In.vWorldPos - g_vCamPosition;
-    
-    float fSpecular = pow(max(dot(normalize(vLook) * -1.f, normalize(vReflect)), 0.f), 50.0f);
-    
-    Out.vColor = (g_vLightDiffuse * vMtrlDiffuse) * saturate(fShade + (g_vLightAmbient * g_vMtrlAmbient)) +
-                    (g_vLightSpecular * g_vMtrlSpecular) * fSpecular;
-    
-    // 안에 숫자가 0이되면 안그린다.
-    clip(vMtrlDissolve.r - g_fDissolveTime);
+//    vector vMtrlDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
+//    vector vMtrlDissolve = g_DissolveTexture.Sample(DefaultSampler, In.vTexcoord);
     
     
-    return Out;
-}
+//    if (vMtrlDiffuse.a < 0.3f)
+//        discard;
+    
+//    float fShade = max(dot(normalize(g_vLightDir) * -1.f, normalize(In.vNormal)), 0.f);
+    
+//    /*슬라이딩 이야기했다*/
+//    vector vReflect = reflect(normalize(g_vLightDir), normalize(In.vNormal));
+//    vector vLook = In.vWorldPos - g_vCamPosition;
+    
+//    float fSpecular = pow(max(dot(normalize(vLook) * -1.f, normalize(vReflect)), 0.f), 50.0f);
+    
+//    Out.vColor = (g_vLightDiffuse * vMtrlDiffuse) * saturate(fShade + (g_vLightAmbient * g_vMtrlAmbient)) +
+//                    (g_vLightSpecular * g_vMtrlSpecular) * fSpecular;
+    
+//    // 안에 숫자가 0이되면 안그린다.
+//    clip(vMtrlDissolve.r - g_fDissolveTime);
+    
+    
+//    return Out;
+//}
 
-PS_OUT PS_REVERSE_DISSOLVE_MAIN(PS_IN In)
-{
-    PS_OUT Out = (PS_OUT) 0;
+//PS_OUT PS_REVERSE_DISSOLVE_MAIN(PS_IN In)
+//{
+//    PS_OUT Out = (PS_OUT) 0;
     
-    vector vMtrlDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
-    vector vMtrlDissolve = g_DissolveTexture.Sample(DefaultSampler, In.vTexcoord);
-    
-    
-    if (vMtrlDiffuse.a < 0.3f)
-        discard;
-    
-    float fShade = max(dot(normalize(g_vLightDir) * -1.f, normalize(In.vNormal)), 0.f);
-    
-    /*슬라이딩 이야기했다*/
-    vector vReflect = reflect(normalize(g_vLightDir), normalize(In.vNormal));
-    vector vLook = In.vWorldPos - g_vCamPosition;
-    
-    float fSpecular = pow(max(dot(normalize(vLook) * -1.f, normalize(vReflect)), 0.f), 50.0f);
-    
-    Out.vColor = (g_vLightDiffuse * vMtrlDiffuse) * saturate(fShade + (g_vLightAmbient * g_vMtrlAmbient)) +
-                    (g_vLightSpecular * g_vMtrlSpecular) * fSpecular;
+//    vector vMtrlDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
+//    vector vMtrlDissolve = g_DissolveTexture.Sample(DefaultSampler, In.vTexcoord);
     
     
-    // 점차 보이게. g_fDissovleTime이 처음에 1로오고, 점차 0으로 변경되면서 보이게하면 될듯?
-    clip(vMtrlDissolve.r - g_fReverseDissolveTime);
+//    if (vMtrlDiffuse.a < 0.3f)
+//        discard;
+    
+//    float fShade = max(dot(normalize(g_vLightDir) * -1.f, normalize(In.vNormal)), 0.f);
+    
+//    /*슬라이딩 이야기했다*/
+//    vector vReflect = reflect(normalize(g_vLightDir), normalize(In.vNormal));
+//    vector vLook = In.vWorldPos - g_vCamPosition;
+    
+//    float fSpecular = pow(max(dot(normalize(vLook) * -1.f, normalize(vReflect)), 0.f), 50.0f);
+    
+//    Out.vColor = (g_vLightDiffuse * vMtrlDiffuse) * saturate(fShade + (g_vLightAmbient * g_vMtrlAmbient)) +
+//                    (g_vLightSpecular * g_vMtrlSpecular) * fSpecular;
     
     
-    return Out;
-}
+//    // 점차 보이게. g_fDissovleTime이 처음에 1로오고, 점차 0으로 변경되면서 보이게하면 될듯?
+//    clip(vMtrlDissolve.r - g_fReverseDissolveTime);
+    
+    
+//    return Out;
+//}
 
 // Deffered Renderging 사용 시
 PS_OUT_BACKBUFFER PS_DEFFERED_MAIN(PS_IN In)
@@ -225,33 +225,32 @@ PS_OUT_BACKBUFFER PS_DEFFERED_DISSOLVE_MAIN(PS_IN In)
     Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
     
     // 안에 숫자가 0이되면 안그린다.
+    
     clip(vMtrlDissolve.r - g_fDissolveTime);
     
     
     return Out;
 }
 
-PS_OUT_BACKBUFFER PS_DEFFERED_REVERSE_DISSOLVE_MAIN(PS_IN In)
-{
-    PS_OUT_BACKBUFFER Out = (PS_OUT_BACKBUFFER) 0;
+//PS_OUT_BACKBUFFER PS_DEFFERED_REVERSE_DISSOLVE_MAIN(PS_IN In)
+//{
+//    PS_OUT_BACKBUFFER Out = (PS_OUT_BACKBUFFER) 0;
     
-    vector vMtrlDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
-    vector vMtrlDissolve = g_DissolveTexture.Sample(DefaultSampler, In.vTexcoord);
+//    vector vMtrlDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
+//    vector vMtrlDissolve = g_DissolveTexture.Sample(DefaultSampler, In.vTexcoord);
     
+//    if (vMtrlDiffuse.a < 0.3f)
+//        discard;
     
-    if (vMtrlDiffuse.a < 0.3f)
-        discard;
+//    Out.vDiffuse = vMtrlDiffuse;
+//    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
     
-    
-    Out.vDiffuse = vMtrlDiffuse;
-    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
-    
-    // 점차 보이게. g_fDissovleTime이 처음에 1로오고, 점차 0으로 변경되면서 보이게하면 될듯?
-    clip(vMtrlDissolve.r - g_fReverseDissolveTime);
+//    // 점차 보이게. g_fDissovleTime이 처음에 1로오고, 점차 0으로 변경되면서 보이게하면 될듯?
+//    clip(vMtrlDissolve.r - g_fReverseDissolveTime);
     
     
-    return Out;
-}
+//    return Out;
+//}
 
 
 
@@ -284,34 +283,5 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_DEFFERED_DISSOLVE_MAIN();
 
     }
-
-    pass ReverseDessolvePass
-    {
-        SetRasterizerState(RS_Default);
-        SetDepthStencilState(DSS_Default, 0);
-        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
-
-        VertexShader = compile vs_5_0 VS_MAIN();
-        GeometryShader = NULL;
-        //PixelShader = compile ps_5_0 PS_REVERSE_DISSOLVE_MAIN();
-        PixelShader = compile ps_5_0 PS_DEFFERED_REVERSE_DISSOLVE_MAIN();
-
-    }
-
-
-    ///* 모델의 상황에 따라 다른 쉐이딩 기법 세트(블렌딩 + 디스토션  )를 먹여주기위해서 */
-    //pass DefaultPass1
-    //{
-    //    VertexShader = compile vs_5_0 VS_MAIN1();
-
-    //}
-
-    ///* 정점의 정보에 따라 쉐이더 파일을 작성한다. */
-    ///* 정점의 정보가 같지만 완전히 다른 취급을 하느 ㄴ객체나 모델을 그리는 방식 -> 렌더링방식에 차이가 생길 수 있다. */ 
-    //pass DefaultPass1
-    //{
-    //    VertexShader = compile vs_5_0 VS_MAIN1();
-
-    //}
-
+   
 }

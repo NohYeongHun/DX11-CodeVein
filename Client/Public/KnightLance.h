@@ -59,6 +59,9 @@ private:
 
 #pragma endregion
 
+#pragma region 2. EFFECT
+
+#pragma endregion
 
 
 private:
@@ -73,25 +76,12 @@ public:
 	virtual void Free() override;
 #pragma endregion
 
-#pragma region 2. EFFECT
-public:
-	void Start_Dissolve(); // Dissolve 재생.
-	void ReverseStart_Dissolve(); // Dissolve 역재생.
-	void End_Dissolve();
-
-private:
-	_uint m_iShaderPath = {};
-	_float m_fDissolveTime = {};
-	_float m_fEndDissolveTime = {};
-#pragma endregion
 
 
 #ifdef _DEBUG
 private:
 	void ImGui_Render();
 
-private:
-	const _float4x4* m_pMatrixArray[4] = { nullptr };
 #endif // _DEBUG
 
 };

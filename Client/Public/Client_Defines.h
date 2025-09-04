@@ -38,7 +38,7 @@ namespace Client
 
 	enum class TRAIL_DIFFUSE : _uint { SWORD = 0, THICK_BLOOD = 1, BLOOD = 2, NONE };
 	enum class ANIMESH_SHADERPATH : _uint { DEFAULT = 0, DISSOLVE = 1, DISSOLVE_REVERSE = 2, NONE };
-	enum class MESH_SHADERPATH : _uint { DEFAULT = 0, SKYBOX = 1, DISSOLVE = 2, DISSOLVE_REVERSE = 3, NONE };
+	enum class MESH_SHADERPATH : _uint { DEFAULT = 0, DISSOLVE = 1, NONE };
 
 
 	/* 애니메이션 바뀌더라도 이값만 바꾸게 */
@@ -77,7 +77,9 @@ namespace Client
 	}PARTICLE_INIT_INFO;
 
 	
-
+	static const float normalize(float x, float min_val, float max_val) {
+		return (x - min_val) / (max_val - min_val);
+	}
 
 
 }

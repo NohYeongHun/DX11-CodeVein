@@ -1,5 +1,4 @@
 ﻿#include "Weapon.h"
-
 CWeapon::CWeapon(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CPartObject(pDevice, pContext)
 {
@@ -79,7 +78,7 @@ HRESULT CWeapon::Render()
 // 타이머 관련한 함수들을 모아둔 클래스
 void CWeapon::Update_Timer(_float fTimeDelta)
 {
-    Update_ColliderFrame(fTimeDelta);
+    Update_DissolveFrame(fTimeDelta);
 }
 
 /* Transform의 Prev Position을 사용할 수 없음 => 오로지 부모뼈에 의해서만 위치가 이동하기 때문. */
@@ -170,7 +169,66 @@ void CWeapon::Decrease_Damage(_float fDamage)
 {
     m_fAttackPower -= fDamage;
 }
+
 #pragma endregion
+
+#pragma region 4. Traill 관리 => 몬스터가 현재 애니메이션 Frame을 확인하고 관리해야함.
+
+#pragma endregion
+
+#pragma region 5. DISSOLVE 처리
+void CWeapon::Set_DissolveTime(_float fDissolveTime)
+{
+    m_fMaxDissolveTime = fDissolveTime;
+}
+void CWeapon::Set_ReverseDissolveTime(_float fDissolveTime)
+{
+    m_fMaxReverseDissolveTime = fDissolveTime;
+}
+
+void CWeapon::Start_Dissolve()
+{
+    m_fCurDissolveTime = 0.f;
+    m_bDissolve = true;
+    m_iShaderPath = static_cast<_uint>(MESH_SHADERPATH::DISSOLVE);
+}
+void CWeapon::ReverseStart_Dissolve()
+{
+    m_fCurDissolveTime = m_fMaxReverseDissolveTime;
+    m_bReverseDissolve = true;
+    m_iShaderPath = static_cast<_uint>(MESH_SHADERPATH::DISSOLVE);
+
+}
+
+void CWeapon::End_Dissolve()
+{
+    m_fCurDissolveTime = 0.f;
+    m_iShaderPath = static_cast<_uint>(ANIMESH_SHADERPATH::DEFAULT);
+    m_bDissolve = false;
+    m_bReverseDissolve = false;
+}
+
+
+void CWeapon::Update_DissolveFrame(_float fTimeDelta)
+{
+    if (m_bDissolve)
+    {
+        m_fCurDissolveTime += fTimeDelta;
+
+        if (m_fCurDissolveTime >= m_fMaxDissolveTime)
+            m_bDissolve = false;
+    }
+
+    if (m_bReverseDissolve)
+    {
+        m_fCurDissolveTime -= fTimeDelta;
+        if (m_fCurDissolveTime <= 0.f)
+            m_bReverseDissolve = false;
+    }
+}
+
+#pragma endregion
+
 
 
 
@@ -191,4 +249,5 @@ void CWeapon::Free()
     Safe_Release(m_pModelCom);
     Safe_Release(m_pShaderCom);
     Safe_Release(m_pColliderCom);
+    Safe_Release(m_pDissolveTexture);
 }

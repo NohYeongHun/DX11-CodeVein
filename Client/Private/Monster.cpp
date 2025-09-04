@@ -119,8 +119,122 @@ _float CMonster::Get_TargetDistance()
 
     return XMVectorGetX(XMVector3Length(vTargetPos - vMyPos));
 }
+
 #pragma endregion
 
+
+#pragma region 몬스터 TRAIL 관리
+
+// 추가
+void CMonster::Add_Trail_Frame(_uint iAnimationIndex, _float fStartRatio, _float fEndRatio, _uint iPartType)
+{
+    MONSTER_TRAIL_FRAME traillFrame(fStartRatio, fEndRatio, iPartType);
+
+    // 해당 애니메이션의 콜라이더 제어 정보가 없으면 생성
+    if (m_TrailControlMap.find(iAnimationIndex) == m_TrailControlMap.end())
+    {
+        m_TrailControlMap[iAnimationIndex] = MONSTER_TRAIL_CONTROL();
+    }
+
+    // Trail 프레임 구조체를 넣어줍니다.
+    m_TrailControlMap[iAnimationIndex].vecTrailFrames.push_back(traillFrame);
+
+    // Part별 인덱스 초기화
+    if (m_TrailControlMap[iAnimationIndex].partCurrentIndex.find(iPartType) ==
+        m_TrailControlMap[iAnimationIndex].partCurrentIndex.end())
+    {
+        m_TrailControlMap[iAnimationIndex].partCurrentIndex[iPartType] = 0;
+        m_TrailControlMap[iAnimationIndex].partProcessed[iPartType] = false;
+    }
+}
+
+void CMonster::Handle_Trail_State()
+{
+    _float fCurrentRatio = m_pModelCom->Get_Current_Ratio();
+
+    auto iter = m_TrailControlMap.find(Get_CurrentAnimation());
+    if (iter == m_TrailControlMap.end())
+        return;
+
+    MONSTER_TRAIL_CONTROL& trailControl = iter->second;
+
+    // 모든 콜라이더 프레임을 순회
+    for (auto& trailFrame : trailControl.vecTrailFrames)
+    {
+        _uint partType = trailFrame.iPartType;
+
+        // 현재 TRAIL 구간 확인
+        _bool bShouldActive = (fCurrentRatio >= trailFrame.fStartRatio &&
+            fCurrentRatio <= trailFrame.fEndRatio);
+
+        // Part별 이전 상태와 비교
+        _bool bPrevState = m_PartPrevColliderState[partType];
+
+        if (bShouldActive != bPrevState)
+        {
+            if (bShouldActive)
+            {
+                // 콜라이더 활성화
+                Enable_Trail(partType);
+                trailFrame.bIsActive = true;
+            }
+            else
+            {
+                // Trail 비활성화
+                Disable_Trail(partType);
+                trailFrame.bIsActive = false;
+            }
+
+            m_PartPrevTrailState[partType] = bShouldActive;
+        }
+
+        // EndRatio를 벗어난 경우 강제로 콜라이더 비활성화
+        if (fCurrentRatio > trailFrame.fEndRatio && trailFrame.bIsActive)
+        {
+            Disable_Trail(partType);
+            trailFrame.bIsActive = false;
+            m_PartPrevTrailState[partType] = false;
+        }
+    }
+    
+    // 애니메이션이 완료된 경우 모든 콜라이더 비활성화 (안전장치)
+    if (m_pModelCom->Is_Finished())
+    {
+        for (auto& trailFrame : trailControl.vecTrailFrames)
+        {
+            if (trailFrame.bIsActive)
+            {
+                Disable_Trail(trailFrame.iPartType);
+                trailFrame.bIsActive = false;
+                m_PartPrevTrailState[trailFrame.iPartType] = false;
+            }
+        }
+    }
+}
+void CMonster::Reset_Trail_ActiveInfo()
+{
+    for (auto& pair : m_TrailControlMap)
+    {
+        MONSTER_TRAIL_CONTROL& trailControl = pair.second;
+
+        // Part별 인덱스와 상태 초기화
+        for (auto& partPair : trailControl.partCurrentIndex)
+        {
+            trailControl.partCurrentIndex[partPair.first] = 0;
+            trailControl.partProcessed[partPair.first] = false;
+        }
+
+        // 모든 콜라이더 프레임 비활성화
+        for (auto& trailFrame : trailControl.vecTrailFrames)
+        {
+            trailFrame.bIsActive = false;
+        }
+    }
+
+    // Part별 이전 상태도 초기화
+    m_PartPrevTrailState.clear();
+}
+#pragma endregion
 
 
 #pragma region 0. 충돌시 발생하는 이벤트에 대한 컨트롤.
@@ -435,6 +549,14 @@ const _float CMonster::Get_BuffTime(uint32_t buffFlag)
 {
     auto iter = m_BuffTimers.find(buffFlag);
     if (iter == m_BuffTimers.end())
+        return 0.f;
+    return iter->second;;
+}
+
+const _float CMonster::Get_DefaultBuffTime(uint32_t buffFlag)
+{
+    auto iter = m_BuffDefault_Durations.find(buffFlag);
+    if (iter == m_BuffDefault_Durations.end())
         return 0.f;
     return iter->second;;
 }

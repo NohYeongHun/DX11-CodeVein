@@ -38,17 +38,6 @@ public:
 
 #pragma region 0. 기본 값들
 
-#pragma region 2.EFFECT
-public:
-	void Start_Dissolve(); // Dissolve 재생.
-	void ReverseStart_Dissolve(); // Dissolve 역재생.
-	void End_Dissolve();
-
-private:
-	_uint m_iShaderPath = {};
-	_float m_fDissolveTime = {};
-	_float m_fEndDissolveTime = {};
-#pragma endregion
 
 
 

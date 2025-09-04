@@ -46,6 +46,7 @@ BT_RESULT CBT_QueenKnight_DownStrikeAction::Perform_Action(_float fTimeDelta)
     case ATTACK_PHASE::COMPLETED:
         return BT_RESULT::SUCCESS;
     }
+
     return BT_RESULT::FAILURE;
 }
 
@@ -60,8 +61,8 @@ void CBT_QueenKnight_DownStrikeAction::Reset()
     m_bDissolveCheck = false;
 
     m_pOwner->Set_Animation_Speed(m_pOwner->Find_AnimationIndex(L"WARP_END"), 1.2f);
+
     m_pOwner->End_Dissolve();
-    m_pOwner->ReverseEnd_Dissolve();
 
     // 위치 변수들을 명확히 초기화
     m_vAscendTarget = _float3{ 0.f, 0.f, 0.f };
@@ -110,21 +111,27 @@ BT_RESULT CBT_QueenKnight_DownStrikeAction::Update_Ascend(_float fTimeDelta)
     _vector vOwnerPos = m_pOwner->Get_Transform()->Get_State(STATE::POSITION);
     _float fCurrentRatio = m_pOwner->Get_CurrentAnimationRatio();
 
-    // Dissolve 실행이 안되었다면?
-    if (!m_bDissolveCheck && fCurrentRatio >= m_fDissolve_StartRatio && fCurrentRatio <= m_fDissolve_EndRatio)
+    if (!m_bDissolveCheck && !m_pOwner->HasBuff(CMonster::BUFF_DISSOLVE) && fCurrentRatio >= m_fDissolve_StartRatio)
     {
         // 디졸브 시작.
-        m_bDissolveCheck = true; 
+        m_bDissolveCheck = true; // 이미 Dissolve가 발생했는지?
         m_pOwner->Start_Dissolve();
+        //m_pOwner->AddBuff(CMonster::BUFF_DISSOLVE);
+
         // 시점과 운동 방향 변경 필요. => 운동 방향은 몬스터 중앙에서 시작해서 위로 퍼져나감.
         m_pOwner->Create_QueenKnightWarp_Effect_Particle({ 0.f, 1.f, 0.f });
     }
-
 
     if (vOwnerPos.m128_f32[1] <= m_vAscendTarget.y && fCurrentRatio >= m_fJump_StartRatio)
     {
         m_pOwner->Move_Direction({ 0.f, 1.f, 0.f }, fTimeDelta * 0.2f);
     }
+
+    // Dissolve가 이미 발생했고 Dissolve 상태가 끝났으면?
+    //if (m_bDissolveCheck && !m_pOwner->HasBuff(CMonster::BUFF_DISSOLVE))
+    //{
+    //    m_pOwner->Set_Visible(false); // 렌더를 끕니다.
+    //}
 
     // 1. 목표 높이까지 도달했는지 확인. 아니면 위로 이동.
     if (m_pOwner->Is_Animation_Finished() && vOwnerPos.m128_f32[1] >= m_vAscendTarget.y)
@@ -165,13 +172,19 @@ BT_RESULT CBT_QueenKnight_DownStrikeAction::Update_Ascend(_float fTimeDelta)
 
         m_pOwner->RotateTurn_ToTargetYaw();
 
-        // 6. Dissolve 해제.
+        
+        //if (m_pOwner->HasBuff(CMonster::BUFF_DISSOLVE))
+            
         m_bDissolveCheck = false;
 
-        m_pOwner->End_Dissolve();
-        m_pOwner->ReverseStart_Dissolve();
-        
 
+
+        // 6. Dissolve 해제.
+        //m_bDissolveCheck = false;
+        //m_pOwner->ReverseStart_Dissolve();
+        //m_pOwner->AddBuff(CMonster::BUFF_REVERSEDISSOLVE);
+        //if (m_pOwner->HasBuff(CMonster::BUFF_DISSOLVE))
+        //    m_pOwner->RemoveBuff(CMonster::BUFF_DISSOLVE);
         //7. 파티클 생성
 
     }
@@ -181,6 +194,14 @@ BT_RESULT CBT_QueenKnight_DownStrikeAction::Update_Ascend(_float fTimeDelta)
 /* Visible 끄기.*/
 BT_RESULT CBT_QueenKnight_DownStrikeAction::Update_Hang(_float fTimeDelta)
 {
+
+    // DISSOLVE가 끝나면 Reverse Dissolv 시작.
+    if (!m_bDissolveCheck && !m_pOwner->HasBuff(CMonster::BUFF_DISSOLVE))
+    {
+        // 2. 목표 하강지점 도착했으므로 렌더링 켜기 (시야에서 나타남)
+        m_pOwner->ReverseStart_Dissolve();
+    }
+
     // 1. 현재 위치
     _vector vOwnerPos = m_pOwner->Get_Transform()->Get_State(STATE::POSITION);
     _vector vTargetPos = XMLoadFloat3(&m_vDesecndTarget);
@@ -203,11 +224,7 @@ BT_RESULT CBT_QueenKnight_DownStrikeAction::Update_Hang(_float fTimeDelta)
             if (m_pOwner->Get_CurrentAnimationRatio() >= m_fAttack_StartRatio)
             {
                 m_eAttackPhase = ATTACK_PHASE::DESCEND;
-               
-                
-                // 2. 목표 하강지점 도착했으므로 렌더링 켜기 (시야에서 나타남)
                 m_pOwner->Set_Animation_Speed(m_pOwner->Find_AnimationIndex(L"WARP_END"), 1.6f);
-
                 m_pOwner->RemoveBuff(CMonster::BUFF_NAVIGATION_OFF, true);
             }
         }
@@ -223,6 +240,7 @@ BT_RESULT CBT_QueenKnight_DownStrikeAction::Update_Hang(_float fTimeDelta)
             m_pOwner->Set_Animation_Speed(m_pOwner->Find_AnimationIndex(L"WARP_END"), 1.6f);
             // 3. Navigation Off 해제. => 다시 Navigation을 타게 만듭니다.
             m_pOwner->RemoveBuff(CMonster::BUFF_NAVIGATION_OFF, true);
+
         }
     }
     
@@ -243,26 +261,10 @@ BT_RESULT CBT_QueenKnight_DownStrikeAction::Update_Descend(_float fTimeDelta)
         m_pOwner->Change_Animation_NonBlend(iNextAnimationIdx, false);
 
         m_pOwner->AddBuff(CQueenKnight::QUEEN_BUFF_DOWN_TRIPLE_STRIKE_COOLDOWN);
-        //m_pOwner->RotateTurn_ToTargetYaw();
+
+        //m_pOwner->End_Dissolve();
     }
 
-    //if (m_pOwner->Get_CurrentAnimationRatio() >= m_fAttack_EndRatio)
-    //{
-    //    m_eAttackPhase = ATTACK_PHASE::COMPLETED;
-
-    //    //m_pOwner->Enable_Collider(CQueenKnight::PART_BODY);
-
-    //    m_pOwner->RemoveBuff(CMonster::BUFF_NAVIGATION_OFF, true);
-
-    //    // 1. 애니메이션 전환.
-    //    _uint iNextAnimationIdx = m_pOwner->Find_AnimationIndex(L"IDLE");
-    //    m_pOwner->Change_Animation_Blend(iNextAnimationIdx, false, 0.1f, true, true, false);
-
-    //    // 2. 쿨타임 제어
-    //    //m_pOwner->AddBuff(CQueenKnight::QUEEN_BUFF_DOWN_TRIPLE_STRIKE_COOLDOWN);
-
-    //    m_pOwner->RotateTurn_ToTarget();
-    //}
 
     return BT_RESULT::RUNNING;
 }

@@ -331,8 +331,16 @@ void CCamera_Player::Update_LockOn_Camera(_float fTimeDelta)
 	}
 
 	// 락온 타겟이 죽었는지 확인
+	//if (m_pLockOnTarget && (m_pLockOnTarget->HasBuff(CMonster::BUFF_DEAD)
+	//	|| m_pLockOnTarget->HasBuff(CMonster::BUFF_CORPSE) || !m_pLockOnTarget->Is_Visible()))
+	//{
+	//	// 락온 해제
+	//	Clear_LockOn_Target();
+	//	return;
+	//}
+
 	if (m_pLockOnTarget && (m_pLockOnTarget->HasBuff(CMonster::BUFF_DEAD)
-		|| m_pLockOnTarget->HasBuff(CMonster::BUFF_CORPSE) || !m_pLockOnTarget->Is_Visible()))
+		|| m_pLockOnTarget->HasBuff(CMonster::BUFF_CORPSE)))
 	{
 		// 락온 해제
 		Clear_LockOn_Target();

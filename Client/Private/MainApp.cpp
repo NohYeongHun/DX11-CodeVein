@@ -44,14 +44,12 @@ HRESULT CMainApp::Initialize_Clone()
 		CRASH("Failed Ready Prototype For Static");
 		return E_FAIL;
 	}
-
+	
 	if (FAILED(Ready_Prototype_Effect()))
 	{
 		CRASH("Failed Ready Prototype For Static");
 		return E_FAIL;
 	}
-		
-		
 
 	if (FAILED(Ready_Clone_ForStatic()))
 	{
@@ -59,7 +57,7 @@ HRESULT CMainApp::Initialize_Clone()
 		return E_FAIL;
 	}
 		
-
+	
 	if (FAILED(Ready_Pooling()))
 	{
 		CRASH("Failed Ready Pooling For Static");
@@ -83,13 +81,6 @@ HRESULT CMainApp::Initialize_Clone()
 void CMainApp::Update(_float fTimeDelta)
 {
 	m_pGameInstance->Update_Engine(fTimeDelta);
-
-	/*if (m_pGameInstance->Get_KeyUp(DIK_F1))
-	{
-		_uint iLevelID = m_pGameInstance->Get_CurrentLevelID();
-		if (iLevelID != ENUM_CLASS(LEVEL::DEBUG) && iLevelID != ENUM_CLASS(LEVEL::LOADING))
-			Start_Level(LEVEL::DEBUG);
-	}*/
 }
 
 HRESULT CMainApp::Render()
