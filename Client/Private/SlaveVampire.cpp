@@ -1,5 +1,4 @@
-﻿#include "SlaveVampire.h"
-CSlaveVampire::CSlaveVampire(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿CSlaveVampire::CSlaveVampire(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CMonster{pDevice, pContext}
 {
 }
@@ -143,8 +142,7 @@ void CSlaveVampire::Finalize_Update(_float fTimeDelta)
 
 void CSlaveVampire::Late_Update(_float fTimeDelta)
 {
-    if (m_IsEncountered)
-        m_pMonsterHpBar->Late_Update(fTimeDelta);
+ 
 
     m_pTransformCom->Set_State(STATE::POSITION
         , m_pNavigationCom->Compute_OnCell(
@@ -160,8 +158,12 @@ void CSlaveVampire::Late_Update(_float fTimeDelta)
     CMonster::Late_Update(fTimeDelta);
 
     if (m_IsEncountered)
+    {
         m_pMonsterHpBar->Calculate_Screen_Position(
-             m_pTransformCom->Get_State(STATE::POSITION));
+            m_pTransformCom->Get_State(STATE::POSITION));
+        m_pMonsterHpBar->Late_Update(fTimeDelta);
+    }
+        
 }
 
 HRESULT CSlaveVampire::Render()
@@ -516,7 +518,6 @@ void CSlaveVampire::Take_Damage(_float fDamage, CGameObject* pGameObject)
 
 void CSlaveVampire::Increase_HpUI(_float fHp, _float fTime)
 {
-
     m_pMonsterHpBar->Increase_Hp(fHp, fTime);
 }
 

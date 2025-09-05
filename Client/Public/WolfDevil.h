@@ -97,6 +97,21 @@ private:
 	HRESULT Initialize_ColliderFrames();
 #pragma endregion
 
+#pragma region 7. Monster HP UI 관리
+public:
+	virtual void Take_Damage(_float fDamage, CGameObject* pGameObject) override;
+public:
+	virtual void Increase_HpUI(_float fHp, _float fTime);
+	virtual void Decrease_HpUI(_float fHp, _float fTime);
+
+
+private:
+	class CMonsterHpBar* m_pMonsterHpBar = { nullptr };
+
+private:
+	HRESULT Initialize_UI();
+#pragma endregion
+
 
 
 

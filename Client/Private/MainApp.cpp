@@ -65,12 +65,12 @@ HRESULT CMainApp::Initialize_Clone()
 	}
 
 
-	//if (FAILED(Start_Level(LEVEL::GAMEPLAY)))
-	//	return E_FAIL;
+	if (FAILED(Start_Level(LEVEL::GAMEPLAY)))
+		return E_FAIL;
 
 	// 원본
-	if (FAILED(Start_Level(LEVEL::LOGO)))
-		return E_FAIL;
+	//if (FAILED(Start_Level(LEVEL::LOGO)))
+	//	return E_FAIL;
 
 	//if (FAILED(Start_Level(LEVEL::DEBUG)))
 	//	return E_FAIL;
