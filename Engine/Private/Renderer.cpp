@@ -72,8 +72,8 @@ HRESULT CRenderer::Initialize()
     if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_LightAcc"), TEXT("Target_Shade"))))
         return E_FAIL;
 
-    if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_LightAcc"), TEXT("Target_Specular"))))
-        return E_FAIL;
+    //if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_LightAcc"), TEXT("Target_Specular"))))
+    //    return E_FAIL;
 #pragma endregion
 
 
@@ -108,11 +108,12 @@ HRESULT CRenderer::Initialize()
         CRASH("Faield Target Shade Ready");
         return E_FAIL;
     }
-    if (FAILED(m_pGameInstance->Ready_RT_Debug(TEXT("Target_Specular"), 450.0f, 450.0f, 300.f, 300.f)))
-    { 
-        CRASH("Faield Target_Specular Ready");
-        return E_FAIL;
-    }
+
+    //if (FAILED(m_pGameInstance->Ready_RT_Debug(TEXT("Target_Specular"), 450.0f, 450.0f, 300.f, 300.f)))
+    //{ 
+    //    CRASH("Faield Target_Specular Ready");
+    //    return E_FAIL;
+    //}
         
 #endif
 #pragma endregion

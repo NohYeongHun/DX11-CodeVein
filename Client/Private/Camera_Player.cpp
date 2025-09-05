@@ -39,7 +39,7 @@ HRESULT CCamera_Player::Initialize_Clone(void* pArg)
 	// 마우스 커서 클립 활성화
 	Enable_Mouse_Clip();
 
-	// LockOn UI 생성
+#pragma region LOCK ON UI 생성
 	CLockOnUI::LOCKONUI_DESC UIDesc{};
 	UIDesc.fSizeX = 64.0f;
 	UIDesc.fSizeY = 64.0f;
@@ -47,8 +47,8 @@ HRESULT CCamera_Player::Initialize_Clone(void* pArg)
 	m_pLockOnUI = static_cast<CLockOnUI*>(m_pGameInstance->Clone_Prototype(
 		PROTOTYPE::GAMEOBJECT
 		, ENUM_CLASS(LEVEL::STATIC)
-		,TEXT("Prototype_GameObject_LockOnUI"), &UIDesc));
-	
+		, TEXT("Prototype_GameObject_LockOnUI"), &UIDesc));
+
 	if (!m_pLockOnUI)
 	{
 		MSG_BOX(TEXT("Failed to create LockOn UI"));
@@ -56,6 +56,9 @@ HRESULT CCamera_Player::Initialize_Clone(void* pArg)
 	}
 
 	return S_OK;
+#pragma endregion
+
+
 }
 
 void CCamera_Player::Priority_Update(_float fTimeDelta)

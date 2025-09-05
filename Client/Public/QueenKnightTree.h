@@ -1,6 +1,4 @@
 ﻿#pragma once
-#include "BehaviorTree.h"
-
 NS_BEGIN(Client)
 class CQueenKnightTree final : public CBehaviorTree
 {

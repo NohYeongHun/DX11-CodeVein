@@ -154,35 +154,6 @@ void CLockOnUI::Clear_Target()
     m_bActive = false;
 }
 
-/* World -> View -> 투영 으로 좌표 계산. */
-_bool CLockOnUI::World_To_Screen(_vector vWorldPos, _float& fScreenX, _float& fScreenY)
-{
-    // 현재 카메라의 뷰/프로젝션 행렬 가져오기
-    _matrix matView = m_pGameInstance->Get_Transform_Matrix(D3DTS::VIEW);
-    _matrix matProj = m_pGameInstance->Get_Transform_Matrix(D3DTS::PROJ);
-
-    // 월드 -> 뷰 공간 변환
-    _vector vViewPos = XMVector3TransformCoord(vWorldPos, matView);
-
-    // 카메라 뒤쪽에 있으면 표시하지 않음
-    if (XMVectorGetZ(vViewPos) < 0.0f)
-        return false;
-
-    // 뷰 -> 투영 공간 변환
-    _vector vProjPos = XMVector3TransformCoord(vViewPos, matProj);
-
-    // NDC 좌표 -> 스크린 좌표 변환
-    fScreenX = (XMVectorGetX(vProjPos) + 1.0f) * 0.5f * m_fWinSizeX;
-    fScreenY = (1.0f - XMVectorGetY(vProjPos)) * 0.5f * m_fWinSizeY;
-
-    // 화면 범위 확인 (여유를 둬서 화면 가장자리까지 표시)
-    if (fScreenX < -50.0f || fScreenX > m_fWinSizeX + 50.0f ||
-        fScreenY < -50.0f || fScreenY > m_fWinSizeY + 50.0f)
-        return false;
-
-
-    return true;
-}
 
 HRESULT CLockOnUI::Bind_ShaderResources()
 {

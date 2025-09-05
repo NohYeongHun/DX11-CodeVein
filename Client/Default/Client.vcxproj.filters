@@ -238,6 +238,9 @@
     <Filter Include="02. GameObject\Effect\Trail">
       <UniqueIdentifier>{9ab5f7e7-4fc3-47cf-bebc-278cf0648dc6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. GameObject\Monster\HPBar">
+      <UniqueIdentifier>{e066fb95-8137-40de-b403-979c6dda3973}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -657,6 +660,9 @@
     <ClInclude Include="..\Public\SwordTrail.h">
       <Filter>02. GameObject\Effect\Trail</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\MonsterHpBarUI.h">
+      <Filter>02. GameObject\Monster\HPBar</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -1049,6 +1055,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\SwordTrail.cpp">
       <Filter>02. GameObject\Effect\Trail</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\MonsterHpBarUi.cpp">
+      <Filter>02. GameObject\Monster\HPBar</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

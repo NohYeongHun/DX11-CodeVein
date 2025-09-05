@@ -1,5 +1,4 @@
-﻿#include "QueenKnightTree.h"
-CQueenKnightTree::CQueenKnightTree(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿CQueenKnightTree::CQueenKnightTree(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CBehaviorTree(pDevice, pContext)
 {
 }

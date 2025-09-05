@@ -343,8 +343,6 @@ public:
     virtual void Increase_HpUI(_float fHp, _float fTime) {};
     virtual void Decrease_HpUI(_float fHp, _float fTime) {};
 
-private:
-
 
 #pragma endregion
 

@@ -608,14 +608,7 @@ void CQueenKnight::Take_Damage(_float fDamage, CGameObject* pGameObject)
 }
 void CQueenKnight::Increase_HpUI(_float fHp, _float fTime)
 {
-    /* 예외처리. */
-	_float fModifyHp = m_MonsterStat.fHP + fHp;
-	if (fModifyHp > m_MonsterStat.fMaxHP)
-        fModifyHp = m_MonsterStat.fMaxHP;
-
-	_float fResultHp = fModifyHp - m_MonsterStat.fHP;
-    
-    m_pBossHpBarUI->Increase_Hp(fResultHp, fTime);
+    m_pBossHpBarUI->Increase_Hp(fHp, fTime);
 }
 
 void CQueenKnight::Decrease_HpUI(_float fHp, _float fTime)
@@ -635,7 +628,7 @@ HRESULT CQueenKnight::Initailize_UI()
     Desc.fSizeY = 40.f;
     Desc.fMaxHp = m_MonsterStat.fMaxHP;
     Desc.strName = TEXT("여왕의 기사");
-
+    Desc.eShaderPath = POSTEX_SHADERPATH::HPPROGRESSBAR;
 
     CUIObject* pUIObject = nullptr;
 
@@ -930,11 +923,11 @@ HRESULT CQueenKnight::Bind_Shader_Resource()
     }
 
 
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
-    {
-        CRASH("Failed Bind CamPosition");
-        return E_FAIL;
-    }
+    //if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
+    //{
+    //    CRASH("Failed Bind CamPosition");
+    //    return E_FAIL;
+    //}
         
     return S_OK;
 }

@@ -9,6 +9,7 @@ public:
 		_wstring strName = {};
 		_uint iTextureIndex = {};
 		_float fMaxHp = {};
+		POSTEX_SHADERPATH eShaderPath = {};
 	}BOSS_HPBAR_DESC;
 
 private:
@@ -53,6 +54,8 @@ private:
 
 	_float m_fRightRatio = {};
 	_float m_fLeftRatio = {};
+	_uint m_iShaderPath = {};
+
 
 
 

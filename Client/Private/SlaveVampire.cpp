@@ -1,4 +1,5 @@
-﻿CSlaveVampire::CSlaveVampire(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿#include "SlaveVampire.h"
+CSlaveVampire::CSlaveVampire(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CMonster{pDevice, pContext}
 {
 }
@@ -84,15 +85,17 @@ HRESULT CSlaveVampire::Initialize_Clone(void* pArg)
         return E_FAIL;
     }
 
+    if (FAILED(Initialize_UI()))
+    {
+        CRASH("Failed Initialize UI");
+        return E_FAIL;
+    }
+
     _vector qInitRot = XMQuaternionRotationAxis(XMVectorSet(0.f, 1.f, 0.f, 0.f), 0.0f);
     m_pTransformCom->Set_Quaternion(qInitRot);
   
     m_pModelCom->Set_RootMotionRotation(true);
     m_pModelCom->Set_RootMotionTranslate(false);
-    //m_pModelCom->Set_Animation(SLAVEVAMPIRE_LSWORD_IDLE_LOOP, true);
-
-   /* _vector vPos = XMLoadFloat3(&pDesc->vPos);
-    m_pTransformCom->Set_State(STATE::POSITION, vPos);*/
     m_pModelCom->Set_Animation(SLAVEVAMPIRE_LSWORD_IDLE_LOOP, true);  // 기본 애니메이션 설정
 
 
@@ -104,11 +107,18 @@ HRESULT CSlaveVampire::Initialize_Clone(void* pArg)
 
 void CSlaveVampire::Priority_Update(_float fTimeDelta)
 {
+    if (m_IsEncountered)
+        m_pMonsterHpBar->Priority_Update(fTimeDelta);
+
     CMonster::Priority_Update(fTimeDelta);
+
+
 }
 
 void CSlaveVampire::Update(_float fTimeDelta)
 {
+    if (m_IsEncountered)
+        m_pMonsterHpBar->Update(fTimeDelta);
     // 이 순서대로 AI 작업을 호출해라.
     Update_AI(fTimeDelta);
 #ifdef _DEBUG
@@ -133,6 +143,9 @@ void CSlaveVampire::Finalize_Update(_float fTimeDelta)
 
 void CSlaveVampire::Late_Update(_float fTimeDelta)
 {
+    if (m_IsEncountered)
+        m_pMonsterHpBar->Late_Update(fTimeDelta);
+
     m_pTransformCom->Set_State(STATE::POSITION
         , m_pNavigationCom->Compute_OnCell(
             m_pTransformCom->Get_State(STATE::POSITION)));
@@ -144,10 +157,11 @@ void CSlaveVampire::Late_Update(_float fTimeDelta)
     if (FAILED(m_pGameInstance->Add_DebugComponent(m_pColliderCom)))
         return;
 #endif // _DEBUG
-
-    
-
     CMonster::Late_Update(fTimeDelta);
+
+    if (m_IsEncountered)
+        m_pMonsterHpBar->Calculate_Screen_Position(
+             m_pTransformCom->Get_State(STATE::POSITION));
 }
 
 HRESULT CSlaveVampire::Render()
@@ -258,6 +272,7 @@ void CSlaveVampire::Update_AI(_float fTimeDelta)
 HRESULT CSlaveVampire::Initialize_Stats()
 {
     m_fMinDetectionDistance = 4.f;
+    m_fEncounterDistance = 16.f;
     return S_OK;
 }
 #pragma endregion
@@ -283,11 +298,16 @@ HRESULT CSlaveVampire::InitializeAction_ToAnimationMap()
     m_Action_AnimMap.emplace(L"RUN", SLAVEVAMPIRE_RUN_F_LOOP);
     // 같은 애니메이션이지만 다른 이름으로 설정해서 Node에서 사용할 수 있게함.
     m_Action_AnimMap.emplace(L"DETECT", SLAVEVAMPIRE_RUN_F_LOOP);
-
+    
+    /* 조우 애니메이션*/
+    m_Action_AnimMap.emplace(L"ENCOUNTER", SLAVEVAMPIRE_NONFIGHT_THREAT_SIT_F);
+    // 조우 이전.
+    m_Action_AnimMap.emplace(L"PREV_ENCOUNTER", SLAVEVAMPIRE_NONFIGHT_IDLE_SIT_LOOP);
     /* 재생속도 증가. */ 
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"DEATH_NORMAL"], 2.f);
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"ATTACK"], 1.f);
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"DETECT"], 1.5f);
+
 
 
 #pragma region COllider 활성화 프레임 관리
@@ -485,20 +505,57 @@ HRESULT CSlaveVampire::Ready_PartObjects()
 
 HRESULT CSlaveVampire::Initialize_ColliderFrames()
 {
-    // WolfDevil 공격 애니메이션에 콜라이더 프레임 추가
-    
-    // WOLFDEVIL_ATTACK_JUMP (인덱스 0) - 점프 공격
-    // 애니메이션의 50%~80% 구간에서 무기 콜라이더 활성화
-    //Add_Collider_Frame(WOLFDEVIL_ATTACK_JUMP, 0.5f, 0.8f, PART_WEAPON);
-    //
-    //// WOLFDEVIL_ATTACK_NORMAL (인덱스 1) - 일반 공격  
-    //// 애니메이션의 30%~70% 구간에서 무기 콜라이더 활성화
-    //Add_Collider_Frame(WOLFDEVIL_ATTACK_NORMAL, 0.3f, 0.7f, PART_WEAPON);
-    //
-    //OutputDebugStringA("WolfDevil: Collider frames initialized for attack animations\n");
-    
     return S_OK;
 }
+
+void CSlaveVampire::Take_Damage(_float fDamage, CGameObject* pGameObject)
+{
+    CMonster::Take_Damage(fDamage, pGameObject);
+    Decrease_HpUI(fDamage, 0.1f);
+}
+
+void CSlaveVampire::Increase_HpUI(_float fHp, _float fTime)
+{
+
+    m_pMonsterHpBar->Increase_Hp(fHp, fTime);
+}
+
+void CSlaveVampire::Decrease_HpUI(_float fHp, _float fTime)
+{
+    m_pMonsterHpBar->Decrease_HpUI(fHp, fTime);
+}
+
+
+#pragma region UI 
+HRESULT CSlaveVampire::Initialize_UI()
+{
+    CMonsterHpBar::MONSTERHPUI_DESC Desc{};
+
+    // 정중앙 위치
+    _float fRadius = static_cast<CBounding_Sphere::BOUNDING_SPHERE_DESC*>(m_pColliderCom->Get_BoundingDesc())->fRadius;
+    Desc.vOffset = { 0.f, fRadius * 2.f }; // x, y 오프셋 값.
+    Desc.vScale = { 1.f, 1.f, 1.f }; // x, y, z 크기.
+    Desc.eShaderPath = POSTEX_SHADERPATH::MONSTERHP_PROGRESSBAR;
+    Desc.fSizeX = 150.f;
+    Desc.fSizeY = 10.f;
+    Desc.fMaxHp = m_MonsterStat.fMaxHP;
+
+
+    m_pMonsterHpBar = static_cast<CMonsterHpBar*>(m_pGameInstance->Clone_Prototype(
+        PROTOTYPE::GAMEOBJECT
+        , ENUM_CLASS(LEVEL::STATIC)
+        , TEXT("Prototype_GameObject_MonsterHPBar"), &Desc));
+
+    if (!m_pMonsterHpBar)
+    {
+        MSG_BOX(TEXT("Failed to Create MonsterHPBar"));
+        return E_FAIL;
+    }
+
+    return S_OK;
+}
+#pragma endregion
+
 
 
 CSlaveVampire* CSlaveVampire::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
@@ -537,6 +594,7 @@ void CSlaveVampire::Free()
     CMonster::Free();
     Safe_Release(m_pTree);
     Safe_Release(m_pWeapon);
+    Safe_Release(m_pMonsterHpBar);
 }
 
 

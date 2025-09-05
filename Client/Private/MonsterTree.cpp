@@ -1,5 +1,4 @@
 ﻿#include "MonsterTree.h"
-
 CMonsterTree::CMonsterTree(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CBehaviorTree(pDevice, pContext)
 {
@@ -32,6 +31,10 @@ HRESULT CMonsterTree::Initialize(void* pArg)
     // 1. Root Node 생성 무조건 Selector
     CBTSelector* pRootSelector = CBTSelector::Create();
 
+
+    // 2. 조우 상태 행동 추가.
+    pRootSelector->Add_Child(Create_EncounterStates_ToSequence());
+
     // 2. 특수한 상태일때 행동 변경 => 필수.
     pRootSelector->Add_Child(Create_SpecialStates_ToSelector());
 
@@ -47,6 +50,16 @@ HRESULT CMonsterTree::Initialize(void* pArg)
 }
 
 #pragma region 특수한 버프/디버프 (죽음, 다운, HIT)를 컨트롤해야 함.
+CBTSequence* CMonsterTree::Create_EncounterStates_ToSequence()
+{
+    CBTSequence* pEncounterState_Sequence = CBTSequence::Create();
+    pEncounterState_Sequence->Add_Child(CBT_Monster_IsEncounterCondition::Create(m_pOwner));
+    pEncounterState_Sequence->Add_Child(CBT_Monster_PrevEncounterAction::Create(m_pOwner));
+    pEncounterState_Sequence->Add_Child(CBT_Monster_EncounterAction::Create(m_pOwner));
+    return pEncounterState_Sequence;
+}
+
+
 // 1. 특수 상태를 제어할 Selector 생성. => 1번 우선 순위로 실행됨.
 CBTSelector* CMonsterTree::Create_SpecialStates_ToSelector()
 {
@@ -113,6 +126,7 @@ CBTSelector* CMonsterTree::Create_ActionStates_ToSelector()
 
     return pActionState_Selector;
 }
+
 
 CBTSequence* CMonsterTree::Create_Rotate_ToSequence()
 {

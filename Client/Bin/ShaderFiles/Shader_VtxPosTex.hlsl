@@ -63,7 +63,7 @@ PS_OUT PS_MAIN(PS_IN In)
 }
 
 
-PS_OUT PS_MAIN2(PS_IN In)
+PS_OUT PS_LOADINGSLOT_MAIN(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
     
@@ -88,7 +88,7 @@ PS_OUT PS_MAIN2(PS_IN In)
     return Out;
 }
 
-PS_OUT PS_MAIN3(PS_IN In)
+PS_OUT PS_SKILLSLOT_MAIN(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
 
@@ -118,7 +118,7 @@ PS_OUT PS_MAIN3(PS_IN In)
 float g_fFade;
 
 // Fade Out Shader
-PS_OUT PS_MAIN4(PS_IN In)
+PS_OUT PS_FADEOUT_MAIN(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
 
@@ -138,7 +138,7 @@ PS_OUT PS_MAIN4(PS_IN In)
 float g_fAlpha;
 
 
-PS_OUT PS_MAIN5(PS_IN In)
+PS_OUT PS_TITLE_BACKGROUND_MAIN(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
     
@@ -153,7 +153,7 @@ float g_fLeftRatio;
 bool g_bIncrease;
 
 // HP Bar Progress
-PS_OUT PS_MAIN6(PS_IN In)
+PS_OUT PS_HP_PROGRESSBAR_MAIN(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
 
@@ -170,7 +170,6 @@ PS_OUT PS_MAIN6(PS_IN In)
     else
         bIsFill = uv.x > (1.0 - g_fFillRatio); 
        
-    
     
     if (bIsFill)
     {
@@ -189,7 +188,7 @@ PS_OUT PS_MAIN6(PS_IN In)
     return Out;
 }
 
-PS_OUT PS_MAIN7(PS_IN In)
+PS_OUT PS_BLACK_MAIN(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
     
@@ -199,7 +198,7 @@ PS_OUT PS_MAIN7(PS_IN In)
     return Out;
 }
 
-PS_OUT PS_MAIN8(PS_IN In)
+PS_OUT PS_LOCKON_MAIN(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
     
@@ -213,7 +212,7 @@ PS_OUT PS_MAIN8(PS_IN In)
     return Out;
 }
 
-PS_OUT PS_MAIN9(PS_IN In)
+PS_OUT PS_FADEIN_MAIN(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
 
@@ -290,28 +289,67 @@ PS_OUT PS_HITFLASH_MAIN(PS_IN In)
     vector vMask = g_MaskTexture.Sample(DefaultSampler, scaledUV);
     vector vMtrlDiffuse = vDestDiffuse * (1.f - vMask) + vSourDiffuse * (vMask);
     
-    //if (vDestDiffuse.r > 0.9f && vDestDiffuse.g > 0.9f && vDestDiffuse.b > 0.9f)
-    //    discard;
-    
-    
-    //vector vMask = g_MaskTexture.Sample(DefaultSampler, scaledUV);
-    //vector vMtrlDiffuse = vDestDiffuse * (vMask) + vSourDiffuse * (1 - vMask);
-    
     // 시간에 따른 알파 페이드아웃
     float fadeAlpha = 1.0f - g_fTimeRatio;
     vMtrlDiffuse.a *= fadeAlpha;
     
     Out.vColor = vMtrlDiffuse;
-    //float2 uv = In.vTexcoord;
-    //float4 baseColor = g_MaskTexture.Sample(DefaultSampler, uv);
-    //float4 baseColor = g_Texture.Sample(DefaultSampler, uv);
-    
-    //Out.vColor = baseColor;
-    
-    
 
     return Out;
 }
+
+
+PS_OUT PS_MONSTERHP_PROGRESSBAR_MAIN(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT)0;
+    
+    float2 uv = In.vTexcoord;
+    float4 baseColor = g_Texture.Sample(PointSampler, uv);
+    
+    float4 fillerColor = float4(0.4, 0.4, 0.4, 1);
+    float4 fillerBlack = float4(0, 0, 0, 1);
+    
+    // 침범할 범위를 아주 작은 값으로 설정 (예: 0.005)
+    float invasionMargin = 0.005f;
+    
+    // 붉은색 픽셀인지 판단하는 조건
+    bool isReddish = (baseColor.r > 0.7f) && (baseColor.g < 0.5f) && (baseColor.b < 0.5f);
+    
+    
+    
+    bool bIsFillGray = uv.x < g_fRightRatio && uv.x > g_fLeftRatio;
+    
+    bool bIsFill;
+    
+    if (isReddish)
+    {
+        if (g_bIncrease)
+            bIsFill = uv.x > g_fLeftRatio;
+        else 
+            bIsFill = uv.x > (1.0 - g_fFillRatio);
+        
+        if (bIsFill)
+        {
+            if (bIsFillGray)
+                Out.vColor = lerp(baseColor, fillerColor, 0.8f);
+            else
+                Out.vColor = fillerBlack;
+        }
+        else
+        {
+            Out.vColor = baseColor;
+        }
+    }
+    else
+    {
+        // 붉은색이 아니면 (외곽선), 항상 렌더링
+        Out.vColor = baseColor;
+    }
+    
+    return Out;
+}
+
+
 
 
 technique11 DefaultTechnique
@@ -333,7 +371,7 @@ technique11 DefaultTechnique
         SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
-        PixelShader = compile ps_5_0 PS_MAIN2();
+        PixelShader = compile ps_5_0 PS_LOADINGSLOT_MAIN();
     }
 
     pass SkillSlotPass
@@ -343,7 +381,7 @@ technique11 DefaultTechnique
         SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
-        PixelShader = compile ps_5_0 PS_MAIN3();
+        PixelShader = compile ps_5_0 PS_SKILLSLOT_MAIN();
     }
 
     pass FadeOutPass
@@ -353,7 +391,7 @@ technique11 DefaultTechnique
         SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
-        PixelShader = compile ps_5_0 PS_MAIN4();
+        PixelShader = compile ps_5_0 PS_FADEOUT_MAIN();
     }
 
     pass TitleBackGroundPass // Alpha Blend
@@ -363,7 +401,7 @@ technique11 DefaultTechnique
         SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
-        PixelShader = compile ps_5_0 PS_MAIN5();
+        PixelShader = compile ps_5_0 PS_TITLE_BACKGROUND_MAIN();
     }
 
     pass HPProgressBarPass
@@ -373,7 +411,7 @@ technique11 DefaultTechnique
         SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
-        PixelShader = compile ps_5_0 PS_MAIN6();
+        PixelShader = compile ps_5_0 PS_HP_PROGRESSBAR_MAIN();
     }
 
     pass BlackColorPass
@@ -383,7 +421,7 @@ technique11 DefaultTechnique
         SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
-        PixelShader = compile ps_5_0 PS_MAIN7();
+        PixelShader = compile ps_5_0 PS_BLACK_MAIN();
     }
 
     pass LockOnPass
@@ -393,7 +431,7 @@ technique11 DefaultTechnique
         SetBlendState(BS_AlphaBlend, float4(0, 0, 0, 0), 0xffffffff);
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
-        PixelShader = compile ps_5_0 PS_MAIN8();
+        PixelShader = compile ps_5_0 PS_LOCKON_MAIN();
     }
 
 
@@ -404,7 +442,7 @@ technique11 DefaultTechnique
         SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
-        PixelShader = compile ps_5_0 PS_MAIN9();
+        PixelShader = compile ps_5_0 PS_FADEIN_MAIN();
     }
     
     pass MonsterLineSlashPass
@@ -427,5 +465,14 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_HITFLASH_MAIN();
     }
 
+    pass MonsterHpProgressBarPass
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_None, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_MONSTERHP_PROGRESSBAR_MAIN();
+    }
 
 }

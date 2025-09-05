@@ -1,5 +1,4 @@
-#pragma once
-#include "Bounding.h"
+﻿#pragma once
 
 NS_BEGIN(Engine)
 class ENGINE_DLL CBounding_Sphere final : public CBounding

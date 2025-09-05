@@ -244,6 +244,7 @@
     <ClInclude Include="..\Public\LockOnUI.h" />
     <ClInclude Include="..\Public\Map.h" />
     <ClInclude Include="..\Public\Monster.h" />
+    <ClInclude Include="..\Public\MonsterHpBarUI.h" />
     <ClInclude Include="..\Public\MonsterTree.h" />
     <ClInclude Include="..\Public\Particle.h" />
     <ClInclude Include="..\Public\Player.h" />
@@ -384,6 +385,7 @@
     <ClCompile Include="..\Private\LockOnUI.cpp" />
     <ClCompile Include="..\Private\Map.cpp" />
     <ClCompile Include="..\Private\Monster.cpp" />
+    <ClCompile Include="..\Private\MonsterHpBarUi.cpp" />
     <ClCompile Include="..\Private\MonsterTree.cpp" />
     <ClCompile Include="..\Private\Particle.cpp" />
     <ClCompile Include="..\Private\Player.cpp" />

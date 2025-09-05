@@ -87,6 +87,9 @@ PS_OUT_LIGHT PS_MAIN_DIRECTIONAL(PS_IN In)
     
     vector vWorldPos;
     
+    // vDepthDesc.x => 정규화된 z값 0 ~ 1사이고
+    // vDepthDesc.y => 원본 픽셀의 깊이값;
+    
     /* 투영공간상의 좌표를 구한다. */
     /* 로컬위치 * 월드행렬 * 뷰행렬 * 투영행렬 * 1/(w == 뷰스페이스상의 z) */
     vWorldPos.x = In.vTexcoord.x * 2.f - 1.f;

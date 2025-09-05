@@ -30,6 +30,8 @@ HRESULT CBossHpBarUI::Initialize_Clone(void* pArg)
     m_fMaxHp = pDesc->fMaxHp;
     m_fHp = m_fMaxHp;
     m_strName = pDesc->strName;
+    m_iShaderPath = static_cast<_uint>(pDesc->eShaderPath);
+    
 
     m_pTransformCom->Scale(_float3(0.7f, 0.7f, 1.f));
 
@@ -93,7 +95,7 @@ HRESULT CBossHpBarUI::Render()
     }
 
     /* HP 깎이는 효과*/
-    m_pShaderCom->Begin(5);
+    m_pShaderCom->Begin(m_iShaderPath);
 
     m_pVIBufferCom->Bind_Resources();
 
