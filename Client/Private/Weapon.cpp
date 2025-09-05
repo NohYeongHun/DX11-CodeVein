@@ -22,6 +22,7 @@ HRESULT CWeapon::Initialize_Clone(void* pArg)
     m_eCurLevel = pDesc->eCurLevel;
     m_pOwner = pDesc->pOwner;
     m_fAttackPower = pDesc->fAttackPower;
+    m_iShaderPath = static_cast<_uint>(pDesc->eShaderPath);
 
     if (FAILED(CPartObject::Initialize_Clone(pDesc)))
     {

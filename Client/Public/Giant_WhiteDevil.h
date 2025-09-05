@@ -21,7 +21,7 @@ public:
 public:
 	typedef struct tagGiantWhiteDevil : public CMonster::MONSTER_DESC
 	{
-
+		ANIMESH_SHADERPATH eShaderPath = { ANIMESH_SHADERPATH::NONE };
 	}GIANTWHITEDEVIL_DESC;
 
 private:
@@ -66,18 +66,6 @@ private:
 #pragma region 3. 몬스터는 자신에게 필요한 수치값들을 초기화해야한다.
 public:
 	virtual HRESULT Initialize_Stats() override;
-
-
-	//public:
-	//	_bool Is_TargetDashRange();
-	//	_bool Is_TargetDodgeRange();
-	//	_bool Is_TargetDownStrikeRange();
-	//
-	//private:
-	//	_float m_fDashMaxDistance = {};
-	//	_float m_fDashMinDistance = {};
-	//	_float m_fDashDodgeDistance = {};
-	//	_float m_fDownStrikeDistance = {};
 #pragma endregion
 
 #pragma region 4. 몬스터는 자신의 애니메이션을 관리해야한다.

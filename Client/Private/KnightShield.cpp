@@ -1,5 +1,4 @@
-﻿#include "KnightShield.h"
-CKnightShield::CKnightShield(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿CKnightShield::CKnightShield(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CWeapon(pDevice, pContext)
 {
 }

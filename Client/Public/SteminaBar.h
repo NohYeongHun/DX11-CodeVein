@@ -35,8 +35,9 @@ private:
 	_uint  m_iTextureIndex = {};
 
 	_uint  m_iAddStemina = {};
+	
 #pragma region Shader용 Stemina Increase, Decrease 효과
-
+	_uint m_iShaderPath = {};
 	_float m_fRightRatio = {};
 	_float m_fLeftRatio = {};
 

@@ -43,6 +43,7 @@ HRESULT CCamera_Player::Initialize_Clone(void* pArg)
 	CLockOnUI::LOCKONUI_DESC UIDesc{};
 	UIDesc.fSizeX = 64.0f;
 	UIDesc.fSizeY = 64.0f;
+	UIDesc.eShaderPath = POSTEX_SHADERPATH::LOCKON;
 	m_pLockOnUI = static_cast<CLockOnUI*>(m_pGameInstance->Clone_Prototype(
 		PROTOTYPE::GAMEOBJECT
 		, ENUM_CLASS(LEVEL::STATIC)

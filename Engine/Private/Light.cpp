@@ -1,6 +1,4 @@
-﻿#include "Light.h"
-
-CLight::CLight()
+﻿CLight::CLight()
 {
 }
 
@@ -17,14 +15,32 @@ HRESULT CLight::Render(CShader* pShader, CVIBuffer_Rect* pVIBuffer)
 
 	if (LIGHT_DESC::DIRECTIONAL == m_LightDesc.eType)
 	{
-		iPassIndex = static_cast<_uint>(RENDERER_SHADERTYPE::DIRECTIONAL);
+		iPassIndex = static_cast<_uint>(DEFFERED_SHADERTYPE::DIRECTIONAL);
 
 		if (FAILED(pShader->Bind_RawValue("g_vLightDir", &m_LightDesc.vDirection, sizeof(_float4))))
 			return E_FAIL;
 	}
 	else if (LIGHT_DESC::POINT == m_LightDesc.eType)
 	{
-		iPassIndex = static_cast<_uint>(RENDERER_SHADERTYPE::POINT);
+		iPassIndex = static_cast<_uint>(DEFFERED_SHADERTYPE::POINT);
+	}
+
+	if (FAILED(pShader->Bind_RawValue("g_vLightDiffuse", &m_LightDesc.vDiffuse, sizeof(_float4))))
+	{
+		CRASH("Failed Bineding Light Diffuse");
+		return E_FAIL;
+	}
+		
+	if (FAILED(pShader->Bind_RawValue("g_vLightAmbient", &m_LightDesc.vAmbient, sizeof(_float4))))
+	{
+		CRASH("Failed Bineding Light Ambient");
+		return E_FAIL;
+	}
+
+	if (FAILED(pShader->Bind_RawValue("g_vLightSpecular", &m_LightDesc.vSpecular, sizeof(_float4))))
+	{
+		CRASH("Failed Bineding Light Specular");
+		return E_FAIL;
 	}
 
 	pShader->Begin(iPassIndex);

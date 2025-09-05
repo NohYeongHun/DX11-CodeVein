@@ -1,6 +1,4 @@
 ﻿#pragma once
-#include "UIObject.h"
-
 NS_BEGIN(Client)
 class CTitleText final : public CUIObject
 {
@@ -8,6 +6,7 @@ public:
 	typedef struct tagTitleTextDesc : CUIObject::UIOBJECT_DESC
 	{
 		_uint iTextureIndex = {};
+		POSTEX_SHADERPATH eShaderPath = {};
 	}TITLETEXT_DESC;
 
 private:
@@ -37,9 +36,10 @@ private:
 	CShader* m_pShaderCom = { nullptr };
 	CVIBuffer_Rect* m_pVIBufferCom = { nullptr };
 	CTexture* m_pTextureCom = { nullptr };
+	_uint m_iShaderPath = {};
+
 	_uint m_iTextureIndex = {};
 
-	_uint m_iPassIdx = {};
 	_float m_fAlpha = {};
 	_float m_fTime = {};
 

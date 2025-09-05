@@ -1,6 +1,4 @@
-﻿#include "Loading_BackGround.h"
-
-CLoading_BackGround::CLoading_BackGround(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿CLoading_BackGround::CLoading_BackGround(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CUIObject{ pDevice, pContext }
 {
 }
@@ -24,6 +22,7 @@ void CLoading_BackGround::Set_Visibility(_bool IsVIsibility)
 void CLoading_BackGround::Loading_End()
 { 
     m_IsLoadingFadeOut = true;
+    m_iShaderPath = static_cast<_uint>(POSTEX_SHADERPATH::FADEOUT);
     m_fFade = { 0.f };
 }
 
@@ -42,11 +41,11 @@ HRESULT CLoading_BackGround::Initialize_Clone(void* pArg)
     Desc.fSizeX = g_iWinSizeX;
     Desc.fSizeY = g_iWinSizeY;
 
-
     if (FAILED(CUIObject::Initialize_Clone(&Desc)))
         return E_FAIL;
 
     m_iTextureIndex = 0;
+    m_iShaderPath = static_cast<_uint>(POSTEX_SHADERPATH::FADEOUT);
 
     if (FAILED(Ready_Components()))
         return E_FAIL;
@@ -71,6 +70,7 @@ void CLoading_BackGround::Priority_Update(_float fTimeDelta)
         // Loading이 끝나는 시점에 
         m_pGameInstance->Publish<CLevel_Loading>(EventType::OPEN_LEVEL, nullptr);
         m_IsLoadingFadeOut = false;
+        m_iShaderPath = static_cast<_uint>(POSTEX_SHADERPATH::FADEOUT);
         m_fFade = 0.f;
     }
 
@@ -116,6 +116,7 @@ HRESULT CLoading_BackGround::Render()
         if (FAILED(m_pShaderCom->Bind_Float("g_fFade", fFade)))
             return E_FAIL;
 
+        
         m_pShaderCom->Begin(3);
     }
     else
@@ -188,6 +189,9 @@ HRESULT CLoading_BackGround::Ready_Childs()
     Desc.fSizeY = 0;
     Desc.fSlotSizeX = 30.f;
     Desc.fSlotSizeY = 30.f;
+    Desc.eNormalShaderPath = POSTEX_SHADERPATH::DEFAULT;
+    Desc.eLoadingShaderPath = POSTEX_SHADERPATH::LOADINGSLOT;
+    
 
     CUIObject* pUIObject = nullptr;
 

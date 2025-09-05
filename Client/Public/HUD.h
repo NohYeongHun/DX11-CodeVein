@@ -1,6 +1,4 @@
 ﻿#pragma once
-#include "UIObject.h"
-
 NS_BEGIN(Client)
 class CHUD final : public CUIObject
 {

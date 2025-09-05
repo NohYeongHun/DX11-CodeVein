@@ -36,7 +36,7 @@ HRESULT CSlash::Initialize_Clone(void* pArg)
         return E_FAIL;
     }
 
-    m_iShaderPath = static_cast<_uint>(POSTEX_SHADRRPATH::MONSTERLINESLASH);
+    m_iShaderPath = static_cast<_uint>(pDesc->eShaderPath);
 
 
 
@@ -135,32 +135,13 @@ void CSlash::OnActivate(void* pArg)
     m_eCurLevel = pDesc->eCurLevel;
     m_vHitDirection = pDesc->vHitDirection;
 
-    cout << "OnActivate - Hit Position: "
-        << XMVectorGetX(pDesc->vHitPosition) << ", "
-        << XMVectorGetY(pDesc->vHitPosition) << ", "
-        << XMVectorGetZ(pDesc->vHitPosition) << endl;
-
     m_pTransformCom->Set_State(STATE::POSITION, pDesc->vHitPosition);
     m_fDisplayTime = pDesc->fDisPlayTime;
     // 2. 설정되었을때 Camera에 따른 방향을 재계산할 필요성이 존재.
     m_bDirectionCalculated = false;
     m_vScale = pDesc->vScale;
-    
-    _vector vPos = m_pTransformCom->Get_State(STATE::POSITION);
-    cout << "After Set_State - Position: "
-        << XMVectorGetX(vPos) << ", "
-        << XMVectorGetY(vPos) << ", "
-        << XMVectorGetZ(vPos) << endl;
-
-
     // 3. 위치 및 회전계산.
     Initialize_Transform();
-
-    vPos = m_pTransformCom->Get_State(STATE::POSITION);
-    cout << "After Initialize_Transform - Position: "
-        << XMVectorGetX(vPos) << ", "
-        << XMVectorGetY(vPos) << ", "
-        << XMVectorGetZ(vPos) << endl;
 
     m_IsActivate = true;
 }

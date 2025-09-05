@@ -21,7 +21,6 @@ HRESULT CFade_Out::Initialize_Clone(void* pArg)
 
     FADEOUT_DESC* pDesc = static_cast<FADEOUT_DESC*>(pArg);
 
-
     if (FAILED(CUIObject::Initialize_Clone(pDesc)))
     {
         CRASH("Failed Clone Fade Out");
@@ -40,7 +39,7 @@ HRESULT CFade_Out::Initialize_Clone(void* pArg)
     // 초기에는 FadeOut 비활성화
     m_IsFadeOut = false;
     m_fFadeTime = 0.f;
-    m_iPassIdx = 0; // 기본 패스
+    m_iShaderPath = static_cast<_uint>(pDesc->eShaderPath); // 기본 패스
         
 
     return S_OK;
@@ -89,7 +88,7 @@ HRESULT CFade_Out::Render()
         return E_FAIL;
     }
 
-    m_pShaderCom->Begin(m_iPassIdx);
+    m_pShaderCom->Begin(m_iShaderPath);
 
     m_pVIBufferCom->Bind_Resources();
 
@@ -105,7 +104,6 @@ void CFade_Out::Start_FadeOut()
     m_IsFadeOut = true;
     m_IsFadeIn = false;
     m_fFadeTime = 0.f;
-    m_iPassIdx = 8; // FadeInPass - 블렌딩 방식 페이드아웃
 }
 
 void CFade_Out::Start_FadeIn()
@@ -113,7 +111,6 @@ void CFade_Out::Start_FadeIn()
     m_IsFadeIn = true;
     m_IsFadeOut = false;
     m_fFadeTime = 2.f; // 최대값에서 시작해서 감소
-    m_iPassIdx = 8; // 같은 패스 사용
 }
 
 void CFade_Out::Time_Calc(_float fTimeDelta)
@@ -170,7 +167,7 @@ HRESULT CFade_Out::Ready_Render_Resource()
         return E_FAIL;
 
     // FadeOut 패스(8번)에서는 텍스처 바인딩 생략
-    if (m_iPassIdx != 8)
+    if (m_iShaderPath != 8)
     {
         if (FAILED(m_pTextureCom->Bind_Shader_Resource(m_pShaderCom, "g_Texture", m_iTextureIndex)))
             return E_FAIL;

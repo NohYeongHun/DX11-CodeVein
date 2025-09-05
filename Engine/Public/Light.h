@@ -1,5 +1,4 @@
 ﻿#pragma once
-#include "Base.h"
 
 NS_BEGIN(Engine)
 class CLight final : public CBase

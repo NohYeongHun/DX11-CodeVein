@@ -19,7 +19,6 @@ HRESULT CPlayerWeapon::Initialize_Prototype()
 HRESULT CPlayerWeapon::Initialize_Clone(void* pArg)
 {
     PLAYER_WEAPON_DESC* pDesc = static_cast<PLAYER_WEAPON_DESC*>(pArg);
-    //m_pParentState = pDesc->pState;
     if (FAILED(CWeapon::Initialize_Clone(pDesc)))
     {
         CRASH("Failed Clone CWeapon");
@@ -137,7 +136,7 @@ HRESULT CPlayerWeapon::Render()
         if (FAILED(m_pModelCom->Bind_Materials(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE, 0)))
             return E_FAIL;
 
-        m_pShaderCom->Begin(0);
+        m_pShaderCom->Begin(m_iShaderPath);
         m_pModelCom->Render(i);
     }
 

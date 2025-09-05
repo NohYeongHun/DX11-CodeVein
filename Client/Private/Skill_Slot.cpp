@@ -1,6 +1,4 @@
-﻿#include "Skill_Slot.h"
-
-CSkill_Slot::CSkill_Slot(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿CSkill_Slot::CSkill_Slot(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CUIObject(pDevice, pContext)
 {
 }
@@ -45,6 +43,7 @@ HRESULT CSkill_Slot::Initialize_Clone(void* pArg)
         return E_FAIL;
 
     SKILLSLOT_DESC* pDesc = static_cast<SKILLSLOT_DESC*>(pArg);
+    m_iShaderPath = static_cast<_uint>(pDesc->eShaderPath);
     if (FAILED(Ready_Components(pDesc)))
         return E_FAIL;
 
@@ -92,7 +91,7 @@ HRESULT CSkill_Slot::Render()
     if (FAILED(Ready_Render_Resources()))
         return E_FAIL;
 
-    m_pShaderCom->Begin(2);
+    m_pShaderCom->Begin(m_iShaderPath);
 
     m_pVIBufferCom->Bind_Resources();
 
@@ -112,6 +111,7 @@ HRESULT CSkill_Slot::Ready_Childs()
     Desc.fY = 0; 
     Desc.fSizeX = m_fSizeX;
     Desc.fSizeY = m_fSizeY;
+    Desc.eShaderPath = POSTEX_SHADERPATH::DEFAULT;
     
     CUIObject* pUIObject = nullptr;
     

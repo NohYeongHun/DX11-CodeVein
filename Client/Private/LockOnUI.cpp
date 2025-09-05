@@ -36,7 +36,7 @@ HRESULT CLockOnUI::Initialize_Clone(void* pArg)
         return E_FAIL;
     }
     m_eCurLevel = pDesc->eCurLevel;
-
+    m_iShaderPath = static_cast<_uint>(pDesc->eShaderPath);
     // 화면 크기 가져오기
     RECT rcClient;
     GetClientRect(g_hWnd, &rcClient);
@@ -119,7 +119,7 @@ HRESULT CLockOnUI::Render()
     
         
     // UI용 쉐이더 패스 (LockOnPass = 패스 7)
-    if (FAILED(m_pShaderCom->Begin(7)))
+    if (FAILED(m_pShaderCom->Begin(m_iShaderPath)))
     {
         CRASH("Ready Shader Begin Failed");
         return E_FAIL;

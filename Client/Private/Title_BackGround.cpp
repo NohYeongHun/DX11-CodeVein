@@ -1,8 +1,4 @@
-﻿#include "Title_BackGround.h"
-
-
-
-CTitle_BackGround::CTitle_BackGround(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿CTitle_BackGround::CTitle_BackGround(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CUIObject { pDevice, pContext }
 {
 }
@@ -28,7 +24,7 @@ HRESULT CTitle_BackGround::Initialize_Clone(void* pArg)
         return E_FAIL;
 
     m_iTextureCount = pDesc->iTextureCount;
-    m_iPassIdx = pDesc->iPassIdx;
+    m_iShaderPath = static_cast<_uint>(pDesc->eShaderPath);
 
     if (FAILED(Ready_Components()))
         return E_FAIL;
@@ -64,20 +60,13 @@ void CTitle_BackGround::Late_Update(_float fTimeDelta)
 
 HRESULT CTitle_BackGround::Render()
 {
-   /* wstring_convert<codecvt_utf8<wchar_t>> converter;
-    string str = converter.to_bytes(m_strObjTag);
-
-    ImGui::Begin("Title BackGround");
-    ImGui::SliderFloat(str.c_str(), &m_fAlpha, 0.f, 1.f);
-    ImGui::End();*/
-
     CUIObject::Begin();
 
     if (FAILED(Ready_Render_Resource()))
         return E_FAIL;
 
 
-    m_pShaderCom->Begin(m_iPassIdx);
+    m_pShaderCom->Begin(m_iShaderPath);
 
     m_pVIBufferCom->Bind_Resources();
 
@@ -92,7 +81,7 @@ void CTitle_BackGround::Start_FadeOut()
 {
     m_IsFadeOut = true;
     m_fFadeTime = 0.f;
-    m_iPassIdx = 3; // FadeOut
+    m_iShaderPath = static_cast<_uint>(POSTEX_SHADERPATH::FADEOUT); // FadeOut
 }
 
 // 필요한 시간을 계산하는 함수.

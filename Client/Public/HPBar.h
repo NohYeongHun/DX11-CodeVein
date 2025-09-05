@@ -1,14 +1,10 @@
 ﻿#pragma once
-#include "UIObject.h"
-
 NS_BEGIN(Client)
 /*
 * HP Bar 객체.
 */
 class CHPBar final : public CUIObject
 {
-public:
-
 private:
 	CHPBar(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CHPBar(const CHPBar& Prototype);
@@ -39,7 +35,7 @@ private:
 #pragma region Shader용 HP Increase, Decrease 효과
 	_float m_fRightRatio = {};
 	_float m_fLeftRatio = {};
-
+	_uint m_iShaderPath = {};
 	_float  m_fHp = {};
 	_float  m_fMaxHp = {};
 

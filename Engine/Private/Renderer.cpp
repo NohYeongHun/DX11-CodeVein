@@ -34,12 +34,28 @@ HRESULT CRenderer::Initialize()
         return E_FAIL;
     }
 
+    /* For.Target_Depth */
+    if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_Depth"), ViewportDesc.Width, ViewportDesc.Height, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(0.f, 0.f, 0.f, 1.f))))
+    {
+        CRASH("Failed Add RenderTarget Depth");
+        return E_FAIL;
+    }
+        
+
     /* For.Target_Shade */
     if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_Shade"), ViewportDesc.Width, ViewportDesc.Height, DXGI_FORMAT_R16G16B16A16_UNORM, _float4(1.f, 1.f, 1.f, 1.f))))
     {
         CRASH("Failed Add RenderTarget Shade");
         return E_FAIL;
     }
+
+    /* For.Target_Specular */
+    if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_Specular"), ViewportDesc.Width, ViewportDesc.Height, DXGI_FORMAT_R16G16B16A16_UNORM, _float4(0.f, 0.f, 0.f, 0.f))))
+    {
+        CRASH("Failed Add RenderTarget Specular");
+        return E_FAIL;
+    }
+        
 
     /* For.MRT_GameObjects : 게임 오브젝트들의 정보를 저장받기위한 타겟들 */
     if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_GameObjects"), TEXT("Target_Diffuse"))))
@@ -48,10 +64,16 @@ HRESULT CRenderer::Initialize()
     if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_GameObjects"), TEXT("Target_Normal"))))
         return E_FAIL;
 
-    /* For.MRT_LightAcc : 빛들의 연산 결과를 누적한다. */
+    if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_GameObjects"), TEXT("Target_Depth"))))
+        return E_FAIL;
+
+
+       /* For.MRT_LightAcc : 빛들의 연산 결과를 누적한다. */
     if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_LightAcc"), TEXT("Target_Shade"))))
         return E_FAIL;
 
+    if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_LightAcc"), TEXT("Target_Specular"))))
+        return E_FAIL;
 #pragma endregion
 
 
@@ -86,6 +108,12 @@ HRESULT CRenderer::Initialize()
         CRASH("Faield Target Shade Ready");
         return E_FAIL;
     }
+    if (FAILED(m_pGameInstance->Ready_RT_Debug(TEXT("Target_Specular"), 450.0f, 450.0f, 300.f, 300.f)))
+    { 
+        CRASH("Faield Target_Specular Ready");
+        return E_FAIL;
+    }
+        
 #endif
 #pragma endregion
 
@@ -126,6 +154,7 @@ HRESULT CRenderer::Draw()
 
     if (FAILED(Render_Blend()))
         return E_FAIL;
+
     if (FAILED(Render_UI()))
         return E_FAIL;
 
@@ -154,35 +183,6 @@ HRESULT CRenderer::Add_DebugComponent(CComponent* pComponent)
 
 #endif // _DEBUG
 
-
-
-#ifdef _DEBUG
-
-HRESULT CRenderer::Render_Debug()
-{
-
-    for (auto& pDebugCom : m_DebugComponent)
-    {
-        if (nullptr != pDebugCom)
-            pDebugCom->Render();
-
-        Safe_Release(pDebugCom);
-    }
-    m_DebugComponent.clear();
-
-
-    if (FAILED(m_pShader->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix)))
-        return E_FAIL;
-
-    if (FAILED(m_pShader->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
-        return E_FAIL;
-
-    m_pGameInstance->Render_RT_Debug(m_pShader, m_pVIBuffer);
-
-    return S_OK;
-}
-
-#endif
 
 HRESULT CRenderer::Render_Priority()
 {
@@ -263,14 +263,36 @@ HRESULT CRenderer::Render_Lights()
         CRASH("Failed Binding Projection Matrix");
         return E_FAIL;
     }
+
+    if (FAILED(m_pShader->Bind_Matrix("g_ViewMatrixInv", m_pGameInstance->Get_Transform_Float4x4_Inverse(D3DTS::VIEW))))
+    {
+        CRASH("Failed Binding ViewMatrix Inverse");
+        return E_FAIL;
+    }
         
+    if (FAILED(m_pShader->Bind_Matrix("g_ProjMatrixInv", m_pGameInstance->Get_Transform_Float4x4_Inverse(D3DTS::PROJ))))
+    {
+        CRASH("Failed Binding ProjMatrix Inverse");
+        return E_FAIL;
+    }
+        
+    if (FAILED(m_pShader->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
+    {
+        CRASH("Failed Binding ProjMatrix Inverse");
+        return E_FAIL;
+    }
 
     if (FAILED(m_pGameInstance->Bind_RT_ShaderResource(TEXT("Target_Normal"), m_pShader, "g_NormalTexture")))
     {
         CRASH("Failed Target Normal Binding");
         return E_FAIL;
     }
-        
+
+    if (FAILED(m_pGameInstance->Bind_RT_ShaderResource(TEXT("Target_Depth"), m_pShader, "g_DepthTexture")))
+    {
+        CRASH("Failed Target Depth Binding");
+        return E_FAIL;
+    }
 
     m_pGameInstance->Render_Lights(m_pShader, m_pVIBuffer);
 
@@ -295,9 +317,16 @@ HRESULT CRenderer::Render_Combined()
         return E_FAIL;
 
     if (FAILED(m_pGameInstance->Bind_RT_ShaderResource(TEXT("Target_Shade"), m_pShader, "g_ShadeTexture")))
+    {
+        CRASH("Failed Bind Target_Shade");
+        return E_FAIL;
+    }
+        
+
+    if (FAILED(m_pGameInstance->Bind_RT_ShaderResource(TEXT("Target_Specular"), m_pShader, "g_SpecularTexture")))
         return E_FAIL;
 
-    _uint iCombinedShaderIndex = static_cast<_uint>(RENDERER_SHADERTYPE::COMBINED);
+    _uint iCombinedShaderIndex = static_cast<_uint>(DEFFERED_SHADERTYPE::COMBINED);
     m_pShader->Begin(iCombinedShaderIndex);
 
     m_pVIBuffer->Bind_Resources();
@@ -373,6 +402,33 @@ HRESULT CRenderer::Render_StaticUI()
     return S_OK;
 }
 
+
+#ifdef _DEBUG
+HRESULT CRenderer::Render_Debug()
+{
+
+    for (auto& pDebugCom : m_DebugComponent)
+    {
+        if (nullptr != pDebugCom)
+            pDebugCom->Render();
+
+        Safe_Release(pDebugCom);
+    }
+    m_DebugComponent.clear();
+
+
+    if (FAILED(m_pShader->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix)))
+        return E_FAIL;
+
+    if (FAILED(m_pShader->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
+        return E_FAIL;
+
+    m_pGameInstance->Render_RT_Debug(m_pShader, m_pVIBuffer);
+
+    return S_OK;
+}
+
+#endif
 
 
 

@@ -1,6 +1,4 @@
 ﻿#pragma once
-#include "UIObject.h"
-
 NS_BEGIN(Client)
 class CFade_Out final : public CUIObject
 {
@@ -8,6 +6,7 @@ public:
 	typedef struct tagFadeOutDesc : CUIObject::UIOBJECT_DESC
 	{
 		_uint iTextureIndex = {};
+		POSTEX_SHADERPATH eShaderPath = {};
 	}FADEOUT_DESC;
 
 private:
@@ -47,7 +46,7 @@ private:
 	class CTexture* m_pTextureCom = { nullptr };
 	_uint m_iTextureIndex = {};
 
-	_uint m_iPassIdx = {};
+	_uint m_iShaderPath = {};
 	_float m_fAlpha = {};
 	_float m_fTime = {};
 

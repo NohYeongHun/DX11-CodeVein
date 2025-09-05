@@ -91,6 +91,7 @@ HRESULT CSkill_Panel::Ready_Childs(SKILLPANEL_DESC* pDesc)
     Desc.fY = 0;
     Desc.fSizeX = fSizeX;
     Desc.fSizeY = fSizeY;
+    Desc.eShaderPath = POSTEX_SHADERPATH::SKILLSLOT;
 
     const _float posX[4] = { -fSizeX * 0.5f - 7.f, 0.f, fSizeX * 0.5f + 7.f, 0.f };
     const _float posY[4] = { 0.f,  fSizeY * 0.5f + 7.f, 0.f, -fSizeY * 0.5f - 7.f };

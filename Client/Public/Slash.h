@@ -10,6 +10,7 @@ public:
     typedef struct tagSlashEffectDesc : public CGameObject::GAMEOBJECT_DESC
     {
         LEVEL eCurLevel = { LEVEL::END };
+        POSTEX_SHADERPATH eShaderPath = {POSTEX_SHADERPATH::NONE };
     }SLASHEFFECT_DESC;
 
     typedef struct tagSlashActivateDesc

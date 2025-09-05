@@ -1,6 +1,4 @@
 ﻿#pragma once
-#include "PartObject.h"
-
 NS_BEGIN(Client)
 class CWeapon abstract : public CPartObject
 {
@@ -10,6 +8,7 @@ public:
 		const _float4x4* pSocketMatrix = { nullptr }; // 장착할 뼈
 		class CGameObject* pOwner = { nullptr };
 		LEVEL eCurLevel = {}; // 현재 레벨
+		MESH_SHADERPATH eShaderPath = { MESH_SHADERPATH::NONE };
 		_float fAttackPower = {}; // 데미지
 	}WEAPON_DESC;
 
@@ -45,9 +44,6 @@ protected:
 #pragma endregion
 
 
-
-#pragma region DEBUG 용도
-#pragma endregion
 
 
 #pragma region 1. 무기는 충돌에 대한 상태제어를 할 수 있어야한다.=> 충돌에 따라 상태가 변하기도, 수치값이 바뀌기도한다.

@@ -10,9 +10,9 @@ class CTitle_BackGround final : public CUIObject
 public:
 	typedef struct tagTitleBackGroundDesc : public CUIObject::UIOBJECT_DESC
 	{
+		POSTEX_SHADERPATH eShaderPath = {};
 		_uint iTextureCount = {};
 		_uint iTexture = {};
-		_uint iPassIdx = { 0 };
 		_float fAlpha = { 0.5f };
 		_float fChangeTime = { 0.f };
 		_wstring strObjTag = {};
@@ -43,7 +43,7 @@ private:
 	CTexture*				m_pTextureCom = { nullptr };
 	_uint					m_iTextureCount = {};
 	_uint					m_iTextureIdx = {};
-	_uint					m_iPassIdx = {};
+	_uint					m_iShaderPath = {};
 
 	_float					m_fAlpha = {};
 	_float					m_fTime = {};

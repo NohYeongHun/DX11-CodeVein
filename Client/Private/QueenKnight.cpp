@@ -865,7 +865,7 @@ HRESULT CQueenKnight::Ready_PartObjects()
     Weapon.pOwner = this;
     Weapon.eCurLevel = m_eCurLevel;
     Weapon.fAttackPower = m_MonsterStat.fAttackPower;
-
+    Weapon.eShaderPath = MESH_SHADERPATH::DEFAULT;
 
 
     if (FAILED(CContainerObject::Add_PartObject(TEXT("Com_Weapon"),
@@ -881,6 +881,7 @@ HRESULT CQueenKnight::Ready_PartObjects()
     Shield.pSocketMatrix = m_pModelCom->Get_BoneMatrix("LeftHandAttachSocket");
     Shield.eCurLevel = m_eCurLevel;
     Shield.pOwner = this;
+    Shield.eShaderPath = MESH_SHADERPATH::DEFAULT;
 
     if (FAILED(CContainerObject::Add_PartObject(TEXT("Com_Shield"),
         ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_GodChildShield")

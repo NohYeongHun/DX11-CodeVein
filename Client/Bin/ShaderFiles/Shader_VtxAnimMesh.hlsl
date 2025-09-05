@@ -2,13 +2,6 @@
 
 matrix g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 
-vector g_vLightDir = vector(1.f, -1.f, 1.f, 0.f);
-vector g_vLightDiffuse = vector(1.f, 1.f, 1.f, 1.f);
-vector g_vLightAmbient = vector(0.4f, 0.4f, 0.4f, 1.f);
-vector g_vLightSpecular = vector(1.f, 1.f, 1.f, 1.f);
-
-vector g_vCamPosition;
-
 /*재질*/
 texture2D g_DiffuseTexture;
 /*재질*/
@@ -44,6 +37,7 @@ struct VS_OUT
     float4 vNormal : NORMAL;
     float2 vTexcoord : TEXCOORD0;
     float4 vWorldPos : TEXCOORD1;
+    float4 vProjPos : TEXCOORD2;
 };
 
 /* 정점쉐이더 : 정점 위치의 스페이스 변환(로컬 -> 월드 -> 뷰 -> 투영). */ 
@@ -75,6 +69,7 @@ VS_OUT VS_MAIN(VS_IN In)
     Out.vNormal = normalize(mul(vNormal, g_WorldMatrix));
     Out.vTexcoord = In.vTexcoord;
     Out.vWorldPos = mul(vPosition, g_WorldMatrix);
+    Out.vProjPos = Out.vPosition;
     
     return Out;
 }
@@ -89,18 +84,19 @@ struct PS_IN
     float4 vNormal : NORMAL;
     float2 vTexcoord : TEXCOORD0;
     float4 vWorldPos : TEXCOORD1;
+    float4 vProjPos : TEXCOORD2;
 };
 
 struct PS_OUT
 {
     float4 vColor : SV_TARGET0;
-    
 };
 
 struct PS_OUT_BACKBUFFER
 {
     float4 vDiffuse : SV_TARGET0;
     float4 vNormal : SV_TARGET1;
+    float4 vDepth : SV_TARGET2;
 };
 
 /* 만든 픽셀 각각에 대해서 픽셀 쉐이더를 수행한다. */
@@ -205,6 +201,7 @@ PS_OUT_BACKBUFFER PS_DEFFERED_MAIN(PS_IN In)
     
     Out.vDiffuse = vMtrlDiffuse;
     Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w, 0.f, 0.f);
     
     return Out;
 }
@@ -223,6 +220,7 @@ PS_OUT_BACKBUFFER PS_DEFFERED_DISSOLVE_MAIN(PS_IN In)
     
     Out.vDiffuse = vMtrlDiffuse;
     Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w, 0.f, 0.f);
     
     // 안에 숫자가 0이되면 안그린다.
     
@@ -231,26 +229,6 @@ PS_OUT_BACKBUFFER PS_DEFFERED_DISSOLVE_MAIN(PS_IN In)
     
     return Out;
 }
-
-//PS_OUT_BACKBUFFER PS_DEFFERED_REVERSE_DISSOLVE_MAIN(PS_IN In)
-//{
-//    PS_OUT_BACKBUFFER Out = (PS_OUT_BACKBUFFER) 0;
-    
-//    vector vMtrlDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
-//    vector vMtrlDissolve = g_DissolveTexture.Sample(DefaultSampler, In.vTexcoord);
-    
-//    if (vMtrlDiffuse.a < 0.3f)
-//        discard;
-    
-//    Out.vDiffuse = vMtrlDiffuse;
-//    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
-    
-//    // 점차 보이게. g_fDissovleTime이 처음에 1로오고, 점차 0으로 변경되면서 보이게하면 될듯?
-//    clip(vMtrlDissolve.r - g_fReverseDissolveTime);
-    
-    
-//    return Out;
-//}
 
 
 
@@ -279,7 +257,6 @@ technique11 DefaultTechnique
 
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
-        //PixelShader = compile ps_5_0 PS_DISSOLVE_MAIN();
         PixelShader = compile ps_5_0 PS_DEFFERED_DISSOLVE_MAIN();
 
     }

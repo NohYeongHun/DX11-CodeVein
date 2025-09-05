@@ -137,17 +137,21 @@ void CSlaveVampire::Late_Update(_float fTimeDelta)
         , m_pNavigationCom->Compute_OnCell(
             m_pTransformCom->Get_State(STATE::POSITION)));
 
-    if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::BLEND, this)))
+    if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::NONBLEND, this)))
         return;
+
+#ifdef _DEBUG
+    if (FAILED(m_pGameInstance->Add_DebugComponent(m_pColliderCom)))
+        return;
+#endif // _DEBUG
+
+    
 
     CMonster::Late_Update(fTimeDelta);
 }
 
 HRESULT CSlaveVampire::Render()
 {
-#ifdef _DEBUG
-    m_pColliderCom->Render();
-#endif // _DEBUG
 
 
     if (FAILED(Ready_Render_Resources()))
@@ -447,25 +451,6 @@ HRESULT CSlaveVampire::Ready_Render_Resources()
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_Transform_Float4x4(D3DTS::PROJ))))
         return E_FAIL;
 
-    const LIGHT_DESC* pLightDesc = m_pGameInstance->Get_LightDesc(0);
-    if (nullptr == pLightDesc)
-        return E_FAIL;
-
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDir", &pLightDesc->vDirection, sizeof(_float4))))
-        return E_FAIL;
-
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDiffuse", &pLightDesc->vDiffuse, sizeof(_float4))))
-        return E_FAIL;
-
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightAmbient", &pLightDesc->vAmbient, sizeof(_float4))))
-        return E_FAIL;
-
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightSpecular", &pLightDesc->vSpecular, sizeof(_float4))))
-        return E_FAIL;
-
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
-        return E_FAIL;
-
     return S_OK;
 }
 
@@ -478,6 +463,7 @@ HRESULT CSlaveVampire::Ready_PartObjects()
     Weapon.pOwner = this;
     Weapon.eCurLevel = m_eCurLevel;
     Weapon.fAttackPower = m_MonsterStat.fAttackPower;
+    Weapon.eShaderPath = MESH_SHADERPATH::DEFAULT;
     
     if (FAILED(CContainerObject::Add_PartObject(TEXT("Com_Weapon"),
         ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_SlaveVampireSword")

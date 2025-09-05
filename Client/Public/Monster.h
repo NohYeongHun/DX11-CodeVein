@@ -45,6 +45,7 @@ public:
         class CPlayer* pPlayer = { nullptr };
         LEVEL eCurLevel;
         MONSTERTYPE eMonsterType;
+        ANIMESH_SHADERPATH eShaderPath = { ANIMESH_SHADERPATH::NONE };
         _float fMaxHP;
         _float fAttackPower;
         _float fDetectionRange;
@@ -182,6 +183,12 @@ public:
 	void Handle_Collider_State();
 	void Reset_Collider_ActiveInfo();
 #pragma endregion
+
+#pragma region SHADER PATH 관리
+protected:
+    _uint m_iShaderPath = {};
+#pragma endregion
+
 
 
 #pragma region 1. 애니메이션 관리. => 몬스터는 내 애니메이션이 무엇인지 알아야한다.

@@ -10,17 +10,17 @@ HRESULT CMainApp::Initialize_Clone()
 	//AllocConsole();
 #endif // DEBUG
 
-	AllocConsole();
-
-	// 표준 출력, 에러, 입력 핸들을 콘솔에 연결
-	FILE* fp;
-
-	freopen_s(&fp, "CONOUT$", "w", stdout); // std::cout
-	freopen_s(&fp, "CONOUT$", "w", stderr); // std::cerr
-	freopen_s(&fp, "CONIN$", "r", stdin);   // std::cin
-
-	// 콘솔 버퍼 동기화
-	std::ios::sync_with_stdio(true);
+	//AllocConsole();
+	//
+	//// 표준 출력, 에러, 입력 핸들을 콘솔에 연결
+	//FILE* fp;
+	//
+	//freopen_s(&fp, "CONOUT$", "w", stdout); // std::cout
+	//freopen_s(&fp, "CONOUT$", "w", stderr); // std::cerr
+	//freopen_s(&fp, "CONIN$", "r", stdin);   // std::cin
+	//
+	//// 콘솔 버퍼 동기화
+	//std::ios::sync_with_stdio(true);
 
 	
 	
@@ -65,8 +65,8 @@ HRESULT CMainApp::Initialize_Clone()
 	}
 
 
-	/*if (FAILED(Start_Level(LEVEL::GAMEPLAY)))
-		return E_FAIL;*/
+	//if (FAILED(Start_Level(LEVEL::GAMEPLAY)))
+	//	return E_FAIL;
 
 	// 원본
 	if (FAILED(Start_Level(LEVEL::LOGO)))
@@ -764,7 +764,7 @@ HRESULT CMainApp::Ready_Pooling()
 #pragma region TEXTURE 타입.
 	// 1. Prototype Clone 객체 생성.
 	CSlash::SLASHEFFECT_DESC slashDesc{};
-
+	slashDesc.eShaderPath = POSTEX_SHADERPATH::MONSTER_LINESLASH;
 	CGameObject* pGameObject = nullptr;
 
 	// 2. 추가할 개수만큼 추가. 
@@ -877,7 +877,7 @@ void CMainApp::Free()
 {
 	CBase::Free();
 
-	FreeConsole();
+	//FreeConsole();
 
 
 

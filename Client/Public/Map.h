@@ -9,6 +9,7 @@ public:
 	{
 		LEVEL eCurLevel = LEVEL::END;
 		const _tchar* PrototypeTag;
+		MESH_SHADERPATH eShaderPath = { MESH_SHADERPATH::NONE };
 		_float3 vScale;
 	}MAP_DESC;
 
@@ -38,6 +39,7 @@ private:
 	class CShader* m_pShaderCom = { nullptr };
 	class CNavigation* m_pNavigationCom = { nullptr };
 	LEVEL m_eCurLevel = { LEVEL::END };
+	_uint m_iShaderPath = {};
 
 private:
 	HRESULT Ready_Components(MAP_DESC* pDesc);

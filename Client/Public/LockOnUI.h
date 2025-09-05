@@ -1,6 +1,4 @@
 ﻿#pragma once
-#include "UIObject.h"
-
 NS_BEGIN(Client)
 class CLockOnUI final : public CGameObject
 {
@@ -8,6 +6,7 @@ public:
     typedef struct tagLockOnUIDesc : public CGameObject::GAMEOBJECT_DESC
     {
         LEVEL eCurLevel = { LEVEL::END };
+        POSTEX_SHADERPATH eShaderPath = {};
         _float fX = 0.f;
         _float fY = 0.f;
         _float fSizeX = 64.f;
@@ -51,6 +50,7 @@ private:
     class CVIBuffer_Rect* m_pVIBufferCom = { nullptr };
     
     LEVEL m_eCurLevel = { LEVEL::END };
+    _uint m_iShaderPath = {};
     // LockOn 관련
     CGameObject* m_pTarget = { nullptr };
     _float m_fTargetRadius = 1.0f;

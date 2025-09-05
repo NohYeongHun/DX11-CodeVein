@@ -1,17 +1,13 @@
 #include "Engine_Shader_Defines.hlsli"
+
 matrix g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
-texture2D g_Texture;
+vector g_vBrushPos = vector(30.f, 0.f, 20.f, 1.f);
+float g_fRange = 5.f;
 
-vector g_vLightDir = vector(1.f, -1.f, 1.f, 0.f);
-vector g_vLightDiffuse = vector(1.f, 1.f, 1.f, 1.f);
-vector g_vLightAmbient = vector(0.4f, 0.4f, 0.4f, 1.f);
-vector g_vLightSpecular = vector(1.f, 1.f, 1.f, 1.f);
-
-vector g_vCamPosition;
-
-/* 재질 
-*/
-texture2D g_DiffuseTexture;
+/*재질*/
+texture2D g_DiffuseTexture[2];
+texture2D g_MaskTexture;
+texture2D g_BrushTexture;
 vector g_vMtrlAmbient = 1.f;
 vector g_vMtrlSpecular = 1.f;
 
@@ -28,6 +24,7 @@ struct VS_OUT
     float4 vNormal : NORMAL;
     float2 vTexcoord : TEXCOORD0;
     float4 vWorldPos : TEXCOORD1;
+    float4 vProjPos : TEXCOORD2;
 };
 
 /* 정점쉐이더 : 정점 위치의 스페이스 변환(로컬 -> 월드 -> 뷰 -> 투영). */ 
@@ -48,6 +45,7 @@ VS_OUT VS_MAIN(VS_IN In)
     Out.vNormal = mul(float4(In.vNormal, 0.f), g_WorldMatrix); // 정점의 노말 벡터를 World 행렬을 곱해준다.
     Out.vTexcoord = In.vTexcoord;
     Out.vWorldPos = mul(float4(In.vPosition, 1.f), g_WorldMatrix);
+    Out.vProjPos = Out.vPosition;
     
     return Out;
 }
@@ -60,8 +58,9 @@ struct PS_IN
 {
     float4 vPosition : SV_POSITION;
     float4 vNormal : NORMAL;
-    float2 vTexcoord : TEXCOORD0;    
+    float2 vTexcoord : TEXCOORD0;
     float4 vWorldPos : TEXCOORD1;
+    float4 vProjPos : TEXCOORD2;
 };
 
 struct PS_OUT
@@ -74,6 +73,7 @@ struct PS_DEFFERD_OUT
 {
     float4 vDiffuse : SV_TARGET0;
     float4 vNormal : SV_TARGET1;
+    float4 vDepth : SV_TARGET2;
 };
 
 /* 만든 픽셀 각각에 대해서 픽셀 쉐이더를 수행한다. */
@@ -81,22 +81,36 @@ struct PS_DEFFERD_OUT
 
 
 
-PS_OUT PS_MAIN(PS_IN In)
+PS_DEFFERD_OUT PS_MAIN(PS_IN In)
 {
-    PS_OUT Out = (PS_OUT) 0;
+    PS_DEFFERD_OUT Out = (PS_DEFFERD_OUT) 0;
     
-    vector vMtrlDiffuse = g_Texture.Sample(DefaultSampler, In.vTexcoord * 50.f);
+    vector vSourDiffuse = g_DiffuseTexture[0].Sample(DefaultSampler, In.vTexcoord * 50.f);
+    vector vDestDiffuse = g_DiffuseTexture[1].Sample(DefaultSampler, In.vTexcoord * 50.f);
     
-    float fShade = max(dot((normalize(g_vLightDir) * -1.f), normalize(In.vNormal)), 0.f); // 명암 계산.
+    vector vMask = g_MaskTexture.Sample(PointSampler, In.vTexcoord);
+    vector vBrush = 0.f;
     
-    vector vReflect = reflect(normalize(g_vLightDir), normalize(In.vNormal));
-    vector vLook = g_vCamPosition - In.vWorldPos;
+    if (g_vBrushPos.x - g_fRange < In.vWorldPos.x && In.vWorldPos.x <= g_vBrushPos.x + g_fRange &&
+        g_vBrushPos.z - g_fRange < In.vWorldPos.z && In.vWorldPos.z <= g_vBrushPos.z + g_fRange)
+    {
+        float2 vTexcoord;
+        
+        vTexcoord.x = (In.vWorldPos.x - (g_vBrushPos.x - g_fRange)) / (2.f * g_fRange);
+        vTexcoord.y = ((g_vBrushPos.z + g_fRange) - In.vWorldPos.z) / (2.f * g_fRange);
+        
+        vBrush = g_BrushTexture.Sample(DefaultSampler, vTexcoord);
+    }
     
-    float fSpecular = pow(max(dot(normalize(vLook), normalize(vReflect)), 0.f), 50.0f);
+    vector vMtrlDiffuse = vDestDiffuse * vMask.r + vSourDiffuse * (1.f - vMask.r) + vBrush;
     
-    Out.vColor = (g_vLightDiffuse * vMtrlDiffuse) * saturate(fShade + (g_vLightAmbient * g_vMtrlAmbient)) +
-                    (g_vLightSpecular * g_vMtrlSpecular) * fSpecular;
+    Out.vDiffuse = vMtrlDiffuse;
     
+    /* In.vNormal(-1 ~ 1) -> Out.vNormal(0 ~ 1) */
+    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+    // vector      vNormalDesc = g_NormalTexture.Sample();
+    // vector vNormal = vector(vNormalDesc.xyz * 2.f - 1.f, 0.f);    
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w, 0.f, 0.f);
     return Out;
 }
 

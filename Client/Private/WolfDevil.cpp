@@ -137,17 +137,17 @@ void CWolfDevil::Late_Update(_float fTimeDelta)
 
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::BLEND, this)))
         return;
+    
+#ifdef _DEBUG
+    if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::BLEND, this)))
+        return;
+#endif // _DEBUG
 
     CMonster::Late_Update(fTimeDelta);
 }
 
 HRESULT CWolfDevil::Render()
 {
-#ifdef _DEBUG
-    m_pColliderCom->Render();
-#endif // _DEBUG
-
-
 
     if (FAILED(Ready_Render_Resources()))
     {

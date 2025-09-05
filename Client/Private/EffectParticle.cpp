@@ -116,6 +116,10 @@ void CEffectParticle::Late_Update(_float fTimeDelta)
 
 HRESULT CEffectParticle::Render()
 {
+#ifdef _DEBUG
+    ImGui_Render();
+#endif // _DEBUG
+
     HRESULT hr;
     hr = Bind_ShaderResources();
     if (FAILED(hr))

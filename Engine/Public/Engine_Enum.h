@@ -14,7 +14,7 @@ namespace Engine
 	};
 	enum class ACTORDIR { U, RU, R, RD, D, LD, L, LU, END};
 
-	enum class RENDERER_SHADERTYPE : _uint { DEBUG = 0, DIRECTIONAL, POINT, COMBINED, END };
+	enum class DEFFERED_SHADERTYPE : _uint { DEBUG = 0, DIRECTIONAL, POINT, COMBINED, END };
 
 	enum class MONSTERTYPE { BOSS, ELITE, NORMAL, END };
 	enum class STATE { RIGHT, UP, LOOK, POSITION };

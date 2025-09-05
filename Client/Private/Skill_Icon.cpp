@@ -1,6 +1,4 @@
-﻿#include "Skill_Icon.h"
-
-CSkill_Icon::CSkill_Icon(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿CSkill_Icon::CSkill_Icon(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CUIObject(pDevice, pContext)
 {
 }
@@ -33,6 +31,8 @@ HRESULT CSkill_Icon::Initialize_Clone(void* pArg)
         return E_FAIL;
 
     SKILLICON_DESC* pDesc = static_cast<SKILLICON_DESC*>(pArg);
+    m_iShaderPath = static_cast<_uint>(pDesc->eShaderPath);
+
     if (FAILED(Ready_Components(pDesc)))
         return E_FAIL;
 
@@ -73,7 +73,7 @@ HRESULT CSkill_Icon::Render()
     if (FAILED(Ready_Render_Resources()))
         return E_FAIL;
 
-    m_pShaderCom->Begin(0);
+    m_pShaderCom->Begin(m_iShaderPath);
 
     m_pVIBufferCom->Bind_Resources();
 

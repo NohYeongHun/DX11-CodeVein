@@ -146,7 +146,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    RECT     rcWindow = { 0, 0, g_iWinSizeX, g_iWinSizeY };
    AdjustWindowRect(&rcWindow, WS_OVERLAPPEDWINDOW, true);
 
-   HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
+   HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_POPUPWINDOW,
       CW_USEDEFAULT, 0, rcWindow.right - rcWindow.left, rcWindow.bottom - rcWindow.top, nullptr, nullptr, hInstance, nullptr);
 
    if (!hWnd)
@@ -198,6 +198,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             }
         }
         break;
+    case WM_KEYDOWN:
+        // ESC 키가 눌렸는지 확인
+        if (wParam == VK_ESCAPE)
+        {
+            // WM_QUIT 메시지를 보내서 프로그램 종료
+            PostQuitMessage(0);
+        }
+        break;
     case WM_PAINT:
         {
             PAINTSTRUCT ps;
@@ -206,9 +214,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             EndPaint(hWnd, &ps);
         }
         break;
-    case WM_DESTROY:
-        PostQuitMessage(0);
-        break;
+
     default:
         return DefWindowProc(hWnd, message, wParam, lParam);
     }

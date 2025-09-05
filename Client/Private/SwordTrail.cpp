@@ -41,7 +41,7 @@ HRESULT CSwordTrail::Initialize_Clone(void* pArg)
     }
         
 	m_eCurLevel = pDesc->eCurLevel;
-    m_iShaderID = static_cast<_uint>(EFFECTTRAIL_SHADERPATH::STRETCH_TRAIL); // StretchTrail 패스 사용 (Ribbon Trail)
+    m_iShaderPath = static_cast<_uint>(EFFECTTRAIL_SHADERPATH::STRETCH_TRAIL); // StretchTrail 패스 사용 (Ribbon Trail)
 	m_iBaseTextureIndex = static_cast<_uint>(pDesc->eDiffuseType);
 
 	CPlayer* pPlayer = dynamic_cast<CPlayer*>(pDesc->pTarget);
@@ -95,7 +95,7 @@ HRESULT CSwordTrail::Render()
 		return E_FAIL;
 	}
 
-	if (FAILED(m_pShaderCom->Begin(m_iShaderID)))
+	if (FAILED(m_pShaderCom->Begin(m_iShaderPath)))
 	{
 		CRASH("Failed Begin Shader");
 		return E_FAIL;

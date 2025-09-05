@@ -19,7 +19,10 @@ HRESULT CKnightLance::Initialize_Clone(void* pArg)
 
 
     if (FAILED(CWeapon::Initialize_Clone(pDesc)))
+    {
+        CRASH("Failed Crash Initialize Clone");
         return E_FAIL;
+    }
 
     if (FAILED(Ready_Components()))
     {
@@ -44,10 +47,6 @@ HRESULT CKnightLance::Initialize_Clone(void* pArg)
 
     m_bTrail = true;
 
-
-    /*m_pTransformCom->Scaling(_float3(0.1f, 0.1f, 0.1f));
-    m_pTransformCom->Rotation(XMVectorSet(0.f, 1.f, 0.f, 0.f), XMConvertToRadians(90.0f));
-    m_pTransformCom->Set_State(STATE::POSITION, XMVectorSet(0.8f, 0.f, 0.f, 1.f));*/
 
     // 기본 false;
     m_pColliderCom->Set_Active(false);

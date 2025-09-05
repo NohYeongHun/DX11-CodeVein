@@ -1,6 +1,4 @@
-﻿#include "Player.h"
-
-#pragma region KEY CODE 미리 정의
+﻿#pragma region KEY CODE 미리 정의
 const _uint CPlayer::m_KeyboardMappingsCount = 12;
 const std::pair<PLAYER_KEY, _ubyte> CPlayer::m_KeyboardMappings[] = {
     { PLAYER_KEY::MOVE_FORWARD,  DIK_W },
@@ -46,7 +44,7 @@ HRESULT CPlayer::Initialize_Clone(void* pArg)
 {
     PLAYER_DESC* pDesc = static_cast<PLAYER_DESC*>(pArg);
     m_eCurLevel = pDesc->eCurLevel;
-
+    m_iShaderPath = static_cast<_uint>(pDesc->eShaderPath);
     m_Stats = {
         pDesc->fMaxHP,
         pDesc->fHP,
@@ -175,7 +173,7 @@ HRESULT CPlayer::Render()
 #endif // _DEBUG
 
 
-    if (FAILED(Ready_Render_Resources()))
+    if (FAILED(Bind_ShaderReosurces()))
     {
         CRASH("Ready Render Resource Failed");
         return E_FAIL;
@@ -191,7 +189,7 @@ HRESULT CPlayer::Render()
             CRASH("Ready Bone Matrices Failed");
 
 
-        if (FAILED(m_pShaderCom->Begin(0)))
+        if (FAILED(m_pShaderCom->Begin(m_iShaderPath)))
             CRASH("Ready Shader Begin Failed");
 
         if (FAILED(m_pModelCom->Render(i)))
@@ -1238,7 +1236,7 @@ void CPlayer::Register_CoolTime()
     m_pFsmCom->Register_StateExitCoolTime(PLAYER_STATE::GUARD, 0.4f);
 }
 
-HRESULT CPlayer::Ready_Render_Resources()
+HRESULT CPlayer::Bind_ShaderReosurces()
 {
       
     if (FAILED(m_pTransformCom->Bind_Shader_Resource(m_pShaderCom, "g_WorldMatrix")))
@@ -1249,27 +1247,6 @@ HRESULT CPlayer::Ready_Render_Resources()
 
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_Transform_Float4x4(D3DTS::PROJ))))
         return E_FAIL;
-
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
-        return E_FAIL;
-
-
-    /*const LIGHT_DESC* pLightDesc = m_pGameInstance->Get_LightDesc(0);
-    if (nullptr == pLightDesc)
-        return E_FAIL;
-
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDir", &pLightDesc->vDirection, sizeof(_float4))))
-        return E_FAIL;
-
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDiffuse", &pLightDesc->vDiffuse, sizeof(_float4))))
-        return E_FAIL;
-
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightAmbient", &pLightDesc->vAmbient, sizeof(_float4))))
-        return E_FAIL;
-
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightSpecular", &pLightDesc->vSpecular, sizeof(_float4))))
-        return E_FAIL;*/
-
 
 
     return S_OK;
@@ -1283,6 +1260,7 @@ HRESULT CPlayer::Ready_PartObjects()
     Weapon.pOwner = this;
     Weapon.eCurLevel = m_eCurLevel;
     Weapon.fAttackPower = m_Stats.fAttackPower;
+    Weapon.eShaderPath = MESH_SHADERPATH::DEFAULT;
 
     if (FAILED(CContainerObject::Add_PartObject(TEXT("Com_Weapon"),
         ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Weapon")

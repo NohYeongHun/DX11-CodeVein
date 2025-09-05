@@ -34,21 +34,13 @@ struct VS_IN
     float2 vTexcoord : TEXCOORD0;
 };
 
-//struct VS_IN
-//{
-//    float3 vPosition : POSITION;
-//    float3 vNormal : NORMAL;
-//    float3 vTangent : TANGENT;
-//    float3 vBinormal : BINORMAL;
-//    float2 vTexcoord : TEXCOORD0;
-//};
-
 struct VS_OUT
 {
     float4 vPosition : SV_POSITION;
     float4 vNormal : NORMAL;
     float2 vTexcoord : TEXCOORD0;
     float4 vWorldPos : TEXCOORD1;
+    float4 vProjPos : TEXCOORD2;
 };
 
 /* 정점쉐이더 : 정점 위치의 스페이스 변환(로컬 -> 월드 -> 뷰 -> 투영). */ 
@@ -69,6 +61,7 @@ VS_OUT VS_MAIN(VS_IN In)
     Out.vNormal = normalize(mul(float4(In.vNormal, 0.f), g_WorldMatrix));
     Out.vTexcoord = In.vTexcoord;
     Out.vWorldPos = mul(float4(In.vPosition, 1.f), g_WorldMatrix);
+    Out.vProjPos = Out.vPosition;
     
     return Out;
 }
@@ -92,6 +85,7 @@ struct PS_BACKBUFFER_IN
     float4 vNormal : NORMAL;
     float2 vTexcoord : TEXCOORD0;
     float4 vWorldPos : TEXCOORD1;
+    float4 vProjPos : TEXCOORD2;
 
 };
 
@@ -104,6 +98,7 @@ struct PS_OUT_BACKBUFFER
 {
     float4 vDiffuse : SV_TARGET0;
     float4 vNormal : SV_TARGET1;
+    float4 vDepth : SV_TARGET2;
 };
 
 /* 만든 픽셀 각각에 대해서 픽셀 쉐이더를 수행한다. */
@@ -142,6 +137,7 @@ PS_OUT_BACKBUFFER PS_DEFFERED_OUT(PS_BACKBUFFER_IN In)
     
     Out.vDiffuse = vMtrlDiffuse;
     Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w, 0.f, 0.f);
     
     return Out;
 }
@@ -160,6 +156,7 @@ PS_OUT_BACKBUFFER PS_DEFFERED_DISSOLVE_MAIN(PS_BACKBUFFER_IN In)
     
     Out.vDiffuse = vMtrlDiffuse;
     Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w, 0.f, 0.f);
     
     // 안에 숫자가 0이되면 안그린다.
     

@@ -55,6 +55,7 @@ HRESULT CSteminaBar::Initialize_Clone(void* pArg)
     m_iTextureIndex = 0;
     m_iMaxStemina = 200;
     m_iStemina = m_iMaxStemina;
+    m_iShaderPath = static_cast<_uint>(POSTEX_SHADERPATH::HPPROGRESSBAR);
 
     if (FAILED(Ready_Components()))
         return E_FAIL;

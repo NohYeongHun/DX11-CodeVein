@@ -1,5 +1,4 @@
-﻿#include "Level_StageOne.h"
-CLevel_StageOne::CLevel_StageOne(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿CLevel_StageOne::CLevel_StageOne(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel{ pDevice, pContext }
 {
 }
@@ -111,6 +110,7 @@ HRESULT CLevel_StageOne::Ready_Layer_FadeOut(const _wstring& strLayerTag)
 	Desc.fSizeX = g_iWinSizeX;
 	Desc.fSizeY = g_iWinSizeY;
 	Desc.iTextureIndex = 0;
+	Desc.eShaderPath = POSTEX_SHADERPATH::FADEIN;
 
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel), strLayerTag,
 		ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_FadeOut"), &Desc)))
@@ -159,6 +159,7 @@ HRESULT CLevel_StageOne::Ready_Layer_Map(const _wstring& strLayerTag)
 	Desc.PrototypeTag = L"Prototype_Component_Model_StageOne";
 	Desc.vScale = { 1.f, 1.f, 1.f };
 	Desc.eCurLevel = m_eCurLevel;
+	Desc.eShaderPath = MESH_SHADERPATH::DEFAULT;
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel), strLayerTag,
 		ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_Map"), &Desc)))
 		return E_FAIL;
@@ -184,6 +185,7 @@ HRESULT CLevel_StageOne::Ready_Layer_Player(const _wstring& strLayerTag)
 	Desc.fMaxHP = 1672;
 	Desc.fHP = 1672;
 	Desc.fAttackPower = 90;
+	Desc.eShaderPath = ANIMESH_SHADERPATH::DEFAULT;
 #pragma endregion
 
 
@@ -212,8 +214,8 @@ HRESULT CLevel_StageOne::Ready_Layer_Camera(const _wstring& strLayerTag)
 	CameraPlayerDesc.fRotationPerSec = XMConvertToRadians(90.0f);
 	CameraPlayerDesc.fMouseSensor = 0.8f;
 
-	CameraPlayerDesc.vTargetOffset = { 0.f, 1.6f, -3.f, 0.f };
-	CameraPlayerDesc.vLockOnOffset = { 0.f, 1.6f, -3.f, 0.f };
+	CameraPlayerDesc.vTargetOffset = { 0.f, 1.6f, -4.3f, 0.f };
+	CameraPlayerDesc.vLockOnOffset = { 0.f, 1.6f, -4.3f, 0.f };
 	CameraPlayerDesc.eCurLevel = m_eCurLevel;
 
 	list<CGameObject*> pGameObjects = m_pGameInstance->Get_Layer(ENUM_CLASS(m_eCurLevel), TEXT("Layer_Player"))->Get_GameObjects();
@@ -325,7 +327,7 @@ HRESULT CLevel_StageOne::Ready_Layer_WolfDevil(const _wstring& strLayerTag)
 	Desc.eCurLevel = m_eCurLevel;
 
 	Desc = { 50.f, XMConvertToRadians(90.0f)
-		, nullptr,  m_eCurLevel, MONSTERTYPE::NORMAL,
+		, nullptr,  m_eCurLevel, MONSTERTYPE::NORMAL, ANIMESH_SHADERPATH::DEFAULT,
 		500.f, 70.f, 15.f, 7.f, 50.f, 50.f };
 
 	Desc.pPlayer = dynamic_cast<CPlayer*>(
@@ -361,7 +363,7 @@ HRESULT CLevel_StageOne::Ready_Layer_SlaveVampire(const _wstring& strLayerTag)
 	CSlaveVampire::SLAVE_VAMPIRE_DSEC Desc{};
 	Desc.eCurLevel = m_eCurLevel;
 	Desc = { 50.f, XMConvertToRadians(90.0f)
-		, nullptr,  m_eCurLevel, MONSTERTYPE::NORMAL,
+		, nullptr,  m_eCurLevel, MONSTERTYPE::NORMAL, ANIMESH_SHADERPATH::DEFAULT,
 		900.f, 70.f, 15.f, 5.f, 50.f, 50.f };
 
 	Desc.pPlayer = dynamic_cast<CPlayer*>(
@@ -404,7 +406,7 @@ HRESULT CLevel_StageOne::Ready_Layer_GiantWhiteDevil(const _wstring& strLayerTag
 	Desc.fRotationPerSec = XMConvertToRadians(180.f);
 	Desc.eCurLevel = m_eCurLevel;
 	Desc = { 50.f, XMConvertToRadians(180.f)
-		, nullptr, m_eCurLevel, MONSTERTYPE::BOSS, 2200.f, 150.f
+		, nullptr, m_eCurLevel, MONSTERTYPE::BOSS, ANIMESH_SHADERPATH::DEFAULT, 2200.f, 150.f
 		, 22.f, 7.f, 10.f, 10.f, {1.f, 1.f, 1.f}
 	};
 	// 60, 21, -28
@@ -442,27 +444,6 @@ HRESULT CLevel_StageOne::Ready_Layer_GiantWhiteDevil(const _wstring& strLayerTag
 
 HRESULT CLevel_StageOne::Ready_Layer_Pooling()
 {
-	//// 1. Prototype Clone 객체 생성.
-	//CSlash::SLASHEFFECT_DESC slashDesc{};
-	//slashDesc.eCurLevel = m_eCurLevel;
-
-	//CGameObject* pGameObject = nullptr;
-
-	///* 100개 추가. */
-	//for (_uint i = 0; i < 100; ++i)
-	//{
-	//	pGameObject = dynamic_cast<CGameObject*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT
-	//		, ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_SlashEffect"), &slashDesc));
-	//	if (nullptr == pGameObject)
-	//	{
-	//		CRASH("Failed Create GameObject");
-	//		return E_FAIL;
-	//	}
-	//	m_pGameInstance->Add_GameObject_ToPools(
-	//		ENUM_CLASS(m_eCurLevel), TEXT("SLASH_EFFECT"), pGameObject);
-	//}
-
-	
 	return S_OK;
 }
 
@@ -471,15 +452,6 @@ HRESULT CLevel_StageOne::Ready_Layer_Pooling()
 
 HRESULT CLevel_StageOne::Ready_Layer_Effect(const _wstring& strLayerTag)
 {
-	//CSnow::SNOW_DESC Desc{};
-	//Desc.eCurLevel = m_eCurLevel;
-	//if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel), strLayerTag,
-	//	ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_Snow"), &Desc)))
-	//{
-	//	CRASH("Failed Ready Layer Snow");
-	//	return E_FAIL;
-	//}
-		
 	return S_OK;
 }
 

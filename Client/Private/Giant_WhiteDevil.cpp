@@ -32,6 +32,7 @@ HRESULT CGiant_WhiteDevil::Initialize_Clone(void* pArg)
         return E_FAIL;
     }
 
+
     if (FAILED(Ready_Components(pDesc)))
     {
         CRASH("Failed Ready Components Failed");
@@ -174,7 +175,7 @@ HRESULT CGiant_WhiteDevil::Render()
         if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
             CRASH("Ready Bone Matrices Failed");
 
-        if (FAILED(m_pShaderCom->Begin(0)))
+        if (FAILED(m_pShaderCom->Begin(m_iShaderPath)))
             CRASH("Ready Shader Begin Failed");
 
         if (FAILED(m_pModelCom->Render(i)))
@@ -556,6 +557,7 @@ HRESULT CGiant_WhiteDevil::Ready_PartObjects()
     Weapon.pOwner = this;
     Weapon.eCurLevel = m_eCurLevel;
     Weapon.fAttackPower = m_MonsterStat.fAttackPower;
+    Weapon.eShaderPath = MESH_SHADERPATH::DEFAULT;
 
     if (FAILED(CContainerObject::Add_PartObject(TEXT("Com_Weapon"),
         ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_WhiteLargeHalberd")

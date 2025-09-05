@@ -42,6 +42,8 @@ private:
 	// 패널은 한개.
 	vector<class CLoading_Panel*> m_LoadingPanels = {};
 
+	_uint m_iShaderPath = {};
+
 private:
 	HRESULT Ready_Components();
 	HRESULT Ready_Events();

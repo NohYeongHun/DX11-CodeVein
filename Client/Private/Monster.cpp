@@ -29,6 +29,7 @@ HRESULT CMonster::Initialize_Clone(void* pArg)
     m_eCurLevel = pDesc->eCurLevel;
     m_pTarget = pDesc->pPlayer;
     m_eMonsterType = pDesc->eMonsterType;
+    m_iShaderPath = static_cast<_uint>(pDesc->eShaderPath);
 
     /* 생성과 동시에 어느정도 필요한 값들의 초기화를 진행 */
     m_MonsterStat.fAttackPower = pDesc->fAttackPower;

@@ -1,6 +1,4 @@
-﻿#include "Skill_Panel.h"
-
-CLoading_Panel::CLoading_Panel(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿CLoading_Panel::CLoading_Panel(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CUIObject(pDevice, pContext)
 {
 }
@@ -13,7 +11,7 @@ CLoading_Panel::CLoading_Panel(const CLoading_Panel& Prototype)
 
 HRESULT CLoading_Panel::Initialize_Prototype()
 {
-    m_iLoading_Slot = 9;
+    m_iLoading_Slot = 9; // Loading Slot 개수.
     return S_OK;
 }
 
@@ -30,6 +28,8 @@ HRESULT CLoading_Panel::Initialize_Clone(void* pArg)
 
 
     LOADING_PANEL_DESC* pDesc = static_cast<LOADING_PANEL_DESC*>(pArg);
+    m_iNormalShaderPath = static_cast<_uint>(pDesc->eNormalShaderPath);
+    m_iLoadingShaderPath = static_cast<_uint>(pDesc->eLoadingShaderPath);
 
     if (FAILED(Ready_Childs(pDesc)))
         return E_FAIL;
@@ -55,10 +55,11 @@ void CLoading_Panel::Update(_float fTimeDelta)
     }
     else
     {
+        // 로딩 시 계속 반짝이는 네모가 바뀌는 효과 주는법.
         m_fLoadingTime = m_pGameInstance->Get_TimeDelta() * 30.f;
-        m_LoadingSlots[m_iCurrentIdx]->Change_Shader_Pass(0);
+        m_LoadingSlots[m_iCurrentIdx]->Change_Shader_Pass(m_iNormalShaderPath);
         m_iCurrentIdx = (m_iCurrentIdx + 1) % 8;
-        m_LoadingSlots[m_iCurrentIdx]->Change_Shader_Pass(1);
+        m_LoadingSlots[m_iCurrentIdx]->Change_Shader_Pass(m_iLoadingShaderPath);
     }
 }
 
@@ -69,7 +70,6 @@ void CLoading_Panel::Late_Update(_float fTimeDelta)
 
 HRESULT CLoading_Panel::Render()
 {
-
     return S_OK;
 }
 

@@ -1,6 +1,4 @@
-﻿#include "HPBar.h"
-
-CHPBar::CHPBar(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿CHPBar::CHPBar(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CUIObject(pDevice, pContext)
 {
 }
@@ -66,6 +64,8 @@ HRESULT CHPBar::Initialize_Clone(void* pArg)
     m_iTextureIndex = 0;
     m_fMaxHp = 1672;
     m_fHp    = m_fMaxHp;
+
+    m_iShaderPath = static_cast<_uint>(POSTEX_SHADERPATH::HPPROGRESSBAR);
 
     if (FAILED(Ready_Components()))
         return E_FAIL;
@@ -135,7 +135,7 @@ HRESULT CHPBar::Render()
     if (FAILED(Ready_Render_Resources()))
         return E_FAIL;
 
-    m_pShaderCom->Begin(5);
+    m_pShaderCom->Begin(m_iShaderPath);
 
     m_pVIBufferCom->Bind_Resources();
 

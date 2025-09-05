@@ -1,6 +1,4 @@
 ﻿#pragma once
-#include "UIObject.h"
-
 NS_BEGIN(Client)
 /*
 * 스킬 슬롯 객체는 스킬 아이콘 객체를 소유하게.
@@ -12,6 +10,7 @@ public:
 	typedef struct tagSkillSlotDesc : CUIObject::UIOBJECT_DESC
 	{
 		_uint iTextureIndex = {};
+		POSTEX_SHADERPATH eShaderPath = {};
 	}SKILLSLOT_DESC;
 
 private:
@@ -41,7 +40,7 @@ private:
 	CTexture* m_pTextureCom = { nullptr };
 
 	_uint m_iTextureIndex = {};
-
+	_uint m_iShaderPath = {};
 	_bool  m_IsCoolTime = { false };
 	_float m_fCoolTime = { 0.f };
 	_float m_fTime = {};

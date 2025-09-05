@@ -21,7 +21,7 @@ HRESULT CMap::Initialize_Clone(void* pArg)
     MAP_DESC* pDesc = static_cast<MAP_DESC*>(pArg);
     
     m_eCurLevel = pDesc->eCurLevel;
-
+    m_iShaderPath = static_cast<_uint>(pDesc->eShaderPath);
     if (FAILED(CGameObject::Initialize_Clone(pDesc)))
     {
         CRASH("Failed Init GameObject");
@@ -96,7 +96,7 @@ HRESULT CMap::Render()
     {
         m_pModelCom->Bind_Materials(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE, 0);
 
-        if (FAILED(m_pShaderCom->Begin(0)))
+        if (FAILED(m_pShaderCom->Begin(m_iShaderPath)))
         {
             CRASH("Shader Begin Failed");
             return E_FAIL;
@@ -135,7 +135,11 @@ HRESULT CMap::Ready_Components(MAP_DESC* pDesc)
 
     if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxMesh"),
         TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom), nullptr)))
+    {
+        CRASH("Failed Crash Shader Component");
         return E_FAIL;
+    }
+        
 
     CLoad_Model::LOADMODEL_DESC Desc{};
     Desc.pGameObject = this;
@@ -169,24 +173,6 @@ HRESULT CMap::Ready_Render_Resources()
 
     if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
         return E_FAIL;
-
-   /* const LIGHT_DESC* pLightDesc = m_pGameInstance->Get_LightDesc(0);
-    if (nullptr == pLightDesc)
-        return E_FAIL;
-
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDir", &pLightDesc->vDirection, sizeof(_float4))))
-        return E_FAIL;
-
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDiffuse", &pLightDesc->vDiffuse, sizeof(_float4))))
-        return E_FAIL;
-
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightAmbient", &pLightDesc->vAmbient, sizeof(_float4))))
-        return E_FAIL;
-
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightSpecular", &pLightDesc->vSpecular, sizeof(_float4))))
-        return E_FAIL;*/
-
-    
 
     return S_OK;
 }
