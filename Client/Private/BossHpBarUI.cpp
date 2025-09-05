@@ -68,6 +68,9 @@ void CBossHpBarUI::Priority_Update(_float fTimeDelta)
 void CBossHpBarUI::Update(_float fTimeDelta)
 {
     CUIObject::Update(fTimeDelta);
+
+    m_fFontScreenX = (g_iWinSizeX >> 1) - 60.f;
+    m_fFontScreenY = (g_iWinSizeY >> 1) - m_RenderMatrix._42 - 50.f;
 }
 
 void CBossHpBarUI::Late_Update(_float fTimeDelta)
@@ -88,7 +91,6 @@ HRESULT CBossHpBarUI::Render()
         CRASH("Failed Ready Render Resources");
         return E_FAIL;
     }
-        
 
     /* HP 깎이는 효과*/
     m_pShaderCom->Begin(5);
@@ -106,11 +108,7 @@ HRESULT CBossHpBarUI::Render()
 
 void CBossHpBarUI::Render_Text()
 {
-
-    _float fScreenX = (g_iWinSizeX >> 1) - 60.f;
-    _float fScreenY = (g_iWinSizeY >> 1) - m_RenderMatrix._42 - 50.f;
-
-    _float2 vPosition = { fScreenX , fScreenY };
+    _float2 vPosition = { m_fFontScreenX , m_fFontScreenY };
 
     wchar_t szBuffer[64] = {};
     swprintf_s(szBuffer, m_strName.c_str());

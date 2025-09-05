@@ -1,7 +1,4 @@
-﻿#include "Monster.h"
-
-
-// 생성자에서 초기화
+﻿// 생성자에서 초기화
 CMonster::CMonster(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CContainerObject(pDevice, pContext)
 {
@@ -60,12 +57,6 @@ HRESULT CMonster::Initialize_Clone(void* pArg)
     _vector vMonsterPos = XMVectorSetW(XMLoadFloat3(&pDesc->vPos), 1.f);
     m_pTransformCom->Set_State(STATE::POSITION, vMonsterPos);
 
-    // CSlash UI 초기화 (비활성화 상태로 생성)
-    /*if (FAILED(Initialize_SlashUI()))
-    {
-        CRASH("Failed Initialize SlashUI");
-        return E_FAIL;
-    }*/
 
     return S_OK;
 }
@@ -251,57 +242,64 @@ void CMonster::On_Collision_Exit(CGameObject* pOther)
 {
 }
 
-void CMonster::Take_Damage(_float fDamage)
-{
-    m_MonsterStat.fHP -= fDamage;
-}
 
-
-/* 충돌 시 */
 void CMonster::Take_Damage(_float fDamage, CGameObject* pGameObject)
 {
     m_MonsterStat.fHP -= fDamage;
-    
+
     CPlayerWeapon* pPlayerWeapon = dynamic_cast<CPlayerWeapon*>(pGameObject);
     if (nullptr != pPlayerWeapon)
     {
-        /* 1. Weapon 포지션 구하기. */
         const _float4x4* pCombinedWorldMatrix = pPlayerWeapon->Get_CombinedWorldMatrix();
+        if (!pCombinedWorldMatrix) return;
+
         _vector vWeaponPosition = XMLoadFloat4(reinterpret_cast<const _float4*>(&pCombinedWorldMatrix->m[3][0]));
 
-        /* 2. 몬스터의 Bounding Sphere 정보 가져오기 */
-        CBounding_Sphere::BOUNDING_SPHERE_DESC* pDesc = static_cast<CBounding_Sphere::BOUNDING_SPHERE_DESC*>(m_pColliderCom->Get_BoundingDesc());
-        //_vector vCenter = XMLoadFloat3(&pDesc->vCenter);
+        CBounding_Sphere::BOUNDING_SPHERE_DESC* pDesc =
+            static_cast<CBounding_Sphere::BOUNDING_SPHERE_DESC*>(m_pColliderCom->Get_BoundingDesc());
+        if (!pDesc) return;
 
-        /* 월드 좌표로 이동. */
-        _vector vCenter = m_pTransformCom->Get_State(STATE::POSITION) + XMLoadFloat3(&pDesc->vCenter);
+        // === 안정화된 계산 ===
+        _vector vMonsterPos = m_pTransformCom->Get_State(STATE::POSITION);
+        _vector vCenter = XMVectorAdd(vMonsterPos, XMLoadFloat3(&pDesc->vCenter));
         _float fRadius = pDesc->fRadius;
 
-        // 3. 몬스터 중심에서 무기 위치로의 방향 벡터를 구합니다.
         _vector vDir = XMVectorSubtract(vWeaponPosition, vCenter);
 
-        // 4. 방향 벡터를 정규화합니다. (크기를 1로 만듦)
-        vDir = XMVector3Normalize(vDir);
-
-        // 5. 정규화된 방향 벡터에 반지름을 곱한 후, 몬스터의 중심점에 더해 표면 위의 점을 구합니다.
-        _vector vClosestPoint = XMVectorMultiplyAdd(vDir, XMVectorReplicate(fRadius), vCenter);
-
-        // 6. 무기의 스윙 방향 사용 (실제 무기가 움직인 궤적)
-        _vector vSwingDirection = pPlayerWeapon->Get_SwingDirection();
-        _vector vAttackDirection = XMVector3Normalize(vSwingDirection);
-        
-        // 스윙 방향이 유효하지 않으면 무기 위치 기반으로 계산
-        if (XMVectorGetX(XMVector3Length(vAttackDirection)) < 0.1f)
+        // 길이 체크
+        _float fDirLength = XMVectorGetX(XMVector3Length(vDir));
+        if (fDirLength < 0.001f)
         {
-            vAttackDirection = XMVector3Normalize(XMVectorSubtract(vClosestPoint, vWeaponPosition));
+            // 방향이 없으면 몬스터 중심 위치 사용
+            Show_Slash_UI_At_Position(vCenter, XMVectorSet(1, 0, 0, 0));
+            return;
         }
-        
-        // 7. SlashUI를 hit point에서 표시
+
+        // 정규화
+        vDir = XMVectorScale(vDir, 1.0f / fDirLength);  // Normalize 대신 수동 계산
+
+        // 표면점 계산 - MultiplyAdd 대신 분리
+        _vector vRadiusOffset = XMVectorScale(vDir, fRadius);
+        _vector vClosestPoint = XMVectorAdd(vCenter, vRadiusOffset);
+
+        // 공격 방향 계산
+        _vector vSwingDirection = pPlayerWeapon->Get_SwingDirection();
+        _vector vAttackDirection = vSwingDirection;
+
+        _float fSwingLength = XMVectorGetX(XMVector3Length(vAttackDirection));
+        if (fSwingLength < 0.1f)
+        {
+            vAttackDirection = vDir;  // vDir 재사용
+        }
+        else
+        {
+            vAttackDirection = XMVectorScale(vAttackDirection, 1.0f / fSwingLength);
+        }
+
         Show_Slash_UI_At_Position(vClosestPoint, vAttackDirection);
     }
 
 }
-
 #pragma endregion
 
 
@@ -1063,8 +1061,11 @@ void CMonster::Show_Slash_UI_At_Position(_fvector vHitPosition, _fvector vAttack
     Desc.vHitPosition = vHitPosition;
     Desc.vHitDirection = vAttackDirection;
     Desc.fDisPlayTime = 0.5f;
-    m_pGameInstance->Move_GameObject_ToObjectLayer(ENUM_CLASS(m_eCurLevel)
+    HRESULT hr = m_pGameInstance->Move_GameObject_ToObjectLayer(ENUM_CLASS(m_eCurLevel)
         , TEXT("SLASH_EFFECT"), TEXT("Layer_Effect"), 1, ENUM_CLASS(CSlash::EffectType), &Desc);
+
+    if (FAILED(hr))
+        CRASH("Failed Slash Effecet");
 
 }
 

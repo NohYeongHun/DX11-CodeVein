@@ -6,21 +6,21 @@
 
 HRESULT CMainApp::Initialize_Clone()
 {
-//#ifdef _DEBUG
-//	AllocConsole();
-//#endif // DEBUG
-
+#ifdef _DEBUG
 	//AllocConsole();
+#endif // DEBUG
 
-	//// 표준 출력, 에러, 입력 핸들을 콘솔에 연결
-	//FILE* fp;
+	AllocConsole();
 
-	//freopen_s(&fp, "CONOUT$", "w", stdout); // std::cout
-	//freopen_s(&fp, "CONOUT$", "w", stderr); // std::cerr
-	//freopen_s(&fp, "CONIN$", "r", stdin);   // std::cin
+	// 표준 출력, 에러, 입력 핸들을 콘솔에 연결
+	FILE* fp;
 
-	//// 콘솔 버퍼 동기화
-	//std::ios::sync_with_stdio(true);
+	freopen_s(&fp, "CONOUT$", "w", stdout); // std::cout
+	freopen_s(&fp, "CONOUT$", "w", stderr); // std::cerr
+	freopen_s(&fp, "CONIN$", "r", stdin);   // std::cin
+
+	// 콘솔 버퍼 동기화
+	std::ios::sync_with_stdio(true);
 
 	
 	
@@ -65,12 +65,12 @@ HRESULT CMainApp::Initialize_Clone()
 	}
 
 
-	if (FAILED(Start_Level(LEVEL::GAMEPLAY)))
-		return E_FAIL;
+	/*if (FAILED(Start_Level(LEVEL::GAMEPLAY)))
+		return E_FAIL;*/
 
 	// 원본
-	//if (FAILED(Start_Level(LEVEL::LOGO)))
-	//	return E_FAIL;
+	if (FAILED(Start_Level(LEVEL::LOGO)))
+		return E_FAIL;
 
 	//if (FAILED(Start_Level(LEVEL::DEBUG)))
 	//	return E_FAIL;
@@ -877,7 +877,7 @@ void CMainApp::Free()
 {
 	CBase::Free();
 
-	//FreeConsole();
+	FreeConsole();
 
 
 

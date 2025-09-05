@@ -1,5 +1,4 @@
-﻿#include "SlaveVampire.h"
-CSlaveVampire::CSlaveVampire(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿CSlaveVampire::CSlaveVampire(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CMonster{pDevice, pContext}
 {
 }
@@ -149,7 +148,6 @@ HRESULT CSlaveVampire::Render()
 #ifdef _DEBUG
     m_pColliderCom->Render();
 #endif // _DEBUG
-
 
 
     if (FAILED(Ready_Render_Resources()))
@@ -369,8 +367,6 @@ HRESULT CSlaveVampire::Ready_Components(SLAVE_VAMPIRE_DSEC* pDesc)
 
     BOUNDING_BOX box = m_pModelCom->Get_BoundingBox();
     CBounding_Sphere::BOUNDING_SPHERE_DESC SphereDesc{};
-    //SphereDesc.fRadius = max(max(box.vExtents.x, box.vExtents.y), box.vExtents.z);
-    //SphereDesc.vCenter = _float3(0.f, box.vExtents.y, 0.f); // 중점.
     SphereDesc.fRadius = 1.f;
     SphereDesc.vCenter = _float3(0.f, 1.2f, 0.f); // 중점.
     SphereDesc.pOwner = this;
@@ -386,6 +382,9 @@ HRESULT CSlaveVampire::Ready_Components(SLAVE_VAMPIRE_DSEC* pDesc)
         CRASH("Failed Clone Collider SPEHRE");
         return E_FAIL;
     }
+
+    cout << "Sphere SlaveVampire Radius : " << SphereDesc.fRadius << endl;
+
 
     m_pGameInstance->Add_Collider_To_Manager(m_pColliderCom, ENUM_CLASS(m_eCurLevel));
 

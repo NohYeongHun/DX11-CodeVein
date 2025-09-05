@@ -82,11 +82,7 @@ HRESULT CCollider::Initialize_Clone(void* pArg)
     m_IsActive = true;
     return S_OK;
 }
-
-
-
 #pragma endregion
-
 
 #pragma region  0. 충돌체가 가져야 하는 식별 정보와 관련 함수들.
 // 1. 주인 체크

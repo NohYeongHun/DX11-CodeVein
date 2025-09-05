@@ -1,6 +1,4 @@
-﻿#include "Bounding_OBB.h"
-
-CBounding_OBB::CBounding_OBB(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿CBounding_OBB::CBounding_OBB(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CBounding(pDevice, pContext)
 {
 }

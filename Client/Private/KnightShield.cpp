@@ -1,4 +1,5 @@
-﻿CKnightShield::CKnightShield(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿#include "KnightShield.h"
+CKnightShield::CKnightShield(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CWeapon(pDevice, pContext)
 {
 }
@@ -71,28 +72,10 @@ void CKnightShield::Late_Update(_float fTimeDelta)
 
 HRESULT CKnightShield::Render()
 {
-//#ifdef _DEBUG
-//    ImGuiIO& io = ImGui::GetIO();
-//
-//    // 기존 Player Debug Window
-//
-//    ImVec2 windowSize = ImVec2(300.f, 300.f);
-//    ImVec2 windowPos = ImVec2(600.f, 0.f);
-//    ImGui::SetNextWindowPos(windowPos, ImGuiCond_Once);
-//    ImGui::SetNextWindowSize(windowSize, ImGuiCond_Once);
-//
-//    string strDebug = "QueenKnight Shield Debug";
-//    ImGui::Begin(strDebug.c_str(), nullptr, ImGuiWindowFlags_NoCollapse);
-//
-//    static _float fPitch = { 0.f }, fYaw = { 0.f }, fRoll = { 0.f };
-//
-//    //m_pTransformCom->Add_Rotation();
-//
-//    ImGui::End();
-//
-//    //Edit_Collider(m_pColliderCom, "QueenKnight Shield");
-//    m_pColliderCom->Render();
-//#endif // _DEBUG
+
+#ifdef _DEBUG
+    //ImGui_Render();
+#endif // _DEBUG
 
     if (FAILED(Bind_ShaderResources()))
     {
@@ -266,3 +249,34 @@ void CKnightShield::Free()
 {
     CWeapon::Free();
 }
+
+#ifdef _DEBUG
+void CKnightShield::ImGui_Render()
+{
+    #ifdef _DEBUG
+    ImGuiIO& io = ImGui::GetIO();
+
+    // 기존 Player Debug Window
+
+    ImVec2 windowSize = ImVec2(300.f, 300.f);
+    ImVec2 windowPos = ImVec2(600.f, 0.f);
+    ImGui::SetNextWindowPos(windowPos, ImGuiCond_Once);
+    ImGui::SetNextWindowSize(windowSize, ImGuiCond_Once);
+
+    string strDebug = "QueenKnight Shield Debug";
+    ImGui::Begin(strDebug.c_str(), nullptr, ImGuiWindowFlags_NoCollapse);
+
+    static _float fPitch = { 0.f }, fYaw = { 0.f }, fRoll = { 0.f };
+
+    //m_pTransformCom->Add_Rotation();
+
+    ImGui::End();
+
+    Edit_Collider(m_pColliderCom, "QueenKnight Shield");
+  
+#endif // _DEBUG
+
+}
+#endif // _DEBUG
+
+

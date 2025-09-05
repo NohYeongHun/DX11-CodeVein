@@ -230,7 +230,7 @@ PS_OUT PS_MAIN9(PS_IN In)
 float g_fTimeRatio; // 0.0 ~ 1.0 (시간 진행도)
 float g_fScale; // 스케일 팩터
 
-PS_OUT PS_MAIN10(PS_IN In)
+PS_OUT PS_LINESLASH_MAIN(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
 
@@ -254,30 +254,19 @@ PS_OUT PS_MAIN10(PS_IN In)
     vector vMask = g_MaskTexture.Sample(DefaultSampler, scaledUV);
     vector vMtrlDiffuse = vDestDiffuse * (1.f - vMask) + vSourDiffuse * (vMask);
     
-    //if (vDestDiffuse.r > 0.9f && vDestDiffuse.g > 0.9f && vDestDiffuse.b > 0.9f)
-    //    discard;
-    
-    
-    //vector vMask = g_MaskTexture.Sample(DefaultSampler, scaledUV);
-    //vector vMtrlDiffuse = vDestDiffuse * (vMask) + vSourDiffuse * (1 - vMask);
-    
     // 시간에 따른 알파 페이드아웃
     float fadeAlpha = 1.0f - g_fTimeRatio;
     vMtrlDiffuse.a *= fadeAlpha;
     
     Out.vColor = vMtrlDiffuse;
-    //float2 uv = In.vTexcoord;
-    //float4 baseColor = g_MaskTexture.Sample(DefaultSampler, uv);
-    //float4 baseColor = g_Texture.Sample(DefaultSampler, uv);
-    
-    //Out.vColor = baseColor;
+
     
     
 
     return Out;
 }
 
-PS_OUT PS_MAIN11(PS_IN In)
+PS_OUT PS_HITFLASH_MAIN(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
 
@@ -425,7 +414,7 @@ technique11 DefaultTechnique
         SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
-        PixelShader = compile ps_5_0 PS_MAIN10();
+        PixelShader = compile ps_5_0 PS_LINESLASH_MAIN();
     }
 
     pass MonsterHitFlashPass
@@ -435,7 +424,7 @@ technique11 DefaultTechnique
         SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
-        PixelShader = compile ps_5_0 PS_MAIN11();
+        PixelShader = compile ps_5_0 PS_HITFLASH_MAIN();
     }
 
 

@@ -191,7 +191,7 @@ void CWolfDevil::On_Collision_Enter(CGameObject* pOther)
         if (!HasBuff(BUFF_INVINCIBLE))
         {
             // 1. 데미지를 입고.
-            Take_Damage(pPlayerWeapon->Get_AttackPower());
+            Take_Damage(pPlayerWeapon->Get_AttackPower(), pPlayerWeapon);
 
             // 2. 해당 위치에 검흔 Effect 생성?
 

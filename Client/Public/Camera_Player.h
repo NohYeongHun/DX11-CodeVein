@@ -128,6 +128,7 @@ private:
 #pragma region 99. 디버그 용도
 public:
 	void Debug_CameraVectors();
+	void ImGui_Render();
 #pragma endregion
 
 public:

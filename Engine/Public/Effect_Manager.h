@@ -17,8 +17,6 @@ public:
 public:
 	// Pool -> ObjectManager
 	HRESULT Move_GameObject_ToObjectLayer(_uint iLayerLevelIndex, const _wstring& strSourTag, const _wstring& strDestTag, _uint iCount, _uint iEffectType, void* pArg = nullptr);
-	// Object Manager -> Pool
-	//HRESULT Move_GameObject_ToPools(_uint iLayerLevelIndex, const _wstring& strSourTag, const _wstring& strDestTag, _uint iCount, void* pArg = nullptr);
 
 	// Pool에 추가
 	HRESULT Add_GameObject_ToPools(const _wstring& strDestTag, _uint iEffectType, class CGameObject* pGameObject);

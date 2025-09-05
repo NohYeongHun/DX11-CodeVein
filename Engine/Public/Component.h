@@ -1,6 +1,5 @@
 ﻿#pragma once
 
-#include "Base.h"
 
 NS_BEGIN(Engine)
 
@@ -14,6 +13,7 @@ protected:
 public:
 	virtual HRESULT Initialize_Prototype();
 	virtual HRESULT Initialize_Clone(void* pArg);
+	virtual HRESULT Render() { return S_OK; }
 
 protected:
 	ID3D11Device*					m_pDevice = { nullptr };

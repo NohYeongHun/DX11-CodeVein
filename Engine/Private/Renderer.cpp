@@ -1,5 +1,4 @@
-﻿#include "Renderer.h"
-CRenderer::CRenderer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿CRenderer::CRenderer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : m_pDevice { pDevice }
     , m_pContext { pContext }
     , m_pGameInstance {CGameInstance::GetInstance()}
@@ -143,11 +142,35 @@ HRESULT CRenderer::Draw()
     return S_OK;
 }
 
+#ifdef _DEBUG
+HRESULT CRenderer::Add_DebugComponent(CComponent* pComponent)
+{
+    m_DebugComponent.push_back(pComponent);
+
+    Safe_AddRef(pComponent);
+
+    return S_OK;
+}
+
+#endif // _DEBUG
+
+
 
 #ifdef _DEBUG
 
 HRESULT CRenderer::Render_Debug()
 {
+
+    for (auto& pDebugCom : m_DebugComponent)
+    {
+        if (nullptr != pDebugCom)
+            pDebugCom->Render();
+
+        Safe_Release(pDebugCom);
+    }
+    m_DebugComponent.clear();
+
+
     if (FAILED(m_pShader->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix)))
         return E_FAIL;
 
@@ -370,6 +393,15 @@ CRenderer* CRenderer::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContex
 void CRenderer::Free()
 {
     CBase::Free();
+
+#ifdef _DEBUG
+    // Debug list 비우기.
+    for (auto& pDebugComponent : m_DebugComponent)
+        Safe_Release(pDebugComponent);
+    m_DebugComponent.clear();
+#endif // _DEBUG
+
+
 
     for (size_t i = 0; i < ENUM_CLASS(RENDERGROUP::END); i++)
     {

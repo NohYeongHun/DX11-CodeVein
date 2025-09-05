@@ -34,6 +34,8 @@ private:
 	/* 스킬 정보? */
 	_float  m_fHp = {};
 	_float  m_fMaxHp = {};
+	_float	m_fFontScreenX = {};
+	_float	m_fFontScreenY = {};
 	_wstring m_strName = {};
 
 private:

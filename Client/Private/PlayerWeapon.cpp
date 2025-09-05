@@ -100,6 +100,16 @@ void CPlayerWeapon::Late_Update(_float fTimeDelta)
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::NONBLEND, this)))
         return;
 
+#ifdef _DEBUG
+    if (FAILED(m_pGameInstance->Add_DebugComponent(m_pColliderCom)))
+    {
+        CRASH("Failed Add DebugComponent");
+        return;
+    }
+        
+#endif // _DEBUG
+
+
     // Trail이 켜질때만 넣기.
     if (m_bTrail)
           m_pTrailWeapon_Effect->Late_Update(fTimeDelta);
@@ -109,7 +119,6 @@ HRESULT CPlayerWeapon::Render()
 {
 #ifdef _DEBUG
     //ImGui_Render();
-    m_pColliderCom->Render();
 #endif // _DEBUG
 
     

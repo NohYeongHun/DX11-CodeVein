@@ -154,6 +154,16 @@ void CPlayer::Late_Update(_float fTimeDelta)
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::NONBLEND, this)))
         return;
 
+#ifdef _DEBUG
+    if (FAILED(m_pGameInstance->Add_DebugComponent(m_pColliderCom)))
+    {
+        CRASH("Failed Add Debug Collider");
+        return;
+    }
+        
+#endif // _DEBUG
+
+
     CContainerObject::Late_Update(fTimeDelta);
 
 }
@@ -162,7 +172,6 @@ HRESULT CPlayer::Render()
 {
 #ifdef _DEBUG
     //ImGui_Render();
-    m_pColliderCom->Render();
 #endif // _DEBUG
 
 

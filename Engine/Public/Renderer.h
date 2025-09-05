@@ -18,8 +18,11 @@ public:
 	HRESULT Initialize();
 
 #pragma region ENGINE에 제공
+public:
 	HRESULT Add_RenderGroup(RENDERGROUP eRenderGroup, class CGameObject* pRenderObject);
 	HRESULT Draw();
+	HRESULT Add_DebugComponent(CComponent* pComponent);
+
 #pragma endregion
 
 	

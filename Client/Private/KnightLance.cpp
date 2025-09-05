@@ -75,12 +75,20 @@ void CKnightLance::Late_Update(_float fTimeDelta)
 {
     CWeapon::Late_Update(fTimeDelta);
 
-
     if (Is_Visible())
     {
         if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::NONBLEND, this)))
             return;
     }
+
+#ifdef _DEBUG
+    if (FAILED(m_pGameInstance->Add_DebugComponent(m_pColliderCom)))
+    {
+        CRASH("Failed AddDebug Collider");
+        return;
+    }
+
+#endif // _DEBUG
 
     if (m_bTrail)
         m_pTrailWeapon_Effect->Late_Update(fTimeDelta);
@@ -315,7 +323,7 @@ void CKnightLance::Free()
 {
     CWeapon::Free();
     Safe_Release(m_pTrailWeapon_Effect);
-    //Safe_Release(m_pDissolveTexture);
+
 }
 
 
@@ -357,8 +365,6 @@ void CKnightLance::ImGui_Render()
     
 
     ImGui::End();
-
-    m_pColliderCom->Render();
 }
 #endif // _DEBUG
 

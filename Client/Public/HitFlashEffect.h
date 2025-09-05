@@ -1,6 +1,4 @@
 ﻿#pragma once
-#include "GameObject.h"
-
 NS_BEGIN(Client)
 class CHitFlashEffect final : public CGameObject
 {

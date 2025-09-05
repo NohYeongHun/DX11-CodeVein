@@ -74,16 +74,21 @@ void CMap::Late_Update(_float fTimeDelta)
 
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::NONBLEND, this)))
         return;
+
+#ifdef _DEBUG
+    if (FAILED(m_pGameInstance->Add_DebugComponent(m_pNavigationCom)))
+    {
+        CRASH("Failed Load Navigation Component");
+        return;
+    }
+#endif // _DEBUG
+
 }
 
 HRESULT CMap::Render()
 {
     if (FAILED(Ready_Render_Resources()))
         return E_FAIL;
-
-#ifdef _DEBUG
-    m_pNavigationCom->Render();
-#endif
 
 #pragma region 기본 렌더링
     _uint iNumMeshes = m_pModelCom->Get_NumMeshes();

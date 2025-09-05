@@ -1,5 +1,4 @@
-﻿#include "QueenKnight.h"
-CQueenKnight::CQueenKnight(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿CQueenKnight::CQueenKnight(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CMonster(pDevice, pContext)
 {
 }
@@ -127,10 +126,6 @@ void CQueenKnight::Update(_float fTimeDelta)
     if (m_IsEncountered)
         m_pBossHpBarUI->Update(fTimeDelta);
 
-#pragma region 테스트
-
-  
-#pragma endregion
 
     Update_AI(fTimeDelta);
 
@@ -176,7 +171,6 @@ HRESULT CQueenKnight::Render()
 {
 #ifdef _DEBUG
     ImGui_Render();
-    m_pColliderCom->Render();
 #endif // _DEBUG
 
     if (FAILED(Bind_Shader_Resource()))
@@ -607,12 +601,6 @@ void CQueenKnight::Disable_Collider(_uint iType)
 #pragma endregion
 
 #pragma region 7. 보스몹 UI 관리
-void CQueenKnight::Take_Damage(_float fDamage)
-{
-    m_MonsterStat.fHP -= fDamage;
-    Decrease_HpUI(fDamage, 0.1f);
-
-}
 void CQueenKnight::Take_Damage(_float fDamage, CGameObject* pGameObject)
 {
     CMonster::Take_Damage(fDamage, pGameObject);
@@ -800,6 +788,7 @@ HRESULT CQueenKnight::Ready_Colliders(QUEENKNIGHT_DESC* pDesc)
     CBounding_Sphere::BOUNDING_SPHERE_DESC SphereDesc{};
     SphereDesc.fRadius = max(max(box.vExtents.x, box.vExtents.y), box.vExtents.z);
     SphereDesc.vCenter = _float3(0.f, box.vExtents.y, 0.f); // 중점.
+
     SphereDesc.pOwner = this;
     SphereDesc.eCollisionType = CCollider::COLLISION_BODY;
     SphereDesc.eMyLayer = CCollider::MONSTER;

@@ -116,7 +116,6 @@ public:
 
 #pragma region 7. 보스몹 체력 UI 관리
 public:
-	virtual void Take_Damage(_float fDamage) override;
 	virtual void Take_Damage(_float fDamage, CGameObject* pGameObject) override;
 
 	virtual void Increase_HpUI(_float fHp, _float fTime) override;

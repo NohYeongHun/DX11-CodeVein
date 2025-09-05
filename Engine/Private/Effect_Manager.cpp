@@ -17,7 +17,11 @@ HRESULT CEffect_Manager::Initialize(_uint iNumLevels)
 HRESULT CEffect_Manager::Move_GameObject_ToObjectLayer(_uint iLayerLevelIndex, const _wstring& strSourTag, const _wstring& strDestTag, _uint iCount, _uint iEffectType, void* pArg)
 {
 	if (iCount > m_pPools[iEffectType][strSourTag].size())
+	{
+		CRASH("Failed Crash Enough Pool Size");
 		return E_FAIL;
+	}
+		
 
 	for (_uint i = 0; i < iCount; ++i)
 	{

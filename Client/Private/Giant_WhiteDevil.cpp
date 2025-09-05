@@ -1,5 +1,4 @@
-﻿#include "Giant_WhiteDevil.h"
-CGiant_WhiteDevil::CGiant_WhiteDevil(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿CGiant_WhiteDevil::CGiant_WhiteDevil(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CMonster{ pDevice, pContext }
 {
 }
@@ -157,48 +156,7 @@ void CGiant_WhiteDevil::Late_Update(_float fTimeDelta)
 HRESULT CGiant_WhiteDevil::Render()
 {
 #ifdef _DEBUG
-    ImGuiIO& io = ImGui::GetIO();
-
-    // 기존 Player Debug Window
-
-    ImVec2 windowSize = ImVec2(300.f, 300.f);
-    ImVec2 windowPos = ImVec2(io.DisplaySize.x - windowSize.x, windowSize.y);
-    ImGui::SetNextWindowPos(windowPos, ImGuiCond_Once);
-    ImGui::SetNextWindowSize(windowSize, ImGuiCond_Once);
-
-    string strDebug = "GiantWhite Debug";
-    ImGui::Begin(strDebug.c_str(), nullptr, ImGuiWindowFlags_NoCollapse);
-    ImGui::Text("HP : (%.2f)", m_MonsterStat.fHP);
-    ImGui::Text("MAX HP : (%.2f)", m_MonsterStat.fMaxHP);
-
-    _float3 vPos = {};
-    XMStoreFloat3(&vPos, m_pTransformCom->Get_State(STATE::POSITION));
-    ImGui::Text("POS : (%.2f, %.2f, %.2f)", vPos.x, vPos.y, vPos.z);
-
-    _vector vMyPos = m_pTransformCom->Get_State(STATE::POSITION);
-    _vector vTargetPos = m_pTarget->Get_Transform()->Get_State(STATE::POSITION);
-    _vector vDistance = vTargetPos - vMyPos;
-    _float fDistance = XMVectorGetX(XMVector3Length(vDistance));
-    ImGui::Text("Target Distance : (%.2f)", fDistance);
-
-    static _float PosArr[3] = { vPos.x, vPos.y, vPos.z };
-    ImGui::InputFloat3("Position", PosArr);
-
-    if (ImGui::Button("Apply"))
-    {
-        _float3 vResultPos = { PosArr[0], PosArr[1], PosArr[2] };
-        _vector vPosition = XMLoadFloat3(&vResultPos);
-        
-        m_pTransformCom->Set_State(STATE::POSITION
-            , m_pNavigationCom->Compute_OnCell(vPosition));
-    }
-
-
-    ImGui::End();
-
-	// 콜라이더 디버그 렌더링
-    m_pColliderCom->Render();
-    
+    ImGui_Render();
 #endif // _DEBUG
 
     if (FAILED(Ready_Render_Resources()))
@@ -445,11 +403,6 @@ void CGiant_WhiteDevil::Disable_Collider(_uint iType)
 
 
 #pragma region 7. 보스몹 UI 관리.
-void CGiant_WhiteDevil::Take_Damage(_float fDamage)
-{
-    CMonster::Take_Damage(fDamage);
-    Decrease_HpUI(fDamage, 0.1f);
-}
 
 void CGiant_WhiteDevil::Take_Damage(_float fDamage, CGameObject* pGameObject)
 {
@@ -691,3 +644,46 @@ void CGiant_WhiteDevil::Free()
     Safe_Release(m_pWeapon);
     Safe_Release(m_pTree);
 }
+#ifdef _DEBUG
+void CGiant_WhiteDevil::ImGui_Render()
+{
+
+    ImGuiIO& io = ImGui::GetIO();
+
+    // 기존 Player Debug Window
+    ImVec2 windowSize = ImVec2(300.f, 300.f);
+    ImVec2 windowPos = ImVec2(io.DisplaySize.x - windowSize.x, windowSize.y);
+    ImGui::SetNextWindowPos(windowPos, ImGuiCond_Once);
+    ImGui::SetNextWindowSize(windowSize, ImGuiCond_Once);
+
+    string strDebug = "GiantWhite Debug";
+    ImGui::Begin(strDebug.c_str(), nullptr, ImGuiWindowFlags_NoCollapse);
+    ImGui::Text("HP : (%.2f)", m_MonsterStat.fHP);
+    ImGui::Text("MAX HP : (%.2f)", m_MonsterStat.fMaxHP);
+
+    _float3 vPos = {};
+    XMStoreFloat3(&vPos, m_pTransformCom->Get_State(STATE::POSITION));
+    ImGui::Text("POS : (%.2f, %.2f, %.2f)", vPos.x, vPos.y, vPos.z);
+
+    _vector vMyPos = m_pTransformCom->Get_State(STATE::POSITION);
+    _vector vTargetPos = m_pTarget->Get_Transform()->Get_State(STATE::POSITION);
+    _vector vDistance = vTargetPos - vMyPos;
+    _float fDistance = XMVectorGetX(XMVector3Length(vDistance));
+    ImGui::Text("Target Distance : (%.2f)", fDistance);
+
+    static _float PosArr[3] = { vPos.x, vPos.y, vPos.z };
+    ImGui::InputFloat3("Position", PosArr);
+
+    if (ImGui::Button("Apply"))
+    {
+        _float3 vResultPos = { PosArr[0], PosArr[1], PosArr[2] };
+        _vector vPosition = XMLoadFloat3(&vResultPos);
+
+        m_pTransformCom->Set_State(STATE::POSITION
+            , m_pNavigationCom->Compute_OnCell(vPosition));
+    }
+
+
+    ImGui::End();
+}
+#endif // _DEBUG

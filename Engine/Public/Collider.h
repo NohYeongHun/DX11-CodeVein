@@ -1,5 +1,4 @@
 ﻿#pragma once
-#include "Component.h"
 
 /*
 * 밀려냄을 어떻게 구현할 것인가?..
@@ -8,7 +7,6 @@ NS_BEGIN(Engine)
 
 class ENGINE_DLL CCollider final : public CComponent
 {
-
 #pragma region 0. Collision Type과 Layer 관리
 public:
 	/* 충돌 타입. */

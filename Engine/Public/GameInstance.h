@@ -86,6 +86,11 @@ public:
 #pragma region RENDERER
 public:
 	HRESULT Add_RenderGroup(RENDERGROUP eRenderGroup, class CGameObject* pRenderObject);
+
+#ifdef _DEBUG
+public:
+	HRESULT Add_DebugComponent(class CComponent* pComponent);
+#endif
 #pragma endregion
 //
 #pragma region TIMER_MANAGER

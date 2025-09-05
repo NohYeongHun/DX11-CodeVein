@@ -11,10 +11,7 @@ HRESULT CBounding_Sphere::Initialize(BOUNDING_DESC* pBoundingDesc)
 {
 	BOUNDING_SPHERE_DESC* pDesc = static_cast<BOUNDING_SPHERE_DESC*>(pBoundingDesc);
 	
-#ifdef _DEBUG
 	m_OriginDesc = *pDesc;
-#endif // _DEBUG
-
 
 	m_pOriginalDesc = new BoundingSphere(pDesc->vCenter, pDesc->fRadius);
 	m_pDesc = new BoundingSphere(*m_pOriginalDesc);

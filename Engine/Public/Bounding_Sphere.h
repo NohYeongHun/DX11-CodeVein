@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "Bounding.h"
 
 NS_BEGIN(Engine)
