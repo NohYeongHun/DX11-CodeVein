@@ -1,6 +1,4 @@
-﻿#include "Load_MeshMaterial.h"
-
-CLoad_MeshMaterial::CLoad_MeshMaterial(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿CLoad_MeshMaterial::CLoad_MeshMaterial(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: m_pDevice {pDevice}
 	, m_pContext {pContext}
 {
@@ -112,4 +110,11 @@ void CLoad_MeshMaterial::Free()
 	CBase::Free();
 	Safe_Release(m_pDevice);
 	Safe_Release(m_pContext);
+
+	for (auto& SRVs : m_SRVs)
+	{
+		for (auto& pSRV : SRVs)
+			Safe_Release(pSRV);
+		SRVs.clear();
+	}
 }

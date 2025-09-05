@@ -1,5 +1,4 @@
-﻿#include "Texture_Manager.h"
-CTexture_Manager::CTexture_Manager()
+﻿CTexture_Manager::CTexture_Manager()
     : m_pGameInstance { CGameInstance::GetInstance()}
 {
     Safe_AddRef(m_pGameInstance);
