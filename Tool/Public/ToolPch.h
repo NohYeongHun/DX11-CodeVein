@@ -11,6 +11,7 @@
 #include "Tool_EffectTexture.h"
 #include "Tool_EffectParticle.h"
 
+#include "TestParticle.h"
 #pragma endregion
 
 

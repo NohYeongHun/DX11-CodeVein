@@ -148,6 +148,12 @@ void CVIBuffer_PointParticleDir_Instance::Create_Buffer()
     }
 }
 
+// 부모의 트랜스폼 정보를 가져온다.
+void CVIBuffer_PointParticleDir_Instance::Bind_Transform(_fvector vPos)
+{
+    XMStoreFloat4(&m_vParentPos, vPos);
+}
+
 
 #pragma endregion
 
@@ -173,6 +179,9 @@ void CVIBuffer_PointParticleDir_Instance::Update(_float fTimeDelta)
         break;
     case PARTICLE_TYPE::PARTICLE_TYPE_BOSS_EXPLOSION:
         BossExplosion_Update(pVertices, fTimeDelta);
+        break;
+    case PARTICLE_TYPE::PARTICLE_TYPE_TEST:
+        TestParticle_Update(pVertices, fTimeDelta);
         break;
     default:
         break;
@@ -274,9 +283,6 @@ void CVIBuffer_PointParticleDir_Instance::Default_Update(VTXINSTANCEPOINTDIR_PAR
 
 void CVIBuffer_PointParticleDir_Instance::QueenKnightWarp_Update(VTXINSTANCEPOINTDIR_PARTICLE* pVertices, _float fTimeDelta)
 {
-    m_fDebugTime += fTimeDelta;
-    OutputDebugWstring(TEXT("QueenKnight Warp Particle"));
-    OutPutDebugFloat(m_fDebugTime);
 
     // 1. Ready Queue에 있는 파티클을 Live Queue로 한 번에 모두 옮깁니다.
     //    파티클 생성 함수에서 큐에 추가된 파티클들을 업데이트 루프로 가져옵니다.
@@ -293,7 +299,7 @@ void CVIBuffer_PointParticleDir_Instance::QueenKnightWarp_Update(VTXINSTANCEPOIN
         pVertices[index].vLifeTime.x = 0.f;
         pVertices[index].vLifeTime.y = particleInfo.lifeTime;
         pVertices[index].fDirSpeed = particleInfo.fRandomSpeed;
-        pVertices[index].vRight.w = particleInfo.fBurstTime;
+        pVertices[index].vRight.w = 1.f;
         pVertices[index].vUp = _float4(particleInfo.initialPos.x, particleInfo.initialPos.y, particleInfo.initialPos.z, 0.f);
         pVertices[index].vLook = _float4(particleInfo.burstDir.x, particleInfo.burstDir.y, particleInfo.burstDir.z, 0.f);
 
@@ -437,6 +443,55 @@ void CVIBuffer_PointParticleDir_Instance::BossExplosion_Update(VTXINSTANCEPOINTD
             ++it;
         }
     }
+}
+
+// 테스트용 파티클을 생성해서 업데이트
+void CVIBuffer_PointParticleDir_Instance::TestParticle_Update(VTXINSTANCEPOINTDIR_PARTICLE* pVertices, _float fTimeDelta)
+{
+#pragma region 1. 정점 정보 채워주기 
+
+#pragma endregion
+
+    while (!m_ReadyparticleIndices.empty())
+    {
+        auto info = m_ReadyparticleIndices.front();
+        m_ReadyparticleIndices.pop();
+        _uint index = info.first;
+        ParticleVertexInfo particleInfo = info.second;
+        _float3 vStartPos = particleInfo.vStartPos;
+        _float3 vParticleDirection = particleInfo.vParticleDir;
+        _float  fLifeTime = particleInfo.fLifeTime; // 시간
+        _float  fLoss = particleInfo.fLoss;
+        _float  fRandomStartSpeed = particleInfo.fRandomStartSpeed;
+
+        // 아직 안들어간 값.
+        _float  fAlpha = particleInfo.fAlpha;
+        _float  fSize = particleInfo.fSize;
+        
+        
+        // 파티클 초기화
+        pVertices[index].vDir = vParticleDirection;
+        pVertices[index].vTranslation = _float4(vStartPos.x, vStartPos.y, vStartPos.z, 1.f);
+        pVertices[index].vLifeTime.x = 0.f;
+        pVertices[index].vLifeTime.y = fLifeTime;
+        pVertices[index].fDirSpeed = fRandomStartSpeed;
+        pVertices[index].vRight.w = 1.f;
+        pVertices[index].vUp = _float4(vStartPos.x, vStartPos.y, vStartPos.z, 0.f);
+        pVertices[index].vLook = _float4(vParticleDirection.x, vParticleDirection.y, vParticleDirection.z, 0.f);
+
+        m_LiveParticleIndices.emplace_back(index);
+    }
+
+#pragma region 2. 받은 정보를 바탕으로 파티클 업데이트
+    // 파티클 업데이트
+    auto it = m_LiveParticleIndices.begin();
+    for (auto it = m_LiveParticleIndices.begin(); it != m_LiveParticleIndices.end();)
+    {
+
+    }
+#pragma endregion
+
+    
 }
 
 void CVIBuffer_PointParticleDir_Instance::CreateAllParticles(_float3 vCenterPos, _float3 vBaseDir, _float fLifeTime)
@@ -679,6 +734,94 @@ void CVIBuffer_PointParticleDir_Instance::Create_BossExplosionParticle(_float3 v
         m_ReadyparticleIndices.emplace(make_pair(index, info));
     }
 }
+
+
+void CVIBuffer_PointParticleDir_Instance::Create_TestParticle(const PARTICLE_TEST_INFO particleInitInfo)
+{
+
+    //_float3 vRange;
+    _float  fRadius = particleInitInfo.fRadius;
+    _float2 vLifeTime = particleInitInfo.vLifeTime;
+    _float3 vParticleDirection = particleInitInfo.vDirection;
+    _float2 vSize = particleInitInfo.vSize;
+    _float  fAlpha = particleInitInfo.fAlpha;
+    _float2  vLoss = particleInitInfo.vLoss;
+    _float2 vRandomSpeed = particleInitInfo.vRandomSpeed;
+
+
+    while (!m_DeadParticleIndices.empty())
+    {
+#pragma region 1. 사용할 Index를 가져옵니다.
+
+#pragma endregion
+
+        // 1. 사용할 Index를 가져옵니다.
+        _uint index = m_DeadParticleIndices.front();
+        m_DeadParticleIndices.pop();
+
+
+#pragma region 2. 보스의 상대 위치를 가지고 무작위 범위(Radius)의 구체가 생성되게함.
+        // 1. 어떻게 만들어주는가?
+        // 보스의 위치를 가져온다.
+        _vector vParentPos = XMLoadFloat4(&m_vParentPos);
+
+        // -1.f ~ fRadius 랜덤 범위
+        _float fRandomX = m_pGameInstance->Rand(-1.f, 1.f);
+        _float fRandomY = m_pGameInstance->Rand(-1.f, 1.f);
+        _float fRandomZ = m_pGameInstance->Rand(-1.f, 1.f);
+
+
+        // 0. x, y, z랜덤 방향 구하기.
+        _float3 vRandomDir = { fRandomX, fRandomY, fRandomZ };
+        _vector vDir = XMVector3Normalize(XMLoadFloat3(&vRandomDir));
+
+
+        // 1. 첫 번째 단계인 구체의 표면 위에 무작위 점을 만드는 방법
+        //먼저, 구체의 표면 위에서 무작위 점을 하나 만듭니다.이 점은 중심에서부터의 거리가 정확히 1.0인 벡터예요.
+
+        //그다음, 이 벡터를 0부터 fRadius 사이의 무작위 값으로 스케일(scale)해 줍니다.이렇게 하면 
+        // 파티클의 위치가 구체 안에서 무작위로 결정되죠.
+        _float fRandomScale = m_pGameInstance->Rand(0, fRadius);
+        vDir = vDir * fRandomScale;
+        _vector vStartPos = vDir += vParentPos;
+
+        // 파티클 마다 사라질 시간 지정.
+        _float fRandomTime = m_pGameInstance->Rand(vLifeTime.x, vLifeTime.y);
+        // 파티클 마다 감쇠 크기 지정.
+        _float fLossValue = m_pGameInstance->Rand(vLoss.x, vLoss.y);
+        // 입자마다 다른 속도 지정.
+        _float fRandomSpeed = m_pGameInstance->Rand(vRandomSpeed.x, vRandomSpeed.y);
+        // 입자마다 다른 크기 지정
+        _float fSize = m_pGameInstance->Rand(vSize.x, vSize.y);
+#pragma endregion
+
+#pragma region 3. 계산한 정보를 바탕으로 ReadyParticle에 넣어줍니다.
+       
+
+        /*
+        * 1. 생성시간
+        * 2. 파티클 방향
+        * 3. 감쇠값
+        * 4. Random 시작 스피드
+        * 5. 시작 알파값.
+        * 6. 시작 사이즈.
+        */
+        ParticleVertexInfo info{};
+        XMStoreFloat3(&info.vStartPos, vStartPos); // 시작 위치 지정.
+        info.vParticleDir = vParticleDirection; // 방향
+        info.fLifeTime = fRandomTime;   // 생성시간
+        info.fLoss = fLossValue; // 감쇠 값.
+        info.fRandomStartSpeed = fRandomSpeed; // 시작 스피드 (입자마다 다르게 줘야함)
+        info.fAlpha = fAlpha;
+        info.fSize = fSize;
+        m_ReadyparticleIndices.emplace(make_pair(index, info));
+#pragma endregion
+
+    }
+
+    
+}
+
 
 #pragma endregion
 

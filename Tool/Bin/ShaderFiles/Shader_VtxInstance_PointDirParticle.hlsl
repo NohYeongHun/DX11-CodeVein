@@ -50,7 +50,7 @@ VS_OUT VS_MAIN(VS_IN In)
  
     vector vPosition = mul(float4(In.vPosition, 1.f), In.TransformMatrix);
     
-    Out.vPosition = mul(vPosition, g_WorldMatrix);
+    Out.vPosition = mul(vPosition, g_WorldMatrix); // 각 정점들에 월드 매트릭스를 곱해준다.
     Out.fSize = length(In.TransformMatrix._11_12_13);
     Out.vLifeTime = In.vLifeTime;
     Out.vDir = mul(In.vDir, In.fSpeed);

@@ -1195,8 +1195,11 @@ void CMap_Tool::Render_Effect_ParticleInspector()
             ImGui::SliderFloat("Distance from Camera", &distance, 1.0f, 20.0f);
 
             // 카메라 기준 방향 설정.
-            static float direction[3] = { 0.0f, 1.0f, 0.0f };
-            ImGui::SliderFloat3("Direction", direction, -1.0f, 1.0f);
+            static float direction[3] = { 0.0f, 0.0f, 0.0f };
+            ImGui::InputFloat3("Particle Direction", direction);
+
+            static float ObjectDirection[3] = { 0.0f, 0.0f, 0.0f };
+            ImGui::InputFloat3("Object Direction", ObjectDirection);
 
             /* 변수값 넣기. */
             static int iNumInstance = { 100 };
@@ -1242,11 +1245,13 @@ void CMap_Tool::Render_Effect_ParticleInspector()
                 _vector vCamLook = XMVector3Normalize(m_pCameraTransformCom->Get_State(STATE::LOOK));
                 _vector vCalculatedPosition = XMVectorAdd(vCamPos, XMVectorScale(vCamLook, distance));
                 _vector vDirection = XMVectorSet(direction[0], direction[1], direction[2], 0.0f);
+                _vector vObjectDirection = XMVectorSet(ObjectDirection[0], ObjectDirection[1], ObjectDirection[2], 0.0f);
 
                 // ImGui 값들을 m_CurrentEffectParticle_Desc에 설정
                 m_CurrentEffectParticle_Desc.eCurLevel = m_eCurLevel;
                 m_CurrentEffectParticle_Desc.vPosition = vCalculatedPosition;
-                m_CurrentEffectParticle_Desc.vDirection = vDirection;
+                m_CurrentEffectParticle_Desc.vParticleDir = vDirection;
+                m_CurrentEffectParticle_Desc.vObjectDir = vObjectDirection;
                 
                 // VIBuffer_Point_Instance용 데이터
                 m_CurrentEffectParticle_Desc.iNumInstance = iNumInstance;
@@ -1277,11 +1282,13 @@ void CMap_Tool::Render_Effect_ParticleInspector()
                 _vector vCamLook = XMVector3Normalize(m_pCameraTransformCom->Get_State(STATE::LOOK));
                 _vector vCalculatedPosition = XMVectorAdd(vCamPos, XMVectorScale(vCamLook, distance));
                 _vector vDirection = XMVectorSet(direction[0], direction[1], direction[2], 0.0f);
+                _vector vObjectDirection = XMVectorSet(ObjectDirection[0], ObjectDirection[1], ObjectDirection[2], 0.0f);
 
                 // ImGui 값들을 m_CurrentEffectParticle_Desc에 설정
                 m_CurrentEffectParticle_Desc.eCurLevel = m_eCurLevel;
                 m_CurrentEffectParticle_Desc.vPosition = vCalculatedPosition;
-                m_CurrentEffectParticle_Desc.vDirection = vDirection;
+                m_CurrentEffectParticle_Desc.vParticleDir = vDirection;
+                m_CurrentEffectParticle_Desc.vObjectDir = vObjectDirection;
                 
                 // VIBuffer_Point_Instance용 데이터
                 m_CurrentEffectParticle_Desc.iNumInstance = iNumInstance;
@@ -1311,6 +1318,7 @@ void CMap_Tool::Render_Effect_ParticleInspector()
                 _vector vCamLook = XMVector3Normalize(m_pCameraTransformCom->Get_State(STATE::LOOK));
                 _vector vCalculatedPosition = XMVectorAdd(vCamPos, XMVectorScale(vCamLook, distance));
                 _vector vDirection = XMVectorSet(direction[0], direction[1], direction[2], 0.0f);
+                _vector vObjectDirection = XMVectorSet(ObjectDirection[0], ObjectDirection[1], ObjectDirection[2], 0.0f);
 
                 // 현재 설정된 값들 사용
                 m_CurrentEffectParticle_Desc.iNumInstance = iNumInstance;
@@ -1321,7 +1329,9 @@ void CMap_Tool::Render_Effect_ParticleInspector()
                 m_CurrentEffectParticle_Desc.vSpeed = _float2(Speed[0], Speed[1]);
                 m_CurrentEffectParticle_Desc.vLifeTime = _float2(LifeTime[0], LifeTime[1]);
                 m_CurrentEffectParticle_Desc.vPosition = vCalculatedPosition;
-                m_CurrentEffectParticle_Desc.vDirection = vDirection;
+                m_CurrentEffectParticle_Desc.vParticleDir = vDirection;
+                m_CurrentEffectParticle_Desc.vObjectDir = vObjectDirection;
+
                 m_CurrentEffectParticle_Desc.eCurLevel = m_eCurLevel;
                 m_CurrentEffectParticle_Desc.isLoop = isLoop;
                 m_CurrentEffectParticle_Desc.isBillBoard = isBillBoard;
@@ -1367,7 +1377,7 @@ void CMap_Tool::Create_Effect_Particle()
                 // UI에서 설정한 값들 사용
                 _float3 centerPos = m_CurrentEffectParticle_Desc.vCenter;
                 
-                _vector vDir = m_CurrentEffectParticle_Desc.vDirection;
+                _vector vDir = m_CurrentEffectParticle_Desc.vParticleDir;
                 _float3 baseDir;
                 XMStoreFloat3(&baseDir, vDir);
                 
@@ -1436,7 +1446,7 @@ void CMap_Tool::Create_QueenKnightWarp_Effect_Particle()
                 // UI에서 설정한 값들 사용
                 _float3 centerPos = m_CurrentEffectParticle_Desc.vCenter;
 
-                _vector vDir = m_CurrentEffectParticle_Desc.vDirection;
+                _vector vDir = m_CurrentEffectParticle_Desc.vParticleDir;
                 _float3 baseDir;
                 XMStoreFloat3(&baseDir, vDir);
 

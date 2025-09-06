@@ -1,6 +1,4 @@
 ﻿#pragma once
-#include "GameObject.h"
-
 NS_BEGIN(Tool)
 class CTool_EffectParticle final : public CGameObject
 {
@@ -34,10 +32,11 @@ public:
         _float2			vSpeed;
         _float2			vLifeTime;
         _bool			isLoop;
+        _vector         vParticleDir = {};
 
         // ========= 객체 용도 ============
         _vector         vPosition = {};
-        _vector         vDirection = {};
+        _vector         vObjectDir = {};
         _bool           useTextureCheckArray[TEXTURE::TEXTURE_END]; // 사용하지 않을 Texture들 지정하기.
         _uint           useTextureIndexArray[TEXTURE::TEXTURE_END]; // 사용할 텍스쳐 번호 지정.
         _uint           iShaderPath = {};
@@ -74,9 +73,13 @@ public:
     void CreateBurstEffect(_float3 vGatherPoint, _float3 vUpDirection, _float fGatherTime = 1.5f, _float fBurstTime = 2.0f, _float fTotalLifeTime = 5.0f);
     void Create_QueenKnightWarpEffect(const PARTICLE_INIT_INFO particleInitInfo);
     void Create_BossExplosionParticle(_float3 vCenterPos, _float fRadius, _float fGatherTime, _float fExplosionTime, _float fTotalLifeTime);
+    void Create_TestParticle(const PARTICLE_TEST_INFO particleTestInfo);
 
 public:
     static const EFFECTTYPE EffectType = EFFECTTYPE::PARTICLE;
+
+private:
+    _float3 m_vDir = {};
 
 private:
     // 컴포넌트
@@ -90,6 +93,7 @@ private:
 
     _bool m_isLoop = { false };
     _bool m_isBillBoard = { false };
+
 
     _vector m_vHitDirection = {};
     _float3 m_vScale = {};
