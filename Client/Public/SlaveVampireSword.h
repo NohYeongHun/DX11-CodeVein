@@ -50,6 +50,10 @@ public:
 	virtual void Free() override;
 #pragma endregion
 
+#ifdef _DEBUG
+private:
+	void ImGui_Render();
+#endif
 };
 NS_END
 

@@ -402,6 +402,16 @@ HRESULT CGameInstance::Add_RenderGroup(RENDERGROUP eRenderGroup, CGameObject* pR
 	return m_pRenderer->Add_RenderGroup(eRenderGroup, pRenderObject);
 }
 
+#ifdef _DEBUG
+// 디버그용도 컴포넌트 추가.
+HRESULT CGameInstance::Add_DebugComponent(CComponent* pComponent)
+{
+	return m_pRenderer->Add_DebugComponent(pComponent);
+}
+#endif // _DEBUG
+
+
+
 
 #pragma endregion
 

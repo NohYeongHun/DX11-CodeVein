@@ -6,21 +6,21 @@
 
 HRESULT CMainApp::Initialize_Clone()
 {
-//#ifdef _DEBUG
-//	AllocConsole();
-//#endif // DEBUG
+#ifdef _DEBUG
+	//AllocConsole();
+#endif // DEBUG
 
-	AllocConsole();
-
-	// 표준 출력, 에러, 입력 핸들을 콘솔에 연결
-	FILE* fp;
-
-	freopen_s(&fp, "CONOUT$", "w", stdout); // std::cout
-	freopen_s(&fp, "CONOUT$", "w", stderr); // std::cerr
-	freopen_s(&fp, "CONIN$", "r", stdin);   // std::cin
-
-	// 콘솔 버퍼 동기화
-	std::ios::sync_with_stdio(true);
+	//AllocConsole();
+	//
+	//// 표준 출력, 에러, 입력 핸들을 콘솔에 연결
+	//FILE* fp;
+	//
+	//freopen_s(&fp, "CONOUT$", "w", stdout); // std::cout
+	//freopen_s(&fp, "CONOUT$", "w", stderr); // std::cerr
+	//freopen_s(&fp, "CONIN$", "r", stdin);   // std::cin
+	//
+	//// 콘솔 버퍼 동기화
+	//std::ios::sync_with_stdio(true);
 
 	
 	
@@ -220,13 +220,15 @@ HRESULT CMainApp::Ready_Prototype_ForStatic()
 	if (FAILED(Ready_Prototype_HUD()))
 		return E_FAIL;
 
+	
+
 	if (FAILED(Ready_Prototype_Inventory()))
 		return E_FAIL;
 	
 	if (FAILED(Ready_Prototype_SkillUI()))
 		return E_FAIL;
 
-	if (FAILED(Ready_Prototype_BossUI()))
+	if (FAILED(Ready_Prototype_MonsterUI()))
 		return E_FAIL;
 
 
@@ -256,12 +258,7 @@ HRESULT CMainApp::Ready_Prototype_ForUsageTexture()
 		, CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/User/Inventory/Category/Category%d.png"), 10))))
 		return E_FAIL;
 
-	/* Boss HP Bar*/
-
-	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
-		, TEXT("Prototype_Component_Texture_BossHPBar")
-		, CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Monster/QueenKnight/HPBar%d.png"), 1))))
-		return E_FAIL;	
+	
 
 	return S_OK;
 }
@@ -473,11 +470,44 @@ HRESULT CMainApp::Ready_Prototype_SkillUI()
 	return S_OK;
 }
 
-HRESULT CMainApp::Ready_Prototype_BossUI()
+HRESULT CMainApp::Ready_Prototype_MonsterUI()
 {
+
+#pragma region BOSS UI
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
+		, TEXT("Prototype_Component_Texture_BossHPBar")
+		, CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Monster/QueenKnight/HPBar%d.png"), 1))))
+	{
+		CRASH("Failed Create Texture BossHPBar UI");
+		return E_FAIL;
+	}
+		
+
+	// 보스 UI
 	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_BossHPBar"),
 		CBossHpBarUI::Create(m_pDevice, m_pContext))))
+	{
+		CRASH("Failed Create BossHpBar UI");
 		return E_FAIL;
+	}
+#pragma endregion
+
+#pragma region MONSTER UI
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
+		, TEXT("Prototype_Component_Texture_MonsterHPBar")
+		, CTexture::Create(m_pDevice, m_pContext, TEXT("../Bin/Resources/Textures/Monster/HPBar/HPBar%d.png"), 1))))
+	{
+		CRASH("Failed Create Texture MonsterHPBar UI");
+		return E_FAIL;
+	}
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_MonsterHPBar"),
+		CMonsterHpBar::Create(m_pDevice, m_pContext))))
+	{
+		CRASH("Failed Create MonsterHpBar UI");
+		return E_FAIL;
+	}
+#pragma endregion
 
 	return S_OK;
 }
@@ -764,7 +794,7 @@ HRESULT CMainApp::Ready_Pooling()
 #pragma region TEXTURE 타입.
 	// 1. Prototype Clone 객체 생성.
 	CSlash::SLASHEFFECT_DESC slashDesc{};
-
+	slashDesc.eShaderPath = POSTEX_SHADERPATH::MONSTER_LINESLASH;
 	CGameObject* pGameObject = nullptr;
 
 	// 2. 추가할 개수만큼 추가. 
@@ -877,7 +907,7 @@ void CMainApp::Free()
 {
 	CBase::Free();
 
-	FreeConsole();
+	//FreeConsole();
 
 
 

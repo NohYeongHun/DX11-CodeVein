@@ -1,6 +1,4 @@
 ﻿#pragma once
-#include "UIObject.h"
-
 NS_BEGIN(Client)
 /*
 * 스킬 슬롯 객체를 고정해주는 위치용 객체.
@@ -13,6 +11,8 @@ public:
 	{
 		_float fSlotSizeX{};
 		_float fSlotSizeY{};
+		POSTEX_SHADERPATH eNormalShaderPath = {};
+		POSTEX_SHADERPATH eLoadingShaderPath = {};
 
 	}LOADING_PANEL_DESC;
 
@@ -39,6 +39,8 @@ private:
 	_uint m_iPrevIdx = {};
 	_uint m_iCurrentIdx = {};
 	_float m_fLoadingTime = {};
+	_uint m_iNormalShaderPath = {};
+	_uint m_iLoadingShaderPath = {};
 
 private:
 	HRESULT Ready_Components();

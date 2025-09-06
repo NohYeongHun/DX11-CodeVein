@@ -45,6 +45,7 @@ public:
         class CPlayer* pPlayer = { nullptr };
         LEVEL eCurLevel;
         MONSTERTYPE eMonsterType;
+        ANIMESH_SHADERPATH eShaderPath = { ANIMESH_SHADERPATH::NONE };
         _float fMaxHP;
         _float fAttackPower;
         _float fDetectionRange;
@@ -52,6 +53,7 @@ public:
         _float fMoveSpeed;
         _float fRotationSpeed;
         _float3 vPos = { 0.f, 0.f, 0.f }; // 시작 위치.
+        _float3 vLockOnOffset = { 0.f, 0.f, 0.f };
     }MONSTER_DESC;
 
 public:
@@ -153,7 +155,6 @@ public:
     
 public:
     // 무기 및 스킬과 충돌 시 받는 데미지 처리.
-    virtual void Take_Damage(_float fDamage); 
     virtual void Take_Damage(_float fDamage, CGameObject* pGameObject); 
     virtual void Collider_Part_Active(_uint iPartType, _bool bActive) {};
     virtual void Collider_All_Active(_bool bActive) {};
@@ -183,6 +184,12 @@ public:
 	void Handle_Collider_State();
 	void Reset_Collider_ActiveInfo();
 #pragma endregion
+
+#pragma region SHADER PATH 관리
+protected:
+    _uint m_iShaderPath = {};
+#pragma endregion
+
 
 
 #pragma region 1. 애니메이션 관리. => 몬스터는 내 애니메이션이 무엇인지 알아야한다.
@@ -316,6 +323,9 @@ public:
     virtual void Reset_Part_Colliders();
     virtual void Dead_Action();
 
+    /* 무기 회전*/
+    virtual void Weapon_Rotation(_uint iPartType, _float3 vRadians, _bool bInverse = false) {};
+
 // 특수 조건 : 조우 했는가?
 protected:
     _bool m_IsEncountered = { false };
@@ -337,8 +347,6 @@ public:
     virtual void Increase_HpUI(_float fHp, _float fTime) {};
     virtual void Decrease_HpUI(_float fHp, _float fTime) {};
 
-private:
-
 
 #pragma endregion
 
@@ -355,8 +363,17 @@ public:
     virtual void Set_Visible(_bool bVisible) {};
     _bool Is_Visible() const { return m_bVisible; }
 
+
 protected:
     _bool m_bVisible = { true };  // 기본적으로 보이는 상태
+
+public:
+    // 몬스터 LockOn 용도 위치 가져오기.
+    const _vector Get_LockOnOffset();
+
+protected:
+    _float3 m_vLockOnResult = {};
+    _float3 m_vLockOnOffset = {};
 #pragma endregion
 
 #pragma region 99. DEBUG 용도 함수.

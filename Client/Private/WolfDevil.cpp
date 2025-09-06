@@ -85,6 +85,12 @@ HRESULT CWolfDevil::Initialize_Clone(void* pArg)
         return E_FAIL;
     }
 
+    if (FAILED(Initialize_UI()))
+    {
+        CRASH("Failed Init UI WolfDevil");
+        return E_FAIL;
+    }
+
     _vector qInitRot = XMQuaternionRotationAxis(XMVectorSet(0.f, 1.f, 0.f, 0.f), 0.0f);
     m_pTransformCom->Set_Quaternion(qInitRot);
 
@@ -105,11 +111,17 @@ HRESULT CWolfDevil::Initialize_Clone(void* pArg)
 
 void CWolfDevil::Priority_Update(_float fTimeDelta)
 {
+    if (m_IsEncountered)
+        m_pMonsterHpBar->Priority_Update(fTimeDelta);
+
     CMonster::Priority_Update(fTimeDelta);
 }
 
 void CWolfDevil::Update(_float fTimeDelta)
 {
+    if (m_IsEncountered)
+        m_pMonsterHpBar->Update(fTimeDelta);
+
     // 이 순서대로 AI 작업을 호출해라.
     Update_AI(fTimeDelta);
 
@@ -130,24 +142,30 @@ void CWolfDevil::Finalize_Update(_float fTimeDelta)
 
 void CWolfDevil::Late_Update(_float fTimeDelta)
 {
-    
     m_pTransformCom->Set_State(STATE::POSITION
         , m_pNavigationCom->Compute_OnCell(
             m_pTransformCom->Get_State(STATE::POSITION)));
 
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::BLEND, this)))
         return;
+    
+#ifdef _DEBUG
+    if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::BLEND, this)))
+        return;
+#endif // _DEBUG
 
     CMonster::Late_Update(fTimeDelta);
+
+    if (m_IsEncountered)
+    {
+        m_pMonsterHpBar->Calculate_Screen_Position(
+            m_pTransformCom->Get_State(STATE::POSITION));
+        m_pMonsterHpBar->Late_Update(fTimeDelta);
+    }
 }
 
 HRESULT CWolfDevil::Render()
 {
-#ifdef _DEBUG
-    m_pColliderCom->Render();
-#endif // _DEBUG
-
-
 
     if (FAILED(Ready_Render_Resources()))
     {
@@ -191,7 +209,7 @@ void CWolfDevil::On_Collision_Enter(CGameObject* pOther)
         if (!HasBuff(BUFF_INVINCIBLE))
         {
             // 1. 데미지를 입고.
-            Take_Damage(pPlayerWeapon->Get_AttackPower());
+            Take_Damage(pPlayerWeapon->Get_AttackPower(), pPlayerWeapon);
 
             // 2. 해당 위치에 검흔 Effect 생성?
 
@@ -255,6 +273,7 @@ void CWolfDevil::Update_AI(_float fTimeDelta)
 HRESULT CWolfDevil::Initialize_Stats()
 {
     m_fMinDetectionDistance = 4.f;
+    m_fEncounterDistance = 20.f;
     return S_OK;
 }
 #pragma endregion
@@ -287,6 +306,10 @@ HRESULT CWolfDevil::InitializeAction_ToAnimationMap()
     // 같은 애니메이션이지만 다른 이름으로 설정해서 Node에서 사용할 수 있게함.
     m_Action_AnimMap.emplace(L"DETECT", WOLFDEVIL_RUN); 
     m_Action_AnimMap.emplace(L"STUN", WOLFDEVIL_STUN);
+
+    m_Action_AnimMap.emplace(L"PREV_ENCOUNTER", WOLFDEVIL_NONFIGHT_IDLE_SIT);
+    m_Action_AnimMap.emplace(L"ENCOUNTER", WOLFDEVIL_THREAT_SIT_01);
+
 
     /* 재생속도 증가. */ 
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"DEATH_NORMAL"], 2.f);
@@ -454,24 +477,6 @@ HRESULT CWolfDevil::Ready_Render_Resources()
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_Transform_Float4x4(D3DTS::PROJ))))
         return E_FAIL;
 
-    const LIGHT_DESC* pLightDesc = m_pGameInstance->Get_LightDesc(0);
-    if (nullptr == pLightDesc)
-        return E_FAIL;
-
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDir", &pLightDesc->vDirection, sizeof(_float4))))
-        return E_FAIL;
-
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDiffuse", &pLightDesc->vDiffuse, sizeof(_float4))))
-        return E_FAIL;
-
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightAmbient", &pLightDesc->vAmbient, sizeof(_float4))))
-        return E_FAIL;
-
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightSpecular", &pLightDesc->vSpecular, sizeof(_float4))))
-        return E_FAIL;
-
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
-        return E_FAIL;
 
     return S_OK;
 }
@@ -522,6 +527,54 @@ HRESULT CWolfDevil::Initialize_ColliderFrames()
     return S_OK;
 }
 
+#pragma region DAMAGE
+void CWolfDevil::Take_Damage(_float fDamage, CGameObject* pGameObject)
+{
+    CMonster::Take_Damage(fDamage, pGameObject);
+    Decrease_HpUI(fDamage, 0.1f);
+}
+
+void CWolfDevil::Increase_HpUI(_float fHp, _float fTime)
+{
+    m_pMonsterHpBar->Increase_Hp(fHp, fTime);
+}
+
+void CWolfDevil::Decrease_HpUI(_float fHp, _float fTime)
+{
+    m_pMonsterHpBar->Decrease_HpUI(fHp, fTime);
+}
+
+HRESULT CWolfDevil::Initialize_UI()
+{
+    CMonsterHpBar::MONSTERHPUI_DESC Desc{};
+
+    // 정중앙 위치
+    _float fRadius = static_cast<CBounding_Sphere::BOUNDING_SPHERE_DESC*>(m_pColliderCom->Get_BoundingDesc())->fRadius;
+    Desc.vOffset = { 0.f, fRadius * 2.f }; // x, y 오프셋 값.
+    Desc.vScale = { 1.f, 1.f, 1.f }; // x, y, z 크기.
+    Desc.eShaderPath = POSTEX_SHADERPATH::MONSTERHP_PROGRESSBAR;
+    Desc.fSizeX = 150.f;
+    Desc.fSizeY = 10.f;
+    Desc.fMaxHp = m_MonsterStat.fMaxHP;
+
+
+    m_pMonsterHpBar = static_cast<CMonsterHpBar*>(m_pGameInstance->Clone_Prototype(
+        PROTOTYPE::GAMEOBJECT
+        , ENUM_CLASS(LEVEL::STATIC)
+        , TEXT("Prototype_GameObject_MonsterHPBar"), &Desc));
+
+    if (!m_pMonsterHpBar)
+    {
+        MSG_BOX(TEXT("Failed to Create MonsterHPBar"));
+        return E_FAIL;
+    }
+
+    return S_OK;
+}
+
+#pragma endregion
+
+
 
 CWolfDevil* CWolfDevil::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
@@ -559,6 +612,7 @@ void CWolfDevil::Free()
     CMonster::Free();
     Safe_Release(m_pTree);
     Safe_Release(m_pWeapon);
+    Safe_Release(m_pMonsterHpBar);
 }
 
 

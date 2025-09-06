@@ -1,6 +1,4 @@
-﻿#include "HPBar.h"
-
-CHPBar::CHPBar(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿CHPBar::CHPBar(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CUIObject(pDevice, pContext)
 {
 }
@@ -10,49 +8,7 @@ CHPBar::CHPBar(const CHPBar& Prototype)
 {
 }
 
-/*
-* 주의점 : 플레이어의 무적 시간 만큼 제공해야합니다. (피격 시간) 
-* 피격 시간 이내에 한번 더 맞았을 경우 효과가 제대로 안나올 수도 있음.
-*/
-void CHPBar::Increase_Hp(_float fHp, _float fTime)
-{
-    if (m_bDecrease)
-    {
-        m_fLeftRatio = m_fRightRatio;
-        m_fHp = m_fHp < fHp ? 0 : m_fHp + fHp;
-        m_fRightRatio = static_cast<_float>(m_fHp) / static_cast<_float>(m_fMaxHp);
-        m_bDecrease = false;
-    }
-    else
-    {
-        m_fLeftRatio = static_cast<_float>(m_fHp) / static_cast<_float>(m_fMaxHp);
-        m_fHp = min(m_fHp + fHp, m_fMaxHp);
-        m_fRightRatio = static_cast<_float>(m_fHp) / static_cast<_float>(m_fMaxHp);
-    }
-    
-    m_bIncrease = true;
-}
-
-void CHPBar::Decrease_Hp(_float fHp, _float fTime)
-{
-    if (m_bIncrease)
-    {
-        m_fRightRatio = m_fLeftRatio;
-        m_fHp = m_fHp < fHp ? 0 : m_fHp - fHp;
-        m_fLeftRatio = static_cast<_float>(m_fHp) / static_cast<_float>(m_fMaxHp);
-        m_bIncrease = false;
-    }
-    else
-    {
-        m_fRightRatio = static_cast<_float>(m_fHp) / static_cast<_float>(m_fMaxHp);
-        m_fHp = max(m_fHp - fHp, 0);
-        m_fLeftRatio = static_cast<_float>(m_fHp) / static_cast<_float>(m_fMaxHp);
-    }
-
-    
-    m_bDecrease = true;
-}
-
+#pragma region 기본 함수들
 HRESULT CHPBar::Initialize_Prototype()
 {
     return S_OK;
@@ -63,9 +19,14 @@ HRESULT CHPBar::Initialize_Clone(void* pArg)
     if (FAILED(CUIObject::Initialize_Clone(pArg)))
         return E_FAIL;
 
-    m_iTextureIndex = 0;
+    m_iDiffuseIndex = 0;
+    m_iNoiseIndex = 1;
+
     m_fMaxHp = 1672;
-    m_fHp    = m_fMaxHp;
+    m_fHp = m_fMaxHp;
+
+    m_iShaderPath = static_cast<_uint>(POSTEX_SHADERPATH::HPPROGRESSBAR);
+    m_fScrollSpeed = 0.1f;
 
     if (FAILED(Ready_Components()))
         return E_FAIL;
@@ -76,10 +37,12 @@ HRESULT CHPBar::Initialize_Clone(void* pArg)
     return S_OK;
 }
 
+
+
 void CHPBar::Priority_Update(_float fTimeDelta)
 {
-    
-    
+
+
     if (m_bDecrease)
     {
         if (m_fRightRatio <= m_fLeftRatio)
@@ -103,7 +66,7 @@ void CHPBar::Priority_Update(_float fTimeDelta)
             m_fLeftRatio += fTimeDelta * 0.2f;
     }
 
-    
+
 
     CUIObject::Priority_Update(fTimeDelta);
 
@@ -114,6 +77,8 @@ void CHPBar::Priority_Update(_float fTimeDelta)
 void CHPBar::Update(_float fTimeDelta)
 {
     CUIObject::Update(fTimeDelta);
+
+    Time_Calc(fTimeDelta);
 }
 
 void CHPBar::Late_Update(_float fTimeDelta)
@@ -124,18 +89,23 @@ void CHPBar::Late_Update(_float fTimeDelta)
         return;
 
 
-    
+
 }
+#pragma endregion
+
+
+
 
 HRESULT CHPBar::Render()
 {
+
     CUIObject::Begin();
 
   
     if (FAILED(Ready_Render_Resources()))
         return E_FAIL;
 
-    m_pShaderCom->Begin(5);
+    m_pShaderCom->Begin(m_iShaderPath);
 
     m_pVIBufferCom->Bind_Resources();
 
@@ -147,6 +117,49 @@ HRESULT CHPBar::Render()
     CUIObject::End();
 
     return S_OK;
+}
+
+/*
+* 주의점 : 플레이어의 무적 시간 만큼 제공해야합니다. (피격 시간)
+* 피격 시간 이내에 한번 더 맞았을 경우 효과가 제대로 안나올 수도 있음.
+*/
+void CHPBar::Increase_Hp(_float fHp, _float fTime)
+{
+    if (m_bDecrease)
+    {
+        m_fLeftRatio = m_fRightRatio;
+        m_fHp = m_fHp < fHp ? 0 : m_fHp + fHp;
+        m_fRightRatio = static_cast<_float>(m_fHp) / static_cast<_float>(m_fMaxHp);
+        m_bDecrease = false;
+    }
+    else
+    {
+        m_fLeftRatio = static_cast<_float>(m_fHp) / static_cast<_float>(m_fMaxHp);
+        m_fHp = min(m_fHp + fHp, m_fMaxHp);
+        m_fRightRatio = static_cast<_float>(m_fHp) / static_cast<_float>(m_fMaxHp);
+    }
+
+    m_bIncrease = true;
+}
+
+void CHPBar::Decrease_Hp(_float fHp, _float fTime)
+{
+    if (m_bIncrease)
+    {
+        m_fRightRatio = m_fLeftRatio;
+        m_fHp = m_fHp < fHp ? 0 : m_fHp - fHp;
+        m_fLeftRatio = static_cast<_float>(m_fHp) / static_cast<_float>(m_fMaxHp);
+        m_bIncrease = false;
+    }
+    else
+    {
+        m_fRightRatio = static_cast<_float>(m_fHp) / static_cast<_float>(m_fMaxHp);
+        m_fHp = max(m_fHp - fHp, 0);
+        m_fLeftRatio = static_cast<_float>(m_fHp) / static_cast<_float>(m_fMaxHp);
+    }
+
+
+    m_bDecrease = true;
 }
 
 void CHPBar::Render_HP()
@@ -168,6 +181,19 @@ void CHPBar::Render_HP()
 
     m_pGameInstance->Render_Font(TEXT("KR_TEXT"), szNextBuffer
         , vPosition, XMVectorSet(1.f, 1.f, 1.f, 1.f), 0.f, {}, 0.7f);
+}
+
+void CHPBar::Time_Calc(_float fTimeDelta)
+{
+    m_fNoiseTime += fTimeDelta;
+    //if (m_fNoiseTime >= m_fNoiseMaxTime)
+    //{
+    //    m_fNoiseTime = 0.f;
+    //}
+    //else
+    //{
+    //    m_fNoiseTime += fTimeDelta;
+    //}
 }
 
 HRESULT CHPBar::Ready_Components()
@@ -199,20 +225,34 @@ HRESULT CHPBar::Ready_Render_Resources()
 
 
     _float fFillRatio = 1.f - (static_cast<_float>(m_fHp) / static_cast<_float>(m_fMaxHp));
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_fFillRatio", static_cast<void*>(&fFillRatio), sizeof(fFillRatio))))
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fFillRatio", static_cast<void*>(&fFillRatio), sizeof(_float))))
         return E_FAIL;
 
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_fLeftRatio", static_cast<void*>(&m_fLeftRatio), sizeof(m_fLeftRatio))))
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fLeftRatio", static_cast<void*>(&m_fLeftRatio), sizeof(_float))))
         return E_FAIL;
 
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_fRightRatio", static_cast<void*>(&m_fRightRatio), sizeof(m_fRightRatio))))
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fRightRatio", static_cast<void*>(&m_fRightRatio), sizeof(_float))))
         return E_FAIL;
 
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_bIncrease", static_cast<void*>(&m_bIncrease), sizeof(m_bIncrease))))
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_bIncrease", static_cast<void*>(&m_bIncrease), sizeof(_bool))))
         return E_FAIL;
 
-    if (FAILED(m_pTextureCom->Bind_Shader_Resource(m_pShaderCom, "g_Texture", m_iTextureIndex)))
+    // Noise Time
+    //_float fNoiseTime  = Normalize(m_fNoiseTime, 0.f, m_fNoiseMaxTime);
+
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fNoiseTime", static_cast<void*>(&m_fNoiseTime), sizeof(_float))))
         return E_FAIL;
+
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fScrollSpeed", static_cast<void*>(&m_fScrollSpeed), sizeof(_float))))
+        return E_FAIL;
+
+    if (FAILED(m_pTextureCom->Bind_Shader_Resource(m_pShaderCom, "g_Texture", m_iDiffuseIndex)))
+        return E_FAIL;
+
+    if (FAILED(m_pTextureCom->Bind_Shader_Resource(m_pShaderCom, "g_NoiseTexture", m_iNoiseIndex)))
+        return E_FAIL;
+
+    
 
     return S_OK;
 }
@@ -288,3 +328,26 @@ void CHPBar::Free()
     
     Safe_Release(m_pTextureCom);
 }
+
+#ifdef _DEBUG
+void CHPBar::ImGui_Render()
+{
+    ImGuiIO& io = ImGui::GetIO();
+
+    // 기존 Player Debug Window
+
+    ImVec2 windowSize = ImVec2(300.f, 300.f);
+    ImVec2 windowPos = ImVec2(windowSize.x, 0.f);
+    ImGui::SetNextWindowPos(windowPos, ImGuiCond_Once);
+    ImGui::SetNextWindowSize(windowSize, ImGuiCond_Once);
+
+    string strDebug = "HpBar Debug";
+    ImGui::Begin(strDebug.c_str(), nullptr, ImGuiWindowFlags_NoCollapse);
+   
+    ImGui::InputFloat("HPBar NoiseMaxTime", &m_fNoiseMaxTime);
+    ImGui::Text("HP Bar MaxTime : %.2f", m_fNoiseMaxTime);
+    ImGui::End();
+}
+#endif // _DEBUG
+
+

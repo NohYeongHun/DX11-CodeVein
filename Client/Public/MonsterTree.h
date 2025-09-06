@@ -22,6 +22,9 @@ public:
     
 #pragma region 특수 상태 제어. Selector -> Buff Sequence
 private:
+    CBTSequence* Create_EncounterStates_ToSequence();
+
+private:
     CBTSelector* Create_SpecialStates_ToSelector();
 
     CBTSequence* Create_SurvivalCheck_ToSequence();
@@ -31,10 +34,11 @@ private:
 
 
 #pragma region 기본 상태 제어 Selector -> Action Sequence
+
 private:
     CBTSelector* Create_ActionStates_ToSelector();
 
-private:
+
     CBTSequence* Create_Rotate_ToSequence();
 
     /* 액션 행동 체크 */

@@ -1,7 +1,4 @@
-﻿#include "Level_Loading.h"
-
-
-CLevel_Loading::CLevel_Loading(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿CLevel_Loading::CLevel_Loading(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CLevel { pDevice, pContext }
 {
 }
@@ -33,6 +30,8 @@ HRESULT CLevel_Loading::Initialize_Clone(LEVEL eNextLevelID)
 */
 void CLevel_Loading::Update(_float fTimeDelta)
 {
+
+
 	/*if (true == m_pLoader->isFinished() && 
 		GetKeyState(VK_SPACE) & 0x8000)*/
 

@@ -5,6 +5,13 @@ sampler DefaultSampler = sampler_state
     AddressV = wrap;
 };
 
+sampler PointSampler = sampler_state
+{
+    filter = min_mag_mip_point;
+    AddressU = wrap;
+    AddressV = wrap;
+};
+
 
 RasterizerState RS_Default
 {

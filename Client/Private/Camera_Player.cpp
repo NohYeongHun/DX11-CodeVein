@@ -1,6 +1,4 @@
-﻿#include "Camera_Player.h"
-
-CCamera_Player::CCamera_Player(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿CCamera_Player::CCamera_Player(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CCamera(pDevice, pContext)
 {
 }
@@ -41,15 +39,16 @@ HRESULT CCamera_Player::Initialize_Clone(void* pArg)
 	// 마우스 커서 클립 활성화
 	Enable_Mouse_Clip();
 
-	// LockOn UI 생성
+#pragma region LOCK ON UI 생성
 	CLockOnUI::LOCKONUI_DESC UIDesc{};
 	UIDesc.fSizeX = 64.0f;
 	UIDesc.fSizeY = 64.0f;
+	UIDesc.eShaderPath = POSTEX_SHADERPATH::LOCKON;
 	m_pLockOnUI = static_cast<CLockOnUI*>(m_pGameInstance->Clone_Prototype(
 		PROTOTYPE::GAMEOBJECT
 		, ENUM_CLASS(LEVEL::STATIC)
-		,TEXT("Prototype_GameObject_LockOnUI"), &UIDesc));
-	
+		, TEXT("Prototype_GameObject_LockOnUI"), &UIDesc));
+
 	if (!m_pLockOnUI)
 	{
 		MSG_BOX(TEXT("Failed to create LockOn UI"));
@@ -57,6 +56,9 @@ HRESULT CCamera_Player::Initialize_Clone(void* pArg)
 	}
 
 	return S_OK;
+#pragma endregion
+
+
 }
 
 void CCamera_Player::Priority_Update(_float fTimeDelta)
@@ -112,34 +114,11 @@ void CCamera_Player::Late_Update(_float fTimeDelta)
 
 HRESULT CCamera_Player::Render()
 {
+#ifdef _DEBUG
+	//ImGui_Render();
+#endif // _DEBUG
 
-//#ifdef _DEBUG
-//	ImGuiIO& io = ImGui::GetIO();
-//
-//	// 기존 Player Debug Window
-//
-//	ImVec2 windowSize = ImVec2(300.f, 300.f);
-//	ImVec2 windowPos = ImVec2(0.f, 0.f);
-//
-//	ImGui::SetNextWindowPos(windowPos, ImGuiCond_Once);
-//	ImGui::SetNextWindowSize(windowSize, ImGuiCond_Once);
-//
-//	ImGui::Begin("CC", nullptr, ImGuiWindowFlags_NoCollapse);
-//
-//	_float3 vPos = {};
-//	XMStoreFloat3(&vPos, m_pTransformCom->Get_State(STATE::POSITION));
-//
-//	if (m_bLockOnMode)
-//	{
-//		ImGui::Text("Lock On Camera Pos : (%.2f, %.2f, %.2f)", vPos.x, vPos.y, vPos.z);
-//	}
-//	else
-//	{
-//		ImGui::Text("Normal Camera Pos : (%.2f, %.2f, %.2f)", vPos.x, vPos.y, vPos.z);
-//	}
-//
-//	ImGui::End();
-//#endif // _DEBUG
+
 
 	return S_OK;
 }
@@ -587,6 +566,38 @@ void CCamera_Player::Debug_CameraVectors()
 		std::to_wstring(XMVectorGetY(vLook)) + L", " +
 		std::to_wstring(XMVectorGetZ(vLook)) + L")\n").c_str());
 }
+
+#ifdef _DEBUG
+void CCamera_Player::ImGui_Render()
+{
+	
+	ImGuiIO& io = ImGui::GetIO();
+
+	// 기존 Player Debug Window
+
+	ImVec2 windowSize = ImVec2(300.f, 300.f);
+	ImVec2 windowPos = ImVec2(0.f, 0.f);
+
+	ImGui::SetNextWindowPos(windowPos, ImGuiCond_Once);
+	ImGui::SetNextWindowSize(windowSize, ImGuiCond_Once);
+
+	ImGui::Begin("CC", nullptr, ImGuiWindowFlags_NoCollapse);
+
+	_float3 vPos = {};
+	XMStoreFloat3(&vPos, m_pTransformCom->Get_State(STATE::POSITION));
+
+	if (m_bLockOnMode)
+	{
+		ImGui::Text("Lock On Camera Pos : (%.2f, %.2f, %.2f)", vPos.x, vPos.y, vPos.z);
+	}
+	else
+	{
+		ImGui::Text("Normal Camera Pos : (%.2f, %.2f, %.2f)", vPos.x, vPos.y, vPos.z);
+	}
+
+	ImGui::End();
+}
+#endif // _DEBUG
 
 CCamera_Player* CCamera_Player::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {

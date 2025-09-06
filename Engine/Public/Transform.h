@@ -133,6 +133,7 @@ public:
 	_float3 Get_Scale();
 
 	void Add_Rotation(_float fPitch, _float fYaw, _float fRoll);
+	void Add_Inverse_Rotation(_float fPitch, _float fYaw, _float fRoll);
 	_float3 Get_EulerAngles() const;
 	void LookAt(const _float3& vTargetPos, const _float3& vUp = { 0.f, 1.f, 0.f });
 

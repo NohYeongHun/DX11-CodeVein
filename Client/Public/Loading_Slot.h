@@ -15,10 +15,8 @@ private:
 	virtual ~CLoading_Slot() = default;
 
 public:
-	void Change_Shader_Pass(_uint iPass)
-	{
-		m_iCurrentPass = iPass;
-	}
+	void Change_Shader_Pass(_uint iShaderPath);
+	
 
 public:
 	virtual HRESULT Initialize_Prototype();
@@ -35,7 +33,7 @@ private:
 	CTexture* m_pTextureCom = { nullptr };
 
 	_uint m_iTextureIndex = {};
-	_uint m_iCurrentPass = {};
+	_uint m_iShaderPath = {};
 
 	_bool  m_IsCoolTime = { false };
 	_float m_fCoolTime = { 2.f };

@@ -67,53 +67,23 @@ void CSlaveVampireSword::Update(_float fTimeDelta)
 void CSlaveVampireSword::Late_Update(_float fTimeDelta)
 {
     CWeapon::Late_Update(fTimeDelta);
-    if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::BLEND, this)))
+    if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::NONBLEND, this)))
         return;
+
+#ifdef _DEBUG
+    if (FAILED(m_pGameInstance->Add_DebugComponent(m_pColliderCom)))
+        return;
+#endif // _DEBUG
+
 }
 
 HRESULT CSlaveVampireSword::Render()
 {
-#ifdef _DEBUG
-    ////Edit_Collider(m_pColliderCom, "SlaveVampireTag");
-    //ImGuiIO& io = ImGui::GetIO();
-
-    //// 기존 Player Debug Window
-
-    //ImVec2 windowSize = ImVec2(300.f, 300.f);
-    //ImVec2 windowPos = ImVec2(io.DisplaySize.x - windowSize.x, windowSize.y);
-
-    //ImGui::SetNextWindowPos(windowPos, ImGuiCond_Once);
-    //ImGui::SetNextWindowSize(windowSize, ImGuiCond_Once);
-
-    //string strDebug = "VampireGreat Sword";
-    //ImGui::Begin(strDebug.c_str(), nullptr, ImGuiWindowFlags_NoCollapse);
-
-    //_float3 vPos = {};
-
-    //static _float vRotation[3] = { 0.f, 0.f, 0.f };
-    //ImGui::InputFloat3("Rotation", vRotation);
-
-    //if (ImGui::Button("Apply"))
-    //{
-    //    m_pTransformCom->Add_Rotation(vRotation[0], vRotation[1], vRotation[2]);
-    //}
-
-    ///* 정보 표시. */
-    //ImGui::Text("Rotation : (%.2f, %.2f, %.2f)", vRotation[0], vRotation[1], vRotation[2]);
-    //ImGui::Separator();
-
-    //ImGui::End();
-
-    m_pColliderCom->Render();
-#endif // _DEBUG
-
-
     if (FAILED(Bind_ShaderResources()))
     {
         CRASH("Ready Render Resource Failed");
         return E_FAIL;
     }
-
 
     _uint           iNumMeshes = m_pModelCom->Get_NumMeshes();
 
@@ -122,7 +92,7 @@ HRESULT CSlaveVampireSword::Render()
         if (FAILED(m_pModelCom->Bind_Materials(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE, 0)))
             return E_FAIL;
 
-        m_pShaderCom->Begin(0);
+        m_pShaderCom->Begin(m_iShaderPath);
 
         m_pModelCom->Render(i);
     }
@@ -290,3 +260,40 @@ void CSlaveVampireSword::Free()
 {
     CWeapon::Free();
 }
+
+#ifdef _DEBUG
+void CSlaveVampireSword::ImGui_Render()
+{
+    //Edit_Collider(m_pColliderCom, "SlaveVampireTag");
+    ImGuiIO& io = ImGui::GetIO();
+
+    // 기존 Player Debug Window
+
+    ImVec2 windowSize = ImVec2(300.f, 300.f);
+    ImVec2 windowPos = ImVec2(io.DisplaySize.x - windowSize.x, windowSize.y);
+
+    ImGui::SetNextWindowPos(windowPos, ImGuiCond_Once);
+    ImGui::SetNextWindowSize(windowSize, ImGuiCond_Once);
+
+    string strDebug = "VampireGreat Sword";
+    ImGui::Begin(strDebug.c_str(), nullptr, ImGuiWindowFlags_NoCollapse);
+
+    _float3 vPos = {};
+
+    static _float vRotation[3] = { 0.f, 0.f, 0.f };
+    ImGui::InputFloat3("Rotation", vRotation);
+
+    if (ImGui::Button("Apply"))
+    {
+        m_pTransformCom->Add_Rotation(vRotation[0], vRotation[1], vRotation[2]);
+    }
+
+    /* 정보 표시. */
+    ImGui::Text("Rotation : (%.2f, %.2f, %.2f)", vRotation[0], vRotation[1], vRotation[2]);
+    ImGui::Separator();
+
+    ImGui::End();
+
+
+}
+#endif // _DEBUG

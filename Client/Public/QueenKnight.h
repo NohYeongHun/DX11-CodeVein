@@ -112,11 +112,15 @@ public:
 	/* 어떤 파츠의 Colider를 제어할 것인지? */
 	virtual void Enable_Collider(_uint iType) override;
 	virtual void Disable_Collider(_uint iType) override;
+
+	/* 무기를 특정 애니메이션에 회전 시켜놓기 위함.*/
+public:
+	virtual void Weapon_Rotation(_uint iPartType, _float3 vRadians, _bool bInverse = false) override;
+	virtual void Encounter_Action() override;
 #pragma endregion
 
 #pragma region 7. 보스몹 체력 UI 관리
 public:
-	virtual void Take_Damage(_float fDamage) override;
 	virtual void Take_Damage(_float fDamage, CGameObject* pGameObject) override;
 
 	virtual void Increase_HpUI(_float fHp, _float fTime) override;
@@ -147,8 +151,8 @@ public:
 	void Create_QueenKnightWarp_Effect_Particle(_float3 vDir);
 
 public:
-	void Start_Dissolve(); // Dissolve 재생.
-	void ReverseStart_Dissolve(); // Dissolve 역재생
+	void Start_Dissolve(_float fDuration = 0.f); // Dissolve 재생.
+	void ReverseStart_Dissolve(_float fDuration = 0.f); // Dissolve 역재생
 	void End_Dissolve();
 
 
@@ -160,7 +164,7 @@ private:
 	_uint m_iShaderPath = {};
 	_float m_fDissolveTime = {};
 
-	_float m_fMaxDissovleTime = {};
+	_float m_fMaxDissolveTime = {};
 	_float m_fCurDissolveTime = {};
 
 	_float m_fReverseDissolveTime = {};

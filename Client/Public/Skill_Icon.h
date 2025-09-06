@@ -1,6 +1,4 @@
 ﻿#pragma once
-#include "UIObject.h"
-
 NS_BEGIN(Client)
 
 /*
@@ -12,6 +10,7 @@ public:
 	typedef struct tagSkillIconDesc : CUIObject::UIOBJECT_DESC
 	{
 		_uint iTextureIndex = {};
+		POSTEX_SHADERPATH eShaderPath = {};
 	}SKILLICON_DESC;
 
 private:
@@ -36,6 +35,7 @@ private:
 	CTexture* m_pTextureCom = { nullptr };
 
 	_uint m_iTextureIndex = {};
+	_uint m_iShaderPath = {};
 
 	/* 스킬 정보? */
 	

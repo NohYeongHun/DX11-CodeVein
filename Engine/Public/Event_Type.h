@@ -69,6 +69,7 @@ typedef struct tagHPSyncronizeDesc
 
 typedef struct tagSteminaChangeDesc
 {
+	_float fStemina;
 	_uint iStemina;
 	_float fTime;
 	_bool bIncrease;

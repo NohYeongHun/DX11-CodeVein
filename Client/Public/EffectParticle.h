@@ -133,6 +133,16 @@ public:
     static CEffectParticle* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
     virtual CGameObject* Clone(void* pArg) override;
     virtual void Free() override;
+
+#pragma region DEBUG 용도
+
+#pragma endregion
+
+#ifdef _DEBUG
+private:
+    void ImGui_Render();
+#endif // _DEBUG
+
 };
 NS_END
 

@@ -1,6 +1,4 @@
-﻿#include "TitleText.h"
-
-CTitleText::CTitleText(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿CTitleText::CTitleText(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CUIObject{ pDevice, pContext }
 {
 }
@@ -28,6 +26,7 @@ HRESULT CTitleText::Initialize_Clone(void* pArg)
         return E_FAIL;
 
     m_iTextureIndex = pDesc->iTextureIndex;
+    m_iShaderPath = static_cast<_uint>(pDesc->eShaderPath);
 
     if (FAILED(Ready_Components()))
         return E_FAIL;
@@ -62,7 +61,7 @@ HRESULT CTitleText::Render()
     if (FAILED(Ready_Render_Resource()))
         return E_FAIL;
 
-    m_pShaderCom->Begin(m_iPassIdx);
+    m_pShaderCom->Begin(m_iShaderPath);
 
     m_pVIBufferCom->Bind_Resources();
 
@@ -77,7 +76,7 @@ void CTitleText::Start_FadeOut()
 {
     m_IsFadeOut = true;
     m_fFadeTime = 0.f;
-    m_iPassIdx = 3; // FadeOut
+    m_iShaderPath = static_cast<_uint>(POSTEX_SHADERPATH::FADEOUT); // FadeOut
 }
 
 void CTitleText::Time_Calc(_float fTimeDelta)

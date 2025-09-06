@@ -35,8 +35,6 @@ HRESULT CEffectParticle::Initialize_Clone(void* pArg)
     m_isLoop = pDesc->isLoop;
     m_eParticleType = pDesc->eParticleType;
     m_iShaderPath = pDesc->iShaderPath;
-    //m_iShaderPath = 2;
-    
     m_isBillBoard = pDesc->isBillBoard;
 
     /* 사용할 텍스쳐의 인덱스를 지정해줍니다. */
@@ -119,47 +117,10 @@ void CEffectParticle::Late_Update(_float fTimeDelta)
 HRESULT CEffectParticle::Render()
 {
 #ifdef _DEBUG
-    ImGuiIO& io = ImGui::GetIO();
-
-    // 기존 Player Debug Window
-
-    ImVec2 windowSize = ImVec2(300.f, 00.f);
-    ImVec2 windowPos = ImVec2(0.f, 0.f);
-    ImGui::SetNextWindowPos(windowPos, ImGuiCond_Once);
-    ImGui::SetNextWindowSize(windowSize, ImGuiCond_Once);
-
-    string strDebug = "QueenKnight Effect Debug";
-    ImGui::Begin(strDebug.c_str(), nullptr, ImGuiWindowFlags_NoCollapse);
-
-    _float3 vPos = {};
-    XMStoreFloat3(&vPos, m_pTransformCom->Get_State(STATE::POSITION));
-    ImGui::Text("POS : (%.2f, %.2f, %.2f)", vPos.x, vPos.y, vPos.z);
-    
-    ImGui::Text("IsActivate : %s", m_IsActivate ? "TRUE" : "FALSE");
-    ImGui::Text("ParticleType : %d", m_eParticleType);
-    ImGui::Text("ShaderPath : %d", m_iShaderPath);
-    ImGui::Text("CurrentTime : %.2f / %.2f", m_fCurrentTime, m_fDisplayTime);
-    
-    if (m_pVIBufferCom)
-    {
-        ImGui::Text("VIBuffer : Valid");
-        // 파티클 인스턴스 수 확인 (VIBuffer 클래스에 getter가 있다면)
-        ImGui::Text("Active Particles: %d", m_pVIBufferCom->Get_LiveParticleCount());
-
-
-    }
-    else
-    {
-        ImGui::Text("VIBuffer : NULL");
-    }
-
-    ImGui::End();
-    
-
+    ImGui_Render();
 #endif // _DEBUG
 
     HRESULT hr;
-    
     hr = Bind_ShaderResources();
     if (FAILED(hr))
     {
@@ -188,15 +149,6 @@ HRESULT CEffectParticle::Render()
         CRASH("Failed Render Failed");
         return E_FAIL;
     }
-
-    // 셰이더 상태 정리
-    //m_pShaderCom->End();
-    
-    // Geometry Shader 해제
-    //m_pContext->GSSetShader(nullptr, nullptr, 0);
-    
-    // 추가 렌더 상태 정리 (필요시)
-    // m_pContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
     return S_OK;
 }
@@ -520,3 +472,43 @@ void CEffectParticle::Free()
         Safe_Release(pTexture);
     Safe_Release(m_pVIBufferCom);
 }
+
+#ifdef _DEBUG
+void CEffectParticle::ImGui_Render()
+{
+    ImGuiIO& io = ImGui::GetIO();
+
+    // 기존 Player Debug Window
+    ImVec2 windowSize = ImVec2(300.f, 00.f);
+    ImVec2 windowPos = ImVec2(0.f, 0.f);
+    ImGui::SetNextWindowPos(windowPos, ImGuiCond_Once);
+    ImGui::SetNextWindowSize(windowSize, ImGuiCond_Once);
+
+    string strDebug = "QueenKnight Effect Debug";
+    ImGui::Begin(strDebug.c_str(), nullptr, ImGuiWindowFlags_NoCollapse);
+
+    _float3 vPos = {};
+    XMStoreFloat3(&vPos, m_pTransformCom->Get_State(STATE::POSITION));
+    ImGui::Text("POS : (%.2f, %.2f, %.2f)", vPos.x, vPos.y, vPos.z);
+
+    ImGui::Text("IsActivate : %s", m_IsActivate ? "TRUE" : "FALSE");
+    ImGui::Text("ParticleType : %d", m_eParticleType);
+    ImGui::Text("ShaderPath : %d", m_iShaderPath);
+    ImGui::Text("CurrentTime : %.2f / %.2f", m_fCurrentTime, m_fDisplayTime);
+
+    if (m_pVIBufferCom)
+    {
+        ImGui::Text("VIBuffer : Valid");
+        // 파티클 인스턴스 수 확인 (VIBuffer 클래스에 getter가 있다면)
+        ImGui::Text("Active Particles: %d", m_pVIBufferCom->Get_LiveParticleCount());
+
+
+    }
+    else
+    {
+        ImGui::Text("VIBuffer : NULL");
+    }
+
+    ImGui::End();
+}
+#endif // _DEBUG

@@ -70,14 +70,17 @@ void CWolfWeapon::Late_Update(_float fTimeDelta)
     CWeapon::Late_Update(fTimeDelta);
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::BLEND, this)))
         return;
+    
+#ifdef _DEBUG
+    if (FAILED(m_pGameInstance->Add_DebugComponent(m_pColliderCom)))
+        return;
+#endif // _DEBUG
+
+    
 }
 
 HRESULT CWolfWeapon::Render()
 {
-#ifdef _DEBUG
-    m_pColliderCom->Render();
-#endif // _DEBUG
-
     return S_OK;
 }
 

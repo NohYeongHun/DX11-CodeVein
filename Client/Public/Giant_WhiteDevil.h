@@ -21,7 +21,7 @@ public:
 public:
 	typedef struct tagGiantWhiteDevil : public CMonster::MONSTER_DESC
 	{
-
+		ANIMESH_SHADERPATH eShaderPath = { ANIMESH_SHADERPATH::NONE };
 	}GIANTWHITEDEVIL_DESC;
 
 private:
@@ -66,18 +66,6 @@ private:
 #pragma region 3. 몬스터는 자신에게 필요한 수치값들을 초기화해야한다.
 public:
 	virtual HRESULT Initialize_Stats() override;
-
-
-	//public:
-	//	_bool Is_TargetDashRange();
-	//	_bool Is_TargetDodgeRange();
-	//	_bool Is_TargetDownStrikeRange();
-	//
-	//private:
-	//	_float m_fDashMaxDistance = {};
-	//	_float m_fDashMinDistance = {};
-	//	_float m_fDashDodgeDistance = {};
-	//	_float m_fDownStrikeDistance = {};
 #pragma endregion
 
 #pragma region 4. 몬스터는 자신의 애니메이션을 관리해야한다.
@@ -99,7 +87,6 @@ public:
 
 #pragma region 7. 보스몹 체력 UI 관리
 public:
-	virtual void Take_Damage(_float fDamage) override;
 	virtual void Take_Damage(_float fDamage, CGameObject* pGameObject) override;
 
 	virtual void Increase_HpUI(_float fHp, _float fTime) override;
@@ -134,5 +121,15 @@ public:
 	virtual void Destroy();
 	virtual void Free() override;
 #pragma endregion
+
+#pragma region IMGUI Render
+
+#ifdef _DEBUG
+private:
+	void ImGui_Render();
+#endif // _DEBUG
+
+#pragma endregion
+
 };
 NS_END

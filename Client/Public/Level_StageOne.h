@@ -1,6 +1,4 @@
 ﻿#pragma once
-#include "Level.h"
-
 NS_BEGIN(Client)
 class CLevel_StageOne final : public CLevel
 {

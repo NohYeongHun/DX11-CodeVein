@@ -46,7 +46,13 @@ void CBT_QueenKnight_DashAttackAction::Reset()
     m_eAttackPhase = ATTACK_PHASE::NONE;
     m_pOwner->Reset_Collider_ActiveInfo();
     m_IsChangeSpeed = false;
-    
+
+    // 증가한 속도. 다시 초기화.
+    m_pOwner->Set_Animation_Speed(m_pOwner->Find_AnimationIndex(TEXT("DODGE_B")), 1.5f);
+    m_IsSpeedChange = false;
+
+    m_pOwner->Enable_Collider(CQueenKnight::PART_BODY);
+    m_pOwner->Disable_Collider(CQueenKnight::PART_WEAPON);
 
 }
 
@@ -73,7 +79,7 @@ BT_RESULT CBT_QueenKnight_DashAttackAction::Enter_Attack(_float fTimeDelta)
 
     // 3. 크기 증가.
     _float3 vExtents = m_pOwner->Get_WeaponOBBExtents();
-    m_pOwner->WeaponOBB_ChangeExtents({ 1.f, 1.f, vExtents.z });
+    m_pOwner->WeaponOBB_ChangeExtents({ 1.f, 1.5f, vExtents.z * 2.f });
     
     return BT_RESULT::RUNNING;
 }
@@ -119,6 +125,10 @@ BT_RESULT CBT_QueenKnight_DashAttackAction::Update_Rotating(_float fTimeDelta)
             m_pOwner->Set_Animation_AddSpeed(
                 m_pOwner->Get_CurrentAnimation(), 1.2f);
 
+            // 5. DashTime 지정
+            m_fDashTime = 0.3f; // 0.5초만큼 더이동.
+
+
             return BT_RESULT::RUNNING;
         }
     }
@@ -128,6 +138,13 @@ BT_RESULT CBT_QueenKnight_DashAttackAction::Update_Rotating(_float fTimeDelta)
 
 BT_RESULT CBT_QueenKnight_DashAttackAction::Update_Dodge(_float fTimeDelta)
 {
+
+    if (!m_IsChangeSpeed && m_pOwner->Get_CurrentAnimationRatio() >= m_fDodgeRatio)
+    {
+        m_pOwner->Set_Animation_Speed(m_pOwner->Find_AnimationIndex(L"DODGE_B"), 2.3f);
+        m_IsChangeSpeed = true;
+    }
+
     if (m_pOwner->Is_Animation_Finished())
     {
         m_eAttackPhase = ATTACK_PHASE::FIRST_ATTACK;
@@ -149,6 +166,12 @@ BT_RESULT CBT_QueenKnight_DashAttackAction::Update_Dodge(_float fTimeDelta)
         // 4. 스피드 증가.
         m_pOwner->Set_Animation_AddSpeed(
             m_pOwner->Get_CurrentAnimation(), 1.2f);
+
+        // 5. 콜라이더 꺼서 통과시키기?
+        m_pOwner->Disable_Collider(CQueenKnight::PART_BODY);
+
+        // 6. Dash Time
+        m_fDashTime = 0.3f; // 0.5초만큼 더이동.
 
         return BT_RESULT::RUNNING;
     }
@@ -172,7 +195,7 @@ BT_RESULT CBT_QueenKnight_DashAttackAction::Update_Dodge(_float fTimeDelta)
 BT_RESULT CBT_QueenKnight_DashAttackAction::Update_FirstAttack(_float fTimeDelta)
 {
     // 공격 모션에 빠르게 이동.
-    if (m_pOwner->Get_CurrentAnimationRatio() > 0.8f)
+    if (m_pOwner->Get_CurrentAnimationRatio() > m_fDashRatio)
     {
         if (!m_IsChangeSpeed)
         {
@@ -180,17 +203,20 @@ BT_RESULT CBT_QueenKnight_DashAttackAction::Update_FirstAttack(_float fTimeDelta
             m_pOwner->Set_Animation_Speed(
                 m_pOwner->Get_CurrentAnimation(), m_fOriginSpeed);
         }
+        m_fDashTime -= fTimeDelta;
 
         _vector vLook = XMVector3Normalize(m_pOwner->Get_Transform()->Get_State(STATE::LOOK));
-        m_pOwner->Move_Direction(vLook, fTimeDelta * 2.f); // 완료 시점만 속도를 빠르게.
+        m_pOwner->Move_Direction(vLook, fTimeDelta * 1.7f); // 완료 시점만 속도를 빠르게.
     }
 
-    if (m_pOwner->Is_Animation_Finished())
+    if (m_pOwner->Is_Animation_Finished() && m_fDashTime <= 0.f)
     {
         m_eAttackPhase = ATTACK_PHASE::LAST_ATTACK;
 
         _uint iNextAnimationIdx = m_pOwner->Find_AnimationIndex(L"DASH_ATTACK_END");
         m_pOwner->Change_Animation_Blend(iNextAnimationIdx, false, 0.2f, true, true, true);
+       
+        m_pOwner->Disable_Collider(CQueenKnight::PART_WEAPON);
     }
 
 
@@ -199,6 +225,7 @@ BT_RESULT CBT_QueenKnight_DashAttackAction::Update_FirstAttack(_float fTimeDelta
 
 BT_RESULT CBT_QueenKnight_DashAttackAction::Update_LastAttack(_float fTimeDelta)
 {
+
     if (m_pOwner->Is_Animation_Finished())
     {
         m_eAttackPhase = ATTACK_PHASE::COMPLETED;
@@ -206,6 +233,12 @@ BT_RESULT CBT_QueenKnight_DashAttackAction::Update_LastAttack(_float fTimeDelta)
         _uint iNextAnimationIdx = m_pOwner->Find_AnimationIndex(L"IDLE");
         m_pOwner->Change_Animation_Blend(iNextAnimationIdx, false, 0.2f, true, true, true);
     }
+    //else
+    //{
+    //    _vector vLook = XMVector3Normalize(m_pOwner->Get_Transform()->Get_State(STATE::LOOK));
+    //    m_pOwner->Move_Direction(vLook, fTimeDelta * 1.5f); // 완료 시점만 속도를 빠르게.
+    //}
+
 
     return BT_RESULT::RUNNING;
 }

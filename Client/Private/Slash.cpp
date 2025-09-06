@@ -1,5 +1,4 @@
-﻿#include "Slash.h"
-CSlash::CSlash(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿CSlash::CSlash(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CGameObject(pDevice, pContext)
 {
 }
@@ -37,6 +36,7 @@ HRESULT CSlash::Initialize_Clone(void* pArg)
         return E_FAIL;
     }
 
+    m_iShaderPath = static_cast<_uint>(pDesc->eShaderPath);
 
 
 
@@ -53,6 +53,7 @@ void CSlash::Priority_Update(_float fTimeDelta)
 
 void CSlash::Update(_float fTimeDelta)
 {
+
     if (!m_IsActivate)
         return;
 
@@ -82,7 +83,11 @@ void CSlash::Late_Update(_float fTimeDelta)
 
     // UI 렌더 그룹에 추가
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::NONLIGHT, this)))
+    {
+        CRASH("Failed Add_RenderGroup Slash");
         return;
+    }
+        
 }
 
 HRESULT CSlash::Render()
@@ -101,14 +106,11 @@ HRESULT CSlash::Render()
         return E_FAIL;
     }
 
-
-    // UI용 쉐이더 패스 (LockOnPass = 패스 7)
-    if (FAILED(m_pShaderCom->Begin(9)))
+    if (FAILED(m_pShaderCom->Begin(m_iShaderPath)))
     {
         CRASH("Ready Shader Begin Failed");
         return E_FAIL;
     }
-
 
     if (FAILED(m_pVIBufferCom->Bind_Resources()))
     {
@@ -132,15 +134,15 @@ void CSlash::OnActivate(void* pArg)
     SLASHACTIVATE_DESC* pDesc = static_cast<SLASHACTIVATE_DESC*>(pArg);
     m_eCurLevel = pDesc->eCurLevel;
     m_vHitDirection = pDesc->vHitDirection;
+
     m_pTransformCom->Set_State(STATE::POSITION, pDesc->vHitPosition);
     m_fDisplayTime = pDesc->fDisPlayTime;
     // 2. 설정되었을때 Camera에 따른 방향을 재계산할 필요성이 존재.
     m_bDirectionCalculated = false;
     m_vScale = pDesc->vScale;
-    
-
     // 3. 위치 및 회전계산.
     Initialize_Transform();
+
     m_IsActivate = true;
 }
 
@@ -325,3 +327,11 @@ void CSlash::Free()
 
     
 }
+
+#ifdef _DEBUG
+void CSlash::ImGui_Render()
+{
+}
+#endif // _DEBUG
+
+

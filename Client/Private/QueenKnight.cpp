@@ -1,5 +1,4 @@
-﻿#include "QueenKnight.h"
-CQueenKnight::CQueenKnight(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿CQueenKnight::CQueenKnight(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CMonster(pDevice, pContext)
 {
 }
@@ -91,10 +90,6 @@ HRESULT CQueenKnight::Initialize_Clone(void* pArg)
         return E_FAIL;
     }
 
-
-
-
-
     _vector qInitRot = XMQuaternionRotationAxis(XMVectorSet(0.f, 1.f, 0.f, 0.f), 0.0f);
     m_pTransformCom->Set_Quaternion(qInitRot);
 
@@ -127,10 +122,6 @@ void CQueenKnight::Update(_float fTimeDelta)
     if (m_IsEncountered)
         m_pBossHpBarUI->Update(fTimeDelta);
 
-#pragma region 테스트
-
-  
-#pragma endregion
 
     Update_AI(fTimeDelta);
 
@@ -175,8 +166,7 @@ void CQueenKnight::Late_Update(_float fTimeDelta)
 HRESULT CQueenKnight::Render()
 {
 #ifdef _DEBUG
-    ImGui_Render();
-    m_pColliderCom->Render();
+    //ImGui_Render();
 #endif // _DEBUG
 
     if (FAILED(Bind_Shader_Resource()))
@@ -286,8 +276,11 @@ void CQueenKnight::Update_AI(_float fTimeDelta)
     Tick_BuffTimers(fTimeDelta);
 
     /* Bind 용 Dissolve Time 계산.*/
+    //if (HasBuff(CMonster::BUFF_DISSOLVE))
+    //m_fCurDissolveTime = Get_DefaultBuffTime(BUFF_DISSOLVE) - Get_BuffTime(BUFF_DISSOLVE); // 점차 보내는 값이 증가.
+
     if (HasBuff(CMonster::BUFF_DISSOLVE))
-        m_fCurDissolveTime = Get_DefaultBuffTime(BUFF_DISSOLVE) - Get_BuffTime(BUFF_DISSOLVE); // 점차 보내는 값이 증가.
+        m_fCurDissolveTime = m_fMaxDissolveTime - Get_BuffTime(BUFF_DISSOLVE); // 점차 보내는 값이 증가.
     else if (HasBuff(CMonster::BUFF_REVERSEDISSOLVE))
         m_fCurDissolveTime = Get_BuffTime(BUFF_REVERSEDISSOLVE); // 점차 값이 감소.
     else
@@ -410,6 +403,7 @@ HRESULT CQueenKnight::InitializeAction_ToAnimationMap()
     /* 워프 애니메이션. */
     m_Action_AnimMap.emplace(L"WARP_START", AS_TStdKnight_TLanceGCS_AttackWarp_Start);
     m_Action_AnimMap.emplace(L"WARP_END", AS_TStdKnight_TLanceGCS_AttackWarp_End01);
+    m_Action_AnimMap.emplace(L"WARP_SKILL", AS_TStdKnight_TLanceGCS_AttackWarp_End02);
     m_Action_AnimMap.emplace(L"WARP_JUMP_ATTACK", AS_TStdKnight_TLanceGCS_AttackWarpJump01_N);
 
     /* 점프 어택. (사라졌다가 나오는 모션.) */
@@ -428,13 +422,16 @@ HRESULT CQueenKnight::InitializeAction_ToAnimationMap()
 
 #pragma region 특수 공격
 
-    /* 연속 3번 공격. */
-    m_Action_AnimMap.emplace(L"PHASE_ATTACK1", AS_TStdKnight_TShieldSword_AttackShield02B_N);
-    m_Action_AnimMap.emplace(L"PHASE_ATTACK2", AS_TStdKnight_TShieldSword_AttackShield02C_N);
-    m_Action_AnimMap.emplace(L"PHASE_ATTACK3", AS_TStdKnight_TShieldSword_AttackShield02A_N);
+    /* 연속 3번 공격. => 방패 위치가 반대임 바꿔야댐47 */
+    //m_Action_AnimMap.emplace(L"PHASE_ATTACK1", AS_TStdKnight_TShieldSword_AttackShield02B_N);
+    //m_Action_AnimMap.emplace(L"PHASE_ATTACK2", AS_TStdKnight_TShieldSword_AttackShield02C_N);
+    //m_Action_AnimMap.emplace(L"PHASE_ATTACK3", AS_TStdKnight_TShieldSword_AttackShield02A_N);
+    m_Action_AnimMap.emplace(L"PHASE_ATTACK1", AS_TStdKnight_TLanceGCS_AttackNormal01_N);
+    m_Action_AnimMap.emplace(L"PHASE_ATTACK2", AS_TStdKnight_TLanceGCS_AttackNormal02_N);
 
     /* 돌진 애니메이션. */
-    m_Action_AnimMap.emplace(L"DODGE_B", AS_TStdKnight_TCmn_Dodge_B);
+    //m_Action_AnimMap.emplace(L"DODGE_B", AS_TStdKnight_TCmn_Dodge_B);
+    m_Action_AnimMap.emplace(L"DODGE_B", AS_TStdKnight_TLanceGCS_AttackBackStep01_N);
     m_Action_AnimMap.emplace(L"DASH_ATTACK_START", AS_TStdKnight_TSword_AttackSpecial03_N_Start);
     m_Action_AnimMap.emplace(L"DASH_ATTACK_LOOP", AS_TStdKnight_TSword_AttackSpecial03_N_Loop);
     m_Action_AnimMap.emplace(L"DASH_ATTACK_END", AS_TStdKnight_TSword_AttackSpecial03_N_End);
@@ -456,19 +453,17 @@ HRESULT CQueenKnight::InitializeAction_ToAnimationMap()
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"DOWN_STRIKE_SKILL"], 1.5f);
 
 
-    //m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"WARP_START"], 1.5f);
-    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"WARP_START"], 1.2f);
-    //m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"WARP_END"], 1.5f);
-    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"WARP_END"], 1.2f);
-    //m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"WARP_END"], 1.5f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"WARP_START"], 1.8f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"WARP_AEND"], 1.6f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"WARP_SKILL"], 1.8f);
 
 
     /* Phase Attack 1 ~ 3 */
-    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"PHASE_ATTACK1"], 2.5f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"PHASE_ATTACK1"], 2.f);
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"PHASE_ATTACK2"], 2.5f);
-    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"PHASE_ATTACK3"], 2.5f);
+    //m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"PHASE_ATTACK3"], 2.5f);
 
-    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"DODGE_B"], 2.5f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"DODGE_B"], 1.5f);
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"DASH_ATTACK_START"], 2.5f);
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"DASH_ATTACK_END"], 4.f);
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"IDLE_L180"], 10.f);
@@ -476,7 +471,7 @@ HRESULT CQueenKnight::InitializeAction_ToAnimationMap()
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"IDLE_R180"], 10.f);
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"IDLE_R90"], 10.f);
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"IDLE"], 10.f);
-    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"ATTACK"], 1.5f);
+    //m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"ATTACK"], 1.5f);
 #pragma endregion
 
 
@@ -485,23 +480,30 @@ HRESULT CQueenKnight::InitializeAction_ToAnimationMap()
 #pragma region COllider 활성화 프레임 관리
     // 100 ~ 136 Frame 활성화
     Add_Collider_Frame(m_Action_AnimMap[TEXT("DASH_ATTACK_START")], 100.f / 136.f, 136.f / 136.f, PART_WEAPON);     // Dash Attack
-    Add_Collider_Frame(m_Action_AnimMap[TEXT("DASH_ATTACK_END")], 0.f / 130.f, 100.f / 130.f, PART_WEAPON);     // Dash Attack
+    Add_Collider_Frame(m_Action_AnimMap[TEXT("DASH_ATTACK_END")], 0.f / 130.f, 120.f / 130.f, PART_WEAPON);     // Dash Attack
 
 
     Add_Collider_Frame(m_Action_AnimMap[TEXT("WARP_END")], 20.f / 137.f, 40.f / 137.f, PART_WEAPON);     // Dash Attack
     // 공격 프레임 60 ~ 100프레임.1
     Add_Collider_Frame(m_Action_AnimMap[TEXT("DOWN_STRIKE")], 60.f / 224.f, 85.f / 224.f, PART_WEAPON);     // Dash Attack
     
+    Add_Collider_Frame(m_Action_AnimMap[TEXT("ATTACK")], 54.f / 194.f, 75.f / 194.f, PART_WEAPON);       // Weapon attack
 
-
-    Add_Collider_Frame(m_Action_AnimMap[TEXT("ATTACK")], 40.f / 195.f, 70.f / 195.f, PART_WEAPON);       // Weapon attack
-    Add_Collider_Frame(m_Action_AnimMap[TEXT("PHASE_ATTACK1")], 40.f / 180.f, 80.f / 180.f, PART_WEAPON);// Weapon attack
-    Add_Collider_Frame(m_Action_AnimMap[TEXT("PHASE_ATTACK2")], 40.f / 180.f, 80.f / 180.f, PART_WEAPON);// Weapon attack
-    Add_Collider_Frame(m_Action_AnimMap[TEXT("PHASE_ATTACK3")], 40.f / 180.f, 80.f / 180.f, PART_WEAPON);// Weapon attack
+    Add_Collider_Frame(m_Action_AnimMap[TEXT("PHASE_ATTACK1")], 54.f / 194.f, 75.f / 194.f, PART_WEAPON);// Weapon attack
+    Add_Collider_Frame(m_Action_AnimMap[TEXT("PHASE_ATTACK2")], 40.f / 241.f, 60.f / 241.f, PART_WEAPON);// Weapon attack
 #pragma endregion
 
 #pragma region TRAIL 활성화 프레임 관리.
-    //Add_Trail_Frame(m_Action_AnimMap[TEXT("WARP_END")], 20.f / 137.f, 40.f / 137.f, PART_WEAPON);     // Dash Attack
+    Add_Trail_Frame(m_Action_AnimMap[TEXT("WARP_END")], 17.f / 136.f, 50.f / 136.f, PART_WEAPON);     // Dash Attack
+    Add_Trail_Frame(m_Action_AnimMap[TEXT("DODGE_B")],10.f / 136.f, 65.f / 136.f, PART_WEAPON);     // Dash Attack
+
+
+    Add_Trail_Frame(m_Action_AnimMap[TEXT("PHASE_ATTACK1")], 20.f / 194.f, 80.f / 194.f, PART_WEAPON);// Weapon attack
+    Add_Trail_Frame(m_Action_AnimMap[TEXT("PHASE_ATTACK2")], 20.f / 241.f, 60.f / 241.f, PART_WEAPON);// Weapon attack
+
+    Add_Trail_Frame(m_Action_AnimMap[TEXT("ATTACK")], 30.f / 195.f, 70.f / 195.f, PART_WEAPON);       // Weapon attack
+
+    Add_Trail_Frame(m_Action_AnimMap[TEXT("ENCOUNTER")], 80.f / 180.f, 130.f / 180.f, PART_WEAPON);// Weapon attack
 #pragma endregion
 
 
@@ -528,12 +530,12 @@ HRESULT CQueenKnight::Initialize_BuffDurations()
     m_BuffDefault_Durations[QUEEN_BUFF_PHASE_ATTACK_COOLDOWN] = 10.f;
 
     // Dissovle 타임.
-    m_BuffDefault_Durations[BUFF_DISSOLVE] = 1.3f;
+    m_BuffDefault_Durations[BUFF_DISSOLVE] = 1.f;
     m_BuffDefault_Durations[BUFF_REVERSEDISSOLVE] = 0.5f;
     // 무기의 Dissolve 타임도 지정.
-    m_pWeapon->Set_DissolveTime(1.3f);
+    m_pWeapon->Set_DissolveTime(1.f);
     m_pWeapon->Set_ReverseDissolveTime(0.3f);
-    m_pShield->Set_DissolveTime(1.3f);
+    m_pShield->Set_DissolveTime(1.f);
     m_pShield->Set_ReverseDissolveTime(0.3f);
 
 
@@ -589,15 +591,48 @@ void CQueenKnight::Disable_Collider(_uint iType)
     }
 }
 
+void CQueenKnight::Weapon_Rotation(_uint iPartType, _float3 vRadians, _bool bInverse)
+{
+
+    if (bInverse)
+    {
+        switch (iPartType)
+        {
+        case PART_WEAPON:
+            m_pWeapon->Get_Transform()->Add_Inverse_Rotation(vRadians.x, vRadians.y, vRadians.z);
+            break;
+        case PART_SHIELD:
+            m_pShield->Get_Transform()->Add_Inverse_Rotation(vRadians.x, vRadians.y, vRadians.z);
+            break;
+        default:
+            break;
+        }
+        return;
+    }
+
+
+    switch (iPartType)
+    {
+    case PART_WEAPON:
+        m_pWeapon->Get_Transform()->Add_Rotation(vRadians.x, vRadians.y, vRadians.z);
+        break;
+    case PART_SHIELD:
+        m_pShield->Get_Transform()->Add_Rotation(vRadians.x, vRadians.y, vRadians.z);
+        break;
+    default:
+        break;
+    }
+}
+
+void CQueenKnight::Encounter_Action()
+{
+    Weapon_Rotation(PART_TYPE::PART_SHIELD
+        , { XMConvertToRadians(180.f), XMConvertToRadians(0.f), XMConvertToRadians(-90.f)}, true);
+}
+
 #pragma endregion
 
 #pragma region 7. 보스몹 UI 관리
-void CQueenKnight::Take_Damage(_float fDamage)
-{
-    m_MonsterStat.fHP -= fDamage;
-    Decrease_HpUI(fDamage, 0.1f);
-
-}
 void CQueenKnight::Take_Damage(_float fDamage, CGameObject* pGameObject)
 {
     CMonster::Take_Damage(fDamage, pGameObject);
@@ -605,14 +640,7 @@ void CQueenKnight::Take_Damage(_float fDamage, CGameObject* pGameObject)
 }
 void CQueenKnight::Increase_HpUI(_float fHp, _float fTime)
 {
-    /* 예외처리. */
-	_float fModifyHp = m_MonsterStat.fHP + fHp;
-	if (fModifyHp > m_MonsterStat.fMaxHP)
-        fModifyHp = m_MonsterStat.fMaxHP;
-
-	_float fResultHp = fModifyHp - m_MonsterStat.fHP;
-    
-    m_pBossHpBarUI->Increase_Hp(fResultHp, fTime);
+    m_pBossHpBarUI->Increase_Hp(fHp, fTime);
 }
 
 void CQueenKnight::Decrease_HpUI(_float fHp, _float fTime)
@@ -632,7 +660,7 @@ HRESULT CQueenKnight::Initailize_UI()
     Desc.fSizeY = 40.f;
     Desc.fMaxHp = m_MonsterStat.fMaxHP;
     Desc.strName = TEXT("여왕의 기사");
-
+    Desc.eShaderPath = POSTEX_SHADERPATH::HPPROGRESSBAR;
 
     CUIObject* pUIObject = nullptr;
 
@@ -661,8 +689,6 @@ void CQueenKnight::Set_Visible(_bool bVisible)
 }
 
 
-
-
 #pragma endregion
 
 #pragma region 9. Effect 객체 제어
@@ -679,24 +705,32 @@ void CQueenKnight::Create_QueenKnightWarp_Effect_Particle(_float3 vDir)
 }
 
 // Dissolve 진행.
-void CQueenKnight::Start_Dissolve()
+void CQueenKnight::Start_Dissolve(_float fDuration)
 {
-    AddBuff(BUFF_DISSOLVE);
+    if(fDuration == 0.f)
+        AddBuff(BUFF_DISSOLVE);
+
+    AddBuff(BUFF_DISSOLVE, fDuration);
+    m_fMaxDissolveTime = Get_BuffTime(BUFF_DISSOLVE);
     m_fCurDissolveTime = 0.f;
-    m_fMaxDissovleTime = Get_DefaultBuffTime(BUFF_DISSOLVE);
+    //m_fCurDissolveTime = m_fMaxDissovleTime;
+    
     m_iShaderPath = static_cast<_uint>(ANIMESH_SHADERPATH::DISSOLVE);
-    m_pWeapon->Start_Dissolve();
-    m_pShield->Start_Dissolve();
+    m_pWeapon->Start_Dissolve(fDuration);
+    m_pShield->Start_Dissolve(fDuration);
 }
 
 
-void CQueenKnight::ReverseStart_Dissolve()
+void CQueenKnight::ReverseStart_Dissolve(_float fDuration)
 {
-    AddBuff(BUFF_REVERSEDISSOLVE);
-    m_fMaxDissovleTime = Get_DefaultBuffTime(BUFF_DISSOLVE);
+    if (fDuration == 0.f)
+        AddBuff(BUFF_REVERSEDISSOLVE);
+
+    AddBuff(BUFF_REVERSEDISSOLVE, fDuration);
+    m_fMaxDissolveTime = Get_DefaultBuffTime(BUFF_DISSOLVE);
     m_iShaderPath = static_cast<_uint>(ANIMESH_SHADERPATH::DISSOLVE);
-    m_pWeapon->ReverseStart_Dissolve();
-    m_pShield->ReverseStart_Dissolve();
+    m_pWeapon->ReverseStart_Dissolve(fDuration);
+    m_pShield->ReverseStart_Dissolve(fDuration);
 }
 
 void CQueenKnight::End_Dissolve()
@@ -777,6 +811,7 @@ HRESULT CQueenKnight::Ready_Colliders(QUEENKNIGHT_DESC* pDesc)
     CBounding_Sphere::BOUNDING_SPHERE_DESC SphereDesc{};
     SphereDesc.fRadius = max(max(box.vExtents.x, box.vExtents.y), box.vExtents.z);
     SphereDesc.vCenter = _float3(0.f, box.vExtents.y, 0.f); // 중점.
+
     SphereDesc.pOwner = this;
     SphereDesc.eCollisionType = CCollider::COLLISION_BODY;
     SphereDesc.eMyLayer = CCollider::MONSTER;
@@ -853,7 +888,7 @@ HRESULT CQueenKnight::Ready_PartObjects()
     Weapon.pOwner = this;
     Weapon.eCurLevel = m_eCurLevel;
     Weapon.fAttackPower = m_MonsterStat.fAttackPower;
-
+    Weapon.eShaderPath = MESH_SHADERPATH::DEFAULT;
 
 
     if (FAILED(CContainerObject::Add_PartObject(TEXT("Com_Weapon"),
@@ -869,6 +904,7 @@ HRESULT CQueenKnight::Ready_PartObjects()
     Shield.pSocketMatrix = m_pModelCom->Get_BoneMatrix("LeftHandAttachSocket");
     Shield.eCurLevel = m_eCurLevel;
     Shield.pOwner = this;
+    Shield.eShaderPath = MESH_SHADERPATH::DEFAULT;
 
     if (FAILED(CContainerObject::Add_PartObject(TEXT("Com_Shield"),
         ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_GodChildShield")
@@ -908,7 +944,7 @@ HRESULT CQueenKnight::Bind_Shader_Resource()
         return E_FAIL;
     }
     
-    _float fDissolveTime = normalize(m_fCurDissolveTime, 0.f, m_fMaxDissovleTime);
+    _float fDissolveTime = normalize(m_fCurDissolveTime, 0.f, m_fMaxDissolveTime);
     
     if (FAILED(m_pShaderCom->Bind_RawValue("g_fDissolveTime", &fDissolveTime, sizeof(_float))))
     {
@@ -917,11 +953,11 @@ HRESULT CQueenKnight::Bind_Shader_Resource()
     }
 
 
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
-    {
-        CRASH("Failed Bind CamPosition");
-        return E_FAIL;
-    }
+    //if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
+    //{
+    //    CRASH("Failed Bind CamPosition");
+    //    return E_FAIL;
+    //}
         
     return S_OK;
 }

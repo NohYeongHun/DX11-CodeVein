@@ -1,6 +1,4 @@
-﻿#include "HUD.h"
-
-CHUD::CHUD(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿CHUD::CHUD(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CUIObject(pDevice, pContext)
     , m_IsVisibility(false)
 {

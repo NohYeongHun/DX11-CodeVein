@@ -18,9 +18,18 @@ public:
 	HRESULT Initialize();
 
 #pragma region ENGINE에 제공
+public:
 	HRESULT Add_RenderGroup(RENDERGROUP eRenderGroup, class CGameObject* pRenderObject);
 	HRESULT Draw();
+	
+
 #pragma endregion
+
+#ifdef _DEBUG
+public:
+	HRESULT Add_DebugComponent(CComponent* pComponent);
+#endif // _DEBUG
+
 
 	
 
@@ -47,10 +56,9 @@ private:
 #ifdef _DEBUG
 private:
 	list <class CComponent*> m_DebugComponent;
-#endif // _DEBUG
 
-private:
-	HRESULT Render_Debug();
+
+
 #pragma endregion
 
 
@@ -66,6 +74,10 @@ private:
 	HRESULT Render_UI();
 	HRESULT Render_StaticUI();
 
+
+private:
+	HRESULT Render_Debug();
+#endif // _DEBUG
 	
 
 

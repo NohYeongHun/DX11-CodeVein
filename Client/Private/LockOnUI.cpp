@@ -36,7 +36,7 @@ HRESULT CLockOnUI::Initialize_Clone(void* pArg)
         return E_FAIL;
     }
     m_eCurLevel = pDesc->eCurLevel;
-
+    m_iShaderPath = static_cast<_uint>(pDesc->eShaderPath);
     // 화면 크기 가져오기
     RECT rcClient;
     GetClientRect(g_hWnd, &rcClient);
@@ -119,7 +119,7 @@ HRESULT CLockOnUI::Render()
     
         
     // UI용 쉐이더 패스 (LockOnPass = 패스 7)
-    if (FAILED(m_pShaderCom->Begin(7)))
+    if (FAILED(m_pShaderCom->Begin(m_iShaderPath)))
     {
         CRASH("Ready Shader Begin Failed");
         return E_FAIL;
@@ -141,7 +141,7 @@ HRESULT CLockOnUI::Render()
     return S_OK;
 }
 
-void CLockOnUI::Set_Target(CGameObject* pTarget)
+void CLockOnUI::Set_Target(CMonster* pTarget)
 {
     m_pTarget = pTarget;
     m_bActive = (pTarget != nullptr);
@@ -154,41 +154,13 @@ void CLockOnUI::Clear_Target()
     m_bActive = false;
 }
 
-/* World -> View -> 투영 으로 좌표 계산. */
-_bool CLockOnUI::World_To_Screen(_vector vWorldPos, _float& fScreenX, _float& fScreenY)
-{
-    // 현재 카메라의 뷰/프로젝션 행렬 가져오기
-    _matrix matView = m_pGameInstance->Get_Transform_Matrix(D3DTS::VIEW);
-    _matrix matProj = m_pGameInstance->Get_Transform_Matrix(D3DTS::PROJ);
-
-    // 월드 -> 뷰 공간 변환
-    _vector vViewPos = XMVector3TransformCoord(vWorldPos, matView);
-
-    // 카메라 뒤쪽에 있으면 표시하지 않음
-    if (XMVectorGetZ(vViewPos) < 0.0f)
-        return false;
-
-    // 뷰 -> 투영 공간 변환
-    _vector vProjPos = XMVector3TransformCoord(vViewPos, matProj);
-
-    // NDC 좌표 -> 스크린 좌표 변환
-    fScreenX = (XMVectorGetX(vProjPos) + 1.0f) * 0.5f * m_fWinSizeX;
-    fScreenY = (1.0f - XMVectorGetY(vProjPos)) * 0.5f * m_fWinSizeY;
-
-    // 화면 범위 확인 (여유를 둬서 화면 가장자리까지 표시)
-    if (fScreenX < -50.0f || fScreenX > m_fWinSizeX + 50.0f ||
-        fScreenY < -50.0f || fScreenY > m_fWinSizeY + 50.0f)
-        return false;
-
-
-    return true;
-}
 
 HRESULT CLockOnUI::Bind_ShaderResources()
 {
     // 타겟의 월드 위치 가져오기
+    
     _vector vTargetPos = m_pTarget->Get_Transform()->Get_State(STATE::POSITION);
-    vTargetPos = XMVectorSetY(vTargetPos, XMVectorGetY(vTargetPos) + m_fTargetRadius); // 조금 더 위로
+    vTargetPos = XMVectorSetY(vTargetPos, XMVectorGetY(vTargetPos) + m_fTargetRadius) + m_pTarget->Get_LockOnOffset(); // 조금 더 위로
     //vTargetPos = XMVectorSetY(vTargetPos, XMVectorGetY(vTargetPos)); // 조금 더 위로
     
     _float fUISize = 0.5f; // 매우 작게 시작해서 보이는지 확인

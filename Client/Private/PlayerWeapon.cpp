@@ -19,7 +19,6 @@ HRESULT CPlayerWeapon::Initialize_Prototype()
 HRESULT CPlayerWeapon::Initialize_Clone(void* pArg)
 {
     PLAYER_WEAPON_DESC* pDesc = static_cast<PLAYER_WEAPON_DESC*>(pArg);
-    //m_pParentState = pDesc->pState;
     if (FAILED(CWeapon::Initialize_Clone(pDesc)))
     {
         CRASH("Failed Clone CWeapon");
@@ -100,6 +99,16 @@ void CPlayerWeapon::Late_Update(_float fTimeDelta)
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::NONBLEND, this)))
         return;
 
+#ifdef _DEBUG
+    if (FAILED(m_pGameInstance->Add_DebugComponent(m_pColliderCom)))
+    {
+        CRASH("Failed Add DebugComponent");
+        return;
+    }
+        
+#endif // _DEBUG
+
+
     // Trail이 켜질때만 넣기.
     if (m_bTrail)
           m_pTrailWeapon_Effect->Late_Update(fTimeDelta);
@@ -109,7 +118,6 @@ HRESULT CPlayerWeapon::Render()
 {
 #ifdef _DEBUG
     //ImGui_Render();
-    m_pColliderCom->Render();
 #endif // _DEBUG
 
     
@@ -128,7 +136,7 @@ HRESULT CPlayerWeapon::Render()
         if (FAILED(m_pModelCom->Bind_Materials(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE, 0)))
             return E_FAIL;
 
-        m_pShaderCom->Begin(0);
+        m_pShaderCom->Begin(m_iShaderPath);
         m_pModelCom->Render(i);
     }
 

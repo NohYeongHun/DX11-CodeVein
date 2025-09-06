@@ -36,7 +36,7 @@ private:
 	HRESULT Ready_Prototype_HUD();
 	HRESULT Ready_Prototype_Inventory();
 	HRESULT Ready_Prototype_SkillUI();
-	HRESULT Ready_Prototype_BossUI();
+	HRESULT Ready_Prototype_MonsterUI();
 	HRESULT Ready_Prototype_Fonts();
 #pragma endregion
 

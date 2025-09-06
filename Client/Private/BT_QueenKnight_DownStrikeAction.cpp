@@ -94,7 +94,7 @@ BT_RESULT CBT_QueenKnight_DownStrikeAction::Enter_Attack(_float fTimeDelta)
 
     // 4. 목표 위치 지정.
     _vector vOwnerPos = m_pOwner->Get_Transform()->Get_State(STATE::POSITION);
-    vOwnerPos.m128_f32[1] += 20.f;
+    vOwnerPos.m128_f32[1] += 30.f;
     XMStoreFloat3(&m_vAscendTarget, vOwnerPos);
 
     m_pOwner->Disable_Collider(CQueenKnight::PART_BODY);
@@ -115,8 +115,7 @@ BT_RESULT CBT_QueenKnight_DownStrikeAction::Update_Ascend(_float fTimeDelta)
     {
         // 디졸브 시작.
         m_bDissolveCheck = true; // 이미 Dissolve가 발생했는지?
-        m_pOwner->Start_Dissolve();
-        //m_pOwner->AddBuff(CMonster::BUFF_DISSOLVE);
+        m_pOwner->Start_Dissolve(1.3f);
 
         // 시점과 운동 방향 변경 필요. => 운동 방향은 몬스터 중앙에서 시작해서 위로 퍼져나감.
         m_pOwner->Create_QueenKnightWarp_Effect_Particle({ 0.f, 1.f, 0.f });
@@ -124,14 +123,14 @@ BT_RESULT CBT_QueenKnight_DownStrikeAction::Update_Ascend(_float fTimeDelta)
 
     if (vOwnerPos.m128_f32[1] <= m_vAscendTarget.y && fCurrentRatio >= m_fJump_StartRatio)
     {
-        m_pOwner->Move_Direction({ 0.f, 1.f, 0.f }, fTimeDelta * 0.2f);
+        m_pOwner->Move_Direction({ 0.f, 1.f, 0.f }, fTimeDelta * 0.7f);
     }
 
     // Dissolve가 이미 발생했고 Dissolve 상태가 끝났으면?
-    //if (m_bDissolveCheck && !m_pOwner->HasBuff(CMonster::BUFF_DISSOLVE))
-    //{
-    //    m_pOwner->Set_Visible(false); // 렌더를 끕니다.
-    //}
+    if (m_bDissolveCheck && !m_pOwner->HasBuff(CMonster::BUFF_DISSOLVE))
+    {
+        m_pOwner->Set_Visible(false); // 렌더를 끕니다.
+    }
 
     // 1. 목표 높이까지 도달했는지 확인. 아니면 위로 이동.
     if (m_pOwner->Is_Animation_Finished() && vOwnerPos.m128_f32[1] >= m_vAscendTarget.y)
@@ -140,7 +139,7 @@ BT_RESULT CBT_QueenKnight_DownStrikeAction::Update_Ascend(_float fTimeDelta)
         m_eAttackPhase = ATTACK_PHASE::HANG;
 
         // 3. 상승이 끝난 후 시야에서 사라지기
-        //m_pOwner->Set_Visible(false);
+        
 
         // 4. 순간이동 페이즈에 진입할때 Player 머리 위로 위치 이동. => 이게 부자연스러운데..
         _float vPosY = vOwnerPos.m128_f32[1];
@@ -187,6 +186,8 @@ BT_RESULT CBT_QueenKnight_DownStrikeAction::Update_Ascend(_float fTimeDelta)
         //    m_pOwner->RemoveBuff(CMonster::BUFF_DISSOLVE);
         //7. 파티클 생성
 
+        m_pOwner->Set_Visible(true);
+
     }
     return BT_RESULT::RUNNING;
 }
@@ -199,7 +200,7 @@ BT_RESULT CBT_QueenKnight_DownStrikeAction::Update_Hang(_float fTimeDelta)
     if (!m_bDissolveCheck && !m_pOwner->HasBuff(CMonster::BUFF_DISSOLVE))
     {
         // 2. 목표 하강지점 도착했으므로 렌더링 켜기 (시야에서 나타남)
-        m_pOwner->ReverseStart_Dissolve();
+        m_pOwner->ReverseStart_Dissolve(0.2f);
     }
 
     // 1. 현재 위치
@@ -259,12 +260,7 @@ BT_RESULT CBT_QueenKnight_DownStrikeAction::Update_Descend(_float fTimeDelta)
 
         //m_pOwner->Change_Animation_Blend(iNextAnimationIdx, false, 0.1f, true, true, false);
         m_pOwner->Change_Animation_NonBlend(iNextAnimationIdx, false);
-
-        m_pOwner->AddBuff(CQueenKnight::QUEEN_BUFF_DOWN_TRIPLE_STRIKE_COOLDOWN);
-
-        //m_pOwner->End_Dissolve();
     }
-
 
     return BT_RESULT::RUNNING;
 }

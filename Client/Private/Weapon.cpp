@@ -22,6 +22,7 @@ HRESULT CWeapon::Initialize_Clone(void* pArg)
     m_eCurLevel = pDesc->eCurLevel;
     m_pOwner = pDesc->pOwner;
     m_fAttackPower = pDesc->fAttackPower;
+    m_iShaderPath = static_cast<_uint>(pDesc->eShaderPath);
 
     if (FAILED(CPartObject::Initialize_Clone(pDesc)))
     {
@@ -186,14 +187,20 @@ void CWeapon::Set_ReverseDissolveTime(_float fDissolveTime)
     m_fMaxReverseDissolveTime = fDissolveTime;
 }
 
-void CWeapon::Start_Dissolve()
+void CWeapon::Start_Dissolve(_float fDuration)
 {
+    if (fDuration != 0.f)
+        m_fMaxDissolveTime = fDuration;
+
     m_fCurDissolveTime = 0.f;
     m_bDissolve = true;
     m_iShaderPath = static_cast<_uint>(MESH_SHADERPATH::DISSOLVE);
 }
-void CWeapon::ReverseStart_Dissolve()
+void CWeapon::ReverseStart_Dissolve(_float fDuration)
 {
+    if (fDuration != 0.f)
+        m_fMaxReverseDissolveTime = fDuration;
+
     m_fCurDissolveTime = m_fMaxReverseDissolveTime;
     m_bReverseDissolve = true;
     m_iShaderPath = static_cast<_uint>(MESH_SHADERPATH::DISSOLVE);

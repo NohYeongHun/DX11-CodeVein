@@ -56,8 +56,6 @@ HRESULT CLevel_GamePlay::Initialize_Clone()
 		return E_FAIL;
 	}
 
-	
-
 	if (FAILED(Ready_Layer_Effect(TEXT("Layer_Effect"))))
 	{
 		CRASH("Failed Ready_Layer_Effect");
@@ -94,6 +92,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_FadeOut(const _wstring& strLayerTag)
 	Desc.fSizeX = g_iWinSizeX;
 	Desc.fSizeY = g_iWinSizeY;
 	Desc.iTextureIndex = 0;
+	Desc.eShaderPath = POSTEX_SHADERPATH::FADEIN;
 
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel), strLayerTag,
 		ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_FadeOut"), &Desc)))
@@ -141,6 +140,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_Map(const _wstring& strLayerTag)
 	Desc.PrototypeTag = L"Prototype_Component_Model_BossStage";
 	Desc.vScale = { 2.f, 1.f, 2.f };
 	Desc.eCurLevel = m_eCurLevel;
+	Desc.eShaderPath = MESH_SHADERPATH::DEFAULT;
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel), strLayerTag,
 		ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_Map"), &Desc)))
 	{
@@ -171,6 +171,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_Player(const _wstring& strLayerTag)
 	Desc.fMaxHP = 1672;
 	Desc.fHP = 1672; // StageOne 전투 후 감소된 HP
 	Desc.fAttackPower = 90;
+	Desc.eShaderPath = ANIMESH_SHADERPATH::DEFAULT;
 #pragma endregion
 
 	
@@ -338,7 +339,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_WolfDevil(const _wstring& strLayerTag)
 
 	Desc.eCurLevel = m_eCurLevel;
 	Desc = { 50.f, XMConvertToRadians(90.0f)
-		, nullptr,  m_eCurLevel, MONSTERTYPE::NORMAL,
+		, nullptr,  m_eCurLevel, MONSTERTYPE::NORMAL, ANIMESH_SHADERPATH::DEFAULT,
 		500.f, 70.f, 15.f, 7.f, 50.f, 50.f};
 
 	Desc.pPlayer = dynamic_cast<CPlayer*>(
@@ -377,7 +378,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_SlaveVampire(const _wstring& strLayerTag)
 	CSlaveVampire::SLAVE_VAMPIRE_DSEC Desc{};
 	Desc.eCurLevel = m_eCurLevel;
 	Desc = { 50.f, XMConvertToRadians(90.0f)
-		, nullptr,  m_eCurLevel, MONSTERTYPE::NORMAL,
+		, nullptr,  m_eCurLevel, MONSTERTYPE::NORMAL, ANIMESH_SHADERPATH::DEFAULT,
 		900.f, 70.f, 20.f, 5.f, 50.f, 50.f };
 
 	Desc.pPlayer = dynamic_cast<CPlayer*>(
@@ -417,8 +418,8 @@ HRESULT CLevel_GamePlay::Ready_Layer_QueenKnight(const _wstring& strLayerTag)
 	Desc.fRotationPerSec = XMConvertToRadians(180.f);
 	Desc.eCurLevel = m_eCurLevel;
 	Desc = { 50.f, XMConvertToRadians(180.f)
-		, nullptr, m_eCurLevel, MONSTERTYPE::BOSS, 2500.f, 150.f
-		, 30.f, 7.f, 10.f, 10.f, {1.f, 1.f, 1.f}
+		, nullptr, m_eCurLevel, MONSTERTYPE::BOSS, ANIMESH_SHADERPATH::DEFAULT, 
+		2500.f, 150.f, 30.f, 7.f, 10.f, 10.f, {1.f, 1.f, 1.f}, {0.f, 1.2f, 0.f}
 	};
 
 	Desc.pPlayer = dynamic_cast<CPlayer*>(

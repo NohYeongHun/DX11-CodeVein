@@ -1,7 +1,5 @@
 ﻿#pragma once
 
-#include "GameObject.h"
-
 NS_BEGIN(Engine)
 
 /*

@@ -1,6 +1,4 @@
-﻿#include "Title.h"
-
-CTitle::CTitle(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿CTitle::CTitle(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CUIObject { pDevice, pContext }
 {
 }
@@ -162,7 +160,7 @@ HRESULT CTitle::Ready_Title_BackGround_Black()
 
     BackGroundDesc.iTextureCount = 2;
     BackGroundDesc.iTexture = 0;
-    BackGroundDesc.iPassIdx = 0;
+    BackGroundDesc.eShaderPath = POSTEX_SHADERPATH::DEFAULT;
     BackGroundDesc.fAlpha = 0.5f;
     BackGroundDesc.strObjTag = TEXT("BackGround Black");
 
@@ -193,7 +191,7 @@ HRESULT CTitle::Ready_Title_BackGround_White()
 
     BackGroundDesc.iTextureCount = 2;
     BackGroundDesc.iTexture = 1;
-    BackGroundDesc.iPassIdx = 4;
+    BackGroundDesc.eShaderPath = POSTEX_SHADERPATH::TITLEBACKGROUND;
     BackGroundDesc.fAlpha = 0.21f;
     BackGroundDesc.strObjTag = TEXT("BackGround White");
     
@@ -225,7 +223,7 @@ HRESULT CTitle::Ready_Title_BackGround_Modify_Light()
 
     BackGroundDesc.iTextureCount = 2;
     BackGroundDesc.iTexture = 2;
-    BackGroundDesc.iPassIdx = 4;
+    BackGroundDesc.eShaderPath = POSTEX_SHADERPATH::TITLEBACKGROUND;
     BackGroundDesc.fAlpha = 0.23f;
     BackGroundDesc.strObjTag = TEXT("BackGround Modify_Light");
 
@@ -255,7 +253,7 @@ HRESULT CTitle::Ready_Title_BackGround_Light()
 
     BackGroundDesc.iTextureCount = 2;
     BackGroundDesc.iTexture = 3;
-    BackGroundDesc.iPassIdx = 4;
+    BackGroundDesc.eShaderPath = POSTEX_SHADERPATH::TITLEBACKGROUND;
     BackGroundDesc.fAlpha = 0.66f;
     BackGroundDesc.strObjTag = TEXT("BackGround Light");
 
@@ -285,7 +283,7 @@ HRESULT CTitle::Ready_Title_BackGround_White_Shade()
 
     BackGroundDesc.iTextureCount = 2;
     BackGroundDesc.iTexture = 4;
-    BackGroundDesc.iPassIdx = 4;
+    BackGroundDesc.eShaderPath = POSTEX_SHADERPATH::TITLEBACKGROUND;
     BackGroundDesc.fAlpha = 0.89f;
     BackGroundDesc.strObjTag = TEXT("BackGround White Shade");
 
@@ -314,7 +312,7 @@ HRESULT CTitle::Ready_Title_Text()
     TitleTextDesc.fY = 0;
     TitleTextDesc.fSizeX = 1280;
     TitleTextDesc.fSizeY = 280;
-
+    TitleTextDesc.eShaderPath = POSTEX_SHADERPATH::DEFAULT;
 
     CUIObject* pUIObject = nullptr;
     TitleTextDesc.iTextureIndex = 0;

@@ -1,6 +1,4 @@
 ﻿#pragma once
-#include "UIObject.h"
-
 NS_BEGIN(Client)
 /* 몬스터가 소유하고 있다가 출력 되게? */
 class CSlash final : public CGameObject
@@ -12,6 +10,7 @@ public:
     typedef struct tagSlashEffectDesc : public CGameObject::GAMEOBJECT_DESC
     {
         LEVEL eCurLevel = { LEVEL::END };
+        POSTEX_SHADERPATH eShaderPath = {POSTEX_SHADERPATH::NONE };
     }SLASHEFFECT_DESC;
 
     typedef struct tagSlashActivateDesc
@@ -73,6 +72,7 @@ private:
     _bool m_bDirectionCalculated = false; // 방향이 계산되었는지 여부
     _vector m_vHitDirection = {};
     _float3 m_vScale = {};
+    _uint m_iShaderPath = {};
 
 
 
@@ -84,6 +84,17 @@ public:
     static CSlash* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
     virtual CGameObject* Clone(void* pArg) override;
     virtual void Free() override;
+
+#pragma region DEBUG
+#ifdef _DEBUG
+private:
+    void ImGui_Render();
+#endif // _DEBUG
+
+
+
+#pragma endregion
+
 };
 NS_END
 

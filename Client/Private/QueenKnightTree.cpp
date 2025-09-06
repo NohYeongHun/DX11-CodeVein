@@ -1,5 +1,4 @@
-﻿#include "QueenKnightTree.h"
-CQueenKnightTree::CQueenKnightTree(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿CQueenKnightTree::CQueenKnightTree(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CBehaviorTree(pDevice, pContext)
 {
 }
@@ -108,7 +107,7 @@ CBTSelector* CQueenKnightTree::Create_ActionStates_ToSelector()
 
     // 액션 상태에서는 Sequence를 제어합니다.
     // 우선 순위가 높은 공격 상태부터 먼저 검증.
-    pActionState_Selector->Add_Child(Create_TripleDownAttack_ToSequence());
+    //pActionState_Selector->Add_Child(Create_TripleDownAttack_ToSequence());
     pActionState_Selector->Add_Child(Create_DashAttack_ToSequence());
     
     pActionState_Selector->Add_Child(Create_FirstPhaseAttack_ToSequence());

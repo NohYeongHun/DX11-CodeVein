@@ -147,7 +147,9 @@
 #include "BT_Monster_RotateAction.h"
 
 /* ======================================== Monster Object ===================================== */
+#include "MonsterHpBarUI.h"
 #include "BossHpBarUI.h"
+
 #include "Monster.h"
 #include "MonsterTree.h"
 /* ======================================== WolfDevil Object ===================================== */

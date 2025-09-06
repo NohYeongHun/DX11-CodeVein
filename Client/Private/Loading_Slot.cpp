@@ -1,6 +1,4 @@
-﻿#include "Loading_Slot.h"
-
-CLoading_Slot::CLoading_Slot(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿CLoading_Slot::CLoading_Slot(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CUIObject(pDevice, pContext)
 {
 }
@@ -8,6 +6,11 @@ CLoading_Slot::CLoading_Slot(ID3D11Device* pDevice, ID3D11DeviceContext* pContex
 CLoading_Slot::CLoading_Slot(const CLoading_Slot& Prototype)
     : CUIObject(Prototype)
 {
+}
+
+void CLoading_Slot::Change_Shader_Pass(_uint iShaderPath)
+{
+    m_iShaderPath = iShaderPath;
 }
 
 
@@ -74,7 +77,7 @@ HRESULT CLoading_Slot::Render()
     if (FAILED(m_pTextureCom->Bind_Shader_Resource(m_pShaderCom, "g_Texture", m_iTextureIndex)))
         return E_FAIL;
 
-    m_pShaderCom->Begin(m_iCurrentPass);
+    m_pShaderCom->Begin(m_iShaderPath);
 
     m_pVIBufferCom->Bind_Resources();
 

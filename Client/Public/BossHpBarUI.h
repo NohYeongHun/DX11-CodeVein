@@ -9,6 +9,7 @@ public:
 		_wstring strName = {};
 		_uint iTextureIndex = {};
 		_float fMaxHp = {};
+		POSTEX_SHADERPATH eShaderPath = {};
 	}BOSS_HPBAR_DESC;
 
 private:
@@ -34,6 +35,8 @@ private:
 	/* 스킬 정보? */
 	_float  m_fHp = {};
 	_float  m_fMaxHp = {};
+	_float	m_fFontScreenX = {};
+	_float	m_fFontScreenY = {};
 	_wstring m_strName = {};
 
 private:
@@ -51,6 +54,10 @@ private:
 
 	_float m_fRightRatio = {};
 	_float m_fLeftRatio = {};
+	_float m_fScrollSpeed = {};
+	_uint m_iShaderPath = {};
+
+
 
 
 

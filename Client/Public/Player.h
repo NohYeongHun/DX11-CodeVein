@@ -1,6 +1,4 @@
 ﻿#pragma once
-#include "GameObject.h"
-
 NS_BEGIN(Client)
 class CPlayer final : public CContainerObject
 {
@@ -46,6 +44,7 @@ public:
 	typedef struct tagPlayerDesc : public CGameObject::GAMEOBJECT_DESC
 	{
 		LEVEL eCurLevel;
+		ANIMESH_SHADERPATH eShaderPath;
 		_float fMaxHP;
 		_float fHP;
 		_float fAttackPower;
@@ -254,7 +253,6 @@ private:
 	class CFsm* m_pFsmCom = { nullptr };
 	class CCamera_Player* m_pPlayerCamera = { nullptr };
 	LEVEL m_eCurLevel = { LEVEL::END };
-
 	_float m_fOffsetY = {};
 	
 #pragma endregion
@@ -283,10 +281,15 @@ private:
 	_float m_fAttackRange = {};
 	_float m_fMoveSpeed = {};
 	_float m_fRotationSpeed = {};
-
 #pragma endregion
 
 
+
+#pragma region SHADER PATH
+private:
+	_uint m_iShaderPath = {};
+
+#pragma endregion
 
 
 
@@ -296,7 +299,7 @@ private:
 	HRESULT Ready_Navigations();
 	HRESULT Ready_Fsm();
 	void Register_CoolTime();
-	HRESULT Ready_Render_Resources();
+	HRESULT Bind_ShaderReosurces();
 	HRESULT Ready_PartObjects();
 
 public:

@@ -19,7 +19,10 @@ HRESULT CKnightLance::Initialize_Clone(void* pArg)
 
 
     if (FAILED(CWeapon::Initialize_Clone(pDesc)))
+    {
+        CRASH("Failed Crash Initialize Clone");
         return E_FAIL;
+    }
 
     if (FAILED(Ready_Components()))
     {
@@ -44,10 +47,6 @@ HRESULT CKnightLance::Initialize_Clone(void* pArg)
 
     m_bTrail = true;
 
-
-    /*m_pTransformCom->Scaling(_float3(0.1f, 0.1f, 0.1f));
-    m_pTransformCom->Rotation(XMVectorSet(0.f, 1.f, 0.f, 0.f), XMConvertToRadians(90.0f));
-    m_pTransformCom->Set_State(STATE::POSITION, XMVectorSet(0.8f, 0.f, 0.f, 1.f));*/
 
     // 기본 false;
     m_pColliderCom->Set_Active(false);
@@ -75,12 +74,20 @@ void CKnightLance::Late_Update(_float fTimeDelta)
 {
     CWeapon::Late_Update(fTimeDelta);
 
-
     if (Is_Visible())
     {
         if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::NONBLEND, this)))
             return;
     }
+
+#ifdef _DEBUG
+    if (FAILED(m_pGameInstance->Add_DebugComponent(m_pColliderCom)))
+    {
+        CRASH("Failed AddDebug Collider");
+        return;
+    }
+
+#endif // _DEBUG
 
     if (m_bTrail)
         m_pTrailWeapon_Effect->Late_Update(fTimeDelta);
@@ -103,7 +110,7 @@ HRESULT CKnightLance::Render()
 {
 
 #ifdef _DEBUG
-    ImGui_Render();
+    //ImGui_Render();
 
 #endif // _DEBUG
 
@@ -315,7 +322,7 @@ void CKnightLance::Free()
 {
     CWeapon::Free();
     Safe_Release(m_pTrailWeapon_Effect);
-    //Safe_Release(m_pDissolveTexture);
+
 }
 
 
@@ -357,8 +364,6 @@ void CKnightLance::ImGui_Render()
     
 
     ImGui::End();
-
-    m_pColliderCom->Render();
 }
 #endif // _DEBUG
 

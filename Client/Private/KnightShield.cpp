@@ -13,7 +13,7 @@ HRESULT CKnightShield::Initialize_Prototype()
     return S_OK;
 }
 
-HRESULT CKnightShield::Initialize(void* pArg)
+HRESULT CKnightShield::Initialize_Clone(void* pArg)
 {
     KNIGHT_SHIELD_DESC* pDesc = static_cast<KNIGHT_SHIELD_DESC*>(pArg);
 
@@ -33,8 +33,7 @@ HRESULT CKnightShield::Initialize(void* pArg)
         return E_FAIL;
     }
         
-
-    //m_pTransformCom->Add_Rotation(XMConvertToRadians(180.f), 0.f, -90.f);
+    m_pTransformCom->Add_Rotation(XMConvertToRadians(180.f), 0.f, XMConvertToRadians(-90.f));
 
     return S_OK;
 }
@@ -71,28 +70,10 @@ void CKnightShield::Late_Update(_float fTimeDelta)
 
 HRESULT CKnightShield::Render()
 {
-//#ifdef _DEBUG
-//    ImGuiIO& io = ImGui::GetIO();
-//
-//    // 기존 Player Debug Window
-//
-//    ImVec2 windowSize = ImVec2(300.f, 300.f);
-//    ImVec2 windowPos = ImVec2(600.f, 0.f);
-//    ImGui::SetNextWindowPos(windowPos, ImGuiCond_Once);
-//    ImGui::SetNextWindowSize(windowSize, ImGuiCond_Once);
-//
-//    string strDebug = "QueenKnight Shield Debug";
-//    ImGui::Begin(strDebug.c_str(), nullptr, ImGuiWindowFlags_NoCollapse);
-//
-//    static _float fPitch = { 0.f }, fYaw = { 0.f }, fRoll = { 0.f };
-//
-//    //m_pTransformCom->Add_Rotation();
-//
-//    ImGui::End();
-//
-//    //Edit_Collider(m_pColliderCom, "QueenKnight Shield");
-//    m_pColliderCom->Render();
-//#endif // _DEBUG
+
+#ifdef _DEBUG
+    //ImGui_Render();
+#endif // _DEBUG
 
     if (FAILED(Bind_ShaderResources()))
     {
@@ -253,7 +234,7 @@ CGameObject* CKnightShield::Clone(void* pArg)
 {
     CKnightShield* pInstance = new CKnightShield(*this);
 
-    if (FAILED(pInstance->Initialize(pArg)))
+    if (FAILED(pInstance->Initialize_Clone(pArg)))
     {
         MSG_BOX(TEXT("Failed to Created : CKnightShield"));
         Safe_Release(pInstance);
@@ -266,3 +247,42 @@ void CKnightShield::Free()
 {
     CWeapon::Free();
 }
+
+#ifdef _DEBUG
+void CKnightShield::ImGui_Render()
+{
+    #ifdef _DEBUG
+    ImGuiIO& io = ImGui::GetIO();
+
+    // 기존 Player Debug Window
+
+    ImVec2 windowSize = ImVec2(300.f, 300.f);
+    ImVec2 windowPos = ImVec2(600.f, 0.f);
+    ImGui::SetNextWindowPos(windowPos, ImGuiCond_Once);
+    ImGui::SetNextWindowSize(windowSize, ImGuiCond_Once);
+
+    string strDebug = "QueenKnight Shield Debug";
+    ImGui::Begin(strDebug.c_str(), nullptr, ImGuiWindowFlags_NoCollapse);
+
+    static _float Rotation[3] = { 0.f, 0.f, 0.f };
+
+    ImGui::InputFloat3("Rotation ", Rotation);
+
+    if (ImGui::Button("Apply Rotation"))
+    {
+        m_pTransformCom->Add_Rotation(Rotation[0], Rotation[1], Rotation[2]);
+    }
+    
+
+    
+
+    ImGui::End();
+
+    Edit_Collider(m_pColliderCom, "QueenKnight Shield");
+  
+#endif // _DEBUG
+
+}
+#endif // _DEBUG
+
+

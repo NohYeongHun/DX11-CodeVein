@@ -49,7 +49,7 @@ private:
 	_float3			m_vPointDown = {};
 	_float3			m_vPoint_Up = {} ;
 	_float4x4		m_WeaponMatrix = {};
-	_uint			m_iShaderID = {};
+	_uint			m_iShaderPath = {};
 	
 	// 블렌딩 파라미터
 	_float			m_fDetailBlendRatio = 0.3f;    // 디테일 텍스처 블렌드 비율

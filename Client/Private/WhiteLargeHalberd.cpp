@@ -67,15 +67,16 @@ void CWhiteLargeHalberd::Late_Update(_float fTimeDelta)
         if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::BLEND, this)))
             return;
     }
+
+#ifdef _DEBUG
+    if (FAILED(m_pGameInstance->Add_DebugComponent(m_pColliderCom)))
+        return;
+#endif // _DEBUG
+
 }
 
 HRESULT CWhiteLargeHalberd::Render()
 {
-#ifdef _DEBUG
-    //Edit_Collider(m_pColliderCom, "WhiteLargeHalberd Lance");
-    m_pColliderCom->Render();
-#endif // _DEBUG
-
     if (FAILED(Bind_ShaderResources()))
     {
         CRASH("Ready Render Resource Failed");
@@ -92,7 +93,7 @@ HRESULT CWhiteLargeHalberd::Render()
         }
             
 
-        m_pShaderCom->Begin(0);
+        m_pShaderCom->Begin(m_iShaderPath);
         m_pModelCom->Render(i);
     }
 
