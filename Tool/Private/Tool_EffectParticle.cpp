@@ -21,6 +21,9 @@ HRESULT CTool_EffectParticle::Initialize_Prototype()
 HRESULT CTool_EffectParticle::Initialize_Clone(void* pArg)
 {
     TOOLEFFECT_PARTICLE_DESC* pDesc = static_cast<TOOLEFFECT_PARTICLE_DESC*>(pArg);
+
+    pDesc->fSpeedPerSec = 5.f;
+    pDesc->fRotationPerSec = XMConvertToRadians(90.f);
     if (FAILED(CGameObject::Initialize_Clone(pDesc)))
     {
         CRASH("Failed Clone CTool_EffectParticle");
@@ -31,11 +34,14 @@ HRESULT CTool_EffectParticle::Initialize_Clone(void* pArg)
    
 
 #pragma region 값 채우기.
-    m_fDisplayTime = pDesc->vLifeTime.y;
+    m_fDisplayTime = pDesc->vLifeTime.y; // 최대 시간.
     m_isLoop = pDesc->isLoop;
     m_eParticleType = pDesc->eParticleType;
     m_iShaderPath = pDesc->iShaderPath;
     m_isBillBoard = pDesc->isBillBoard;
+
+    
+    XMStoreFloat3(&m_vDir, pDesc->vObjectDir); // 방향 지정.
 
     /* 사용할 텍스쳐의 인덱스를 지정해줍니다. */
     for (_uint i = 0; i < TEXTURE::TEXTURE_END; ++i)
@@ -68,9 +74,17 @@ void CTool_EffectParticle::Update(_float fTimeDelta)
 
 #pragma region 파티클 타입 에 따른 업데이트
 
+    // 업데이트 이전에 현재 정보 전달.
+    
+    _vector vDirection = XMLoadFloat3(&m_vDir);
+    m_pTransformCom->Move_Direction(vDirection, fTimeDelta * 0.1f); // 지정된 방향으로 날라감.
+
+    //_fvector vPos = m_pTransformCom->Get_State(STATE::POSITION); // 이동 이후 위치 제공.
+    //m_pVIBufferCom->Bind_Transform(vPos); // Shader에서 정점들에 WorldMatrix를 이미 곱해주고 있음.
     m_pVIBufferCom->Update(fTimeDelta);
 #pragma endregion
 
+    
 
 #pragma region 타이머 업데이트
     // 타이머 업데이트
@@ -354,7 +368,7 @@ HRESULT CTool_EffectParticle::Ready_VIBuffer_Point(const TOOLEFFECT_PARTICLE_DES
     PointDesc.isLoop = pDesc->isLoop;
     PointDesc.eParticleType = static_cast<CVIBuffer_PointParticleDir_Instance::PARTICLE_TYPE>(pDesc->eParticleType);
     
-    XMStoreFloat3(&PointDesc.vDir, pDesc->vDirection);
+    XMStoreFloat3(&PointDesc.vDir, pDesc->vParticleDir);
 
     m_pVIBufferCom = CVIBuffer_PointParticleDir_Instance::Create(m_pDevice, m_pContext, &PointDesc);
     if (nullptr == m_pVIBufferCom)
@@ -398,6 +412,14 @@ void CTool_EffectParticle::Create_BossExplosionParticle(_float3 vCenterPos, _flo
     if (m_pVIBufferCom)
     {
         m_pVIBufferCom->Create_BossExplosionParticle(vCenterPos, fRadius, fGatherTime, fExplosionTime, fTotalLifeTime);
+    }
+}
+
+void CTool_EffectParticle::Create_TestParticle(const PARTICLE_TEST_INFO particleTestInfo)
+{
+    if (m_pVIBufferCom)
+    {
+        m_pVIBufferCom->Create_TestParticle(particleTestInfo);
     }
 }
 

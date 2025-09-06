@@ -48,5 +48,22 @@ typedef struct ParticleInitInfo
 }PARTICLE_INIT_INFO;
 
 
+// Input 값 (생성 시 받아옴)
+typedef struct ParticleTestInfo
+{
+	_float3 vRange;
+	
+	_float2 vLifeTime;
+	_float3 vDirection;
+	_float2 vSize;
+	_float2  vLoss;
+	_float2  vRandomSpeed;
+	_float  fRadius;
+	_float  fAlpha;
+	
+	
+}PARTICLE_TEST_INFO;
+
+
 
 NS_END

@@ -228,6 +228,9 @@
     <ClInclude Include="..\Public\VIBuffer_PointParticleDir_Instance.h">
       <Filter>03. Component\VIBuffer</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\TestParticle.h">
+      <Filter>02. GameObject\Effect\Particle</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="small.ico">
@@ -342,6 +345,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\VIBuffer_PointParticleDir_Instance.cpp">
       <Filter>03. Component\VIBuffer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\TestParticle.cpp">
+      <Filter>02. GameObject\Effect\Particle</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
