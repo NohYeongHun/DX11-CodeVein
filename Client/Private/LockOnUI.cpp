@@ -141,7 +141,7 @@ HRESULT CLockOnUI::Render()
     return S_OK;
 }
 
-void CLockOnUI::Set_Target(CGameObject* pTarget)
+void CLockOnUI::Set_Target(CMonster* pTarget)
 {
     m_pTarget = pTarget;
     m_bActive = (pTarget != nullptr);
@@ -158,8 +158,9 @@ void CLockOnUI::Clear_Target()
 HRESULT CLockOnUI::Bind_ShaderResources()
 {
     // 타겟의 월드 위치 가져오기
+    
     _vector vTargetPos = m_pTarget->Get_Transform()->Get_State(STATE::POSITION);
-    vTargetPos = XMVectorSetY(vTargetPos, XMVectorGetY(vTargetPos) + m_fTargetRadius); // 조금 더 위로
+    vTargetPos = XMVectorSetY(vTargetPos, XMVectorGetY(vTargetPos) + m_fTargetRadius) + m_pTarget->Get_LockOnOffset(); // 조금 더 위로
     //vTargetPos = XMVectorSetY(vTargetPos, XMVectorGetY(vTargetPos)); // 조금 더 위로
     
     _float fUISize = 0.5f; // 매우 작게 시작해서 보이는지 확인

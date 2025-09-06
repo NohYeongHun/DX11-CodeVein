@@ -52,7 +52,6 @@ BT_RESULT CBT_Monster_EncounterAction::Enter_Encounter(_float fTimeDelta)
 
     // 2. 조우 상태로 변경
     m_pOwner->Change_Animation_Blend(iNextAnimationIdx);
-
     return BT_RESULT::RUNNING;
 }
 
@@ -73,6 +72,7 @@ BT_RESULT CBT_Monster_EncounterAction::Complete(_float fTimeDleta)
 {
     /* Encounter 시 실행할 Action */
     m_pOwner->Encounter_Action();
+    
     return BT_RESULT::SUCCESS;
 }
 

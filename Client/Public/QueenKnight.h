@@ -112,6 +112,11 @@ public:
 	/* 어떤 파츠의 Colider를 제어할 것인지? */
 	virtual void Enable_Collider(_uint iType) override;
 	virtual void Disable_Collider(_uint iType) override;
+
+	/* 무기를 특정 애니메이션에 회전 시켜놓기 위함.*/
+public:
+	virtual void Weapon_Rotation(_uint iPartType, _float3 vRadians, _bool bInverse = false) override;
+	virtual void Encounter_Action() override;
 #pragma endregion
 
 #pragma region 7. 보스몹 체력 UI 관리

@@ -110,7 +110,7 @@ HRESULT CKnightLance::Render()
 {
 
 #ifdef _DEBUG
-    ImGui_Render();
+    //ImGui_Render();
 
 #endif // _DEBUG
 

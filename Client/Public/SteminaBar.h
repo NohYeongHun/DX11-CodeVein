@@ -1,5 +1,4 @@
 ﻿#pragma once
-#include "UIObject.h"
 
 NS_BEGIN(Client)
 /*
@@ -14,10 +13,7 @@ private:
 	CSteminaBar(const CSteminaBar& Prototype);
 	virtual ~CSteminaBar() = default;
 
-public:
-	void Increase_Stemina(_uint iStemina, _float fTime);
-	void Decrease_Stemina(_uint iStemina, _float fTime);
-
+#pragma region 0. 기본 함수들 
 public:
 	virtual HRESULT Initialize_Prototype();
 	virtual HRESULT Initialize_Clone(void* pArg);
@@ -25,8 +21,21 @@ public:
 	virtual void Update(_float fTimeDelta);
 	virtual void Late_Update(_float fTimeDelta);
 	virtual HRESULT Render();
+#pragma endregion
+
+
+#pragma region  증감 효과
+public:
+	//void Increase_Stemina(_uint iStemina, _float fTime);
+	//void Decrease_Stemina(_uint iStemina, _float fTime);
 
 public:
+	void Increase_Stemina(_float fStemina, _float fTime);
+	void Decrease_Stemina(_float fStemina, _float fTime);
+#pragma endregion
+
+
+
 
 private:
 	CShader* m_pShaderCom = { nullptr };
@@ -45,6 +54,10 @@ private:
 
 	_uint  m_iStemina = {};
 	_uint  m_iMaxStemina = {};
+
+	_float  m_fStemina = {};
+	_float  m_fMaxStemina = {};
+	_float	m_fIncreaseSpeed = {};
 
 	_bool  m_bIncrease = { false };
 	_bool  m_bDecrease = { false };

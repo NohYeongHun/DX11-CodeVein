@@ -88,6 +88,13 @@ void CPlayer_AttackState::Enter(void* pArg)
 			m_pPlayer->Get_Transform()->Set_Quaternion(qNewRot);
 		}
 	}
+	
+	// 1. 스테미나 감소.
+	STEMINA_CHANGE_DESC SteminaDesc{};
+	SteminaDesc.bIncrease = false;
+	SteminaDesc.fStemina = 20.f;
+	SteminaDesc.fTime = 1.f;
+	m_pGameInstance->Publish(EventType::STEMINA_CHANGE, &SteminaDesc);
 }
 
 /* State 실행 */

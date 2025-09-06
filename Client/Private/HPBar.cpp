@@ -26,7 +26,7 @@ HRESULT CHPBar::Initialize_Clone(void* pArg)
     m_fHp = m_fMaxHp;
 
     m_iShaderPath = static_cast<_uint>(POSTEX_SHADERPATH::HPPROGRESSBAR);
-    m_fNoiseMaxTime = 5.f;
+    m_fScrollSpeed = 0.1f;
 
     if (FAILED(Ready_Components()))
         return E_FAIL;
@@ -185,14 +185,15 @@ void CHPBar::Render_HP()
 
 void CHPBar::Time_Calc(_float fTimeDelta)
 {
-    if (m_fNoiseTime >= m_fNoiseMaxTime)
-    {
-        m_fNoiseTime = 0.f;
-    }
-    else
-    {
-        m_fNoiseTime += fTimeDelta;
-    }
+    m_fNoiseTime += fTimeDelta;
+    //if (m_fNoiseTime >= m_fNoiseMaxTime)
+    //{
+    //    m_fNoiseTime = 0.f;
+    //}
+    //else
+    //{
+    //    m_fNoiseTime += fTimeDelta;
+    //}
 }
 
 HRESULT CHPBar::Ready_Components()
@@ -237,9 +238,12 @@ HRESULT CHPBar::Ready_Render_Resources()
         return E_FAIL;
 
     // Noise Time
-    _float fNoiseTime  = Normalize(m_fNoiseTime, 0.f, m_fNoiseMaxTime);
+    //_float fNoiseTime  = Normalize(m_fNoiseTime, 0.f, m_fNoiseMaxTime);
 
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_fNoiseTime", static_cast<void*>(&fNoiseTime), sizeof(_float))))
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fNoiseTime", static_cast<void*>(&m_fNoiseTime), sizeof(_float))))
+        return E_FAIL;
+
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fScrollSpeed", static_cast<void*>(&m_fScrollSpeed), sizeof(_float))))
         return E_FAIL;
 
     if (FAILED(m_pTextureCom->Bind_Shader_Resource(m_pShaderCom, "g_Texture", m_iDiffuseIndex)))

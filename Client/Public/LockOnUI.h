@@ -31,7 +31,7 @@ public:
 
 public:
     // LockOn 대상 설정/해제
-    void Set_Target(CGameObject* pTarget);
+    void Set_Target(CMonster* pTarget);
     void Clear_Target();
     _bool Has_Target() const { return m_pTarget != nullptr; }
     
@@ -52,7 +52,7 @@ private:
     LEVEL m_eCurLevel = { LEVEL::END };
     _uint m_iShaderPath = {};
     // LockOn 관련
-    CGameObject* m_pTarget = { nullptr };
+    CMonster* m_pTarget = { nullptr };
     _float m_fTargetRadius = 1.0f;
     _bool m_bActive = false;
     

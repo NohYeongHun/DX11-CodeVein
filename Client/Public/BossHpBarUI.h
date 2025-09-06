@@ -54,7 +54,9 @@ private:
 
 	_float m_fRightRatio = {};
 	_float m_fLeftRatio = {};
+	_float m_fScrollSpeed = {};
 	_uint m_iShaderPath = {};
+
 
 
 

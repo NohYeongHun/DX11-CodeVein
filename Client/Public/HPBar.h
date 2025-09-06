@@ -5,6 +5,7 @@ NS_BEGIN(Client)
 */
 class CHPBar final : public CUIObject
 {
+
 private:
 	CHPBar(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	CHPBar(const CHPBar& Prototype);
@@ -56,6 +57,7 @@ private:
 	// Noise Time => Texture 흐르는 효과
 	_float m_fNoiseTime = {};
 	_float m_fNoiseMaxTime = {};
+	_float m_fScrollSpeed = {};
 
 
 #pragma endregion

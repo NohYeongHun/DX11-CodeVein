@@ -10,6 +10,7 @@ vector g_vCamPosition;
 
 /*재질*/
 texture2D g_DiffuseTexture;
+texture2D g_NormalTexture;
 
 /*재질*/
 texture2D g_DissolveTexture;

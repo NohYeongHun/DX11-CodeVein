@@ -21,8 +21,6 @@ BT_RESULT CBT_QueenKnight_FirstPhase_AttackAction::Perform_Action(_float fTimeDe
         return UpdateFirstAttack(fTimeDelta);
     case ATTACK_PHASE::SECOND_ATTACK:
         return UpdateSecondAttack(fTimeDelta);
-    case ATTACK_PHASE::LAST_ATTACK:
-        return UpdateLastAttack(fTimeDelta);
     case ATTACK_PHASE::COMPLETED:
         return Complete(fTimeDelta);
     }
@@ -124,21 +122,39 @@ BT_RESULT CBT_QueenKnight_FirstPhase_AttackAction::UpdateSecondAttack(_float fTi
         m_pOwner->RotateTurn_ToTargetYaw();
         m_IsSecondAttack = true;
     }
-    
-    if (m_pOwner->Get_CurrentAnimationRatio() > 0.7f)
+
+    if (m_pOwner->Is_Animation_Finished())
     {
-        m_eAttackPhase = ATTACK_PHASE::LAST_ATTACK;
+        m_eAttackPhase = ATTACK_PHASE::COMPLETED;
 
-        // 1. 공격 애니메이션 선택
-        _uint iNextAnimationIdx = m_pOwner->Find_AnimationIndex(L"PHASE_ATTACK3");
+        //m_pOwner->Set_RootMotionTranslate(false);
+        // 1. IDLE 애니메이션 선택
+        _uint iNextAnimationIdx = m_pOwner->Find_AnimationIndex(L"IDLE");
 
-        // 2. 공격 상태로 변경
-        m_pOwner->Change_Animation_Blend(iNextAnimationIdx, false ,0.2f, true, true, true);
-        
-        // 3. 콜라이더 상태 초기화
-        m_pOwner->Reset_Collider_ActiveInfo();
-        
+        // 2. IDLE 상태로 변경
+        m_pOwner->Change_Animation_NonBlend(iNextAnimationIdx);
     }
+
+    //if (!m_IsSecondAttack)
+    //{
+    //    m_pOwner->RotateTurn_ToTargetYaw();
+    //    m_IsSecondAttack = true;
+    //}
+    //
+    //if (m_pOwner->Get_CurrentAnimationRatio() > 0.7f)
+    //{
+    //    m_eAttackPhase = ATTACK_PHASE::LAST_ATTACK;
+
+    //    // 1. 공격 애니메이션 선택
+    //    _uint iNextAnimationIdx = m_pOwner->Find_AnimationIndex(L"PHASE_ATTACK3");
+
+    //    // 2. 공격 상태로 변경
+    //    m_pOwner->Change_Animation_Blend(iNextAnimationIdx, false ,0.2f, true, true, true);
+    //    
+    //    // 3. 콜라이더 상태 초기화
+    //    m_pOwner->Reset_Collider_ActiveInfo();
+    //    
+    //}
 
     return BT_RESULT::RUNNING;
 }

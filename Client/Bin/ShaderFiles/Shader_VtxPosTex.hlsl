@@ -10,6 +10,7 @@ float g_fNoiseTime;
 
 float g_fRightRatio;
 float g_fLeftRatio;
+float g_fScrollSpeed;
 bool g_bIncrease;
 
 
@@ -165,11 +166,10 @@ PS_OUT PS_HP_PROGRESSBAR_MAIN(PS_IN In)
     float4 fillerBlack = float4(0, 0, 0, 1);
     
     // 시간 변수 및 스크롤 속도 (외부에서 전달되어야 함)
-    float scrollSpeed = 0.3;
 
     // 스크롤된 uv를 사용하여 baseColor를 샘플링
     float2 scrolledUv = uv;
-    scrolledUv.x = frac(uv.x - g_fNoiseTime * scrollSpeed);
+    scrolledUv.x = frac(uv.x - g_fNoiseTime * g_fScrollSpeed);
 
     // 왜곡 효과 적용 (선택 사항)
     float4 distortion = g_NoiseTexture.Sample(PointSampler, scrolledUv);

@@ -1,5 +1,4 @@
-﻿#include "Loader_StageOne.h"
-HRESULT CLoader_StageOne::Loading_Resource(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
+﻿HRESULT CLoader_StageOne::Loading_Resource(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
 {
 
 	if (FAILED(Add_Prototype_Map(pDevice, pContext, pGameInstance)))

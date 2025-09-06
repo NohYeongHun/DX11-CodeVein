@@ -1,6 +1,4 @@
-﻿#include "BossHpBarUI.h"
-
-CBossHpBarUI::CBossHpBarUI(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿CBossHpBarUI::CBossHpBarUI(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CUIObject(pDevice, pContext)
 {
 }
@@ -30,7 +28,9 @@ HRESULT CBossHpBarUI::Initialize_Clone(void* pArg)
     m_fMaxHp = pDesc->fMaxHp;
     m_fHp = m_fMaxHp;
     m_strName = pDesc->strName;
+    m_fScrollSpeed = 0.05f;
     m_iShaderPath = static_cast<_uint>(pDesc->eShaderPath);
+    
     
 
     m_pTransformCom->Scale(_float3(0.7f, 0.7f, 1.f));
@@ -202,16 +202,18 @@ HRESULT CBossHpBarUI::Ready_Render_Resources()
 
     /* HP 비율 */
     _float fFillRatio = 1.f - (static_cast<_float>(m_fHp) / static_cast<_float>(m_fMaxHp));
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_fFillRatio", static_cast<void*>(&fFillRatio), sizeof(fFillRatio))))
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fFillRatio", static_cast<void*>(&fFillRatio), sizeof(_float))))
         return E_FAIL;
 
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_fLeftRatio", static_cast<void*>(&m_fLeftRatio), sizeof(m_fLeftRatio))))
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fLeftRatio", static_cast<void*>(&m_fLeftRatio), sizeof(_float))))
         return E_FAIL;
 
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_fRightRatio", static_cast<void*>(&m_fRightRatio), sizeof(m_fRightRatio))))
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fRightRatio", static_cast<void*>(&m_fRightRatio), sizeof(_float))))
+        return E_FAIL;
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fScrollSpeed", static_cast<void*>(&m_fScrollSpeed), sizeof(_float))))
         return E_FAIL;
 
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_bIncrease", static_cast<void*>(&m_bIncrease), sizeof(m_bIncrease))))
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_bIncrease", static_cast<void*>(&m_bIncrease), sizeof(_bool))))
         return E_FAIL;
 
     if (FAILED(m_pTextureCom->Bind_Shader_Resource(m_pShaderCom, "g_Texture", m_iTextureIndex)))

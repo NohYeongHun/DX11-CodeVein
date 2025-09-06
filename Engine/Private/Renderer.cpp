@@ -418,13 +418,13 @@ HRESULT CRenderer::Render_Debug()
     m_DebugComponent.clear();
 
 
-    if (FAILED(m_pShader->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix)))
+   /* if (FAILED(m_pShader->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix)))
         return E_FAIL;
 
     if (FAILED(m_pShader->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
         return E_FAIL;
 
-    m_pGameInstance->Render_RT_Debug(m_pShader, m_pVIBuffer);
+    m_pGameInstance->Render_RT_Debug(m_pShader, m_pVIBuffer);*/
 
     return S_OK;
 }

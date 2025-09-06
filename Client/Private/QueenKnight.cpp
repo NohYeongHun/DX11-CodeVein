@@ -90,10 +90,6 @@ HRESULT CQueenKnight::Initialize_Clone(void* pArg)
         return E_FAIL;
     }
 
-
-
-
-
     _vector qInitRot = XMQuaternionRotationAxis(XMVectorSet(0.f, 1.f, 0.f, 0.f), 0.0f);
     m_pTransformCom->Set_Quaternion(qInitRot);
 
@@ -170,7 +166,7 @@ void CQueenKnight::Late_Update(_float fTimeDelta)
 HRESULT CQueenKnight::Render()
 {
 #ifdef _DEBUG
-    ImGui_Render();
+    //ImGui_Render();
 #endif // _DEBUG
 
     if (FAILED(Bind_Shader_Resource()))
@@ -426,13 +422,16 @@ HRESULT CQueenKnight::InitializeAction_ToAnimationMap()
 
 #pragma region 특수 공격
 
-    /* 연속 3번 공격. */
-    m_Action_AnimMap.emplace(L"PHASE_ATTACK1", AS_TStdKnight_TShieldSword_AttackShield02B_N);
-    m_Action_AnimMap.emplace(L"PHASE_ATTACK2", AS_TStdKnight_TShieldSword_AttackShield02C_N);
-    m_Action_AnimMap.emplace(L"PHASE_ATTACK3", AS_TStdKnight_TShieldSword_AttackShield02A_N);
+    /* 연속 3번 공격. => 방패 위치가 반대임 바꿔야댐47 */
+    //m_Action_AnimMap.emplace(L"PHASE_ATTACK1", AS_TStdKnight_TShieldSword_AttackShield02B_N);
+    //m_Action_AnimMap.emplace(L"PHASE_ATTACK2", AS_TStdKnight_TShieldSword_AttackShield02C_N);
+    //m_Action_AnimMap.emplace(L"PHASE_ATTACK3", AS_TStdKnight_TShieldSword_AttackShield02A_N);
+    m_Action_AnimMap.emplace(L"PHASE_ATTACK1", AS_TStdKnight_TLanceGCS_AttackNormal01_N);
+    m_Action_AnimMap.emplace(L"PHASE_ATTACK2", AS_TStdKnight_TLanceGCS_AttackNormal02_N);
 
     /* 돌진 애니메이션. */
-    m_Action_AnimMap.emplace(L"DODGE_B", AS_TStdKnight_TCmn_Dodge_B);
+    //m_Action_AnimMap.emplace(L"DODGE_B", AS_TStdKnight_TCmn_Dodge_B);
+    m_Action_AnimMap.emplace(L"DODGE_B", AS_TStdKnight_TLanceGCS_AttackBackStep01_N);
     m_Action_AnimMap.emplace(L"DASH_ATTACK_START", AS_TStdKnight_TSword_AttackSpecial03_N_Start);
     m_Action_AnimMap.emplace(L"DASH_ATTACK_LOOP", AS_TStdKnight_TSword_AttackSpecial03_N_Loop);
     m_Action_AnimMap.emplace(L"DASH_ATTACK_END", AS_TStdKnight_TSword_AttackSpecial03_N_End);
@@ -454,20 +453,17 @@ HRESULT CQueenKnight::InitializeAction_ToAnimationMap()
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"DOWN_STRIKE_SKILL"], 1.5f);
 
 
-    //m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"WARP_START"], 1.5f);
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"WARP_START"], 1.8f);
-    //m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"WARP_END"], 1.5f);
-    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"WARP_END"], 1.6f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"WARP_AEND"], 1.6f);
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"WARP_SKILL"], 1.8f);
-    //m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"WARP_END"], 1.5f);
 
 
     /* Phase Attack 1 ~ 3 */
-    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"PHASE_ATTACK1"], 2.5f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"PHASE_ATTACK1"], 2.f);
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"PHASE_ATTACK2"], 2.5f);
-    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"PHASE_ATTACK3"], 2.5f);
+    //m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"PHASE_ATTACK3"], 2.5f);
 
-    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"DODGE_B"], 2.5f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"DODGE_B"], 1.5f);
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"DASH_ATTACK_START"], 2.5f);
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"DASH_ATTACK_END"], 4.f);
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"IDLE_L180"], 10.f);
@@ -475,7 +471,7 @@ HRESULT CQueenKnight::InitializeAction_ToAnimationMap()
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"IDLE_R180"], 10.f);
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"IDLE_R90"], 10.f);
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"IDLE"], 10.f);
-    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"ATTACK"], 1.5f);
+    //m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"ATTACK"], 1.5f);
 #pragma endregion
 
 
@@ -484,29 +480,26 @@ HRESULT CQueenKnight::InitializeAction_ToAnimationMap()
 #pragma region COllider 활성화 프레임 관리
     // 100 ~ 136 Frame 활성화
     Add_Collider_Frame(m_Action_AnimMap[TEXT("DASH_ATTACK_START")], 100.f / 136.f, 136.f / 136.f, PART_WEAPON);     // Dash Attack
-    Add_Collider_Frame(m_Action_AnimMap[TEXT("DASH_ATTACK_END")], 0.f / 130.f, 100.f / 130.f, PART_WEAPON);     // Dash Attack
+    Add_Collider_Frame(m_Action_AnimMap[TEXT("DASH_ATTACK_END")], 0.f / 130.f, 120.f / 130.f, PART_WEAPON);     // Dash Attack
 
 
     Add_Collider_Frame(m_Action_AnimMap[TEXT("WARP_END")], 20.f / 137.f, 40.f / 137.f, PART_WEAPON);     // Dash Attack
     // 공격 프레임 60 ~ 100프레임.1
     Add_Collider_Frame(m_Action_AnimMap[TEXT("DOWN_STRIKE")], 60.f / 224.f, 85.f / 224.f, PART_WEAPON);     // Dash Attack
     
+    Add_Collider_Frame(m_Action_AnimMap[TEXT("ATTACK")], 54.f / 194.f, 75.f / 194.f, PART_WEAPON);       // Weapon attack
 
-
-    Add_Collider_Frame(m_Action_AnimMap[TEXT("ATTACK")], 40.f / 195.f, 70.f / 195.f, PART_WEAPON);       // Weapon attack
-    Add_Collider_Frame(m_Action_AnimMap[TEXT("PHASE_ATTACK1")], 40.f / 180.f, 80.f / 180.f, PART_WEAPON);// Weapon attack
-    Add_Collider_Frame(m_Action_AnimMap[TEXT("PHASE_ATTACK2")], 40.f / 180.f, 80.f / 180.f, PART_WEAPON);// Weapon attack
-    Add_Collider_Frame(m_Action_AnimMap[TEXT("PHASE_ATTACK3")], 40.f / 180.f, 80.f / 180.f, PART_WEAPON);// Weapon attack
+    Add_Collider_Frame(m_Action_AnimMap[TEXT("PHASE_ATTACK1")], 54.f / 194.f, 75.f / 194.f, PART_WEAPON);// Weapon attack
+    Add_Collider_Frame(m_Action_AnimMap[TEXT("PHASE_ATTACK2")], 40.f / 241.f, 60.f / 241.f, PART_WEAPON);// Weapon attack
 #pragma endregion
 
 #pragma region TRAIL 활성화 프레임 관리.
     Add_Trail_Frame(m_Action_AnimMap[TEXT("WARP_END")], 17.f / 136.f, 50.f / 136.f, PART_WEAPON);     // Dash Attack
-    //Add_Trail_Frame(m_Action_AnimMap[TEXT("WARP_END")], 20.f / 137.f, 40.f / 137.f, PART_WEAPON);     // Dash Attack
-    //Add_Trail_Frame(m_Action_AnimMap[TEXT("WARP_END")], 20.f / 137.f, 40.f / 137.f, PART_WEAPON);     // Dash Attack
+    Add_Trail_Frame(m_Action_AnimMap[TEXT("DODGE_B")],10.f / 136.f, 65.f / 136.f, PART_WEAPON);     // Dash Attack
 
-    Add_Trail_Frame(m_Action_AnimMap[TEXT("PHASE_ATTACK1")], 20.f / 180.f, 80.f / 180.f, PART_WEAPON);// Weapon attack
-    Add_Trail_Frame(m_Action_AnimMap[TEXT("PHASE_ATTACK2")], 20.f / 180.f, 80.f / 180.f, PART_WEAPON);// Weapon attack
-    Add_Trail_Frame(m_Action_AnimMap[TEXT("PHASE_ATTACK3")], 20.f / 180.f, 80.f / 180.f, PART_WEAPON);// Weapon attack
+
+    Add_Trail_Frame(m_Action_AnimMap[TEXT("PHASE_ATTACK1")], 20.f / 194.f, 80.f / 194.f, PART_WEAPON);// Weapon attack
+    Add_Trail_Frame(m_Action_AnimMap[TEXT("PHASE_ATTACK2")], 20.f / 241.f, 60.f / 241.f, PART_WEAPON);// Weapon attack
 
     Add_Trail_Frame(m_Action_AnimMap[TEXT("ATTACK")], 30.f / 195.f, 70.f / 195.f, PART_WEAPON);       // Weapon attack
 
@@ -598,6 +591,45 @@ void CQueenKnight::Disable_Collider(_uint iType)
     }
 }
 
+void CQueenKnight::Weapon_Rotation(_uint iPartType, _float3 vRadians, _bool bInverse)
+{
+
+    if (bInverse)
+    {
+        switch (iPartType)
+        {
+        case PART_WEAPON:
+            m_pWeapon->Get_Transform()->Add_Inverse_Rotation(vRadians.x, vRadians.y, vRadians.z);
+            break;
+        case PART_SHIELD:
+            m_pShield->Get_Transform()->Add_Inverse_Rotation(vRadians.x, vRadians.y, vRadians.z);
+            break;
+        default:
+            break;
+        }
+        return;
+    }
+
+
+    switch (iPartType)
+    {
+    case PART_WEAPON:
+        m_pWeapon->Get_Transform()->Add_Rotation(vRadians.x, vRadians.y, vRadians.z);
+        break;
+    case PART_SHIELD:
+        m_pShield->Get_Transform()->Add_Rotation(vRadians.x, vRadians.y, vRadians.z);
+        break;
+    default:
+        break;
+    }
+}
+
+void CQueenKnight::Encounter_Action()
+{
+    Weapon_Rotation(PART_TYPE::PART_SHIELD
+        , { XMConvertToRadians(180.f), XMConvertToRadians(0.f), XMConvertToRadians(-90.f)}, true);
+}
+
 #pragma endregion
 
 #pragma region 7. 보스몹 UI 관리
@@ -655,8 +687,6 @@ void CQueenKnight::Set_Visible(_bool bVisible)
     m_pWeapon->Set_Visible(m_bVisible);
     m_pShield->Set_Visible(m_bVisible);
 }
-
-
 
 
 #pragma endregion

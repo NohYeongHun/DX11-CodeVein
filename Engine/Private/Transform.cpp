@@ -399,6 +399,16 @@ void CTransform::Add_Rotation(_float fPitch, _float fYaw, _float fRoll)
 	m_bIsDirty = true;
 }
 
+void CTransform::Add_Inverse_Rotation(_float fPitch, _float fYaw, _float fRoll)
+{
+	// 1. 회전 쿼터니언 생성 (Yaw-Pitch-Roll 순서)
+	_vector deltaQuat = XMQuaternionRotationRollPitchYaw(fPitch, fYaw, fRoll);
+	deltaQuat = XMQuaternionInverse(deltaQuat);
+	// 2. 기존 쿼터니언과 곱해 누적 (순서 주의: 새 회전을 뒤에 곱한다)
+	m_QuatRotation = XMQuaternionNormalize(XMQuaternionMultiply(m_QuatRotation, deltaQuat));
+	m_bIsDirty = true;
+}
+
 CTransform* CTransform::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
 	CTransform* pInstance = new CTransform(pDevice, pContext);

@@ -58,6 +58,8 @@ HRESULT CMonster::Initialize_Clone(void* pArg)
     _vector vMonsterPos = XMVectorSetW(XMLoadFloat3(&pDesc->vPos), 1.f);
     m_pTransformCom->Set_State(STATE::POSITION, vMonsterPos);
 
+    // 락온 위치 지정
+    m_vLockOnOffset = pDesc->vLockOnOffset;
 
     return S_OK;
 }
@@ -928,11 +930,17 @@ _bool CMonster::Monster_Dead()
 #pragma region 99. DEBUG용도 함수.
 #ifdef _DEBUG
 
+const _vector CMonster::Get_LockOnOffset()
+{
+    _vector vLockOnOffset = XMLoadFloat3(&m_vLockOnOffset);
+    return vLockOnOffset;
+}
+
 void CMonster::Print_Position()
 {
     _float3 vDebugPos = {};
 
-    _wstring wstrTag = m_strObjTag + TEXT("| Pos : ");
+    _wstring wstrTag = m_strObjTag + TEXT(" Pos : ");
     OutputDebugWstring(wstrTag);
 
     _vector vPos = m_pTransformCom->Get_State(STATE::POSITION);

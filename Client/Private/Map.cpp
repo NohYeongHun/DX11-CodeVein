@@ -36,7 +36,6 @@ HRESULT CMap::Initialize_Clone(void* pArg)
     }
         
 
-
     /* 2배 기준으로 NaviMesh 깔았음. */
     m_pTransformCom->Set_Scale(pDesc->vScale);
     // Player 정면 바라보게 하기?
@@ -95,6 +94,7 @@ HRESULT CMap::Render()
     for (_uint i = 0; i < iNumMeshes; i++)
     {
         m_pModelCom->Bind_Materials(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE, 0);
+        m_pModelCom->Bind_Materials(m_pShaderCom, "g_NormalTexture", i, aiTextureType_NORMALS, 0);
 
         if (FAILED(m_pShaderCom->Begin(m_iShaderPath)))
         {

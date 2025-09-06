@@ -1,7 +1,4 @@
-﻿#include "Tool_MainApp.h"
-#include "GameInstance.h"
-
-CTool_MainApp::CTool_MainApp()
+﻿CTool_MainApp::CTool_MainApp()
 	: m_pGameInstance{ CGameInstance::GetInstance() }
 {
 	Safe_AddRef(m_pGameInstance);

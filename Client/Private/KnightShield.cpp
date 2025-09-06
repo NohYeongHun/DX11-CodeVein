@@ -13,7 +13,7 @@ HRESULT CKnightShield::Initialize_Prototype()
     return S_OK;
 }
 
-HRESULT CKnightShield::Initialize(void* pArg)
+HRESULT CKnightShield::Initialize_Clone(void* pArg)
 {
     KNIGHT_SHIELD_DESC* pDesc = static_cast<KNIGHT_SHIELD_DESC*>(pArg);
 
@@ -33,8 +33,7 @@ HRESULT CKnightShield::Initialize(void* pArg)
         return E_FAIL;
     }
         
-
-    //m_pTransformCom->Add_Rotation(XMConvertToRadians(180.f), 0.f, -90.f);
+    m_pTransformCom->Add_Rotation(XMConvertToRadians(180.f), 0.f, XMConvertToRadians(-90.f));
 
     return S_OK;
 }
@@ -235,7 +234,7 @@ CGameObject* CKnightShield::Clone(void* pArg)
 {
     CKnightShield* pInstance = new CKnightShield(*this);
 
-    if (FAILED(pInstance->Initialize(pArg)))
+    if (FAILED(pInstance->Initialize_Clone(pArg)))
     {
         MSG_BOX(TEXT("Failed to Created : CKnightShield"));
         Safe_Release(pInstance);
@@ -265,9 +264,17 @@ void CKnightShield::ImGui_Render()
     string strDebug = "QueenKnight Shield Debug";
     ImGui::Begin(strDebug.c_str(), nullptr, ImGuiWindowFlags_NoCollapse);
 
-    static _float fPitch = { 0.f }, fYaw = { 0.f }, fRoll = { 0.f };
+    static _float Rotation[3] = { 0.f, 0.f, 0.f };
 
-    //m_pTransformCom->Add_Rotation();
+    ImGui::InputFloat3("Rotation ", Rotation);
+
+    if (ImGui::Button("Apply Rotation"))
+    {
+        m_pTransformCom->Add_Rotation(Rotation[0], Rotation[1], Rotation[2]);
+    }
+    
+
+    
 
     ImGui::End();
 

@@ -27,6 +27,12 @@ private:
     CBounding_OBB::BOUNDING_OBB_DESC* m_OriginDesc = { nullptr };
     _bool m_IsColliderChange = { false };
 
+    _float m_fDodgeRatio = { 110.f / 208.f};
+    _float m_fDashRatio = { 130.f / 137.f };
+    _float m_fDashTime = {};
+    _bool m_IsSpeedChange = { false };
+
+    
 
 public:
     explicit CBT_QueenKnight_DashAttackAction(class CQueenKnight* pOwner);
