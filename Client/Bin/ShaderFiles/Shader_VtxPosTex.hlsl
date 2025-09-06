@@ -3,9 +3,15 @@
 matrix g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 texture2D g_Texture;
 texture2D g_MaskTexture;
-
+texture2D g_NoiseTexture;
 
 float g_fFillRatio;
+float g_fNoiseTime;
+
+float g_fRightRatio;
+float g_fLeftRatio;
+bool g_bIncrease;
+
 
 struct VS_IN
 {
@@ -105,7 +111,7 @@ PS_OUT PS_SKILLSLOT_MAIN(PS_IN In)
 
     if (bIsInDiamond && bIsFillRegion)
     {
-        Out.vColor = lerp(baseColor, fillerColor, 0.8f); // �ε巴�� ����
+        Out.vColor = lerp(baseColor, fillerColor, 0.8f); 
     }
     else
     {
@@ -148,9 +154,6 @@ PS_OUT PS_TITLE_BACKGROUND_MAIN(PS_IN In)
     return Out;
 }
 
-float g_fRightRatio; 
-float g_fLeftRatio;
-bool g_bIncrease;
 
 // HP Bar Progress
 PS_OUT PS_HP_PROGRESSBAR_MAIN(PS_IN In)
@@ -158,27 +161,42 @@ PS_OUT PS_HP_PROGRESSBAR_MAIN(PS_IN In)
     PS_OUT Out = (PS_OUT) 0;
 
     float2 uv = In.vTexcoord;
-    float4 fillerColor = float4(0.5, 0.5, 0.5, 1); 
+    float4 fillerColor = float4(0.5, 0.5, 0.5, 1);
     float4 fillerBlack = float4(0, 0, 0, 1);
-    float4 baseColor = g_Texture.Sample(DefaultSampler, uv);
+    
+    // 시간 변수 및 스크롤 속도 (외부에서 전달되어야 함)
+    float scrollSpeed = 0.3;
 
+    // 스크롤된 uv를 사용하여 baseColor를 샘플링
+    float2 scrolledUv = uv;
+    scrolledUv.x = frac(uv.x - g_fNoiseTime * scrollSpeed);
+
+    // 왜곡 효과 적용 (선택 사항)
+    float4 distortion = g_NoiseTexture.Sample(PointSampler, scrolledUv);
+    float distortionStrength = 0.05;
+    float2 distortedUv = scrolledUv + (distortion.rg - 0.5) * distortionStrength;
+
+    // 흐르는 효과가 적용된 baseColor
+    float4 baseColor = g_Texture.Sample(PointSampler, distortedUv);
+    
+    // bIsFill과 bIsFillGray는 원래의, 즉 스크롤되지 않은 uv를 사용합니다.
     bool bIsFillGray = uv.x < g_fRightRatio && uv.x > g_fLeftRatio;
-    bool bIsFill; 
+    bool bIsFill;
     
     if (g_bIncrease)
-        bIsFill = uv.x > g_fLeftRatio; 
+        bIsFill = uv.x > g_fLeftRatio;
     else
-        bIsFill = uv.x > (1.0 - g_fFillRatio); 
-       
+        bIsFill = uv.x > (1.0 - g_fFillRatio);
     
     if (bIsFill)
     {
+        // 흐르는 효과가 적용된 baseColor를 사용해 lerp
         if (bIsFillGray)
         {
-            Out.vColor = lerp(baseColor, fillerColor, 0.8f); 
+            Out.vColor = lerp(baseColor, fillerColor, 0.8f);
         }
         else
-            Out.vColor = fillerBlack; 
+            Out.vColor = fillerBlack;
     }
     else
     {
@@ -186,6 +204,61 @@ PS_OUT PS_HP_PROGRESSBAR_MAIN(PS_IN In)
     }
 
     return Out;
+    
+    
+    //PS_OUT Out = (PS_OUT) 0;
+
+    //float2 uv = In.vTexcoord;
+    //float4 fillerColor = float4(0.5, 0.5, 0.5, 1); 
+    //float4 fillerBlack = float4(0, 0, 0, 1);
+    ////float4 baseColor = g_Texture.Sample(PointSampler, uv);
+
+    // // 흐르는 효과의 속도를 조절하는 변수
+    //float scrollSpeed = 0.2;
+    
+    //// uv.x 좌표에 시간을 더하여 텍스처를 가로(x축) 방향으로 스크롤
+    //float2 scrolledUv = uv;
+    //scrolledUv.x += g_fNoiseTime * scrollSpeed;
+    
+    //// Image 2 (g_DistortionTexture라고 가정)에서 왜곡 값을 샘플링
+    //// 두 번째 이미지를 텍스처로 로드하고 g_DistortionTexture로 바인딩했다고 가정합니다.
+    //float4 distortion = g_NoiseTexture.Sample(PointSampler, uv);
+    
+    //// 왜곡의 강도를 조절하는 변수 (예: 0.01)
+    //float distortionStrength = 0.05;
+    
+    //// uv 좌표에 왜곡 적용
+    //// distortion.r은 흑백 이미지의 빨간 채널 값을 사용합니다.
+    //// 0.5를 빼서 -0.5 ~ 0.5 범위로 만들어 uv를 양방향으로 이동시킵니다.
+    //float2 distortedUv = uv + (distortion.rg - 0.5) * distortionStrength;
+    
+    //float4 baseColor = g_Texture.Sample(PointSampler, distortedUv);
+    
+    
+    //bool bIsFillGray = uv.x < g_fRightRatio && uv.x > g_fLeftRatio;
+    //bool bIsFill; 
+    
+    //if (g_bIncrease)
+    //    bIsFill = uv.x > g_fLeftRatio; 
+    //else
+    //    bIsFill = uv.x > (1.0 - g_fFillRatio); 
+       
+    
+    //if (bIsFill)
+    //{
+    //    if (bIsFillGray)
+    //    {
+    //        Out.vColor = lerp(baseColor, fillerColor, 0.8f); 
+    //    }
+    //    else
+    //        Out.vColor = fillerBlack; 
+    //}
+    //else
+    //{
+    //    Out.vColor = baseColor;
+    //}
+
+    //return Out;
 }
 
 PS_OUT PS_BLACK_MAIN(PS_IN In)
