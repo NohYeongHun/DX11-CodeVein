@@ -1070,7 +1070,7 @@ void CMonster::Show_Slash_UI_At_Position(_fvector vHitPosition, _fvector vAttack
     Desc.vHitPosition = vHitPosition;
     Desc.vHitDirection = vAttackDirection;
     Desc.fDisPlayTime = 0.5f;
-    HRESULT hr = m_pGameInstance->Move_GameObject_ToObjectLayer(ENUM_CLASS(m_eCurLevel)
+    HRESULT hr = m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(m_eCurLevel)
         , TEXT("SLASH_EFFECT"), TEXT("Layer_Effect"), 1, ENUM_CLASS(CSlash::EffectType), &Desc);
 
     if (FAILED(hr))

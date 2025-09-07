@@ -804,6 +804,21 @@ void CPlayer::SetTrail_Visible(_bool bTrail)
 {
     m_pPlayerWeapon->Set_Trail(bTrail);
 }
+
+
+#pragma endregion
+
+#pragma region MyRegion
+void CPlayer::Create_Particle(CParticleSystem::PARTICLE_TYPE eType)
+{
+    CParticleSystem::PARTICLESYSTEM_ACTIVATE_DESC ActivateDesc = {};
+    ActivateDesc.eAttachType = CParticleSystem::EAttachType::WORLD;
+    ActivateDesc.pOwnerTransform = m_pTransformCom;
+
+    m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(m_eCurLevel)
+        , TEXT("PARTICLE_SYSTEM"), TEXT("Layer_Effect")
+        , 2, ENUM_CLASS(EFFECTTYPE::PARTICLE), &ActivateDesc);
+}
 #pragma endregion
 
 

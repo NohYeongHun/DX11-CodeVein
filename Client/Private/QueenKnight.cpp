@@ -699,8 +699,8 @@ void CQueenKnight::Create_QueenKnightWarp_Effect_Particle(_float3 vDir)
     Desc.vStartPos = m_pTransformCom->Get_State(STATE::POSITION); // 몬스터 현재위치로 생성.
     Desc.particleInitInfo.lifeTime = 5.f;
     Desc.particleInitInfo.dir = vDir;
-    m_pGameInstance->Move_GameObject_ToObjectLayer(ENUM_CLASS(m_eCurLevel)
-        , TEXT("QUEENKNIGHT_WARP"), TEXT("Layer_Effect"), 2, ENUM_CLASS(CEffectParticle::EffectType), &Desc);
+    m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(m_eCurLevel)
+        , TEXT("QUEENKNIGHT_WARP"), TEXT("Layer_Effect"), 2, ENUM_CLASS(EFFECTTYPE::PARTICLE), &Desc);
 
 }
 

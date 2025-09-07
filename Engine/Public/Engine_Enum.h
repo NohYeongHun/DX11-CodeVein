@@ -28,7 +28,11 @@ namespace Engine
 
 	enum class COLLIDERSHAPE { NONE = 0, AABB, OBB, SPHERE, CAPSULE, END };
 
-	enum class EFFECTTYPE { TEXTURE, PARTICLE, MESH, END };
+	enum class EFFECTTYPE { PARTICLE, MESH, TEXTURE, TRAIL, END };
+	// Emitter의 방출 형태
+	enum EMITTER_SHAPE { EMITTER_POINT, EMITTER_BOX, EMITTER_SPHERE, EMITTER_CONE };
+	// Emitter의 방출 타입
+	enum EMISSION_TYPE { EMITTER_CONTINUOUS, EMITTER_BURST };
 
 	// 콜라이더 타입 별로 배열에 담을 것.
 	enum class COLLIDERLAYER : uint32_t {

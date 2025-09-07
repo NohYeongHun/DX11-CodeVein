@@ -201,6 +201,7 @@ PS_OUT PS_STRETCH_TRAIL(PS_IN In)
         discard;
     //Out.vDiffuse.rgb = float3(0.f, 0.f, 0.f);
     //Out.vDiffuse.a = 1.f;
+    
     return Out;
 }
 

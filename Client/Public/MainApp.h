@@ -1,7 +1,5 @@
 ﻿#pragma once
 
-#include "Client_Defines.h"
-#include "Base.h"
 
 NS_BEGIN(Engine)
 class CGameInstance;
@@ -16,7 +14,7 @@ private:
 	virtual ~CMainApp() = default;
 
 public:
-	HRESULT Initialize_Clone();
+	HRESULT Initialize();
 	void Update(_float fTimeDelta);
 	HRESULT Render();
 
@@ -28,30 +26,16 @@ private:
 	CImgui_Manager* m_pImGui_Manager = { nullptr };
 
 private:
-#pragma region PROTOTYPE
-	HRESULT Ready_Prototype_ForStatic();
-	HRESULT Ready_Prototype_ForUsageTexture();
-	//HRESULT Ready_Prototype_ForModel();
-	HRESULT Ready_Prototype_ForPlayer();
-	HRESULT Ready_Prototype_HUD();
-	HRESULT Ready_Prototype_Inventory();
-	HRESULT Ready_Prototype_SkillUI();
-	HRESULT Ready_Prototype_MonsterUI();
-	HRESULT Ready_Prototype_Fonts();
-#pragma endregion
+	// 로더용 클래스 하나 가져오기.
+	CLoader_Static m_cLoader_Static;
 
 
 #pragma region STATIC OBJECT
 	HRESULT Ready_Clone_ForStatic();
-	HRESULT Ready_Clone_Texture();
 	HRESULT Ready_Clone_HUD(const _wstring& strLayerTag);
 	HRESULT Ready_Clone_Inventory(const _wstring& strLayerTag);
 	HRESULT Ready_Clone_SkillUI(const _wstring& strLayerTag);
 	
-#pragma endregion
-
-#pragma region EFFECT
-	HRESULT Ready_Prototype_Effect();
 #pragma endregion
 
 

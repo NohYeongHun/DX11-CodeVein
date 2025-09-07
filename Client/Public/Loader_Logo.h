@@ -22,6 +22,9 @@ private:
     HRESULT Add_Prototype_Platform(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance);
     
 
+private:
+    HRESULT Add_Prototpye_Static(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance);
+
 };
 
 NS_END

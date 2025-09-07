@@ -1195,10 +1195,10 @@ void CMap_Tool::Render_Effect_ParticleInspector()
             ImGui::SliderFloat("Distance from Camera", &distance, 1.0f, 20.0f);
 
             // 카메라 기준 방향 설정.
-            static float direction[3] = { 0.0f, 0.0f, 0.0f };
+            static float direction[3] = { 0.0f, 0.1f, 0.0f };
             ImGui::InputFloat3("Particle Direction", direction);
 
-            static float ObjectDirection[3] = { 0.0f, 0.0f, 0.0f };
+            static float ObjectDirection[3] = { 0.0f, 0.1f, 0.0f };
             ImGui::InputFloat3("Object Direction", ObjectDirection);
 
             /* 변수값 넣기. */

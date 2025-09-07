@@ -1,6 +1,4 @@
-﻿#include "GameInstance.h"
-
-IMPLEMENT_SINGLETON(CGameInstance)
+﻿IMPLEMENT_SINGLETON(CGameInstance)
 
 CGameInstance::CGameInstance()
 {
@@ -656,12 +654,12 @@ void CGameInstance::Set_TargetPlayer(CGameObject* pTargetPlayer)
 #pragma endregion
 
 #pragma region EFFECT_MANAGER
-HRESULT CGameInstance::Move_GameObject_ToObjectLayer(_uint iLayerLevelIndex, const _wstring& strSourTag, const _wstring& strDestTag, _uint iCount, _uint iEffectType, void* pArg)
+HRESULT CGameInstance::Move_Effect_ToObjectLayer(_uint iLayerLevelIndex, const _wstring& strSourTag, const _wstring& strDestTag, _uint iCount, _uint iEffectType, void* pArg)
 {
 	if (nullptr == m_pEffect_Manager)
 		return E_FAIL;
 
-	return m_pEffect_Manager->Move_GameObject_ToObjectLayer(iLayerLevelIndex, strSourTag, strDestTag, iCount, iEffectType, pArg);
+	return m_pEffect_Manager->Move_Effect_ToObjectLayer(iLayerLevelIndex, strSourTag, strDestTag, iCount, iEffectType, pArg);
 }
 HRESULT CGameInstance::Add_GameObject_ToPools(const _wstring& strDestTag, _uint iEffectType, CGameObject* pGameObject)
 {

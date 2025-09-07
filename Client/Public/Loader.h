@@ -1,7 +1,5 @@
 ﻿#pragma once
 
-#include "Client_Defines.h"
-#include "Base.h"
 
 /* 로고, 게임플레이 -> 객체, 리소스들, 사운드, 쉐이더 ->자원준비를 거치는 과정 => 로딩 */
 
@@ -48,9 +46,11 @@ private:
 	CLoader_StageOne m_cLoader_StatgeOne;
 	CLoader_GamePlay m_cLoader_GamePlay;
 	CLoader_Debug m_cLoader_Debug;
+	CLoader_Static m_cLoader_Static;
 	
 	
 private:
+	HRESULT Loading_For_Static_Level();
 	HRESULT Loading_For_Logo_Level();
 	HRESULT Loading_For_StageOne_Level();
 	HRESULT Loading_For_GamePlay_Level();

@@ -223,6 +223,15 @@
     <Filter Include="01. Utility\13. RenderTargets\Manager">
       <UniqueIdentifier>{b4520a85-ed44-4543-a8d4-4b5249fe5faa}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01. Utility\14. Particle">
+      <UniqueIdentifier>{3109bd24-b0eb-4930-921d-06597269fab0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\12. Effect\Particle">
+      <UniqueIdentifier>{41e39362-5d37-4edd-8203-2f7fe7b25c8a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="01. Utility\03. Component\VIBuffer\Particle">
+      <UniqueIdentifier>{ae6b51f9-7518-4a01-8194-c27495a18ee7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Timer.cpp">
@@ -452,6 +461,21 @@
     </ClCompile>
     <ClCompile Include="..\Private\Target_Manager.cpp">
       <Filter>01. Utility\13. RenderTargets\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Effect.cpp">
+      <Filter>01. Utility\12. Effect</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\ParticleEmitter.cpp">
+      <Filter>01. Utility\12. Effect\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\ParticleSystem.cpp">
+      <Filter>01. Utility\12. Effect\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\VIBuffer_Particle.cpp">
+      <Filter>01. Utility\03. Component\VIBuffer\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\VIBuffer_Particle_Instance.cpp">
+      <Filter>01. Utility\03. Component\VIBuffer\Particle</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -709,6 +733,21 @@
     </ClInclude>
     <ClInclude Include="..\Public\Target_Manager.h">
       <Filter>01. Utility\13. RenderTargets\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Effect.h">
+      <Filter>01. Utility\12. Effect</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\ParticleEmitter.h">
+      <Filter>01. Utility\12. Effect\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\ParticleSystem.h">
+      <Filter>01. Utility\12. Effect\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\VIBuffer_Particle.h">
+      <Filter>01. Utility\03. Component\VIBuffer\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\VIBuffer_Particle_Instance.h">
+      <Filter>01. Utility\03. Component\VIBuffer\Particle</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

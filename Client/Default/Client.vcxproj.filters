@@ -663,6 +663,12 @@
     <ClInclude Include="..\Public\MonsterHpBarUI.h">
       <Filter>02. GameObject\Monster\HPBar</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Loader_Static.h">
+      <Filter>01. Levels\99. Loading\Loader\Personal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\ParticlePresets.h">
+      <Filter>99. Defines</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -1058,6 +1064,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\MonsterHpBarUi.cpp">
       <Filter>02. GameObject\Monster\HPBar</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Loader_Static.cpp">
+      <Filter>01. Levels\99. Loading\Loader\Personal</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

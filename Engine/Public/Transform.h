@@ -1,7 +1,5 @@
 ﻿#pragma once
 
-#include "Component.h"
-
 NS_BEGIN(Engine)
 
 class ENGINE_DLL CTransform final : public CComponent

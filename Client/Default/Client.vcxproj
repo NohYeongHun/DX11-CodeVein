@@ -238,6 +238,7 @@
     <ClInclude Include="..\Public\Loader_Logo.h" />
     <ClInclude Include="..\Public\Loader_Personal.h" />
     <ClInclude Include="..\Public\Loader_StageOne.h" />
+    <ClInclude Include="..\Public\Loader_Static.h" />
     <ClInclude Include="..\Public\Loading_BackGround.h" />
     <ClInclude Include="..\Public\Loading_Panel.h" />
     <ClInclude Include="..\Public\Loading_Slot.h" />
@@ -247,6 +248,7 @@
     <ClInclude Include="..\Public\MonsterHpBarUI.h" />
     <ClInclude Include="..\Public\MonsterTree.h" />
     <ClInclude Include="..\Public\Particle.h" />
+    <ClInclude Include="..\Public\ParticlePresets.h" />
     <ClInclude Include="..\Public\Player.h" />
     <ClInclude Include="..\Public\PlayerDefine.h" />
     <ClInclude Include="..\Public\PlayerState.h" />
@@ -379,6 +381,7 @@
     <ClCompile Include="..\Private\Loader_Logo.cpp" />
     <ClCompile Include="..\Private\Loader_Personal.cpp" />
     <ClCompile Include="..\Private\Loader_StageOne.cpp" />
+    <ClCompile Include="..\Private\Loader_Static.cpp" />
     <ClCompile Include="..\Private\Loading_BackGround.cpp" />
     <ClCompile Include="..\Private\Loading_Panel.cpp" />
     <ClCompile Include="..\Private\Loading_Slot.cpp" />

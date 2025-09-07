@@ -1,5 +1,4 @@
 ﻿#include "Loader_Logo.h"
-
 HRESULT CLoader_Logo::Loading_Resource(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
 {
 	if (FAILED(Add_Prototype_Title(pDevice, pContext, pGameInstance)))
@@ -79,6 +78,11 @@ HRESULT CLoader_Logo::Add_Prototype_Block(ID3D11Device* pDevice, ID3D11DeviceCon
 }
 
 HRESULT CLoader_Logo::Add_Prototype_Platform(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
+{
+	return S_OK;
+}
+
+HRESULT CLoader_Logo::Add_Prototpye_Static(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
 {
 	return S_OK;
 }

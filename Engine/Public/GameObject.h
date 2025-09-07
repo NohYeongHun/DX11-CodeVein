@@ -1,6 +1,5 @@
 ﻿#pragma once
 
-#include "Transform.h"
 
 /* 게임오브젝트들의 부모가 되는 클래스. */
 
