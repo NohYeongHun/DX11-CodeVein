@@ -41,9 +41,14 @@ public:
         _uint           useTextureIndexArray[TEXTURE::TEXTURE_END]; // 사용할 텍스쳐 번호 지정.
         _uint           iShaderPath = {};
         _bool           isBillBoard = { false };
-
+        
+        _bool           isSpawn = {};
+        _uint           iSpawnCount = {};
+        _float          fSpawnInterval = {};
+        
 
         // =========== PARTICLE_TYPE ===========
+        _float fEmissiveIntencity = {};
         PARTICLE_TYPE eParticleType;
     }TOOLEFFECT_PARTICLE_DESC;
 
@@ -72,7 +77,7 @@ public:
     void CreateDefault_Particle(_float3 vCenterPosition, _float3 vBaseDirection, _float fLifeTime = 3.0f);
     void CreateBurstEffect(_float3 vGatherPoint, _float3 vUpDirection, _float fGatherTime = 1.5f, _float fBurstTime = 2.0f, _float fTotalLifeTime = 5.0f);
     void Create_QueenKnightWarpEffect(const PARTICLE_INIT_INFO particleInitInfo);
-    void Create_BossExplosionParticle(_float3 vCenterPos, _float fRadius, _float fGatherTime, _float fExplosionTime, _float fTotalLifeTime);
+    void Create_BossExplosionParticle(_float3 vCenterPos, _float fRadius, _float fExplosionTime, _float fTotalLifeTime);
     void Create_TestParticle(const PARTICLE_TEST_INFO particleTestInfo);
 
 public:
@@ -80,6 +85,7 @@ public:
 
 private:
     _float3 m_vDir = {};
+
 
 private:
     // 컴포넌트
@@ -109,6 +115,14 @@ private:
 
 
     PARTICLE_TYPE m_eParticleType = { PARTICLE_TYPE::PARTICLE_TYPE_END };
+
+    _uint m_iSpawnCount = {};
+    _float m_fSpawnInterval = {};
+    _float m_fSpawnTime = {};
+    _bool m_IsSpawn = { false };
+
+    _float m_fEmissiveIntencity = {};
+    
 
 private:
     HRESULT Bind_ShaderResources();

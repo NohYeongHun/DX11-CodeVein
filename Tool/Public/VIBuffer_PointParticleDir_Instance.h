@@ -53,6 +53,11 @@ public:
 		_float3 vDir; // 어떤 방향을 기준으로 움직일 것인지를 제공받음.
 		_bool isLoop;
 		PARTICLE_TYPE eParticleType;
+
+		_bool IsSpawn = { false };
+		_uint iSpawnCount = {};
+		_float fSpawnInterval = {};
+
 	}PARTICLEPOINTDIR_INSTANCE_DESC;
 
 #pragma region 기본 함수들
@@ -90,8 +95,11 @@ public:
 	void CreateAllParticles(_float3 vCenterPos, _float3 vBaseDir, _float fLifeTime = 3.0f);
 	void CreateBurstParticles(_float3 vGatherPoint, _float3 vUpDir, _float fGatherTime, _float fBurstTime, _float fTotalLifeTime);
 	void Create_QueenKnightWarpParticle(const PARTICLE_INIT_INFO particleInitInfo);
-	void Create_BossExplosionParticle(_float3 vCenterPos, _float fRadius, _float fGatherTime, _float fExplosionTime, _float fTotalLifeTime);
+	void Create_BossExplosionParticle(_float3 vCenterPos, _float fRadius, _float fExplosionTime, _float fTotalLifeTime);
 	void Create_TestParticle(const PARTICLE_TEST_INFO particleInitInfo);
+
+
+	/* 스폰 전용*/
 
 
 #pragma endregion
@@ -118,6 +126,12 @@ private:
 	_float2 m_vLifeTime = {}; // 파티클 생명시간 범위 (min, max)
 	_bool	m_isLoop = {};
 	PARTICLE_TYPE m_eParticleType = { PARTICLE_TYPE::PARTICLE_TYPE_END };
+
+	_uint m_iSpawnCount = {};
+	_bool m_isSpawn = {};
+	_float m_fSpawnInterval = {};
+	_float m_fSpawnTime = {};
+	_float2 m_vSpeed = {};
 
 #ifdef _DEBUG
 	_float m_fDebugTime = { 0.f };

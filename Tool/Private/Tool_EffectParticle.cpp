@@ -40,6 +40,7 @@ HRESULT CTool_EffectParticle::Initialize_Clone(void* pArg)
     m_iShaderPath = pDesc->iShaderPath;
     m_isBillBoard = pDesc->isBillBoard;
 
+    m_fEmissiveIntencity = pDesc->fEmissiveIntencity;
     
     XMStoreFloat3(&m_vDir, pDesc->vObjectDir); // 방향 지정.
 
@@ -76,8 +77,8 @@ void CTool_EffectParticle::Update(_float fTimeDelta)
 
     // 업데이트 이전에 현재 정보 전달.
     
-    _vector vDirection = XMLoadFloat3(&m_vDir);
-    m_pTransformCom->Move_Direction(vDirection, fTimeDelta * 0.1f); // 지정된 방향으로 날라감.
+    _vector vDirection = XMVector3Normalize(XMLoadFloat3(&m_vDir));
+    m_pTransformCom->Move_Direction(vDirection, fTimeDelta * 1.f); // 지정된 방향으로 날라감.
 
     //_fvector vPos = m_pTransformCom->Get_State(STATE::POSITION); // 이동 이후 위치 제공.
     //m_pVIBufferCom->Bind_Transform(vPos); // Shader에서 정점들에 WorldMatrix를 이미 곱해주고 있음.
@@ -106,7 +107,6 @@ void CTool_EffectParticle::Update(_float fTimeDelta)
         }
     }
 #pragma endregion
-  
     
 }
 
@@ -200,6 +200,12 @@ HRESULT CTool_EffectParticle::Bind_ShaderResources()
     }
 
     if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
+    {
+        CRASH("Failed Bind Cam Position");
+        return E_FAIL;
+    }
+
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fEmissiveIntensity", &m_fEmissiveIntencity, sizeof(_float))))
     {
         CRASH("Failed Bind Cam Position");
         return E_FAIL;
@@ -366,7 +372,11 @@ HRESULT CTool_EffectParticle::Ready_VIBuffer_Point(const TOOLEFFECT_PARTICLE_DES
     PointDesc.vSize = pDesc->vSize;
     PointDesc.vLifeTime = pDesc->vLifeTime;
     PointDesc.isLoop = pDesc->isLoop;
+    
     PointDesc.eParticleType = static_cast<CVIBuffer_PointParticleDir_Instance::PARTICLE_TYPE>(pDesc->eParticleType);
+    PointDesc.IsSpawn = pDesc->isSpawn;
+    PointDesc.fSpawnInterval = pDesc->fSpawnInterval;
+    PointDesc.iSpawnCount = pDesc->iSpawnCount;
     
     XMStoreFloat3(&PointDesc.vDir, pDesc->vParticleDir);
 
@@ -407,11 +417,11 @@ void CTool_EffectParticle::Create_QueenKnightWarpEffect(const PARTICLE_INIT_INFO
     }
 }
 
-void CTool_EffectParticle::Create_BossExplosionParticle(_float3 vCenterPos, _float fRadius, _float fGatherTime, _float fExplosionTime, _float fTotalLifeTime)
+void CTool_EffectParticle::Create_BossExplosionParticle(_float3 vCenterPos, _float fRadius, _float fExplosionTime, _float fTotalLifeTime)
 {
     if (m_pVIBufferCom)
     {
-        m_pVIBufferCom->Create_BossExplosionParticle(vCenterPos, fRadius, fGatherTime, fExplosionTime, fTotalLifeTime);
+        m_pVIBufferCom->Create_BossExplosionParticle(vCenterPos, fRadius, fExplosionTime, fTotalLifeTime);
     }
 }
 

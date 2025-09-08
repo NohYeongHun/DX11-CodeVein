@@ -64,6 +64,21 @@ private:
 	_wstring m_PartName = {  };
 	int m_iPartID = {};
 
+#pragma region EFFECT 용도
+	_float m_fTotalTime = { 0.f };
+	_float m_fSpiralStrength = { 5.f };
+	_float m_fRotationSpeed = {2.f};
+	_uint m_iEffectWindPath = { 2 };
+
+	float m_fEffectLifetime = 4.f; // 이펙트의 총 수명 (초)
+	float m_fEffectStartTime = 0.f; // 이펙트가 생성된 시간
+	float m_fWipeInTime = 1.5f; // 나타나는 데 걸리는 시간 (초)
+	float m_fWipeOutTime = 1.f; // 사라지는 데 걸리는 시간 (초)
+	float m_fWipeSoftness = 0.2f; // 와이프 경계선의 부드러운 정도
+#pragma endregion
+
+	
+
 
 private:
 	HRESULT Ready_Components();

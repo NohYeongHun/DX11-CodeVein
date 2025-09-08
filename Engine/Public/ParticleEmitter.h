@@ -15,6 +15,7 @@ public:
 		_uint   iBurstCount = 50;       // 한 번에 생성 시 터져나올 개수
 		_float3 vShapeSize = { 1.f, 1.f, 1.f }; // 방출 형태의 크기 (박스 크기, 구 반지름(x로 사용) 등)
 		_float  fConeAngle = 45.f; // 콘(Cone) 형태일 경우 추가 정보
+		_float fShapeTransitionTime = 1.f; // ★ 모양이 바뀌는 시간(예: 1초 뒤)
 	}EMITTER_DESC;
 private:
 	CParticleEmitter();
@@ -53,8 +54,11 @@ private:
 	// --- Emitter 자체의 동작을 위한 변수들 ---
 	_float                  m_fEmitTimer = { 0.f };     // 파티클 생성 간격 계산을 위한 타이머
 	_float                  m_fEmitInterval = { 0.f };  // 1초에 몇 개를 생성할지에 대한 실제 시간 간격
+	_float					m_fElapsedTime = 0.f; // 활성화 후 누적시간
 	_uint                   m_iBurstCount = { 0 };      // 한번에 터뜨릴 파티클 개수
 	_bool					m_bHasBursted = { false };
+	
+
 	// Emitter의 고유 속성
 	EMITTER_DESC            m_tDesc = {};
 #pragma endregion
@@ -65,6 +69,11 @@ private:
 	void Create_One_Particle(vector<PARTICLE_DATA>& out_Particles);
 	_float3 Create_Random_Direction();
 	void Generate_Particle_Attribute(_float3& out_vPosition, _float3& out_vDirection);
+
+	void Create_Particle_By_Type(vector<PARTICLE_DATA>& out_Particles);
+	void Create_QueenKnight_Particle(vector<PARTICLE_DATA>& out_Particles);
+	void Create_BossExplosion_Particle(vector<PARTICLE_DATA>& out_Particles);
+	void Create_Default_Particle(vector<PARTICLE_DATA>& out_Particles);
 #pragma endregion
 
 

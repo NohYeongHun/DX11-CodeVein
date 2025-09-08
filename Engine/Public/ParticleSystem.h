@@ -1,6 +1,13 @@
 ﻿#pragma once
 
 NS_BEGIN(Engine)
+
+
+typedef struct tagParticleSystemInfo
+{
+
+}PARTICLE_INFO;
+
 /* 실체가 있는 클래스. */
 class ENGINE_DLL CParticleSystem final : public CEffect
 {
@@ -26,30 +33,23 @@ public:
 	/* 클론시에 한번만 사용하고 계속 들고 있는 정보*/
 	typedef struct tagParticleSystemCloneDesc : public CEffect::EFFECTCLONE_DESC
 	{
+#pragma region CLONE시 무조건 필요한 정보들.
 		_wstring strPoolTag = {};
 
 		// Ready_Components에 필요한 모든 정적 정보
 		_uint iComponentPrototypeLevel;
-		_wstring strShaderPrototypeTag;
+		_wstring strShaderPrototypeTag; 
 		_wstring strTexturePrototypeTag[TEXTURE_END];
-		/* 사용할 Shader 정보 */
-		_uint iShaderPath = {};
 
 		/* 사용할 Texture 정보 */
-		
 		_bool   useTextureCheckArray[TEXTURE_END]; // 사용하지 않을 Texture들 지정하기.
 		_uint   useTextureIndexArray[TEXTURE_END]; // 사용할 텍스쳐 번호 지정.
 
+		/* 사용할 Shader 정보 */
+		_uint iShaderPath = {};
 
-		/* 기본적인 Particle 정점 구조 정보.*/
-		_float2 vLifeTime; // x Min, y Max => 전체 시스템의 수명 시간.
-		_float2 vSpeed;    // x Min, y Max
-		_float2 vSizeStart;     // x Min, y Max
-		_float2 vSizeEnd;     // x Min, y Max
-		_float4 vColorStart;
-		_float4 vColorEnd;
-		_uint   iEmitCount = 100; // 기본 100개 
-		_bool isLoop;
+		/* 사용할 VIBuffer 정보 */
+		_wstring strVIBufferPrototypeTag;
 
 		/* Enitter 정보 => 추후 프리셋으로 정의. */
 		EMISSION_TYPE eEmissionType = EMITTER_CONTINUOUS;  // 연속 생성? 한 번에 생성?
@@ -58,13 +58,27 @@ public:
 		_uint   iBurstCount = 50;       // 한 번에 생성 시 터져나올 개수
 		_float3 vShapeSize = { 1.f, 1.f, 1.f }; // 방출 형태의 크기 (박스 크기, 구 반지름(x로 사용) 등)
 		_float  fConeAngle = 45.f;
+
+
+		_float3 vStartPos;
+		_float2 vLifeTime; // x Min, y Max => 전체 시스템의 수명 시간.
+		_float2 vSpeed;    // x Min, y Max
+		_float2 vSizeStart;     // x Min, y Max
+		_float2 vSizeEnd;     // x Min, y Max
+		_float4 vColorStart;
+		_float4 vColorEnd;
+		_uint   iEmitCount = 100; // 기본 100개 
+		_bool isLoop;
+		PARTICLE_TYPE eParticleType = PARTICLE_TYPE_DEFAULT;  // 파티클 타입 추가
+		
+#pragma endregion
 	} PARTICLESYSTEM_CLONE_DESC;
+
 
 	// CPU에서 관리하는 데이터들.
 	// Activate 시 정의되는 데이터들.
 	typedef struct tagParticleSystemActivateDesc : public CEffect::EFFECTACITVATE_DESC
 	{
-
 	}PARTICLESYSTEM_ACTIVATE_DESC;
 public:
 	
@@ -103,7 +117,7 @@ public:
 
 public:
 	void Calc_Timer(_float fTimeDelta);
-	void Reset_Timer() { m_fLifeTime = 0.f;  }
+	void Reset_Timer() { m_fLifeTime = m_fLifeMaxTime;  }
 #pragma endregion
 
 

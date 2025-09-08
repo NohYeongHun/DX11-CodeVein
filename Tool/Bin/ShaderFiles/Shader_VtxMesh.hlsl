@@ -15,12 +15,7 @@ vector g_vMtrlAmbient = 1.f;
 vector g_vMtrlSpecular = 1.f;
 
 
-//sampler DefaultSampler = sampler_state
-//{
-//    filter = min_mag_mip_linear;
-//    AddressU = wrap;
-//    AddressV = wrap;
-//};
+
 
 struct VS_IN
 {
@@ -176,6 +171,76 @@ PS_OUT PS_MAIN2(PS_IN In)
 }
 
 
+// ... 기존 변수들 아래에 추가
+float g_fTime = 0.f;
+float g_fSpiralStrength = 5.0f; // 나선 강도
+float g_fRotationSpeed = 2.0f; // 회전 속도
+vector g_vTintColor = vector(1.f, 1.f, 1.f, 1.f); // 기본값은 흰색
+
+// ... 기존 변수들 아래에 추가 ...
+float g_fEffectLifetime = 4.f; // 이펙트의 총 수명 (초)
+float g_fEffectStartTime = 0.f; // 이펙트가 생성된 시간
+float g_fWipeInTime = 1.5f; // 나타나는 데 걸리는 시간 (초)
+float g_fWipeOutTime = 1.f; // 사라지는 데 걸리는 시간 (초)
+float g_fWipeSoftness = 0.2f; // 와이프 경계선의 부드러운 정도
+
+PS_OUT PS_EFFECT_WIND(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+    
+     // --- 절차적 UV 계산 시작 ---
+    // 1. UV 좌표를 (-0.5 ~ 0.5) 범위로 중앙 정렬합니다.
+    float2 vCenterUV = In.vTexcoord - 0.5f;
+
+    // 2. 중심으로부터의 거리와 각도를 계산합니다 (극좌표계 변환).
+    float fDistance = length(vCenterUV);
+    float fAngle = atan2(vCenterUV.y, vCenterUV.x);
+
+    // 3. 거리에 비례해서 각도를 왜곡하고, 시간에 따라 회전시킵니다.
+    fAngle += fDistance * g_fSpiralStrength;
+    fAngle += g_fTime * g_fRotationSpeed;
+
+    // 4. 새로운 각도와 기존 거리를 이용해 새로운 UV 좌표를 만듭니다.
+    float2 vSpiralUV;
+    vSpiralUV.x = cos(fAngle) * fDistance;
+    vSpiralUV.y = sin(fAngle) * fDistance;
+
+    // 5. UV 좌표를 다시 (0 ~ 1) 범위로 복원합니다.
+    vSpiralUV += 0.5f;
+    // --- 절차적 UV 계산 끝 ---
+
+
+    // 왜곡된 vSpiralUV를 사용해 텍스처를 샘플링합니다.
+    float4 vTextureColor = g_DiffuseTexture.Sample(DefaultSampler, vSpiralUV);
+
+    Out.vColor = vTextureColor * g_vTintColor;
+    Out.vColor.a = vTextureColor.r * g_vTintColor.a;
+
+    float fBaseAlpha = Out.vColor.a;
+
+    // 1. 이펙트 생성 후 경과 시간을 계산합니다.
+    float fElapsedTime = g_fTime - g_fEffectStartTime;
+
+    // 2. Wipe-In 진행률 (0에서 1로 증가)
+    // saturate는 값을 0과 1 사이로 제한해주는 함수입니다.
+    float fWipeInRatio = saturate(fElapsedTime / g_fWipeInTime);
+
+    // 3. Wipe-Out 시작 시간을 계산하고, 진행률 (0에서 1로 증가)을 구합니다.
+    float fWipeOutStartTime = g_fEffectLifetime - g_fWipeOutTime;
+    float fWipeOutRatio = saturate((fElapsedTime - fWipeOutStartTime) / g_fWipeOutTime);
+
+    // 4. 현재 픽셀의 가로 UV 좌표(In.vTexcoord.x)를 이용해 와이프 마스크를 만듭니다.
+    //    smoothstep은 두 값 사이를 부드럽게 보간하여 경계선을 부드럽게 만듭니다.
+    float fWipeInMask = smoothstep(1.0 - fWipeInRatio - g_fWipeSoftness, 1.0 - fWipeInRatio, In.vTexcoord.x);
+    float fWipeOutMask = 1.0 - smoothstep(0.0, g_fWipeSoftness, (1.0f - In.vTexcoord.x) - fWipeOutRatio);
+
+    // 5. 최종 알파 값은 [기존 알파] x [Wipe-In 마스크] x [Wipe-Out 마스크] 입니다.
+    Out.vColor.a = fBaseAlpha * fWipeInMask * fWipeOutMask;
+    
+    return Out;
+}
+
+
 technique11 DefaultTechnique
 {
     /* 특정 패스를 이용해서 점정을 그려냈다. */
@@ -200,6 +265,17 @@ technique11 DefaultTechnique
 
         VertexShader = compile vs_5_0 VS_MAIN();
         PixelShader = compile ps_5_0 PS_MAIN2();
+    }
+
+    pass EffectWindPass
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+
+        PixelShader = compile ps_5_0 PS_EFFECT_WIND();
     }
     ///* 모델의 상황에 따라 다른 쉐이딩 기법 세트(블렌딩 + 디스토션  )를 먹여주기위해서 */
     //pass DefaultPass1

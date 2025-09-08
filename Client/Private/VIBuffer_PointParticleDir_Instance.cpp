@@ -170,11 +170,14 @@ void CVIBuffer_PointParticleDir_Instance::Update(_float fTimeDelta)
     case PARTICLE_TYPE::PARTICLE_TYPE_DEFAULT:
         Default_Update(pVertices, fTimeDelta);
         break;
-    case PARTICLE_TYPE::PARTICLE_TYPE_QUEENKNGIHT_WARP:
+    case PARTICLE_TYPE::PARTICLE_TYPE_QUEEN_WARP:
         QueenKnightWarp_Update(pVertices, fTimeDelta);
         break;
+    //case PARTICLE_TYPE::PARTICLE_TYPE_BOSS_EXPLOSION:
+    //    BossExplosion_Update(pVertices, fTimeDelta);
+    //    break;
     case PARTICLE_TYPE::PARTICLE_TYPE_BOSS_EXPLOSION:
-        BossExplosion_Update(pVertices, fTimeDelta);
+        QueenKnightWarp_Update(pVertices, fTimeDelta);
         break;
     default:
         break;
@@ -282,6 +285,8 @@ void CVIBuffer_PointParticleDir_Instance::QueenKnightWarp_Update(VTXINSTANCEPOIN
     //OutPutDebugFloat(m_fDebugTime);
 #endif
 
+
+
     // 1. Ready Queue에 있는 파티클을 Live Queue로 한 번에 모두 옮깁니다.
     //    파티클 생성 함수에서 큐에 추가된 파티클들을 업데이트 루프로 가져옵니다.
     while (!m_ReadyparticleIndices.empty())
@@ -297,7 +302,7 @@ void CVIBuffer_PointParticleDir_Instance::QueenKnightWarp_Update(VTXINSTANCEPOIN
         pVertices[index].vLifeTime.x = 0.f;
         pVertices[index].vLifeTime.y = particleInfo.lifeTime;
         pVertices[index].fDirSpeed = particleInfo.fRandomSpeed;
-        pVertices[index].vRight.w = particleInfo.fBurstTime;
+        pVertices[index].vRight.w = 1.f;
         pVertices[index].vUp = _float4(particleInfo.initialPos.x, particleInfo.initialPos.y, particleInfo.initialPos.z, 0.f);
         pVertices[index].vLook = _float4(particleInfo.burstDir.x, particleInfo.burstDir.y, particleInfo.burstDir.z, 0.f);
 
@@ -351,6 +356,7 @@ void CVIBuffer_PointParticleDir_Instance::QueenKnightWarp_Update(VTXINSTANCEPOIN
     }
 
 }
+
 
 void CVIBuffer_PointParticleDir_Instance::BossExplosion_Update(VTXINSTANCEPOINTDIR_PARTICLE* pVertices, _float fTimeDelta)
 {
@@ -536,10 +542,13 @@ void CVIBuffer_PointParticleDir_Instance::CreateBurstParticles(_float3 vGatherPo
 }
 
 
-void CVIBuffer_PointParticleDir_Instance::Create_QueenKnightWarpParticle(const PARTICLE_INIT_INFO particleInitInfo)
+/* 사실상 Activate시 지정해줘야하는 정보. */
+void CVIBuffer_PointParticleDir_Instance::Create_QueenKnightWarpParticle_Limited(const PARTICLE_INIT_INFO particleInitInfo, _uint iSpawnCount)
 {
-    while (!m_DeadParticleIndices.empty())
+    _uint spawnedCount = 0;
+    while (!m_DeadParticleIndices.empty() && spawnedCount < iSpawnCount)
     {
+        spawnedCount++;
         _uint index = m_DeadParticleIndices.front();
         m_DeadParticleIndices.pop();
 
@@ -583,15 +592,17 @@ void CVIBuffer_PointParticleDir_Instance::Create_QueenKnightWarpParticle(const P
 
         /* vRange 범위 내에서 응집된 시작 위치 설정 */
         _float3 startPos = {
-            m_vPivot.x + randomOffset.x,
-            m_vPivot.y + randomOffset.y,
-            m_vPivot.z + randomOffset.z
+            particleInitInfo.pos.x + randomOffset.x,
+            particleInitInfo.pos.y + randomOffset.y,
+            particleInitInfo.pos.z + randomOffset.z
         };
 
         // --- 방향성 스프레드 효과 추가 ---
         // 해결 방법: XMVector3Orthogonal 대신 외적(Cross Product)을 사용합니다.
 
         // 주 방향과 수직인 임의의 벡터 생성
+        up = { 0.0f, 1.0f, 0.0f };
+        vUp = XMLoadFloat3(&up);
         _vector vCrossDir = vUp;
         if (XMVector3Equal(vDir, vUp) || XMVector3Equal(vDir, -vUp))
         {
@@ -604,7 +615,7 @@ void CVIBuffer_PointParticleDir_Instance::Create_QueenKnightWarpParticle(const P
         _vector vSpreadUp = XMVector3Normalize(XMVector3Cross(vDir, vSpreadRight));
 
         // 2. 퍼짐 정도를 결정하는 각도(라디안)를 설정합니다. (원하는 값으로 조절)
-        _float spreadAngle = 0.2f;
+        _float spreadAngle = XMConvertToRadians(30.f);
 
         // 3. 무작위 퍼짐 각도를 만듭니다.
         _float randomYaw = (static_cast<_float>(rand()) / RAND_MAX * 2.0f - 1.0f) * spreadAngle;
@@ -633,6 +644,12 @@ void CVIBuffer_PointParticleDir_Instance::Create_QueenKnightWarpParticle(const P
 
         m_ReadyparticleIndices.emplace(make_pair(index, info));
     }
+}
+
+void CVIBuffer_PointParticleDir_Instance::Create_QueenKnightWarpParticle(const PARTICLE_INIT_INFO particleInitInfo)
+{
+    // 모든 Dead 파티클을 생성 (기존 동작 유지)
+    Create_QueenKnightWarpParticle_Limited(particleInitInfo, static_cast<_uint>(m_DeadParticleIndices.size()));
 }
 
 
@@ -683,6 +700,7 @@ void CVIBuffer_PointParticleDir_Instance::Create_BossExplosionParticle(_float3 v
         m_ReadyparticleIndices.emplace(make_pair(index, info));
     }
 }
+
 
 #pragma endregion
 

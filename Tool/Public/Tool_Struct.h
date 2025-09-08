@@ -45,6 +45,13 @@ typedef struct ParticleInitInfo
 	_float3 pos;
 	_float3 dir;
 	_float lifeTime;
+
+	_float3 vCenterPos;
+	_float  fRadius;
+	_float fExplosionTime;
+	_float fTotalLifeTime;
+
+
 }PARTICLE_INIT_INFO;
 
 

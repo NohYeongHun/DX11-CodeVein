@@ -115,8 +115,7 @@ BT_RESULT CBT_QueenKnight_TripleDownStrikeAction::Update_Ascend(_float fTimeDelt
         m_pOwner->Start_Dissolve(1.f);
         //m_pOwner->AddBuff(CMonster::BUFF_DISSOLVE);
 
-        // 시점과 운동 방향 변경 필요. => 운동 방향은 몬스터 중앙에서 시작해서 위로 퍼져나감.
-        m_pOwner->Create_QueenKnightWarp_Effect_Particle({ 0.f, 1.f, 0.f });
+        
     }
 
     if (vOwnerPos.m128_f32[1] <= m_vAscendTarget.y && fCurrentRatio >= m_fJump_StartRatio)
@@ -150,6 +149,9 @@ BT_RESULT CBT_QueenKnight_TripleDownStrikeAction::Update_Ascend(_float fTimeDelt
         m_pOwner->Change_Animation_Blend(iNextAnimationIdx, false, 0.1f, true, true, true);
 
         m_pOwner->RotateTurn_ToTargetYaw();
+
+        // 시점과 운동 방향 변경 필요. => 운동 방향은 몬스터 중앙에서 시작해서 아래로 퍼져나감.
+        m_pOwner->Create_QueenKnightWarp_Effect_Particle({ 0.f, -1.f, 0.f });
 
 
         m_bDissolveCheck = false;

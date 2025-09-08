@@ -16,9 +16,11 @@ public:
 
 	typedef struct tagEffectActivateDesc 
 	{
+		_float4 vStartPos;
 		// 생성 시 부모의 TransformComponent를 받아옵니다.
 		class CTransform* pOwnerTransform = { nullptr };
 		EAttachType eAttachType = { EAttachType::WORLD };
+
 	}EFFECTACITVATE_DESC;
 protected:
 	CEffect(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

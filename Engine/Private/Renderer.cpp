@@ -50,11 +50,11 @@ HRESULT CRenderer::Initialize()
     }
 
     /* For.Target_Specular */
-    if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_Specular"), ViewportDesc.Width, ViewportDesc.Height, DXGI_FORMAT_R16G16B16A16_UNORM, _float4(0.f, 0.f, 0.f, 0.f))))
-    {
-        CRASH("Failed Add RenderTarget Specular");
-        return E_FAIL;
-    }
+    //if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_Specular"), ViewportDesc.Width, ViewportDesc.Height, DXGI_FORMAT_R16G16B16A16_UNORM, _float4(0.f, 0.f, 0.f, 0.f))))
+    //{
+    //    CRASH("Failed Add RenderTarget Specular");
+    //    return E_FAIL;
+    //}
         
 
     /* For.MRT_GameObjects : 게임 오브젝트들의 정보를 저장받기위한 타겟들 */
@@ -324,8 +324,8 @@ HRESULT CRenderer::Render_Combined()
     }
         
 
-    if (FAILED(m_pGameInstance->Bind_RT_ShaderResource(TEXT("Target_Specular"), m_pShader, "g_SpecularTexture")))
-        return E_FAIL;
+    //if (FAILED(m_pGameInstance->Bind_RT_ShaderResource(TEXT("Target_Specular"), m_pShader, "g_SpecularTexture")))
+    //    return E_FAIL;
 
     _uint iCombinedShaderIndex = static_cast<_uint>(DEFFERED_SHADERTYPE::COMBINED);
     m_pShader->Begin(iCombinedShaderIndex);

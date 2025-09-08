@@ -69,7 +69,7 @@ PS_OUT_BACKBUFFER PS_MAIN_DEBUG(PS_IN In)
 struct PS_OUT_LIGHT
 {
     vector vShade : SV_TARGET0;
-    vector vSpecular : SV_TARGET1;
+    //vector vSpecular : SV_TARGET1;
 };
 
 PS_OUT_LIGHT PS_MAIN_DIRECTIONAL(PS_IN In)
@@ -108,11 +108,11 @@ PS_OUT_LIGHT PS_MAIN_DIRECTIONAL(PS_IN In)
     
     vector vLook = vWorldPos - g_vCamPosition;
     
-    float fSpecular = pow(max(dot(normalize(vReflect) * -1.f, normalize(vLook)), 0.f), 50.f);
+    //float fSpecular = pow(max(dot(normalize(vReflect) * -1.f, normalize(vLook)), 0.f), 50.f);
     
     
     Out.vShade = g_vLightDiffuse * saturate(fShade + (g_vLightAmbient * g_vMtrlAmbient));
-    Out.vSpecular = (g_vLightSpecular * g_vMtrlSpecular) * fSpecular;
+    //Out.vSpecular = (g_vLightSpecular * g_vMtrlSpecular) * fSpecular;
     
     return Out;
 }
@@ -135,9 +135,10 @@ PS_OUT_BACKBUFFER PS_MAIN_COMBINED(PS_IN In)
         discard;
     
     vector vShade = g_ShadeTexture.Sample(DefaultSampler, In.vTexcoord);
-    vector vSpecular = g_SpecularTexture.Sample(DefaultSampler, In.vTexcoord);
+    //vector vSpecular = g_SpecularTexture.Sample(DefaultSampler, In.vTexcoord);
     
-    Out.vColor = vDiffuse * vShade + vSpecular;
+    //Out.vColor = vDiffuse * vShade + vSpecular;
+    Out.vColor = vDiffuse * vShade;
     
     return Out;
 }

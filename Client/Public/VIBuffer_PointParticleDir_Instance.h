@@ -19,7 +19,7 @@ public:
 	enum class PARTICLE_TYPE : _uint
 	{
 		PARTICLE_TYPE_DEFAULT = 0,
-		PARTICLE_TYPE_QUEENKNGIHT_WARP = 1,
+		PARTICLE_TYPE_QUEEN_WARP = 1,
 		PARTICLE_TYPE_BOSS_EXPLOSION = 2,
 		PARTICLE_TYPE_END,
 	};
@@ -61,12 +61,15 @@ public:
 	void CreateAllParticles(_float3 vCenterPos, _float3 vBaseDir, _float fLifeTime = 3.0f);
 	void CreateBurstParticles(_float3 vGatherPoint, _float3 vUpDir, _float fGatherTime, _float fBurstTime, _float fTotalLifeTime);
 	void Create_QueenKnightWarpParticle(const PARTICLE_INIT_INFO particleInitInfo);
+	void Create_QueenKnightWarpParticle_Limited(const PARTICLE_INIT_INFO particleInitInfo, _uint iSpawnCount);
 	void Create_BossExplosionParticle(_float3 vCenterPos, _float fRadius, _float fGatherTime, _float fExplosionTime, _float fTotalLifeTime);
 #pragma endregion
 
 
 
-#pragma region MyRegion
+#pragma region 헬퍼함수
+private:
+	_vector Get_Velocity();
 
 #pragma endregion
 
@@ -82,6 +85,14 @@ private:
 	list<_uint> m_LiveParticleIndices;
 	queue<pair<_uint, PARTICLE_VERTEX_INFO>> m_ReadyparticleIndices;
 #pragma endregion
+
+
+public:
+	void Set_TargetTransform(class CTransform* pTargetTransform) { m_pTargetTransform = pTargetTransform; }
+
+private:
+	class CTransform* m_pTargetTransform = { nullptr };
+
 
 
 

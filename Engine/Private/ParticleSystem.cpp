@@ -54,8 +54,7 @@ void CParticleSystem::Update(_float fTimeDelta)
 {
     CEffect::Update(fTimeDelta);
 
-    // 1. VIBuffer에 데이터를 갱신해주는 로직.
-    Update_Particles_Logic(fTimeDelta);
+
 
     // 2. 시간이 다되면 Pool에 재입장
     Calc_Timer(fTimeDelta);
@@ -65,11 +64,6 @@ void CParticleSystem::Late_Update(_float fTimeDelta)
 {
     CEffect::Late_Update(fTimeDelta);
 
-    if (m_eAttachType == EAttachType::PARENT)
-        XMStoreFloat4x4(&m_CombinedWorldMatrix
-            , m_pTransformCom->Get_WorldMatrix() * m_pOwnerTransform->Get_WorldMatrix());
-    else
-        XMStoreFloat4x4(&m_CombinedWorldMatrix,m_pTransformCom->Get_WorldMatrix());
 
     if (m_IsActivate)
     {
@@ -79,6 +73,9 @@ void CParticleSystem::Late_Update(_float fTimeDelta)
             return;
         }
     }
+
+    // 1. VIBuffer에 데이터를 갱신해주는 로직.
+    Update_Particles_Logic(fTimeDelta);
 }
 
 HRESULT CParticleSystem::Render()
@@ -192,12 +189,16 @@ void CParticleSystem::OnActivate(void* pArg)
 
     CEffect::OnActivate(pParticleDesc);
 
+    // 0. 위치 지정.
+    _vector vStartPos = XMLoadFloat4(&pParticleDesc->vStartPos);
+    m_pTransformCom->Set_State(STATE::POSITION, vStartPos);
+
     m_tDesc = *pParticleDesc;
     
-    // 0. 전체 소멸 시간 지정
+    // 1. 전체 소멸 시간 지정
     m_fLifeTime = m_tLayOutDesc.vLifeTime.y;
 
-    // 1. '레시피(DESC)'를 다시 적용하여 재설정 (가장 중요)
+    // 2. '레시피(DESC)'를 다시 적용하여 재설정 (가장 중요)
     m_eAttachType = pParticleDesc->eAttachType;
     m_pOwnerTransform = pParticleDesc->pOwnerTransform;
 
@@ -260,6 +261,17 @@ HRESULT CParticleSystem::Ready_Components(PARTICLESYSTEM_CLONE_DESC* pDesc)
     }
 
 #pragma endregion
+
+#pragma region 1. VIBuffer 초기화
+    if (FAILED(Add_Component(pDesc->iComponentPrototypeLevel, pDesc->strVIBufferPrototypeTag,
+        TEXT("Com_VIBuffer"), reinterpret_cast<CComponent**>(&m_pVIBufferCom))))
+    {
+        CRASH("Failed Com VIBuffer");
+        return E_FAIL;
+    }
+
+#pragma endregion
+
 
 #pragma region SHADER 초기화
     if (FAILED(Add_Component(pDesc->iComponentPrototypeLevel, pDesc->strShaderPrototypeTag,

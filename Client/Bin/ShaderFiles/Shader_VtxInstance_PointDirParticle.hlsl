@@ -19,6 +19,7 @@ vector g_vCamPosition;
 /* 사용할 변수 목록 시간, 크기 => 비율*/
 float g_fTimeRatio;
 float g_fScaleRatio;
+float g_fEmissiveIntensity;
 
 struct VS_IN
 {
@@ -267,11 +268,30 @@ PS_OUT PS_DIFFUSE_MASK_MAIN(PS_IN In)
 
     if (vDestDiffuse.r < 0.1f && vDestDiffuse.g < 0.1f && vDestDiffuse.b < 0.1f)
         discard;
+    
     vector vMtrlDiffuse = vDestDiffuse * (1.f - vMask) + vSourDiffuse * (vMask);
-
+    
+    
+    //vMtrlDiffuse.rgb = pow(vMtrlDiffuse.rgb, 7.f);
+    
+    // Emissive 추가 발광효과.
+    float fMaskBrightness = dot(vMask.rgb, float3(0.299, 0.587, 0.114));
+    if (fMaskBrightness > 0.5f)
+    {
+        vector vEmissive = vMask * g_fEmissiveIntensity * 2.0f;
+        //vector vEmissive = vMask * 2.f;
+        //vMtrlDiffuse.rgb = saturate(vMtrlDiffuse.rgb + vEmissive.rgb);
+        vMtrlDiffuse.rgb += vEmissive.rgb;
+        
+    }
+    
+    vMtrlDiffuse.rgb = pow(vMtrlDiffuse.rgb, 7.f);
+    
     float fadeAlpha = 1.0f - g_fTimeRatio;
     vMtrlDiffuse.a *= fadeAlpha;
 
+    
+    
     Out.vColor = vMtrlDiffuse;
     
 

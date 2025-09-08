@@ -27,6 +27,7 @@ HRESULT CEffectParticle::Initialize_Clone(void* pArg)
         return E_FAIL;
     }
 
+    m_fEmissiveIntencity = 0.3f;
     m_eCurLevel = pDesc->eCurLevel;
    
 
@@ -36,6 +37,7 @@ HRESULT CEffectParticle::Initialize_Clone(void* pArg)
     m_eParticleType = pDesc->eParticleType;
     m_iShaderPath = pDesc->iShaderPath;
     m_isBillBoard = pDesc->isBillBoard;
+    m_iSpawnCount = pDesc->iSpawnCount;
 
     /* 사용할 텍스쳐의 인덱스를 지정해줍니다. */
     for (_uint i = 0; i < TEXTURE::TEXTURE_END; ++i)
@@ -65,11 +67,27 @@ void CEffectParticle::Update(_float fTimeDelta)
 {
     CGameObject::Update(fTimeDelta);
 
+    if (nullptr != m_pTargetTransform && m_fChaseTime > 0.f)
+    {
+        
+        // 또는 실제 Velocity 길이 확인
+        _vector vVelocity = m_pTargetTransform->Get_Velocity();
+        _float fVelocityLength = XMVectorGetX(XMVector3Length(vVelocity));
+        
+        // 디버그: Speed 값 확인
+        OutputDebugWstring(TEXT("Particle : "));
+        OutPutDebugFloat(fVelocityLength);
+        if (fVelocityLength >= 0.01f)  // 임계값을 낮춤
+            // Velocity가 있으면 Velocity 방향 사용
+            m_pTransformCom->Move_Direction(XMVector3Normalize(vVelocity), fTimeDelta * 2.f);
 
+    }
 #pragma region 파티클 타입 에 따른 업데이트
 
     m_pVIBufferCom->Update(fTimeDelta);
 #pragma endregion
+
+
 
 
 #pragma region 타이머 업데이트
@@ -94,6 +112,10 @@ void CEffectParticle::Update(_float fTimeDelta)
             return;
         }
     }
+
+    if (m_fChaseTime >= 0.f)
+        m_fChaseTime -= fTimeDelta;
+    
 #pragma endregion
   
     
@@ -180,6 +202,12 @@ HRESULT CEffectParticle::Bind_ShaderResources()
     if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
     {
         CRASH("Failed Bind Cam Position");
+        return E_FAIL;
+    }
+
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fEmissiveIntensity", &m_fEmissiveIntencity, sizeof(_float))))
+    {
+        CRASH("Failed Bind Emissive");
         return E_FAIL;
     }
         
@@ -388,6 +416,14 @@ void CEffectParticle::Create_QueenKnightWarpEffect(const PARTICLE_INIT_INFO part
     }
 }
 
+void CEffectParticle::Create_QueenKnightWarpEffect_Limited(const PARTICLE_INIT_INFO particleInitInfo, _uint iSpawnCount)
+{
+    if (m_pVIBufferCom)
+    {
+        m_pVIBufferCom->Create_QueenKnightWarpParticle_Limited(particleInitInfo, iSpawnCount);
+    }
+}
+
 void CEffectParticle::Create_BossExplosionParticle(_float3 vCenterPos, _float fRadius, _float fGatherTime, _float fExplosionTime, _float fTotalLifeTime)
 {
     if (m_pVIBufferCom)
@@ -396,19 +432,46 @@ void CEffectParticle::Create_BossExplosionParticle(_float3 vCenterPos, _float fR
     }
 }
 
+void CEffectParticle::Set_SpawnSettings(_float fInterval, _uint iCount, _bool bContinuous)
+{
+    m_fSpawnInterval = fInterval;
+    m_iSpawnCount = iCount;
+    m_bContinuousSpawn = bContinuous;
+}
+
+void CEffectParticle::Start_ContinuousSpawn()
+{
+    m_bContinuousSpawn = true;
+    m_fSpawnTimer = 0.0f;
+}
+
+void CEffectParticle::Stop_ContinuousSpawn()
+{
+    m_bContinuousSpawn = false;
+    m_fSpawnTimer = 0.0f;
+}
+
 
 #pragma region POOLING에서 꺼내질때 필요한 작업 정의 
 void CEffectParticle::OnActivate(void* pArg)
 {
     EFFECTPARTICLE_ENTER_DESC* pDesc = static_cast<EFFECTPARTICLE_ENTER_DESC*>(pArg);
 
+    // 0. 타겟 트랜스폼 지정.
+    m_pTargetTransform = pDesc->pTargetTransform;
     // 1. 위치 지정. => WorldMatrix용
     m_pTransformCom->Set_State(STATE::POSITION, pDesc->vStartPos);
 
     // 2. 활성화 상태로 설정
     m_IsActivate = true;
     Reset_Timer(); // 타이머 초기화
-    
+    m_fSpawnTimer = 0.0f; // 스폰 타이머도 초기화
+
+    m_bContinuousSpawn = pDesc->IsSpawn;
+    m_fSpawnInterval = pDesc->fSpawnInterval;
+    m_iSpawnCount = pDesc->iSpawnCount;
+    m_fChaseTime = pDesc->fChaseTime;
+
     const PARTICLE_INIT_INFO& particleInit = pDesc->particleInitInfo;
 
     // 2. 타입에 맞는 Create 함수 호출
@@ -420,10 +483,13 @@ void CEffectParticle::OnActivate(void* pArg)
     case PARTICLE_TYPE_QUEEN_WARP:
         m_pVIBufferCom->Create_QueenKnightWarpParticle(particleInit);
         break;
-
     case PARTICLE_TYPE_BOSS_EXPLOSION:
         m_pVIBufferCom->Create_BossExplosionParticle(particleInit.pos, particleInit.fRadius, particleInit.fGatherTime
             , particleInit.fExplositionTime, particleInit.lifeTime);
+        break;
+    case PARTICLE_TYPE_QUEEN_WARP_SPAWN:
+        // 연속 생성 타입은 OnActivate에서 초기 파티클을 생성하지 않음
+        // 타이머 기반으로만 생성
         break;
 
     }
@@ -432,8 +498,17 @@ void CEffectParticle::OnActivate(void* pArg)
 
 void CEffectParticle::OnDeActivate()
 {
+    // ★ 비활성화 시 타겟 정보 초기화
+    if (m_pVIBufferCom)
+    {
+        m_pVIBufferCom->Set_TargetTransform(nullptr);
+    }
+
+    m_pTargetTransform = nullptr;
     // Activate할때 적용함.
     m_pGameInstance->Add_GameObject_ToPools(TEXT("QUEENKNIGHT_WARP"), ENUM_CLASS(CHitFlashEffect::EffectType), this);
+
+    
 }
 
 #pragma endregion
@@ -479,7 +554,7 @@ void CEffectParticle::ImGui_Render()
     ImGuiIO& io = ImGui::GetIO();
 
     // 기존 Player Debug Window
-    ImVec2 windowSize = ImVec2(300.f, 00.f);
+    ImVec2 windowSize = ImVec2(300.f, 300.f);
     ImVec2 windowPos = ImVec2(0.f, 0.f);
     ImGui::SetNextWindowPos(windowPos, ImGuiCond_Once);
     ImGui::SetNextWindowSize(windowSize, ImGuiCond_Once);
@@ -495,6 +570,15 @@ void CEffectParticle::ImGui_Render()
     ImGui::Text("ParticleType : %d", m_eParticleType);
     ImGui::Text("ShaderPath : %d", m_iShaderPath);
     ImGui::Text("CurrentTime : %.2f / %.2f", m_fCurrentTime, m_fDisplayTime);
+
+    static float fEmissive = { 0.1f };
+    ImGui::InputFloat("Emissive : ", &fEmissive);
+
+
+    if (ImGui::Button("Apply Emissive"))
+    {
+        m_fEmissiveIntencity = fEmissive;
+    }
 
     if (m_pVIBufferCom)
     {

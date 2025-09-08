@@ -125,6 +125,8 @@ void CToolMap_Part::Update(_float fTimeDelta)
         m_pGameInstance->Publish(EventType::SELECTED_MODEL, &Desc);
     }*/
     
+    m_fTotalTime += fTimeDelta;
+
 }
 
 void CToolMap_Part::Late_Update(_float fTimeDelta)
@@ -151,7 +153,13 @@ HRESULT CToolMap_Part::Render()
         m_pModelCom->Bind_Materials(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE, 0);
 		//m_pModelCom->Bind_Materials(m_pShaderCom, "g_NormalTexture", i, aiTextureType_NORMALS, 0);
 
-        if (FAILED(m_pShaderCom->Begin(0)))
+        /*if (FAILED(m_pShaderCom->Begin(0)))
+        {
+            CRASH("Failed Begin Failed");
+            return E_FAIL;
+        }*/
+
+        if (FAILED(m_pShaderCom->Begin(m_iEffectWindPath)))
         {
             CRASH("Failed Begin Failed");
             return E_FAIL;
@@ -283,6 +291,20 @@ HRESULT CToolMap_Part::Ready_Render_Resources()
 
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_Transform_Float4x4(D3DTS::PROJ))))
         return E_FAIL;
+
+
+#pragma region EFFECT 전용 메쉬 변수 추가.
+
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fTime", &m_fTotalTime, sizeof(float))))
+        return E_FAIL;
+
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fSpiralStrength", &m_fSpiralStrength, sizeof(float))))
+        return E_FAIL;
+
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fRotationSpeed", &m_fRotationSpeed, sizeof(float))))
+        return E_FAIL;
+
+#pragma endregion
 
 
     return S_OK;

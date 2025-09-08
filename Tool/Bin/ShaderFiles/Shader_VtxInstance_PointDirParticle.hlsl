@@ -20,6 +20,8 @@ vector g_vCamPosition;
 float g_fTimeRatio;
 float g_fScaleRatio;
 
+float g_fEmissiveIntensity;
+
 struct VS_IN
 {
     float3 vPosition : POSITION;
@@ -230,6 +232,18 @@ PS_OUT PS_DIFFUSE_MASK_MAIN(PS_IN In)
         discard;
     vector vMtrlDiffuse = vDestDiffuse * (1.f - vMask) + vSourDiffuse * (vMask);
 
+    float fMaskBrightness = dot(vMask.rgb, float3(0.299, 0.587, 0.114));
+    if (fMaskBrightness > 0.5f)
+    {
+        vector vEmissive = vMask * g_fEmissiveIntensity * 2.0f;
+        //vector vEmissive = vMask * 2.f;
+        //vMtrlDiffuse.rgb = saturate(vMtrlDiffuse.rgb + vEmissive.rgb);
+        vMtrlDiffuse.rgb += vEmissive.rgb;
+        
+    }
+    
+    vMtrlDiffuse.rgb = pow(vMtrlDiffuse.rgb, 7.f);
+    
     float fadeAlpha = 1.0f - g_fTimeRatio;
     vMtrlDiffuse.a *= fadeAlpha;
 

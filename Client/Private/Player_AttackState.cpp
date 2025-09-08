@@ -97,7 +97,7 @@ void CPlayer_AttackState::Enter(void* pArg)
 	m_pGameInstance->Publish(EventType::STEMINA_CHANGE, &SteminaDesc);
 
 	// 2. Particle 생성
-	m_pPlayer->Create_Particle(CParticleSystem::PARTICLE_TYPE::PARTICLE_TYPE_QUEEN_WARP);
+	//m_pPlayer->Create_Particle(CParticleSystem::PARTICLE_TYPE::PARTICLE_TYPE_QUEEN_WARP);
 }
 
 /* State 실행 */

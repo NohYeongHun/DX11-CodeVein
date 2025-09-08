@@ -1205,6 +1205,8 @@ void CMap_Tool::Render_Effect_ParticleInspector()
             static int iNumInstance = { 100 };
             ImGui::SliderInt("NumInstance", &iNumInstance, 50, 1000);
 
+            
+
             static float Center[3] = { 0.f, 0.f, 0.f };
             ImGui::SliderFloat3("Center", Center, 0.0f, 10.0f);
 
@@ -1223,6 +1225,11 @@ void CMap_Tool::Render_Effect_ParticleInspector()
             static float LifeTime[2] = {1.f, 5.f};
             ImGui::SliderFloat2("LifeTime", LifeTime, 1.f, 10.f);
 
+            static float EmissiveIntencity = { 0.388f };
+            ImGui::SliderFloat("Emissive", &EmissiveIntencity, 0.f, 5.f);
+
+            m_CurrentEffectParticle_Desc.fEmissiveIntencity = EmissiveIntencity;
+
             ImGui::SliderInt("Shader Path", (int*)&m_CurrentEffectParticle_Desc.iShaderPath, 0, PARTICLE_SHADER_END - 1);
 
             ImGui::SliderInt("PARTICLE TYPE", (int*)&m_CurrentEffectParticle_Desc.eParticleType, 0, CTool_EffectParticle::PARTICLE_TYPE_END - 1);
@@ -1235,6 +1242,31 @@ void CMap_Tool::Render_Effect_ParticleInspector()
             ImGui::Checkbox("Is BillBoard", &isBillBoard);
             
             
+            ImGui::SameLine();
+            static bool isSpawn = { false };
+            ImGui::Checkbox("Is Spawn", &isSpawn);
+
+            if (isSpawn)
+            {
+                static int iNumSpawnCount = { 10 };
+                ImGui::SliderInt("SpawnCount", &iNumSpawnCount, 10, iNumInstance);
+
+                static float fSpawnInterval = { 0.01f };
+                ImGui::SliderFloat("SpawnInterval", &fSpawnInterval, 0.01f, 1.f);
+
+                m_CurrentEffectParticle_Desc.iSpawnCount = iNumSpawnCount;
+                m_CurrentEffectParticle_Desc.fSpawnInterval = fSpawnInterval;
+                m_CurrentEffectParticle_Desc.isSpawn = isSpawn;
+            }
+            else
+            {
+                m_CurrentEffectParticle_Desc.iSpawnCount = 0.f;
+                m_CurrentEffectParticle_Desc.fSpawnInterval = 0.f;
+                m_CurrentEffectParticle_Desc.isSpawn = false;
+            }
+            
+            
+
 
             // === Effect 생성 버튼 ===
             ImGui::Separator();
@@ -1668,7 +1700,7 @@ void CMap_Tool::Create_BossExplosion_Effect_Particle()
                 _float fExplosionTime = 2.0f; // 폭발 시작 시간
                 _float fTotalLifeTime = m_CurrentEffectParticle_Desc.vLifeTime.y; // 받아온 LifeTime의 최대값
 
-                pParticleEffect->Create_BossExplosionParticle(centerPos, fRadius, fGatherTime, fExplosionTime, fTotalLifeTime);
+                pParticleEffect->Create_BossExplosionParticle(centerPos, fRadius, fExplosionTime, fTotalLifeTime);
             }
         }
     }

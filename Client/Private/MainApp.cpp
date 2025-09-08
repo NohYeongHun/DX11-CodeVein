@@ -203,17 +203,20 @@ HRESULT CMainApp::Ready_Pooling()
 	//}
 
 	CEffectParticle::EFFECT_PARTICLE_DESC ParticleDesc{};
+	ParticleDesc.fSpeedPerSec = 10.f;
+	ParticleDesc.fRotationPerSec = XMConvertToRadians(90.f);
 	ParticleDesc.iShaderPath = 1;
 	ParticleDesc.eParticleType = CEffectParticle::PARTICLE_TYPE_QUEEN_WARP;
-	ParticleDesc.iNumInstance = 400;
-	ParticleDesc.vCenter = { 0.f, 0.f, 0.f };
-	ParticleDesc.vRange = { 6.f, 6.f, 3.f };
-	ParticleDesc.vSpeed = { 3.f, 6.f };
+	//ParticleDesc.eParticleType = CEffectParticle::PARTICLE_TYPE_QUEEN_WARP_SPAWN;
+	ParticleDesc.iNumInstance = 1000;
+	ParticleDesc.vCenter = { 0.f, -1.f, 0.f };
+	ParticleDesc.vRange = { 5.f, 5.f, 5.f };
+	ParticleDesc.vSpeed = { 3.f, 9.f };
 	ParticleDesc.vSize = { 0.1f, 0.11f };
 	ParticleDesc.vLifeTime = { 5.f, 6.f };
 	ParticleDesc.isLoop = false;
 	ParticleDesc.isBillBoard = true;
-
+	ParticleDesc.iSpawnCount = 50;
 	
 	ParticleDesc.useTextureCheckArray[TEXTURE::TEXTURE_DIFFUSE] = true;
 	ParticleDesc.useTextureIndexArray[TEXTURE::TEXTURE_DIFFUSE] = 1;
@@ -224,6 +227,8 @@ HRESULT CMainApp::Ready_Pooling()
 	ParticleDesc.useTextureCheckArray[TEXTURE::TEXTURE_GRADIENT_ALPHA] = false;
 	ParticleDesc.useTextureCheckArray[TEXTURE::TEXTURE_NOISE] = false;
 
+
+
 	/* Particle Init Info 설정으로 Pool에서 사용할때마다. 값을 채워줍니다. */
 	for (_uint i = 0; i < 200; ++i)
 	{
@@ -233,21 +238,57 @@ HRESULT CMainApp::Ready_Pooling()
 		));
 		m_pGameInstance->Add_GameObject_ToPools(TEXT("QUEENKNIGHT_WARP"), ENUM_CLASS(CEffectParticle::EffectType), pGameObject);
 	}
-#pragma endregion
 
-#pragma region PARTICLE SYSTEM으로 만들기.
-	CParticleSystem::PARTICLESYSTEM_CLONE_DESC ParticleSystemDesc = ParticlePresets::Get(CParticleSystem::PARTICLE_TYPE_QUEEN_WARP);
-	
-	// 객체 100개 풀링.
-	for (_uint i = 0; i < 100; ++i)
+	ParticleDesc.fSpeedPerSec = 10.f;
+	ParticleDesc.fRotationPerSec = XMConvertToRadians(90.f);
+	ParticleDesc.iShaderPath = 1;
+	ParticleDesc.eParticleType = CEffectParticle::PARTICLE_TYPE_BOSS_EXPLOSION;
+	//ParticleDesc.eParticleType = CEffectParticle::PARTICLE_TYPE_QUEEN_WARP_SPAWN;
+	ParticleDesc.iNumInstance = 450;
+	ParticleDesc.vCenter = { 0.f, 0.f, 0.f };
+	ParticleDesc.vRange = { 2.f, 2.f, 2.f };
+	ParticleDesc.vSpeed = { 10.f, 15.f };
+	ParticleDesc.vSize = { 0.1f, 0.11f };
+	ParticleDesc.vLifeTime = { 3.f, 6.f };
+	ParticleDesc.isLoop = false;
+	ParticleDesc.isBillBoard = true;
+	ParticleDesc.iSpawnCount = 50;
+
+	ParticleDesc.useTextureCheckArray[TEXTURE::TEXTURE_DIFFUSE] = true;
+	ParticleDesc.useTextureIndexArray[TEXTURE::TEXTURE_DIFFUSE] = 1;
+	ParticleDesc.useTextureCheckArray[TEXTURE::TEXTURE_MASK] = true;
+	ParticleDesc.useTextureIndexArray[TEXTURE::TEXTURE_MASK] = 0;
+
+	ParticleDesc.useTextureCheckArray[TEXTURE::TEXTURE_GRADIENT] = false;
+	ParticleDesc.useTextureCheckArray[TEXTURE::TEXTURE_GRADIENT_ALPHA] = false;
+	ParticleDesc.useTextureCheckArray[TEXTURE::TEXTURE_NOISE] = false;
+
+
+
+	/* Particle Init Info 설정으로 Pool에서 사용할때마다. 값을 채워줍니다. */
+	for (_uint i = 0; i < 200; ++i)
 	{
 		pGameObject = dynamic_cast<CGameObject*>(m_pGameInstance->Clone_Prototype(
 			PROTOTYPE::GAMEOBJECT, ENUM_CLASS(LEVEL::STATIC)
-			, TEXT("Prototype_QueenKnight_ParticleSystem"), &ParticleSystemDesc
+			, TEXT("Prototype_GameObject_EffectParticle"), &ParticleDesc
 		));
-		m_pGameInstance->Add_GameObject_ToPools(ParticleSystemDesc.strPoolTag,
-			ENUM_CLASS(EFFECTTYPE::PARTICLE), pGameObject);
+		m_pGameInstance->Add_GameObject_ToPools(TEXT("QUEENKNIGHT_EXPLOSION"), ENUM_CLASS(CEffectParticle::EffectType), pGameObject);
 	}
+#pragma endregion
+
+#pragma region PARTICLE SYSTEM으로 만들기.
+	//CParticleSystem::PARTICLESYSTEM_CLONE_DESC ParticleSystemDesc = ParticlePresets::Get(CParticleSystem::PARTICLE_TYPE_QUEEN_WARP);
+	//
+	//// 객체 100개 풀링.
+	//for (_uint i = 0; i < 100; ++i)
+	//{
+	//	pGameObject = dynamic_cast<CGameObject*>(m_pGameInstance->Clone_Prototype(
+	//		PROTOTYPE::GAMEOBJECT, ENUM_CLASS(LEVEL::STATIC)
+	//		, TEXT("Prototype_QueenKnight_ParticleSystem"), &ParticleSystemDesc
+	//	));
+	//	m_pGameInstance->Add_GameObject_ToPools(ParticleSystemDesc.strPoolTag,
+	//		ENUM_CLASS(EFFECTTYPE::PARTICLE), pGameObject);
+	//}
 
 	//CParticleSystem::PARTICLESYSTEM_DESC desc = ParticlePresets::Get(CParticleSystem::PARTICLE_TYPE::PARTICLE_TYPE_QUEEN_WARP);
 	

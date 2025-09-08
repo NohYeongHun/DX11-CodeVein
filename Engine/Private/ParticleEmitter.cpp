@@ -34,6 +34,7 @@ void CParticleEmitter::Reset(const CParticleSystem::PARTICLESYSTEM_CLONE_DESC* p
 
 	// Emitter의 내부 상태를 초기화합니다.
 	m_fEmitTimer = 0.f;
+	m_fElapsedTime = 0.f;
 
 	// BURST 타입일 경우, 아직 터지지 않았다는 상태로 리셋
 	if (m_tDesc.eEmissionType == EMITTER_BURST)
@@ -43,11 +44,15 @@ void CParticleEmitter::Reset(const CParticleSystem::PARTICLESYSTEM_CLONE_DESC* p
 	}
 	
 }
+
+/* 파티클의 방향 결정 주체는 시스템의 레시피. */
 void CParticleEmitter::Emit(_float fTimeDelta, vector<PARTICLE_DATA>& out_Particles)
 {
 	// 유효한 소유주 정보가 없거나 Stop()이 호출된 상태면 아무것도 하지 않음
 	if (nullptr == m_pOwnerDesc || nullptr == m_pOwnerTransform || m_fEmitTimer < 0.f)
 		return;
+
+	m_fElapsedTime += fTimeDelta; // 매 프레임 시간 누적;
 
 	switch (m_tDesc.eEmissionType)
 	{
@@ -58,7 +63,7 @@ void CParticleEmitter::Emit(_float fTimeDelta, vector<PARTICLE_DATA>& out_Partic
 		// if 대신 while을 쓰는 이유: 프레임이 심하게 끊겨도 그 시간만큼의 파티클을 모두 생성해주기 위함
 		while (m_fEmitTimer >= m_fEmitInterval)
 		{
-			Create_One_Particle(out_Particles);
+			Create_Particle_By_Type(out_Particles);
 			m_fEmitTimer -= m_fEmitInterval; // 타이머에서 생성 간격만큼 차감
 		}
 	}
@@ -72,11 +77,12 @@ void CParticleEmitter::Emit(_float fTimeDelta, vector<PARTICLE_DATA>& out_Partic
 		 {
 		     for (_uint i = 0; i < m_tDesc.iBurstCount; ++i)
 		     {
-		         Create_One_Particle(out_Particles);
+		         Create_Particle_By_Type(out_Particles);
 		     }
 		     m_bHasBursted = true; // 터졌다고 표시
 		 }
 	}
+
 	break;
 	}
 }
@@ -176,7 +182,123 @@ void CParticleEmitter::Generate_Particle_Attribute(_float3& out_vPosition, _floa
 	case EMITTER_CONE:
 		// ...
 		break;
+	break;
+
+	default:
+		break;
 	}
+}
+void CParticleEmitter::Create_QueenKnight_Particle(vector<PARTICLE_DATA>& out_Particles)
+{
+	if (nullptr == m_pOwnerDesc)
+		return;
+
+	PARTICLE_DATA newParticle = {};
+
+	// 1. 원기둥 형태로 분포된 초기 위치 생성
+	_float fRadius = min(m_tDesc.vShapeSize.x, m_tDesc.vShapeSize.z);
+	_float fTheta = m_pGameInstance->Rand(0.f, XM_2PI);
+	_float fR = m_pGameInstance->Rand(0.f, fRadius);
+	_float fHeight = m_pGameInstance->Rand(-m_tDesc.vShapeSize.y * 0.5f, m_tDesc.vShapeSize.y * 0.5f);
+
+	// Emitter 위치 기준으로 원기둥 좌표 계산
+	_float3 vEmitterPos = {};
+	XMStoreFloat3(&vEmitterPos, m_pOwnerTransform->Get_State(STATE::POSITION));
+
+	newParticle.vPosition.x = vEmitterPos.x + fR * cosf(fTheta);
+	newParticle.vPosition.y = vEmitterPos.y + fHeight;
+	newParticle.vPosition.z = vEmitterPos.z + fR * sinf(fTheta);
+
+	// 2. 방향은 약간의 스프레드를 가진 전방향
+	_float3 baseDir = { 0.f, 0.f, 1.f }; // 기본 전방향
+	_float spreadAngle = 0.2f;
+	_float randomYaw = m_pGameInstance->Rand(-spreadAngle, spreadAngle);
+	_float randomPitch = m_pGameInstance->Rand(-spreadAngle, spreadAngle);
+
+	_vector vBaseDir = XMLoadFloat3(&baseDir);
+	_matrix rotMatrix = XMMatrixRotationRollPitchYaw(randomPitch, randomYaw, 0.f);
+	_vector vFinalDir = XMVector3Transform(vBaseDir, rotMatrix);
+	XMStoreFloat3(&newParticle.vDir, XMVector3Normalize(vFinalDir));
+
+	// 3. 기타 속성 설정
+	newParticle.vLife.y = m_pGameInstance->Rand(m_pOwnerDesc->vLifeTime.x, m_pOwnerDesc->vLifeTime.y);
+	newParticle.fSpeed = m_pGameInstance->Rand(m_pOwnerDesc->vSpeed.x, m_pOwnerDesc->vSpeed.y);
+	newParticle.fStartSize = m_pGameInstance->Rand(m_pOwnerDesc->vSizeStart.x, m_pOwnerDesc->vSizeStart.y);
+	newParticle.fEndSize = m_pGameInstance->Rand(m_pOwnerDesc->vSizeEnd.x, m_pOwnerDesc->vSizeEnd.y);
+
+	newParticle.vLife.x = 0.f;
+	newParticle.fCurrentSize = newParticle.fStartSize;
+
+	out_Particles.push_back(newParticle);
+}
+
+void CParticleEmitter::Create_BossExplosion_Particle(vector<PARTICLE_DATA>& out_Particles)
+{
+	if (nullptr == m_pOwnerDesc)
+		return;
+
+	PARTICLE_DATA newParticle = {};
+
+	// 1. 구형 표면에서 균등하게 분포된 점 생성
+	_float u = m_pGameInstance->Rand(-1.f, 1.f);
+	_float theta = m_pGameInstance->Rand(0.f, XM_2PI);
+	_float sqrtOneMinusU2 = sqrtf(1.f - u * u);
+
+	_float3 sphereDirection = {
+		sqrtOneMinusU2 * cosf(theta),
+		u,
+		sqrtOneMinusU2 * sinf(theta)
+	};
+
+	// Emitter 위치에서 구형 표면 위치 계산
+	_float3 vEmitterPos = {};
+	XMStoreFloat3(&vEmitterPos, m_pOwnerTransform->Get_State(STATE::POSITION));
+	_float fRadius = m_tDesc.vShapeSize.x;
+
+	newParticle.vPosition.x = vEmitterPos.x + sphereDirection.x * fRadius;
+	newParticle.vPosition.y = vEmitterPos.y + sphereDirection.y * fRadius;
+	newParticle.vPosition.z = vEmitterPos.z + sphereDirection.z * fRadius;
+
+	// 2. 방향은 중심에서 바깥쪽으로
+	newParticle.vDir = sphereDirection;
+
+	// 3. 기타 속성 설정
+	newParticle.vLife.y = m_pGameInstance->Rand(m_pOwnerDesc->vLifeTime.x, m_pOwnerDesc->vLifeTime.y);
+	newParticle.fSpeed = m_pGameInstance->Rand(m_pOwnerDesc->vSpeed.x, m_pOwnerDesc->vSpeed.y);
+	newParticle.fStartSize = m_pGameInstance->Rand(m_pOwnerDesc->vSizeStart.x, m_pOwnerDesc->vSizeStart.y);
+	newParticle.fEndSize = m_pGameInstance->Rand(m_pOwnerDesc->vSizeEnd.x, m_pOwnerDesc->vSizeEnd.y);
+
+	newParticle.vLife.x = 0.f;
+	newParticle.fCurrentSize = newParticle.fStartSize;
+
+	out_Particles.push_back(newParticle);
+}
+
+void CParticleEmitter::Create_Particle_By_Type(vector<PARTICLE_DATA>& out_Particles)
+{
+	if (nullptr == m_pOwnerDesc)
+		return;
+
+	switch (static_cast<CParticleSystem::PARTICLE_TYPE>(m_pOwnerDesc->eParticleType))
+	{
+	case CParticleSystem::PARTICLE_TYPE_DEFAULT:
+		Create_Default_Particle(out_Particles);
+		break;
+	case CParticleSystem::PARTICLE_TYPE_QUEEN_WARP:
+		Create_QueenKnight_Particle(out_Particles);
+		break;
+	case CParticleSystem::PARTICLE_TYPE_BOSS_EXPLOSION:
+		Create_BossExplosion_Particle(out_Particles);
+		break;
+	default:
+		Create_Default_Particle(out_Particles);
+		break;
+	}
+}
+
+void CParticleEmitter::Create_Default_Particle(vector<PARTICLE_DATA>& out_Particles)
+{
+	Create_One_Particle(out_Particles);
 }
 #pragma endregion
 

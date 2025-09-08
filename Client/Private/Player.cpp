@@ -812,6 +812,7 @@ void CPlayer::SetTrail_Visible(_bool bTrail)
 void CPlayer::Create_Particle(CParticleSystem::PARTICLE_TYPE eType)
 {
     CParticleSystem::PARTICLESYSTEM_ACTIVATE_DESC ActivateDesc = {};
+    XMStoreFloat4((&ActivateDesc.vStartPos),m_pTransformCom->Get_State(STATE::POSITION));
     ActivateDesc.eAttachType = CParticleSystem::EAttachType::WORLD;
     ActivateDesc.pOwnerTransform = m_pTransformCom;
 
