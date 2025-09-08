@@ -75,6 +75,8 @@ private:
 	float m_fWipeInTime = 1.5f; // 나타나는 데 걸리는 시간 (초)
 	float m_fWipeOutTime = 1.f; // 사라지는 데 걸리는 시간 (초)
 	float m_fWipeSoftness = 0.2f; // 와이프 경계선의 부드러운 정도
+
+	class CTexture* m_pTextureCom = { nullptr };
 #pragma endregion
 
 	

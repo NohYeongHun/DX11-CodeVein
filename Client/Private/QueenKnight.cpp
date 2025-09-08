@@ -704,7 +704,7 @@ void CQueenKnight::Create_QueenKnightWarp_Effect_Particle(_float3 vDir)
     Desc.particleInitInfo.lifeTime = 5.f;
     Desc.particleInitInfo.dir = vDir;
     Desc.pTargetTransform = m_pTransformCom;
-    Desc.fChaseTime = m_pGameInstance->Get_TimeDelta() * 100.f; // 50 프레임만 추적
+    Desc.fChaseTime = 5.f; // 50 프레임만 추적
     m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(m_eCurLevel)
         , TEXT("QUEENKNIGHT_WARP"), TEXT("Layer_Effect"), 1, ENUM_CLASS(EFFECTTYPE::PARTICLE), &Desc);
 

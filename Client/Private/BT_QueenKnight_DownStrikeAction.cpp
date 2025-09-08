@@ -110,6 +110,7 @@ BT_RESULT CBT_QueenKnight_DownStrikeAction::Update_Ascend(_float fTimeDelta)
 {
     _vector vOwnerPos = m_pOwner->Get_Transform()->Get_State(STATE::POSITION);
     _float fCurrentRatio = m_pOwner->Get_CurrentAnimationRatio();
+    _bool bParticle = { false };
 
     if (!m_bDissolveCheck && !m_pOwner->HasBuff(CMonster::BUFF_DISSOLVE) && fCurrentRatio >= m_fDissolve_StartRatio)
     {
@@ -123,6 +124,8 @@ BT_RESULT CBT_QueenKnight_DownStrikeAction::Update_Ascend(_float fTimeDelta)
        //m_pOwner->Create_QueenKnightWarp_Effect_Particle_Spawn({ 0.f, 1.f, 0.f }, 50); // 한번에 몇개?
     }
 
+
+
     if (vOwnerPos.m128_f32[1] <= m_vAscendTarget.y && fCurrentRatio >= m_fJump_StartRatio)
     {
 #ifdef _DEBUG
@@ -131,27 +134,18 @@ BT_RESULT CBT_QueenKnight_DownStrikeAction::Update_Ascend(_float fTimeDelta)
         XMStoreFloat3(&vPosBefore, vOwnerPos);
 #endif // _DEBUG
 
-        
-        
         m_pOwner->Move_Direction({ 0.f, 1.f, 0.f }, fTimeDelta * 0.7f);
         
-#ifdef _DEBUG
-        // 이동 후 위치 확인
-        _vector vPosAfter = m_pOwner->Get_Transform()->Get_State(STATE::POSITION);
-        _float3 vPosAfter3 = {};
-        XMStoreFloat3(&vPosAfter3, vPosAfter);
 
-        _float fMoveAmount = vPosAfter3.y - vPosBefore.y;
-        OutputDebugStringA(("QueenKnight Move Y: " + std::to_string(fMoveAmount) + ", TimeDelta: " + std::to_string(fTimeDelta) + "\n").c_str());
-#endif // _DEBUG
-
-        
     }
 
     // Dissolve가 이미 발생했고 Dissolve 상태가 끝났으면?
     if (m_bDissolveCheck && !m_pOwner->HasBuff(CMonster::BUFF_DISSOLVE))
     {
         m_pOwner->Set_Visible(false); // 렌더를 끕니다.
+
+        if (!bParticle)
+            m_pOwner->Create_QueenKnightWarp_Effect_Particle({ 0.f, 1.f, 0.f });
     }
 
     // 1. 목표 높이까지 도달했는지 확인. 아니면 위로 이동.

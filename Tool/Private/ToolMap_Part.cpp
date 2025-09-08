@@ -244,6 +244,14 @@ HRESULT CToolMap_Part::Ready_Components()
         TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom), nullptr)))
         return E_FAIL;
 
+#pragma region EFFECT
+    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_EffectNoiseTexture"),
+        TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom), nullptr)))
+        return E_FAIL;
+#pragma endregion
+
+
+
     return S_OK;
 }
 
@@ -304,6 +312,11 @@ HRESULT CToolMap_Part::Ready_Render_Resources()
     if (FAILED(m_pShaderCom->Bind_RawValue("g_fRotationSpeed", &m_fRotationSpeed, sizeof(float))))
         return E_FAIL;
 
+    if (FAILED(m_pTextureCom->Bind_Shader_Resource(m_pShaderCom, "g_NoiseTexture", 0)))
+    {
+        return E_FAIL;
+    }
+
 #pragma endregion
 
 
@@ -346,4 +359,5 @@ void CToolMap_Part::Free()
     CGameObject::Free();
     Safe_Release(m_pModelCom);
     Safe_Release(m_pShaderCom);
+    Safe_Release(m_pTextureCom);
 }

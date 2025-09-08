@@ -208,7 +208,7 @@ HRESULT CMainApp::Ready_Pooling()
 	ParticleDesc.iShaderPath = 1;
 	ParticleDesc.eParticleType = CEffectParticle::PARTICLE_TYPE_QUEEN_WARP;
 	//ParticleDesc.eParticleType = CEffectParticle::PARTICLE_TYPE_QUEEN_WARP_SPAWN;
-	ParticleDesc.iNumInstance = 1000;
+	ParticleDesc.iNumInstance = 500;
 	ParticleDesc.vCenter = { 0.f, -1.f, 0.f };
 	ParticleDesc.vRange = { 5.f, 5.f, 5.f };
 	ParticleDesc.vSpeed = { 3.f, 9.f };

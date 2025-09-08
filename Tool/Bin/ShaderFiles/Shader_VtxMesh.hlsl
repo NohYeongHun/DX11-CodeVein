@@ -9,8 +9,9 @@ vector g_vLightSpecular = vector(1.f, 1.f, 1.f, 1.f);
 
 vector g_vCamPosition;
 
-/*ÀçÁú*/
+/*    */
 texture2D g_DiffuseTexture;
+texture2D g_NoiseTexture;
 vector g_vMtrlAmbient = 1.f;
 vector g_vMtrlSpecular = 1.f;
 
@@ -23,7 +24,7 @@ struct VS_IN
     float3 vNormal : NORMAL;
     float3 vTangent : TANGENT;
     float3 vBinormal : BINORMAL;
-    uint4  vBlendIndex : BLENDINDEX;
+    uint4 vBlendIndex : BLENDINDEX;
     float4 vBlendWeight : BLENDWEIGHT;
     float2 vTexcoord : TEXCOORD0;
 };
@@ -36,14 +37,14 @@ struct VS_OUT
     float4 vWorldPos : TEXCOORD1;
 };
 
-/* Á¤Á¡½¦ÀÌ´õ : Á¤Á¡ À§Ä¡ÀÇ ½ºÆäÀÌ½º º¯È¯(·ÎÄÃ -> ¿ùµå -> ºä -> Åõ¿µ). */ 
-/*          : Á¤Á¡ÀÇ ±¸¼ºÀ» º¯°æ.(in:3°³, out:2°³ or 5°³) */
-/*          : Á¤Á¡ ´ÜÀ§(Á¤Á¡ ÇÏ³ª´ç VS_MAINÇÑ¹øÈ£Ãâ) */ 
+/*        Ì´  :        Ä¡        Ì½    È¯(     ->      ->    ->     ). */ 
+/*          :                   .(in:3  , out:2   or 5  ) */
+/*          :          (      Ï³    VS_MAIN Ñ¹ È£  ) */ 
 VS_OUT VS_MAIN(VS_IN In)
 {
     VS_OUT Out = (VS_OUT) 0;
     
-    /* Á¤Á¡ÀÇ ·ÎÄÃÀ§Ä¡ * ¿ùµå * ºä * Åõ¿µ */ 
+    /*              Ä¡ *      *    *      */ 
         
     float4x4 matWV, matWVP;
     
@@ -63,7 +64,7 @@ VS_OUT VS_MAIN2(VS_IN In)
 {
     VS_OUT Out = (VS_OUT) 0;
     
-    /* Á¤Á¡ÀÇ ·ÎÄÃÀ§Ä¡ * ¿ùµå * ºä * Åõ¿µ */ 
+
         
     float4x4 matWV, matWVP;
     
@@ -78,9 +79,6 @@ VS_OUT VS_MAIN2(VS_IN In)
     return Out;
 }
 
-/* /WÀ» ¼öÇàÇÑ´Ù. Åõ¿µ½ºÆäÀÌ½º·Î º¯È¯ */
-/* ºäÆ÷Æ®·Î º¯È¯ÇÏ°í.*/
-/* ·¡½ºÅÍ¶óÀÌÁî : ÇÈ¼¿À» ¸¸µç´Ù. */
 
 struct PS_IN
 {
@@ -97,8 +95,6 @@ struct PS_OUT
     
 };
 
-/* ¸¸µç ÇÈ¼¿ °¢°¢¿¡ ´ëÇØ¼­ ÇÈ¼¿ ½¦ÀÌ´õ¸¦ ¼öÇàÇÑ´Ù. */
-/* ÇÈ¼¿ÀÇ »öÀ» °áÁ¤ÇÑ´Ù. */
 
 
 PS_OUT PS_MAIN(PS_IN In)
@@ -110,7 +106,7 @@ PS_OUT PS_MAIN(PS_IN In)
     
     float fShade = max(dot(normalize(g_vLightDir) * -1.f, normalize(In.vNormal)), 0.f);
     
-    /*½½¶óÀÌµù ÀÌ¾ß±âÇß´Ù*/
+    /*     Ìµ   Ì¾ß±  ß´ */
     vector vReflect = reflect(normalize(g_vLightDir), normalize(In.vNormal));
     vector vLook = In.vWorldPos - g_vCamPosition;
     
@@ -130,21 +126,21 @@ PS_OUT PS_MAIN2(PS_IN In)
       
     vector vMtrlDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
 
-      // ¾ËÆÄ°¡ 0ÀÎ °æ¿ì¿¡¸¸ ÁÖº¯ ÇÈ¼¿ »ö»ó »ç¿ë
+      //    Ä°  0     ì¿¡    Öº   È¼          
     if (vMtrlDiffuse.a < 0.01f)
     {
-        float2 texelSize = float2(1.0f / 1024.0f, 1.0f / 1024.0f); // ÅØ½ºÃ³ ÇØ»óµµ¿¡ ¸Â°Ô Á¶Á¤
+        float2 texelSize = float2(1.0f / 1024.0f, 1.0f / 1024.0f); //  Ø½ Ã³  Ø»óµµ¿   Â°      
 
-          // 4¹æÇâ ¶Ç´Â 8¹æÇâ¿¡¼­ ¾ËÆÄ°¡ ÀÖ´Â Ã¹ ¹øÂ° ÇÈ¼¿ Ã£±â
+          // 4      Ç´  8   â¿¡      Ä°   Ö´  Ã¹   Â°  È¼  Ã£  
         vector neighbors[4] =
         {
-            g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord + float2(0, -texelSize.y)), // À§
-              g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord + float2(texelSize.x, 0)), // ¿À¸¥ÂÊ
-              g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord + float2(0, texelSize.y)), // ¾Æ·¡
-              g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord + float2(-texelSize.x, 0)) // ¿ÞÂÊ
+            g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord + float2(0, -texelSize.y)), //   
+              g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord + float2(texelSize.x, 0)), //       
+              g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord + float2(0, texelSize.y)), //  Æ· 
+              g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord + float2(-texelSize.x, 0)) //     
         };
 
-          // À¯È¿ÇÑ ÁÖº¯ ÇÈ¼¿ Áß Ã¹ ¹øÂ° °Í »ç¿ë
+          //   È¿    Öº   È¼     Ã¹   Â°       
         for (int i = 0; i < 4; i++)
         {
             if (neighbors[i].a > 0.01f)
@@ -171,81 +167,129 @@ PS_OUT PS_MAIN2(PS_IN In)
 }
 
 
-// ... ±âÁ¸ º¯¼öµé ¾Æ·¡¿¡ Ãß°¡
+// ... ê¸°ì¡´ ë³€ìˆ˜ë“¤ ì•„ëž˜ì— ì¶”ê°€
 float g_fTime = 0.f;
-float g_fSpiralStrength = 5.0f; // ³ª¼± °­µµ
-float g_fRotationSpeed = 2.0f; // È¸Àü ¼Óµµ
-vector g_vTintColor = vector(1.f, 1.f, 1.f, 1.f); // ±âº»°ªÀº Èò»ö
+float g_fSpiralStrength = 5.0f; // ë‚˜ì„  ê°•ë„
+float g_fRotationSpeed = 2.0f; // íšŒì „ ì†ë„
+vector g_vTintColor = vector(1.f, 1.f, 1.f, 1.f); // ê¸°ë³¸ê°’ì€ í°ìƒ‰
 
-// ... ±âÁ¸ º¯¼öµé ¾Æ·¡¿¡ Ãß°¡ ...
-float g_fEffectLifetime = 4.f; // ÀÌÆåÆ®ÀÇ ÃÑ ¼ö¸í (ÃÊ)
-float g_fEffectStartTime = 0.f; // ÀÌÆåÆ®°¡ »ý¼ºµÈ ½Ã°£
-float g_fWipeInTime = 1.5f; // ³ªÅ¸³ª´Â µ¥ °É¸®´Â ½Ã°£ (ÃÊ)
-float g_fWipeOutTime = 1.f; // »ç¶óÁö´Â µ¥ °É¸®´Â ½Ã°£ (ÃÊ)
-float g_fWipeSoftness = 0.2f; // ¿ÍÀÌÇÁ °æ°è¼±ÀÇ ºÎµå·¯¿î Á¤µµ
+// ... ê¸°ì¡´ ë³€ìˆ˜ë“¤ ì•„ëž˜ì— ì¶”ê°€ ...
+float g_fEffectLifetime = 4.f; // ì´íŽ™íŠ¸ì˜ ì´ ìˆ˜ëª… (ì´ˆ)
+float g_fEffectStartTime = 0.f; // ì´íŽ™íŠ¸ê°€ ìƒì„±ëœ ì‹œê°„
+float g_fWipeInTime = 1.5f; // ë‚˜íƒ€ë‚˜ëŠ” ë° ê±¸ë¦¬ëŠ” ì‹œê°„ (ì´ˆ)
+float g_fWipeOutTime = 1.f; // ì‚¬ë¼ì§€ëŠ” ë° ê±¸ë¦¬ëŠ” ì‹œê°„ (ì´ˆ)
+float g_fWipeSoftness = 0.2f; // ì™€ì´í”„ ê²½ê³„ì„ ì˜ ë¶€ë“œëŸ¬ìš´ ì •ë„
+
+//PS_OUT PS_EFFECT_WIND(PS_IN In)
+//{
+//    PS_OUT Out = (PS_OUT) 0;
+    
+//     // --- ì ˆì°¨ì  UV ê³„ì‚° ì‹œìž‘ ---
+//    // 1. UV ì¢Œí‘œë¥¼ (-0.5 ~ 0.5) ë²”ìœ„ë¡œ ì¤‘ì•™ ì •ë ¬í•©ë‹ˆë‹¤.
+//    float2 vCenterUV = In.vTexcoord - 0.5f;
+
+//    // 2. ì¤‘ì‹¬ìœ¼ë¡œë¶€í„°ì˜ ê±°ë¦¬ì™€ ê°ë„ë¥¼ ê³„ì‚°í•©ë‹ˆë‹¤ (ê·¹ì¢Œí‘œê³„ ë³€í™˜).
+//    float fDistance = length(vCenterUV);
+//    float fAngle = atan2(vCenterUV.y, vCenterUV.x);
+
+//    // 3. ê±°ë¦¬ì— ë¹„ë¡€í•´ì„œ ê°ë„ë¥¼ ì™œê³¡í•˜ê³ , ì‹œê°„ì— ë”°ë¼ íšŒì „ì‹œí‚µë‹ˆë‹¤.
+//    fAngle += fDistance * g_fSpiralStrength;
+//    fAngle += g_fTime * g_fRotationSpeed;
+
+//    // 4. ìƒˆë¡œìš´ ê°ë„ì™€ ê¸°ì¡´ ê±°ë¦¬ë¥¼ ì´ìš©í•´ ìƒˆë¡œìš´ UV ì¢Œí‘œë¥¼ ë§Œë“­ë‹ˆë‹¤.
+//    float2 vSpiralUV;
+//    vSpiralUV.x = cos(fAngle) * fDistance;
+//    vSpiralUV.y = sin(fAngle) * fDistance;
+
+//    // 5. UV ì¢Œí‘œë¥¼ ë‹¤ì‹œ (0 ~ 1) ë²”ìœ„ë¡œ ë³µì›í•©ë‹ˆë‹¤.
+//    vSpiralUV += 0.5f;
+//    // --- ì ˆì°¨ì  UV ê³„ì‚° ë ---
+
+
+//    // ì™œê³¡ëœ vSpiralUVë¥¼ ì‚¬ìš©í•´ í…ìŠ¤ì²˜ë¥¼ ìƒ˜í”Œë§í•©ë‹ˆë‹¤.
+//    float4 vTextureColor = g_DiffuseTexture.Sample(DefaultSampler, vSpiralUV);
+
+//    Out.vColor = vTextureColor * g_vTintColor;
+//    Out.vColor.a = vTextureColor.r * g_vTintColor.a;
+
+//    float fBaseAlpha = Out.vColor.a;
+
+//    // 1. ì´íŽ™íŠ¸ ìƒì„± í›„ ê²½ê³¼ ì‹œê°„ì„ ê³„ì‚°í•©ë‹ˆë‹¤.
+//    float fElapsedTime = g_fTime - g_fEffectStartTime;
+
+//    // 2. Wipe-In ì§„í–‰ë¥  (0ì—ì„œ 1ë¡œ ì¦ê°€)
+//    float fWipeInRatio = saturate(fElapsedTime / g_fWipeInTime);
+
+//    // 3. Wipe-Out ì‹œìž‘ ì‹œê°„ì„ ê³„ì‚°í•˜ê³ , ì§„í–‰ë¥  (0ì—ì„œ 1ë¡œ ì¦ê°€)ì„ êµ¬í•©ë‹ˆë‹¤.
+//    float fWipeOutStartTime = g_fEffectLifetime - g_fWipeOutTime;
+//    float fWipeOutRatio = saturate((fElapsedTime - fWipeOutStartTime) / g_fWipeOutTime);
+
+//    // 4. í˜„ìž¬ í”½ì…€ì˜ ê°€ë¡œ UV ì¢Œí‘œë¥¼ ì´ìš©í•´ ì™€ì´í”„ ë§ˆìŠ¤í¬ë¥¼ ë§Œë“­ë‹ˆë‹¤.
+//    //    ì˜¤ë¥¸ìª½ì—ì„œ ì™¼ìª½ìœ¼ë¡œ ë‚˜íƒ€ë‚˜ëŠ” ë§ˆìŠ¤í¬ (Wipe-In)
+//    //    In.vTexcoord.xê°€ 1.0 (ì˜¤ë¥¸ìª½)ì— ê°€ê¹Œìš¸ìˆ˜ë¡ ë¨¼ì € ë‚˜íƒ€ë‚˜ê¸° ì‹œìž‘í•©ë‹ˆë‹¤.
+//    float fWipeInMask = smoothstep(1.0 - fWipeInRatio - g_fWipeSoftness, 1.0 - fWipeInRatio, In.vTexcoord.x);
+    
+//    //    ì˜¤ë¥¸ìª½ì—ì„œ ì™¼ìª½ìœ¼ë¡œ ì‚¬ë¼ì§€ëŠ” ë§ˆìŠ¤í¬ (Wipe-Out)
+//    //    ì—¬ê¸°ì„œ In.vTexcoord.x ëŒ€ì‹  (1.0f - In.vTexcoord.x)ë¥¼ ì‚¬ìš©í•˜ì—¬ ì‚¬ë¼ì§€ëŠ” ë°©í–¥ì„ ë°˜ì „ì‹œí‚µë‹ˆë‹¤.
+//    //    (1.0f - In.vTexcoord.x)ëŠ” UVì˜ ì˜¤ë¥¸ìª½(1)ì—ì„œ 0ìœ¼ë¡œ, ì™¼ìª½(0)ì—ì„œ 1ë¡œ ì¦ê°€í•˜ëŠ” ê°’ì„ ê°€ì§‘ë‹ˆë‹¤.
+//    //    smoothstepì˜ ì²« ë²ˆì§¸ ì¸ìžëŠ” ì‹œìž‘ì , ë‘ ë²ˆì§¸ ì¸ìžëŠ” ëì ìž…ë‹ˆë‹¤.
+//    //    ì´ ê°’ë“¤ì€ WipeOutRatioê°€ ì§„í–‰ë ìˆ˜ë¡ ì´ë™í•˜ë©° ì˜ì—­ì„ ë§Œë“­ë‹ˆë‹¤.
+//    float fWipeOutMask = 1.0 - smoothstep(0.0 - g_fWipeSoftness, 0.0, (1.0f - In.vTexcoord.x) - fWipeOutRatio);
+
+//    // 5. ìµœì¢… ì•ŒíŒŒ ê°’ì€ [ê¸°ì¡´ ì•ŒíŒŒ] x [Wipe-In ë§ˆìŠ¤í¬] x [Wipe-Out ë§ˆìŠ¤í¬] ìž…ë‹ˆë‹¤.
+//    Out.vColor.a = fBaseAlpha * fWipeInMask * fWipeOutMask;
+    
+//    return Out;
+//}
+
+
 
 PS_OUT PS_EFFECT_WIND(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
     
-     // --- ÀýÂ÷Àû UV °è»ê ½ÃÀÛ ---
-    // 1. UV ÁÂÇ¥¸¦ (-0.5 ~ 0.5) ¹üÀ§·Î Áß¾Ó Á¤·ÄÇÕ´Ï´Ù.
+     // --- ê¸°ì¡´ì˜ ì ˆì°¨ì  UV ê³„ì‚° ë° í…ìŠ¤ì²˜ ìƒ˜í”Œë§ (ë³€ë™ ì—†ìŒ) ---
     float2 vCenterUV = In.vTexcoord - 0.5f;
-
-    // 2. Áß½ÉÀ¸·ÎºÎÅÍÀÇ °Å¸®¿Í °¢µµ¸¦ °è»êÇÕ´Ï´Ù (±ØÁÂÇ¥°è º¯È¯).
-    float fDistance = length(vCenterUV);
+    float fDistance = length(vCenterUV); // ì¤‘ì‹¬ìœ¼ë¡œë¶€í„°ì˜ ê±°ë¦¬
     float fAngle = atan2(vCenterUV.y, vCenterUV.x);
-
-    // 3. °Å¸®¿¡ ºñ·ÊÇØ¼­ °¢µµ¸¦ ¿Ö°îÇÏ°í, ½Ã°£¿¡ µû¶ó È¸Àü½ÃÅµ´Ï´Ù.
     fAngle += fDistance * g_fSpiralStrength;
     fAngle += g_fTime * g_fRotationSpeed;
-
-    // 4. »õ·Î¿î °¢µµ¿Í ±âÁ¸ °Å¸®¸¦ ÀÌ¿ëÇØ »õ·Î¿î UV ÁÂÇ¥¸¦ ¸¸µì´Ï´Ù.
     float2 vSpiralUV;
     vSpiralUV.x = cos(fAngle) * fDistance;
     vSpiralUV.y = sin(fAngle) * fDistance;
-
-    // 5. UV ÁÂÇ¥¸¦ ´Ù½Ã (0 ~ 1) ¹üÀ§·Î º¹¿øÇÕ´Ï´Ù.
     vSpiralUV += 0.5f;
-    // --- ÀýÂ÷Àû UV °è»ê ³¡ ---
 
-
-    // ¿Ö°îµÈ vSpiralUV¸¦ »ç¿ëÇØ ÅØ½ºÃ³¸¦ »ùÇÃ¸µÇÕ´Ï´Ù.
     float4 vTextureColor = g_DiffuseTexture.Sample(DefaultSampler, vSpiralUV);
+    // ì—°í•œ íšŒìƒ‰ ê¸°ë³¸ìƒ‰ì„ ì •ì˜í•©ë‹ˆë‹¤. (RGB)
+    float3 vBaseGreyColor = float3(0.7f, 0.7f, 0.7f); // ì—°í•œ íšŒìƒ‰
+    
+    Out.vColor.rgb = vBaseGreyColor * vTextureColor.rgb;
+    //Out.vColor = vTextureColor * g_vTintColor;
+    float fBaseAlpha = vTextureColor.r * g_vTintColor.a;
 
-    Out.vColor = vTextureColor * g_vTintColor;
-    Out.vColor.a = vTextureColor.r * g_vTintColor.a;
 
-    float fBaseAlpha = Out.vColor.a;
-
-    // 1. ÀÌÆåÆ® »ý¼º ÈÄ °æ°ú ½Ã°£À» °è»êÇÕ´Ï´Ù.
+    
     float fElapsedTime = g_fTime - g_fEffectStartTime;
 
-    // 2. Wipe-In ÁøÇà·ü (0¿¡¼­ 1·Î Áõ°¡)
-    // saturate´Â °ªÀ» 0°ú 1 »çÀÌ·Î Á¦ÇÑÇØÁÖ´Â ÇÔ¼öÀÔ´Ï´Ù.
-    float fWipeInRatio = saturate(fElapsedTime / g_fWipeInTime);
+    float2 vNoiseUV = In.vTexcoord;
+    vNoiseUV += fDistance * 0.5f;
+    vNoiseUV += g_fTime * 0.1f;
+    
+    float fNoiseValue = g_NoiseTexture.Sample(DefaultSampler, vNoiseUV).r; // ë…¸ì´ì¦ˆ ê°’ (0~1)
 
-    // 3. Wipe-Out ½ÃÀÛ ½Ã°£À» °è»êÇÏ°í, ÁøÇà·ü (0¿¡¼­ 1·Î Áõ°¡)À» ±¸ÇÕ´Ï´Ù.
-    float fWipeOutStartTime = g_fEffectLifetime - g_fWipeOutTime;
-    float fWipeOutRatio = saturate((fElapsedTime - fWipeOutStartTime) / g_fWipeOutTime);
+    float fAppearProgress = saturate(fElapsedTime / g_fWipeInTime);
+    float fAppearMask = smoothstep(fAppearProgress - g_fWipeSoftness, fAppearProgress, fNoiseValue);
 
-    // 4. ÇöÀç ÇÈ¼¿ÀÇ °¡·Î UV ÁÂÇ¥(In.vTexcoord.x)¸¦ ÀÌ¿ëÇØ ¿ÍÀÌÇÁ ¸¶½ºÅ©¸¦ ¸¸µì´Ï´Ù.
-    //    smoothstepÀº µÎ °ª »çÀÌ¸¦ ºÎµå·´°Ô º¸°£ÇÏ¿© °æ°è¼±À» ºÎµå·´°Ô ¸¸µì´Ï´Ù.
-    float fWipeInMask = smoothstep(1.0 - fWipeInRatio - g_fWipeSoftness, 1.0 - fWipeInRatio, In.vTexcoord.x);
-    float fWipeOutMask = 1.0 - smoothstep(0.0, g_fWipeSoftness, (1.0f - In.vTexcoord.x) - fWipeOutRatio);
-
-    // 5. ÃÖÁ¾ ¾ËÆÄ °ªÀº [±âÁ¸ ¾ËÆÄ] x [Wipe-In ¸¶½ºÅ©] x [Wipe-Out ¸¶½ºÅ©] ÀÔ´Ï´Ù.
-    Out.vColor.a = fBaseAlpha * fWipeInMask * fWipeOutMask;
+    float fDisappearProgress = saturate((fElapsedTime - (g_fEffectLifetime - g_fWipeOutTime)) / g_fWipeOutTime);
+    float fDisappearMask = 1.0 - smoothstep(fDisappearProgress - g_fWipeSoftness, fDisappearProgress, fNoiseValue);
+    
+    Out.vColor.a = fBaseAlpha * fAppearMask * fDisappearMask;
     
     return Out;
 }
 
-
 technique11 DefaultTechnique
 {
-    /* Æ¯Á¤ ÆÐ½º¸¦ ÀÌ¿ëÇØ¼­ Á¡Á¤À» ±×·Á³Â´Ù. */
-    /* ÇÏ³ªÀÇ ¸ðµ¨À» ±×·Á³Â´Ù. */ 
-    /* ¸ðµ¨ÀÇ »óÈ²¿¡ µû¶ó ´Ù¸¥ ½¦ÀÌµù ±â¹ý ¼¼Æ®(¸í¾Ï + ¸²¶óÀÌÆ® + ½ºÆåÅ§·¯ + ³ë¸Ö¸Ê + ssao )¸¦ ¸Ô¿©ÁÖ±âÀ§ÇØ¼­ */
     pass DefaultPass
     {
         SetRasterizerState(RS_Default);
@@ -257,7 +301,7 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_MAIN();
     }
 
-    pass SkyPass // ÇÏ´Ã Àü¿ë ÆÐ½º
+    pass SkyPass // í•˜ëŠ˜ ì „ìš© íŒ¨ìŠ¤
     {
         SetRasterizerState(RS_Cull_CW);
         SetDepthStencilState(DSS_None, 0);
@@ -277,19 +321,5 @@ technique11 DefaultTechnique
 
         PixelShader = compile ps_5_0 PS_EFFECT_WIND();
     }
-    ///* ¸ðµ¨ÀÇ »óÈ²¿¡ µû¶ó ´Ù¸¥ ½¦ÀÌµù ±â¹ý ¼¼Æ®(ºí·»µù + µð½ºÅä¼Ç  )¸¦ ¸Ô¿©ÁÖ±âÀ§ÇØ¼­ */
-    //pass DefaultPass1
-    //{
-    //    VertexShader = compile vs_5_0 VS_MAIN1();
-
-    //}
-
-    ///* Á¤Á¡ÀÇ Á¤º¸¿¡ µû¶ó ½¦ÀÌ´õ ÆÄÀÏÀ» ÀÛ¼ºÇÑ´Ù. */
-    ///* Á¤Á¡ÀÇ Á¤º¸°¡ °°Áö¸¸ ¿ÏÀüÈ÷ ´Ù¸¥ Ãë±ÞÀ» ÇÏ´À ¤¤°´Ã¼³ª ¸ðµ¨À» ±×¸®´Â ¹æ½Ä -> ·»´õ¸µ¹æ½Ä¿¡ Â÷ÀÌ°¡ »ý±æ ¼ö ÀÖ´Ù. */ 
-    //pass DefaultPass1
-    //{
-    //    VertexShader = compile vs_5_0 VS_MAIN1();
-
-    //}
 
 }
