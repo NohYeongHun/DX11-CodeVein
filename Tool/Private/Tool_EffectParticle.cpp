@@ -77,8 +77,12 @@ void CTool_EffectParticle::Update(_float fTimeDelta)
 
     // 업데이트 이전에 현재 정보 전달.
     
+    
     _vector vDirection = XMVector3Normalize(XMLoadFloat3(&m_vDir));
     m_pTransformCom->Move_Direction(vDirection, fTimeDelta * 1.f); // 지정된 방향으로 날라감.
+
+    // Bind Transform
+    m_pVIBufferCom->Bind_Transform(m_pTransformCom->Get_WorldMatrix());
 
     //_fvector vPos = m_pTransformCom->Get_State(STATE::POSITION); // 이동 이후 위치 제공.
     //m_pVIBufferCom->Bind_Transform(vPos); // Shader에서 정점들에 WorldMatrix를 이미 곱해주고 있음.
@@ -425,11 +429,13 @@ void CTool_EffectParticle::Create_BossExplosionParticle(_float3 vCenterPos, _flo
     }
 }
 
-void CTool_EffectParticle::Create_TestParticle(const PARTICLE_TEST_INFO particleTestInfo)
+void CTool_EffectParticle::Create_SwirlParticle(const ParticleSwirlInfo particleSwirlInfo)
 {
     if (m_pVIBufferCom)
     {
-        m_pVIBufferCom->Create_TestParticle(particleTestInfo);
+        // 생성시 Transform Bind
+        m_pVIBufferCom->Bind_Transform(m_pTransformCom->Get_WorldMatrix());
+        m_pVIBufferCom->Create_SwirlParticle(particleSwirlInfo);
     }
 }
 

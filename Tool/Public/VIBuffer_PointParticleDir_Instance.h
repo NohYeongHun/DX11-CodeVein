@@ -40,7 +40,7 @@ public:
 		PARTICLE_TYPE_DEFAULT = 0,
 		PARTICLE_TYPE_QUEENKNGIHT_WARP = 1,
 		PARTICLE_TYPE_BOSS_EXPLOSION = 2,
-		PARTICLE_TYPE_TEST = 3,
+		PARTICLE_TYPE_SWIRL = 3,
 		PARTICLE_TYPE_END,
 	};
 
@@ -76,10 +76,13 @@ public:
 
 #pragma region 0. 부모로 부터 실시간으로 받아올 정보들.
 public:
-	void Bind_Transform(_fvector vPos);
+	void Bind_Pos(_fvector vPos);
+	void Bind_Transform(_matrix matParent);
 
 private:
 	_float4 m_vParentPos = {};
+
+	_matrix m_MatParent = {};
 #pragma endregion
 
 
@@ -89,20 +92,28 @@ public:
 	void Default_Update(VTXINSTANCEPOINTDIR_PARTICLE* pVertices, _float fTimeDelta);
 	void QueenKnightWarp_Update(VTXINSTANCEPOINTDIR_PARTICLE* pVertices, _float fTimeDelta);
 	void BossExplosion_Update(VTXINSTANCEPOINTDIR_PARTICLE* pVertices, _float fTimeDelta);
-	void TestParticle_Update(VTXINSTANCEPOINTDIR_PARTICLE* pVertices, _float fTimeDelta);
+	void SwirlParticle_Update(VTXINSTANCEPOINTDIR_PARTICLE* pVertices, _float fTimeDelta);
 
 public:
 	void CreateAllParticles(_float3 vCenterPos, _float3 vBaseDir, _float fLifeTime = 3.0f);
 	void CreateBurstParticles(_float3 vGatherPoint, _float3 vUpDir, _float fGatherTime, _float fBurstTime, _float fTotalLifeTime);
 	void Create_QueenKnightWarpParticle(const PARTICLE_INIT_INFO particleInitInfo);
 	void Create_BossExplosionParticle(_float3 vCenterPos, _float fRadius, _float fExplosionTime, _float fTotalLifeTime);
-	void Create_TestParticle(const PARTICLE_TEST_INFO particleInitInfo);
+	void Create_SwirlParticle(const PARTICLE_SWIRL_INFO particleSwirlInfo);
 
+	// Swirl 파티클 설정 함수들
+	void Set_SwirlAxis(_float3 vAxis) { m_vSwirlLocalAxis = vAxis; }
+	void Set_SwirlRotationSpeed(_float fSpeed) { m_fSwirlRotationSpeed = fSpeed; }
+	void Set_SwirlInwardSpeed(_float fSpeed) { m_fSwirlInwardSpeed = fSpeed; }
+	_float3 Get_SwirlAxis() const { return m_vSwirlLocalAxis; }
+	_float Get_SwirlRotationSpeed() const { return m_fSwirlRotationSpeed; }
+	_float Get_SwirlInwardSpeed() const { return m_fSwirlInwardSpeed; }
 
 	/* 스폰 전용*/
 
 
 #pragma endregion
+
 
 
 
@@ -132,6 +143,11 @@ private:
 	_float m_fSpawnInterval = {};
 	_float m_fSpawnTime = {};
 	_float2 m_vSpeed = {};
+
+	// Swirl 파티클 관련 멤버 변수
+	_float3 m_vSwirlLocalAxis = { 0.f, 1.f, 0.f }; // 회전축 (기본: Y축)
+	_float m_fSwirlRotationSpeed = 2.0f; // 회전 속도
+	_float m_fSwirlInwardSpeed = 1.0f;   // 중심으로 향하는 속도
 
 #ifdef _DEBUG
 	_float m_fDebugTime = { 0.f };

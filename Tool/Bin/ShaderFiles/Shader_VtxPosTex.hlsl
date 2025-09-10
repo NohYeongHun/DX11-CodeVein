@@ -101,7 +101,7 @@ PS_OUT PS_MAIN2(PS_IN In)
     vector vDestDiffuse = g_GradientTexture.Sample(DefaultSampler, scaledUV);
     
     // 소스 텍스처가 검정색이면 discard
-    if (vDestDiffuse.r < 0.1f && vDestDiffuse.g < 0.1f && vDestDiffuse.b < 0.1f)
+    if (vDestDiffuse.r < 0.3f && vDestDiffuse.g < 0.3f && vDestDiffuse.b < 0.3f)
         discard;
     
     

@@ -144,6 +144,23 @@ PS_OUT_BACKBUFFER PS_MAIN_COMBINED(PS_IN In)
 }
 
 
+PS_OUT_BACKBUFFER PS_MAIN_DISTORTION(PS_IN In)
+{
+    PS_OUT_BACKBUFFER Out = (PS_OUT_BACKBUFFER) 0;
+    
+    vector vDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
+    
+    if (vDiffuse.a == 0.f)
+        discard;
+    
+    vector vShade = g_ShadeTexture.Sample(DefaultSampler, In.vTexcoord);
+    //vector vSpecular = g_SpecularTexture.Sample(DefaultSampler, In.vTexcoord);
+    
+    //Out.vColor = vDiffuse * vShade + vSpecular;
+    Out.vColor = vDiffuse * vShade;
+    
+    return Out;
+}
 
 
 
@@ -191,6 +208,17 @@ technique11 DefaultTechnique
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_MAIN_COMBINED();
+    }
+
+    pass Distortion
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_None, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_MAIN_DISTORTION();
     }
 
 

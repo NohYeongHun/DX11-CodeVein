@@ -1,6 +1,4 @@
-﻿#include "ToolMap_Part.h"
-
-CToolMap_Part::CToolMap_Part(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿CToolMap_Part::CToolMap_Part(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CGameObject(pDevice, pContext)
 {
 }
@@ -64,7 +62,11 @@ HRESULT CToolMap_Part::Initialize_Craete(MODEL_CREATE_DESC* pDesc)
 {
     m_strModelTag = pDesc->pModelTag;
     m_strObjTag = m_strModelTag.c_str();
-
+    m_iShaderPath = pDesc->iShaderPath;
+    m_IsColor = pDesc->isColor;
+    m_vTintColor = pDesc->vTintColor;
+    m_fFadeOutStartTime = pDesc->fFadeOutStartTime;
+    m_fFadeOutDuration = pDesc->fFadeOutDuration;;
 
     if (FAILED(CGameObject::Initialize_Clone(pDesc)))
         return E_FAIL;
@@ -127,6 +129,10 @@ void CToolMap_Part::Update(_float fTimeDelta)
     
     m_fTotalTime += fTimeDelta;
 
+    _float3 vScaled = m_pTransformCom->Get_Scaled();
+
+    XMStoreFloat3(&vScaled, XMLoadFloat3(&vScaled) * (1.f + fTimeDelta));
+    m_pTransformCom->Set_Scale(vScaled);
 }
 
 void CToolMap_Part::Late_Update(_float fTimeDelta)
@@ -134,7 +140,7 @@ void CToolMap_Part::Late_Update(_float fTimeDelta)
     
     CGameObject::Late_Update(fTimeDelta);
 
-    if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::PRIORITY, this)))
+    if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::NONBLEND, this)))
         return;
 }
 
@@ -150,21 +156,25 @@ HRESULT CToolMap_Part::Render()
     _uint iNumMeshes = m_pModelCom->Get_NumMeshes();
     for (_uint i = 0; i < iNumMeshes; i++)
     {
-        m_pModelCom->Bind_Materials(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE, 0);
+        if (FAILED(m_pModelCom->Bind_Materials(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE, 0)))
+        {
+            CRASH("Failed Bind Diffuse Texture");
+            return E_FAIL;
+        }
 		//m_pModelCom->Bind_Materials(m_pShaderCom, "g_NormalTexture", i, aiTextureType_NORMALS, 0);
 
-        /*if (FAILED(m_pShaderCom->Begin(0)))
-        {
-            CRASH("Failed Begin Failed");
-            return E_FAIL;
-        }*/
 
-        if (FAILED(m_pShaderCom->Begin(m_iEffectWindPath)))
+        if (FAILED(m_pShaderCom->Begin(m_iShaderPath)))
         {
             CRASH("Failed Begin Failed");
             return E_FAIL;
         }
-            
+         
+        //if (FAILED(m_pShaderCom->Begin(0)))
+        //{
+        //    CRASH("Failed Begin Failed");
+        //    return E_FAIL;
+        //}
 
         if (FAILED(m_pModelCom->Render(i)))
         {
@@ -238,6 +248,11 @@ const _bool CToolMap_Part::Is_Ray_LocalHit(MODEL_PICKING_INFO* pPickingInfo, _fl
     return false;
 }
 
+void CToolMap_Part::Send_Data(void* pArg)
+{
+    m_vTintColor = *reinterpret_cast<_float4*>(pArg);
+}
+
 HRESULT CToolMap_Part::Ready_Components()
 {
     if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxMesh"),
@@ -246,8 +261,16 @@ HRESULT CToolMap_Part::Ready_Components()
 
 #pragma region EFFECT
     if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_EffectNoiseTexture"),
-        TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom), nullptr)))
+        TEXT("Com_Texture1"), reinterpret_cast<CComponent**>(&m_pTextureCom[0]), nullptr)))
         return E_FAIL;
+    
+    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_EffectSwirlTexture"),
+        TEXT("Com_Texture2"), reinterpret_cast<CComponent**>(&m_pTextureCom[1]), nullptr)))
+        return E_FAIL;
+    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_EffectWindOtherTexture"),
+        TEXT("Com_Texture3"), reinterpret_cast<CComponent**>(&m_pTextureCom[2]), nullptr)))
+        return E_FAIL;
+
 #pragma endregion
 
 
@@ -301,21 +324,48 @@ HRESULT CToolMap_Part::Ready_Render_Resources()
         return E_FAIL;
 
 
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
+    {
+        return E_FAIL;
+    }
+
+    
+
+
 #pragma region EFFECT 전용 메쉬 변수 추가.
+
+    // Shader 색상 선택.
+    if (m_IsColor)
+    {
+        if (FAILED(m_pShaderCom->Bind_RawValue("g_vTintColor", &m_vTintColor, sizeof(_float4))))
+            return E_FAIL;
+    }
 
     if (FAILED(m_pShaderCom->Bind_RawValue("g_fTime", &m_fTotalTime, sizeof(float))))
         return E_FAIL;
 
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_fSpiralStrength", &m_fSpiralStrength, sizeof(float))))
-        return E_FAIL;
-
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_fRotationSpeed", &m_fRotationSpeed, sizeof(float))))
-        return E_FAIL;
-
-    if (FAILED(m_pTextureCom->Bind_Shader_Resource(m_pShaderCom, "g_NoiseTexture", 0)))
+    m_fFadeOutStartTime = 0.3f;
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fFadeOutStartTime", &m_fFadeOutStartTime, sizeof(_float))))
     {
         return E_FAIL;
     }
+
+    m_fFadeOutDuration = 1.f;
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fFadeOutDuration", &m_fFadeOutDuration, sizeof(_float))))
+    {
+        return E_FAIL;
+    }
+
+    m_vBaseColor = { 0.5f, 0.5f, 0.5f, 0.5f };
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fEmissiveIntensity", &m_fEmissiveIntensity, sizeof(_float))))
+    {
+        return E_FAIL;
+    }
+        
+
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_vBaseColor", &m_vBaseColor, sizeof(_float4))))
+        return E_FAIL;
+    
 
 #pragma endregion
 
@@ -359,5 +409,6 @@ void CToolMap_Part::Free()
     CGameObject::Free();
     Safe_Release(m_pModelCom);
     Safe_Release(m_pShaderCom);
-    Safe_Release(m_pTextureCom);
+    for (auto& pTextureCom : m_pTextureCom)
+        Safe_Release(pTextureCom);
 }

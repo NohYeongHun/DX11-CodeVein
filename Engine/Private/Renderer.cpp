@@ -1,4 +1,5 @@
-﻿CRenderer::CRenderer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿#include "Renderer.h"
+CRenderer::CRenderer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : m_pDevice { pDevice }
     , m_pContext { pContext }
     , m_pGameInstance {CGameInstance::GetInstance()}
@@ -55,6 +56,20 @@ HRESULT CRenderer::Initialize()
     //    CRASH("Failed Add RenderTarget Specular");
     //    return E_FAIL;
     //}
+
+#pragma region DISTIORTION 용도
+
+    if (FAILED(m_pGameInstance->Add_RenderTarget(TEXT("Target_SceneColor"), ViewportDesc.Width, ViewportDesc.Height, DXGI_FORMAT_R8G8B8A8_UNORM, _float4(0.f, 0.f, 0.f, 1.f))))
+    {
+        CRASH("Failed Add RenderTarget SceneColor");
+        return E_FAIL;
+    }
+
+    // MRT 그룹에도 추가해줍니다.
+    if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_FinalScene"), TEXT("Target_SceneColor"))))
+        return E_FAIL;
+#pragma endregion
+
         
 
     /* For.MRT_GameObjects : 게임 오브젝트들의 정보를 저장받기위한 타겟들 */
@@ -149,6 +164,9 @@ HRESULT CRenderer::Draw()
     if (FAILED(Render_Combined()))
         return E_FAIL;
 
+    if (FAILED(Render_PostProcess()))
+        return E_FAIL;
+
     if (FAILED(Render_NonLight()))
         return E_FAIL;
 
@@ -202,16 +220,6 @@ HRESULT CRenderer::Render_Priority()
 
 HRESULT CRenderer::Render_NonBlend()
 {
-   /* for (auto& pRenderObject : m_RenderObjects[ENUM_CLASS(RENDERGROUP::NONBLEND)])
-    {
-        if (nullptr != pRenderObject)
-            pRenderObject->Render();
-
-        Safe_Release(pRenderObject);
-    }
-
-    m_RenderObjects[ENUM_CLASS(RENDERGROUP::NONBLEND)].clear();*/
-
     // 후처리 쉐이딩.
     /* Diffuse + Normal */
     if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_GameObjects"))))
@@ -304,7 +312,13 @@ HRESULT CRenderer::Render_Lights()
 }
 
 HRESULT CRenderer::Render_Combined()
-{
+{ 
+    
+    // 백버퍼가 아닌 Target_SceneColor에 렌더링 시작
+    if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_FinalScene"))))
+        return E_FAIL;
+
+
     /* 백버퍼 */
 
     if (FAILED(m_pShader->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix)))
@@ -322,6 +336,12 @@ HRESULT CRenderer::Render_Combined()
         CRASH("Failed Bind Target_Shade");
         return E_FAIL;
     }
+
+    if (FAILED(m_pGameInstance->Bind_RT_ShaderResource(TEXT("Target_Depth"), m_pShader, "g_DepthTexture")))
+    {
+        CRASH("Failed Bind Target_Combined");
+        return E_FAIL;
+    }
         
 
     //if (FAILED(m_pGameInstance->Bind_RT_ShaderResource(TEXT("Target_Specular"), m_pShader, "g_SpecularTexture")))
@@ -330,8 +350,39 @@ HRESULT CRenderer::Render_Combined()
     _uint iCombinedShaderIndex = static_cast<_uint>(DEFFERED_SHADERTYPE::COMBINED);
     m_pShader->Begin(iCombinedShaderIndex);
 
+
+
     m_pVIBuffer->Bind_Resources();
     m_pVIBuffer->Render();
+
+    // 렌더링 종료
+    if (FAILED(m_pGameInstance->End_MRT()))
+        return E_FAIL;
+
+    return S_OK;
+}
+
+/* Post Process 로 Rendering 진행. */
+HRESULT CRenderer::Render_PostProcess()
+{
+
+    if (FAILED(m_pShader->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix)))
+        return E_FAIL;
+    if (FAILED(m_pShader->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix)))
+        return E_FAIL;
+    if (FAILED(m_pShader->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
+        return E_FAIL;
+
+    //if (FAILED(m_pGameInstance->Bind_RT_ShaderResource(TEXT("Target_SceneColor"), m_pShader, "g_sceneTexture")))
+    //    return E_FAIL;
+
+    _uint iCombinedShaderIndex = static_cast<_uint>(DEFFERED_SHADERTYPE::DISTORTION);
+    m_pShader->Begin(iCombinedShaderIndex);
+
+
+    m_pVIBuffer->Bind_Resources();
+    m_pVIBuffer->Render();
+
 
     return S_OK;
 }

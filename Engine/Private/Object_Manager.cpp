@@ -266,6 +266,10 @@ void CObject_Manager::Edit_Transform(_uint iLayerLevelIndex, const _wstring& str
 			
 			pTransform->Set_Scale(data.scale);
 
+			void* pArg = (void*)(&data.vTintColor);
+			pGameObject->Send_Data(pArg);
+			
+
 			return;
 		}
 	}

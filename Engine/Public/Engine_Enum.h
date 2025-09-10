@@ -1,4 +1,4 @@
-#ifndef Engine_Enum_h__
+﻿#ifndef Engine_Enum_h__
 #define Engine_Enum_h__
 
 namespace Engine
@@ -14,12 +14,12 @@ namespace Engine
 	};
 	enum class ACTORDIR { U, RU, R, RD, D, LD, L, LU, END};
 
-	enum class DEFFERED_SHADERTYPE : _uint { DEBUG = 0, DIRECTIONAL, POINT, COMBINED, END };
+	enum class DEFFERED_SHADERTYPE : _uint { DEBUG = 0, DIRECTIONAL, POINT, COMBINED, DISTORTION, END };
 
 	enum class MONSTERTYPE { BOSS, ELITE, NORMAL, END };
 	enum class STATE { RIGHT, UP, LOOK, POSITION };
 	enum class PROTOTYPE { GAMEOBJECT, COMPONENT };
-	enum class RENDERGROUP { PRIORITY, NONBLEND, LIGHT, COMBINED, NONLIGHT, BLEND, UI, STATIC_UI, CAMERA, END };
+	enum class RENDERGROUP { PRIORITY, NONBLEND, LIGHT, COMBINED, DISTOTION, NONLIGHT, BLEND, UI, STATIC_UI, CAMERA, END };
 	enum class WINMODE { FULL, WIN, END };
 	enum class D3DTS { VIEW, PROJ, END };
 	
@@ -60,6 +60,7 @@ namespace Engine
 		_float4 pos;
 		_float3 rot;
 		_float3 scale;
+		_float4 vTintColor;
 	};
 
 	struct RenameData { std::wstring newName; };

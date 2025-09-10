@@ -53,6 +53,11 @@ public:
 	
 #pragma endregion
 
+#pragma region void Data 받는 함수
+public:
+	virtual void Send_Data(void* pArg) {};
+#pragma endregion
+
 
 public:
 	virtual HRESULT Initialize_Prototype();

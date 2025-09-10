@@ -19,7 +19,7 @@ HRESULT CMainApp::Initialize()
 	//freopen_s(&fp, "CONOUT$", "w", stderr); // std::cerr
 	//freopen_s(&fp, "CONIN$", "r", stdin);   // std::cin
 	//
-	//// 콘솔 버퍼 동기화
+	//// 콘솔 버퍼 동기화,
 	//std::ios::sync_with_stdio(true);
 
 	
@@ -63,12 +63,12 @@ HRESULT CMainApp::Initialize()
 	}
 
 
-	if (FAILED(Start_Level(LEVEL::GAMEPLAY)))
-		return E_FAIL;
+	//if (FAILED(Start_Level(LEVEL::GAMEPLAY)))
+	//	return E_FAIL;
 
 	// 원본
-	//if (FAILED(Start_Level(LEVEL::LOGO)))
-	//	return E_FAIL;
+	if (FAILED(Start_Level(LEVEL::LOGO)))
+		return E_FAIL;
 
 	//if (FAILED(Start_Level(LEVEL::DEBUG)))
 	//	return E_FAIL;
