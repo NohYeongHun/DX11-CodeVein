@@ -24,6 +24,8 @@ HRESULT CLight::Render(CShader* pShader, CVIBuffer_Rect* pVIBuffer)
 	{
 		iPassIndex = static_cast<_uint>(DEFFERED_SHADERTYPE::POINT);
 	}
+	else
+		return S_OK;
 
 	if (FAILED(pShader->Bind_RawValue("g_vLightDiffuse", &m_LightDesc.vDiffuse, sizeof(_float4))))
 	{

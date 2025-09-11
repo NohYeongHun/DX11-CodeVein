@@ -140,7 +140,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_Map(const _wstring& strLayerTag)
 	Desc.PrototypeTag = L"Prototype_Component_Model_BossStage";
 	Desc.vScale = { 2.f, 1.f, 2.f };
 	Desc.eCurLevel = m_eCurLevel;
-	Desc.eShaderPath = MESH_SHADERPATH::DEFAULT;
+	Desc.eShaderPath = MESH_SHADERPATH::NORMAL;
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel), strLayerTag,
 		ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_Map"), &Desc)))
 	{
@@ -171,7 +171,7 @@ HRESULT CLevel_GamePlay::Ready_Layer_Player(const _wstring& strLayerTag)
 	Desc.fMaxHP = 1672;
 	Desc.fHP = 1672; // StageOne 전투 후 감소된 HP
 	Desc.fAttackPower = 90;
-	Desc.eShaderPath = ANIMESH_SHADERPATH::DEFAULT;
+	Desc.eShaderPath = ANIMESH_SHADERPATH::NORMAL;
 #pragma endregion
 
 	

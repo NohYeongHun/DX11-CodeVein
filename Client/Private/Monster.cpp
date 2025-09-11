@@ -927,14 +927,17 @@ _bool CMonster::Monster_Dead()
 
 #pragma endregion
 
-#pragma region 99. DEBUG용도 함수.
-#ifdef _DEBUG
 
 const _vector CMonster::Get_LockOnOffset()
 {
     _vector vLockOnOffset = XMLoadFloat3(&m_vLockOnOffset);
     return vLockOnOffset;
 }
+
+#pragma region 99. DEBUG용도 함수.
+#ifdef _DEBUG
+
+
 
 void CMonster::Print_Position()
 {
@@ -1064,14 +1067,25 @@ void CMonster::Reset_Collider_ActiveInfo()
 #pragma region CSlash UI 관련
 void CMonster::Show_Slash_UI_At_Position(_fvector vHitPosition, _fvector vAttackDirection)
 {
+    HRESULT hr = {};
     // 1. 풀에서 꺼내씁니다.
-    CSlash::SLASHACTIVATE_DESC Desc{};
-    Desc.eCurLevel = m_eCurLevel;
-    Desc.vHitPosition = vHitPosition;
-    Desc.vHitDirection = vAttackDirection;
-    Desc.fDisPlayTime = 0.5f;
-    HRESULT hr = m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(m_eCurLevel)
-        , TEXT("SLASH_EFFECT"), TEXT("Layer_Effect"), 1, ENUM_CLASS(CSlash::EffectType), &Desc);
+    CSlash::SLASHACTIVATE_DESC SlashDesc{};
+    SlashDesc.eCurLevel = m_eCurLevel;
+    SlashDesc.vHitPosition = vHitPosition;
+    SlashDesc.vHitDirection = vAttackDirection;
+    SlashDesc.fDisPlayTime = 0.5f;
+    hr = m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(m_eCurLevel)
+        , TEXT("SLASH_EFFECT"), TEXT("Layer_Effect"), 1, ENUM_CLASS(CSlash::EffectType), &SlashDesc);
+
+
+    CHitFlashEffect::HITFLASHACTIVATE_DESC HitFlashDesc{};
+    HitFlashDesc.eCurLevel = m_eCurLevel;
+    HitFlashDesc.vHitPosition = vHitPosition;
+    HitFlashDesc.vHitDirection = vAttackDirection;
+    HitFlashDesc.fDisPlayTime = 0.5f;
+    hr = m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(m_eCurLevel)
+        , TEXT("HITFLASH_EFFECT"), TEXT("Layer_Effect"), 1, ENUM_CLASS(CHitFlashEffect::EffectType), &HitFlashDesc);
+
 
     if (FAILED(hr))
         CRASH("Failed Slash Effecet");

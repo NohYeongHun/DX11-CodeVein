@@ -3,23 +3,24 @@ NS_BEGIN(Client)
 class CHitFlashEffect final : public CGameObject
 {
 public:
-	enum TEXTURE { TEXTURE_DIFFUSE, TEXTURE_MASK, TEXTURE_END };
+	enum TEXTURE { DIFFUSE, OPACITY, OTHER, END };
 
 
 public:
     typedef struct tagHitFlashDesc : public CGameObject::GAMEOBJECT_DESC
     {
         LEVEL eCurLevel = { LEVEL::END };
+        EFFECTPOSTEX_SHADERPATH eShaderPath = { EFFECTPOSTEX_SHADERPATH::HITFLASH };
     }HITFLASH_DESC;
 
-    typedef struct tagHitFlashEffectEnterDesc
+    typedef struct tagHitFlashEffectActivateDesc
     {
         LEVEL eCurLevel = { LEVEL::END };
         _vector vHitDirection = {};
         _vector vHitPosition = {};
         _float  fDisPlayTime = {};
-        _float3 vScale = {};
-    }HITFLASHENTER_DESC;
+        _float3 vScale = { 1.5f, 1.5f, 1.f };
+    }HITFLASHACTIVATE_DESC;
 
 private:
     explicit CHitFlashEffect(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -39,6 +40,10 @@ public:
     virtual void OnActivate(void* pArg) override;
     virtual void OnDeActivate() override;
 
+private:
+    // 이펙트 생존 시간. 타이머
+    _float m_fDisplayTime = 10.0f;        // 테스트용 표시 시간 (초)
+    _float m_fCurrentTime = 0.0f;        // 현재 경과 시간
 
 #pragma endregion
 
@@ -57,17 +62,13 @@ private:
     class CVIBuffer_Rect* m_pVIBufferCom = { nullptr };
 
     LEVEL m_eCurLevel = { LEVEL::END };
-    // LockOn 관련
-    CGameObject* m_pTarget = { nullptr };
-    _bool m_bActive = false;
+    
+#pragma region 쉐이더 전달 변수
+    _uint m_iCurFrame = {}; // 16개의 프레임이 존재.
+    _uint m_iShaderPath = {};
+#pragma endregion
 
-
-    // 타이머
-    //_float m_fDisplayTime = 1.0f;        // 표시 시간 (초)
-    _float m_fDisplayTime = 10.0f;        // 테스트용 표시 시간 (초)
-    _float m_fCurrentTime = 0.0f;        // 현재 경과 시간
     // 회전 정보
-    _float m_fRotationAngle = 0.0f; // Z축 회전 각도 (라디안)
     _bool m_bDirectionCalculated = false; // 방향이 계산되었는지 여부
     _vector m_vHitDirection = {};
     _float3 m_vScale = {};

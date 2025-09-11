@@ -98,6 +98,13 @@ HRESULT CLoader_Static::Add_Prototype_ForShader(ID3D11Device* pDevice, ID3D11Dev
 		CShader::Create(pDevice, pContext, TEXT("../Bin/ShaderFiles/Shader_VtxPosTex.hlsl"), VTXPOSTEX::Elements, VTXPOSTEX::iNumElements))))
 		return E_FAIL;
 
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel), TEXT("Prototype_Component_Shader_VtxEffectPosTex"),
+		CShader::Create(pDevice, pContext, TEXT("../Bin/ShaderFiles/Shader_VtxEffectPosTex.hlsl"), VTXPOSTEX::Elements, VTXPOSTEX::iNumElements))))
+	{
+		CRASH("Failed Create Shader Cube");
+		return E_FAIL;
+	}
+
 	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel), TEXT("Prototype_Component_Shader_VtxNorTex"),
 		CShader::Create(pDevice, pContext, TEXT("../Bin/ShaderFiles/Shader_VtxNorTex.hlsl"), VTXNORTEX::Elements, VTXNORTEX::iNumElements))))
 		return E_FAIL;
@@ -117,6 +124,10 @@ HRESULT CLoader_Static::Add_Prototype_ForShader(ID3D11Device* pDevice, ID3D11Dev
 		CRASH("Failed Create Shader Cube");
 		return E_FAIL;
 	}
+
+
+	
+
 
     return S_OK;
 }
@@ -547,16 +558,24 @@ HRESULT CLoader_Static::Add_Prototype_HitFlash_Effects(ID3D11Device* pDevice, ID
 {
 #pragma region HITFLASTH EFFECT
 	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
-		, TEXT("Prototype_Component_Texture_HitFlashEffectMask")
-		, CTexture::Create(pDevice, pContext, TEXT("../Bin/Resources/Textures/Effects/Texture/HitFlash/HitFlashMask%d.png"), 1))))
+		, TEXT("Prototype_Component_Texture_HitFlashDiffuse")
+		, CTexture::Create(pDevice, pContext, TEXT("../Bin/Resources/Textures/Effects/Texture/HitFlash/Diffuse%d.png"), 1))))
 	{
 		CRASH("Failed Load SlashEffect Texture");
 		return E_FAIL;
 	}
 
 	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
-		, TEXT("Prototype_Component_Texture_HitFlashEffectDiffuse")
-		, CTexture::Create(pDevice, pContext, TEXT("../Bin/Resources/Textures/Effects/Texture/HitFlash/HitFlashDiffuse%d.png"), 1))))
+		, TEXT("Prototype_Component_Texture_HitFlashOpacity")
+		, CTexture::Create(pDevice, pContext, TEXT("../Bin/Resources/Textures/Effects/Texture/HitFlash/Opacity%d.png"), 1))))
+	{
+		CRASH("Failed Load SlashEffect Texture");
+		return E_FAIL;
+	}
+
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
+		, TEXT("Prototype_Component_Texture_HitFlashOther")
+		, CTexture::Create(pDevice, pContext, TEXT("../Bin/Resources/Textures/Effects/Texture/HitFlash/Other%d.png"), 4))))
 	{
 		CRASH("Failed Load SlashEffect Texture");
 		return E_FAIL;

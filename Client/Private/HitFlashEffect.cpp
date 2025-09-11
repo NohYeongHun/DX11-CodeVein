@@ -29,6 +29,10 @@ HRESULT CHitFlashEffect::Initialize_Clone(void* pArg)
         return E_FAIL;
     }
     m_eCurLevel = pDesc->eCurLevel;
+    m_iShaderPath = static_cast<_uint>(pDesc->eShaderPath);
+    
+    // 강제로 HitFlash 패스(1번)로 설정
+    m_iShaderPath = 1;
 
     if (FAILED(Ready_Components()))
     {
@@ -98,7 +102,7 @@ HRESULT CHitFlashEffect::Render()
     }
 
 
-    if (FAILED(m_pShaderCom->Begin(10)))
+    if (FAILED(m_pShaderCom->Begin(m_iShaderPath)))
     {
         CRASH("Ready Shader Begin Failed");
         return E_FAIL;
@@ -124,7 +128,7 @@ HRESULT CHitFlashEffect::Render()
 void CHitFlashEffect::OnActivate(void* pArg)
 {
     // 1. Activate하는데 필요한 값 설정
-    HITFLASHENTER_DESC* pDesc = static_cast<HITFLASHENTER_DESC*>(pArg);
+    HITFLASHACTIVATE_DESC* pDesc = static_cast<HITFLASHACTIVATE_DESC*>(pArg);
     m_eCurLevel = pDesc->eCurLevel;
     m_vHitDirection = pDesc->vHitDirection;
     m_pTransformCom->Set_State(STATE::POSITION, pDesc->vHitPosition);
@@ -148,7 +152,7 @@ void CHitFlashEffect::OnDeActivate()
 #pragma endregion
 
 
-
+/* 타격 위치 계산. */
 void CHitFlashEffect::Initialize_Transform()
 {
     // 이미 계산되었다면 다시 계산하지 않음
@@ -194,6 +198,8 @@ void CHitFlashEffect::Initialize_Transform()
 
 HRESULT CHitFlashEffect::Bind_ShaderResources()
 {
+
+#pragma region 기본 행렬 바인딩
     if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", m_pTransformCom->Get_WorldMatrixPtr())))
     {
         CRASH("Failed Bind World Matrix CHitFlashEffect");
@@ -212,35 +218,52 @@ HRESULT CHitFlashEffect::Bind_ShaderResources()
         return E_FAIL;
     }
 
-    if (FAILED(m_pTextureCom[TEXTURE_MASK]->Bind_Shader_Resource(m_pShaderCom, "g_MaskTexture", 0)))
-    {
-        CRASH("Failed Bind Texture CHitFlashEffect");
-        return E_FAIL;
-    }
-
-    if (FAILED(m_pTextureCom[TEXTURE_DIFFUSE]->Bind_Shader_Resource(m_pShaderCom, "g_Texture", 0)))
-    {
-        CRASH("Failed Bind Texture CHitFlashEffect");
-        return E_FAIL;
-    }
+#pragma region 변수 바인딩.
 
     // 시간 진행도 계산 (0.0 ~ 1.0)
     _float fTimeRatio = m_fCurrentTime / m_fDisplayTime;
 
-    // 시간에 따른 스케일 감소 (1.0 -> 0.3)
-    _float fScale = 1.0f - (fTimeRatio * 0.7f);
-
+    // 계산된 시간 값을 셰이더의 g_fTimeRatio 변수로 전달
     if (FAILED(m_pShaderCom->Bind_RawValue("g_fTimeRatio", &fTimeRatio, sizeof(_float))))
     {
         CRASH("Failed Bind TimeRatio");
         return E_FAIL;
     }
 
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_fScale", &fScale, sizeof(_float))))
+    // Bloom 효과를 위한 밝기 배수 (1.5 이상이면 Bloom 적용)
+    _float fBloomIntensity = 5.0f;
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fBloomIntensity", &fBloomIntensity, sizeof(_float))))
     {
-        CRASH("Failed Bind Scale");
+        CRASH("Failed Bind BloomIntensity");
         return E_FAIL;
     }
+#pragma endregion
+
+
+#pragma region TEXTURE 바인딩.
+    // 텍스쳐 바인딩
+    if (FAILED(m_pTextureCom[DIFFUSE]->Bind_Shader_Resource(m_pShaderCom, "g_DiffuseTexture", 0)))
+    {
+        CRASH("Failed Bind Texture");
+        return E_FAIL;
+    }
+        
+
+    if (FAILED(m_pTextureCom[OPACITY]->Bind_Shader_Resource(m_pShaderCom, "g_OpacityTexture", 0)))
+    {
+        CRASH("Failed Bind Texture");
+        return E_FAIL;
+    }
+
+    if (FAILED(m_pTextureCom[OTHER]->Bind_Shader_Resources(m_pShaderCom, "g_OtherTexture")))
+    {
+        CRASH("Failed Bind Texture");
+        return E_FAIL;
+    }
+#pragma endregion
+
+
+
 
     return S_OK;
 }
@@ -248,7 +271,7 @@ HRESULT CHitFlashEffect::Bind_ShaderResources()
 HRESULT CHitFlashEffect::Ready_Components()
 {
     // 컴포넌트 추가
-    if (FAILED(Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxPosTex"),
+    if (FAILED(Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxEffectPosTex"),
         TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom))))
     {
         CRASH("Failed Load Shader");
@@ -263,15 +286,25 @@ HRESULT CHitFlashEffect::Ready_Components()
     }
 
 
-    if (FAILED(Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_HitFlashEffectMask"),
-        TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom[TEXTURE_MASK]))))
+    // 1. Diffuse
+    if (FAILED(Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_HitFlashDiffuse"),
+        TEXT("Com_DiffuseTexture"), reinterpret_cast<CComponent**>(&m_pTextureCom[DIFFUSE]))))
     {
         CRASH("Failed Load Texture");
         return E_FAIL;
     }
 
-    if (FAILED(Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_HitFlashEffectDiffuse"),
-        TEXT("Com_DiffuseTexture"), reinterpret_cast<CComponent**>(&m_pTextureCom[TEXTURE_DIFFUSE]))))
+    // 2. Opacity (Mask)
+    if (FAILED(Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_HitFlashOpacity"),
+        TEXT("Com_OpacityTexture"), reinterpret_cast<CComponent**>(&m_pTextureCom[OPACITY]))))
+    {
+        CRASH("Failed Load Texture");
+        return E_FAIL;
+    } 
+
+    // 3. Other 4개있음.
+    if (FAILED(Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_HitFlashOther"),
+        TEXT("Com_OtherTexture"), reinterpret_cast<CComponent**>(&m_pTextureCom[OTHER]))))
     {
         CRASH("Failed Load Texture");
         return E_FAIL;

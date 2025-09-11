@@ -175,6 +175,7 @@ HRESULT CMainApp::Ready_Pooling()
 	}
 
 	CHitFlashEffect::HITFLASH_DESC HitFlashDesc{};
+	HitFlashDesc.eShaderPath = EFFECTPOSTEX_SHADERPATH::HITFLASH;
 	for (_uint i = 0; i < 100; ++i)
 	{
 		pGameObject = dynamic_cast<CGameObject*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT

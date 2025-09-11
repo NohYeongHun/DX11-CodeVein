@@ -45,7 +45,7 @@ public:
 	virtual void OnMoved_ToObjectManager() {}
 #pragma endregion
 
-
+	
 #pragma region 생존 여부 확인
 public:
 	const _bool Is_Destroy() { return m_IsDestroy; }
@@ -71,6 +71,7 @@ public:
 	virtual void Late_Update(_float fTimeDelta);
 	virtual void Finalize_LateUpdate(_float fTimeDelta) {}; // Update의 마지막 부근에 사용되는 함수
 	virtual HRESULT Render();
+	virtual HRESULT Render_Shadow() { return S_OK; }
 
 
 

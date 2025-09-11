@@ -39,6 +39,8 @@ struct VS_OUT
 {
     float4 vPosition : SV_POSITION;
     float4 vNormal : NORMAL;
+    float4 vTangent : TANGENT;
+    float4 vBinormal : BINORMAL;
     float2 vTexcoord : TEXCOORD0;
     float4 vWorldPos : TEXCOORD1;
     float4 vProjPos : TEXCOORD2;
@@ -60,6 +62,8 @@ VS_OUT VS_MAIN(VS_IN In)
     
     Out.vPosition = mul(float4(In.vPosition, 1.f), matWVP);
     Out.vNormal = normalize(mul(float4(In.vNormal, 0.f), g_WorldMatrix));
+    Out.vTangent = normalize(mul(float4(In.vTangent, 0.f), g_WorldMatrix));
+    Out.vBinormal = normalize(mul(float4(In.vBinormal, 0.f), g_WorldMatrix));
     Out.vTexcoord = In.vTexcoord;
     Out.vWorldPos = mul(float4(In.vPosition, 1.f), g_WorldMatrix);
     Out.vProjPos = Out.vPosition;
@@ -84,6 +88,8 @@ struct PS_BACKBUFFER_IN
 {
     float4 vPosition : SV_POSITION;
     float4 vNormal : NORMAL;
+    float4 vTangent : TANGENT;
+    float4 vBinormal : BINORMAL;
     float2 vTexcoord : TEXCOORD0;
     float4 vWorldPos : TEXCOORD1;
     float4 vProjPos : TEXCOORD2;
@@ -143,6 +149,30 @@ PS_OUT_BACKBUFFER PS_DEFFERED_OUT(PS_BACKBUFFER_IN In)
     return Out;
 }
 
+PS_OUT_BACKBUFFER PS_DEFFERED_NORMALOUT(PS_BACKBUFFER_IN In)
+{
+    PS_OUT_BACKBUFFER Out = (PS_OUT_BACKBUFFER) 0;
+    
+    vector vMtrlDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
+    
+    if (vMtrlDiffuse.a < 0.3f)
+        discard;
+    
+     /* 노멀 벡터 하나를 정의하기위한 독립적인 로컬스페이스를 만들고 그 공간안에서의 방향벡터를 정의 */
+    vector vNormalDesc = g_NormalTexture.Sample(DefaultSampler, In.vTexcoord);
+    float3 vNormal = vNormalDesc.xyz * 2.f - 1.f;
+    
+    float3x3 WorldMatrix = float3x3(In.vTangent.xyz, In.vBinormal.xyz * -1.f, In.vNormal.xyz);
+    vNormal = mul(vNormal, WorldMatrix);
+    
+    Out.vDiffuse = vMtrlDiffuse;
+    //Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+    Out.vNormal = vector(vNormal * 0.5f + 0.5f, 0.f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w, 0.f, 0.f);
+    
+    return Out;
+}
+
 PS_OUT_BACKBUFFER PS_DEFFERED_DISSOLVE_MAIN(PS_BACKBUFFER_IN In)
 {
     PS_OUT_BACKBUFFER Out = (PS_OUT_BACKBUFFER) 0;
@@ -181,6 +211,18 @@ technique11 DefaultTechnique
         GeometryShader = NULL;
         //PixelShader = compile ps_5_0 PS_MAIN();
         PixelShader = compile ps_5_0 PS_DEFFERED_OUT();
+    }
+
+    pass NormalPass
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        //PixelShader = compile ps_5_0 PS_MAIN();
+        PixelShader = compile ps_5_0 PS_DEFFERED_NORMALOUT();
     }
     
     pass DessolvePass
