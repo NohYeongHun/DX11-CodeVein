@@ -10,7 +10,7 @@ const MODEL_DESC Model_Prototypes[] =
 	//{ MODELTYPE::NONANIM,  TEXT("MapPart_Floor"),        "../Bin/Resources/Models/Map/BossMap/Floor.fbx",        "textures/Floor/" },
 	//{ MODELTYPE::NONANIM,  TEXT("MapPart_BossStage"),        "../Bin/Resources/Models/Map/BossMap/BossMap.fbx",        "textures/BossStage/" },
 	//{ MODELTYPE::NONANIM,  TEXT("MapPart_BossStageType1"),        "../Bin/Resources/Models/Map/BossMap/BossMapType1.fbx",        "textures/BossStage/" },
-	//{ MODELTYPE::ANIM,  TEXT("Prototype_Component_Model_Player"), "../Bin/Resources/Models/Player/Player.fbx",        "textures/"},
+	{ MODELTYPE::ANIM,  TEXT("Prototype_Component_Model_Player"), "../Bin/Resources/Models/Player/Player.fbx",        "textures/"},
 	//{ MODELTYPE::ANIM,  TEXT("Prototype_Component_Model_SkyBoss"), "../Bin/Resources/Models/SkyBoss/SkyBoss.fbx",        "textures/"},
 	
 	//{ MODELTYPE::NONANIM,  TEXT("Prototype_Component_Model_Sword"), "../Bin/Resources/Models/Weapon/Player/Sword.fbx",        "textures/"},
@@ -19,7 +19,7 @@ const MODEL_DESC Model_Prototypes[] =
 	//{ MODELTYPE::NONANIM,  TEXT("Prototype_Component_Model_Effect_Sylinder"), "../Bin/Resources/Models/EffectMesh/Sylinder.fbx",        "textures/"},
 	//{ MODELTYPE::NONANIM,  TEXT("Prototype_Component_Model_Effect_WindSpiral"), "../Bin/Resources/Models/EffectMesh/WinSpiral.fbx",        "textures/"},
 	//{ MODELTYPE::NONANIM,  TEXT("Prototype_Component_Model_Effect_Wind"), "../Bin/Resources/Models/EffectMesh/EffectWind.fbx",        "textures/"},
-	{ MODELTYPE::NONANIM,  TEXT("Prototype_Component_Model_WindEffect"), "../Bin/Resources/Models/EffectMesh/WindEffect.fbx",        "textures/"},
+	//{ MODELTYPE::NONANIM,  TEXT("Prototype_Component_Model_WindEffect"), "../Bin/Resources/Models/EffectMesh/WindEffect.fbx",        "textures/"},
 	//{ MODELTYPE::ANIM,  TEXT("Prototype_Component_Model_WolfDevil"), "../Bin/Resources/Models/WolfDevil/WolfDevil.fbx",        "textures/"},
 	//{ MODELTYPE::ANIM,  TEXT("Prototype_Component_Model_BlackKnight"), "../Bin/Resources/Models/BlackKnight/BlackKnight.fbx",        "textures/"},
 	//{ MODELTYPE::ANIM,  TEXT("Prototype_Component_Model_GodChildLance"), "../Bin/Resources/Models/Weapon/GodsChildServant/GodChildLance.fbx",        "textures/"},
