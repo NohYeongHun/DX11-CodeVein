@@ -202,6 +202,7 @@ HRESULT CRenderer::Add_RenderGroup(RENDERGROUP eRenderGroup, CGameObject* pRende
 // Renderer.cpp
 HRESULT CRenderer::Draw()
 {
+    // 0. Priority 렌더링 (스카이박스 등) - 백버퍼에 직접
 
     // 1. G-Buffer 생성 (불투명 객체)
     if (FAILED(Render_NonBlend()))
@@ -214,6 +215,11 @@ HRESULT CRenderer::Draw()
     // 3. G-Buffer 합성 및 스카이박스 렌더링으로 최종 씬 완성
     if (FAILED(Render_Combined()))
         return E_FAIL;
+  
+
+    if (FAILED(Render_Priority()))
+        return E_FAIL;
+
 
     // 4. 모든 반투명 객체(HitFlashEffect 포함)를 최종 씬 위에 렌더링
     if (FAILED(Render_Blend()))
@@ -223,7 +229,6 @@ HRESULT CRenderer::Draw()
     // 5. 반투명 객체까지 포함된 씬으로 블룸 효과 생성
     if (FAILED(Render_Bloom()))
         return E_FAIL;
-   
    
     // 6. 씬과 블룸 효과를 최종 합성하여 화면에 출력
     if (FAILED(Render_PostProcess()))
@@ -262,6 +267,9 @@ HRESULT CRenderer::Add_DebugComponent(CComponent* pComponent)
 
 HRESULT CRenderer::Render_Priority()
 {
+    if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_FinalScene"), false)))
+        return E_FAIL;
+
     for (auto& pRenderObject : m_RenderObjects[ENUM_CLASS(RENDERGROUP::PRIORITY)])
     {
         if (nullptr != pRenderObject)
@@ -270,6 +278,9 @@ HRESULT CRenderer::Render_Priority()
         Safe_Release(pRenderObject);
     }
     m_RenderObjects[ENUM_CLASS(RENDERGROUP::PRIORITY)].clear();
+
+    if (FAILED(m_pGameInstance->End_MRT()))
+        return E_FAIL;
     return S_OK;
 }
 
@@ -381,6 +392,10 @@ HRESULT CRenderer::Render_Lights()
 
     m_pGameInstance->Render_Lights(m_pShader, m_pVIBuffer);
 
+
+
+    
+
     if (FAILED(m_pGameInstance->End_MRT()))
         return E_FAIL;
 
@@ -390,17 +405,16 @@ HRESULT CRenderer::Render_Lights()
 HRESULT CRenderer::Render_Combined()
 { 
     // 1. Target_SceneColor에 렌더링 시작
-    
+    if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_FinalScene"))))
+        return E_FAIL;
 
-    // 2. 스카이박스(PRIORITY 그룹)를 먼저 그린다.
-    for (auto& pRenderObject : m_RenderObjects[ENUM_CLASS(RENDERGROUP::PRIORITY)]) {
+    // 2. Priority 그룹은 이미 Draw() 시작에서 처리됨
+    /*for (auto& pRenderObject : m_RenderObjects[ENUM_CLASS(RENDERGROUP::PRIORITY)]) {
         if (nullptr != pRenderObject) pRenderObject->Render();
         Safe_Release(pRenderObject);
     }
-    m_RenderObjects[ENUM_CLASS(RENDERGROUP::PRIORITY)].clear();
+    m_RenderObjects[ENUM_CLASS(RENDERGROUP::PRIORITY)].clear();*/
 
-    if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_FinalScene"))))
-        return E_FAIL;
 
     if (FAILED(m_pShader->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix)))
         return E_FAIL;
@@ -434,6 +448,9 @@ HRESULT CRenderer::Render_Combined()
     m_pVIBuffer->Bind_Resources();
     m_pVIBuffer->Render();
 
+    if (FAILED(m_pGameInstance->End_MRT()))
+        return E_FAIL;
+
     
     return S_OK;
 }
@@ -465,6 +482,11 @@ HRESULT CRenderer::Render_NonLight()
 
 HRESULT CRenderer::Render_Blend()
 {
+    // 1. Target_SceneColor에 렌더링 시작
+    if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_FinalScene"), false)))
+        return E_FAIL;
+
+
     m_RenderObjects[ENUM_CLASS(RENDERGROUP::BLEND)].sort([](CGameObject* pSour, CGameObject* pDest)->_bool
     {
         return pSour->Get_CamDistance() > pDest->Get_CamDistance();
