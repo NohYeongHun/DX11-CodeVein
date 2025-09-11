@@ -227,7 +227,7 @@
 #pragma region Effect 이미지
 
 
-#include "PrototypeName.h"
+#include "ClientPrototypeName.h"
 #include "ParticlePresets.h"
 #pragma endregion
 

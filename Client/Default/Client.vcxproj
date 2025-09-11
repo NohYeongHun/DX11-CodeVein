@@ -263,7 +263,7 @@
     <ClInclude Include="..\Public\Player_SecondSkillState.h" />
     <ClInclude Include="..\Public\Player_StrongAttackState.h" />
     <ClInclude Include="..\Public\Player_WalkState.h" />
-    <ClInclude Include="..\Public\PrototypeName.h" />
+    <ClInclude Include="..\Public\ClientPrototypeName.h" />
     <ClInclude Include="..\Public\QueenKnight.h" />
     <ClInclude Include="..\Public\QueenKnightDefine.h" />
     <ClInclude Include="..\Public\QueenKnightTree.h" />
@@ -405,7 +405,7 @@
     <ClCompile Include="..\Private\Player_SecondSkillState.cpp" />
     <ClCompile Include="..\Private\Player_StrongAttackState.cpp" />
     <ClCompile Include="..\Private\Player_WalkState.cpp" />
-    <ClCompile Include="..\Private\PrototypeName.cpp" />
+    <ClCompile Include="..\Private\ClientPrototypeName.cpp" />
     <ClCompile Include="..\Private\QueenKnight.cpp" />
     <ClCompile Include="..\Private\QueenKnightTree.cpp" />
     <ClCompile Include="..\Private\Sky.cpp" />

@@ -718,6 +718,7 @@ HRESULT CLoader_Static::Add_Prototype_Trail_Effects(ID3D11Device* pDevice, ID3D1
 
 HRESULT CLoader_Static::Add_Prototype_ParticleSystem(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
 {
+#pragma region TEXTURE 생성
 	// 0. Texture 종류별 생성.
 	for (_uint i = 0; i < Effect_TexturePrototypeSize; ++i)
 	{
@@ -730,6 +731,20 @@ HRESULT CLoader_Static::Add_Prototype_ParticleSystem(ID3D11Device* pDevice, ID3D
 			return E_FAIL;
 		}
 	}
+
+	//// 발광 효과 텍스처 등록  
+	//if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
+	//	, TEXT("Prototype_Component_Texture_ExplosionParticle")
+	//	, CTexture::Create(pDevice, pContext
+	//		, TEXT("../Bin/Resources/Textures/Effects/Texture/HitFlash/Particle%d.png"), 1))))
+	//{
+	//	CRASH("Failed Load Effect TrailGlow Texture");
+	//	return E_FAIL;
+	//}
+#pragma endregion
+
+
+
 
 	CVIBuffer_Particle_Instance::PARTICLE_INSTANCE_DESC ParticleInstanceDesc{};
 	ParticleInstanceDesc.iMaxNumInstance = 500;

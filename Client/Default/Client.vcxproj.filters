@@ -663,7 +663,7 @@
     <ClInclude Include="..\Public\Particle.h">
       <Filter>02. GameObject\Effect\Particle</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\PrototypeName.h">
+    <ClInclude Include="..\Public\ClientPrototypeName.h">
       <Filter>99. Defines</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\SwordTrail.h">
@@ -1068,7 +1068,7 @@
     <ClCompile Include="..\Private\Particle.cpp">
       <Filter>02. GameObject\Effect\Particle</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\PrototypeName.cpp">
+    <ClCompile Include="..\Private\ClientPrototypeName.cpp">
       <Filter>99. Defines</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\SwordTrail.cpp">

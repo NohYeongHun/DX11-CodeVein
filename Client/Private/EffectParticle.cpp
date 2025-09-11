@@ -75,8 +75,6 @@ void CEffectParticle::Update(_float fTimeDelta)
         _float fVelocityLength = XMVectorGetX(XMVector3Length(vVelocity));
         
         // 디버그: Speed 값 확인
-        OutputDebugWstring(TEXT("Particle : "));
-        OutPutDebugFloat(fVelocityLength);
         if (fVelocityLength >= 0.01f)  // 임계값을 낮춤
             // Velocity가 있으면 Velocity 방향 사용
             m_pTransformCom->Move_Direction(XMVector3Normalize(vVelocity), fTimeDelta * 2.f);
@@ -486,10 +484,10 @@ void CEffectParticle::OnActivate(void* pArg)
     case PARTICLE_TYPE_BOSS_EXPLOSION:
         m_pVIBufferCom->Create_BossExplosionParticle(particleInit.pos, particleInit.fRadius, particleInit.fGatherTime
             , particleInit.fExplositionTime, particleInit.lifeTime);
-        break;
-    case PARTICLE_TYPE_QUEEN_WARP_SPAWN:
-        // 연속 생성 타입은 OnActivate에서 초기 파티클을 생성하지 않음
-        // 타이머 기반으로만 생성
+    case PARTICLE_TYPE_EXPLOSION:
+        m_pVIBufferCom->Create_BossExplosionParticle(particleInit.pos, particleInit.fRadius, particleInit.fGatherTime
+            , particleInit.fExplositionTime, particleInit.lifeTime);
+
         break;
 
     }

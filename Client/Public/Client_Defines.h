@@ -46,6 +46,7 @@ namespace Client
 		MONSTERHITFLASH = 10, MONSTERHP_PROGRESSBAR = 11, NONE
 	};
 
+
 	enum class EFFECTPOSTEX_SHADERPATH : _uint
 	{
 		DEFAULT = 0, HITFLASH = 1, NONE
@@ -57,7 +58,7 @@ namespace Client
 
 	enum class POINTDIRPARTICLE_SHADERPATH : _uint
 	{
-		DEFAULT = 0, QUEENKNIGHTWARP = 1, DEBUG = 2,
+		DEFAULT = 0, QUEENKNIGHTWARP = 1, EXPLOSION = 2,DEBUG = 3,
 		NONE
 	};
 

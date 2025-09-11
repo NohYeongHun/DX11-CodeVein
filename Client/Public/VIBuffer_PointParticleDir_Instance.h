@@ -20,8 +20,9 @@ public:
 	{
 		PARTICLE_TYPE_DEFAULT = 0,
 		PARTICLE_TYPE_QUEEN_WARP = 1,
-		PARTICLE_TYPE_BOSS_EXPLOSION = 2,
-		PARTICLE_TYPE_END,
+		PARTICLE_TYPE_EXPLOSION = 2,
+		PARTICLE_TYPE_BOSS_EXPLOSION = 3,
+		PARTICLE_TYPE_END
 	};
 
 public:
@@ -56,6 +57,7 @@ public:
 	void Default_Update(VTXINSTANCEPOINTDIR_PARTICLE* pVertices, _float fTimeDelta);
 	void QueenKnightWarp_Update(VTXINSTANCEPOINTDIR_PARTICLE* pVertices, _float fTimeDelta);
 	void BossExplosion_Update(VTXINSTANCEPOINTDIR_PARTICLE* pVertices, _float fTimeDelta);
+	void Explosion_Update(VTXINSTANCEPOINTDIR_PARTICLE* pVertices, _float fTimeDelta);
 
 public:
 	void CreateAllParticles(_float3 vCenterPos, _float3 vBaseDir, _float fLifeTime = 3.0f);

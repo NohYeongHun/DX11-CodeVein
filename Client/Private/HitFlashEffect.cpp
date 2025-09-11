@@ -72,6 +72,18 @@ void CHitFlashEffect::Update(_float fTimeDelta)
         return;
     }
 
+    m_fFrameTime += fTimeDelta;
+
+    if (m_fFrameTime >= fTimeDelta * 2.f)
+    {
+        m_fFrameTime = 0.f;
+        m_iCurFrame = (m_iCurFrame + 1) % 16;
+    }
+
+  /*  _float3 vScale = m_pTransformCom->Get_Scale();
+    XMStoreFloat3(&vScale, XMLoadFloat3(&vScale) * (1.f + fTimeDelta));
+    m_pTransformCom->Set_Scale(vScale);*/
+    
 }
 
 void CHitFlashEffect::Late_Update(_float fTimeDelta)
@@ -231,7 +243,7 @@ HRESULT CHitFlashEffect::Bind_ShaderResources()
     }
 
     // Bloom 효과를 위한 밝기 배수 (1.5 이상이면 Bloom 적용)
-    _float fBloomIntensity = 5.0f;
+    _float fBloomIntensity = 2.0f;
     if (FAILED(m_pShaderCom->Bind_RawValue("g_fBloomIntensity", &fBloomIntensity, sizeof(_float))))
     {
         CRASH("Failed Bind BloomIntensity");

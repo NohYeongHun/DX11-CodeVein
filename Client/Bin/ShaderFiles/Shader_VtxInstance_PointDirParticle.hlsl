@@ -300,6 +300,42 @@ PS_OUT PS_DIFFUSE_MASK_MAIN(PS_IN In)
 }
 
 
+PS_OUT PS_DIFFUSE_EXPLOSION_MAIN(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+    // 1. 파티클의 수명 비율 계산 (0.0 ~ 1.0)
+    // In.vLifeTime.x : 현재 살아온 시간
+    // In.vLifeTime.y : 최대 수명
+    float lifeRatio = In.vLifeTime.x / In.vLifeTime.y;
+
+    // 2. 수명에 따른 알파(투명도) 애니메이션 생성 (Fade In / Fade Out)
+    // sin 함수를 이용해 파티클이 생성될 때 부드럽게 나타났다가(Fade In),
+    // 수명이 다할 때 부드럽게 사라지도록(Fade Out) 만듭니다.
+    float fadeAlpha = sin(lifeRatio * 3.14159f); // PI를 곱해 0->1->0 형태의 곡선 생성
+
+    // 3. 텍스처 샘플링 및 블룸(Bloom) 효과 적용
+    // g_DiffuseTexture에 Diffuse4.png를 바인딩했다고 가정합니다.
+    vector texColor = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
+    
+    // 텍스처의 원래 색상에 g_fEmissiveIntensity(C++에서 전달)를 곱해 HDR 색상으로 만듭니다.
+    // 이 값이 1.0을 초과하면 후처리 단계에서 블룸 효과가 적용됩니다.
+    //vector bloomColor = texColor * g_fEmissiveIntensity;
+    
+    vector bloomColor = texColor * 5.f;
+
+    if (texColor.r < 0.1f && texColor.g < 0.1f && texColor.b < 0.1f)
+        discard;
+    
+    // 4. 최종 색상 조합
+    // 최종 색상 = 블룸이 적용된 밝은 색상
+    // 최종 알파 = (텍스처의 원래 알파 * 시간에 따른 Fade 알파)
+    Out.vColor = float4(bloomColor.rgb, texColor.a * fadeAlpha);
+    
+    
+    
+    return Out;
+}
 
 
 
@@ -326,6 +362,16 @@ technique11 DefaultTechnique
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = compile gs_5_0 GS_Stretched_Billboard_MAIN();
         PixelShader = compile ps_5_0 PS_DIFFUSE_MASK_MAIN();
+    }
+
+    pass ExplossionPass
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = compile gs_5_0 GS_Stretched_Billboard_MAIN();
+        PixelShader = compile ps_5_0 PS_DIFFUSE_EXPLOSION_MAIN();
     }
 
     pass DebugPass

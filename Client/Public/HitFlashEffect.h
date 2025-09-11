@@ -64,8 +64,12 @@ private:
     LEVEL m_eCurLevel = { LEVEL::END };
     
 #pragma region 쉐이더 전달 변수
-    _uint m_iCurFrame = {}; // 16개의 프레임이 존재.
+    _uint m_iCurFrame = { 0 }; // 16개의 프레임이 존재.
     _uint m_iShaderPath = {};
+
+    _float m_fFrameTime = {};
+
+
 #pragma endregion
 
     // 회전 정보

@@ -1,4 +1,5 @@
-﻿CVIBuffer_PointParticleDir_Instance::CVIBuffer_PointParticleDir_Instance(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿#include "VIBuffer_PointParticleDir_Instance.h"
+CVIBuffer_PointParticleDir_Instance::CVIBuffer_PointParticleDir_Instance(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CVIBuffer_Instance{ pDevice, pContext }
 {
 }
@@ -173,9 +174,9 @@ void CVIBuffer_PointParticleDir_Instance::Update(_float fTimeDelta)
     case PARTICLE_TYPE::PARTICLE_TYPE_QUEEN_WARP:
         QueenKnightWarp_Update(pVertices, fTimeDelta);
         break;
-    //case PARTICLE_TYPE::PARTICLE_TYPE_BOSS_EXPLOSION:
-    //    BossExplosion_Update(pVertices, fTimeDelta);
-    //    break;
+    case PARTICLE_TYPE::PARTICLE_TYPE_EXPLOSION:
+        BossExplosion_Update(pVertices, fTimeDelta);
+        break;
     case PARTICLE_TYPE::PARTICLE_TYPE_BOSS_EXPLOSION:
         QueenKnightWarp_Update(pVertices, fTimeDelta);
         break;
@@ -444,6 +445,53 @@ void CVIBuffer_PointParticleDir_Instance::BossExplosion_Update(VTXINSTANCEPOINTD
             }
 
             pVertices[index].vTranslation = _float4(currentPos.x, currentPos.y, currentPos.z, 1.f);
+            ++it;
+        }
+    }
+}
+
+void CVIBuffer_PointParticleDir_Instance::Explosion_Update(VTXINSTANCEPOINTDIR_PARTICLE* pVertices, _float fTimeDelta)
+{
+    // 1. Ready Queue에 있는 파티클을 Live Queue로 옮깁니다.
+    while (!m_ReadyparticleIndices.empty())
+    {
+        auto info = m_ReadyparticleIndices.front();
+        m_ReadyparticleIndices.pop();
+        _uint index = info.first;
+        ParticleVertexInfo particleInfo = info.second;
+
+        pVertices[index].vDir = particleInfo.dir;
+        pVertices[index].vTranslation = _float4(particleInfo.pos.x, particleInfo.pos.y, particleInfo.pos.z, 1.f);
+        pVertices[index].vLifeTime.x = 0.f;
+        pVertices[index].vLifeTime.y = particleInfo.lifeTime;
+        pVertices[index].fDirSpeed = particleInfo.fRandomSpeed;
+    }
+
+    // 2. Live Queue에 있는 파티클을 업데이트하고, 수명이 다하면 제거합니다.
+    for (auto it = m_LiveParticleIndices.begin(); it != m_LiveParticleIndices.end(); )
+    {
+        _uint index = *it;
+        pVertices[index].vLifeTime.x += fTimeDelta; // 시간 누적
+
+        if (pVertices[index].vLifeTime.x >= pVertices[index].vLifeTime.y) // 수명 체크
+        {
+            m_DeadParticleIndices.emplace(*it);
+            it = m_LiveParticleIndices.erase(it);
+        }
+        else
+        {
+            // 파티클 위치 업데이트 (단순히 dir 방향으로 speed만큼 이동)
+            _float3 currentPos = { pVertices[index].vTranslation.x, pVertices[index].vTranslation.y, pVertices[index].vTranslation.z };
+            _float3 direction = pVertices[index].vDir;
+            _float speed = pVertices[index].fDirSpeed;
+
+            _float3 newPos = {
+                currentPos.x + (direction.x * speed * fTimeDelta),
+                currentPos.y + (direction.y * speed * fTimeDelta),
+                currentPos.z + (direction.z * speed * fTimeDelta)
+            };
+
+            pVertices[index].vTranslation = _float4(newPos.x, newPos.y, newPos.z, 1.f);
             ++it;
         }
     }

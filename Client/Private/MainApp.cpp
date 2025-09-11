@@ -203,6 +203,33 @@ HRESULT CMainApp::Ready_Pooling()
 	//	m_pGameInstance->Add_GameObject_ToPools(TEXT("Particle_EFFECT"), ENUM_CLASS(EFFECTTYPE::PARTICLE), pGameObject);
 	//}
 
+	// MainApp.cpp의 Ready_Pooling 함수 내부에 추가
+
+	CEffectParticle::EFFECT_PARTICLE_DESC burstDesc{};
+	burstDesc.iNumInstance = 50; // 한 번에 터질 최대 파티클 개수
+	burstDesc.eParticleType = CEffectParticle::PARTICLE_TYPE_EXPLOSION; // ★가장 중요★
+	burstDesc.iShaderPath = ENUM_CLASS(POINTDIRPARTICLE_SHADERPATH::EXPLOSION); // 셰이더의 QueenKnightWarpPass (PS_DIFFUSE_MASK_MAIN) 사용
+
+	// 파티클의 속도, 크기, 수명 범위를 설정합니다.
+	burstDesc.vSpeed = { 3.f, 5.f };   // 10 ~ 15의 무작위 속도
+	//burstDesc.vSpeed = { 10.f, 15.f };   // 10 ~ 15의 무작위 속도
+	burstDesc.vSize = { 0.01f, 0.03f };  // 0.05 ~ 0.1의 무작위 크기
+	burstDesc.vLifeTime = { 2.f, 5.0f }; // 0.5 ~ 1.0초의 무작위 수명
+
+	// 사용할 텍스처를 지정합니다.
+	burstDesc.useTextureCheckArray[TEXTURE::TEXTURE_DIFFUSE] = true; // g_DiffuseTexture
+	burstDesc.useTextureIndexArray[TEXTURE::TEXTURE_DIFFUSE] = 4;
+
+
+	for (_uint i = 0; i < 200; ++i)
+	{
+		pGameObject = dynamic_cast<CGameObject*>(m_pGameInstance->Clone_Prototype(
+			PROTOTYPE::GAMEOBJECT, ENUM_CLASS(LEVEL::STATIC)
+			, TEXT("Prototype_GameObject_EffectParticle"), &burstDesc
+		));
+		m_pGameInstance->Add_GameObject_ToPools(TEXT("EXPLOSION"), ENUM_CLASS(CEffectParticle::EffectType), pGameObject);
+	}
+
 	CEffectParticle::EFFECT_PARTICLE_DESC ParticleDesc{};
 	ParticleDesc.fSpeedPerSec = 10.f;
 	ParticleDesc.fRotationPerSec = XMConvertToRadians(90.f);

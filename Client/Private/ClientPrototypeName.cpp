@@ -4,7 +4,7 @@ NS_BEGIN(Client)
 const EFFECT_TEXTURE_DESC Effect_TexturePrototypes[] =
 {
 	{ TEXT("Prototype_Component_Effect_DiffuseTexture")
-	, TEXT("../Bin/Resources/Textures/Effects/Texture/Diffuse/Diffuse%d.png"), 2},
+	, TEXT("../Bin/Resources/Textures/Effects/Texture/Diffuse/Diffuse%d.png"), 5},
 
 	{TEXT("Prototype_Component_Effect_GradientTexture")
 	, TEXT("../Bin/Resources/Textures/Effects/Texture/Gradient/Gradient%d.png"), 2},

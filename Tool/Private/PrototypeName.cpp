@@ -41,7 +41,7 @@ extern unsigned int Model_PrototypeSize = 1;
 const EFFECT_TEXTURE_DESC Effect_TexturePrototypes[] =
 {
 	{ TEXT("Prototype_Component_Effect_DiffuseTexture")
-	, TEXT("../Bin/Resources/Textures/Effects/Particle/Diffuse/Diffuse%d.png"), 2},
+	, TEXT("../Bin/Resources/Textures/Effects/Particle/Diffuse/Diffuse%d.png"), 3},
 
 	{TEXT("Prototype_Component_Effect_GradientTexture") 
 	, TEXT("../Bin/Resources/Textures/Effects/Particle/Gradient/Gradient%d.png"), 2},

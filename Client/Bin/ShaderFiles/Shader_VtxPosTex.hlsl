@@ -328,9 +328,12 @@ PS_OUT PS_LINESLASH_MAIN(PS_IN In)
     
     // 시간에 따른 알파 페이드아웃
     float fadeAlpha = 1.0f - g_fTimeRatio;
+    
+    
     vMtrlDiffuse.a *= fadeAlpha;
     
     Out.vColor = vMtrlDiffuse;
+    
 
     
     
