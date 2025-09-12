@@ -49,7 +49,7 @@ namespace Client
 
 	enum class EFFECTPOSTEX_SHADERPATH : _uint
 	{
-		DEFAULT = 0, HITFLASH = 1, NONE
+		DEFAULT = 0, HITFLASH = 1, MONSTER_LINESLASH = 2, NONE
 	};
 	enum class EFFECTTRAIL_SHADERPATH : _uint {
 		TRAIL = 0, MULTITRAIL = 1, STRETCH_TRAIL = 2

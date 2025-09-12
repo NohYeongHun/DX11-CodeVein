@@ -8,8 +8,8 @@ public:
     {
         PARTICLE_TYPE_DEFAULT = 0 ,
         PARTICLE_TYPE_QUEEN_WARP = 1,
-        PARTICLE_TYPE_BOSS_EXPLOSION = 2,
-        PARTICLE_TYPE_EXPLOSION = 3,
+        PARTICLE_TYPE_EXPLOSION = 2,
+        PARTICLE_TYPE_BOSS_EXPLOSION = 3,
         PARTICLE_TYPE_END
     };
 
@@ -100,6 +100,7 @@ public:
     void Create_QueenKnightWarpEffect(const PARTICLE_INIT_INFO particleInitInfo);
     void Create_QueenKnightWarpEffect_Limited(const PARTICLE_INIT_INFO particleInitInfo, _uint iSpawnCount);
     void Create_BossExplosionParticle(_float3 vCenterPos, _float fRadius, _float fGatherTime, _float fExplosionTime, _float fTotalLifeTime);
+    void Create_ExplosionParticle(_float3 vNomalDir, _float3 vCenterPos, _float fRadius, _float fExplosionTime, _float fTotalLifeTime);
 
     // 타이머 기반 파티클 생성 설정
     void Set_SpawnSettings(_float fInterval, _uint iCount, _bool bContinuous = true);
@@ -143,6 +144,7 @@ private:
 
     _uint m_iTextureIndexArray[TEXTURE_END] = {};
 
+    _float m_fBloomIntensity = { 2.f };
 
     PARTICLE_TYPE m_eParticleType = { PARTICLE_TYPE::PARTICLE_TYPE_END };
 

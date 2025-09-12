@@ -4,13 +4,14 @@ NS_BEGIN(Client)
 class CSlash final : public CGameObject
 {
 public:
-    enum TEXTURE { TEXTURE_DIFFUSE, TEXTURE_MASK, TEXTURE_END };
+    enum TEXTURE { DIFFUSE, MASK, OTHER, TEXTURE_END };
 
 public:
     typedef struct tagSlashEffectDesc : public CGameObject::GAMEOBJECT_DESC
     {
         LEVEL eCurLevel = { LEVEL::END };
-        POSTEX_SHADERPATH eShaderPath = {POSTEX_SHADERPATH::NONE };
+        EFFECTPOSTEX_SHADERPATH eShaderPath = { EFFECTPOSTEX_SHADERPATH::NONE };
+        //POSTEX_SHADERPATH eShaderPath = {POSTEX_SHADERPATH::NONE };
     }SLASHEFFECT_DESC;
 
     typedef struct tagSlashActivateDesc
@@ -74,6 +75,7 @@ private:
     _float3 m_vScale = {};
     _uint m_iShaderPath = {};
 
+    _float m_fBloomIntensity = 5.f;
 
 
 private:

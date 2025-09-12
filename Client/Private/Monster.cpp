@@ -1068,34 +1068,35 @@ void CMonster::Reset_Collider_ActiveInfo()
 void CMonster::Show_Slash_UI_At_Position(_fvector vHitPosition, _fvector vAttackDirection)
 {
     HRESULT hr = {};
-    //// 1. 풀에서 꺼내씁니다....
-    //CSlash::SLASHACTIVATE_DESC SlashDesc{};
-    //SlashDesc.eCurLevel = m_eCurLevel;
-    //SlashDesc.vHitPosition = vHitPosition;
-    //SlashDesc.vHitDirection = vAttackDirection;
-    //SlashDesc.fDisPlayTime = 0.5f;
-    //hr = m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(m_eCurLevel)
-    //    , TEXT("SLASH_EFFECT"), TEXT("Layer_Effect"), 1, ENUM_CLASS(CSlash::EffectType), &SlashDesc);
+    // 1. 풀에서 꺼내씁니다
+    CSlash::SLASHACTIVATE_DESC SlashDesc{};
+    SlashDesc.eCurLevel = m_eCurLevel;
+    SlashDesc.vHitPosition = vHitPosition;
+    SlashDesc.vHitDirection = vAttackDirection;
+    SlashDesc.fDisPlayTime = 0.2f;
+    SlashDesc.vScale = { 2.f, 0.5f, 1.f };
+    hr = m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(m_eCurLevel)
+        , TEXT("SLASH_EFFECT"), TEXT("Layer_Effect"), 1, ENUM_CLASS(CSlash::EffectType), &SlashDesc);
 
 
     CHitFlashEffect::HITFLASHACTIVATE_DESC HitFlashDesc{};
     HitFlashDesc.eCurLevel = m_eCurLevel;
     HitFlashDesc.vHitPosition = vHitPosition;
     HitFlashDesc.vHitDirection = vAttackDirection;
-    HitFlashDesc.fDisPlayTime = 5.f;
-    HitFlashDesc.vScale = { 0.5f, 0.5f, 1.f };
+    HitFlashDesc.fDisPlayTime = 0.1f;
+    HitFlashDesc.vScale = { 1.f, 1.f, 1.f };
     hr = m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(m_eCurLevel)
         , TEXT("HITFLASH_EFFECT"), TEXT("Layer_Effect"), 1, ENUM_CLASS(CHitFlashEffect::EffectType), &HitFlashDesc);
 
 
     CEffectParticle::EFFECTPARTICLE_ENTER_DESC Desc{};
+    Desc.eParticleType = CEffectParticle::PARTICLE_TYPE_EXPLOSION;
     Desc.vStartPos = vHitPosition; // 몬스터 현재위치로 생성.
-    Desc.particleInitInfo.lifeTime = 2.f;
+    Desc.particleInitInfo.lifeTime = 0.4f; // lisfeTime
+    Desc.particleInitInfo.fRadius = 0.2f; // 모일 반경
+    Desc.particleInitInfo.fExplositionTime = 0.1f;
     XMStoreFloat3(&Desc.particleInitInfo.dir, vAttackDirection);
     Desc.pTargetTransform = m_pTransformCom;
-    //Desc.fSpawnInterval = m_pGameInstance->Get_TimeDelta() * 20.f;
-    //Desc.iSpawnCount = iSpawnCount;
-    //Desc.IsSpawn = true;
     m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(m_eCurLevel)
         , TEXT("EXPLOSION"), TEXT("Layer_Effect"), 1, ENUM_CLASS(EFFECTTYPE::PARTICLE), &Desc);
 

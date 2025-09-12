@@ -1,4 +1,5 @@
-﻿CEffectParticle::CEffectParticle(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿
+CEffectParticle::CEffectParticle(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CGameObject{ pDevice, pContext }
 {
 }
@@ -126,7 +127,7 @@ void CEffectParticle::Late_Update(_float fTimeDelta)
     // 활성화된 상태에서만 렌더링
     if (m_IsActivate)
     {
-        if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::NONLIGHT, this)))
+        if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::BLEND, this)))
         {
             CRASH("Failed Add RenderGroup");
             return;
@@ -209,6 +210,12 @@ HRESULT CEffectParticle::Bind_ShaderResources()
         return E_FAIL;
     }
         
+
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fBloomIntensity", &m_fBloomIntensity, sizeof(_float))))
+    {
+        CRASH("Failed Bind Emissive");
+        return E_FAIL;
+    }
 #pragma endregion
 
 #pragma region Texture 바인딩
@@ -430,6 +437,15 @@ void CEffectParticle::Create_BossExplosionParticle(_float3 vCenterPos, _float fR
     }
 }
 
+void CEffectParticle::Create_ExplosionParticle(_float3 vNomalDir, _float3 vCenterPos, _float fRadius,  _float fExplosionTime, _float fTotalLifeTime)
+{
+    if (m_pVIBufferCom)
+    {
+        
+        m_pVIBufferCom->Create_ExplosionParticle(vNomalDir, vCenterPos, fRadius,  fExplosionTime, fTotalLifeTime);
+    }
+}
+
 void CEffectParticle::Set_SpawnSettings(_float fInterval, _uint iCount, _bool bContinuous)
 {
     m_fSpawnInterval = fInterval;
@@ -460,6 +476,8 @@ void CEffectParticle::OnActivate(void* pArg)
     // 1. 위치 지정. => WorldMatrix용
     m_pTransformCom->Set_State(STATE::POSITION, pDesc->vStartPos);
 
+
+    // pDesc->vStartPos : 타격 지점. 
     // 2. 활성화 상태로 설정
     m_IsActivate = true;
     Reset_Timer(); // 타이머 초기화
@@ -484,10 +502,13 @@ void CEffectParticle::OnActivate(void* pArg)
     case PARTICLE_TYPE_BOSS_EXPLOSION:
         m_pVIBufferCom->Create_BossExplosionParticle(particleInit.pos, particleInit.fRadius, particleInit.fGatherTime
             , particleInit.fExplositionTime, particleInit.lifeTime);
+        break;
     case PARTICLE_TYPE_EXPLOSION:
-        m_pVIBufferCom->Create_BossExplosionParticle(particleInit.pos, particleInit.fRadius, particleInit.fGatherTime
-            , particleInit.fExplositionTime, particleInit.lifeTime);
-
+    {
+        _float3 vNormalDir = {};
+        XMStoreFloat3(&vNormalDir, XMLoadFloat4(m_pGameInstance->Get_CamPosition()) - pDesc->vStartPos);
+        m_pVIBufferCom->Create_ExplosionParticle(vNormalDir, particleInit.pos, particleInit.fRadius, particleInit.fExplositionTime, particleInit.lifeTime);
+    }
         break;
 
     }

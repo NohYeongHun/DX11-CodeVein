@@ -525,9 +525,26 @@ HRESULT CLoader_Static::Add_Prototype_Dissolve_Effects(ID3D11Device* pDevice, ID
 
 HRESULT CLoader_Static::Add_Prototype_Slash_Effects(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
 {
-#pragma region SLASH UI
+#pragma region SLASH Effect
+
+	// Diffuse
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
+		, TEXT("Prototype_Component_Texture_SlashEffectDiffuse")
+		, CTexture::Create(pDevice, pContext, TEXT("../Bin/Resources/Textures/Effects/Texture/Slash/Diffuse%d.png"), 1))))
+	{
+		CRASH("Failed Load SlashEffect Texture");
+		return E_FAIL;
+	}
 
 	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
+		, TEXT("Prototype_Component_Texture_SlashEffectOther")
+		, CTexture::Create(pDevice, pContext, TEXT("../Bin/Resources/Textures/Effects/Texture/Slash/Other%d.png"), 5))))
+	{
+		CRASH("Failed Load SlashEffect Texture");
+		return E_FAIL;
+	}
+
+	/*if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
 		, TEXT("Prototype_Component_Texture_SlashEffectMask")
 		, CTexture::Create(pDevice, pContext, TEXT("../Bin/Resources/Textures/Effects/Texture/Slash/Slash%d.png"), 1))))
 	{
@@ -541,7 +558,7 @@ HRESULT CLoader_Static::Add_Prototype_Slash_Effects(ID3D11Device* pDevice, ID3D1
 	{
 		CRASH("Failed Load SlashEffect Texture");
 		return E_FAIL;
-	}
+	}*/
 
 
 	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_SlashEffect"),

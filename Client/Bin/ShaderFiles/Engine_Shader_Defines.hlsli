@@ -96,7 +96,7 @@ BlendState BS_AlphaBlend_Additive // 새로운 가산 혼합 상태
     
     // (SourceColor * SourceAlpha) + (DestinationColor * 1)
     // 소스(이펙트)의 알파 값만큼 기존 화면에 더해져서 빛나는 효과를 냄
-    SrcBlend = SRC_ALPHA;
+    SrcBlend = ONE;
     DestBlend = ONE;
     BlendOp = ADD;
 };

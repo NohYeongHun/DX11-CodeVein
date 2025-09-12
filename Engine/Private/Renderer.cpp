@@ -225,6 +225,8 @@ HRESULT CRenderer::Draw()
     if (FAILED(Render_Blend()))
         return E_FAIL;
 
+
+
 #pragma region BLOOM
     // 5. 반투명 객체까지 포함된 씬으로 블룸 효과 생성
     if (FAILED(Render_Bloom()))
@@ -234,6 +236,7 @@ HRESULT CRenderer::Draw()
     if (FAILED(Render_PostProcess()))
         return E_FAIL;
 #pragma endregion
+   
     // 7. NonLight, UI 등 나머지 렌더링
     if (FAILED(Render_NonLight()))
         return E_FAIL;
@@ -245,8 +248,8 @@ HRESULT CRenderer::Draw()
         return E_FAIL;
 
 #ifdef _DEBUG
-    if (FAILED(Render_Debug()))
-        return E_FAIL;
+    //if (FAILED(Render_Debug()))
+    //    return E_FAIL;
 #endif
 
     return S_OK;
@@ -616,7 +619,8 @@ HRESULT CRenderer::Render_BloomBlur()
 
     // 1/4 크기로 스케일 조정
     _float4x4 BlurWorldMatrix;
-    XMStoreFloat4x4(&BlurWorldMatrix, XMMatrixScaling(1280.f / 4.f, 720.f / 4.f, 1.f));
+    //XMStoreFloat4x4(&BlurWorldMatrix, XMMatrixScaling(1280.f / 4.f, 720.f / 4.f, 1.f));
+    XMStoreFloat4x4(&BlurWorldMatrix, XMMatrixScaling(1920.f / 4.f, 1080.f / 4.f, 1.f));
     
     if (FAILED(m_pShader->Bind_Matrix("g_WorldMatrix", &BlurWorldMatrix)))
         return E_FAIL;

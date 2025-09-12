@@ -89,7 +89,8 @@ PS_OUT PS_LOADINGSLOT_MAIN(PS_IN In)
     }
     else
     {
-        Out.vColor = baseColor;
+        discard;
+        //Out.vColor = baseColor;
     }
     
     return Out;

@@ -93,7 +93,7 @@ void GS_Stretched_Billboard_MAIN(point GS_IN In[1], inout TriangleStream<GS_OUT>
     float3 vDir = normalize(In[0].vDir);
 
     float speed = In[0].fSpeed; // 개별 속도값 사용
-    float stretchScale = In[0].fSize * (1.0f + speed * 0.2f); // 0.1f는 보정값 너무 길게 늘어나면 수정 필요 
+    float stretchScale = In[0].fSize * (1.0f + speed * 1.5f); // 0.1f는 보정값 너무 길게 늘어나면 수정 필요 
     //늘어지는 효과
 
     // 속도 방향을 Up으로 사용
