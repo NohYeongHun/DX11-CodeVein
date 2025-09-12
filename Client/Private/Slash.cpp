@@ -82,7 +82,13 @@ void CSlash::Late_Update(_float fTimeDelta)
     CGameObject::Late_Update(fTimeDelta);
 
     // UI 렌더 그룹에 추가
-    if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::NONLIGHT, this)))
+    //if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::NONLIGHT, this)))
+    //{
+    //    CRASH("Failed Add_RenderGroup Slash");
+    //    return;
+    //}
+
+    if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::BLEND, this)))
     {
         CRASH("Failed Add_RenderGroup Slash");
         return;
@@ -190,8 +196,13 @@ void CSlash::Initialize_Transform()
     m_pTransformCom->Set_State(STATE::LOOK, vLook);
 
     // 6. 크기 설정.
-    _float fSizeX = m_vScale.x + static_cast<float>(rand()) / RAND_MAX * 1.5f; // 1.5f ~ 3.f
-    _float fSizeY = m_vScale.y + static_cast<float>(rand()) / RAND_MAX * 0.2f; // 0.2f ~ 0.3f
+    //_float fSizeX = m_vScale.x + static_cast<float>(rand()) / RAND_MAX * 1.5f; // 1.5f ~ 3.f
+    //_float fSizeY = m_vScale.y + static_cast<float>(rand()) / RAND_MAX * 0.2f; // 0.2f ~ 0.3f
+
+    //_float fSizeX = m_pGameInstance->Rand(1.5f, 3.f); // 1.5f ~ 3.f
+    //_float fSizeY = 0.15f;
+    _float fSizeX = m_vScale.x;
+    _float fSizeY = m_vScale.y;
     m_pTransformCom->Set_Scale({ fSizeX, fSizeY, m_vScale.z });
 
     // 7. 계산 완료 플래그 설정
@@ -221,23 +232,39 @@ HRESULT CSlash::Bind_ShaderResources()
         return E_FAIL;
     }
 
-    if (FAILED(m_pTextureCom[TEXTURE_MASK]->Bind_Shader_Resource(m_pShaderCom, "g_MaskTexture", 0)))
+#pragma region TEXTURE
+    if (FAILED(m_pTextureCom[DIFFUSE]->Bind_Shader_Resource(m_pShaderCom, "g_DiffuseTexture", 0)))
     {
         CRASH("Failed Bind Texture LockOnUI");
         return E_FAIL;
     }
 
-    if (FAILED(m_pTextureCom[TEXTURE_DIFFUSE]->Bind_Shader_Resource(m_pShaderCom, "g_Texture", 0)))
+
+    if (FAILED(m_pTextureCom[OTHER]->Bind_Shader_Resources(m_pShaderCom, "g_OtherTexture")))
     {
         CRASH("Failed Bind Texture LockOnUI");
         return E_FAIL;
     }
+#pragma endregion
+
+   /* if (FAILED(m_pTextureCom[TEXTURE_MASK]->Bind_Shader_Resource(m_pShaderCom, "g_MaskTexture", 0)))
+    {
+        CRASH("Failed Bind Texture LockOnUI");
+        return E_FAIL;
+    }
+
+
+    if (FAILED(m_pTextureCom[TEXTURE_DIFFUSE]->Bind_Shader_Resource(m_pShaderCom, "g_DiffuseTexture", 0)))
+    {
+        CRASH("Failed Bind Texture LockOnUI");
+        return E_FAIL;
+    }*/
 
     // 시간 진행도 계산 (0.0 ~ 1.0)
     _float fTimeRatio = m_fCurrentTime / m_fDisplayTime;
     
-    // 시간에 따른 스케일 감소 (1.0 -> 0.3)
-    _float fScale = 1.0f - (fTimeRatio * 0.7f);
+    // 시간에 따른 스케일 증가 (1.0 -> 0.3)
+    _float fScale = 0.1f + (fTimeRatio * 0.7f);
     
     if (FAILED(m_pShaderCom->Bind_RawValue("g_fTimeRatio", &fTimeRatio, sizeof(_float))))
     {
@@ -251,6 +278,12 @@ HRESULT CSlash::Bind_ShaderResources()
         return E_FAIL;
     }
 
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fBloomIntensity", &m_fBloomIntensity, sizeof(_float))))
+    {
+        CRASH("Failed Bind Scale");
+        return E_FAIL;
+    }
+
     return S_OK;
 }
 
@@ -258,7 +291,14 @@ HRESULT CSlash::Bind_ShaderResources()
 HRESULT CSlash::Ready_Components()
 {
     // 컴포넌트 추가
-    if (FAILED(Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxPosTex"),
+    /*if (FAILED(Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxPosTex"),
+        TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom))))
+    {
+        CRASH("Failed Load Shader");
+        return E_FAIL;
+    }*/
+
+    if (FAILED(Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxEffectPosTex"),
         TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom))))
     {
         CRASH("Failed Load Shader");
@@ -272,20 +312,41 @@ HRESULT CSlash::Ready_Components()
         return E_FAIL;
     }
 
-
-    if (FAILED(Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_SlashEffectMask"),
-        TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom[TEXTURE_MASK]))))
-    {
-        CRASH("Failed Load Texture");
-        return E_FAIL;
-    }
-
+#pragma region 텍스쳐
+    /* Resource */
     if (FAILED(Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_SlashEffectDiffuse"),
-        TEXT("Com_DiffuseTexture"), reinterpret_cast<CComponent**>(&m_pTextureCom[TEXTURE_DIFFUSE]))))
+        TEXT("Com_DiffuseTexture"), reinterpret_cast<CComponent**>(&m_pTextureCom[DIFFUSE]))))
     {
         CRASH("Failed Load Texture");
         return E_FAIL;
     }
+
+    if (FAILED(Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_SlashEffectOther"),
+        TEXT("Com_OtherTexture"), reinterpret_cast<CComponent**>(&m_pTextureCom[OTHER]))))
+    {
+        CRASH("Failed Load Texture");
+        return E_FAIL;
+    }
+#pragma endregion
+
+
+
+
+
+
+    //if (FAILED(Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_SlashEffectMask"),
+    //    TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom[TEXTURE_MASK]))))
+    //{
+    //    CRASH("Failed Load Texture");
+    //    return E_FAIL;
+    //}
+
+    //if (FAILED(Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_SlashEffectDiffuse"),
+    //    TEXT("Com_DiffuseTexture"), reinterpret_cast<CComponent**>(&m_pTextureCom[TEXTURE_DIFFUSE]))))
+    //{
+    //    CRASH("Failed Load Texture");
+    //    return E_FAIL;
+    //}
 
     return S_OK;
 }

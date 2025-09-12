@@ -47,6 +47,9 @@ HRESULT CLoader::Loading()
 
 	switch(m_eNextLevelID)
 	{
+	case LEVEL::STATIC:
+		hr = Loading_For_Static_Level();
+		break;
 	case LEVEL::LOGO:
 		hr = Loading_For_Logo_Level();
 		break;
@@ -69,6 +72,21 @@ HRESULT CLoader::Loading()
 		
 
 	LeaveCriticalSection(&m_CriticalSection);
+
+	return S_OK;
+}
+
+HRESULT CLoader::Loading_For_Static_Level()
+{
+	lstrcpy(m_szLoadingText, TEXT("Static 레벨을 로딩중입니다."));
+
+	if (FAILED(m_cLoader_Static
+		.Loading_Resource(m_pDevice, m_pContext, m_pGameInstance)))
+		return E_FAIL;
+
+	lstrcpy(m_szLoadingText, TEXT("Static 레벨 로딩이 완료되었습니다."));
+
+	m_isFinished = true;
 
 	return S_OK;
 }

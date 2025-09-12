@@ -56,7 +56,7 @@ HRESULT CTarget_Manager::Add_MRT(const _wstring& strMRTTag, const _wstring& strT
 	return S_OK;
 }
 
-HRESULT CTarget_Manager::Begin_MRT(const _wstring& strMRTTag)
+HRESULT CTarget_Manager::Begin_MRT(const _wstring& strMRTTag, _bool bClear)
 {
 	list<CRenderTarget*>* pMRTList = Find_MRT(strMRTTag);
 	if (nullptr == pMRTList)
@@ -71,7 +71,8 @@ HRESULT CTarget_Manager::Begin_MRT(const _wstring& strMRTTag)
 	for (auto& pRenderTarget : *pMRTList)
 	{
 		// 그리기 전 Clear
-		pRenderTarget->Clear();
+		if (bClear)
+			pRenderTarget->Clear();
 		RenderTargets[iNumRenderTargets++] = pRenderTarget->Get_RTV();
 	}
 

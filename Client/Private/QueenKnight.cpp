@@ -1,4 +1,5 @@
-﻿CQueenKnight::CQueenKnight(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿#include "QueenKnight.h"
+CQueenKnight::CQueenKnight(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CMonster(pDevice, pContext)
 {
 }
@@ -110,10 +111,10 @@ HRESULT CQueenKnight::Initialize_Clone(void* pArg)
 
 void CQueenKnight::Priority_Update(_float fTimeDelta)
 {
-    CMonster::Priority_Update(fTimeDelta);
-
     if (m_IsEncountered)
         m_pBossHpBarUI->Priority_Update(fTimeDelta);
+
+    CMonster::Priority_Update(fTimeDelta);
         
 }
 
@@ -122,11 +123,15 @@ void CQueenKnight::Update(_float fTimeDelta)
     if (m_IsEncountered)
         m_pBossHpBarUI->Update(fTimeDelta);
 
+    CMonster::Update(fTimeDelta);
+
+   
+
 
     Update_AI(fTimeDelta);
 
     // 하위 객체들 움직임 제어는 Tree 제어 이후에
-    CMonster::Update(fTimeDelta);
+    
 
     Finalize_Update(fTimeDelta);
 }
@@ -699,10 +704,60 @@ void CQueenKnight::Create_QueenKnightWarp_Effect_Particle(_float3 vDir)
     Desc.vStartPos = m_pTransformCom->Get_State(STATE::POSITION); // 몬스터 현재위치로 생성.
     Desc.particleInitInfo.lifeTime = 5.f;
     Desc.particleInitInfo.dir = vDir;
-    m_pGameInstance->Move_GameObject_ToObjectLayer(ENUM_CLASS(m_eCurLevel)
-        , TEXT("QUEENKNIGHT_WARP"), TEXT("Layer_Effect"), 2, ENUM_CLASS(CEffectParticle::EffectType), &Desc);
+    Desc.pTargetTransform = m_pTransformCom;
+    Desc.fChaseTime = 5.f; // 50 프레임만 추적
+    m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(m_eCurLevel)
+        , TEXT("QUEENKNIGHT_WARP"), TEXT("Layer_Effect"), 1, ENUM_CLASS(EFFECTTYPE::PARTICLE), &Desc);
 
 }
+
+void CQueenKnight::Create_QueenKnightWarp_Effect_Particle_Spawn(_float3 vDir, _uint iSpawnCount)
+{
+    CEffectParticle::EFFECTPARTICLE_ENTER_DESC Desc{};
+    Desc.vStartPos = m_pTransformCom->Get_State(STATE::POSITION); // 몬스터 현재위치로 생성.
+    Desc.particleInitInfo.lifeTime = 5.f;
+    Desc.particleInitInfo.dir = vDir;
+    Desc.pTargetTransform = m_pTransformCom;
+    Desc.fSpawnInterval = m_pGameInstance->Get_TimeDelta() * 20.f;
+    Desc.iSpawnCount = iSpawnCount;
+    Desc.IsSpawn = true;
+    m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(m_eCurLevel)
+        , TEXT("QUEENKNIGHT_WARP"), TEXT("Layer_Effect"), 1, ENUM_CLASS(EFFECTTYPE::PARTICLE), &Desc);
+
+
+}
+
+void CQueenKnight::Create_QueenKnightWarp_Effect_Particle_Explosion(_float3 vDir)
+{
+    CEffectParticle::EFFECTPARTICLE_ENTER_DESC Desc{};
+    Desc.vStartPos = m_pTransformCom->Get_State(STATE::POSITION); // 몬스터 현재위치로 생성.
+    Desc.particleInitInfo.lifeTime = 5.f;
+    Desc.particleInitInfo.dir = vDir;
+    Desc.particleInitInfo.fExplositionTime = 1.f;
+    Desc.particleInitInfo.fRadius = 5.f;
+    
+    Desc.pTargetTransform = m_pTransformCom;
+    Desc.fSpawnInterval = m_pGameInstance->Get_TimeDelta() * 20.f;
+    Desc.IsSpawn = true;
+    m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(m_eCurLevel)
+        , TEXT("QUEENKNIGHT_EXPLOSION"), TEXT("Layer_Effect"), 1, ENUM_CLASS(EFFECTTYPE::PARTICLE), &Desc);
+}
+
+#pragma region 새로 만드는 파티클 객체
+void CQueenKnight::Create_QueenKnightWarp_Effect(_float3 vDir)
+{
+    CEffectParticle::EFFECTPARTICLE_ENTER_DESC Desc{};
+    Desc.vStartPos = m_pTransformCom->Get_State(STATE::POSITION); // 몬스터 현재위치로 생성.
+    Desc.particleInitInfo.lifeTime = 5.f;
+    Desc.particleInitInfo.dir = vDir;
+    Desc.pTargetTransform = m_pTransformCom;
+    Desc.fChaseTime = 5.f; // 50 프레임만 추적
+    m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(m_eCurLevel)
+        , TEXT("QUEENKNIGHT_PARTICLE"), TEXT("Layer_Effect"), 1, ENUM_CLASS(EFFECTTYPE::PARTICLE), &Desc);
+}
+#pragma endregion
+
+
 
 // Dissolve 진행.
 void CQueenKnight::Start_Dissolve(_float fDuration)

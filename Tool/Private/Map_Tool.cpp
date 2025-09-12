@@ -1,4 +1,5 @@
-﻿CMap_Tool::CMap_Tool(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿#include "Map_Tool.h"
+CMap_Tool::CMap_Tool(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : m_pDevice { pDevice }
     , m_pDeviceContext { pContext }
     , m_pGameInstance { CGameInstance::GetInstance()}
@@ -334,9 +335,9 @@ void CMap_Tool::Render_Prototype_Inspector()
     ImGuiIO& io = ImGui::GetIO();
 
     // 오른쪽 위 위치 계산 (창 크기 300x250 고려)
-    ImVec2 vPos = ImVec2(io.DisplaySize.x - 310.f, 10.f); // 오른쪽에서 310픽셀, 위에서 10픽셀
+    ImVec2 vPos = ImVec2(g_iWinSizeX - g_iWinSizeX * 0.25f, 0.f); // 오른쪽에서 310픽셀, 위에서 10픽셀
     ImGui::SetNextWindowPos(vPos, ImGuiCond_Always);
-    ImGui::SetNextWindowSize(ImVec2(300, 250), ImGuiCond_Once);
+    ImGui::SetNextWindowSize(ImVec2(g_iWinSizeX * 0.25f, g_iWinSizeY), ImGuiCond_Once);
 
 
     ImGui::Begin("Prototype_Transform");
@@ -353,6 +354,24 @@ void CMap_Tool::Render_Prototype_Inspector()
         static float fScale[3] = { 1.f, 1.f, 1.f };
         ImGui::InputFloat3("Scale", fScale);
 
+        static int iShaderPath = {};
+        ImGui::SliderInt("Shader Path", &iShaderPath, 0, 1);
+
+        static bool isTintColor = {};
+        ImGui::Checkbox("Tint Color", &isTintColor);
+
+        static float vTintColor[4] = { 0.f, 0.f, 0.f, 1.f };
+
+        if (isTintColor)
+        {
+            ImGui::Separator();
+            ImGui::InputFloat4("fColor", vTintColor);
+        }
+            
+
+        
+
+
         if (ImGui::Button("Create Instance"))
         {
             CToolMap_Part::MAP_PART_DESC Desc{};
@@ -363,6 +382,10 @@ void CMap_Tool::Render_Prototype_Inspector()
             CreateDesc.vPosition = _float4(fPosition[0], fPosition[1], fPosition[2], 1.f);
             CreateDesc.vRotate = _float3(fRotation[0], fRotation[1], fRotation[2]);
             CreateDesc.vScale = _float3(fScale[0], fScale[1], fScale[2]);
+            CreateDesc.iShaderPath = iShaderPath;
+            CreateDesc.isColor = isTintColor;
+            memcpy(&CreateDesc.vTintColor, vTintColor, sizeof(_float4));
+
 
             /* 구조체 데이터 넣기. */
             Desc.pData = reinterpret_cast<void*>(&CreateDesc);
@@ -375,6 +398,22 @@ void CMap_Tool::Render_Prototype_Inspector()
                 MSG_BOX(TEXT("Add GameObject_To_Layer Failed"));
                 return;
             }
+
+            /*for (_uint i = 0; i < 3; ++i)
+            {
+                CreateDesc.vPosition.y -= i * 0.01f;
+                CreateDesc.fFadeOutStartTime = 0.5f + i * 0.2f;
+                CreateDesc.fFadeOutDuration = 1.f;
+                if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel)
+                    , TEXT("Layer_Map_Parts")
+                    , ENUM_CLASS(m_eCurLevel)
+                    , m_wSelected_PrototypeObjTag, &Desc)))
+                {
+                    MSG_BOX(TEXT("Add GameObject_To_Layer Failed"));
+                    return;
+                }
+            }*/
+            
         }
 
 
@@ -452,9 +491,9 @@ void CMap_Tool::Render_Edit_Inspector()
     ImGuiIO& io = ImGui::GetIO();
 
     // 오른쪽 위 위치 계산 (창 크기 300x250 고려)
-    ImVec2 vPos = ImVec2(io.DisplaySize.x - 310.f, 10.f); // 오른쪽에서 310픽셀, 위에서 10픽셀
+    ImVec2 vPos = ImVec2(g_iWinSizeX * 0.75f, 0.f); // 오른쪽에서 310픽셀, 위에서 10픽셀
     ImGui::SetNextWindowPos(vPos, ImGuiCond_Always);
-    ImGui::SetNextWindowSize(ImVec2(300, 250), ImGuiCond_Once);
+    ImGui::SetNextWindowSize(ImVec2(g_iWinSizeX * 0.25f, g_iWinSizeY), ImGuiCond_Once);
 
     if (!ImGui::Begin("Edit_Inspector"))
     {
@@ -477,6 +516,7 @@ void CMap_Tool::Render_Edit_Inspector()
     static float fPos[3] = {};
     static float fRot[3] = {};
     static float fScl[3] = { 1.f,1.f,1.f };
+    static float fTintColor[4] = { 1.f,1.f,1.f,1.f };
 
     /* 선택이 바뀌면 초기화 */
     if (cachedObjID != m_Selected_EditObjID)
@@ -497,12 +537,15 @@ void CMap_Tool::Render_Edit_Inspector()
     ImGui::InputFloat3("Rotation", fRot);
     ImGui::InputFloat3("Scale", fScl);
 
+    ImGui::SliderFloat4("vTintColor", fTintColor, 0.f, 1.f);
+
     if (ImGui::Button("Apply"))
     {
         TransformData data{};
         memcpy(&data.pos, fPos, sizeof(_float3)); data.pos.w = 1.f;
         memcpy(&data.rot, fRot, sizeof(_float3));
         memcpy(&data.scale, fScl, sizeof(_float3));
+        memcpy(&data.vTintColor, fTintColor, sizeof(_float4));
 
         EditPayload payload;
         payload.type = EEditType::Transform;
@@ -1195,15 +1238,17 @@ void CMap_Tool::Render_Effect_ParticleInspector()
             ImGui::SliderFloat("Distance from Camera", &distance, 1.0f, 20.0f);
 
             // 카메라 기준 방향 설정.
-            static float direction[3] = { 0.0f, 0.0f, 0.0f };
+            static float direction[3] = { 0.0f, 0.1f, 0.0f };
             ImGui::InputFloat3("Particle Direction", direction);
 
-            static float ObjectDirection[3] = { 0.0f, 0.0f, 0.0f };
+            static float ObjectDirection[3] = { 0.0f, 0.1f, 0.0f };
             ImGui::InputFloat3("Object Direction", ObjectDirection);
 
             /* 변수값 넣기. */
             static int iNumInstance = { 100 };
             ImGui::SliderInt("NumInstance", &iNumInstance, 50, 1000);
+
+
 
             static float Center[3] = { 0.f, 0.f, 0.f };
             ImGui::SliderFloat3("Center", Center, 0.0f, 10.0f);
@@ -1214,14 +1259,19 @@ void CMap_Tool::Render_Effect_ParticleInspector()
             static float Size[2] = { 0.1f, 0.2f };
             ImGui::SliderFloat2("Size", Size, 0.1f, 2.f);
 
-            static float Pivot[3] = { 0.f, 0.f, 0.f};
+            static float Pivot[3] = { 0.f, 0.f, 0.f };
             ImGui::SliderFloat3("Pivot", Pivot, -1.f, 1.f);
 
-            static float Speed[2] = { 1.f, 2.f};
+            static float Speed[2] = { 1.f, 2.f };
             ImGui::SliderFloat2("Speed", Speed, 1.f, 10.f);
 
-            static float LifeTime[2] = {1.f, 5.f};
+            static float LifeTime[2] = { 1.f, 5.f };
             ImGui::SliderFloat2("LifeTime", LifeTime, 1.f, 10.f);
+
+            static float EmissiveIntencity = { 0.388f };
+            ImGui::SliderFloat("Emissive", &EmissiveIntencity, 0.f, 5.f);
+
+            m_CurrentEffectParticle_Desc.fEmissiveIntencity = EmissiveIntencity;
 
             ImGui::SliderInt("Shader Path", (int*)&m_CurrentEffectParticle_Desc.iShaderPath, 0, PARTICLE_SHADER_END - 1);
 
@@ -1233,8 +1283,33 @@ void CMap_Tool::Render_Effect_ParticleInspector()
             ImGui::SameLine();
             static bool isBillBoard = { false };
             ImGui::Checkbox("Is BillBoard", &isBillBoard);
-            
-            
+
+
+            ImGui::SameLine();
+            static bool isSpawn = { false };
+            ImGui::Checkbox("Is Spawn", &isSpawn);
+
+            if (isSpawn)
+            {
+                static int iNumSpawnCount = { 10 };
+                ImGui::SliderInt("SpawnCount", &iNumSpawnCount, 10, iNumInstance);
+
+                static float fSpawnInterval = { 0.01f };
+                ImGui::SliderFloat("SpawnInterval", &fSpawnInterval, 0.01f, 1.f);
+
+                m_CurrentEffectParticle_Desc.iSpawnCount = iNumSpawnCount;
+                m_CurrentEffectParticle_Desc.fSpawnInterval = fSpawnInterval;
+                m_CurrentEffectParticle_Desc.isSpawn = isSpawn;
+            }
+            else
+            {
+                m_CurrentEffectParticle_Desc.iSpawnCount = 0.f;
+                m_CurrentEffectParticle_Desc.fSpawnInterval = 0.f;
+                m_CurrentEffectParticle_Desc.isSpawn = false;
+            }
+
+
+
 
             // === Effect 생성 버튼 ===
             ImGui::Separator();
@@ -1252,7 +1327,7 @@ void CMap_Tool::Render_Effect_ParticleInspector()
                 m_CurrentEffectParticle_Desc.vPosition = vCalculatedPosition;
                 m_CurrentEffectParticle_Desc.vParticleDir = vDirection;
                 m_CurrentEffectParticle_Desc.vObjectDir = vObjectDirection;
-                
+
                 // VIBuffer_Point_Instance용 데이터
                 m_CurrentEffectParticle_Desc.iNumInstance = iNumInstance;
                 m_CurrentEffectParticle_Desc.vCenter = _float3(Center[0], Center[1], Center[2]);
@@ -1263,7 +1338,7 @@ void CMap_Tool::Render_Effect_ParticleInspector()
                 m_CurrentEffectParticle_Desc.vLifeTime = _float2(LifeTime[0], LifeTime[1]);
                 m_CurrentEffectParticle_Desc.isLoop = isLoop;
                 m_CurrentEffectParticle_Desc.isBillBoard = isBillBoard;
-                
+
                 // 텍스처 정보 복사
                 for (_uint i = 0; i < TEXTURE_END; ++i)
                 {
@@ -1273,7 +1348,7 @@ void CMap_Tool::Render_Effect_ParticleInspector()
 
                 Create_Effect_Particle();
             }
-            
+
             ImGui::SameLine();
             if (ImGui::Button("Create QueenKnightWarp Effect", ImVec2(150, 40)))
             {
@@ -1289,7 +1364,7 @@ void CMap_Tool::Render_Effect_ParticleInspector()
                 m_CurrentEffectParticle_Desc.vPosition = vCalculatedPosition;
                 m_CurrentEffectParticle_Desc.vParticleDir = vDirection;
                 m_CurrentEffectParticle_Desc.vObjectDir = vObjectDirection;
-                
+
                 // VIBuffer_Point_Instance용 데이터
                 m_CurrentEffectParticle_Desc.iNumInstance = iNumInstance;
                 m_CurrentEffectParticle_Desc.vCenter = _float3(Center[0], Center[1], Center[2]);
@@ -1300,7 +1375,7 @@ void CMap_Tool::Render_Effect_ParticleInspector()
                 m_CurrentEffectParticle_Desc.vLifeTime = _float2(LifeTime[0], LifeTime[1]);
                 m_CurrentEffectParticle_Desc.isLoop = isLoop;
                 m_CurrentEffectParticle_Desc.isBillBoard = isBillBoard;
-                
+
                 // 텍스처 정보 복사
                 for (_uint i = 0; i < TEXTURE_END; ++i)
                 {
@@ -1335,7 +1410,7 @@ void CMap_Tool::Render_Effect_ParticleInspector()
                 m_CurrentEffectParticle_Desc.eCurLevel = m_eCurLevel;
                 m_CurrentEffectParticle_Desc.isLoop = isLoop;
                 m_CurrentEffectParticle_Desc.isBillBoard = isBillBoard;
-                
+
                 // 텍스처 정보 복사
                 for (_uint i = 0; i < TEXTURE_END; ++i)
                 {
@@ -1345,6 +1420,67 @@ void CMap_Tool::Render_Effect_ParticleInspector()
 
                 Create_BossExplosion_Effect_Particle();
             }
+
+
+            static float fRadius = { 1.f };
+            ImGui::SliderFloat("Radius", &fRadius, 1.f, 10.f);
+
+            static float fHeight = { 0.5f };
+            ImGui::SliderFloat("Height", &fHeight, 0.1f, 10.f);
+
+            static float vRotationSpeed[2] = { 0.1f, 0.1f };
+            ImGui::SliderFloat2("vRotation Speed", vRotationSpeed, 0.1f, 10.f);
+
+            static float vInwardSpeed[2] = { 0.1f, 0.1f };
+            ImGui::SliderFloat2("vInwardSpeed Speed", vInwardSpeed, 0.1f, 10.f);
+
+            static float fStartAlpha = { 0.1f };
+            ImGui::SliderFloat("StartAlpha", &fStartAlpha, 0.1f, 10.f);
+
+            static float fEndAlpha = { 0.1f };
+            ImGui::SliderFloat("EndAlpha", &fEndAlpha, 0.1f, 10.f);
+
+            ImGui::Separator();
+            if (ImGui::Button("Create Swirl Particle ", ImVec2(150, 40)))
+            {
+                _vector vCamPos = XMLoadFloat4(m_pGameInstance->Get_CamPosition());
+                _vector vCamLook = XMVector3Normalize(m_pCameraTransformCom->Get_State(STATE::LOOK));
+                _vector vCalculatedPosition = XMVectorAdd(vCamPos, XMVectorScale(vCamLook, distance));
+                _vector vDirection = XMVectorSet(direction[0], direction[1], direction[2], 0.0f);
+                _vector vObjectDirection = XMVectorSet(ObjectDirection[0], ObjectDirection[1], ObjectDirection[2], 0.0f);
+
+                m_CurrentEffectParticle_Desc.iNumInstance = iNumInstance;
+                m_CurrentEffectParticle_Desc.vCenter = _float3(Center[0], Center[1], Center[2]);
+                m_CurrentEffectParticle_Desc.vRange = _float3(Range[0], Range[1], Range[2]);
+                m_CurrentEffectParticle_Desc.vSize = _float2(Size[0], Size[1]);
+                m_CurrentEffectParticle_Desc.vPivot = _float3(Pivot[0], Pivot[1], Pivot[2]);
+                m_CurrentEffectParticle_Desc.vSpeed = _float2(Speed[0], Speed[1]);
+                m_CurrentEffectParticle_Desc.vLifeTime = _float2(LifeTime[0], LifeTime[1]);
+                m_CurrentEffectParticle_Desc.vPosition = vCalculatedPosition;
+                m_CurrentEffectParticle_Desc.vParticleDir = vDirection;
+                m_CurrentEffectParticle_Desc.vObjectDir = vObjectDirection;
+
+                m_CurrentEffectParticle_Desc.eCurLevel = m_eCurLevel;
+                m_CurrentEffectParticle_Desc.isLoop = isLoop;
+                m_CurrentEffectParticle_Desc.isBillBoard = isBillBoard;
+
+                m_CurrentEffectParticle_Desc.fRadius = fRadius;
+                m_CurrentEffectParticle_Desc.fHeight = fHeight;
+                memcpy(&m_CurrentEffectParticle_Desc.vRotationSpeed, vRotationSpeed, sizeof(_float2));
+                memcpy(&m_CurrentEffectParticle_Desc.vInwardSpeed, vInwardSpeed, sizeof(_float2));
+                m_CurrentEffectParticle_Desc.fStartAlpha = fStartAlpha;
+                m_CurrentEffectParticle_Desc.fEndAlpha = fEndAlpha;
+
+                // 텍스처 정보 복사
+                for (_uint i = 0; i < TEXTURE_END; ++i)
+                {
+                    m_CurrentEffectParticle_Desc.useTextureCheckArray[i] = m_SelectedTextures[i].bSelected;
+                    m_CurrentEffectParticle_Desc.useTextureIndexArray[i] = m_SelectedTextures[i].iSelectedIndex;
+                }
+
+                Create_Swirl_Effect_Particle();
+            }
+
            
         }
 
@@ -1662,13 +1798,14 @@ void CMap_Tool::Create_BossExplosion_Effect_Particle()
             if (pParticleEffect)
             {
                 // UI에서 설정한 값들 사용
+                
                 _float3 centerPos = m_CurrentEffectParticle_Desc.vCenter;
                 _float fRadius = min(min(m_CurrentEffectParticle_Desc.vRange.x, m_CurrentEffectParticle_Desc.vRange.y), m_CurrentEffectParticle_Desc.vRange.z); // vRange에서 반지름
                 _float fGatherTime = 1.5f; // 응집 시간
                 _float fExplosionTime = 2.0f; // 폭발 시작 시간
                 _float fTotalLifeTime = m_CurrentEffectParticle_Desc.vLifeTime.y; // 받아온 LifeTime의 최대값
 
-                pParticleEffect->Create_BossExplosionParticle(centerPos, fRadius, fGatherTime, fExplosionTime, fTotalLifeTime);
+                pParticleEffect->Create_BossExplosionParticle(centerPos, fRadius, fExplosionTime, fTotalLifeTime);
             }
         }
     }
@@ -1681,5 +1818,61 @@ void CMap_Tool::Create_BossExplosion_Effect_Particle()
     else
     {
         ImGui::OpenPopup("Boss Explosion Particle Creation Failed");
+    }
+}
+
+void CMap_Tool::Create_Swirl_Effect_Particle()
+{
+    // m_CurrentEffectParticle_Desc 사용해서 파티클 생성
+    CGameObject* pEffectParticle = dynamic_cast<CGameObject*>(m_pGameInstance->Clone_Prototype(
+        PROTOTYPE::GAMEOBJECT, ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_EffectParticle"), &m_CurrentEffectParticle_Desc
+    ));
+
+    if (pEffectParticle != nullptr)
+    {
+        // 레벨에 추가 (Effect 레이어에)
+        if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(
+            ENUM_CLASS(m_eCurLevel), TEXT("Layer_Effect"), pEffectParticle)))
+        {
+            // 실패시
+            Safe_Release(pEffectParticle);
+        }
+        else
+        {
+            // 성공 시 - Swirl 파티클 생성
+            CTool_EffectParticle* pParticleEffect = dynamic_cast<CTool_EffectParticle*>(pEffectParticle);
+            if (pParticleEffect)
+            {
+
+                ParticleSwirlInfo info;
+                XMStoreFloat3(&info.vLocalRotationAxis, pParticleEffect->Get_Transform()->Get_State(STATE::LOOK));
+                // UI에서 설정한 값들 사용
+
+                info.fRadius = m_CurrentEffectParticle_Desc.fRadius;
+                info.fHeight = m_CurrentEffectParticle_Desc.fHeight;
+                info.vRotationSpeed = m_CurrentEffectParticle_Desc.vRotationSpeed;
+                info.vInwardSpeed = m_CurrentEffectParticle_Desc.vInwardSpeed;
+                info.vSize = m_CurrentEffectParticle_Desc.vSize;
+                info.fStartAlpha = m_CurrentEffectParticle_Desc.fStartAlpha;
+                info.fEndAlpha = m_CurrentEffectParticle_Desc.fEndAlpha;
+                
+                _float fRadius = min(min(m_CurrentEffectParticle_Desc.vRange.x, m_CurrentEffectParticle_Desc.vRange.y), m_CurrentEffectParticle_Desc.vRange.z); // vRange에서 반지름
+                _float fGatherTime = 1.5f; // 응집 시간
+                _float fExplosionTime = 2.0f; // 폭발 시작 시간
+                _float fTotalLifeTime = m_CurrentEffectParticle_Desc.vLifeTime.y; // 받아온 LifeTime의 최대값
+
+                pParticleEffect->Create_SwirlParticle(info);
+            }
+        }
+    }
+
+    // 성공/실패 팝업
+    if (pEffectParticle != nullptr)
+    {
+        ImGui::OpenPopup("Create_Swirl_Effect_Particle Created");
+    }
+    else
+    {
+        ImGui::OpenPopup("Create_Swirl_Effect_Particle Creation Failed");
     }
 }

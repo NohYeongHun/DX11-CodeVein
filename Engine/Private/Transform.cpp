@@ -1,6 +1,4 @@
-﻿#include "Transform.h"
-
-
+﻿
 CTransform::CTransform(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CComponent{ pDevice, pContext }
 {

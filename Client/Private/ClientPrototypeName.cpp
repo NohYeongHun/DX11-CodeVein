@@ -1,10 +1,10 @@
 ﻿// Diffuse, Gradient, Gradient_Alpha, Mask, Noise
 
 NS_BEGIN(Client)
-const EFFECT_TEXTURE_DESC Effect_TexturePrototypes[] =
+const EFFECT_TEXTURE_DESC ClientEffect_TexturePrototypes[] =
 {
 	{ TEXT("Prototype_Component_Effect_DiffuseTexture")
-	, TEXT("../Bin/Resources/Textures/Effects/Texture/Diffuse/Diffuse%d.png"), 2},
+	, TEXT("../Bin/Resources/Textures/Effects/Texture/Diffuse/Diffuse%d.png"), 5},
 
 	{TEXT("Prototype_Component_Effect_GradientTexture")
 	, TEXT("../Bin/Resources/Textures/Effects/Texture/Gradient/Gradient%d.png"), 2},
@@ -14,6 +14,9 @@ const EFFECT_TEXTURE_DESC Effect_TexturePrototypes[] =
 
 	{TEXT("Prototype_Component_Texture_EffectMask")
 	, TEXT("../Bin/Resources/Textures/Effects/Texture/Mask/Mask%d.png"), 16},
+
+	{TEXT("Prototype_Component_Texture_EffectOther")
+	, TEXT("../Bin/Resources/Textures/Effects/Texture/Other/Other%d.png"), 6},
 
 	//{TEXT("Prototype_Component_Texture_EffectNoise")
 	//, TEXT("../Bin/Resources/Textures/Effects/Texture/Noise/Noise%d.png"), 2},

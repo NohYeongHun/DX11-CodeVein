@@ -356,6 +356,23 @@ namespace Engine
 		_int     iFlag = -1;      // 0 : 초기, 1 : 실행 완료, -1 : 오류
 	}TRIGGER_MONSTER_DESC;
 
+
+	// GPU 버퍼 인스턴싱에 사용되는 데이터
+	typedef struct tagParticleData
+	{
+		// 필수 데이터
+		_float3  vPosition;      // 현재 파티클의 3D 월드 위치
+		_float3  vDir;			 // 방향 구별.
+		_float   fSpeed;		 // 속도 구별
+		_float2  vLife;          // 남은 수명 (0이 되면 파티클 소멸)
+
+		// 시각적 표현을 위한 데이터
+		_float  fLifeRatio;	    // 현재 수명 Ratio
+		_float4 vColor;         // 현재 색상 (RGBA)
+		_float  fCurrentSize;   // 현재 프레임의 실제 크기 (보간된 값)
+		_float  fStartSize;     // 이 파티클이 태어날 때 정해진 시작 크기
+		_float  fEndSize;       // 이 파티클이 죽을 때 도달할 끝 크기
+	} PARTICLE_DATA;
 }
 
 #include "Event_Type.h"

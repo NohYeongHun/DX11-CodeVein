@@ -20,11 +20,15 @@
 #include "Trigger_Manager.h"
 #include "Renderer.h"
 
-#include "Effect_Manager.h"
+
+
+
+
 
 #pragma region COMPONENT
 #include "Component.h"
 
+#include "Transform.h"
 #include "DebugDraw.h"
 #include "Collider.h"
 #include "Bounding.h"
@@ -47,6 +51,9 @@
 
 #include "VIBuffer_Point_Instance.h"
 #include "VIBuffer_PointDir_Instance.h"
+
+#include "VIBuffer_Particle.h"
+#include "VIBuffer_Particle_Instance.h"
 #pragma endregion
 
 
@@ -97,13 +104,23 @@
 #include "PartObject.h"
 #include "ContainerObject.h"
 
-#include "Transform.h"
+
 #include "Layer.h"
 #include "Object_Manager.h"
 #include "UIObject.h"
 #include "Input_Device.h"
 #include "Camera.h"
 #include "Camera_Manager.h"
+
+#pragma endregion
+
+#pragma region EFFECT
+#include "Effect_Manager.h"
+#include "Effect.h"
+#include "ParticleSystem.h"
+#include "ParticleEmitter.h"
+
+//#include "ParticlePresets.h"
 
 #pragma endregion
 

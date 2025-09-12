@@ -147,6 +147,7 @@ private:
 	void Create_Effect_Particle();
 	void Create_QueenKnightWarp_Effect_Particle();
 	void Create_BossExplosion_Effect_Particle();
+	void Create_Swirl_Effect_Particle();
 
 private:	
 	CTool_EffectParticle::TOOLEFFECT_PARTICLE_DESC m_CurrentEffectParticle_Desc = {};

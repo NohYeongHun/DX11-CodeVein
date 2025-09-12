@@ -200,6 +200,7 @@
     <ClInclude Include="..\Public\Client_Debug.h" />
     <ClInclude Include="..\Public\Client_Defines.h" />
     <ClInclude Include="..\Public\EffectParticle.h" />
+    <ClInclude Include="..\Public\Effect_Wind.h" />
     <ClInclude Include="..\Public\Fade_Out.h" />
     <ClInclude Include="..\Public\Giant_WhiteDevil.h" />
     <ClInclude Include="..\public\Giant_WhiteDevilDefine.h" />
@@ -238,6 +239,7 @@
     <ClInclude Include="..\Public\Loader_Logo.h" />
     <ClInclude Include="..\Public\Loader_Personal.h" />
     <ClInclude Include="..\Public\Loader_StageOne.h" />
+    <ClInclude Include="..\Public\Loader_Static.h" />
     <ClInclude Include="..\Public\Loading_BackGround.h" />
     <ClInclude Include="..\Public\Loading_Panel.h" />
     <ClInclude Include="..\Public\Loading_Slot.h" />
@@ -247,6 +249,7 @@
     <ClInclude Include="..\Public\MonsterHpBarUI.h" />
     <ClInclude Include="..\Public\MonsterTree.h" />
     <ClInclude Include="..\Public\Particle.h" />
+    <ClInclude Include="..\Public\ParticlePresets.h" />
     <ClInclude Include="..\Public\Player.h" />
     <ClInclude Include="..\Public\PlayerDefine.h" />
     <ClInclude Include="..\Public\PlayerState.h" />
@@ -260,7 +263,7 @@
     <ClInclude Include="..\Public\Player_SecondSkillState.h" />
     <ClInclude Include="..\Public\Player_StrongAttackState.h" />
     <ClInclude Include="..\Public\Player_WalkState.h" />
-    <ClInclude Include="..\Public\PrototypeName.h" />
+    <ClInclude Include="..\Public\ClientPrototypeName.h" />
     <ClInclude Include="..\Public\QueenKnight.h" />
     <ClInclude Include="..\Public\QueenKnightDefine.h" />
     <ClInclude Include="..\Public\QueenKnightTree.h" />
@@ -344,6 +347,7 @@
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ClientPch.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ClientPch.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
     </ClCompile>
+    <ClCompile Include="..\Private\Effect_Wind.cpp" />
     <ClCompile Include="..\Private\Fade_Out.cpp" />
     <ClCompile Include="..\Private\Giant_WhiteDevil.cpp" />
     <ClCompile Include="..\Private\Giant_WhiteDevilTree.cpp" />
@@ -379,6 +383,7 @@
     <ClCompile Include="..\Private\Loader_Logo.cpp" />
     <ClCompile Include="..\Private\Loader_Personal.cpp" />
     <ClCompile Include="..\Private\Loader_StageOne.cpp" />
+    <ClCompile Include="..\Private\Loader_Static.cpp" />
     <ClCompile Include="..\Private\Loading_BackGround.cpp" />
     <ClCompile Include="..\Private\Loading_Panel.cpp" />
     <ClCompile Include="..\Private\Loading_Slot.cpp" />
@@ -400,7 +405,7 @@
     <ClCompile Include="..\Private\Player_SecondSkillState.cpp" />
     <ClCompile Include="..\Private\Player_StrongAttackState.cpp" />
     <ClCompile Include="..\Private\Player_WalkState.cpp" />
-    <ClCompile Include="..\Private\PrototypeName.cpp" />
+    <ClCompile Include="..\Private\ClientPrototypeName.cpp" />
     <ClCompile Include="..\Private\QueenKnight.cpp" />
     <ClCompile Include="..\Private\QueenKnightTree.cpp" />
     <ClCompile Include="..\Private\Sky.cpp" />
@@ -444,6 +449,7 @@
   <ItemGroup>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxAnimMesh.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxCube.hlsl" />
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxEffectPosTex.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxEffectTrail.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxInstance_Particle.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxInstance_PointDirParticle.hlsl" />

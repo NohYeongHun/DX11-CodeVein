@@ -25,7 +25,11 @@ VS_OUT VS_MAIN(VS_IN In)
     matWVP = mul(matWV, g_ProjMatrix);
     
     Out.vPosition = mul(float4(In.vPosition, 1.f), matWVP);    
+    
+    Out.vPosition.z = Out.vPosition.w;
+    
     Out.vTexcoord = In.vTexcoord;    
+    
     
     return Out;     
 }
@@ -40,8 +44,6 @@ struct PS_IN
 struct PS_OUT
 {
     float4 vColor : SV_TARGET0;
-    
-    
 };
 
 PS_OUT PS_MAIN(PS_IN In)
@@ -60,7 +62,7 @@ technique11 DefaultTechnique
     pass Sky
     {
         SetRasterizerState(RS_Cull_CW);
-        SetDepthStencilState(DSS_None, 0);
+        SetDepthStencilState(DSS_WeightBlend, 0);
         SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 
         VertexShader = compile vs_5_0 VS_MAIN();   

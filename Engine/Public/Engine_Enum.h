@@ -14,12 +14,12 @@ namespace Engine
 	};
 	enum class ACTORDIR { U, RU, R, RD, D, LD, L, LU, END};
 
-	enum class DEFFERED_SHADERTYPE : _uint { DEBUG = 0, DIRECTIONAL, POINT, COMBINED, END };
+	enum class DEFFERED_SHADERTYPE : _uint { DEBUG = 0, DIRECTIONAL, POINT, COMBINED, DISTORTION, BRIGHT_PASS, BLUR_HORIZONTAL, BLUR_VERTICAL, BLOOM_COMBINE, END };
 
 	enum class MONSTERTYPE { BOSS, ELITE, NORMAL, END };
 	enum class STATE { RIGHT, UP, LOOK, POSITION };
 	enum class PROTOTYPE { GAMEOBJECT, COMPONENT };
-	enum class RENDERGROUP { PRIORITY, NONBLEND, LIGHT, COMBINED, NONLIGHT, BLEND, UI, STATIC_UI, CAMERA, END };
+	enum class RENDERGROUP { PRIORITY, SHADOW, NONBLEND, LIGHT, COMBINED, BLOOM, DISTOTION, NONLIGHT, BLEND,  UI, STATIC_UI, CAMERA, END };
 	enum class WINMODE { FULL, WIN, END };
 	enum class D3DTS { VIEW, PROJ, END };
 	
@@ -28,7 +28,11 @@ namespace Engine
 
 	enum class COLLIDERSHAPE { NONE = 0, AABB, OBB, SPHERE, CAPSULE, END };
 
-	enum class EFFECTTYPE { TEXTURE, PARTICLE, MESH, END };
+	enum class EFFECTTYPE { PARTICLE, MESH, TEXTURE, TRAIL, END };
+	// Emitter의 방출 형태
+	enum EMITTER_SHAPE { EMITTER_POINT, EMITTER_BOX, EMITTER_SPHERE, EMITTER_CONE };
+	// Emitter의 방출 타입
+	enum EMISSION_TYPE { EMITTER_CONTINUOUS, EMITTER_BURST };
 
 	// 콜라이더 타입 별로 배열에 담을 것.
 	enum class COLLIDERLAYER : uint32_t {
@@ -56,6 +60,7 @@ namespace Engine
 		_float4 pos;
 		_float3 rot;
 		_float3 scale;
+		_float4 vTintColor;
 	};
 
 	struct RenameData { std::wstring newName; };

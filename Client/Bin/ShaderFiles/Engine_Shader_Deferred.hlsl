@@ -19,6 +19,15 @@ texture2D g_DepthTexture;
 texture2D g_ShadeTexture;
 texture2D g_SpecularTexture;
 
+// Bloomìš© í…ìŠ¤ì²˜ë“¤
+texture2D g_sceneTexture;
+texture2D g_BloomTexture;
+
+// Bloom íŒŒë¼ë¯¸í„°ë“¤
+float g_fBrightThreshold = 1.0f;
+float g_fBloomIntensity = 1.0f;
+float2 g_vTexelSize = float2(1.0f / 1280.0f, 1.0f / 720.0f);
+
 struct VS_IN
 {
     float3 vPosition : POSITION;
@@ -69,7 +78,7 @@ PS_OUT_BACKBUFFER PS_MAIN_DEBUG(PS_IN In)
 struct PS_OUT_LIGHT
 {
     vector vShade : SV_TARGET0;
-    vector vSpecular : SV_TARGET1;
+    //vector vSpecular : SV_TARGET1;
 };
 
 PS_OUT_LIGHT PS_MAIN_DIRECTIONAL(PS_IN In)
@@ -87,32 +96,29 @@ PS_OUT_LIGHT PS_MAIN_DIRECTIONAL(PS_IN In)
     
     vector vWorldPos;
     
-    // vDepthDesc.x => Á¤±ÔÈ­µÈ z°ª 0 ~ 1»çÀÌ°í
-    // vDepthDesc.y => ¿øº» ÇÈ¼¿ÀÇ ±íÀÌ°ª;
+
     
-    /* Åõ¿µ°ø°£»óÀÇ ÁÂÇ¥¸¦ ±¸ÇÑ´Ù. */
-    /* ·ÎÄÃÀ§Ä¡ * ¿ùµåÇà·Ä * ºäÇà·Ä * Åõ¿µÇà·Ä * 1/(w == ºä½ºÆäÀÌ½º»óÀÇ z) */
+
     vWorldPos.x = In.vTexcoord.x * 2.f - 1.f;
     vWorldPos.y = In.vTexcoord.y * -2.f + 1.f;
     vWorldPos.z = vDepthDesc.x;
     vWorldPos.w = 1.f;
     
-    /* ºä°ø°£»óÀÇ ÁÂÇ¥¸¦ ±¸ÇÑ´Ù. */
-    /* ·ÎÄÃÀ§Ä¡ * ¿ùµåÇà·Ä * ºäÇà·Ä * Åõ¿µÇà·Ä */
+  
     vWorldPos = vWorldPos * vDepthDesc.y;
-    /* ·ÎÄÃÀ§Ä¡ * ¿ùµåÇà·Ä * ºäÇà·Ä */
     vWorldPos = mul(vWorldPos, g_ProjMatrixInv);
     
-    /* ¿ùµå°ø°£»óÀÇ ÁÂÇ¥¸¦ ±¸ÇÑ´Ù. */
     vWorldPos = mul(vWorldPos, g_ViewMatrixInv);
     
     vector vLook = vWorldPos - g_vCamPosition;
     
-    float fSpecular = pow(max(dot(normalize(vReflect) * -1.f, normalize(vLook)), 0.f), 50.f);
+    //float fSpecular = pow(max(dot(normalize(vReflect) * -1.f, normalize(vLook)), 0.f), 50.f);
     
     
     Out.vShade = g_vLightDiffuse * saturate(fShade + (g_vLightAmbient * g_vMtrlAmbient));
-    Out.vSpecular = (g_vLightSpecular * g_vMtrlSpecular) * fSpecular;
+    //Out.vSpecular = (g_vLightSpecular * g_vMtrlSpecular) * fSpecular;
+    
+    //Out.vShade = vNormal; // ì–‘ìˆ˜ë§Œ í‘œí˜„ë˜ë¯€ë¡œ (vNormal * 0.5f + 0.5f) ë¡œ í•˜ì…”ë„ ì¢‹ìŠµë‹ˆë‹¤.
     
     return Out;
 }
@@ -131,18 +137,130 @@ PS_OUT_BACKBUFFER PS_MAIN_COMBINED(PS_IN In)
     
     vector vDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
     
-    if (vDiffuse.a == 0.f)
-        discard;
+    //if (vDiffuse.a == 0.f)
+    //    discard;
     
     vector vShade = g_ShadeTexture.Sample(DefaultSampler, In.vTexcoord);
-    vector vSpecular = g_SpecularTexture.Sample(DefaultSampler, In.vTexcoord);
+    //vector vSpecular = g_SpecularTexture.Sample(DefaultSampler, In.vTexcoord);
     
-    Out.vColor = vDiffuse * vShade + vSpecular;
+    //Out.vColor = vDiffuse * vShade + vSpecular;
+    
+    /*
+    ë§Œì•½ vShade(ì¡°ëª… MRT)ê°€ ë¹„ì–´ ìˆê±°ë‚˜ 0ìœ¼ë¡œ í´ë¦¬ì–´ëœ ìƒíƒœë©´, diffuseì™€ ê³±í•˜ë©´ ì „ë¶€ ê²€ì •ìƒ‰ ëœë‹¤.
+    â†’ í•˜ì§€ë§Œ ë””í´íŠ¸ í´ë¦¬ì–´ ì»¬ëŸ¬ê°€ (1,1,1,1)ë¼ì„œ ìµœì†Œí•œ í°ìƒ‰ ì¡°ëª…ì€ ë‚˜ì™€ì•¼ í•˜ë‹ˆê¹Œ, 
+    */
+
+    Out.vColor = vDiffuse * vShade;
     
     return Out;
 }
 
 
+PS_OUT_BACKBUFFER PS_MAIN_DISTORTION(PS_IN In)
+{
+    PS_OUT_BACKBUFFER Out = (PS_OUT_BACKBUFFER) 0;
+    
+    vector vDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
+    
+    if (vDiffuse.a == 0.f)
+        discard;
+    
+    vector vShade = g_ShadeTexture.Sample(DefaultSampler, In.vTexcoord);
+    //vector vSpecular = g_SpecularTexture.Sample(DefaultSampler, In.vTexcoord);
+    
+    //Out.vColor = vDiffuse * vShade + vSpecular;
+    Out.vColor = vDiffuse * vShade;
+    
+    return Out;
+}
+
+// Bloom Bright Pass - ë°ì€ ë¶€ë¶„ë§Œ ì¶”ì¶œ
+PS_OUT_BACKBUFFER PS_MAIN_BRIGHT_PASS(PS_IN In)
+{
+    PS_OUT_BACKBUFFER Out = (PS_OUT_BACKBUFFER) 0;
+    vector vSceneColor = g_sceneTexture.Sample(DefaultSampler, In.vTexcoord);
+
+    // ì›ë³¸ ìƒ‰ìƒì—ì„œ ì„ê³„ê°’ë§Œí¼ ë°ê¸°ë¥¼ ëºŒ (ì–´ë‘ìš´ ë¶€ë¶„ì€ ìŒìˆ˜ê°€ ë¨)
+    vector vBrightColor = vSceneColor - g_fBrightThreshold;
+    
+    // saturateë¥¼ í†µí•´ 0 ë¯¸ë§Œì¸ ê°’ë“¤ì„ 0ìœ¼ë¡œ ë§Œë“¦
+    Out.vColor = saturate(vBrightColor);
+    
+    // ì•ŒíŒŒ ê°’ ìœ ì§€ (í•„ìš” ì‹œ)
+    Out.vColor.a = vSceneColor.a;
+    
+    return Out;
+}
+
+// ìˆ˜í‰ ë¸”ëŸ¬
+PS_OUT_BACKBUFFER PS_MAIN_BLUR_HORIZONTAL(PS_IN In)
+{
+    PS_OUT_BACKBUFFER Out = (PS_OUT_BACKBUFFER) 0;
+    
+    float4 vColor = float4(0.0f, 0.0f, 0.0f, 0.0f);
+    
+    // ê°€ìš°ì‹œì•ˆ ë¸”ëŸ¬ ê°€ì¤‘ì¹˜
+    float weights[5] = { 0.227027, 0.1945946, 0.1216216, 0.054054, 0.016216 };
+    
+    // í˜„ì¬ í”½ì…€
+    vColor += g_sceneTexture.Sample(DefaultSampler, In.vTexcoord) * weights[0];
+    
+    // ìˆ˜í‰ ë°©í–¥ ë¸”ëŸ¬
+    for (int i = 1; i < 5; ++i)
+    {
+        float2 offset = float2(g_vTexelSize.x * i, 0.0f);
+        vColor += g_sceneTexture.Sample(DefaultSampler, In.vTexcoord + offset) * weights[i];
+        vColor += g_sceneTexture.Sample(DefaultSampler, In.vTexcoord - offset) * weights[i];
+    }
+    
+    Out.vColor = vColor;
+    return Out;
+}
+
+// ìˆ˜ì§ ë¸”ëŸ¬
+PS_OUT_BACKBUFFER PS_MAIN_BLUR_VERTICAL(PS_IN In)
+{
+    PS_OUT_BACKBUFFER Out = (PS_OUT_BACKBUFFER) 0;
+    
+    float4 vColor = float4(0.0f, 0.0f, 0.0f, 0.0f);
+    
+    // ê°€ìš°ì‹œì•ˆ ë¸”ëŸ¬ ê°€ì¤‘ì¹˜
+    float weights[5] = { 0.227027, 0.1945946, 0.1216216, 0.054054, 0.016216 };
+    
+    // í˜„ì¬ í”½ì…€
+    vColor += g_sceneTexture.Sample(DefaultSampler, In.vTexcoord) * weights[0];
+    
+    // ìˆ˜ì§ ë°©í–¥ ë¸”ëŸ¬
+    for (int i = 1; i < 5; ++i)
+    {
+        float2 offset = float2(0.0f, g_vTexelSize.y * i);
+        vColor += g_sceneTexture.Sample(DefaultSampler, In.vTexcoord + offset) * weights[i];
+        vColor += g_sceneTexture.Sample(DefaultSampler, In.vTexcoord - offset) * weights[i];
+    }
+    
+    Out.vColor = vColor;
+    return Out;
+}
+
+// Bloomê³¼ ì›ë³¸ ì”¬ í•©ì„±
+PS_OUT_BACKBUFFER PS_MAIN_BLOOM_COMBINE(PS_IN In)
+{
+    PS_OUT_BACKBUFFER Out = (PS_OUT_BACKBUFFER) 0;
+    
+    vector vSceneColor = g_sceneTexture.Sample(DefaultSampler, In.vTexcoord);
+    vector vBloomColor = g_BloomTexture.Sample(DefaultSampler, In.vTexcoord);
+    
+    // ... ì´ì „ ì½”ë“œ ...
+    vector vCombinedColor = vSceneColor + (vBloomColor * g_fBloomIntensity);
+
+    // í†¤ ë§¤í•‘ ì ìš© (ê°„ë‹¨í•œ Reinhard ë°©ì‹)
+    vector vTonemappedColor = vCombinedColor / (vCombinedColor + 1.0f);
+
+    // ìµœì¢… ì¶œë ¥
+    Out.vColor = float4(vTonemappedColor.rgb, 1.0f);
+    
+    return Out;
+}
 
 
 
@@ -190,6 +308,61 @@ technique11 DefaultTechnique
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_MAIN_COMBINED();
+    }
+
+    pass Distortion
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_None, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_MAIN_DISTORTION();
+    }
+
+    pass BrightPass
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_None, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_MAIN_BRIGHT_PASS();
+    }
+
+    pass BlurHorizontal
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_None, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_MAIN_BLUR_HORIZONTAL();
+    }
+
+    pass BlurVertical
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_None, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_MAIN_BLUR_VERTICAL();
+    }
+
+    pass BloomCombine
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_None, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_MAIN_BLOOM_COMBINE();
     }
 
 

@@ -52,7 +52,7 @@ private:
     LEVEL m_eCurLevel = { LEVEL::END };
     _uint m_iShaderPath = {};
     // LockOn 관련
-    CMonster* m_pTarget = { nullptr };
+    class CMonster* m_pTarget = { nullptr };
     _float m_fTargetRadius = 1.0f;
     _bool m_bActive = false;
     

@@ -8,12 +8,14 @@ public:
         PARTICLE_TYPE_DEFAULT = 0 ,
         PARTICLE_TYPE_QUEEN_WARP = 1,
         PARTICLE_TYPE_BOSS_EXPLOSION = 2,
+        PARTICLE_TYPE_SWIRL = 3,
         PARTICLE_TYPE_END
     };
 
     enum PARTICLE_SHADER
     {
         PARTICLE_SHADER_DEFAULT = 0,
+        PARTICLE_SHADER_QUEENKNIGHT_WARP = 1,
         PARTICLE_SHADER_END,
     };
     
@@ -41,9 +43,21 @@ public:
         _uint           useTextureIndexArray[TEXTURE::TEXTURE_END]; // 사용할 텍스쳐 번호 지정.
         _uint           iShaderPath = {};
         _bool           isBillBoard = { false };
-
+        
+        _bool           isSpawn = {};
+        _uint           iSpawnCount = {};
+        _float          fSpawnInterval = {};
+        
+        // ======== 다른 객체 용도 ============
+        _float fRadius;
+        _float fHeight;
+        _float2 vRotationSpeed = {};
+        _float2 vInwardSpeed = {};
+        _float fStartAlpha;
+        _float fEndAlpha;
 
         // =========== PARTICLE_TYPE ===========
+        _float fEmissiveIntencity = {};
         PARTICLE_TYPE eParticleType;
     }TOOLEFFECT_PARTICLE_DESC;
 
@@ -72,14 +86,15 @@ public:
     void CreateDefault_Particle(_float3 vCenterPosition, _float3 vBaseDirection, _float fLifeTime = 3.0f);
     void CreateBurstEffect(_float3 vGatherPoint, _float3 vUpDirection, _float fGatherTime = 1.5f, _float fBurstTime = 2.0f, _float fTotalLifeTime = 5.0f);
     void Create_QueenKnightWarpEffect(const PARTICLE_INIT_INFO particleInitInfo);
-    void Create_BossExplosionParticle(_float3 vCenterPos, _float fRadius, _float fGatherTime, _float fExplosionTime, _float fTotalLifeTime);
-    void Create_TestParticle(const PARTICLE_TEST_INFO particleTestInfo);
+    void Create_BossExplosionParticle(_float3 vCenterPos, _float fRadius, _float fExplosionTime, _float fTotalLifeTime);
+    void Create_SwirlParticle(const ParticleSwirlInfo particleTestInfo);
 
 public:
     static const EFFECTTYPE EffectType = EFFECTTYPE::PARTICLE;
 
 private:
     _float3 m_vDir = {};
+
 
 private:
     // 컴포넌트
@@ -109,6 +124,14 @@ private:
 
 
     PARTICLE_TYPE m_eParticleType = { PARTICLE_TYPE::PARTICLE_TYPE_END };
+
+    _uint m_iSpawnCount = {};
+    _float m_fSpawnInterval = {};
+    _float m_fSpawnTime = {};
+    _bool m_IsSpawn = { false };
+
+    _float m_fEmissiveIntencity = {};
+    
 
 private:
     HRESULT Bind_ShaderResources();

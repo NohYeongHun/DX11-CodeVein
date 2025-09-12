@@ -242,6 +242,12 @@ public:
 
 #pragma endregion
 
+#pragma region 6. 파티클 시전.
+public:
+	void Create_Particle(CParticleSystem::PARTICLE_TYPE eType);
+
+#pragma endregion
+
 
 
 #pragma region Player 기본 상태 값

@@ -56,7 +56,7 @@ private:
 #ifdef _DEBUG
 private:
 	list <class CComponent*> m_DebugComponent;
-
+#endif // _DEBUG
 
 
 #pragma endregion
@@ -66,19 +66,30 @@ private:
 
 private:
 	HRESULT Render_Priority();
+	HRESULT Render_Shadow();
 	HRESULT Render_NonBlend();
+
 	HRESULT Render_Lights();
 	HRESULT Render_Combined();
+	HRESULT Render_BloomObjects();
+	HRESULT Render_Bloom();
+	HRESULT Render_BrightPass();
+	HRESULT Render_BloomBlur();
+	HRESULT Render_BloomCombine();
+	HRESULT Render_PostProcess();
 	HRESULT Render_NonLight();
 	HRESULT Render_Blend();
+	
+
+
 	HRESULT Render_UI();
 	HRESULT Render_StaticUI();
 
-
+#ifdef _DEBUG
 private:
 	HRESULT Render_Debug();
+
 #endif // _DEBUG
-	
 
 
 public:

@@ -185,6 +185,9 @@ HRESULT CPlayer::Render()
         if (FAILED(m_pModelCom->Bind_Materials(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE, 0)))
             CRASH("Ready Bine Materials Failed");
 
+        if (FAILED(m_pModelCom->Bind_Materials(m_pShaderCom, "g_NormalTexture", i, aiTextureType_NORMALS, 0)))
+            CRASH("Ready Bine Materials Failed");
+
         if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
             CRASH("Ready Bone Matrices Failed");
 
@@ -803,6 +806,22 @@ void CPlayer::Decrease_Damage(_float fDamage)
 void CPlayer::SetTrail_Visible(_bool bTrail)
 {
     m_pPlayerWeapon->Set_Trail(bTrail);
+}
+
+
+#pragma endregion
+
+#pragma region MyRegion
+void CPlayer::Create_Particle(CParticleSystem::PARTICLE_TYPE eType)
+{
+    CParticleSystem::PARTICLESYSTEM_ACTIVATE_DESC ActivateDesc = {};
+    XMStoreFloat4((&ActivateDesc.vStartPos),m_pTransformCom->Get_State(STATE::POSITION));
+    ActivateDesc.eAttachType = CParticleSystem::EAttachType::WORLD;
+    ActivateDesc.pOwnerTransform = m_pTransformCom;
+
+    m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(m_eCurLevel)
+        , TEXT("PARTICLE_SYSTEM"), TEXT("Layer_Effect")
+        , 2, ENUM_CLASS(EFFECTTYPE::PARTICLE), &ActivateDesc);
 }
 #pragma endregion
 

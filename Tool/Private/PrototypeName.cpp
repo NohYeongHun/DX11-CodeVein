@@ -10,10 +10,16 @@ const MODEL_DESC Model_Prototypes[] =
 	//{ MODELTYPE::NONANIM,  TEXT("MapPart_Floor"),        "../Bin/Resources/Models/Map/BossMap/Floor.fbx",        "textures/Floor/" },
 	//{ MODELTYPE::NONANIM,  TEXT("MapPart_BossStage"),        "../Bin/Resources/Models/Map/BossMap/BossMap.fbx",        "textures/BossStage/" },
 	//{ MODELTYPE::NONANIM,  TEXT("MapPart_BossStageType1"),        "../Bin/Resources/Models/Map/BossMap/BossMapType1.fbx",        "textures/BossStage/" },
-	//{ MODELTYPE::ANIM,  TEXT("Prototype_Component_Model_Player"), "../Bin/Resources/Models/Player/Player.fbx",        "textures/"},
+	{ MODELTYPE::ANIM,  TEXT("Prototype_Component_Model_Player"), "../Bin/Resources/Models/Player/Player.fbx",        "textures/"},
 	//{ MODELTYPE::ANIM,  TEXT("Prototype_Component_Model_SkyBoss"), "../Bin/Resources/Models/SkyBoss/SkyBoss.fbx",        "textures/"},
 	
-	{ MODELTYPE::NONANIM,  TEXT("Prototype_Component_Model_Sword"), "../Bin/Resources/Models/Weapon/Player/Sword.fbx",        "textures/"},
+	//{ MODELTYPE::NONANIM,  TEXT("Prototype_Component_Model_Sword"), "../Bin/Resources/Models/Weapon/Player/Sword.fbx",        "textures/"},
+	//{ MODELTYPE::NONANIM,  TEXT("Prototype_Component_Model_Effect_SprialWind"), "../Bin/Resources/Models/EffectMesh/SpiralWind.fbx",        "textures/"},
+	//{ MODELTYPE::NONANIM,  TEXT("Prototype_Component_Model_Effect_Sprial"), "../Bin/Resources/Models/EffectMesh/Spiral.fbx",        "textures/"},
+	//{ MODELTYPE::NONANIM,  TEXT("Prototype_Component_Model_Effect_Sylinder"), "../Bin/Resources/Models/EffectMesh/Sylinder.fbx",        "textures/"},
+	//{ MODELTYPE::NONANIM,  TEXT("Prototype_Component_Model_Effect_WindSpiral"), "../Bin/Resources/Models/EffectMesh/WinSpiral.fbx",        "textures/"},
+	//{ MODELTYPE::NONANIM,  TEXT("Prototype_Component_Model_Effect_Wind"), "../Bin/Resources/Models/EffectMesh/EffectWind.fbx",        "textures/"},
+	//{ MODELTYPE::NONANIM,  TEXT("Prototype_Component_Model_WindEffect"), "../Bin/Resources/Models/EffectMesh/WindEffect.fbx",        "textures/"},
 	//{ MODELTYPE::ANIM,  TEXT("Prototype_Component_Model_WolfDevil"), "../Bin/Resources/Models/WolfDevil/WolfDevil.fbx",        "textures/"},
 	//{ MODELTYPE::ANIM,  TEXT("Prototype_Component_Model_BlackKnight"), "../Bin/Resources/Models/BlackKnight/BlackKnight.fbx",        "textures/"},
 	//{ MODELTYPE::ANIM,  TEXT("Prototype_Component_Model_GodChildLance"), "../Bin/Resources/Models/Weapon/GodsChildServant/GodChildLance.fbx",        "textures/"},
@@ -31,12 +37,11 @@ const MODEL_DESC Model_Prototypes[] =
 
 extern unsigned int Model_PrototypeSize = 1;
 
-
 // Diffuse, Gradient, Gradient_Alpha, Mask, Noise
 const EFFECT_TEXTURE_DESC Effect_TexturePrototypes[] =
 {
 	{ TEXT("Prototype_Component_Effect_DiffuseTexture")
-	, TEXT("../Bin/Resources/Textures/Effects/Particle/Diffuse/Diffuse%d.png"), 2},
+	, TEXT("../Bin/Resources/Textures/Effects/Particle/Diffuse/Diffuse%d.png"), 3},
 
 	{TEXT("Prototype_Component_Effect_GradientTexture") 
 	, TEXT("../Bin/Resources/Textures/Effects/Particle/Gradient/Gradient%d.png"), 2},
@@ -51,6 +56,6 @@ const EFFECT_TEXTURE_DESC Effect_TexturePrototypes[] =
 	//, TEXT("../Bin/Resources/Textures/Effects/Texture/Noise/Noise%d.png"), 2},
 };
 
-extern unsigned int Effect_TexturePrototypeSize = 4;
+extern unsigned int Effect_TexturePrototypeSize = 5;
 
 NS_END

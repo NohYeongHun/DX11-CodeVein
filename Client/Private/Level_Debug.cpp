@@ -496,7 +496,7 @@ void CLevel_Debug::Create_SlashEffect()
 	Desc.vHitPosition = vSlashPosition;
 	Desc.vHitDirection = XMLoadFloat3(&vDirection);
 	Desc.fDisPlayTime = 10.f;
-	m_pGameInstance->Move_GameObject_ToObjectLayer(ENUM_CLASS(m_eCurLevel)
+	m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(m_eCurLevel)
 		, TEXT("SLASH_EFFECT"), TEXT("Layer_Effect"), 1, ENUM_CLASS(CSlash::EffectType), &Desc);
 
 }
@@ -576,7 +576,7 @@ void CLevel_Debug::Create_SelectedEffect(_vector vPosition, const EFFECT_ACTIVEI
 		Desc.vHitDirection = XMLoadFloat3(&vDirection);
 		Desc.fDisPlayTime = effectInfo.fDisplayTime;
 		Desc.vScale = effectInfo.vScale;
-		m_pGameInstance->Move_GameObject_ToObjectLayer(ENUM_CLASS(m_eCurLevel)
+		m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(m_eCurLevel)
 			, TEXT("SLASH_EFFECT"), TEXT("Layer_Effect"), 1, ENUM_CLASS(CSlash::EffectType), &Desc);
 	}
 	// 다른 이펙트 타입들도 여기에 추가 가능
@@ -590,7 +590,7 @@ void CLevel_Debug::Create_SelectedEffect(_vector vPosition, const EFFECT_ACTIVEI
 		Desc.vHitDirection = XMLoadFloat3(&vDirection);
 		Desc.fDisPlayTime = effectInfo.fDisplayTime;
 		Desc.vScale = effectInfo.vScale;
-		m_pGameInstance->Move_GameObject_ToObjectLayer(ENUM_CLASS(m_eCurLevel)
+		m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(m_eCurLevel)
 			, m_wSelected_EffectTag, TEXT("Layer_Effect"), 1, ENUM_CLASS(CHitFlashEffect::EffectType), &Desc);
 
 	}

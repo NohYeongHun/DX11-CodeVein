@@ -159,7 +159,7 @@ HRESULT CLevel_StageOne::Ready_Layer_Map(const _wstring& strLayerTag)
 	Desc.PrototypeTag = L"Prototype_Component_Model_StageOne";
 	Desc.vScale = { 1.f, 1.f, 1.f };
 	Desc.eCurLevel = m_eCurLevel;
-	Desc.eShaderPath = MESH_SHADERPATH::DEFAULT;
+	Desc.eShaderPath = MESH_SHADERPATH::NORMAL;
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel), strLayerTag,
 		ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_Map"), &Desc)))
 		return E_FAIL;
@@ -185,8 +185,7 @@ HRESULT CLevel_StageOne::Ready_Layer_Player(const _wstring& strLayerTag)
 	Desc.fMaxHP = 1672;
 	Desc.fHP = 1672;
 	Desc.fAttackPower = 90;
-	Desc.eShaderPath = ANIMESH_SHADERPATH::DEFAULT;
-#pragma endregion
+	Desc.eShaderPath = ANIMESH_SHADERPATH::NORMAL;
 
 
 	//Desc.vPos = { 100.f, 0.f, 0.f };

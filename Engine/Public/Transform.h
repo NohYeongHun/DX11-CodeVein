@@ -1,7 +1,5 @@
 ﻿#pragma once
 
-#include "Component.h"
-
 NS_BEGIN(Engine)
 
 class ENGINE_DLL CTransform final : public CComponent
@@ -21,6 +19,8 @@ private:
 
 public:
 	void Set_State(STATE eState, _fvector vState);
+
+	const _float Get_Speed() { return m_fSpeedPerSec; }
 
 	_vector Get_State(STATE eState)  {
 		Update_WorldMatrix(); // 최신화 보장

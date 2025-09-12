@@ -1,4 +1,5 @@
-﻿HRESULT CPlayerState::Initialize(_uint iStateNum, void* pArg)
+﻿#include "PlayerState.h"
+HRESULT CPlayerState::Initialize(_uint iStateNum, void* pArg)
 {
     PLAYER_STATE_DESC* pDesc = static_cast<PLAYER_STATE_DESC*>(pArg);
     m_pFsm = pDesc->pFsm;
@@ -240,6 +241,68 @@ void CPlayerState::Add_AnimationTrail_Info(_uint iAnimIdx, const TRAIL_ACTIVE_IN
 {
     m_AnimationTrailMap[iAnimIdx].emplace_back(info);
     
+}
+
+#pragma endregion
+
+
+#pragma region 애니메이션 중간에 실행할 이펙트 정보
+void CPlayerState::Handle_AnimationEffect_State()
+{
+    // 1. 현재 Frame Ratio를 가져옵니다.
+    _float fCurrentRatio = m_pModelCom->Get_Current_Ratio();
+
+    // 2. 현재 애니메이션 인덱스의 Speed 정보를 가져옵니다.
+    auto iter = m_AnimationEffectMap.find(m_iCurAnimIdx);
+    if (iter == m_AnimationEffectMap.end())
+        return;
+
+    // 3. 각 애니메이션 정보를 순회하며 시작 / 끝 지점에서만 처리.
+    for (auto& animEffectInfo : iter->second)
+    {
+        _bool bInRange = (fCurrentRatio >= animEffectInfo.fStartRatio &&
+            fCurrentRatio <= animEffectInfo.fEndRatio);
+
+        // 구간에 진입했을 때 (시작 지점)
+        if (bInRange && !animEffectInfo.bIsCurrentlyActive)
+        {
+            // 시작 지점에서 한번만 호출. 
+            if (!animEffectInfo.bHasTriggeredStart)
+            {
+                //m_pPlayer->SetTrail_Visible(animEffectInfo.bTriggerVisible);
+                if (animEffectInfo.events)
+                {
+                    animEffectInfo.events(animEffectInfo.pDesc); // 정의된 이펙트 실행함수를 실행합니다.
+                }
+                animEffectInfo.bHasTriggeredStart = true;
+            }
+            animEffectInfo.bIsCurrentlyActive = true;
+        }
+        // 구간에서 벗어났을 때 (끝 지점)
+        else if (!bInRange && animEffectInfo.bIsCurrentlyActive)
+        {
+            //m_pPlayer->SetTrail_Visible(!animEffectInfo.bTriggerVisible);
+            animEffectInfo.bIsCurrentlyActive = false;
+            animEffectInfo.bHasTriggeredStart = false; // 다음 사이클을 위해 리셋.
+        }
+    }
+}
+void CPlayerState::Reset_AnimationEffectInfo()
+{
+        for (auto& pair : m_AnimationEffectMap)
+        {
+            for (auto& EffectInfo : pair.second)
+            {
+                EffectInfo.bHasTriggeredStart = false;
+                EffectInfo.bIsCurrentlyActive = false;
+
+            }
+        }
+       
+}
+void CPlayerState::Add_AnimationEffect_Info(_uint iAnimIdx, const EFFECT_ACTIVE_INFO& info)
+{
+    m_AnimationEffectMap[iAnimIdx].emplace_back(info);
 }
 #pragma endregion
 

@@ -79,6 +79,13 @@ HRESULT CPlayer_FirstSkillState::Initialize(_uint iStateNum, void* pArg)
 
 	m_fIncreaseDamage = 10.f; // 기본 공격력 증가량 설정
 
+    // 1. 스테미나 감소.
+    STEMINA_CHANGE_DESC SteminaDesc{};
+    SteminaDesc.bIncrease = false;
+    SteminaDesc.fStemina = 35.f;
+    SteminaDesc.fTime = 1.f;
+    m_pGameInstance->Publish(EventType::STEMINA_CHANGE, &SteminaDesc);
+
     return S_OK;
 }
 

@@ -20,6 +20,8 @@ vector g_vCamPosition;
 float g_fTimeRatio;
 float g_fScaleRatio;
 
+float g_fEmissiveIntensity;
+
 struct VS_IN
 {
     float3 vPosition : POSITION;
@@ -91,7 +93,7 @@ void GS_Stretched_Billboard_MAIN(point GS_IN In[1], inout TriangleStream<GS_OUT>
     float3 vDir = normalize(In[0].vDir);
 
     float speed = In[0].fSpeed; // 개별 속도값 사용
-    float stretchScale = In[0].fSize * (1.0f + speed * 0.2f); // 0.1f는 보정값 너무 길게 늘어나면 수정 필요 
+    float stretchScale = In[0].fSize * (1.0f + speed * 1.5f); // 0.1f는 보정값 너무 길게 늘어나면 수정 필요 
     //늘어지는 효과
 
     // 속도 방향을 Up으로 사용
@@ -230,6 +232,18 @@ PS_OUT PS_DIFFUSE_MASK_MAIN(PS_IN In)
         discard;
     vector vMtrlDiffuse = vDestDiffuse * (1.f - vMask) + vSourDiffuse * (vMask);
 
+    float fMaskBrightness = dot(vMask.rgb, float3(0.299, 0.587, 0.114));
+    if (fMaskBrightness > 0.5f)
+    {
+        vector vEmissive = vMask * g_fEmissiveIntensity * 2.0f;
+        //vector vEmissive = vMask * 2.f;
+        //vMtrlDiffuse.rgb = saturate(vMtrlDiffuse.rgb + vEmissive.rgb);
+        vMtrlDiffuse.rgb += vEmissive.rgb;
+        
+    }
+    
+    vMtrlDiffuse.rgb = pow(vMtrlDiffuse.rgb, 7.f);
+    
     float fadeAlpha = 1.0f - g_fTimeRatio;
     vMtrlDiffuse.a *= fadeAlpha;
 

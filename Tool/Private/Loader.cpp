@@ -68,7 +68,7 @@ HRESULT CLoader::Loading_For_Logo_Level()
 	lstrcpy(m_szLoadingText, TEXT("로고 레벨을 로딩중입니다."));
 
 
-
+	
 
 
 #pragma region MAP PART
@@ -108,6 +108,30 @@ HRESULT CLoader::Loading_For_Logo_Level()
 		return E_FAIL;
 	}
 		
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
+		, TEXT("Prototype_GameObject_EffectNoiseTexture")
+		, CTexture::Create(m_pDevice, m_pContext, L"../Bin/Resources/Models/EffectMesh/textures/RingWave%d.png",1))))
+	{
+		CRASH("Prototype GameObject Create Failed");
+		return E_FAIL;
+	}
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
+		, TEXT("Prototype_GameObject_EffectSwirlTexture")
+		, CTexture::Create(m_pDevice, m_pContext, L"../Bin/Resources/Models/EffectMesh/textures/Swirl%d.png", 1))))
+	{
+		CRASH("Prototype GameObject Create Failed");
+		return E_FAIL;
+	}
+	
+
+	if (FAILED(m_pGameInstance->Add_Prototype(ENUM_CLASS(LEVEL::STATIC)
+		, TEXT("Prototype_GameObject_EffectWindOtherTexture")
+		, CTexture::Create(m_pDevice, m_pContext, L"../Bin/Resources/Models/EffectMesh/textures/WindOther%d.png", 5))))
+	{
+		CRASH("Prototype GameObject Create Failed");
+		return E_FAIL;
+	}
 
 #pragma endregion
 
@@ -122,6 +146,8 @@ HRESULT CLoader::Loading_For_Logo_Level()
 		CRASH("Failed Load Effect");
 		return E_FAIL;
 	}
+
+	
 	
 	lstrcpy(m_szLoadingText, TEXT("로고 레벨 로딩이 완료되었습니다."));
 

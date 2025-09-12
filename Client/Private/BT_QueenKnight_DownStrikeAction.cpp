@@ -110,26 +110,42 @@ BT_RESULT CBT_QueenKnight_DownStrikeAction::Update_Ascend(_float fTimeDelta)
 {
     _vector vOwnerPos = m_pOwner->Get_Transform()->Get_State(STATE::POSITION);
     _float fCurrentRatio = m_pOwner->Get_CurrentAnimationRatio();
+    _bool bParticle = { false };
 
     if (!m_bDissolveCheck && !m_pOwner->HasBuff(CMonster::BUFF_DISSOLVE) && fCurrentRatio >= m_fDissolve_StartRatio)
     {
         // 디졸브 시작.
         m_bDissolveCheck = true; // 이미 Dissolve가 발생했는지?
-        m_pOwner->Start_Dissolve(1.3f);
+        m_pOwner->Start_Dissolve(1.2f);
 
         // 시점과 운동 방향 변경 필요. => 운동 방향은 몬스터 중앙에서 시작해서 위로 퍼져나감.
         m_pOwner->Create_QueenKnightWarp_Effect_Particle({ 0.f, 1.f, 0.f });
+        
+       //m_pOwner->Create_QueenKnightWarp_Effect_Particle_Spawn({ 0.f, 1.f, 0.f }, 50); // 한번에 몇개?
     }
+
+
 
     if (vOwnerPos.m128_f32[1] <= m_vAscendTarget.y && fCurrentRatio >= m_fJump_StartRatio)
     {
+#ifdef _DEBUG
+        // 이동 전 위치 저장
+        _float3 vPosBefore = {};
+        XMStoreFloat3(&vPosBefore, vOwnerPos);
+#endif // _DEBUG
+
         m_pOwner->Move_Direction({ 0.f, 1.f, 0.f }, fTimeDelta * 0.7f);
+        
+
     }
 
     // Dissolve가 이미 발생했고 Dissolve 상태가 끝났으면?
     if (m_bDissolveCheck && !m_pOwner->HasBuff(CMonster::BUFF_DISSOLVE))
     {
         m_pOwner->Set_Visible(false); // 렌더를 끕니다.
+
+        if (!bParticle)
+            m_pOwner->Create_QueenKnightWarp_Effect_Particle({ 0.f, 1.f, 0.f });
     }
 
     // 1. 목표 높이까지 도달했는지 확인. 아니면 위로 이동.
@@ -200,7 +216,7 @@ BT_RESULT CBT_QueenKnight_DownStrikeAction::Update_Hang(_float fTimeDelta)
     if (!m_bDissolveCheck && !m_pOwner->HasBuff(CMonster::BUFF_DISSOLVE))
     {
         // 2. 목표 하강지점 도착했으므로 렌더링 켜기 (시야에서 나타남)
-        m_pOwner->ReverseStart_Dissolve(0.2f);
+        m_pOwner->ReverseStart_Dissolve(0.4f);
     }
 
     // 1. 현재 위치
@@ -217,7 +233,19 @@ BT_RESULT CBT_QueenKnight_DownStrikeAction::Update_Hang(_float fTimeDelta)
         // 목표 Y 위치보다 높을 때만 하강
         if (XMVectorGetY(vOwnerPos) > XMVectorGetY(vTargetPos))
         {
+            // 이동 전 위치 저장
+            _float3 vPosBefore = {};
+            XMStoreFloat3(&vPosBefore, vOwnerPos);
+            
             m_pOwner->Move_Direction({ 0.f, -1.f, 0.f }, fTimeDelta * 0.7f);
+            
+            // 이동 후 위치 확인
+            _vector vPosAfter = m_pOwner->Get_Transform()->Get_State(STATE::POSITION);
+            _float3 vPosAfter3 = {};
+            XMStoreFloat3(&vPosAfter3, vPosAfter);
+            
+            _float fMoveAmount = vPosAfter3.y - vPosBefore.y;
+            OutputDebugStringA(("QueenKnight Descend Y: " + std::to_string(fMoveAmount) + ", TimeDelta: " + std::to_string(fTimeDelta) + "\n").c_str());
         }
         else
         {
