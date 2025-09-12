@@ -9,6 +9,7 @@ texture2D g_GradientAlphaTexture;
 texture2D g_MaskTexture;
 
 texture2D g_MaskTextures[16];
+texture2D g_OtherTextures[6];
 //Texture2DArray g_MaskTextures;
 
 uint g_MaskMaxidx;
@@ -436,6 +437,16 @@ PS_OUT PS_DIFFUSE_EXPLOSION_MAIN(PS_IN In)
     return Out;
 }
 
+// QueenKnight Particle 전용.
+PS_OUT PS_QUEENKNGIHT_PARTICLE_MAIN(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+  
+    
+    return Out;
+}
+
 
 technique11 DefaultTechnique
 {
@@ -472,6 +483,17 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_DIFFUSE_EXPLOSION_MAIN();
     }
 
+    // QueenKnight Particle Pass
+    pass QueenKngihtParticlePass
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = compile gs_5_0 GS_Stretched_BillboardQueenKnight_MAIN();
+        PixelShader = compile ps_5_0 PS_QUEENKNGIHT_PARTICLE_MAIN();
+    }
+
     pass DebugPass
     {
         SetRasterizerState(RS_Default);
@@ -481,6 +503,7 @@ technique11 DefaultTechnique
         GeometryShader = compile gs_5_0 GS_Stretched_Billboard_MAIN();
         PixelShader = compile ps_5_0 PS_DEBUG_MAIN();
     }
+
 
    
 }

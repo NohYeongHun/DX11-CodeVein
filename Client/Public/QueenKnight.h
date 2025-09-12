@@ -150,6 +150,9 @@ public:
 	void Create_QueenKnightWarp_Effect_Particle_Spawn(_float3 vDir, _uint iSpawnCount);
 	void Create_QueenKnightWarp_Effect_Particle_Explosion(_float3 vDir);
 
+	void Create_QueenKnightWarp_Effect(_float3 vDir);
+
+
 public:
 	void Start_Dissolve(_float fDuration = 0.f); // Dissolve 재생.
 	void ReverseStart_Dissolve(_float fDuration = 0.f); // Dissolve 역재생

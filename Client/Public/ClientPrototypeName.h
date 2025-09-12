@@ -7,7 +7,7 @@ typedef struct EffectTextureDesc
 	_uint iNumTextures;
 }EFFECT_TEXTURE_DESC;
 
-extern const EFFECT_TEXTURE_DESC Effect_TexturePrototypes[];
+extern const EFFECT_TEXTURE_DESC ClientEffect_TexturePrototypes[];
 
 extern unsigned int Effect_TexturePrototypeSize;
 NS_END

@@ -56,6 +56,6 @@ const EFFECT_TEXTURE_DESC Effect_TexturePrototypes[] =
 	//, TEXT("../Bin/Resources/Textures/Effects/Texture/Noise/Noise%d.png"), 2},
 };
 
-extern unsigned int Effect_TexturePrototypeSize = 4;
+extern unsigned int Effect_TexturePrototypeSize = 5;
 
 NS_END

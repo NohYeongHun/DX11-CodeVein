@@ -1,5 +1,4 @@
-﻿#include "Renderer.h"
-CRenderer::CRenderer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿CRenderer::CRenderer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : m_pDevice { pDevice }
     , m_pContext { pContext }
     , m_pGameInstance {CGameInstance::GetInstance()}
@@ -18,6 +17,8 @@ HRESULT CRenderer::Initialize()
     D3D11_VIEWPORT      ViewportDesc{};
 
     m_pContext->RSGetViewports(&iNumViewports, &ViewportDesc);
+
+    
 
 #pragma region 후처리 쉐이딩 Render Target 추가.
     /* For.Target_Diffuse */
@@ -120,13 +121,15 @@ HRESULT CRenderer::Initialize()
     if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_BrightPass"), TEXT("Target_BrightPass"))))
         return E_FAIL;
 
-    /* For.MRT_BloomBlur1 : Bloom용 첫 번째 블러 패스 */
     if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_BloomBlur1"), TEXT("Target_BloomBlur1"))))
         return E_FAIL;
 
-    /* For.MRT_BloomBlur2 : Bloom용 두 번째 블러 패스 */
+    /* For.MRT_BloomBlur1 : Bloom용 첫 번째 블러 패스 */
     if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_BloomBlur2"), TEXT("Target_BloomBlur2"))))
         return E_FAIL;
+
+    /* For.MRT_BloomBlur2 : Bloom용 두 번째 블러 패스 */
+    
 
     /* For.MRT_FinalScene : 최종 장면 렌더링 */
     if (FAILED(m_pGameInstance->Add_MRT(TEXT("MRT_FinalScene"), TEXT("Target_SceneColor"))))
@@ -177,7 +180,28 @@ HRESULT CRenderer::Initialize()
     //}
 
     if (FAILED(m_pGameInstance->Ready_RT_Debug(TEXT("Target_LightDepth"), ViewportDesc.Width - 150.0f, 150.0f, 300.f, 300.f)))
+    {
         return E_FAIL;
+    }
+
+    if (FAILED(m_pGameInstance->Ready_RT_Debug(TEXT("Target_BrightPass"), ViewportDesc.Width - 150.0f, 450.0f, 300.f, 300.f)))
+    {
+        return E_FAIL;
+    }
+
+    if (FAILED(m_pGameInstance->Ready_RT_Debug(TEXT("Target_BloomBlur1"), ViewportDesc.Width - 150.0f, 450.0f, 300.f, 300.f)))
+    {
+        return E_FAIL;
+    }
+
+    if (FAILED(m_pGameInstance->Ready_RT_Debug(TEXT("Target_BloomBlur2"), ViewportDesc.Width - 150.0f, 750.0f, 300.f, 300.f)))
+    {
+        return E_FAIL;
+    }
+        
+
+    //if (FAILED(m_pGameInstance->Ready_RT_Debug(TEXT("Target_LightDepth"), ViewportDesc.Width - 150.0f, 150.0f, 300.f, 300.f)))
+    //    return E_FAIL;
         
 #endif
 #pragma endregion
@@ -248,8 +272,8 @@ HRESULT CRenderer::Draw()
         return E_FAIL;
 
 #ifdef _DEBUG
-    //if (FAILED(Render_Debug()))
-    //    return E_FAIL;
+    if (FAILED(Render_Debug()))
+        return E_FAIL;
 #endif
 
     return S_OK;

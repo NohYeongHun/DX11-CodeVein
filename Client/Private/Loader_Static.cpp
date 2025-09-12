@@ -614,18 +614,6 @@ HRESULT CLoader_Static::Add_Prototype_Particle_Effects(ID3D11Device* pDevice, ID
 
 #pragma region 2. TEXTURE OBJECT
 
-	//// 0. Texture 종류별 생성.
-	//for (_uint i = 0; i < Effect_TexturePrototypeSize; ++i)
-	//{
-	//	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
-	//		, Effect_TexturePrototypes[i].prototypeName
-	//		, CTexture::Create(pDevice, pContext, Effect_TexturePrototypes[i].textureFilePath
-	//			, Effect_TexturePrototypes[i].iNumTextures))))
-	//	{
-	//		CRASH("Failed Load Effect Texture");
-	//		return E_FAIL;
-	//	}
-	//}
 #pragma endregion
 
 #pragma region 3. Shader 생성.
@@ -659,13 +647,6 @@ HRESULT CLoader_Static::Add_Prototype_Particle_Effects(ID3D11Device* pDevice, ID
 		return E_FAIL;
 	}
 	
-#pragma endregion
-	//if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_Particle"),
-	//	CParticle::Create(pDevice, pContext))))
-	//{
-	//	CRASH("Failed Load Effect Particle GameObject ");
-	//	return E_FAIL;
-	//}
 #pragma endregion
 	return S_OK;
 }
@@ -740,24 +721,15 @@ HRESULT CLoader_Static::Add_Prototype_ParticleSystem(ID3D11Device* pDevice, ID3D
 	for (_uint i = 0; i < Effect_TexturePrototypeSize; ++i)
 	{
 		if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
-			, Effect_TexturePrototypes[i].prototypeName
-			, CTexture::Create(pDevice, pContext, Effect_TexturePrototypes[i].textureFilePath
-				, Effect_TexturePrototypes[i].iNumTextures))))
+			, ClientEffect_TexturePrototypes[i].prototypeName
+			, CTexture::Create(pDevice, pContext, ClientEffect_TexturePrototypes[i].textureFilePath
+				, ClientEffect_TexturePrototypes[i].iNumTextures))))
 		{
 			CRASH("Failed Load Effect Texture");
 			return E_FAIL;
 		}
 	}
 
-	//// 발광 효과 텍스처 등록  
-	//if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
-	//	, TEXT("Prototype_Component_Texture_ExplosionParticle")
-	//	, CTexture::Create(pDevice, pContext
-	//		, TEXT("../Bin/Resources/Textures/Effects/Texture/HitFlash/Particle%d.png"), 1))))
-	//{
-	//	CRASH("Failed Load Effect TrailGlow Texture");
-	//	return E_FAIL;
-	//}
 #pragma endregion
 
 

@@ -18,7 +18,7 @@ namespace ParticlePresets
 			ParticleSystemDesc.fRotationPerSec = XMConvertToRadians(90.f);
 
 			// Texture
-			ParticleSystemDesc.strTexturePrototypeTag[TEXTURE_DIFFUSE] = Effect_TexturePrototypes[TEXTURE_DIFFUSE].prototypeName;
+			ParticleSystemDesc.strTexturePrototypeTag[TEXTURE_DIFFUSE] = ClientEffect_TexturePrototypes[TEXTURE_DIFFUSE].prototypeName;
 
 			ParticleSystemDesc.iComponentPrototypeLevel = ENUM_CLASS(LEVEL::STATIC);
 
@@ -65,8 +65,8 @@ namespace ParticlePresets
 			ParticleSystemDesc.fRotationPerSec = XMConvertToRadians(90.f);
 
 			// Texture
-			ParticleSystemDesc.strTexturePrototypeTag[TEXTURE_DIFFUSE] = Effect_TexturePrototypes[TEXTURE_DIFFUSE].prototypeName;
-			ParticleSystemDesc.strTexturePrototypeTag[TEXTURE_MASK] = Effect_TexturePrototypes[TEXTURE_MASK].prototypeName;
+			ParticleSystemDesc.strTexturePrototypeTag[TEXTURE_DIFFUSE] = ClientEffect_TexturePrototypes[TEXTURE_DIFFUSE].prototypeName;
+			ParticleSystemDesc.strTexturePrototypeTag[TEXTURE_MASK] = ClientEffect_TexturePrototypes[TEXTURE_MASK].prototypeName;
 
 			ParticleSystemDesc.iComponentPrototypeLevel = ENUM_CLASS(LEVEL::STATIC);
 

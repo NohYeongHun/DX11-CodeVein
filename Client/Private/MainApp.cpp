@@ -192,17 +192,6 @@ HRESULT CMainApp::Ready_Pooling()
 #pragma endregion
 
 #pragma region PARTICLE 타입 => 디버그 용도. 
-	//for (_uint i = 0; i < 100; ++i)
-	//{
-	//	pGameObject = dynamic_cast<CGameObject*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT
-	//		, ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Particle"), &HitFlashDesc));
-	//	if (nullptr == pGameObject)
-	//	{
-	//		CRASH("Failed Create Particle GameObject");
-	//		return E_FAIL;
-	//	}
-	//	m_pGameInstance->Add_GameObject_ToPools(TEXT("Particle_EFFECT"), ENUM_CLASS(EFFECTTYPE::PARTICLE), pGameObject);
-	//}
 
 	// MainApp.cpp의 Ready_Pooling 함수 내부에 추가
 
@@ -235,7 +224,6 @@ HRESULT CMainApp::Ready_Pooling()
 	ParticleDesc.fRotationPerSec = XMConvertToRadians(90.f);
 	ParticleDesc.iShaderPath = 1;
 	ParticleDesc.eParticleType = CEffectParticle::PARTICLE_TYPE_QUEEN_WARP;
-	//ParticleDesc.eParticleType = CEffectParticle::PARTICLE_TYPE_QUEEN_WARP_SPAWN;
 	ParticleDesc.iNumInstance = 500;
 	ParticleDesc.vCenter = { 0.f, -1.f, 0.f };
 	ParticleDesc.vRange = { 5.f, 5.f, 5.f };
@@ -267,29 +255,27 @@ HRESULT CMainApp::Ready_Pooling()
 		m_pGameInstance->Add_GameObject_ToPools(TEXT("QUEENKNIGHT_WARP"), ENUM_CLASS(CEffectParticle::EffectType), pGameObject);
 	}
 
-	ParticleDesc.fSpeedPerSec = 10.f;
-	ParticleDesc.fRotationPerSec = XMConvertToRadians(90.f);
-	ParticleDesc.iShaderPath = 1;
-	ParticleDesc.eParticleType = CEffectParticle::PARTICLE_TYPE_BOSS_EXPLOSION;
-	//ParticleDesc.eParticleType = CEffectParticle::PARTICLE_TYPE_QUEEN_WARP_SPAWN;
-	ParticleDesc.iNumInstance = 450;
-	ParticleDesc.vCenter = { 0.f, 0.f, 0.f };
-	ParticleDesc.vRange = { 2.f, 2.f, 2.f };
-	ParticleDesc.vSpeed = { 10.f, 15.f };
-	ParticleDesc.vSize = { 0.1f, 0.11f };
-	ParticleDesc.vLifeTime = { 3.f, 6.f };
-	ParticleDesc.isLoop = false;
-	ParticleDesc.isBillBoard = true;
-	ParticleDesc.iSpawnCount = 50;
-
-	ParticleDesc.useTextureCheckArray[TEXTURE::TEXTURE_DIFFUSE] = true;
-	ParticleDesc.useTextureIndexArray[TEXTURE::TEXTURE_DIFFUSE] = 1;
-	ParticleDesc.useTextureCheckArray[TEXTURE::TEXTURE_MASK] = true;
-	ParticleDesc.useTextureIndexArray[TEXTURE::TEXTURE_MASK] = 0;
-
-	ParticleDesc.useTextureCheckArray[TEXTURE::TEXTURE_GRADIENT] = false;
-	ParticleDesc.useTextureCheckArray[TEXTURE::TEXTURE_GRADIENT_ALPHA] = false;
-	ParticleDesc.useTextureCheckArray[TEXTURE::TEXTURE_NOISE] = false;
+	CEffectParticle::EFFECT_PARTICLE_DESC ParticleExplosionDesc{};
+	ParticleExplosionDesc.fSpeedPerSec = 10.f;
+	ParticleExplosionDesc.fRotationPerSec = XMConvertToRadians(90.f);
+	ParticleExplosionDesc.iShaderPath = 1;
+	ParticleExplosionDesc.eParticleType = CEffectParticle::PARTICLE_TYPE_BOSS_EXPLOSION;
+	ParticleExplosionDesc.iNumInstance = 450;
+	ParticleExplosionDesc.vCenter = { 0.f, 0.f, 0.f };
+	ParticleExplosionDesc.vRange = { 2.f, 2.f, 2.f };
+	ParticleExplosionDesc.vSpeed = { 10.f, 15.f };
+	ParticleExplosionDesc.vSize = { 0.1f, 0.11f };
+	ParticleExplosionDesc.vLifeTime = { 3.f, 6.f };
+	ParticleExplosionDesc.isLoop = false;
+	ParticleExplosionDesc.isBillBoard = true;
+	ParticleExplosionDesc.iSpawnCount = 50;
+	ParticleExplosionDesc.useTextureCheckArray[TEXTURE::TEXTURE_DIFFUSE] = true;
+	ParticleExplosionDesc.useTextureIndexArray[TEXTURE::TEXTURE_DIFFUSE] = 1;
+	ParticleExplosionDesc.useTextureCheckArray[TEXTURE::TEXTURE_MASK] = true;
+	ParticleExplosionDesc.useTextureIndexArray[TEXTURE::TEXTURE_MASK] = 0;
+	ParticleExplosionDesc.useTextureCheckArray[TEXTURE::TEXTURE_GRADIENT] = false;
+	ParticleExplosionDesc.useTextureCheckArray[TEXTURE::TEXTURE_GRADIENT_ALPHA] = false;
+	ParticleExplosionDesc.useTextureCheckArray[TEXTURE::TEXTURE_NOISE] = false;
 
 
 
@@ -298,28 +284,41 @@ HRESULT CMainApp::Ready_Pooling()
 	{
 		pGameObject = dynamic_cast<CGameObject*>(m_pGameInstance->Clone_Prototype(
 			PROTOTYPE::GAMEOBJECT, ENUM_CLASS(LEVEL::STATIC)
-			, TEXT("Prototype_GameObject_EffectParticle"), &ParticleDesc
+			, TEXT("Prototype_GameObject_EffectParticle"), &ParticleExplosionDesc
 		));
 		m_pGameInstance->Add_GameObject_ToPools(TEXT("QUEENKNIGHT_EXPLOSION"), ENUM_CLASS(CEffectParticle::EffectType), pGameObject);
 	}
 #pragma endregion
 
-#pragma region PARTICLE SYSTEM으로 만들기.
-	//CParticleSystem::PARTICLESYSTEM_CLONE_DESC ParticleSystemDesc = ParticlePresets::Get(CParticleSystem::PARTICLE_TYPE_QUEEN_WARP);
-	//
-	//// 객체 100개 풀링.
-	//for (_uint i = 0; i < 100; ++i)
-	//{
-	//	pGameObject = dynamic_cast<CGameObject*>(m_pGameInstance->Clone_Prototype(
-	//		PROTOTYPE::GAMEOBJECT, ENUM_CLASS(LEVEL::STATIC)
-	//		, TEXT("Prototype_QueenKnight_ParticleSystem"), &ParticleSystemDesc
-	//	));
-	//	m_pGameInstance->Add_GameObject_ToPools(ParticleSystemDesc.strPoolTag,
-	//		ENUM_CLASS(EFFECTTYPE::PARTICLE), pGameObject);
-	//}
 
-	//CParticleSystem::PARTICLESYSTEM_DESC desc = ParticlePresets::Get(CParticleSystem::PARTICLE_TYPE::PARTICLE_TYPE_QUEEN_WARP);
-	
+#pragma region PARTICLE 타입 (Queen Knight Warp 시 사용.) 
+	CEffectParticle::EFFECT_PARTICLE_DESC ParticleWarp{};
+	ParticleWarp.fSpeedPerSec = 10.f;
+	ParticleWarp.fRotationPerSec = XMConvertToRadians(90.f);
+	ParticleWarp.iShaderPath = 1;
+	ParticleWarp.eParticleType = CEffectParticle::PARTICLE_TYPE_QUEEN_NPARTCILE;
+	ParticleWarp.iNumInstance = 700;
+	ParticleWarp.vCenter = { 0.f, 0.f, 0.f };
+	ParticleWarp.vRange = { 6.f, 6.f, 6.f };
+	ParticleWarp.vSpeed = { 3.f, 9.f };
+	ParticleWarp.vSize = { 0.1f, 0.11f };
+	ParticleWarp.vLifeTime = { 5.f, 6.f };
+	ParticleWarp.isLoop = false;
+	ParticleWarp.isBillBoard = true;
+
+	// 사용하는 텍스쳐 종류
+	ParticleWarp.useTextureCheckArray[TEXTURE::TEXTURE_DIFFUSE] = true;
+	ParticleWarp.useTextureIndexArray[TEXTURE::TEXTURE_DIFFUSE] = 1;
+	ParticleWarp.useTextureCheckArray[TEXTURE::TEXTURE_OTHER] = true; // 0 ~  5 Other는 Bind_Resources로
+
+	for (_uint i = 0; i < 200; ++i)
+	{
+		pGameObject = dynamic_cast<CGameObject*>(m_pGameInstance->Clone_Prototype(
+			PROTOTYPE::GAMEOBJECT, ENUM_CLASS(LEVEL::STATIC)
+			, TEXT("Prototype_GameObject_EffectParticle"), &ParticleDesc
+		));
+		m_pGameInstance->Add_GameObject_ToPools(TEXT("d"), ENUM_CLASS(CEffectParticle::EffectType), pGameObject);
+	}
 #pragma endregion
 
 

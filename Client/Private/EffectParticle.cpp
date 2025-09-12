@@ -269,6 +269,16 @@ HRESULT CEffectParticle::Bind_ShaderResources()
                 }
             }
             break;
+
+            case TEXTURE::TEXTURE_OTHER:
+            {
+                if (FAILED(m_pTextureCom[TEXTURE_OTHER]->Bind_Shader_Resources(m_pShaderCom, "g_OtherTextures")))
+                {
+                    CRASH("Failed Bind Texture Other Texture Other");
+                    return E_FAIL;
+                }
+            }
+            break;
             }
         }
     }
@@ -348,11 +358,16 @@ HRESULT CEffectParticle::Ready_Components(const EFFECT_PARTICLE_DESC* pDesc)
                 strTextureTag = TEXT("Com_MaskTexture");
                 break;
             }
+            case TEXTURE::TEXTURE_OTHER:
+            {
+                strTextureTag = TEXT("Com_OtherTexture");
+                break;
+            }
             default:
                 break;
             }
 
-            if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), Effect_TexturePrototypes[i].prototypeName
+            if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), ClientEffect_TexturePrototypes[i].prototypeName
                 , strTextureTag, reinterpret_cast<CComponent**>(&m_pTextureCom[i]))))
             {
                 CRASH("Failed LoadTexture");

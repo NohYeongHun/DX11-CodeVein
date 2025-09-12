@@ -1,4 +1,5 @@
-﻿CQueenKnight::CQueenKnight(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿#include "QueenKnight.h"
+CQueenKnight::CQueenKnight(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CMonster(pDevice, pContext)
 {
 }
@@ -741,6 +742,22 @@ void CQueenKnight::Create_QueenKnightWarp_Effect_Particle_Explosion(_float3 vDir
     m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(m_eCurLevel)
         , TEXT("QUEENKNIGHT_EXPLOSION"), TEXT("Layer_Effect"), 1, ENUM_CLASS(EFFECTTYPE::PARTICLE), &Desc);
 }
+
+#pragma region 새로 만드는 파티클 객체
+void CQueenKnight::Create_QueenKnightWarp_Effect(_float3 vDir)
+{
+    CEffectParticle::EFFECTPARTICLE_ENTER_DESC Desc{};
+    Desc.vStartPos = m_pTransformCom->Get_State(STATE::POSITION); // 몬스터 현재위치로 생성.
+    Desc.particleInitInfo.lifeTime = 5.f;
+    Desc.particleInitInfo.dir = vDir;
+    Desc.pTargetTransform = m_pTransformCom;
+    Desc.fChaseTime = 5.f; // 50 프레임만 추적
+    m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(m_eCurLevel)
+        , TEXT("QUEENKNIGHT_PARTICLE"), TEXT("Layer_Effect"), 1, ENUM_CLASS(EFFECTTYPE::PARTICLE), &Desc);
+}
+#pragma endregion
+
+
 
 // Dissolve 진행.
 void CQueenKnight::Start_Dissolve(_float fDuration)
