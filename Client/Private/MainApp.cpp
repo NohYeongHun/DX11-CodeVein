@@ -1,4 +1,4 @@
-
+﻿
 CMainApp::CMainApp()
 	: m_pGameInstance{ CGameInstance::GetInstance() }
 {
@@ -177,7 +177,6 @@ HRESULT CMainApp::Ready_Clone_SkillUI(const _wstring& strLayerTag)
 
 HRESULT CMainApp::Ready_Pooling()
 {
-	 
 #pragma region TEXTURE 타입.
 	// 1. Prototype Clone 객체 생성.
 	CSlash::SLASHEFFECT_DESC slashDesc{};
@@ -250,16 +249,16 @@ HRESULT CMainApp::Ready_Pooling()
 	ParticleDesc.eParticleType = CEffectParticle::PARTICLE_TYPE_QUEEN_WARP;
 	ParticleDesc.iNumInstance = 700;
 	ParticleDesc.vCenter = { 0.f, -1.f, 0.f };
-	ParticleDesc.vRange = { 8.f, 15.f, 8.f };
+	ParticleDesc.vRange = { 5.f, 15.f, 5.f };
 	ParticleDesc.vSpeed = { 3.f, 9.f };
 	ParticleDesc.vSize = { 0.1f, 0.11f };
-	ParticleDesc.vLifeTime = { 6.f, 9.f };
+	ParticleDesc.vLifeTime = { 2.f, 5.f };
 	ParticleDesc.isLoop = false;
 	ParticleDesc.isBillBoard = true;
 	ParticleDesc.iSpawnCount = 50;
 	
 	ParticleDesc.useTextureCheckArray[TEXTURE::TEXTURE_DIFFUSE] = true;
-	ParticleDesc.useTextureIndexArray[TEXTURE::TEXTURE_DIFFUSE] = 1;
+	ParticleDesc.useTextureIndexArray[TEXTURE::TEXTURE_DIFFUSE] = 2;
 	ParticleDesc.useTextureCheckArray[TEXTURE::TEXTURE_MASK] = true;
 	ParticleDesc.useTextureIndexArray[TEXTURE::TEXTURE_MASK] = 0;
 
