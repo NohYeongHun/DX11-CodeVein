@@ -1,4 +1,4 @@
-﻿
+﻿#include "EffectParticle.h"
 CEffectParticle::CEffectParticle(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CGameObject{ pDevice, pContext }
 {
@@ -28,12 +28,13 @@ HRESULT CEffectParticle::Initialize_Clone(void* pArg)
         return E_FAIL;
     }
 
-    m_fEmissiveIntencity = 0.3f;
+    m_fEmissiveIntencity = 0.4f;
     m_eCurLevel = pDesc->eCurLevel;
    
 
 #pragma region 값 채우기.
-    m_fDisplayTime = pDesc->vLifeTime.y;
+    m_fDisplayTime = pDesc->vLifeTime.y; //지정된 시간만큼 Display
+    m_vLifeTime = pDesc->vLifeTime;
     m_isLoop = pDesc->isLoop;
     m_eParticleType = pDesc->eParticleType;
     m_iShaderPath = pDesc->iShaderPath;
@@ -94,10 +95,27 @@ void CEffectParticle::Update(_float fTimeDelta)
     m_fCurrentTime += fTimeDelta;
 
     // 활성 파티클 수 확인
-    _uint liveParticleCount = m_pVIBufferCom->Get_LiveParticleCount();
-    
+    //_uint liveParticleCount = m_pVIBufferCom->Get_LiveParticleCount();
+    //
+    //// 모든 파티클이 죽었거나 시간이 지나면 비활성화
+    //if (liveParticleCount == 0 || m_fCurrentTime >= m_fDisplayTime)
+    //{
+    //    // Loop면 다시 시작.
+    //    if (m_isLoop)
+    //    {
+    //        m_fCurrentTime = 0.f;
+    //    }
+    //    else
+    //    {
+    //        m_IsActivate = false;
+    //        Reset_Timer(); // 타이머 초기화.
+    //        return;
+    //    }
+    //}
+
+
     // 모든 파티클이 죽었거나 시간이 지나면 비활성화
-    if (liveParticleCount == 0 || m_fCurrentTime >= m_fDisplayTime)
+    if (m_fCurrentTime >= m_fDisplayTime)
     {
         // Loop면 다시 시작.
         if (m_isLoop)
@@ -256,12 +274,6 @@ HRESULT CEffectParticle::Bind_ShaderResources()
             break;
             case TEXTURE::TEXTURE_MASK:
             {
-                /*if (FAILED(m_pTextureCom[TEXTURE_MASK]->Bind_Shader_Resources(m_pShaderCom, "g_MaskTextures", m_iTextureIndexArray[i])))
-                {
-                    CRASH("Failed Bind Texture Gradient Texture Mask");
-                    return E_FAIL;
-                }*/
-
                 if (FAILED(m_pTextureCom[TEXTURE_MASK]->Bind_Shader_Resources(m_pShaderCom, "g_MaskTextures")))
                 {
                     CRASH("Failed Bind Texture Gradient Texture Mask");
@@ -272,12 +284,25 @@ HRESULT CEffectParticle::Bind_ShaderResources()
 
             case TEXTURE::TEXTURE_OTHER:
             {
+                // 배열로 던짐.
                 if (FAILED(m_pTextureCom[TEXTURE_OTHER]->Bind_Shader_Resources(m_pShaderCom, "g_OtherTextures")))
                 {
                     CRASH("Failed Bind Texture Other Texture Other");
                     return E_FAIL;
                 }
             }
+            break;
+
+            case TEXTURE::TEXTURE_NOISE:
+            {
+                // 배열로 던짐.
+                if (FAILED(m_pTextureCom[TEXTURE_NOISE]->Bind_Shader_Resources(m_pShaderCom, "g_NoiseTextures")))
+                {
+                    CRASH("Failed Bind Texture Other Texture Other");
+                    return E_FAIL;
+                }
+            }
+
             break;
             }
         }
@@ -363,6 +388,11 @@ HRESULT CEffectParticle::Ready_Components(const EFFECT_PARTICLE_DESC* pDesc)
                 strTextureTag = TEXT("Com_OtherTexture");
                 break;
             }
+            case TEXTURE::TEXTURE_NOISE:
+            {
+                strTextureTag = TEXT("Com_NoiseTexture");
+                break;
+            }
             default:
                 break;
             }
@@ -395,7 +425,7 @@ HRESULT CEffectParticle::Ready_VIBuffer_Point(const EFFECT_PARTICLE_DESC* pDesc)
     PointDesc.isLoop = pDesc->isLoop;
     PointDesc.eParticleType = static_cast<CVIBuffer_PointParticleDir_Instance::PARTICLE_TYPE>(pDesc->eParticleType);
 
-    m_fDisplayTime = PointDesc.vLifeTime.y + 1.0f;  // 개별 파티클보다 1초 더 길게
+    m_fDisplayTime = PointDesc.vLifeTime.y;  // 개별 파티클보다 1초 더 길게
     
     XMStoreFloat3(&PointDesc.vDir, pDesc->vDirection);
 
@@ -458,6 +488,22 @@ void CEffectParticle::Create_ExplosionParticle(_float3 vNomalDir, _float3 vCente
     {
         
         m_pVIBufferCom->Create_ExplosionParticle(vNomalDir, vCenterPos, fRadius,  fExplosionTime, fTotalLifeTime);
+    }
+}
+
+void CEffectParticle::Create_HitParticle(_float3 vCenterPos, _float fRadius, _float fTotalLifeTime)
+{
+    if (m_pVIBufferCom)
+    {
+        m_pVIBufferCom->Create_HitParticle(vCenterPos, fRadius, fTotalLifeTime);
+    }
+}
+
+void CEffectParticle::Create_PlayerHitParticle(_float3 vCenterPos, _float fRadius, _float fTotalLifeTime)
+{
+    if (m_pVIBufferCom)
+    {
+        m_pVIBufferCom->Create_HitParticle(vCenterPos, fRadius, fTotalLifeTime);
     }
 }
 
@@ -525,6 +571,18 @@ void CEffectParticle::OnActivate(void* pArg)
         m_pVIBufferCom->Create_ExplosionParticle(vNormalDir, particleInit.pos, particleInit.fRadius, particleInit.fExplositionTime, particleInit.lifeTime);
     }
         break;
+
+    case PARTICLE_TYPE_HIT_PARTCILE:
+    {
+        m_pVIBufferCom->Create_HitParticle(particleInit.pos, particleInit.fRadius, particleInit.lifeTime);
+    }
+        break;
+
+    case PARTICLE_TYPE_PLAYERHIT_PARTCILE:
+    {
+        m_pVIBufferCom->Create_HitParticle(particleInit.pos, particleInit.fRadius, particleInit.lifeTime);
+    }
+    break;
 
     }
 

@@ -1,4 +1,4 @@
-﻿
+
 CMainApp::CMainApp()
 	: m_pGameInstance{ CGameInstance::GetInstance() }
 {
@@ -108,14 +108,14 @@ HRESULT CMainApp::Render()
 
 	ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
 	
-	ImGui::SliderFloat("threshold", &m_fThreshold, 0.f, 1.f);
-	ImGui::SliderFloat("soft", &m_fSoft, 0.f, 1.f);
-
-	if (ImGui::Button("Apply Value"))
-	{
-		m_pGameInstance->Setting_Threshold(m_fThreshold);
-		m_pGameInstance->Setting_Soft(m_fSoft);
-	}
+	//ImGui::SliderFloat("threshold", &m_fThreshold, 0.f, 1.f);
+	//ImGui::SliderFloat("soft", &m_fSoft, 0.f, 1.f);
+	//
+	//if (ImGui::Button("Apply Value"))
+	//{
+	//	m_pGameInstance->Setting_Threshold(m_fThreshold);
+	//	m_pGameInstance->Setting_Soft(m_fSoft);
+	//}
 	
 
 	ImGui::End();
@@ -227,7 +227,7 @@ HRESULT CMainApp::Ready_Pooling()
 	// 파티클의 속도, 크기, 수명 범위를 설정합니다.
 	burstDesc.vSpeed = { 1.f, 3.f };   // 10 ~ 15의 무작위 속도
 	burstDesc.vSize = { 0.05f, 0.2f };  // 0.05 ~ 0.1의 무작위 크기
-	burstDesc.vLifeTime = { 1.f, 2.f }; // 0.5 ~ 1.0초의 무작위 수명
+	burstDesc.vLifeTime = { 0.5f, 1.f }; // 0.5 ~ 1.0초의 무작위 수명
 
 	// 사용할 텍스처를 지정합니다.
 	burstDesc.useTextureCheckArray[TEXTURE::TEXTURE_DIFFUSE] = true; // g_DiffuseTexture
@@ -246,14 +246,14 @@ HRESULT CMainApp::Ready_Pooling()
 	CEffectParticle::EFFECT_PARTICLE_DESC ParticleDesc{};
 	ParticleDesc.fSpeedPerSec = 10.f;
 	ParticleDesc.fRotationPerSec = XMConvertToRadians(90.f);
-	ParticleDesc.iShaderPath = 1;
+	ParticleDesc.iShaderPath = static_cast<_uint>(POINTDIRPARTICLE_SHADERPATH::QUEENKNIGHTWARP);
 	ParticleDesc.eParticleType = CEffectParticle::PARTICLE_TYPE_QUEEN_WARP;
-	ParticleDesc.iNumInstance = 500;
+	ParticleDesc.iNumInstance = 700;
 	ParticleDesc.vCenter = { 0.f, -1.f, 0.f };
-	ParticleDesc.vRange = { 5.f, 5.f, 5.f };
+	ParticleDesc.vRange = { 8.f, 15.f, 8.f };
 	ParticleDesc.vSpeed = { 3.f, 9.f };
 	ParticleDesc.vSize = { 0.1f, 0.11f };
-	ParticleDesc.vLifeTime = { 5.f, 6.f };
+	ParticleDesc.vLifeTime = { 6.f, 9.f };
 	ParticleDesc.isLoop = false;
 	ParticleDesc.isBillBoard = true;
 	ParticleDesc.iSpawnCount = 50;
@@ -265,7 +265,8 @@ HRESULT CMainApp::Ready_Pooling()
 
 	ParticleDesc.useTextureCheckArray[TEXTURE::TEXTURE_GRADIENT] = false;
 	ParticleDesc.useTextureCheckArray[TEXTURE::TEXTURE_GRADIENT_ALPHA] = false;
-	ParticleDesc.useTextureCheckArray[TEXTURE::TEXTURE_NOISE] = false;
+	ParticleDesc.useTextureCheckArray[TEXTURE::TEXTURE_NOISE] = true;
+	ParticleDesc.useTextureCheckArray[TEXTURE::TEXTURE_OTHER] = true;
 
 
 
@@ -299,7 +300,7 @@ HRESULT CMainApp::Ready_Pooling()
 	ParticleExplosionDesc.useTextureIndexArray[TEXTURE::TEXTURE_MASK] = 0;
 	ParticleExplosionDesc.useTextureCheckArray[TEXTURE::TEXTURE_GRADIENT] = false;
 	ParticleExplosionDesc.useTextureCheckArray[TEXTURE::TEXTURE_GRADIENT_ALPHA] = false;
-	ParticleExplosionDesc.useTextureCheckArray[TEXTURE::TEXTURE_NOISE] = false;
+	ParticleExplosionDesc.useTextureCheckArray[TEXTURE::TEXTURE_NOISE] = true;
 
 
 
@@ -315,34 +316,63 @@ HRESULT CMainApp::Ready_Pooling()
 #pragma endregion
 
 
-#pragma region PARTICLE 타입 (Queen Knight Warp 시 사용.) 
-	CEffectParticle::EFFECT_PARTICLE_DESC ParticleWarp{};
-	ParticleWarp.fSpeedPerSec = 10.f;
-	ParticleWarp.fRotationPerSec = XMConvertToRadians(90.f);
-	ParticleWarp.iShaderPath = 1;
-	ParticleWarp.eParticleType = CEffectParticle::PARTICLE_TYPE_QUEEN_NPARTCILE;
-	ParticleWarp.iNumInstance = 700;
-	ParticleWarp.vCenter = { 0.f, 0.f, 0.f };
-	ParticleWarp.vRange = { 6.f, 6.f, 6.f };
-	ParticleWarp.vSpeed = { 3.f, 9.f };
-	ParticleWarp.vSize = { 0.1f, 0.11f };
-	ParticleWarp.vLifeTime = { 5.f, 6.f };
-	ParticleWarp.isLoop = false;
-	ParticleWarp.isBillBoard = true;
+#pragma region HIT PARTICLE 타입
+	CEffectParticle::EFFECT_PARTICLE_DESC HitParticleExplosionDesc{};
+	HitParticleExplosionDesc.fSpeedPerSec = 10.f;
+	HitParticleExplosionDesc.fRotationPerSec = XMConvertToRadians(90.f);
+	HitParticleExplosionDesc.iShaderPath = static_cast<_uint>(POINTDIRPARTICLE_SHADERPATH::HITPARTICLE);
+	HitParticleExplosionDesc.eParticleType = CEffectParticle::PARTICLE_TYPE_HIT_PARTCILE;
+	HitParticleExplosionDesc.iNumInstance = 50;
+	HitParticleExplosionDesc.vCenter = { 0.f, 0.f, 0.f };
+	HitParticleExplosionDesc.vRange = { 1.f, 1.f, 1.f };
+	HitParticleExplosionDesc.vSpeed = { 2.f, 3.f };
+	HitParticleExplosionDesc.vSize = { 0.05f, 0.06f };
+	HitParticleExplosionDesc.vLifeTime = { 1.f, 2.f };
+	HitParticleExplosionDesc.isLoop = false;
+	HitParticleExplosionDesc.isBillBoard = true;
+	HitParticleExplosionDesc.useTextureCheckArray[TEXTURE::TEXTURE_DIFFUSE] = true;
+	HitParticleExplosionDesc.useTextureIndexArray[TEXTURE::TEXTURE_DIFFUSE] = 2;
+	HitParticleExplosionDesc.useTextureCheckArray[TEXTURE::TEXTURE_OTHER] = true;
+	HitParticleExplosionDesc.useTextureCheckArray[TEXTURE::TEXTURE_NOISE] = true;
 
-	// 사용하는 텍스쳐 종류
-	ParticleWarp.useTextureCheckArray[TEXTURE::TEXTURE_DIFFUSE] = true;
-	ParticleWarp.useTextureIndexArray[TEXTURE::TEXTURE_DIFFUSE] = 1;
-	ParticleWarp.useTextureCheckArray[TEXTURE::TEXTURE_OTHER] = true; // 0 ~  5 Other는 Bind_Resources로
 
 	for (_uint i = 0; i < 200; ++i)
 	{
 		pGameObject = dynamic_cast<CGameObject*>(m_pGameInstance->Clone_Prototype(
 			PROTOTYPE::GAMEOBJECT, ENUM_CLASS(LEVEL::STATIC)
-			, TEXT("Prototype_GameObject_EffectParticle"), &ParticleDesc
+			, TEXT("Prototype_GameObject_EffectParticle"), &HitParticleExplosionDesc
 		));
-		m_pGameInstance->Add_GameObject_ToPools(TEXT("d"), ENUM_CLASS(CEffectParticle::EffectType), pGameObject);
+		m_pGameInstance->Add_GameObject_ToPools(TEXT("HIT_PARTICLE"), ENUM_CLASS(CEffectParticle::EffectType), pGameObject);
 	}
+
+	CEffectParticle::EFFECT_PARTICLE_DESC PlayerHitParticleExplosionDesc{};
+	PlayerHitParticleExplosionDesc.fSpeedPerSec = 10.f;
+	PlayerHitParticleExplosionDesc.fRotationPerSec = XMConvertToRadians(90.f);
+	PlayerHitParticleExplosionDesc.iShaderPath = static_cast<_uint>(POINTDIRPARTICLE_SHADERPATH::PLAYERHITPARTICLE);
+	PlayerHitParticleExplosionDesc.eParticleType = CEffectParticle::PARTICLE_TYPE_HIT_PARTCILE; // VIBuffer에 들어감.
+	PlayerHitParticleExplosionDesc.iNumInstance = 50;
+	PlayerHitParticleExplosionDesc.vCenter = { 0.f, 0.f, 0.f };
+	PlayerHitParticleExplosionDesc.vRange = { 1.f, 1.f, 1.f };
+	PlayerHitParticleExplosionDesc.vSpeed = { 2.f, 3.f };
+	PlayerHitParticleExplosionDesc.vSize = { 0.05f, 0.06f };
+	PlayerHitParticleExplosionDesc.vLifeTime = { 1.f, 2.f };
+	PlayerHitParticleExplosionDesc.isLoop = false;
+	PlayerHitParticleExplosionDesc.isBillBoard = true;
+	PlayerHitParticleExplosionDesc.useTextureCheckArray[TEXTURE::TEXTURE_DIFFUSE] = true;
+	PlayerHitParticleExplosionDesc.useTextureIndexArray[TEXTURE::TEXTURE_DIFFUSE] = 7;
+	PlayerHitParticleExplosionDesc.useTextureCheckArray[TEXTURE::TEXTURE_OTHER] = true;
+	PlayerHitParticleExplosionDesc.useTextureCheckArray[TEXTURE::TEXTURE_NOISE] = true;
+
+
+	for (_uint i = 0; i < 200; ++i)
+	{
+		pGameObject = dynamic_cast<CGameObject*>(m_pGameInstance->Clone_Prototype(
+			PROTOTYPE::GAMEOBJECT, ENUM_CLASS(LEVEL::STATIC)
+			, TEXT("Prototype_GameObject_EffectParticle"), &PlayerHitParticleExplosionDesc
+		));
+		m_pGameInstance->Add_GameObject_ToPools(TEXT("PLAYER_HITPARTICLE"), ENUM_CLASS(CEffectParticle::EffectType), pGameObject);
+	}
+	
 #pragma endregion
 
 

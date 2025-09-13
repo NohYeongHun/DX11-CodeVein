@@ -45,6 +45,7 @@ public:
 		_bool   useTextureCheckArray[TEXTURE_END]; // 사용하지 않을 Texture들 지정하기.
 		_uint   useTextureIndexArray[TEXTURE_END]; // 사용할 텍스쳐 번호 지정.
 
+
 		/* 사용할 Shader 정보 */
 		_uint iShaderPath = {};
 

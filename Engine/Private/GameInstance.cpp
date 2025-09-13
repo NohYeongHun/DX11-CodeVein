@@ -441,6 +441,16 @@ void CGameInstance::Compute_TimeDelta(const _wstring& strTimerTag)
 	m_pTimer_Manager->Compute_TimeDelta(strTimerTag);
 }
 
+void CGameInstance::Set_SlowMoment(_float fSlowTime, _float fSlowFactor)
+{
+	m_pTimer_Manager->Set_SlowMoment(fSlowTime, fSlowFactor);
+}
+
+void CGameInstance::Time_Pass(const _wstring& strTimerTag)
+{
+	m_pTimer_Manager->Time_Pass(strTimerTag);
+}
+
 #pragma endregion
 
 #pragma region FONT_MANAGER

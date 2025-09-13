@@ -88,6 +88,8 @@ private:
 	void Take_Damage(_float fHp);
 	ACTORDIR Calculate_Damage_Direction(class CMonster* pAttacker);
 
+	void Create_HitEffects(_fvector vHitPosition, _fvector vAttackDirection);
+
 private:
 	class CCollider* m_pColliderCom = { nullptr };
 #pragma endregion

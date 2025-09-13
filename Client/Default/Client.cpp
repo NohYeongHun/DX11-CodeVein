@@ -82,11 +82,14 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
         pGameInstance->Compute_TimeDelta(TEXT("Timer_Default"));
 
+        pGameInstance->Time_Pass(TEXT("Timer_Default"));
+
         fTimeAcc += pGameInstance->Get_TimeDelta(TEXT("Timer_Default"));
 
         if (fTimeAcc >= 1.f / 200.f)
         {
             pGameInstance->Compute_TimeDelta(TEXT("Timer_60"));
+            
 
             pMainApp->Update(pGameInstance->Get_TimeDelta(TEXT("Timer_60")));
             pMainApp->Render();

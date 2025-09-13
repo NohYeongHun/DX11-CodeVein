@@ -22,7 +22,8 @@ public:
 		PARTICLE_TYPE_QUEEN_WARP = 1,
 		PARTICLE_TYPE_EXPLOSION = 2,
 		PARTICLE_TYPE_BOSS_EXPLOSION = 3,
-		PARTICLE_TYPE_QUEEN_NPARTCILE = 4,
+		PARTICLE_TYPE_QUEENN_PARTICLE = 4,
+		PARTICLE_TYPE_HIT_PARTICLE = 5,
 		PARTICLE_TYPE_END
 	};
 
@@ -59,6 +60,7 @@ public:
 	void QueenKnightWarp_Update(VTXINSTANCEPOINTDIR_PARTICLE* pVertices, _float fTimeDelta);
 	void BossExplosion_Update(VTXINSTANCEPOINTDIR_PARTICLE* pVertices, _float fTimeDelta);
 	void Explosion_Update(VTXINSTANCEPOINTDIR_PARTICLE* pVertices, _float fTimeDelta);
+	void HitParticle_Update(VTXINSTANCEPOINTDIR_PARTICLE* pVertices, _float fTimeDelta);
 
 public:
 	void CreateAllParticles(_float3 vCenterPos, _float3 vBaseDir, _float fLifeTime = 3.0f);
@@ -67,6 +69,7 @@ public:
 	void Create_QueenKnightWarpParticle_Limited(const PARTICLE_INIT_INFO particleInitInfo, _uint iSpawnCount);
 	void Create_BossExplosionParticle(_float3 vCenterPos, _float fRadius, _float fGatherTime, _float fExplosionTime, _float fTotalLifeTime);
 	void Create_ExplosionParticle(_float3 vNomalDir, _float3 vCenterPos, _float fRadius, _float fExplosionTime, _float fTotalLifeTime);
+	void Create_HitParticle(_float3 vCenterPos, _float fRadius, _float fTotalLifeTime);
 #pragma endregion
 
 

@@ -10,7 +10,9 @@ public:
         PARTICLE_TYPE_QUEEN_WARP = 1,
         PARTICLE_TYPE_EXPLOSION = 2,
         PARTICLE_TYPE_BOSS_EXPLOSION = 3,
-        PARTICLE_TYPE_QUEEN_NPARTCILE = 4,
+        PARTICLE_TYPE_QUEEN_PARTICLE = 4,
+        PARTICLE_TYPE_HIT_PARTCILE = 5,
+        PARTICLE_TYPE_PLAYERHIT_PARTCILE = 6,
         PARTICLE_TYPE_END
     };
 
@@ -101,8 +103,10 @@ public:
     void Create_QueenKnightWarpEffect(const PARTICLE_INIT_INFO particleInitInfo);
     void Create_QueenKnightWarpEffect_Limited(const PARTICLE_INIT_INFO particleInitInfo, _uint iSpawnCount);
     void Create_BossExplosionParticle(_float3 vCenterPos, _float fRadius, _float fGatherTime, _float fExplosionTime, _float fTotalLifeTime);
-    
-    void Create_ExplosionParticle(_float3 vNomalDir, _float3 vCenterPos, _float fRadius, _float fExplosionTime, _float fTotalLifeTime);
+    void Create_ExplosionParticle(_float3 vNomalDir, _float3 vCenterPos, _float fRadius, _float fExplosionTime, _float fTotalLifeTime); // 2D
+
+    void Create_HitParticle(_float3 vCenterPos, _float fRadius, _float fTotalLifeTime);
+    void Create_PlayerHitParticle(_float3 vCenterPos, _float fRadius, _float fTotalLifeTime);
 
 
 #pragma region 
@@ -143,6 +147,7 @@ private:
     _vector m_vObjectDirection = {};
     _float3 m_vScale = {};
     _float m_fDisplayTime = {};        // 표시 시간 (초)
+    _float2 m_vLifeTime = {};
     _float m_fCurrentTime = 0.0f;        // 현재 경과 시간
     _float m_fRotationAngle = 0.0f;      // Z축 회전 각도 (라디안)
     _uint m_iShaderPath = {}; // Shader Path.
