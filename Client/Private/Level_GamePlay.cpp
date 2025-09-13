@@ -65,6 +65,12 @@ HRESULT CLevel_GamePlay::Initialize_Clone()
 	// 레벨 시작 시 FadeIn 효과 시작
 	Start_FadeIn();
 	
+
+	// threshold, Soft 설정
+	m_pGameInstance->Setting_Threshold(0.9f);
+	m_pGameInstance->Setting_Soft(0.2f);
+	
+
 	return S_OK;
 }
 

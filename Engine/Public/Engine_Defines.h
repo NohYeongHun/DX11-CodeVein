@@ -190,6 +190,8 @@ static void OutPutDebugFloat4(XMFLOAT4 vDebugValue)
 }
 
 
+
+
 #pragma endregion
 
 

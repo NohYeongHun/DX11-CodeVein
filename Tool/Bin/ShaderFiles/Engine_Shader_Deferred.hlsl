@@ -18,6 +18,7 @@ texture2D g_NormalTexture;
 texture2D g_DepthTexture;
 texture2D g_ShadeTexture;
 texture2D g_SpecularTexture;
+texture2D g_EmissiveTexture;
 
 // Bloom용 텍스처들
 texture2D g_sceneTexture;
@@ -28,6 +29,8 @@ float g_fBrightThreshold = 1.0f;
 float g_fBloomIntensity = 1.0f;
 float2 g_vTexelSize = float2(1.0f / 1280.0f, 1.0f / 720.0f);
 
+float threshold = 0.5f; // 조정 가능 (예: 0.8 ~ 0.95)
+float soft = 0.20f; // 페이드 범위
 struct VS_IN
 {
     float3 vPosition : POSITION;
@@ -81,6 +84,7 @@ struct PS_OUT_LIGHT
     //vector vSpecular : SV_TARGET1;
 };
 
+/* 빛연산 */
 PS_OUT_LIGHT PS_MAIN_DIRECTIONAL(PS_IN In)
 {
     PS_OUT_LIGHT Out = (PS_OUT_LIGHT) 0;
@@ -135,10 +139,22 @@ PS_OUT_BACKBUFFER PS_MAIN_COMBINED(PS_IN In)
 {
     PS_OUT_BACKBUFFER Out = (PS_OUT_BACKBUFFER) 0;
     
+    
+    // 1. 깊이 텍스처를 샘플링하여 깊이 값을 가져옵니다.
+    float fDepth = g_DepthTexture.Sample(DefaultSampler, In.vTexcoord).r;
+    
+    // 2. 깊이 값이 1.0에 가깝다면 (배경이라면) 픽셀 렌더링을 중단합니다.
+    if (fDepth >= 0.9999f)
+    {
+        discard;
+    }
+    
+    // 3. (오브젝트가 그려진 경우) 기존 로직을 그대로 수행합니다.
     vector vDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
     
-    //if (vDiffuse.a == 0.f)
-    //    discard;
+    if (vDiffuse.a == 0.f)
+        discard;
+    
     
     vector vShade = g_ShadeTexture.Sample(DefaultSampler, In.vTexcoord);
     //vector vSpecular = g_SpecularTexture.Sample(DefaultSampler, In.vTexcoord);
@@ -154,6 +170,23 @@ PS_OUT_BACKBUFFER PS_MAIN_COMBINED(PS_IN In)
     
     return Out;
 }
+
+PS_OUT_BACKBUFFER PS_MAIN_EMISSIVE(PS_IN In)
+{
+    PS_OUT_BACKBUFFER Out = (PS_OUT_BACKBUFFER) 0;
+    
+    // 1. 기본 Diffuse Sampling 
+    vector vDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
+    
+    clip(vDiffuse.a - 0.05f);
+    
+    // 2. Emissive 공식
+    vDiffuse += pow(vDiffuse, 1.1f); 
+    
+    Out.vColor = vDiffuse;
+    return Out;
+}
+
 
 
 PS_OUT_BACKBUFFER PS_MAIN_DISTORTION(PS_IN In)
@@ -177,22 +210,32 @@ PS_OUT_BACKBUFFER PS_MAIN_DISTORTION(PS_IN In)
 // Bloom Bright Pass - 밝은 부분만 추출
 PS_OUT_BACKBUFFER PS_MAIN_BRIGHT_PASS(PS_IN In)
 {
-    PS_OUT_BACKBUFFER Out = (PS_OUT_BACKBUFFER) 0;
-    vector vSceneColor = g_sceneTexture.Sample(DefaultSampler, In.vTexcoord);
+    //PS_OUT_BACKBUFFER Out = (PS_OUT_BACKBUFFER) 0;
+    //vector vSceneColor = g_sceneTexture.Sample(DefaultSampler, In.vTexcoord);
 
-    // 원본 색상에서 임계값만큼 밝기를 뺌 (어두운 부분은 음수가 됨)
-    vector vBrightColor = vSceneColor - g_fBrightThreshold;
+    //// 원본 색상에서 임계값만큼 밝기를 뺌 (어두운 부분은 음수가 됨)
+    //vector vBrightColor = vSceneColor - g_fBrightThreshold;
     
-    // saturate를 통해 0 미만인 값들을 0으로 만듦
-    Out.vColor = saturate(vBrightColor);
+    //// saturate를 통해 0 미만인 값들을 0으로 만듦
+    //Out.vColor = saturate(vBrightColor);
     
-    // 알파 값 유지 (필요 시)
-    Out.vColor.a = vSceneColor.a;
+    //// 알파 값 유지 (필요 시)
+    //Out.vColor.a = vSceneColor.a;
     
+    //return Out;
+    
+    PS_OUT_BACKBUFFER Out = (PS_OUT_BACKBUFFER) 0;
+    float4 BrightColor = float4(0.0f, 0.0f, 0.0f, 0.0f);
+    float4 originalColor = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
+    float brightness = dot(originalColor.rgb, float3(0.2126f, 0.7152f, 0.0722f));
+
+    float factor = smoothstep(threshold, threshold + soft, brightness);
+    BrightColor = originalColor * factor;
+    Out.vColor = BrightColor;
     return Out;
 }
 
-// 수평 블러
+// 수평 블러 X
 PS_OUT_BACKBUFFER PS_MAIN_BLUR_HORIZONTAL(PS_IN In)
 {
     PS_OUT_BACKBUFFER Out = (PS_OUT_BACKBUFFER) 0;
@@ -266,7 +309,8 @@ PS_OUT_BACKBUFFER PS_MAIN_BLOOM_COMBINE(PS_IN In)
 
 technique11 DefaultTechnique
 {
-    pass Debug
+    
+    pass Debug // 0
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_Default, 0);
@@ -277,7 +321,7 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_MAIN_DEBUG();
     }
 
-    pass Directional
+    pass Directional // 1
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_None, 0);
@@ -288,7 +332,7 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_MAIN_DIRECTIONAL();
     }
 
-    pass Point
+    pass Point // 2
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_None, 0);
@@ -299,7 +343,7 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_MAIN_POINT();
     }
 
-    pass Combined
+    pass Combined // 3
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_None, 0);
@@ -310,7 +354,18 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_MAIN_COMBINED();
     }
 
-    pass Distortion
+    pass Emissive // 4
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_None, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_MAIN_EMISSIVE();
+    }
+
+    pass Distortion // 5
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_None, 0);
@@ -321,7 +376,7 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_MAIN_DISTORTION();
     }
 
-    pass BrightPass
+    pass BrightPass // 6
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_None, 0);
@@ -332,7 +387,7 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_MAIN_BRIGHT_PASS();
     }
 
-    pass BlurHorizontal
+    pass BlurHorizontal // 7
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_None, 0);
@@ -343,7 +398,7 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_MAIN_BLUR_HORIZONTAL();
     }
 
-    pass BlurVertical
+    pass BlurVertical // 8
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_None, 0);
@@ -354,7 +409,7 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_MAIN_BLUR_VERTICAL();
     }
 
-    pass BloomCombine
+    pass BloomCombine // 9
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_None, 0);

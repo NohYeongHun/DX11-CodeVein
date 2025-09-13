@@ -7,6 +7,8 @@ NS_END
 
 NS_BEGIN(Client)
 
+
+
 class CMainApp final : public CBase
 {
 private:
@@ -25,6 +27,9 @@ private:
 
 	CImgui_Manager* m_pImGui_Manager = { nullptr };
 
+
+	_float m_fThreshold = { 0.8f };
+	_float m_fSoft = { 0.2f };
 private:
 	// 로더용 클래스 하나 가져오기.
 	CLoader_Static m_cLoader_Static;

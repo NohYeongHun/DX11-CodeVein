@@ -75,6 +75,9 @@ HRESULT CLevel_StageOne::Initialize_Clone()
 	// 레벨 시작 시 FadeIn 효과 시작
 	Start_FadeIn();
 
+	m_pGameInstance->Setting_Threshold(0.9f);
+	m_pGameInstance->Setting_Soft(0.3f);
+
 	return S_OK;
 }
 
@@ -130,7 +133,7 @@ HRESULT CLevel_StageOne::Ready_Lights()
 	LightDesc.eType = LIGHT_DESC::TYPE::DIRECTIONAL;
 	LightDesc.vDirection = _float4(1.f, -1.f, 1.f, 0.f);
 	LightDesc.vDiffuse = _float4(1.f, 1.f, 1.f, 1.f);
-	LightDesc.vAmbient = _float4(0.4f, 0.4f, 0.4f, 1.f);
+	LightDesc.vAmbient = _float4(0.3f, 0.3f, 0.3f, 1.f);
 	LightDesc.vSpecular = _float4(1.f, 1.f, 1.f, 1.f);
 
 	if (FAILED(m_pGameInstance->Add_Light(LightDesc)))

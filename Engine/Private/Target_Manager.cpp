@@ -59,8 +59,11 @@ HRESULT CTarget_Manager::Add_MRT(const _wstring& strMRTTag, const _wstring& strT
 HRESULT CTarget_Manager::Begin_MRT(const _wstring& strMRTTag, _bool bClear)
 {
 	list<CRenderTarget*>* pMRTList = Find_MRT(strMRTTag);
-	if (nullptr == pMRTList)
-		return E_FAIL;
+
+	ASSERT_CRASH(pMRTList);
+
+	Safe_Release(m_pBackBuffer);
+	Safe_Release(m_pOriginalDSV);
 
 	m_pContext->OMGetRenderTargets(1, &m_pBackBuffer, &m_pOriginalDSV);
 
@@ -76,7 +79,21 @@ HRESULT CTarget_Manager::Begin_MRT(const _wstring& strMRTTag, _bool bClear)
 		RenderTargets[iNumRenderTargets++] = pRenderTarget->Get_RTV();
 	}
 
-	m_pContext->OMSetRenderTargets(iNumRenderTargets, RenderTargets, m_pOriginalDSV);
+	ID3D11DepthStencilView* pDSV = m_pOriginalDSV;
+
+	//// 2. 만약 MRT 이름이 블러용 MRT라면, 뎁스 버퍼를 사용하지 않도록 nullptr로 변경
+	if (strMRTTag == TEXT("MRT_BloomBlurX") ||
+		strMRTTag == TEXT("MRT_BloomBlurY") ||
+		strMRTTag == TEXT("MRT_BrightPass") || // BrightPass도 뎁스 버퍼 불필요
+		strMRTTag == TEXT("MRT_Post_BlurX") || // 이전 코드 호환
+		strMRTTag == TEXT("MRT_Post_BlurY"))   // 이전 코드 호환
+	{
+		pDSV = nullptr;
+	}
+
+	// 3. 최종적으로 위에서 결정된 pDSV를 사용해 렌더 타겟 설정
+	m_pContext->OMSetRenderTargets(iNumRenderTargets, RenderTargets, pDSV);
+	//m_pContext->OMSetRenderTargets(iNumRenderTargets, RenderTargets, m_pOriginalDSV);
 
 	return S_OK;
 }
@@ -85,8 +102,8 @@ HRESULT CTarget_Manager::End_MRT()
 {
 	m_pContext->OMSetRenderTargets(1, &m_pBackBuffer, m_pOriginalDSV);
 
-	Safe_Release(m_pOriginalDSV);
-	Safe_Release(m_pBackBuffer);
+	//Safe_Release(m_pOriginalDSV);
+	//Safe_Release(m_pBackBuffer);
 
 	return S_OK;
 }
@@ -168,6 +185,10 @@ void CTarget_Manager::Free()
 	for (auto& Pair : m_RenderTargets)
 		Safe_Release(Pair.second);
 	m_RenderTargets.clear();
+
+	Safe_Release(m_pBackBuffer);
+	Safe_Release(m_pOriginalDSV);
+	
 
 	Safe_Release(m_pDevice);
 	Safe_Release(m_pContext);

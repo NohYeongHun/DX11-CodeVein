@@ -1,4 +1,5 @@
-﻿CMainApp::CMainApp()
+﻿
+CMainApp::CMainApp()
 	: m_pGameInstance{ CGameInstance::GetInstance() }
 {
 	Safe_AddRef(m_pGameInstance);
@@ -63,12 +64,12 @@ HRESULT CMainApp::Initialize()
 	}
 
 
-	//if (FAILED(Start_Level(LEVEL::GAMEPLAY)))
-	//	return E_FAIL;
+	if (FAILED(Start_Level(LEVEL::GAMEPLAY)))
+		return E_FAIL;
 
 	// 원본
-	if (FAILED(Start_Level(LEVEL::LOGO)))
-		return E_FAIL;
+	//if (FAILED(Start_Level(LEVEL::LOGO)))
+	//	return E_FAIL;
 
 	//if (FAILED(Start_Level(LEVEL::DEBUG)))
 	//	return E_FAIL;
@@ -92,8 +93,31 @@ HRESULT CMainApp::Render()
 
 	m_pGameInstance->Draw();
 
+	
+
+	ImGuiIO& io = ImGui::GetIO();
+
+	// 기존 Player Debug Window
+	ImVec2 windowPos = ImVec2(0.f, io.DisplaySize.y - 300.f);
+	ImVec2 windowSize = ImVec2(300.f, 300.f);
+
+	ImGui::SetNextWindowPos(windowPos, ImGuiCond_Once);
+	ImGui::SetNextWindowSize(windowSize, ImGuiCond_Once);
 	ImGui::Begin("Information");
+
+
 	ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
+	
+	ImGui::SliderFloat("threshold", &m_fThreshold, 0.f, 1.f);
+	ImGui::SliderFloat("soft", &m_fSoft, 0.f, 1.f);
+
+	if (ImGui::Button("Apply Value"))
+	{
+		m_pGameInstance->Setting_Threshold(m_fThreshold);
+		m_pGameInstance->Setting_Soft(m_fSoft);
+	}
+	
+
 	ImGui::End();
 
 	m_pImGui_Manager->Render_End();
