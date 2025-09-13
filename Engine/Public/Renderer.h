@@ -6,6 +6,9 @@
 /* 화면에 그려질 객체들을 그리는 순서대로 분류하여 보관한 클래스 */
 /* 보관한 순서대로 객첻르의 렌더콜을 해준다. */
 
+
+
+
 NS_BEGIN(Engine)
 
 class CRenderer final : public CBase
@@ -21,6 +24,9 @@ public:
 public:
 	HRESULT Add_RenderGroup(RENDERGROUP eRenderGroup, class CGameObject* pRenderObject);
 	HRESULT Draw();
+
+	void Setting_Threshold(_float fThreShold);
+	void Setting_Soft(_float fSoft);
 	
 
 #pragma endregion
@@ -43,11 +49,15 @@ private:
 
 #pragma region 장면 캡쳐(직교 투영 텍스쳐)를 만들기 위해 소유해야할 것들.
 private:
-	class CShader* m_pShader = { nullptr };
+	class CShader* m_pDefferedShader = { nullptr };
+	class CShader* m_pPostLightShader = { nullptr };
+
 	class CVIBuffer_Rect* m_pVIBuffer = { nullptr };
-
-
 	_float4x4 m_WorldMatrix{}, m_ViewMatrix{}, m_ProjMatrix{};
+	D3D11_VIEWPORT m_ViewPortDesc = {};
+
+	_float m_fThreShold = { 0.8f };
+	_float m_fSoft = { 0.2f };
 #pragma endregion
 
 
@@ -66,19 +76,22 @@ private:
 
 private:
 	HRESULT Render_Priority();
-	HRESULT Render_Shadow();
+	//HRESULT Render_Shadow();
 	HRESULT Render_NonBlend();
-
 	HRESULT Render_Lights();
 	HRESULT Render_Combined();
-	HRESULT Render_BloomObjects();
-	HRESULT Render_Bloom();
-	HRESULT Render_BrightPass();
+	HRESULT Render_Blend();
+
+	HRESULT Render_DebugCombined();
+	HRESULT Render_NonLight();
 	HRESULT Render_BloomBlur();
 	HRESULT Render_BloomCombine();
-	HRESULT Render_PostProcess();
-	HRESULT Render_NonLight();
-	HRESULT Render_Blend();
+	/*HRESULT Render_Bloom();
+	HRESULT Render_BrightPass();*/
+	
+	
+	
+	
 	
 
 

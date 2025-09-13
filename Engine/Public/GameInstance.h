@@ -86,6 +86,8 @@ public:
 #pragma region RENDERER
 public:
 	HRESULT Add_RenderGroup(RENDERGROUP eRenderGroup, class CGameObject* pRenderObject);
+	void Setting_Threshold(_float fThreShold);
+	void Setting_Soft(_float fSoft);
 
 #ifdef _DEBUG
 public:

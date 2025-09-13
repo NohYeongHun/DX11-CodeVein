@@ -210,7 +210,7 @@ struct PS_IN
 struct PS_OUT
 {
     float4 vColor : SV_TARGET0;
-    
+
 };
 
 /* 만든 픽셀 각각에 대해서 픽셀 쉐이더를 수행한다. */
@@ -346,57 +346,40 @@ PS_OUT PS_DIFFUSE_QUEENKNIGHTWARP_MAIN(PS_IN In)
         
     }
     
-    vMtrlDiffuse.rgb = pow(vMtrlDiffuse.rgb, 7.f);
-    
-    float fadeAlpha = 1.0f - g_fTimeRatio;
-    vMtrlDiffuse.a *= fadeAlpha;
+    float lifeRatio = In.vLifeTime.x / In.vLifeTime.y;
+    float lifeCurve = sin(lifeRatio * 3.14159f);
 
+    vector bloomColor = float4(float3(4.0f, 0.5f, 0.2f) * g_fBloomIntensity, 1.0f);
     
+    // 3. 마스크가 밝은 부분에 블룸 색상을 더해줍니다.
+    //    fMaskBrightness 값은 이미 위에서 계산되었습니다.
+    if (fMaskBrightness > 0.1f) // 임계값은 0.1 ~ 0.5 사이에서 조정
+    {
+        // vMtrlDiffuse.rgb에 bloomColor.rgb를 더합니다.
+        // lifeCurve를 곱해줘서 파티클 수명에 따라 자연스럽게 빛나도록 합니다.
+        vMtrlDiffuse.rgb += bloomColor.rgb * vMask.rgb * lifeCurve;
+    }
+
+    // 4. 최종 알파 값을 계산하고 적용합니다.
+    float fadeAlpha = 1.0f - g_fTimeRatio; // 기존 코드
+    vMtrlDiffuse.a *= fadeAlpha; // 기존 코드
     
     Out.vColor = vMtrlDiffuse;
+    
+    //vMtrlDiffuse.rgb = pow(vMtrlDiffuse.rgb, 7.f);
+    //
+    //float fadeAlpha = 1.0f - g_fTimeRatio;
+    //vMtrlDiffuse.a *= fadeAlpha;
+    //
+    //
+    //
+    //Out.vColor = vMtrlDiffuse;
     
 
     
     return Out;
 }
 
-
-
-
-//PS_OUT PS_DIFFUSE_EXPLOSION_MAIN(PS_IN In)
-//{
-//    PS_OUT Out = (PS_OUT) 0;
-
-//    float lifeRatio = In.vLifeTime.x / In.vLifeTime.y; // 0.0 ~ 1.0
-
-//    // ▼▼▼ [핵심 수정] sin 함수로 알파 값을 한번에 계산 ▼▼▼
-//    // lifeRatio가 0.0 -> 1.0 으로 변할 때, sin 값은 0 -> 1 -> 0 으로 부드럽게 변합니다.
-//    float fadeAlpha = sin(lifeRatio * 3.14159f);
-
-//    // 2. 크기 애니메이션은 그대로 유지
-//    float initialScale = 0.1f;
-//    float maxScale = 1.0f;
-//    float scaleProgress = pow(lifeRatio, 0.5f);
-//    float currentTextureScale = lerp(initialScale, maxScale, scaleProgress);
-
-//    float2 centerUV = float2(0.5f, 0.5f);
-//    float2 scaledUV = centerUV + (In.vTexcoord - centerUV) / currentTextureScale;
-
-//    if (scaledUV.x < 0.0f || scaledUV.x > 1.0f || scaledUV.y < 0.0f || scaledUV.y > 1.0f)
-//        discard;
-    
-//    // 3. 텍스처 샘플링 및 블룸
-//    vector texColor = g_DiffuseTexture.Sample(DefaultSampler, scaledUV);
-//    vector bloomColor = float4(float3(2.5f, 1.8f, 0.5f) * g_fBloomIntensity, texColor.a);
-    
-//    if (texColor.r < 0.1f && texColor.g < 0.1f && texColor.b < 0.1f)
-//        discard;
-
-//    // 4. 최종 색상 조합
-//    Out.vColor = float4(bloomColor.rgb, texColor.a * fadeAlpha);
-    
-//    return Out;
-//}
 
 PS_OUT PS_DIFFUSE_EXPLOSION_MAIN(PS_IN In)
 {
@@ -426,7 +409,7 @@ PS_OUT PS_DIFFUSE_EXPLOSION_MAIN(PS_IN In)
     
     // 3. 텍스처 샘플링 및 블룸 (기존과 동일)
     vector texColor = g_DiffuseTexture.Sample(DefaultSampler, scaledUV);
-    vector bloomColor = float4(float3(2.5f, 1.8f, 0.5f) * g_fBloomIntensity, texColor.a);
+    vector bloomColor = float4(float3(2.5f, 1.8f, 0.5f) * g_fBloomIntensity * 5.f, texColor.a);
     
     if (texColor.r < 0.1f && texColor.g < 0.1f && texColor.b < 0.1f)
         discard;

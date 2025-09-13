@@ -2,10 +2,13 @@
 
 matrix g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 Texture2D g_DiffuseTexture;
-Texture2D g_BlurTexture;
-float2 g_vTexelSize = float2(1.0f / (1920.f / 4.f), 1.0f / (1080.f / 4.f));
-float threshold = 0.5f; // 조정 가능 (예: 0.8 ~ 0.95)
-float soft = 0.20f; // 페이드 범위
+Texture2D g_BloomTexture;
+//float2 g_vTexelSize = float2(1.0f / (1920.f / 4.f), 1.0f / (1080.f / 4.f));
+float2 g_vTexelSize = float2(1.0f / (1920.f / 8.f), 1.0f / (1080.f / 8.f));
+
+float threshold = 0.95f; // 조정 가능 (예: 0.8 ~ 0.95)
+float soft = 0.1f; // 페이드 범위
+float g_fBloomIntensity = 2.f;
 
 struct VS_IN
 {
@@ -44,43 +47,7 @@ struct PS_OUT
     float4 vColor : SV_TARGET0;
 };
 
-// PS_OUT PS_DOWNSAMPLE_2X2(PS_IN In)
-// {
-//     PS_OUT Out = (PS_OUT)0;
-//     float4 color = float4(0, 0, 0, 0);
-//
-//     // 주변 4픽셀 샘플링 (2x2)
-//     color += g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
-//     color += g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord + float2(g_vTexelSize.x, 0));
-//     color += g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord + float2(0, g_vTexelSize.y));
-//     color += g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord + g_vTexelSize);
-//
-//     color *= 0.25f; // 평균값
-//     Out.vColor = color;
-//     return Out;
-// }
-
-// PS_OUT PS_DOWNSAMPLE_4X4(PS_IN In)
-// {
-//     PS_OUT Out = (PS_OUT)0;
-//     float4 color = float4(0, 0, 0, 0);
-//
-//     // 4x4 샘플링
-//     for (int y = 0; y < 4; ++y)
-//     {
-//         for (int x = 0; x < 4; ++x)
-//         {
-//             float2 offset = float2(x * g_vTexelSize.x, y * g_vTexelSize.y);
-//             color += g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord + offset);
-//         }
-//     }
-//
-//     color *= 1.0 / 16.0; // 16픽셀 평균
-//     Out.vColor = color;
-//     return Out;
-// }
-
-PS_OUT PS_MAIN(PS_IN In)
+PS_OUT PS_BLOOMBRIGHT_MAIN(PS_IN In)
 {
     PS_OUT Out = (PS_OUT)0;
     float4 BrightColor = float4(0.0f, 0.0f, 0.0f, 0.0f);
@@ -131,19 +98,40 @@ PS_OUT PS_BLUR_Y(PS_IN In)
     return Out;
 }
 
+//PS_OUT PS_SUM_BLUR(PS_IN In)
+//{
+//    PS_OUT Out = (PS_OUT)0;
+//    float4 vColor = float4(0.0f, 0.0f, 0.0f, 0.0f);
+//    vColor += g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
+//    vColor += g_BloomTexture.Sample(DefaultSampler, In.vTexcoord);
+//    Out.vColor = vColor;
+//    return Out;
+//}
+
 PS_OUT PS_SUM_BLUR(PS_IN In)
 {
-    PS_OUT Out = (PS_OUT)0;
-    float4 vColor = float4(0.0f, 0.0f, 0.0f, 0.0f);
-    vColor += g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
-    vColor += g_BlurTexture.Sample(DefaultSampler, In.vTexcoord);
-    Out.vColor = vColor;
+    PS_OUT Out = (PS_OUT) 0;
+    
+    float4 vSceneColor = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
+    float4 vBloomColor = g_BloomTexture.Sample(DefaultSampler, In.vTexcoord);
+
+    // 금빛 느낌을 강조하기 위해 약간의 오렌지색 틴트(Tint)를 곱해줍니다.
+    float3 vBloomTint = float3(1.0f, 0.7f, 0.3f);
+    vBloomColor.rgb *= vBloomTint;
+
+    // C++에서 받아온 g_fBloomIntensity와 같은 변수로 강도 조절
+    Out.vColor = vSceneColor + vBloomColor * g_fBloomIntensity;
+    
+    // (선택) 톤 매핑으로 자연스러운 마무리
+    Out.vColor.rgb = Out.vColor.rgb / (Out.vColor.rgb + 1.0f);
+    
     return Out;
 }
 
+
 technique11 DefaultTechnique
 {
-    pass BloomExtractBrightPass
+    pass BloomExtractBrightPass // 0
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_None, 0);
@@ -151,7 +139,7 @@ technique11 DefaultTechnique
         
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
-        PixelShader = compile ps_5_0 PS_MAIN();
+        PixelShader = compile ps_5_0 PS_BLOOMBRIGHT_MAIN();
     
     
     
@@ -171,7 +159,7 @@ technique11 DefaultTechnique
     
     }
 
-    pass GaussianBlurXPass
+    pass GaussianBlurXPass // 1
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_None, 0);
@@ -199,7 +187,7 @@ technique11 DefaultTechnique
     
     }
 
-    pass GaussianBlurYPass
+    pass GaussianBlurYPass // 2
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_None, 0);
@@ -226,7 +214,7 @@ technique11 DefaultTechnique
     
     
     }
-    pass SumBlurYPass
+    pass SumBlurPass // 3
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_None, 0);

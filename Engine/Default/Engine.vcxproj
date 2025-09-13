@@ -353,6 +353,7 @@ call copy.bat</Command>
     <None Include="GameInstance.inl" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="..\Bin\ShaderFiles\Engine_Shader_BloomBright.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Engine_Shader_Cell.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Engine_Shader_Deferred.hlsl" />
   </ItemGroup>

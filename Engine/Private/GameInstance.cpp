@@ -1,4 +1,5 @@
-﻿IMPLEMENT_SINGLETON(CGameInstance)
+﻿#include "GameInstance.h"
+IMPLEMENT_SINGLETON(CGameInstance)
 
 CGameInstance::CGameInstance()
 {
@@ -398,6 +399,16 @@ HRESULT CGameInstance::Add_RenderGroup(RENDERGROUP eRenderGroup, CGameObject* pR
 {
 
 	return m_pRenderer->Add_RenderGroup(eRenderGroup, pRenderObject);
+}
+
+void CGameInstance::Setting_Threshold(_float fThreShold)
+{
+	m_pRenderer->Setting_Threshold(fThreShold);
+}
+
+void CGameInstance::Setting_Soft(_float fSoft)
+{
+	m_pRenderer->Setting_Soft(fSoft);
 }
 
 #ifdef _DEBUG

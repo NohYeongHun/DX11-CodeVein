@@ -68,94 +68,6 @@ PS_OUT PS_MAIN(PS_IN In)
 }
 
 
-//PS_OUT PS_HITFLASH_MAIN(PS_IN In)
-//{
-//    PS_OUT Out = (PS_OUT) 0;
-
-//    // --- 1. '선들이 길어지는' 효과를 위한 마스크 생성 ---
-//    // Radial 텍스처(Other[2])를 이용해 중앙에서부터 바깥으로 퍼지는 원형 마스크를 만듭니다.
-//    float radialValue = g_OtherTexture[2].Sample(DefaultSampler, In.vTexcoord).r;
-    
-//    // 시간에 따라 마스크의 경계선이 1(중앙)에서 0(가장자리)으로 이동합니다.
-//    float threshold = 1.0f - g_fTimeRatio;
-    
-//    // 경계선 안쪽만 보이도록 하여 '자라나는' 효과를 만듭니다.
-//    float revealMask = smoothstep(threshold - 0.1f, threshold + 0.1f, radialValue);
-
-//    // --- 2. 최종 조합 ---
-//    // Opacity 텍스처에서 원본 불꽃 모양을 가져옵니다.
-//    float sparkShape = g_OpacityTexture.Sample(DefaultSampler, In.vTexcoord).r;
-
-//    // 시간에 따라 전체적으로 옅어지며 사라지는 효과를 만듭니다.
-//    float fadeAlpha = pow(1.0f - g_fTimeRatio, 2.0f);
-
-//    // 최종 모양 = (원본 불꽃 모양 * 자라나는 마스크)
-//    float finalShape = sparkShape * revealMask;
-    
-//    // 최종 알파 = (최종 모양 * 전체 Fade)
-//    float finalAlpha = finalShape * fadeAlpha;
-
-//    // 색상 적용
-//    float3 goldColor = float3(2.5f, 1.8f, 0.5f) * g_fBloomIntensity;
-//    float3 finalColor = goldColor * finalShape;
-    
-//    // 최종 결과 반환
-//    Out.vColor = float4(finalColor, finalAlpha);
-    
-//    return Out;
-//}
-
-// UV를 회전시키는 헬퍼 함수
-
-
-
-//PS_OUT PS_HITFLASH_MAIN(PS_IN In)
-//{
-//    PS_OUT Out = (PS_OUT) 0;
-
-//    float radialValue = g_OtherTexture[2].Sample(DefaultSampler, In.vTexcoord).r;
-//    float threshold = 1.0f - g_fTimeRatio;
-//    float revealMask = smoothstep(threshold - 0.1f, threshold + 0.1f, radialValue);
-
-//    // --- 노이즈 마스크 생성 ---
-//    float2 noiseUV = RotateUV(In.vTexcoord, g_fTimeRatio * 2.0f, float2(0.5f, 0.5f));
-//    float noiseValue = g_DiffuseTexture.Sample(DefaultSampler, noiseUV).r;
-
-//    // ▼▼▼ [핵심 수정] 구름 텍스처로 더 효과적인 '가짜 노이즈' 생성 ▼▼▼
-//    // 1. 값에 숫자를 곱해 범위를 증폭시킵니다. (패턴이 더 많아짐)
-//    float amplifiedNoise = noiseValue * 10.0f;
-    
-//    // 2. frac() 함수로 소수점 아랫부분만 남겨 등고선 같은 패턴을 만듭니다.
-//    float proceduralNoise = frac(amplifiedNoise);
-    
-//    // 3. 이 새로운 패턴을 기준으로 흑백 마스크를 생성합니다.
-//    float binaryNoiseMask = step(0.5f, proceduralNoise);
-    
-//    // --- 최종 조합 ---
-//    float sparkShape = g_OpacityTexture.Sample(DefaultSampler, In.vTexcoord).r;
-//    float fadeAlpha = pow(1.0f - g_fTimeRatio, 2.0f);
-    
-//    // 최종 모양에 새로 만든 노이즈 마스크를 곱합니다.
-//    float finalShape = sparkShape * revealMask * binaryNoiseMask;
-    
-//    float finalAlpha = finalShape * fadeAlpha;
-//    float3 goldColor = float3(2.5f, 1.8f, 0.5f) * g_fBloomIntensity;
-//    float3 finalColor = goldColor * finalShape;
-    
-//    Out.vColor = float4(finalColor, finalAlpha);
-    
-//    return Out;
-//}
-
-//float2 RotateUV(float2 uv, float rotation, float2 pivot)
-//{
-//    float s = sin(rotation);
-//    float c = cos(rotation);
-//    uv -= pivot;
-//    uv = float2(uv.x * c - uv.y * s, uv.x * s + uv.y * c);
-//    uv += pivot;
-//    return uv;
-//}
 
 PS_OUT PS_HITFLASH_MAIN(PS_IN In)
 {
@@ -169,7 +81,10 @@ PS_OUT PS_HITFLASH_MAIN(PS_IN In)
     
     // ▼▼▼ [핵심 수정] radialGlow의 강도를 0.25배로 줄여 은은하게 만듭니다 ▼▼▼
     // 이 숫자(0.25f)를 조절하여 빛무리의 밝기를 원하는 대로 바꿀 수 있습니다.
-    float finalShape = saturate(sparkShape + (radialGlow * 0.25f));
+    
+    // radialGlow 관련 두 줄을 삭제하고 아래와 같이 수정합니다.
+    //float finalShape = sparkShape;
+    float finalShape = saturate(sparkShape + (radialGlow * 0.1f));
 
     // 2. 시간에 따라 나타났다가 사라지는 알파값을 계산합니다.
     float fadeAlpha = sin(saturate(g_fTimeRatio) * 3.14159f);
