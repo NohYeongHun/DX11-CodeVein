@@ -247,8 +247,14 @@
     <Filter Include="02. GameObject\Effect\Mesh">
       <UniqueIdentifier>{0671d8e2-3718-4deb-b6fe-ee9b240163c2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="02. GameObject\Effect\Mesh\CirculatePurge">
+    <Filter Include="02. GameObject\Effect\Mesh\Player">
+      <UniqueIdentifier>{97ad954e-5241-4d79-b8fd-bca7f53bf75a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Effect\Mesh\Player\CirculatePurge">
       <UniqueIdentifier>{ab7f70dc-17c3-45c2-a229-ccbdce235810}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Effect\Mesh\Boss">
+      <UniqueIdentifier>{6fc47c4d-0b5b-4e1e-ae5a-f0dafe85725a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -679,7 +685,7 @@
       <Filter>99. Defines</Filter>
     </ClInclude>
     <ClInclude Include="..\Public\Effect_Wind.h">
-      <Filter>02. GameObject\Effect\Mesh\CirculatePurge</Filter>
+      <Filter>02. GameObject\Effect\Mesh\Player\CirculatePurge</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1081,7 +1087,7 @@
       <Filter>01. Levels\99. Loading\Loader\Personal</Filter>
     </ClCompile>
     <ClCompile Include="..\Private\Effect_Wind.cpp">
-      <Filter>02. GameObject\Effect\Mesh\CirculatePurge</Filter>
+      <Filter>02. GameObject\Effect\Mesh\Player\CirculatePurge</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

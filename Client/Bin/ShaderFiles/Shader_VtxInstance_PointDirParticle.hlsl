@@ -340,7 +340,7 @@ PS_OUT PS_DIFFUSE_QUEENKNIGHTWARP_MAIN(PS_IN In)
     float fMaskBrightness = dot(vMask.rgb, float3(0.299, 0.587, 0.114));
     if (fMaskBrightness > 0.5f)
     {
-        vector vEmissive = vMask * g_fEmissiveIntensity * 2.0f;
+        vector vEmissive = vMask * g_fEmissiveIntensity * 4.0f;
         //vector vEmissive = vMask * 2.f;
         //vMtrlDiffuse.rgb = saturate(vMtrlDiffuse.rgb + vEmissive.rgb);
         vMtrlDiffuse.rgb += vEmissive.rgb;
@@ -350,7 +350,7 @@ PS_OUT PS_DIFFUSE_QUEENKNIGHTWARP_MAIN(PS_IN In)
     float lifeRatio = In.vLifeTime.x / In.vLifeTime.y;
     float lifeCurve = sin(lifeRatio * 3.14159f);
 
-    vector bloomColor = float4(float3(4.0f, 0.5f, 0.2f) * g_fBloomIntensity, 1.0f);
+    vector bloomColor = float4(float3(8.0f, 0.01f, 0.01f) * g_fBloomIntensity, 1.0f);
     
     // 3. 마스크가 밝은 부분에 블룸 색상을 더해줍니다.
     //    fMaskBrightness 값은 이미 위에서 계산되었습니다.
@@ -366,11 +366,10 @@ PS_OUT PS_DIFFUSE_QUEENKNIGHTWARP_MAIN(PS_IN In)
     vMtrlDiffuse.a *= fadeAlpha; // 기존 코드
     
     Out.vColor = vMtrlDiffuse;
+
     
     vector vMtrlDissolve = g_NoiseTextures[0].Sample(DefaultSampler, In.vTexcoord);
-    //vector vMtrlDissolve = g_OtherTextures[5].Sample(DefaultSampler, In.vTexcoord);
-    
-    clip(vMtrlDissolve.r - g_fTimeRatio);
+    clip(vMtrlDissolve.r - g_fTimeRatio); // r 0 ~ 1.f => g_fTimeRatio를 최소시간, 최대시간이 있잖아요 이걸 0 ~ 1.f로 정규화해서
     
     
 
