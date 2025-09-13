@@ -264,7 +264,7 @@ HRESULT CSlash::Bind_ShaderResources()
     _float fTimeRatio = m_fCurrentTime / m_fDisplayTime;
     
     // 시간에 따른 스케일 증가 (1.0 -> 0.3)
-    _float fScale = 0.1f + (fTimeRatio * 0.7f);
+    _float fScale = 0.54f + (fTimeRatio * 1.f);
     
     if (FAILED(m_pShaderCom->Bind_RawValue("g_fTimeRatio", &fTimeRatio, sizeof(_float))))
     {

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 
 #include "Timer.h"
@@ -20,6 +20,18 @@ public:
 
 private:		
 	map<const _wstring, CTimer*>	m_Timers;
+
+#pragma region 느리게
+
+public:
+	void Set_SlowMoment(_float fSlowTime, _float fSlowFactor);
+	void Time_Pass(const _wstring& strTimerTag);
+
+private:
+	_float m_fSlowTime = {};   
+	_float m_fSlowFactor = {}; // 느리게 할 크기.
+#pragma endregion
+
 
 private:
 	CTimer* Find_Timer(const _wstring& strTimerTag);

@@ -10,6 +10,7 @@ texture2D g_MaskTexture;
 
 texture2D g_MaskTextures[16];
 texture2D g_OtherTextures[6];
+texture2D g_NoiseTextures[4];
 //Texture2DArray g_MaskTextures;
 
 uint g_MaskMaxidx;
@@ -366,59 +367,82 @@ PS_OUT PS_DIFFUSE_QUEENKNIGHTWARP_MAIN(PS_IN In)
     
     Out.vColor = vMtrlDiffuse;
     
-    //vMtrlDiffuse.rgb = pow(vMtrlDiffuse.rgb, 7.f);
-    //
-    //float fadeAlpha = 1.0f - g_fTimeRatio;
-    //vMtrlDiffuse.a *= fadeAlpha;
-    //
-    //
-    //
-    //Out.vColor = vMtrlDiffuse;
+    vector vMtrlDissolve = g_NoiseTextures[0].Sample(DefaultSampler, In.vTexcoord);
+    //vector vMtrlDissolve = g_OtherTextures[5].Sample(DefaultSampler, In.vTexcoord);
+    
+    clip(vMtrlDissolve.r - g_fTimeRatio);
+    
     
 
     
     return Out;
 }
-
 
 PS_OUT PS_DIFFUSE_EXPLOSION_MAIN(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
 
     float lifeRatio = In.vLifeTime.x / In.vLifeTime.y; // 0.0 ~ 1.0
-
-    // ▼▼▼ [핵심 수정 1] 알파와 스케일에 공통으로 사용할 sin 곡선 계산 ▼▼▼
-    // 이 값은 파티클 수명에 따라 0 -> 1 -> 0 으로 부드럽게 변합니다.
-    float lifeCurve = sin(lifeRatio * 3.14159f);
-
-    // 알파 값에 sin 곡선을 그대로 적용 (기존과 동일)
+    float lifeCurve = sin(lifeRatio * 3.14159f); // 0 -> 1 -> 0
     float fadeAlpha = lifeCurve;
 
-    // ▼▼▼ [핵심 수정 2] 크기 애니메이션에도 sin 곡선을 적용 ▼▼▼
-    float minScale = 0.01f; // 0으로 나누는 것을 방지하기 위한 최소 크기
+    // 크기 애니메이션
+    float minScale = 0.01f;
     float maxScale = 1.0f;
-    // lifeCurve(0->1->0)에 맞춰 크기가 minScale -> maxScale -> minScale 로 변하도록 수정
     float currentTextureScale = lerp(minScale, maxScale, lifeCurve);
 
-    // UV 계산 및 discard 로직은 그대로 유지
+    // UV 계산
     float2 centerUV = float2(0.5f, 0.5f);
     float2 scaledUV = centerUV + (In.vTexcoord - centerUV) / currentTextureScale;
 
     if (scaledUV.x < 0.0f || scaledUV.x > 1.0f || scaledUV.y < 0.0f || scaledUV.y > 1.0f)
         discard;
-    
-    // 3. 텍스처 샘플링 및 블룸 (기존과 동일)
+
+    // 텍스처 샘플링
     vector texColor = g_DiffuseTexture.Sample(DefaultSampler, scaledUV);
-    vector bloomColor = float4(float3(2.5f, 1.8f, 0.5f) * g_fBloomIntensity * 5.f, texColor.a);
-    
+
     if (texColor.r < 0.1f && texColor.g < 0.1f && texColor.b < 0.1f)
         discard;
 
-    // 4. 최종 색상 조합 (기존과 동일)
-    Out.vColor = float4(bloomColor.rgb, texColor.a * fadeAlpha);
+    // 기본 블룸 색상 계산
+    vector bloomColor = float4(float3(2.5f, 1.8f, 0.5f) * g_fBloomIntensity * 5.f, texColor.a);
+    
+    // ▼▼▼ [Emissive 효과 추가] ▼▼▼
+    
+    // 1. 텍스처의 현재 픽셀 밝기를 계산합니다. (Luminance)
+    float fBrightness = dot(texColor.rgb, float3(0.299, 0.587, 0.114));
+    
+    // 2. 최종 색상을 담을 변수를 선언하고, 기본 블룸 색상으로 초기화합니다.
+    vector vFinalColor = bloomColor;
+
+    // 3. 텍스처가 일정 밝기(임계값 0.5f) 이상인 부분에만 발광 효과를 추가합니다.
+    if (fBrightness > 0.5f) // 이 임계값(0.5f)은 원하는 결과에 따라 조절할 수 있습니다.
+    {
+        // 발광 색상을 계산합니다. (원본 텍스처 색상 * 발광 강도)
+        // g_fEmissiveIntensity는 C++ 코드에서 제어하는 전역 변수여야 합니다.
+        vector vEmissive = texColor * g_fEmissiveIntensity * 2.0f;
+        
+        // 최종 색상에 발광 색상을 더해줍니다. (Additive Blending)
+        vFinalColor.rgb += vEmissive.rgb;
+    }
+
+    // 4. 최종 색상 조합
+    // lifeCurve를 곱해주면 파티클 수명에 따라 자연스럽게 빛이 사라집니다.
+    Out.vColor = float4(vFinalColor.rgb * lifeCurve, texColor.a * fadeAlpha);
+    
+    
+    // 5. 사라짐 효과 추가.
+    
+
+    vector vMtrlDissolve = g_NoiseTextures[2].Sample(DefaultSampler, In.vTexcoord);
+    
+    clip(vMtrlDissolve.r - lifeRatio);
+    
     
     return Out;
 }
+
+
 
 // QueenKnight Particle 전용.
 PS_OUT PS_QUEENKNGIHT_PARTICLE_MAIN(PS_IN In)
@@ -430,13 +454,124 @@ PS_OUT PS_QUEENKNGIHT_PARTICLE_MAIN(PS_IN In)
     return Out;
 }
 
+PS_OUT PS_HITPARTICLE_MAIN(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+    
+    // 1. 기본 색상.
+    vector vSourDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
+    vector vDestDiffuse = float4(0, 0, 0, 1);
+    vector vMask = float4(0, 0, 0, 0);
+    
+    // 2. 마스킹
+    vMask = g_OtherTextures[5].Sample(DefaultSampler, In.vTexcoord);
+    vDestDiffuse = g_OtherTextures[5].Sample(DefaultSampler, In.vTexcoord);
+    
+    
+    // 3. 색상 버리기.
+    if (vDestDiffuse.r < 0.1f && vDestDiffuse.g < 0.1f && vDestDiffuse.b < 0.1f)
+        discard;
+    
+    // 4. Mask 범위 구하기.
+    vector vMtrlDiffuse = vDestDiffuse * (1.f - vMask) + vSourDiffuse * (vMask);
+    
+     // 5. Emissive 추가 발광효과.
+    float fMaskBrightness = dot(vMask.rgb, float3(0.299, 0.587, 0.114));
+    if (fMaskBrightness > 0.5f)
+    {
+        vector vEmissive = vMask * g_fEmissiveIntensity * 2.0f;
+        vMtrlDiffuse.rgb += vEmissive.rgb;
+    }
+    
+    // 6. Bloom Color 계산
+    float lifeRatio = In.vLifeTime.x / In.vLifeTime.y;
+    float lifeCurve = sin(lifeRatio * 3.14159f);
+
+    vector bloomColor = float4(float3(4.0f, 0.5f, 0.2f) * g_fBloomIntensity, 1.0f);
+    
+    // 7. 밝기 
+    if (fMaskBrightness > 0.1f) // 임계값은 0.1 ~ 0.5 사이에서 조정
+    {
+        // vMtrlDiffuse.rgb에 bloomColor.rgb를 더합니다.
+        // lifeCurve를 곱해줘서 파티클 수명에 따라 자연스럽게 빛나도록 합니다.
+        //vMtrlDiffuse.rgb += bloomColor.rgb * vMask.rgb * lifeCurve;
+        vMtrlDiffuse.rgb += bloomColor.rgb * vMask.rgb;
+    }
+
+    // 4. 최종 알파 값을 계산하고 적용합니다.
+    //float fadeAlpha = 1.0f - g_fTimeRatio; // 기존 코드
+    float fadeAlpha = 1.0f - lifeRatio; // 기존 코드
+    vMtrlDiffuse.a *= fadeAlpha; // 기존 코드
+    
+    Out.vColor = vMtrlDiffuse;
+    
+    vector vMtrlDissolve = g_NoiseTextures[2].Sample(DefaultSampler, In.vTexcoord);
+    
+    
+    clip(vMtrlDissolve.r - lifeRatio);
+    
+    
+    return Out;
+}
+
+PS_OUT PS_PLAYERHIT_PARTICLE(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+    
+    // 1. 사용할 텍스처들을 샘플링합니다.
+    vector vSourDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
+    vector vDestDiffuse = g_OtherTextures[5].Sample(DefaultSampler, In.vTexcoord); // 금빛 텍스처
+    vector vMask = g_OtherTextures[5].Sample(DefaultSampler, In.vTexcoord);
+    
+    // 2. 검은 부분은 그리지 않습니다.
+    if (vDestDiffuse.r < 0.1f && vDestDiffuse.g < 0.1f && vDestDiffuse.b < 0.1f)
+        discard;
+    
+    // 3. 텍스처와 마스크를 조합하여 기본 재질 색상을 계산합니다.
+    vector vMtrlDiffuse = vDestDiffuse * (1.f - vMask) + vSourDiffuse * (vMask);
+
+    float3 goldBloomColor = float3(1.0f, 0.7f, 0.1f) * g_fBloomIntensity;
+    
+    // 4. Emissive 효과를 더해줍니다.
+    float fMaskBrightness = dot(vMask.rgb, float3(0.299, 0.587, 0.114));
+    if (fMaskBrightness > 0.5f)
+    {
+        // Emissive는 텍스처 자체의 색으로 빛나도록 vMtrlDiffuse를 사용합니다.
+        // vMtrlDiffuse.rgb += vMtrlDiffuse.rgb * g_fEmissiveIntensity;
+        vMtrlDiffuse.rgb += goldBloomColor;
+
+    }
+    
+    // ▼▼▼ [수정] Bloom 효과를 텍스처 색상 기반으로 변경 ▼▼▼
+    // 5. Bloom 효과를 기본 재질 색상(vMtrlDiffuse)에 곱해 밝기를 증폭시킵니다.
+    // 이렇게 하면 붉은색이 아닌, 원래의 금빛이 더욱 밝아집니다.
+    vMtrlDiffuse.rgb *= (1.f + g_fBloomIntensity);
+
+    // 6. 파티클 수명에 따른 최종 밝기와 알파를 계산합니다.
+    float lifeRatio = In.vLifeTime.x / In.vLifeTime.y;
+    float lifeCurve = sin(lifeRatio * 3.14159f);
+
+    vMtrlDiffuse.rgb *= lifeCurve;
+    vMtrlDiffuse.a *= lifeCurve;
+    
+    Out.vColor = vMtrlDiffuse;
+
+    // 7. Dissolve(소멸) 효과를 적용합니다.
+    vector vMtrlDissolve = g_NoiseTextures[2].Sample(DefaultSampler, In.vTexcoord);
+    clip(vMtrlDissolve.r - lifeRatio);
+    
+    return Out;
+}
+
+
+
 
 technique11 DefaultTechnique
 {
     /* 특정 패스를 이용해서 점정을 그려냈다. */
     /* 하나의 모델을 그려냈다. */ 
     /* 모델의 상황에 따라 다른 쉐이딩 기법 세트(명암 + 림라이트 + 스펙큘러 + 노멀맵 + ssao )를 먹여주기위해서 */
-    pass DefaultPass
+    pass DefaultPass // 0 
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_Default, 0);
@@ -446,7 +581,7 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_MAIN();
     }
 
-    pass QueenKnightWarpPass
+    pass QueenKnightWarpPass // 1
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_Default, 0);
@@ -456,7 +591,7 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_DIFFUSE_QUEENKNIGHTWARP_MAIN();
     }
 
-    pass ExplossionPass
+    pass ExplossionPass // 2
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_Default, 0);
@@ -467,7 +602,7 @@ technique11 DefaultTechnique
     }
 
     // QueenKnight Particle Pass
-    pass QueenKngihtParticlePass
+    pass QueenKngihtParticlePass // 3
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_Default, 0);
@@ -477,7 +612,28 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_QUEENKNGIHT_PARTICLE_MAIN();
     }
 
-    pass DebugPass
+    
+    pass HitParticlePass // 4
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = compile gs_5_0 GS_Stretched_BillboardQueenKnight_MAIN();
+        PixelShader = compile ps_5_0 PS_HITPARTICLE_MAIN();
+    }
+
+    pass PlayerHitParticlePass // 5
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = compile gs_5_0 GS_Stretched_BillboardQueenKnight_MAIN();
+        PixelShader = compile ps_5_0 PS_PLAYERHIT_PARTICLE();
+    }
+
+    pass DebugPass // 6
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_Default, 0);

@@ -36,6 +36,10 @@ public:
 public:
 	void Update_AttackDirection(_float fTimeDelta);
 
+
+public:
+	_vector Get_SwingDirection() const { return m_vSwingDirection; }
+
 protected:
 	// 스윙 방향 계산을 위한 변수들
 	_vector m_vPreviousPosition = XMVectorSet(0.f, 0.f, 0.f, 1.f);  // 이전 프레임 위치
@@ -74,6 +78,11 @@ protected:
 
 	//_uint* m_pParentState = { nullptr };
 	_float m_fAttackPower = {}; // 공격 데미지.
+
+
+public:
+	const _float4x4* Get_CombinedWorldMatrix() { return &m_CombinedWorldMatrix; }
+
 #pragma endregion
 
 

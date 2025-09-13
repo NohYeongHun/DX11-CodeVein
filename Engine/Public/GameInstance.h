@@ -100,6 +100,8 @@ public:
 	_float	Get_TimeDelta(const _wstring& strTimerTag);
 	HRESULT	Add_Timer(const _wstring& strTimerTag);
 	void	Compute_TimeDelta(const _wstring& strTimerTag);
+	void    Set_SlowMoment(_float fSlowTime, _float fSlowFactor);
+	void    Time_Pass(const _wstring& strTimerTag);
 #pragma endregion
 
 #pragma region FONT_MANAGER

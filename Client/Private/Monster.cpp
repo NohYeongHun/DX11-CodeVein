@@ -300,6 +300,8 @@ void CMonster::Take_Damage(_float fDamage, CGameObject* pGameObject)
         }
 
         Show_Slash_UI_At_Position(vClosestPoint, vAttackDirection);
+
+       
     }
 
 }
@@ -1100,8 +1102,22 @@ void CMonster::Show_Slash_UI_At_Position(_fvector vHitPosition, _fvector vAttack
     m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(m_eCurLevel)
         , TEXT("EXPLOSION"), TEXT("Layer_Effect"), 1, ENUM_CLASS(EFFECTTYPE::PARTICLE), &Desc);
 
-    if (FAILED(hr))
-        CRASH("Failed Slash Effecet");
+
+    // Hit Particle 맞으면 파티클도.
+    CEffectParticle::EFFECTPARTICLE_ENTER_DESC HitParticleDesc{};
+    HitParticleDesc.eParticleType = CEffectParticle::PARTICLE_TYPE_HIT_PARTCILE;
+    HitParticleDesc.vStartPos = vHitPosition; // 몬스터 현재위치로 생성.
+    HitParticleDesc.particleInitInfo.lifeTime = 0.5f; // lisfeTime
+    HitParticleDesc.particleInitInfo.fRadius = 0.3f; // 모일 반경
+    HitParticleDesc.particleInitInfo.fExplositionTime = 0.1f;
+    
+    XMStoreFloat3(&HitParticleDesc.particleInitInfo.dir, vAttackDirection);
+    HitParticleDesc.pTargetTransform = m_pTransformCom;
+    m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(m_eCurLevel)
+        , TEXT("HIT_PARTICLE"), TEXT("Layer_Effect"), 1, ENUM_CLASS(EFFECTTYPE::PARTICLE), &Desc);
+    
+    //if (FAILED(hr))
+    //    CRASH("Failed Slash Effecet");
 
 }
 

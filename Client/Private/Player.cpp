@@ -1,4 +1,5 @@
-﻿#pragma region KEY CODE 미리 정의
+﻿#include "Player.h"
+#pragma region KEY CODE 미리 정의
 const _uint CPlayer::m_KeyboardMappingsCount = 12;
 const std::pair<PLAYER_KEY, _ubyte> CPlayer::m_KeyboardMappings[] = {
     { PLAYER_KEY::MOVE_FORWARD,  DIK_W },
@@ -850,6 +851,52 @@ void CPlayer::On_Collision_Enter(CGameObject* pOther)
         {
             // 몬스터 위치를 기반으로 피격 방향 계산 및 DamageState 전환
             Take_Damage(pWeapon->Get_AttackPower(), pMonster);
+
+
+            if (pWeapon->Get_AttackPower() > 0.f)
+            {
+                CBounding_Sphere::BOUNDING_SPHERE_DESC* pDesc =
+                    static_cast<CBounding_Sphere::BOUNDING_SPHERE_DESC*>(m_pColliderCom->Get_BoundingDesc());
+
+                if (!pDesc) return;
+                _vector vPlayerPos = m_pTransformCom->Get_State(STATE::POSITION);
+                _vector vCenter = XMVectorAdd(vPlayerPos, XMLoadFloat3(&pDesc->vCenter));
+                _float fRadius = pDesc->fRadius;
+
+                // Weapon의 최종 합산된 matrix 가져오기.
+                const _float4x4* pCombinedWorldMatrix = pWeapon->Get_CombinedWorldMatrix();
+                _vector vWeaponPosition = XMLoadFloat4(reinterpret_cast<const _float4*>(&pCombinedWorldMatrix->m[3][0]));
+                _vector vDir = XMVectorSubtract(vWeaponPosition, vCenter);
+
+                // 길이 체크
+                _float fDirLength = XMVectorGetX(XMVector3Length(vDir));
+
+                // 정규화
+                vDir = XMVectorScale(vDir, 1.0f / fDirLength);  // Normalize 대신 수동 계산
+
+
+                // 표면점 계산 - MultiplyAdd 대신 분리
+                _vector vRadiusOffset = XMVectorScale(vDir, fRadius);
+                _vector vClosestPoint = XMVectorAdd(vCenter, vRadiusOffset);
+
+                // 공격 방향 계산
+                _vector vSwingDirection = pWeapon->Get_SwingDirection();
+                _vector vAttackDirection = vSwingDirection;
+
+                _float fSwingLength = XMVectorGetX(XMVector3Length(vAttackDirection));
+                if (fSwingLength < 0.1f)
+                {
+                    vAttackDirection = vDir;  // vDir 재사용
+                }
+                else
+                {
+                    vAttackDirection = XMVectorScale(vAttackDirection, 1.0f / fSwingLength);
+                }
+
+
+                Create_HitEffects(vClosestPoint, vAttackDirection);
+            }
+           
         }
     }
 
@@ -920,6 +967,9 @@ void CPlayer::Take_Damage(_float fHp)
     HpDesc.fHp = fHp;
     HpDesc.fTime = 0.2f;
     m_pGameInstance->Publish(EventType::HP_CHANGE, &HpDesc);
+
+
+
 }
 
 ACTORDIR CPlayer::Calculate_Damage_Direction(CMonster* pAttacker)
@@ -959,6 +1009,21 @@ ACTORDIR CPlayer::Calculate_Damage_Direction(CMonster* pAttacker)
     {
         return (fRightDot > 0) ? ACTORDIR::L : ACTORDIR::R;
     }
+}
+
+void CPlayer::Create_HitEffects(_fvector vHitPosition, _fvector vAttackDirection)
+{
+    CEffectParticle::EFFECTPARTICLE_ENTER_DESC HitParticleDesc{};
+    HitParticleDesc.eParticleType = CEffectParticle::PARTICLE_TYPE_PLAYERHIT_PARTCILE;
+    HitParticleDesc.vStartPos = vHitPosition; // 몬스터 현재위치로 생성.
+    HitParticleDesc.particleInitInfo.lifeTime = 0.5f; // lisfeTime
+    HitParticleDesc.particleInitInfo.fRadius = 0.3f; // 모일 반경
+    HitParticleDesc.particleInitInfo.fExplositionTime = 0.1f;
+
+    XMStoreFloat3(&HitParticleDesc.particleInitInfo.dir, vAttackDirection);
+    HitParticleDesc.pTargetTransform = m_pTransformCom;
+    m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(m_eCurLevel)
+        , TEXT("PLAYER_HITPARTICLE"), TEXT("Layer_Effect"), 1, ENUM_CLASS(EFFECTTYPE::PARTICLE), &HitParticleDesc);
 }
 
 #pragma endregion
@@ -1085,6 +1150,16 @@ void CPlayer::Take_Damage(_float fDamage, CMonster* pMonster)
     damageDesc.eDamageDirection = eDamageDirection;
     
     m_pFsmCom->Change_State(PLAYER_STATE::DAMAGE, &damageDesc);
+
+    m_pGameInstance->Set_SlowMoment(0.5f, 0.8f);
+
+
+#pragma region 파티클 추가.
+
+   
+#pragma endregion
+
+
 }
 
 

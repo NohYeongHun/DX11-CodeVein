@@ -202,6 +202,9 @@ void CVIBuffer_PointParticleDir_Instance::Update(_float fTimeDelta)
     case PARTICLE_TYPE::PARTICLE_TYPE_BOSS_EXPLOSION:
         BossExplosion_Update(pVertices, fTimeDelta);
         break;
+    case PARTICLE_TYPE::PARTICLE_TYPE_HIT_PARTICLE:
+        HitParticle_Update(pVertices, fTimeDelta);
+        break;
     default:
         break;
     }
@@ -518,6 +521,54 @@ void CVIBuffer_PointParticleDir_Instance::Explosion_Update(VTXINSTANCEPOINTDIR_P
     }
 }
 
+// VIBuffer_PointParticleDir_Instance.cpp
+
+void CVIBuffer_PointParticleDir_Instance::HitParticle_Update(VTXINSTANCEPOINTDIR_PARTICLE* pVertices, _float fTimeDelta)
+{
+    // 1. 생성 대기 중인 파티클을 활성 목록으로 이동
+    while (!m_ReadyparticleIndices.empty())
+    {
+        auto info = m_ReadyparticleIndices.front();
+        m_ReadyparticleIndices.pop();
+        _uint index = info.first;
+        ParticleVertexInfo particleInfo = info.second;
+
+        pVertices[index].vTranslation = _float4(particleInfo.pos.x, particleInfo.pos.y, particleInfo.pos.z, 1.f);
+        pVertices[index].vDir = particleInfo.dir;
+        pVertices[index].vLifeTime.x = 0.f;
+        pVertices[index].vLifeTime.y = particleInfo.lifeTime;
+        pVertices[index].fDirSpeed = particleInfo.fRandomSpeed;
+
+        m_LiveParticleIndices.emplace_back(index);
+    }
+
+    // 2. 활성화된 파티클들의 움직임 계산
+    for (auto it = m_LiveParticleIndices.begin(); it != m_LiveParticleIndices.end(); )
+    {
+        _uint index = *it;
+        pVertices[index].vLifeTime.x += fTimeDelta;
+
+        // 수명이 다하면 비활성 목록으로 이동
+        if (pVertices[index].vLifeTime.x >= pVertices[index].vLifeTime.y)
+        {
+            m_DeadParticleIndices.emplace(*it);
+            it = m_LiveParticleIndices.erase(it);
+        }
+        else
+        {
+            // 단순 직진 운동: 각자 부여받은 방향으로 자신의 속도만큼 이동
+            _vector currentPos = XMLoadFloat4(&pVertices[index].vTranslation);
+            _vector direction = XMLoadFloat3(&pVertices[index].vDir);
+            _float speed = pVertices[index].fDirSpeed;
+
+            _vector newPos = currentPos + (direction * speed * fTimeDelta);
+
+            XMStoreFloat4(&pVertices[index].vTranslation, newPos);
+            ++it;
+        }
+    }
+}
+
 void CVIBuffer_PointParticleDir_Instance::CreateAllParticles(_float3 vCenterPos, _float3 vBaseDir, _float fLifeTime)
 {
     // 모든 Dead 파티클을 한번에 활성화
@@ -622,7 +673,7 @@ void CVIBuffer_PointParticleDir_Instance::Create_QueenKnightWarpParticle_Limited
         m_DeadParticleIndices.pop();
 
         // Direction 방향을 축으로 하는 원기둥 형태로 분포
-        _float radius = min(m_vRange.x, m_vRange.z);
+        _float radius = min(m_vRange.x, m_vRange.z); // 처음에 설정했던 range
         _float theta = static_cast<_float>(rand()) / RAND_MAX * 2.0f * XM_PI;
         _float r = static_cast<_float>(rand()) / RAND_MAX * radius;
         _float height = (static_cast<_float>(rand()) / RAND_MAX * 2.0f - 1.0f) * m_vRange.y;
@@ -822,6 +873,43 @@ void CVIBuffer_PointParticleDir_Instance::Create_ExplosionParticle(_float3 vNoma
         info.lifeTime = fTotalLifeTime;
         info.fRandomSpeed = m_pGameInstance->Rand(m_vSpeed.x, m_vSpeed.y);
 
+        m_ReadyparticleIndices.emplace(make_pair(index, info));
+    }
+}
+
+void CVIBuffer_PointParticleDir_Instance::Create_HitParticle(_float3 vCenterPos, _float fRadius, _float fLifeTime)
+{
+    while (!m_DeadParticleIndices.empty())
+    {
+        _uint index = m_DeadParticleIndices.front();
+        m_DeadParticleIndices.pop();
+
+
+        // 1. 구 형태의 폭발을 위해 랜덤 방향 벡터 생성
+        _float3 randomDir = {
+            m_pGameInstance->Rand(-1.f, 1.f),
+            m_pGameInstance->Rand(-1.f, 1.f),
+            m_pGameInstance->Rand(-1.f, 1.f)
+        };
+
+        // 2. 방향 벡터 정규화
+        _vector vNormalizedDir = XMVector3Normalize(XMLoadFloat3(&randomDir));
+        XMStoreFloat3(&randomDir, vNormalizedDir);
+     
+
+        // 3. 파티클 정보 설정
+        ParticleVertexInfo info{};
+        info.pos = vCenterPos;                                  // 시작 위치는 타격 지점
+        info.dir = randomDir;                                   // 이동 방향은 랜덤
+        info.lifeTime = m_pGameInstance->Rand(m_vLifeTime.x, m_vLifeTime.y); // 수명 랜덤 설정 Pooling시 생성한 설정.
+        info.fRandomSpeed = m_pGameInstance->Rand(m_vSpeed.x, m_vSpeed.y); // 속도 랜덤 설정 (멤버 변수 m_vSpeed 사용)
+
+        // 사용하지 않는 정보 초기화
+        info.initialPos = vCenterPos;
+        info.burstDir = randomDir;
+        info.fBurstTime = 0.f; // 즉시 폭발하므로 0
+
+        // 3. 파티클을 생성 대기열에 추가
         m_ReadyparticleIndices.emplace(make_pair(index, info));
     }
 }

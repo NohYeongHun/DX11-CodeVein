@@ -47,10 +47,10 @@ public:
 
 	/* Weapon의 최종 행렬 가져오기. */
 public:
-	const _float4x4* Get_CombinedWorldMatrix() { return &m_CombinedWorldMatrix; }
+	//const _float4x4* Get_CombinedWorldMatrix() { return &m_CombinedWorldMatrix; }
 
 	/* 무기의 스윙 방향 가져오기 */
-	_vector Get_SwingDirection() const { return m_vSwingDirection; }
+	
 
 #pragma endregion
 

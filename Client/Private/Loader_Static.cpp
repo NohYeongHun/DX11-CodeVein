@@ -477,6 +477,21 @@ HRESULT CLoader_Static::Add_Prototype_Fonts(ID3D11Device* pDevice, ID3D11DeviceC
 #pragma region EFFECT
 HRESULT CLoader_Static::Add_Prototype_Effects(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
 {
+#pragma region TEXTURE 생성
+	// 0. Texture 종류별 생성.
+	for (_uint i = 0; i < Effect_TexturePrototypeSize; ++i)
+	{
+		if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
+			, ClientEffect_TexturePrototypes[i].prototypeName
+			, CTexture::Create(pDevice, pContext, ClientEffect_TexturePrototypes[i].textureFilePath
+				, ClientEffect_TexturePrototypes[i].iNumTextures))))
+		{
+			CRASH("Failed Load Effect Texture");
+			return E_FAIL;
+		}
+	}
+#pragma endregion
+
 	if (FAILED(Add_Prototype_Dissolve_Effects(pDevice, pContext, pGameInstance)))
 	{
 		CRASH("Failed Clone Effects");
@@ -612,9 +627,6 @@ HRESULT CLoader_Static::Add_Prototype_Particle_Effects(ID3D11Device* pDevice, ID
 {
 #pragma region PARTICLE
 
-#pragma region 2. TEXTURE OBJECT
-
-#pragma endregion
 
 #pragma region 3. Shader 생성.
 	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel), TEXT("Prototype_Component_Shader_VtxInstance_PointParticle"),
@@ -716,21 +728,7 @@ HRESULT CLoader_Static::Add_Prototype_Trail_Effects(ID3D11Device* pDevice, ID3D1
 
 HRESULT CLoader_Static::Add_Prototype_ParticleSystem(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
 {
-#pragma region TEXTURE 생성
-	// 0. Texture 종류별 생성.
-	for (_uint i = 0; i < Effect_TexturePrototypeSize; ++i)
-	{
-		if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
-			, ClientEffect_TexturePrototypes[i].prototypeName
-			, CTexture::Create(pDevice, pContext, ClientEffect_TexturePrototypes[i].textureFilePath
-				, ClientEffect_TexturePrototypes[i].iNumTextures))))
-		{
-			CRASH("Failed Load Effect Texture");
-			return E_FAIL;
-		}
-	}
 
-#pragma endregion
 
 
 
