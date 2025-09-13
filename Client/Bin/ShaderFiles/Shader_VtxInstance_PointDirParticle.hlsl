@@ -366,11 +366,10 @@ PS_OUT PS_DIFFUSE_QUEENKNIGHTWARP_MAIN(PS_IN In)
     vMtrlDiffuse.a *= fadeAlpha; // 기존 코드
     
     Out.vColor = vMtrlDiffuse;
+
     
     vector vMtrlDissolve = g_NoiseTextures[0].Sample(DefaultSampler, In.vTexcoord);
-    //vector vMtrlDissolve = g_OtherTextures[5].Sample(DefaultSampler, In.vTexcoord);
-    
-    clip(vMtrlDissolve.r - g_fTimeRatio);
+    clip(vMtrlDissolve.r - g_fTimeRatio); // r 0 ~ 1.f => g_fTimeRatio를 최소시간, 최대시간이 있잖아요 이걸 0 ~ 1.f로 정규화해서
     
     
 
