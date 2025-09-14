@@ -125,10 +125,11 @@ void CQueenKnight::Update(_float fTimeDelta)
 
     CMonster::Update(fTimeDelta);
 
-   
-
 
     Update_AI(fTimeDelta);
+
+    // 스킬 체크
+    Update_BloodPillar(fTimeDelta);
 
     // 하위 객체들 움직임 제어는 Tree 제어 이후에
     
@@ -756,6 +757,56 @@ void CQueenKnight::Create_QueenKnightWarp_Effect(_float3 vDir)
     m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(m_eCurLevel)
         , TEXT("QUEENKNIGHT_PARTICLE"), TEXT("Layer_Effect"), 1, ENUM_CLASS(EFFECTTYPE::PARTICLE), &Desc);
 }
+
+// Pillar 시작 시.
+void CQueenKnight::Start_PillarSkill()
+{
+    m_bIsSkillActive = true;
+    m_fSkillElapsedTime = 0.f; // 타이머 리셋
+    XMStoreFloat3(&m_vSkillCenterPos, m_pTransformCom->Get_State(STATE::POSITION)); // 스킬 중심 위치 저장
+    std::fill(m_vecIsPillarActivated.begin(), m_vecIsPillarActivated.end(), false);
+}
+
+void CQueenKnight::Update_BloodPillar(_float fTimeDelta)
+{
+    if (!m_bIsSkillActive)
+        return;
+
+    m_fSkillElapsedTime += fTimeDelta;
+
+    for (_uint i = 0; i < m_vecPillarPositions.size(); ++i)
+    {
+        // 이미 소환된 Pillar는 건너뜀
+        if (m_vecIsPillarActivated[i])
+            continue;
+
+        // 이 Pillar가 소환되어야 하는 시간을 계산
+        _vector vPillarDir = XMLoadFloat3(&m_vecPillarPositions[i]) - XMLoadFloat3(&m_vSkillCenterPos);
+        _float fDistance = XMVectorGetX(XMVector3Length(vPillarDir));
+        _float fRequiredTime = fDistance / m_fRippleSpeed;
+
+        // 스킬 경과 시간이 소환 필요 시간을 지났다면
+        if (m_fSkillElapsedTime >= fRequiredTime)
+        {
+            // 드디어 풀에서 Pillar를 꺼내와 활성화!
+            CEffect_Pillar::PILLAR_ACTIVATE_DESC EffectPillarDesc{};
+            EffectPillarDesc.eCurLevel = m_eCurLevel;
+            EffectPillarDesc.vStartPos = XMLoadFloat3(&m_vecPillarPositions[i]); // 계산된 위치를 넣어줌
+            EffectPillarDesc.fDuration = 2.2f;
+            EffectPillarDesc.fAttackPower = static_cast<_float>(m_pGameInstance->Rand_UnsignedInt(150, 200));
+            // ... 나머지 Desc 내용 채우기 ...
+
+            m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(m_eCurLevel)
+                , TEXT("BLOOD_PILLAR"), TEXT("Layer_Effect"), 1, ENUM_CLASS(CEffect_Pillar::EffectType), &EffectPillarDesc);
+
+            // 소환되었다고 표시
+            m_vecIsPillarActivated[i] = true;
+        }
+    }
+}
+void CQueenKnight::Reset_PillarSkill()
+{
+}
 #pragma endregion
 
 
@@ -973,10 +1024,42 @@ HRESULT CQueenKnight::Ready_PartObjects()
     return S_OK;
 }
 
-#pragma region Effect 생성
+#pragma region Effect 생성관련 정보 정의해 두기.
 HRESULT CQueenKnight::Ready_Effects(QUEENKNIGHT_DESC* pDesc)
 {
-        
+    /* 스킬 생성 정보*/
+    m_vecPillarPositions.clear();
+    m_vecIsPillarActivated.clear();
+
+    const _uint iNumArms = 4;                // 십자 모양의 팔 개수 (상하좌우 = 4)
+    const _uint iNumPillarsPerArm = 4;       // 각 팔(선)에 생성될 Pillar 개수
+    const _float fSpacing = 6.f;             // Pillar 사이의 간격 (미터 단위)
+    const _uint iTotalPillars = iNumArms * iNumPillarsPerArm;
+
+    m_vecPillarPositions.reserve(iTotalPillars);
+    m_vecIsPillarActivated.resize(iTotalPillars);
+
+    for (_uint i = 0; i < iNumArms; ++i)
+    {
+        _float3 vDirection = { 0.f, 0.f, 0.f };
+
+        switch (i)
+        {
+        case 0: vDirection = { 0.f, 0.f, 1.f };  break; // 위
+        case 1: vDirection = { 1.f, 0.f, 0.f };  break; // 오른쪽
+        case 2: vDirection = { 0.f, 0.f, -1.f }; break; // 아래
+        case 3: vDirection = { -1.f, 0.f, 0.f }; break; // 왼쪽
+        }
+
+        _float3 vPos = {};
+        for (_uint j = 1; j <= iNumPillarsPerArm; ++j)
+        {
+            _float fDistance = fSpacing * j;
+            XMStoreFloat3(&vPos, XMLoadFloat3(&vDirection) * fDistance); // 방향 벡터 * 거리 = 최종 위치
+            m_vecPillarPositions.push_back(vPos);
+        }
+    }
+
     return S_OK;
 }
 #pragma endregion

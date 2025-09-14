@@ -86,7 +86,8 @@ public:
 private:
 	// 데미지 
 	void Take_Damage(_float fHp);
-	ACTORDIR Calculate_Damage_Direction(class CMonster* pAttacker);
+	//ACTORDIR Calculate_Damage_Direction(class CMonster* pAttacker);
+	ACTORDIR Calculate_Damage_Direction(class CGameObject* pAttacker);
 
 	void Create_HitEffects(_fvector vHitPosition, _fvector vAttackDirection);
 
@@ -133,6 +134,7 @@ public:
 	ACTORDIR Calculate_Direction();
 
 	void Take_Damage(_float fDamage, class CMonster* pMonster);
+	void Take_Damage(_float fDamage, class CEffect_Pillar* pEffectPillar);
 #pragma endregion
 
 

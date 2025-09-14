@@ -900,6 +900,67 @@ void CPlayer::On_Collision_Enter(CGameObject* pOther)
         }
     }
 
+    // 스킬 충돌.
+    CEffect_Pillar* pEffectPillar = dynamic_cast<CEffect_Pillar*>(pOther);
+    if (nullptr != pEffectPillar)
+    {
+        if (HasBuff(BUFF_INVINCIBLE))
+        {
+            OutputDebugWstring(TEXT("Buff Has Invincible"));
+            return;
+        }
+
+        Take_Damage(pEffectPillar->Get_AttackPower(), pEffectPillar);
+
+        // 플레이어 정보.
+        CBounding_Sphere::BOUNDING_SPHERE_DESC* pDesc =
+            static_cast<CBounding_Sphere::BOUNDING_SPHERE_DESC*>(m_pColliderCom->Get_BoundingDesc());
+
+        if (!pDesc) return;
+        _vector vPlayerPos = m_pTransformCom->Get_State(STATE::POSITION);
+        _vector vCenter = XMVectorAdd(vPlayerPos, XMLoadFloat3(&pDesc->vCenter));
+        _float fRadius = pDesc->fRadius;
+
+
+        CBounding_OBB::BOUNDING_OBB_DESC* pOBBDesc =
+            static_cast<CBounding_OBB::BOUNDING_OBB_DESC*>(m_pColliderCom->Get_BoundingDesc());
+
+        // Weapon의 최종 합산된 matrix 가져오기.
+        _vector vPillarPosition = pEffectPillar->Get_Transform()->Get_State(STATE::POSITION);
+        _vector vDir = XMVectorSubtract(vPillarPosition, vCenter); // PillarPosition - vCenter 이면 vCenter => Pillar
+
+        // 길이 체크
+        _float fDirLength = XMVectorGetX(XMVector3Length(vDir));
+
+        // 정규화
+        vDir = XMVectorScale(vDir, 1.0f / fDirLength);  // Normalize 대신 수동 계산
+
+
+        // 표면점 계산 - MultiplyAdd 대신 분리
+        _vector vRadiusOffset = XMVectorScale(vDir, fRadius);
+        _vector vClosestPoint = XMVectorAdd(vCenter, vRadiusOffset);
+
+        // 공격 방향 계산
+        
+        _vector vAttackDirection = vDir * -1.f; // 반대방향.
+
+        _float fSwingLength = XMVectorGetX(XMVector3Length(vAttackDirection));
+        if (fSwingLength < 0.1f)
+        {
+            vAttackDirection = vDir;  // vDir 재사용
+        }
+        else
+        {
+            vAttackDirection = XMVectorScale(vAttackDirection, 1.0f / fSwingLength);
+        }
+
+
+
+        Create_HitEffects(vClosestPoint, vAttackDirection);
+    }
+
+
+    /* 스킬 도중 몬스터와 충돌했을 때 */
     CMonster* pMonster = dynamic_cast<CMonster*>(pOther);
     if (nullptr != pMonster)
     {
@@ -972,7 +1033,7 @@ void CPlayer::Take_Damage(_float fHp)
 
 }
 
-ACTORDIR CPlayer::Calculate_Damage_Direction(CMonster* pAttacker)
+ACTORDIR CPlayer::Calculate_Damage_Direction(CGameObject* pAttacker)
 {
     if (nullptr == pAttacker)
         return ACTORDIR::U; // 기본값: 앞쪽
@@ -1160,6 +1221,28 @@ void CPlayer::Take_Damage(_float fDamage, CMonster* pMonster)
 #pragma endregion
 
 
+}
+
+void CPlayer::Take_Damage(_float fDamage, CEffect_Pillar* pEffectPillar)
+{
+    Take_Damage(fDamage);
+
+    if (fDamage <= 0.f)
+        return;
+
+    AddBuff(BUFF_INVINCIBLE, 3.f); // 아프니까.. 좀 길게.
+    AddBuff(BUFF_HIT);
+
+    // 공격자로부터 피격 방향 계산
+    ACTORDIR eDamageDirection = Calculate_Damage_Direction(pEffectPillar);
+
+    // DamageState로 전환
+    CPlayer_DamageState::DAMAGE_ENTER_DESC damageDesc{};
+    damageDesc.eDamageDirection = eDamageDirection;
+
+    m_pFsmCom->Change_State(PLAYER_STATE::DAMAGE, &damageDesc);
+
+    m_pGameInstance->Set_SlowMoment(0.5f, 0.8f);
 }
 
 

@@ -555,7 +555,7 @@ HRESULT CRenderer::Render_Debug()
     if (FAILED(m_pDefferedShader->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
         return E_FAIL;
 
-    m_pGameInstance->Render_RT_Debug(m_pDefferedShader, m_pVIBuffer);
+    //m_pGameInstance->Render_RT_Debug(m_pDefferedShader, m_pVIBuffer);
 
     return S_OK;
 }

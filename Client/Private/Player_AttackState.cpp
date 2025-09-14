@@ -96,8 +96,14 @@ void CPlayer_AttackState::Enter(void* pArg)
 	SteminaDesc.fTime = 1.f;
 	m_pGameInstance->Publish(EventType::STEMINA_CHANGE, &SteminaDesc);
 
-	// 2. Particle 생성
-	//m_pPlayer->Create_Particle(CParticleSystem::PARTICLE_TYPE::PARTICLE_TYPE_QUEEN_WARP);
+	// 임시 피기둥 만들어보기?
+
+	_float3 vStartPos = {};
+	XMStoreFloat3(&vStartPos, m_pPlayer->Get_Transform()->Get_State(STATE::POSITION));
+	
+
+	
+
 }
 
 /* State 실행 */

@@ -173,56 +173,7 @@ PS_OUT PS_WIND_EFFECT_MAIN(PS_IN In)
     return Out;
 }
 
-//PS_OUT PS_WIND_EFFECT_MAIN(PS_IN In)
-//{
-//    PS_OUT Out = (PS_OUT) 0;
 
-//    // === 1. UV 좌표 가져오기 ===
-//    float2 uv = In.vTexcoord * float2(2.0f, 1.5f);
-
-//    // === 2. UV 회전 (Spiral 느낌) ===
-//    float2 center = float2(0.5f, 0.5f);
-//    float2 p = uv - center;
-//    float r = length(p);
-//    float theta = atan2(p.y, p.x);
-
-//    // 회전 + 꼬임
-//    float rotateSpeed = 0.5f;
-//    float spiralStrength = 0.5f;
-//    //theta += rotateSpeed * g_fTime + spiralStrength * r;
-//    theta += rotateSpeed * g_fTime; // r 비례 꼬임 제거
-
-//    // 극좌표 → UV 복원
-//    uv = float2(cos(theta), sin(theta)) * r + center;
-
-//    // === 3. 텍스처 샘플링 ===
-//    float4 texColor = g_DiffuseTexture.Sample(DefaultSampler, uv);
-
-//    float alpha = texColor.r;
-//    if (alpha < 0.1f)
-//        discard;
-
-//    // === 4. 페이드 아웃 ===
-//    float fadeFactor = 1.0f;
-//    if (g_fTime > g_fFadeOutStartTime)
-//    {
-//        float fadeT = saturate((g_fTime - g_fFadeOutStartTime) / g_fFadeOutDuration);
-//        fadeFactor = 1.0f - fadeT;
-//    }
-
-//    // === 5. 최종 색상 ===
-//    float4 finalColor = float4(g_vBaseColor.rgb * texColor.r * g_fEmissiveIntensity, alpha);
-//    finalColor.a *= fadeFactor;
-
-//    // === 6. 출력 ===
-//    Out.vDiffuse = finalColor;
-//    Out.vNormal = float4(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
-//    Out.vDepth = float4(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w, 0.f, 0.f);
-
-//    return Out;
-    
-//}
-    
 
 technique11 DefaultTechnique
 {

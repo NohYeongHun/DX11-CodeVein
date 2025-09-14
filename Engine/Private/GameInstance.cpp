@@ -230,6 +230,13 @@ _float CGameInstance::Rand(_float fMin, _float fMax)
 	return fMin + Rand_Normal() * (fMax - fMin);	
 }
 
+_uint CGameInstance::Rand_UnsignedInt(_uint iMin, _uint iMax)
+{
+	return static_cast<_uint>(Rand(static_cast<float>(iMin), static_cast<float>(iMax + 1)));
+}
+
+
+
 // 현재 창의 마우스 좌표로 가져와야함.
 POINT CGameInstance::Get_Mouse_Cursor(HWND hWnd)
 {

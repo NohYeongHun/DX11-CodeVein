@@ -40,6 +40,7 @@ public:
 public:
 	_float Rand_Normal();
 	_float Rand(_float fMin, _float fMax);
+	_uint Rand_UnsignedInt(_uint iMin, _uint iMax);
 
 
 	// 마우스 2D 충돌 관련 헬퍼 함수 모아두기.
