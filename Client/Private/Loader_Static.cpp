@@ -813,8 +813,6 @@ HRESULT CLoader_Static::Add_Prototype_BloodPillar_Effects(ID3D11Device* pDevice,
 		CRASH("Failed Prototype Blood Pillar Effects");
 
 
-	
-
 
 	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
 		, TEXT("Prototype_Component_Model_Effect_BloodPillarB")
@@ -824,8 +822,9 @@ HRESULT CLoader_Static::Add_Prototype_BloodPillar_Effects(ID3D11Device* pDevice,
 
 	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
 		, TEXT("Prototype_Component_Model_Effect_BloodPillarC")
-		, CLoad_Model::Create(pDevice, pContext, MODELTYPE::NONANIM, PreTransformMatrix, "../../SaveFile/Model/Effect/BloodPillarC.dat", L""))))
+		, CLoad_Model::Create(pDevice, pContext, MODELTYPE::NONANIM, PreTransformMatrix, "../../SaveFile/Model/Effect/BloodC.dat", L""))))
 		CRASH("Failed Prototype Blood Pillar Effects");
+
 
 #pragma endregion
 

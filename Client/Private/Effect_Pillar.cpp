@@ -106,9 +106,9 @@ void CEffect_Pillar::OnActivate(void* pArg)
     PillarADesc.vColor = { 1.f, 0.f, 0.f };
     PillarADesc.fEmissiveIntensity = 0.5f;
     PillarADesc.vStartPos = { 0.f, 0.f, 0.f }; // 최종 위치는 어차피 곱해진다. => 서서히 조절.
-    PillarADesc.fTargetRadius = 6.f;
+    PillarADesc.fTargetRadius = 4.f;
     PillarADesc.fDecreaseTargetRadius = 2.f;
-    PillarADesc.fTargetHeight = 5.f;
+    PillarADesc.fTargetHeight = 4.f;
     PillarADesc.fGrowDuration = 1.f;
     PillarADesc.fStayDuration = 0.2f;
     PillarADesc.fDecreaseDuration = 0.8f;
@@ -120,14 +120,27 @@ void CEffect_Pillar::OnActivate(void* pArg)
     PillarBDesc.vColor = { 1.f, 0.f, 0.f };
     PillarBDesc.fEmissiveIntensity = 0.5f;
     PillarBDesc.vStartPos = { 0.f, 0.f, 0.f }; // 최종 위치는 어차피 곱해진다. => 서서히 조절.
-    PillarBDesc.fTargetRadius = 6.f;
+    PillarBDesc.fTargetRadius = 4.2f;
     PillarBDesc.fDecreaseTargetRadius = 2.f;
-    PillarBDesc.fTargetHeight = 5.f;
+    PillarBDesc.fTargetHeight = 4.f;
     PillarBDesc.fGrowDuration = 1.f;
     PillarBDesc.fStayDuration = 0.2f;
     PillarBDesc.fDecreaseDuration = 0.8f;
     m_pBloodPillarB->OnActivate(&PillarBDesc);
 
+
+    CBlood_PillarC::PILLARC_ACTIVATE_DESC PillarCDesc{};
+    PillarCDesc.eCurLevel = pDesc->eCurLevel;
+    PillarCDesc.vColor = { 1.f, 0.f, 0.f };
+    PillarCDesc.fEmissiveIntensity = 0.5f;
+    PillarCDesc.vStartPos = { 0.f, 0.f, 0.f }; // 최종 위치는 어차피 곱해진다. => 서서히 조절.
+    PillarCDesc.fTargetRadius = 5.f;
+    PillarCDesc.fDecreaseTargetRadius = 2.f;
+    PillarCDesc.fTargetHeight = 5.f;
+    PillarCDesc.fGrowDuration = 1.f;
+    PillarCDesc.fStayDuration = 0.2f;
+    PillarCDesc.fDecreaseDuration = 0.8f;
+    m_pBloodPillarC->OnActivate(&PillarCDesc);
 
     m_pColliderCom->Set_Active(true);
 
@@ -225,20 +238,20 @@ HRESULT CEffect_Pillar::Ready_PartObjects()
     }
 
     /////* Clone시 지정될 값들 => 초기 설정 값들.*/
-    //CBlood_PillarC::BLOODPILLAR_DESC PillarC{};
-    //PillarC.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
-    //PillarC.pOwner = this;
-    //PillarC.eCurLevel = m_eCurLevel;
-    //PillarC.eShaderPath = MESH_SHADERPATH::BLOOD_PILLARC;
-    //PillarC.iTextureIndexArray[TEXTURE::TEXTURE_DIFFUSE] = 0; // 사용할 인덱스
+    CBlood_PillarC::BLOODPILLAR_DESC PillarC{};
+    PillarC.pParentMatrix = m_pTransformCom->Get_WorldMatrixPtr();
+    PillarC.pOwner = this;
+    PillarC.eCurLevel = m_eCurLevel;
+    PillarC.eShaderPath = MESH_SHADERPATH::BLOOD_PILLARC;
+    PillarC.iTextureIndexArray[TEXTURE::TEXTURE_DIFFUSE] = 0; // 사용할 인덱스
 
-    //if (FAILED(CContainerObject::Add_PartObject(TEXT("Com_PillarC"),
-    //    ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_BloodPillarC")
-    //    , reinterpret_cast<CPartObject**>(&m_pBloodPillarC), &PillarC)))
-    //{
-    //    CRASH("Failed Create PillarC");
-    //    return E_FAIL;
-    //}
+    if (FAILED(CContainerObject::Add_PartObject(TEXT("Com_PillarC"),
+        ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_BloodPillarC")
+        , reinterpret_cast<CPartObject**>(&m_pBloodPillarC), &PillarC)))
+    {
+        CRASH("Failed Create PillarC");
+        return E_FAIL;
+    }
 
     return S_OK;
 }
@@ -304,6 +317,6 @@ void CEffect_Pillar::Free()
     Safe_Release(m_pColliderCom);
     Safe_Release(m_pBloodPillarA);
     Safe_Release(m_pBloodPillarB);
-    //Safe_Release(m_pBloodPillarC);
+    Safe_Release(m_pBloodPillarC);
     
 }

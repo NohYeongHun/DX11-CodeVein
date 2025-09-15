@@ -34,11 +34,11 @@ HRESULT CBlood_PillarC::Initialize_Clone(void* pArg)
 	
 
 	if (FAILED(CGameObject::Initialize_Clone(pDesc)))
-		CRASH("Failed Clone Blood PillarA");
+		CRASH("Failed Clone Blood Pillar");
 
 	// 초기 지정 정보. 
 	if (FAILED(Ready_Components(pDesc)))
-		CRASH("Failed Clone Blood PillarA");
+		CRASH("Failed Clone Blood PillarC");
 
 	return S_OK;
 }
@@ -52,6 +52,11 @@ void CBlood_PillarC::Update(_float fTimeDelta)
 {
 	CPartObject::Update(fTimeDelta);
 
+
+	/* 전체 회전시키기? */
+	Shape_Control(fTimeDelta);
+
+
 	/* 따로 소켓은 없으니까 소켓은 곱하지 않습니다. => m_CombinedWorld Matrix가 최종 객체. */
 	XMStoreFloat4x4(&m_CombinedWorldMatrix,
 		m_pTransformCom->Get_WorldMatrix() *
@@ -62,8 +67,8 @@ void CBlood_PillarC::Late_Update(_float fTimeDelta)
 {
 	CPartObject::Late_Update(fTimeDelta);
 
-	//if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::BLEND, this)))
-	//	return;
+	if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::BLEND, this)))
+		return;
 }
 
 HRESULT CBlood_PillarC::Render()
@@ -98,6 +103,23 @@ void CBlood_PillarC::OnActivate(void* pArg)
 	PILLARC_ACTIVATE_DESC* pDesc = static_cast<PILLARC_ACTIVATE_DESC*>(pArg);
 	m_ActivateDesc = *pDesc;
 	Reset_Timer();
+
+
+	m_bIsGrowing = true;
+	m_fGrowDuration = pDesc->fGrowDuration;
+	m_fStayDuration = pDesc->fStayDuration;
+	m_fDecreaseDuration = pDesc->fDecreaseDuration;
+	m_fTargetRadius = pDesc->fTargetRadius;
+	m_fDecreaseTargetRadius = pDesc->fDecreaseTargetRadius;
+	m_fTargetHeight = pDesc->fTargetHeight;
+	m_fDisplayTime = m_fGrowDuration + m_fStayDuration + m_fDecreaseDuration;
+
+	/* 시작 시 */
+	_float3 vScale = { 0.01f, 0.f, 0.01f };
+	//_float3 vScale = { 1.f, 1.f, 1.f };
+
+	m_eState = STATE_GROW;
+	m_pTransformCom->Set_Scale(vScale);
 	
 }
 
@@ -108,15 +130,87 @@ void CBlood_PillarC::OnDeActivate()
 
 #pragma endregion
 
-
-void CBlood_PillarC::Calc_Timer(_float fTimeDelta)
+void CBlood_PillarC::Shape_Control(_float fTimeDelta)
 {
-	if (m_fCurrentTime < m_fDisplayTime)
-		m_fCurrentTime += fTimeDelta;
 
-	// 처리할 게 있다면? 시간다돼면
+	RotateTurn_ToYaw(fTimeDelta);
+
+	m_fCurrentTime += fTimeDelta;
+	switch (m_eState)
+	{
+	case STATE_GROW:
+		Update_Grow(fTimeDelta);
+		break;
+	case STATE_STAY:
+		Update_Stay(fTimeDelta);
+		break;
+	case STATE_DECREASE:
+		Update_Decrease(fTimeDelta);
+		break;
+	}
+
+	if (!m_bIsGrowing)
+		return;
 }
 
+void CBlood_PillarC::Update_Grow(_float fTimeDelta)
+{
+	// 성장 완료 시, 다음 상태로 전환
+	if (m_fCurrentTime >= m_fGrowDuration)
+	{
+		m_eState = STATE_STAY; // '유지' 상태로 변경
+		m_fCurrentTime = 0.f;  // 타이머 리셋!
+		m_pTransformCom->Set_Scale({ m_fTargetRadius, m_fTargetHeight, m_fTargetRadius }); // 최종 크기로 고정
+		return;
+	}
+
+	_float fRatio = m_fCurrentTime / m_fGrowDuration;
+
+	fRatio = fRatio;
+
+	_float fCurrentRadius = 0.01f + (m_fTargetRadius - 0.01f) * fRatio;
+	_float fCurrentHeight = 0.f + (m_fTargetHeight - 0.f) * fRatio;
+
+	m_pTransformCom->Set_Scale({ fCurrentRadius, fCurrentHeight, fCurrentRadius });
+}
+
+void CBlood_PillarC::Update_Stay(_float fTimeDelta)
+{
+	// 유지 시간 완료 시, 다음 상태로 전환
+	if (m_fCurrentTime >= m_fStayDuration)
+	{
+		m_eState = STATE_DECREASE; // '감소' 상태로 변경
+		m_fCurrentTime = 0.f;     // 타이머 리셋!
+	}
+	// 이 상태에서는 아무것도 하지 않고 그냥 크기를 유지합니다.
+}
+
+void CBlood_PillarC::Update_Decrease(_float fTimeDelta)
+{
+	if (m_fCurrentTime >= m_fDecreaseDuration)
+	{
+		m_eState = STATE_END; // '종료' 상태로 변경
+		// Set_Dead() 같은 함수로 객체를 비활성화하거나 풀에 반납
+		return;
+	}
+
+	_float fRatio = m_fCurrentTime / m_fDecreaseDuration;
+
+	fRatio = fRatio;
+
+	// [수정] 선형 보간 공식을 사용하여 반지름을 계산합니다.
+	// 시작값: m_fTargetRadius
+	// 목표값: m_fDecreaseTargetRadius
+	_float fCurrentRadius = m_fTargetRadius + (m_fDecreaseTargetRadius - m_fTargetRadius) * fRatio;
+
+	// Y축 스케일(높이)은 이전 요청대로 m_fTargetHeight 값으로 고정합니다.
+	m_pTransformCom->Set_Scale({ fCurrentRadius, m_fTargetHeight, fCurrentRadius });
+}
+
+void CBlood_PillarC::RotateTurn_ToYaw(_float fTimeDelta)
+{
+	m_pTransformCom->Add_Rotation(0.f, fTimeDelta * XMConvertToRadians(90.f), 0.f);
+}
 
 HRESULT CBlood_PillarC::Bind_ShaderResources()
 {

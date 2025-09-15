@@ -130,12 +130,6 @@ void CBlood_PillarB::OnDeActivate()
 #pragma endregion
 
 
-void CBlood_PillarB::Calc_Timer(_float fTimeDelta)
-{
-
-	// 처리할 게 있다면? 시간다돼면
-}
-
 
 void CBlood_PillarB::Shape_Control(_float fTimeDelta)
 {

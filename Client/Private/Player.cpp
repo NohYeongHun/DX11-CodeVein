@@ -895,6 +895,7 @@ void CPlayer::On_Collision_Enter(CGameObject* pOther)
 
 
                 Create_HitEffects(vClosestPoint, vAttackDirection);
+
             }
            
         }
@@ -954,6 +955,8 @@ void CPlayer::On_Collision_Enter(CGameObject* pOther)
             vAttackDirection = XMVectorScale(vAttackDirection, 1.0f / fSwingLength);
         }
 
+
+        
 
 
         Create_HitEffects(vClosestPoint, vAttackDirection);

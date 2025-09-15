@@ -80,7 +80,6 @@ private:
 public:
     // 타이머 리셋
     void Reset_Timer() { m_fCurrentTime = 0.0f; }
-    void Calc_Timer(_float fTimeDelta);
 
 private:
     LEVEL m_eCurLevel = { LEVEL::END };

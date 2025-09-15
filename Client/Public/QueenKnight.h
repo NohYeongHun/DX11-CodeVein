@@ -177,6 +177,9 @@ private:
 	_float m_fSkillElapsedTime = 0.f; // 스킬이 발동된 후 흐른 시간
 	_float3 m_vSkillCenterPos;         // 스킬이 발동된 중심 위치
 	_float m_fRippleSpeed = 15.f;     // 효과 전파 속도
+	
+	_float m_fMaxPillarDistance = {};
+	_float m_fMaxSkillDuration = { 2.2f }; // [추가] 가장 먼 거리를 계산하기 위한 로직
 
 public:
 	void Start_Dissolve(_float fDuration = 0.f); // Dissolve 재생.
