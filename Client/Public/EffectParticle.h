@@ -13,6 +13,7 @@ public:
         PARTICLE_TYPE_QUEEN_PARTICLE = 4,
         PARTICLE_TYPE_HIT_PARTCILE = 5,
         PARTICLE_TYPE_PLAYERHIT_PARTCILE = 6,
+        PARTICLE_TYPE_TORNADO = 7,
         PARTICLE_TYPE_END
     };
 
@@ -107,6 +108,7 @@ public:
 
     void Create_HitParticle(_float3 vCenterPos, _float fRadius, _float fTotalLifeTime);
     void Create_PlayerHitParticle(_float3 vCenterPos, _float fRadius, _float fTotalLifeTime);
+    void Create_TornadoParticle(_float3 vCenterPos, _float fRadius, _float fHeight, _float fLifeTime);
 
 
 #pragma region 

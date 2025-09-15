@@ -10,6 +10,8 @@ vector g_vCamPosition;
 
 /*재질*/
 texture2D g_DiffuseTexture;
+texture2D g_DiffuseTextures[6];
+
 texture2D g_NormalTexture;
 texture2D g_NoiseTexture;
 
@@ -23,6 +25,9 @@ vector g_vMtrlSpecular = 1.f;
 // 시간.
 float g_fDissolveTime;
 
+
+float g_fTime;
+float g_fScrollSpeed = 2.f;
 
 
 struct VS_IN
@@ -179,48 +184,82 @@ PS_OUT_BACKBUFFER PS_DEFFERED_DISSOLVE_MAIN(PS_BACKBUFFER_IN In)
 
 
 /* */
+float g_fScrollSpeedU = 2.f;
+float g_fScrollSpeedV = 2.f;
+
+
 PS_OUT_BACKBUFFER PS_DEFFERED_BLOODPILLARA_MAIN(PS_BACKBUFFER_IN In)
 {
     PS_OUT_BACKBUFFER Out = (PS_OUT_BACKBUFFER) 0;
     
+    // [추가] 1. 시간에 따라 흐르는 UV 좌표 계산
+    // Diffuse 텍스처용 UV. V(세로) 방향으로만 흐르도록 설정.
+    float2 vDiffusePannedUV = In.vTexcoord + float2(0.f, g_fScrollSpeedV) * g_fTime;
+    
+    // Noise 텍스처용 UV. Diffuse와는 다른 속도로 흐르게 하여 깊이감을 줍니다.
+    float2 vNoisePannedUV = In.vTexcoord + float2(g_fScrollSpeedU, g_fScrollSpeedV * 0.5f) * g_fTime;
+    
+    // [수정] 2. 계산된 UV로 텍스처 샘플링
     // 기본이 Noise
-    vector vMtrlNoise = g_NoiseTexture.Sample(DefaultSampler, In.vTexcoord);
-    vector vMtrlDissolve = g_DissolveTexture.Sample(DefaultSampler, In.vTexcoord);
+    vector vMtrlNoise = g_NoiseTexture.Sample(DefaultSampler, vNoisePannedUV); // 수정: vNoisePannedUV 사용
+    vector vMtrlDissolve = g_DissolveTexture.Sample(DefaultSampler, In.vTexcoord); // 디졸브는 고정
+    
+    vector vDarkColor = vector(0.5f, 0.f, 0.f, 1.f); // 어두운 피 색상
+    vector vMtrlDiffuse = g_DiffuseTextures[5].Sample(DefaultSampler, vDiffusePannedUV); // 수정: vDiffusePannedUV 사용
     
     
     if (vMtrlNoise.a < 0.3f)
         discard;
     
     
-    Out.vDiffuse = vMtrlNoise; // 최종 색상.
+    // 노이즈 값(vMtrlNoise.r)에 따라 두 색상을 보간합니다.
+    Out.vDiffuse.rgb = lerp(vDarkColor.rgb, vMtrlDiffuse.rgb, vMtrlNoise.r);
+    Out.vDiffuse.a = vMtrlDiffuse.a;
+    
     Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w, 0.f, 0.f);
     
     // 안에 숫자가 0이되면 안그린다.
-    
     clip(vMtrlDissolve.r - g_fDissolveTime);
     
     return Out;
 }
 
+
+
+
 PS_OUT_BACKBUFFER PS_DEFFERED_BLOODPILLARB_MAIN(PS_BACKBUFFER_IN In)
 {
     PS_OUT_BACKBUFFER Out = (PS_OUT_BACKBUFFER) 0;
     
-    vector vMtrlDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
-    vector vMtrlDissolve = g_DissolveTexture.Sample(DefaultSampler, In.vTexcoord);
+    // [추가] 1. 시간에 따라 흐르는 UV 좌표 계산
+    // Diffuse 텍스처용 UV. V(세로) 방향으로만 흐르도록 설정.
+    float2 vDiffusePannedUV = In.vTexcoord + float2(0.f, g_fScrollSpeedV) * g_fTime;
+    
+    // Noise 텍스처용 UV. Diffuse와는 다른 속도로 흐르게 하여 깊이감을 줍니다.
+    float2 vNoisePannedUV = In.vTexcoord + float2(g_fScrollSpeedU, g_fScrollSpeedV * 0.5f) * g_fTime;
+    
+    // [수정] 2. 계산된 UV로 텍스처 샘플링
+    // 기본이 Noise
+    vector vMtrlNoise = g_NoiseTexture.Sample(DefaultSampler, vNoisePannedUV); // 수정: vNoisePannedUV 사용
+    vector vMtrlDissolve = g_DissolveTexture.Sample(DefaultSampler, In.vTexcoord); // 디졸브는 고정
+    
+    vector vDarkColor = vector(0.5f, 0.f, 0.f, 1.f); // 어두운 피 색상
+    vector vMtrlDiffuse = g_DiffuseTextures[5].Sample(DefaultSampler, vDiffusePannedUV); // 수정: vDiffusePannedUV 사용
     
     
-    if (vMtrlDiffuse.a < 0.3f)
+    if (vMtrlNoise.a < 0.3f)
         discard;
     
     
-    Out.vDiffuse = vMtrlDiffuse;
+    // 노이즈 값(vMtrlNoise.r)에 따라 두 색상을 보간합니다.
+    Out.vDiffuse.rgb = lerp(vDarkColor.rgb, vMtrlDiffuse.rgb, vMtrlNoise.r);
+    Out.vDiffuse.a = vMtrlDiffuse.a;
+    
     Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w, 0.f, 0.f);
     
     // 안에 숫자가 0이되면 안그린다.
-    
     clip(vMtrlDissolve.r - g_fDissolveTime);
     
     return Out;
@@ -230,21 +269,34 @@ PS_OUT_BACKBUFFER PS_DEFFERED_BLOODPILLARC_MAIN(PS_BACKBUFFER_IN In)
 {
     PS_OUT_BACKBUFFER Out = (PS_OUT_BACKBUFFER) 0;
     
+    // [추가] 1. 시간에 따라 흐르는 UV 좌표 계산
+    // Diffuse 텍스처용 UV. V(세로) 방향으로만 흐르도록 설정.
+    float2 vDiffusePannedUV = In.vTexcoord + float2(0.f, g_fScrollSpeedV) * g_fTime;
+    
+    // Noise 텍스처용 UV. Diffuse와는 다른 속도로 흐르게 하여 깊이감을 줍니다.
+    float2 vNoisePannedUV = In.vTexcoord + float2(g_fScrollSpeedU, g_fScrollSpeedV * 0.5f) * g_fTime;
+    
+    // [수정] 2. 계산된 UV로 텍스처 샘플링
     // 기본이 Noise
-    vector vMtrlNoise = g_NoiseTexture.Sample(DefaultSampler, In.vTexcoord);
-    vector vMtrlDissolve = g_DissolveTexture.Sample(DefaultSampler, In.vTexcoord);
+    vector vMtrlNoise = g_NoiseTexture.Sample(DefaultSampler, vNoisePannedUV); // 수정: vNoisePannedUV 사용
+    vector vMtrlDissolve = g_DissolveTexture.Sample(DefaultSampler, In.vTexcoord); // 디졸브는 고정
+    
+    vector vDarkColor = vector(0.5f, 0.f, 0.f, 1.f); // 어두운 피 색상
+    vector vMtrlDiffuse = g_DiffuseTextures[5].Sample(DefaultSampler, vDiffusePannedUV); // 수정: vDiffusePannedUV 사용
     
     
     if (vMtrlNoise.a < 0.3f)
         discard;
     
     
-    Out.vDiffuse = vMtrlNoise; // 최종 색상.
+    // 노이즈 값(vMtrlNoise.r)에 따라 두 색상을 보간합니다.
+    Out.vDiffuse.rgb = lerp(vDarkColor.rgb, vMtrlDiffuse.rgb, vMtrlNoise.r);
+    Out.vDiffuse.a = vMtrlDiffuse.a;
+    
     Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w, 0.f, 0.f);
     
     // 안에 숫자가 0이되면 안그린다.
-    
     clip(vMtrlDissolve.r - g_fDissolveTime);
     
     return Out;

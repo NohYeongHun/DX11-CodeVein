@@ -66,11 +66,18 @@ private:
     // 컴포넌트
     class CShader* m_pShaderCom = { nullptr };
     _uint m_iShaderPath = {};
-    _float2 m_vTexcoord = {};
     class CLoad_Model* m_pModelCom = { nullptr };
     class CTexture* m_pTextureCom[TEXTURE_END] = { nullptr };
     _uint m_iTextureIndexArray[TEXTURE_END] = {};
 
+#pragma endregion
+
+#pragma region SHADER 변수들
+private:
+    _float2 m_vTexcoord = {};
+    _float m_fTime = {};; // C++에서 계속 증가하는 시간 값을 전달받을 변수
+    _float m_fScrollSpeed = 2.f; // 흐르는 속도를 제어할 변수
+    _float m_fDissolveTime = 0.f;
 #pragma endregion
 
 #pragma region 기본 변수들

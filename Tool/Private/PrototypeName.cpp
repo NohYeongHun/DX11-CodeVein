@@ -24,8 +24,8 @@ const MODEL_DESC Model_Prototypes[] =
 	//{ MODELTYPE::NONANIM,  TEXT("Prototype_Component_Model_Effect_BloodPillarC"), "../Bin/Resources/Models/EffectMesh/BloodPillarC.fbx",        "textures/"},
 	// 
 	//{ MODELTYPE::NONANIM,  TEXT("Prototype_Component_Model_Effect_BloodA"), "../Bin/Resources/Models/EffectMesh/BloodA.fbx",        "textures/"},
-	//{ MODELTYPE::NONANIM,  TEXT("Prototype_Component_Model_Effect_BloodB"), "../Bin/Resources/Models/EffectMesh/BloodB.fbx",        "textures/"},
-	{ MODELTYPE::NONANIM,  TEXT("Prototype_Component_Model_Effect_BloodC"), "../Bin/Resources/Models/EffectMesh/BloodC.fbx",        "textures/"},
+	{ MODELTYPE::NONANIM,  TEXT("Prototype_Component_Model_Effect_BloodB"), "../Bin/Resources/Models/EffectMesh/BloodB.fbx",        "textures/"},
+	//{ MODELTYPE::NONANIM,  TEXT("Prototype_Component_Model_Effect_BloodC"), "../Bin/Resources/Models/EffectMesh/BloodC.fbx",        "textures/"},
 	//{ MODELTYPE::NONANIM,  TEXT("Prototype_Component_Model_Effect_SprialWind"), "../Bin/Resources/Models/EffectMesh/SpiralWind.fbx",        "textures/"},
 	//{ MODELTYPE::NONANIM,  TEXT("Prototype_Component_Model_Effect_Sprial"), "../Bin/Resources/Models/EffectMesh/Spiral.fbx",        "textures/"},
 	//{ MODELTYPE::NONANIM,  TEXT("Prototype_Component_Model_Effect_Sylinder"), "../Bin/Resources/Models/EffectMesh/Sylinder.fbx",        "textures/"},

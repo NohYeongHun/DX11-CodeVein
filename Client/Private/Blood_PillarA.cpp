@@ -66,6 +66,9 @@ void CBlood_PillarA::Update(_float fTimeDelta)
 		XMLoadFloat4x4(m_pParentMatrix));
 
 	
+	/* 쉐이더에 전달해줄 시간값. */
+	if (m_fTime < m_fDisplayTime)
+		m_fTime += fTimeDelta;
 }
 
 void CBlood_PillarA::Late_Update(_float fTimeDelta)
@@ -118,9 +121,11 @@ void CBlood_PillarA::OnActivate(void* pArg)
 	m_fTargetHeight = pDesc->fTargetHeight;
 	m_fDisplayTime = m_fGrowDuration + m_fStayDuration + m_fDecreaseDuration;
 
+	m_fDissolveTime = 0.f;
 
 	/* 시작 시 */
-	_float3 vScale = { 0.01f, 0.f, 0.01f };
+	//_float3 vScale = { 0.01f, 0.f, 0.01f };
+	_float3 vScale = { 0.01f, 0.01f, m_fTargetHeight }; // Z가 높이임.
 
 	m_eState = STATE_GROW;
 	m_pTransformCom->Set_Scale(vScale);
@@ -128,7 +133,7 @@ void CBlood_PillarA::OnActivate(void* pArg)
 
 void CBlood_PillarA::OnDeActivate()
 {
-
+	
 }
 
 #pragma endregion
@@ -157,12 +162,15 @@ void CBlood_PillarA::Shape_Control(_float fTimeDelta)
 		break;
 	}
 
+	_float3 vScale = m_pTransformCom->Get_Scale();
+
 	if (!m_bIsGrowing)
 		return;
 
 	
 }
 
+// z가 높이임.
 void CBlood_PillarA::Update_Grow(_float fTimeDelta)
 {
 	// 성장 완료 시, 다음 상태로 전환
@@ -180,6 +188,8 @@ void CBlood_PillarA::Update_Grow(_float fTimeDelta)
 	_float fCurrentHeight = 0.f + (m_fTargetHeight - 0.f) * fRatio;
 
 	m_pTransformCom->Set_Scale({ fCurrentRadius, fCurrentHeight, fCurrentRadius });
+
+	OutPutDebugFloat(fCurrentRadius);
 }
 
 void CBlood_PillarA::Update_Stay(_float fTimeDelta)
@@ -195,6 +205,7 @@ void CBlood_PillarA::Update_Stay(_float fTimeDelta)
 
 void CBlood_PillarA::Update_Decrease(_float fTimeDelta)
 {
+	
 	// 감소 완료 시, 종료 상태로 전환
 	if (m_fCurrentTime >= m_fDecreaseDuration)
 	{
@@ -203,7 +214,10 @@ void CBlood_PillarA::Update_Decrease(_float fTimeDelta)
 		return;
 	}
 
+	m_fDissolveTime += fTimeDelta;
 	_float fRatio = m_fCurrentTime / m_fDecreaseDuration;
+
+	fRatio = fRatio * fRatio;
 
 	// [수정] 선형 보간 공식을 사용하여 반지름을 계산합니다.
 	// 시작값: m_fTargetRadius
@@ -220,6 +234,8 @@ void CBlood_PillarA::Update_Decrease(_float fTimeDelta)
 /* Combined 곱하기 전에 실행. => Update*/
 void CBlood_PillarA::RotateTurn_ToYaw(_float fTimeDelta)
 {
+	
+
 	m_pTransformCom->Add_Rotation( 0.f, fTimeDelta * XMConvertToRadians(90.f), 0.f );
 }
 
@@ -252,11 +268,37 @@ HRESULT CBlood_PillarA::Bind_ShaderResources()
 		CRASH("Failed Bind Cam Position");
 		return E_FAIL;
 	}
+
+	
+	_float fRatio = m_fTime / m_fDisplayTime;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fTime", &m_fTime, sizeof(_float))))
+	{
+		CRASH("Failed Bind Cam Position");
+		return E_FAIL;
+	}
+
+	
+	_float fDisolveRatio = m_fDissolveTime / m_fDecreaseDuration;
+	
+
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fDissolveTime", &fDisolveRatio, sizeof(_float))))
+	{
+		CRASH("Failed Bind Cam Position");
+		return E_FAIL;
+	}
+
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fScrollSpeed", &m_fScrollSpeed, sizeof(_float))))
+	{
+		CRASH("Failed Bind Cam Position");
+		return E_FAIL;
+	}
+
+	
 	
 #pragma endregion
 
 #pragma region TEXTURE 바인딩.
-	if (FAILED(m_pTextureCom[TEXTURE_DIFFUSE]->Bind_Shader_Resources(m_pShaderCom, "g_DiffuseTexture")))
+	if (FAILED(m_pTextureCom[TEXTURE_DIFFUSE]->Bind_Shader_Resources(m_pShaderCom, "g_DiffuseTextures")))
 	{
 		CRASH("Failed Bind Texture Diffuse Texture ");
 		return E_FAIL;

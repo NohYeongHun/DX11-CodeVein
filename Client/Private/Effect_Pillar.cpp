@@ -142,7 +142,24 @@ void CEffect_Pillar::OnActivate(void* pArg)
     PillarCDesc.fDecreaseDuration = 0.8f;
     m_pBloodPillarC->OnActivate(&PillarCDesc);
 
+    /* Effect 파티클 활성화 */
+    //CEffectParticle::EFFECTPARTICLE_ENTER_DESC TornadoDesc{};
+    //TornadoDesc.vStartPos = m_pTransformCom->Get_State(STATE::POSITION); // 몬스터 현재위치로 생성.
+    //
+    //PARTICLE_INIT_INFO Info = {};
+    //Info.lifeTime = m_fDuration * 5.f;
+    //Info.dir = { 0.f, 0.f, 0.f };
+    //Info.fHeight = 7.f;
+    //Info.fRadius = 6.f;
+    //Info.pos = { 0.f, 0.f, 0.f };
+    //TornadoDesc.particleInitInfo = Info;
+    //TornadoDesc.pTargetTransform = m_pTransformCom;
+    //
+    //m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(m_eCurLevel)
+    //    , TEXT("TORNADO"), TEXT("Layer_Effect"), 1, ENUM_CLASS(EFFECTTYPE::PARTICLE), &TornadoDesc);
+
     m_pColliderCom->Set_Active(true);
+
 
     /* Pool이 활성화될 때 등록. 
     * 원래는 Pool이 빠질때 빼는 로직도 생성해야하나 => Destroy로 해결.

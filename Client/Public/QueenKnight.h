@@ -125,6 +125,8 @@ public:
 public:
 	virtual void Weapon_Rotation(_uint iPartType, _float3 vRadians, _bool bInverse = false) override;
 	virtual void Encounter_Action() override;
+
+	virtual void IncreaseDetection();
 #pragma endregion
 
 #pragma region 7. 보스몹 체력 UI 관리
@@ -157,16 +159,20 @@ public:
 	void Create_QueenKnightWarp_Effect_Particle(_float3 vDir);
 	void Create_QueenKnightWarp_Effect_Particle_Spawn(_float3 vDir, _uint iSpawnCount);
 	void Create_QueenKnightWarp_Effect_Particle_Explosion(_float3 vDir);
-
 	void Create_QueenKnightWarp_Effect(_float3 vDir);
+	void Create_QueenKnightTornado_Effect();
 
 	/* Blood Pillar Event 활성화*/
 	void Start_PillarSkill();
 	void Update_BloodPillar(_float fTimeDelta);
 	void Reset_PillarSkill(); // 이미 사용했을 경우 상태값 초기화.
 
+	/* Tornado */
+
 	
 private:
+	_float m_fPillarSpawnInterval = 0.0f; // 기둥 하나당 생성 간격 (0.1초)
+
 	/* Blood Pillar Event 활성화 용도 */
 	vector<_float3> m_vecPillarPositions;
 	// 각 위치의 Pillar가 소환되었는지 여부를 체크하는 목록

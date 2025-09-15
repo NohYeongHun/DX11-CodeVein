@@ -51,6 +51,7 @@ private:
 private:
 	class CShader* m_pDefferedShader = { nullptr };
 	class CShader* m_pPostLightShader = { nullptr };
+	class CShader* m_pDistortionShader = { nullptr };
 
 	class CVIBuffer_Rect* m_pVIBuffer = { nullptr };
 	_float4x4 m_WorldMatrix{}, m_ViewMatrix{}, m_ProjMatrix{};
@@ -80,7 +81,7 @@ private:
 	HRESULT Render_NonBlend();
 	HRESULT Render_Lights();
 	HRESULT Render_Combined();
-	HRESULT Render_Distiotion();
+	HRESULT Render_Distortion();
 
 	HRESULT Render_Blend();
 

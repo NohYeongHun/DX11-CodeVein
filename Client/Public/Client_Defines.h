@@ -58,7 +58,8 @@ namespace Client
 
 	enum class POINTDIRPARTICLE_SHADERPATH : _uint
 	{
-		DEFAULT = 0, QUEENKNIGHTWARP = 1, EXPLOSION = 2,QUEENKINGHT_PARTICLE = 3, HITPARTICLE = 4, PLAYERHITPARTICLE = 5, DEBUG = 6,
+		DEFAULT = 0, QUEENKNIGHTWARP = 1, EXPLOSION = 2,QUEENKINGHT_PARTICLE = 3, HITPARTICLE = 4, PLAYERHITPARTICLE = 5,
+		TORNADO = 6, DEBUG = 7,
 		NONE
 	};
 
@@ -80,6 +81,7 @@ namespace Client
 		_float3 dir;
 		_float lifeTime;
 		_float fRadius = { 0.f };
+		_float fHeight = { 0.f }; // 높이.
 		_float fGatherTime = { 0.f };
 		_float fExplositionTime = { 0.f };
 	}PARTICLE_INIT_INFO;

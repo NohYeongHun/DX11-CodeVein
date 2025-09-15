@@ -779,7 +779,7 @@ HRESULT CLoader_Static::Add_Prototype_BloodPillar_Effects(ID3D11Device* pDevice,
 	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
 		, TEXT("Prototype_Component_Texture_BloodPillarDiffuse")
 		, CTexture::Create(pDevice, pContext
-			, TEXT("../Bin/Resources/Models/EffectMesh/Diffuse/Diffuse%d.png"), 1))))
+			, TEXT("../Bin/Resources/Models/EffectMesh/Diffuse/Diffuse%d.png"), 6))))
 	{
 		CRASH("Failed Load Effect TrailGlow Texture");
 		return E_FAIL;

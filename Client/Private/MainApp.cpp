@@ -392,6 +392,38 @@ HRESULT CMainApp::Ready_Pooling()
 		));
 		m_pGameInstance->Add_GameObject_ToPools(TEXT("PLAYER_HITPARTICLE"), ENUM_CLASS(CEffectParticle::EffectType), pGameObject);
 	}
+
+	CEffectParticle::EFFECT_PARTICLE_DESC QueenKnightTornadoParticle{};
+	QueenKnightTornadoParticle.fSpeedPerSec = 10.f;
+	QueenKnightTornadoParticle.fRotationPerSec = XMConvertToRadians(90.f);
+	QueenKnightTornadoParticle.iShaderPath = static_cast<_uint>(POINTDIRPARTICLE_SHADERPATH::TORNADO);
+	QueenKnightTornadoParticle.eParticleType = CEffectParticle::PARTICLE_TYPE_TORNADO; // VIBuffer에 들어감.
+	QueenKnightTornadoParticle.iNumInstance = 400;
+	QueenKnightTornadoParticle.vCenter = { 0.f, 0.f, 0.f };
+	QueenKnightTornadoParticle.vRange = { 7.f, 7.f, 7.f };
+	QueenKnightTornadoParticle.vSpeed = { 3.f, 9.f };
+	QueenKnightTornadoParticle.vSize = { 0.1f, 0.11f };
+	QueenKnightTornadoParticle.vLifeTime = { 2.f, 5.f };
+	QueenKnightTornadoParticle.isLoop = false;
+	QueenKnightTornadoParticle.isBillBoard = true;
+	QueenKnightTornadoParticle.useTextureCheckArray[TEXTURE::TEXTURE_DIFFUSE] = true;
+	QueenKnightTornadoParticle.useTextureIndexArray[TEXTURE::TEXTURE_DIFFUSE] = 2;
+	QueenKnightTornadoParticle.useTextureCheckArray[TEXTURE::TEXTURE_MASK] = true;
+	QueenKnightTornadoParticle.useTextureIndexArray[TEXTURE::TEXTURE_MASK] = 0;
+	QueenKnightTornadoParticle.useTextureCheckArray[TEXTURE::TEXTURE_GRADIENT] = false;
+	QueenKnightTornadoParticle.useTextureCheckArray[TEXTURE::TEXTURE_GRADIENT_ALPHA] = false;
+	QueenKnightTornadoParticle.useTextureCheckArray[TEXTURE::TEXTURE_NOISE] = true;
+	QueenKnightTornadoParticle.useTextureCheckArray[TEXTURE::TEXTURE_OTHER] = true;
+
+
+	for (_uint i = 0; i < 200; ++i)
+	{
+		pGameObject = dynamic_cast<CGameObject*>(m_pGameInstance->Clone_Prototype(
+			PROTOTYPE::GAMEOBJECT, ENUM_CLASS(LEVEL::STATIC)
+			, TEXT("Prototype_GameObject_EffectParticle"), &QueenKnightTornadoParticle
+		));
+		m_pGameInstance->Add_GameObject_ToPools(TEXT("TORNADO"), ENUM_CLASS(CEffectParticle::EffectType), pGameObject);
+	}
 	
 #pragma endregion
 

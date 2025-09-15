@@ -632,7 +632,17 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_PLAYERHIT_PARTICLE();
     }
 
-    pass DebugPass // 6
+    pass TornadoParticlePass // 6
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = compile gs_5_0 GS_Stretched_BillboardQueenKnight_MAIN();
+        PixelShader = compile ps_5_0 PS_DIFFUSE_QUEENKNIGHTWARP_MAIN();
+    }
+
+    pass DebugPass // 7
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_Default, 0);

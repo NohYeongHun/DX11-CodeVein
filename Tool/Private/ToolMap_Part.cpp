@@ -133,6 +133,10 @@ void CToolMap_Part::Update(_float fTimeDelta)
 
     //XMStoreFloat3(&vScaled, XMLoadFloat3(&vScaled) * (1.f + fTimeDelta));
     //m_pTransformCom->Set_Scale(vScaled);
+
+    //m_fTotalTime += fTimeDelta;
+
+    //m_pTransformCom->Add_Rotation(0.f, XMConvertToRadians(90.f) * fTimeDelta, 0.f);
 }
 
 void CToolMap_Part::Late_Update(_float fTimeDelta)

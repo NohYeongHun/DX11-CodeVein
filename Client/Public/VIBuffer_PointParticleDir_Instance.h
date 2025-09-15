@@ -10,6 +10,13 @@ typedef struct ParticleVertexInfo
 	_float3 burstDir;       // 터질 때의 방향
 	_float fBurstTime;      // 터지는 시간
 	_float fRandomSpeed;    // 랜덤 스피드.
+
+	// --- 토네이도 파티클용 변수 ---
+	_float fAngle; // 시작 각도.
+	_float fRadius; // 회전 반지름
+	_float fHeight; // 높이 범위;
+	_float fAngularSpeed; // 회전 속도;
+	_float fUpwardSpeed; // 상승 속도;
 }PARTICLE_VERTEX_INFO;
 
 
@@ -24,6 +31,8 @@ public:
 		PARTICLE_TYPE_BOSS_EXPLOSION = 3,
 		PARTICLE_TYPE_QUEENN_PARTICLE = 4,
 		PARTICLE_TYPE_HIT_PARTICLE = 5,
+		PARTICLE_TYPE_PLAYERHIT_PARTCILE = 6,
+		PARTICLE_TYPE_TORNADO = 7,
 		PARTICLE_TYPE_END
 	};
 
@@ -61,6 +70,7 @@ public:
 	void BossExplosion_Update(VTXINSTANCEPOINTDIR_PARTICLE* pVertices, _float fTimeDelta);
 	void Explosion_Update(VTXINSTANCEPOINTDIR_PARTICLE* pVertices, _float fTimeDelta);
 	void HitParticle_Update(VTXINSTANCEPOINTDIR_PARTICLE* pVertices, _float fTimeDelta);
+	void Tornado_Update(VTXINSTANCEPOINTDIR_PARTICLE* pVertices, _float fTimeDelta);
 
 public:
 	void CreateAllParticles(_float3 vCenterPos, _float3 vBaseDir, _float fLifeTime = 3.0f);
@@ -70,6 +80,7 @@ public:
 	void Create_BossExplosionParticle(_float3 vCenterPos, _float fRadius, _float fGatherTime, _float fExplosionTime, _float fTotalLifeTime);
 	void Create_ExplosionParticle(_float3 vNomalDir, _float3 vCenterPos, _float fRadius, _float fExplosionTime, _float fTotalLifeTime);
 	void Create_HitParticle(_float3 vCenterPos, _float fRadius, _float fTotalLifeTime);
+	void Create_TornadoParticle(_float3 vCenterPos, _float fRadius, _float fHeight, _float fLifeTime);
 #pragma endregion
 
 

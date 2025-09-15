@@ -205,6 +205,9 @@ void CVIBuffer_PointParticleDir_Instance::Update(_float fTimeDelta)
     case PARTICLE_TYPE::PARTICLE_TYPE_HIT_PARTICLE:
         HitParticle_Update(pVertices, fTimeDelta);
         break;
+    case PARTICLE_TYPE::PARTICLE_TYPE_TORNADO:
+        Tornado_Update(pVertices, fTimeDelta);
+        break;
     default:
         break;
     }
@@ -355,13 +358,6 @@ void CVIBuffer_PointParticleDir_Instance::QueenKnightWarp_Update(VTXINSTANCEPOIN
             _float3 direction = pVertices[index].vDir;
             _float speed = pVertices[index].fDirSpeed;
 
-
-            // 여기서 fDirSpeed 값이 0인지 확인
-            if (fabsf(speed) <= 0.01f)
-            {
-                // 0이면 디버그 메시지 출력
-                OutputDebugWstring(TEXT("Warning: Particle speed is 0. Particle is not moving.\n"));
-            }
 
             _float3 velocity = {
                 direction.x * speed * fTimeDelta,
@@ -566,6 +562,28 @@ void CVIBuffer_PointParticleDir_Instance::HitParticle_Update(VTXINSTANCEPOINTDIR
             XMStoreFloat4(&pVertices[index].vTranslation, newPos);
             ++it;
         }
+    }
+}
+
+void CVIBuffer_PointParticleDir_Instance::Tornado_Update(VTXINSTANCEPOINTDIR_PARTICLE* pVertices, _float fTimeDelta)
+{
+    // 1. 생성 대기 중인 파티클을 활성 목록으로 이동
+    while (!m_ReadyparticleIndices.empty())
+    {
+        auto info = m_ReadyparticleIndices.front();
+        m_ReadyparticleIndices.pop();
+        _uint index = info.first;
+        ParticleVertexInfo particleInfo = info.second;
+
+        m_LiveParticleIndices.emplace_back(index);
+    }
+
+    // 2. 활성화된 파티클들의 토네이도 움직임 계산
+    for (auto it = m_LiveParticleIndices.begin(); it != m_LiveParticleIndices.end(); )
+    {
+        _uint index = *it;
+        pVertices[index].vLifeTime.x += fTimeDelta;
+        // ...
     }
 }
 
@@ -844,15 +862,6 @@ void CVIBuffer_PointParticleDir_Instance::Create_ExplosionParticle(_float3 vNoma
         _float3 outwardDir;
         XMStoreFloat3(&outwardDir, XMVector3Normalize(vOutwardDir));
 
-        // ▼▼▼ [핵심 수정] ▼▼▼
-
-        // 2. ★파티클 초기 위치★를 중심에서 fRadius만큼 떨어진 곳으로 설정
-      /*  _float3 initialPos = {
-            vCenterPos.x + outwardDir.x * fRadius,
-            vCenterPos.y + outwardDir.y * fRadius,
-            vCenterPos.z + outwardDir.z * fRadius
-        };*/
-
         _float3 initialPos = vCenterPos;
 
         // 3. ★파티클 이동 방향★을 중심으로 향하도록 (-1을 곱해) 뒤집어 줌
@@ -861,8 +870,6 @@ void CVIBuffer_PointParticleDir_Instance::Create_ExplosionParticle(_float3 vNoma
             -outwardDir.y,
             -outwardDir.z
         };
-
-        // ▲▲▲ [핵심 수정 끝] ▲▲▲
 
         ParticleVertexInfo info{};
         info.pos = initialPos;          // 바깥에서 시작
@@ -913,6 +920,56 @@ void CVIBuffer_PointParticleDir_Instance::Create_HitParticle(_float3 vCenterPos,
         m_ReadyparticleIndices.emplace(make_pair(index, info));
     }
 }
+
+/*
+  1. _float3 vCenterPos - Blood_Pillar의 중심 위치 (기준점)
+  2. _float fRadius - 토네이도 회전 반지름
+  3. _float fHeight - 토네이도 높이 범위
+  4. _float fRotationSpeed - 회전 속도 (라디안/초)
+  5. _float fLifeTime - 파티클 생명시간
+*/
+void CVIBuffer_PointParticleDir_Instance::Create_TornadoParticle(_float3 vCenterPos, _float fRadius, _float fHeight, _float fLifeTime)
+{
+
+    while (!m_DeadParticleIndices.empty())
+    {
+        _uint index = m_DeadParticleIndices.front();
+        m_DeadParticleIndices.pop();
+
+        ParticleVertexInfo info{};
+
+        // 1. 수명: 풀링시 설정한 범위 또는 매개변수값 사용
+        info.lifeTime = m_pGameInstance->Rand(0.1f, fLifeTime);
+
+        // 2. 시작 각도는 0~360도 사이에서 완전 무작위
+        info.fAngle = m_pGameInstance->Rand(0.f, 360.f);
+
+        // 3. 각 파티클의 회전 반지름 (0부터 최대 반지름까지 무작위)
+        info.fRadius = m_pGameInstance->Rand(1.f, fRadius);
+
+        // 4. 회전 속도
+        info.fAngularSpeed = m_pGameInstance->Rand(m_vSpeed.x, m_vSpeed.y);
+
+        // 5. 상승 속도는 파티클이 자신의 수명 동안 최대 높이에 도달하도록 계산
+        info.fUpwardSpeed = fabs(fHeight) / info.lifeTime; // 절댓값을 사용해서 항상 위로 상승
+
+        // 6. 초기 위치 계산 (원형 궤도 상의 위치)
+        _float fRadian = XMConvertToRadians(info.fAngle);
+        _float fInitialX = vCenterPos.x + info.fRadius * cosf(fRadian);
+        _float fInitialZ = vCenterPos.z + info.fRadius * sinf(fRadian);
+
+        // 최종 정보 설정
+        info.pos = { fInitialX, vCenterPos.y, fInitialZ };
+        info.initialPos = vCenterPos;
+        info.dir = { 0.f, 0.f, 0.f };
+        info.fHeight = fHeight;
+        info.fRandomSpeed = info.fAngularSpeed;
+
+        // 3. 파티클을 생성 대기열에 추가
+        m_ReadyparticleIndices.emplace(make_pair(index, info));
+    }
+}
+
 
 #pragma endregion
 

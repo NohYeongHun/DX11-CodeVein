@@ -37,6 +37,10 @@ HRESULT CRenderer::Initialize()
     m_pGameInstance->Add_RenderTarget(TEXT("Target_Shade"), ViewportDesc.Width, ViewportDesc.Height, DXGI_FORMAT_R16G16B16A16_UNORM, _float4(1.f, 1.f, 1.f, 1.f));
     //m_pGameInstance->Add_RenderTarget(TEXT("Target_LightDepth"), ViewportDesc.Width, ViewportDesc.Height, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(0.f, 0.f, 0.f, 0.f));
     m_pGameInstance->Add_RenderTarget(TEXT("Combine_Shade"), ViewportDesc.Width, ViewportDesc.Height, DXGI_FORMAT_R16G16B16A16_FLOAT, _float4(1.f, 0.f, 1.f, 1.f));
+
+    m_pGameInstance->Add_RenderTarget(TEXT("Target_Distotion"), ViewportDesc.Width, ViewportDesc.Height, DXGI_FORMAT_R16G16B16A16_FLOAT, _float4(1.f, 0.f, 1.f, 1.f));
+
+
     m_pGameInstance->Add_RenderTarget(TEXT("Target_BrightPass"), ViewportDesc.Width, ViewportDesc.Height, DXGI_FORMAT_R8G8B8A8_UNORM, _float4(0.f, 0.f, 0.f, 1.f));
     m_pGameInstance->Add_RenderTarget(TEXT("Target_BloomBlurX"), ViewportDesc.Width / 8, ViewportDesc.Height / 8, DXGI_FORMAT_R8G8B8A8_UNORM, _float4(0.f, 0.f, 0.f, 1.f));
     m_pGameInstance->Add_RenderTarget(TEXT("Target_BloomBlurY"), ViewportDesc.Width / 8, ViewportDesc.Height / 8, DXGI_FORMAT_R8G8B8A8_UNORM, _float4(0.f, 0.f, 0.f, 1.f));
@@ -68,6 +72,9 @@ HRESULT CRenderer::Initialize()
     m_pDefferedShader = CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Engine_Shader_Deferred.hlsl"), VTXPOSTEX::Elements, VTXPOSTEX::iNumElements);
     ASSERT_CRASH(m_pDefferedShader);
 
+    m_pDistortionShader = CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Engine_Shader_Distortion.hlsl"), VTXPOSTEX::Elements, VTXPOSTEX::iNumElements);
+    ASSERT_CRASH(m_pDistortionShader);
+
     m_pPostLightShader = CShader::Create(m_pDevice, m_pContext, TEXT("../Bin/ShaderFiles/Engine_Shader_BloomBright.hlsl"), VTXPOSTEX::Elements, VTXPOSTEX::iNumElements);
     ASSERT_CRASH(m_pPostLightShader);
 
@@ -84,6 +91,7 @@ HRESULT CRenderer::Initialize()
     m_pGameInstance->Ready_RT_Debug(TEXT("Target_Depth"), 150.0f, 750.0f, 300.f, 300.f);
     m_pGameInstance->Ready_RT_Debug(TEXT("Target_Shade"), 450.0f, 150.0f, 300.f, 300.f);
     m_pGameInstance->Ready_RT_Debug(TEXT("Combine_Shade"), 450.0f, 450.0f, 300.f, 300.f);
+    m_pGameInstance->Ready_RT_Debug(TEXT("Target_Distotion"), 450.0f, 750.0f, 300.f, 300.f);
     //m_pGameInstance->Ready_RT_Debug(TEXT("Target_LightDepth"), ViewportDesc.Width - 150.0f, 150.0f, 300.f, 300.f);
     
     m_pGameInstance->Ready_RT_Debug(TEXT("Target_BrightPass"), ViewportDesc.Width - 150.0f, 150.0f, 300.f, 300.f);
@@ -125,29 +133,34 @@ HRESULT CRenderer::Draw()
     if (FAILED(Render_Lights()))
         return E_FAIL;
     //
-    //// 3. G-Buffer 합성 및 스카이박스 렌더링으로 최종 씬 완성
+    // 3. G-Buffer 합성 및 스카이박스 렌더링으로 최종 씬 완성
     if (FAILED(Render_Combined()))
         return E_FAIL;
     
+    // 4. Distotion 추가.
+    if (FAILED(Render_Distortion()))
+        return E_FAIL;
 
-    // 4. 모든 반투명 객체(HitFlashEffect 포함)를 최종 씬 위에 렌더링
+    // 5. 모든 반투명 객체(HitFlashEffect 포함)를 최종 씬 위에 렌더링
     if (FAILED(Render_Blend()))
         return E_FAIL;
 
-    // 5. 반투명 객체까지 포함된 씬으로 블룸 효과 생성
+   
+
+    // 6. 반투명 객체까지 포함된 씬으로 블룸 효과 생성
     if (FAILED(Render_BloomBlur()))
         return E_FAIL;
     //
-    //// 6. 씬과 블룸 효과를 최종 합성하여 화면에 출력
+    // 7. 씬과 블룸 효과를 최종 합성하여 화면에 출력
     if (FAILED(Render_BloomCombine()))
         return E_FAIL;
 //   
-    // 7. NonLight,  등 나머지 렌더링 => 사실상 안씀.
+    // 8. NonLight,  등 나머지 렌더링 => 사실상 안씀.
     if (FAILED(Render_NonLight()))
         return E_FAIL;
 
 
-
+    // EX) 나머지 효과를 적용하지 않을 객체들 그려넣기.
     if (FAILED(Render_UI()))
         return E_FAIL;
 
@@ -312,8 +325,33 @@ HRESULT CRenderer::Render_Combined()
     return S_OK;
 }
 
-HRESULT CRenderer::Render_Distiotion()
+//[추가] 왜곡 효과 렌더링
+// Render_Combined의 결과물을 배경으로 사용
+HRESULT CRenderer::Render_Distortion()
 {
+    // 1. Combine Texture에 Blend 객체들 덮어 그리기.
+    if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_Combine"), false)))
+        return E_FAIL;
+
+
+    m_RenderObjects[ENUM_CLASS(RENDERGROUP::DISTOTION)].sort([](CGameObject* pSour, CGameObject* pDest)->_bool
+        {
+            return pSour->Get_CamDistance() > pDest->Get_CamDistance();
+        });
+
+    for (auto& pRenderObject : m_RenderObjects[ENUM_CLASS(RENDERGROUP::DISTOTION)])
+    {
+        if (nullptr != pRenderObject)
+            pRenderObject->Render();
+
+        Safe_Release(pRenderObject);
+    }
+
+    m_RenderObjects[ENUM_CLASS(RENDERGROUP::DISTOTION)].clear();
+
+    // 2. 최종 Combine Texture 완료.
+    m_pGameInstance->End_MRT();
+
     return S_OK;
 }
 
@@ -561,7 +599,7 @@ HRESULT CRenderer::Render_Debug()
     if (FAILED(m_pDefferedShader->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
         return E_FAIL;
 
-    //m_pGameInstance->Render_RT_Debug(m_pDefferedShader, m_pVIBuffer);
+    m_pGameInstance->Render_RT_Debug(m_pDefferedShader, m_pVIBuffer);
 
     return S_OK;
 }
@@ -606,6 +644,7 @@ void CRenderer::Free()
     }
 
     Safe_Release(m_pDefferedShader);
+    Safe_Release(m_pDistortionShader);
     Safe_Release(m_pPostLightShader);
     Safe_Release(m_pVIBuffer);
 

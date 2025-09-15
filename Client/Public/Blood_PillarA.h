@@ -68,13 +68,22 @@ private:
     _uint m_iShaderPath = {};
 
 
-    _float2 m_vTexcoord = {};
+    
 
     class CLoad_Model* m_pModelCom = { nullptr };
     class CTexture* m_pTextureCom[TEXTURE_END] = { nullptr };
     _uint m_iTextureIndexArray[TEXTURE_END] = {};
 
 #pragma endregion
+
+#pragma region SHADER 변수들
+private:
+    _float2 m_vTexcoord = {};
+    _float m_fTime = {};; // C++에서 계속 증가하는 시간 값을 전달받을 변수
+    _float m_fScrollSpeed = 2.f; // 흐르는 속도를 제어할 변수
+    _float m_fDissolveTime = 0.f;
+#pragma endregion
+
 
 #pragma region 기본 변수들
 public:
@@ -101,12 +110,14 @@ private:
     // --- 성장 애니메이션용 변수 ---
     _bool  m_bIsGrowing = false;   // 애니메이션이 진행 중인지 여부
     _float m_fCurrentTime = 0.0f;        // 현재 경과 시간
+    
     _float m_fGrowDuration = 0.f;      // 총 성장 시간
     _float m_fStayDuration = 0.f;      // 총 성장 시간
     _float m_fDecreaseDuration = 0.f;
     _float m_fTargetRadius = 0.f;  // 목표 XZ 크기 (반지름)
     _float m_fDecreaseTargetRadius = 0.f;  // 목표 XZ 크기 (감소 최종 반지름)
     _float m_fTargetHeight = 0.f;  // 목표 Y 크기 (높이)
+
 
 private:
     void Shape_Control(_float fTimeDelta);
@@ -117,6 +128,7 @@ private:
     void RotateTurn_ToYaw(_float fTimeDelta);
     
 #pragma endregion
+
 
 
 #pragma region Clone시 지정할 변수들
