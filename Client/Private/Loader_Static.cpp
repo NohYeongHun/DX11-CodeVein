@@ -1,4 +1,5 @@
-﻿HRESULT CLoader_Static::Loading_Resource(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
+﻿#include "Loader_Static.h"
+HRESULT CLoader_Static::Loading_Resource(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
 {
 	if (FAILED(Add_Prototype_ForShader(pDevice, pContext, pGameInstance)))
 	{
@@ -522,6 +523,12 @@ HRESULT CLoader_Static::Add_Prototype_Effects(ID3D11Device* pDevice, ID3D11Devic
 		return E_FAIL;
 	}
 
+	if (FAILED(Add_Prototype_BloodPillar_Effects(pDevice, pContext, pGameInstance)))
+	{
+		CRASH("Failed Clone Effects");
+		return E_FAIL;
+	}
+
 	return S_OK;
 }
 
@@ -760,6 +767,92 @@ HRESULT CLoader_Static::Add_Prototype_ParticleSystem(ID3D11Device* pDevice, ID3D
 		CRASH("Failed Load Effect Particle System");
 		return E_FAIL;
 	}
+
+
+	return S_OK;
+}
+
+HRESULT CLoader_Static::Add_Prototype_BloodPillar_Effects(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
+{
+#pragma region TEXTURE
+	// 발광 효과 텍스처 등록  
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
+		, TEXT("Prototype_Component_Texture_BloodPillarDiffuse")
+		, CTexture::Create(pDevice, pContext
+			, TEXT("../Bin/Resources/Models/EffectMesh/Diffuse/Diffuse%d.png"), 1))))
+	{
+		CRASH("Failed Load Effect TrailGlow Texture");
+		return E_FAIL;
+	}
+
+
+#pragma endregion
+
+
+#pragma region 모델
+	_matrix		PreTransformMatrix = XMMatrixIdentity();
+
+	PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XM_PI);
+
+	/* Prototype_Component_Model */
+	
+	//if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
+	//	, TEXT("Prototype_Component_Model_Effect_BloodPillarA")
+	//	, CLoad_Model::Create(pDevice, pContext, MODELTYPE::NONANIM, PreTransformMatrix, "../../SaveFile/Model/Effect/BloodPillarA.dat", L""))))
+	//	CRASH("Failed Prototype Blood Pillar Effects");
+
+	/*if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
+		, TEXT("Prototype_Component_Model_Effect_BloodPillarB")
+		, CLoad_Model::Create(pDevice, pContext, MODELTYPE::NONANIM, PreTransformMatrix, "../../SaveFile/Model/Effect/BloodPillarB.dat", L""))))
+		CRASH("Failed Prototype Blood Pillar Effects");*/
+
+
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
+		, TEXT("Prototype_Component_Model_Effect_BloodPillarA")
+		, CLoad_Model::Create(pDevice, pContext, MODELTYPE::NONANIM, PreTransformMatrix, "../../SaveFile/Model/Effect/BloodA.dat", L""))))
+		CRASH("Failed Prototype Blood Pillar Effects");
+
+
+
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
+		, TEXT("Prototype_Component_Model_Effect_BloodPillarB")
+		, CLoad_Model::Create(pDevice, pContext, MODELTYPE::NONANIM, PreTransformMatrix, "../../SaveFile/Model/Effect/BloodB.dat", L""))))
+		CRASH("Failed Prototype Blood Pillar Effects");
+
+
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
+		, TEXT("Prototype_Component_Model_Effect_BloodPillarC")
+		, CLoad_Model::Create(pDevice, pContext, MODELTYPE::NONANIM, PreTransformMatrix, "../../SaveFile/Model/Effect/BloodC.dat", L""))))
+		CRASH("Failed Prototype Blood Pillar Effects");
+
+
+#pragma endregion
+
+	
+
+	/* 최종 명령을 내리는 주체.*/
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
+		, TEXT("Prototype_GameObject_BloodPillarA")
+		, CBlood_PillarA::Create(pDevice, pContext))))
+		CRASH("Failed Prototype Blood Pillar Effects");
+
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
+		, TEXT("Prototype_GameObject_BloodPillarB")
+		, CBlood_PillarB::Create(pDevice, pContext))))
+		CRASH("Failed Prototype Blood Pillar Effects");
+
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
+		, TEXT("Prototype_GameObject_BloodPillarC")
+		, CBlood_PillarC::Create(pDevice, pContext))))
+		CRASH("Failed Prototype Blood Pillar Effects");
+
+
+	/* 최종 명령을 내리는 주체.*/
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
+		, TEXT("Prototype_GameObject_EffectPillar")
+		, CEffect_Pillar::Create(pDevice, pContext))))
+		CRASH("Failed Prototype Blood Pillar Effects");
+
 
 
 	return S_OK;

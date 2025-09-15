@@ -64,12 +64,12 @@ HRESULT CMainApp::Initialize()
 	}
 
 
-	//if (FAILED(Start_Level(LEVEL::GAMEPLAY)))
-	//	return E_FAIL;
+	if (FAILED(Start_Level(LEVEL::GAMEPLAY)))
+		return E_FAIL;
 
 	// 원본
-	if (FAILED(Start_Level(LEVEL::LOGO)))
-		return E_FAIL;
+	//if (FAILED(Start_Level(LEVEL::LOGO)))
+	//	return E_FAIL;
 
 	//if (FAILED(Start_Level(LEVEL::DEBUG)))
 	//	return E_FAIL;
@@ -177,12 +177,33 @@ HRESULT CMainApp::Ready_Clone_SkillUI(const _wstring& strLayerTag)
 
 HRESULT CMainApp::Ready_Pooling()
 {
+	CGameObject* pGameObject = nullptr;
+	
+#pragma region MESH 타입.
+	CEffect_Pillar::EFFECT_PILLARDESC EffectPillarDesc{};
+	// 한번에 십자모양 12개씩 사용 예정. => 넉넉하게 넣자.
+	for (_uint i = 0; i < 300; ++i)
+	{
+		pGameObject = dynamic_cast<CGameObject*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT
+			, ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_EffectPillar"), &EffectPillarDesc));
+		if (nullptr == pGameObject)
+		{
+			CRASH("Failed Create GameObject");
+			return E_FAIL;
+		}
+		m_pGameInstance->Add_GameObject_ToPools(TEXT("BLOOD_PILLAR"), ENUM_CLASS(CEffect_Pillar::EffectType), pGameObject);
+	}
+
+	pGameObject = nullptr;
+#pragma endregion
+
+
 #pragma region TEXTURE 타입.
 	// 1. Prototype Clone 객체 생성.
 	CSlash::SLASHEFFECT_DESC slashDesc{};
 	//slashDesc.eShaderPath = POSTEX_SHADERPATH::MONSTER_LINESLASH;
 	slashDesc.eShaderPath = EFFECTPOSTEX_SHADERPATH::MONSTER_LINESLASH;
-	CGameObject* pGameObject = nullptr;
+	
 
 	// 2. 추가할 개수만큼 추가. 
 	/* 3개 추가. => 풀링 제대로 되는지 테스트. */

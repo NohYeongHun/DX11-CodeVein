@@ -1100,7 +1100,7 @@ void CMonster::Show_Slash_UI_At_Position(_fvector vHitPosition, _fvector vAttack
     XMStoreFloat3(&Desc.particleInitInfo.dir, vAttackDirection);
     Desc.pTargetTransform = m_pTransformCom;
     m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(m_eCurLevel)
-        , TEXT("EXPLOSION"), TEXT("Layer_Effect"), 1, ENUM_CLASS(EFFECTTYPE::PARTICLE), &Desc);
+        , TEXT("EXPLOSION"), TEXT("Layer_Effect"), 1, ENUM_CLASS(CEffectParticle::EffectType), &Desc);
 
 
     // Hit Particle 맞으면 파티클도.
@@ -1114,8 +1114,15 @@ void CMonster::Show_Slash_UI_At_Position(_fvector vHitPosition, _fvector vAttack
     XMStoreFloat3(&HitParticleDesc.particleInitInfo.dir, vAttackDirection);
     HitParticleDesc.pTargetTransform = m_pTransformCom;
     m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(m_eCurLevel)
-        , TEXT("HIT_PARTICLE"), TEXT("Layer_Effect"), 1, ENUM_CLASS(EFFECTTYPE::PARTICLE), &Desc);
+        , TEXT("HIT_PARTICLE"), TEXT("Layer_Effect"), 1, ENUM_CLASS(CEffectParticle::EffectType), &HitParticleDesc);
     
+
+#pragma region 임시
+   
+#pragma endregion
+
+   
+
     //if (FAILED(hr))
     //    CRASH("Failed Slash Effecet");
 

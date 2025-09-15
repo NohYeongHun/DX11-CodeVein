@@ -33,6 +33,7 @@ public:
 #pragma region ENGINE에 제공
 public:
 	HRESULT Add_Collider_To_Manager(CCollider* pCollider, _uint iLevelIndex);
+	HRESULT Remove_Collider_To_Manager(CCollider* pCollider, _uint iLevelIndex);
 	HRESULT Clear(_uint iLevelIndex);
 
 public:

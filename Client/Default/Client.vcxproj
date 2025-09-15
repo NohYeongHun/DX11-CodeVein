@@ -160,6 +160,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\public\BackGround.h" />
+    <ClInclude Include="..\Public\Blood_PillarA.h" />
+    <ClInclude Include="..\Public\Blood_PillarB.h" />
+    <ClInclude Include="..\Public\Blood_PillarC.h" />
     <ClInclude Include="..\Public\BossHpBarUI.h" />
     <ClInclude Include="..\Public\BT_Monster_EncounterAction.h" />
     <ClInclude Include="..\Public\BT_GiantWhiteDevil_ComboAttackAction.h" />
@@ -200,6 +203,7 @@
     <ClInclude Include="..\Public\Client_Debug.h" />
     <ClInclude Include="..\Public\Client_Defines.h" />
     <ClInclude Include="..\Public\EffectParticle.h" />
+    <ClInclude Include="..\Public\Effect_Pillar.h" />
     <ClInclude Include="..\Public\Effect_Wind.h" />
     <ClInclude Include="..\Public\Fade_Out.h" />
     <ClInclude Include="..\Public\Giant_WhiteDevil.h" />
@@ -305,6 +309,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\private\BackGround.cpp" />
+    <ClCompile Include="..\Private\Blood_PillarA.cpp" />
+    <ClCompile Include="..\Private\Blood_PillarB.cpp" />
+    <ClCompile Include="..\Private\Blood_PillarC.cpp" />
     <ClCompile Include="..\Private\BossHpBarUI.cpp" />
     <ClCompile Include="..\Private\BT_Monster_EncounterAction.cpp" />
     <ClCompile Include="..\Private\BT_GiantWhiteDevil_ComboAttackAction.cpp" />
@@ -347,6 +354,7 @@
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ClientPch.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ClientPch.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
     </ClCompile>
+    <ClCompile Include="..\Private\Effect_Pillar.cpp" />
     <ClCompile Include="..\Private\Effect_Wind.cpp" />
     <ClCompile Include="..\Private\Fade_Out.cpp" />
     <ClCompile Include="..\Private\Giant_WhiteDevil.cpp" />

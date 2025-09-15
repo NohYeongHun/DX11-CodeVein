@@ -256,6 +256,12 @@
     <Filter Include="02. GameObject\Effect\Mesh\Boss">
       <UniqueIdentifier>{6fc47c4d-0b5b-4e1e-ae5a-f0dafe85725a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. GameObject\Effect\Mesh\Boss\QueenKnight">
+      <UniqueIdentifier>{0b25d49c-ea46-4fde-af68-093e9781c32e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="02. GameObject\Effect\Mesh\Boss\QueenKnight\BloodPillar">
+      <UniqueIdentifier>{39bdd772-2c2f-4fa7-9139-5aedc0ab25e9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -687,6 +693,18 @@
     <ClInclude Include="..\Public\Effect_Wind.h">
       <Filter>02. GameObject\Effect\Mesh\Player\CirculatePurge</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Effect_Pillar.h">
+      <Filter>02. GameObject\Effect\Mesh\Boss\QueenKnight</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Blood_PillarA.h">
+      <Filter>02. GameObject\Effect\Mesh\Boss\QueenKnight\BloodPillar</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Blood_PillarB.h">
+      <Filter>02. GameObject\Effect\Mesh\Boss\QueenKnight\BloodPillar</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Blood_PillarC.h">
+      <Filter>02. GameObject\Effect\Mesh\Boss\QueenKnight\BloodPillar</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -1088,6 +1106,18 @@
     </ClCompile>
     <ClCompile Include="..\Private\Effect_Wind.cpp">
       <Filter>02. GameObject\Effect\Mesh\Player\CirculatePurge</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Effect_Pillar.cpp">
+      <Filter>02. GameObject\Effect\Mesh\Boss\QueenKnight</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Blood_PillarA.cpp">
+      <Filter>02. GameObject\Effect\Mesh\Boss\QueenKnight\BloodPillar</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Blood_PillarB.cpp">
+      <Filter>02. GameObject\Effect\Mesh\Boss\QueenKnight\BloodPillar</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Blood_PillarC.cpp">
+      <Filter>02. GameObject\Effect\Mesh\Boss\QueenKnight\BloodPillar</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

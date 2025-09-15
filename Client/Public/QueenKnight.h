@@ -35,6 +35,14 @@ public:
 	}QUEENKNIGHT_DESC;
 
 
+	typedef struct tagEffectEventDesc
+	{
+		_float fEventTime = {}; // 이벤트 시작 타임.
+		_float3 vStartPos = {}; // 활성화 하는데 필요한 위치.
+		_float fAttackPower = {}; // 활성화 하는데 필요한 정보
+		_float fDuration = {}; // 생존 시간.
+	}EFFECT_EVENTDESC;
+
 private:
 	explicit CQueenKnight(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
 	explicit CQueenKnight(const CQueenKnight& Prototype);
@@ -152,6 +160,26 @@ public:
 
 	void Create_QueenKnightWarp_Effect(_float3 vDir);
 
+	/* Blood Pillar Event 활성화*/
+	void Start_PillarSkill();
+	void Update_BloodPillar(_float fTimeDelta);
+	void Reset_PillarSkill(); // 이미 사용했을 경우 상태값 초기화.
+
+	
+private:
+	/* Blood Pillar Event 활성화 용도 */
+	vector<_float3> m_vecPillarPositions;
+	// 각 위치의 Pillar가 소환되었는지 여부를 체크하는 목록
+	vector<bool>    m_vecIsPillarActivated;
+
+	// 스킬 관련 변수
+	_bool   m_bIsSkillActive = false;    // 스킬이 발동 중인지
+	_float m_fSkillElapsedTime = 0.f; // 스킬이 발동된 후 흐른 시간
+	_float3 m_vSkillCenterPos;         // 스킬이 발동된 중심 위치
+	_float m_fRippleSpeed = 15.f;     // 효과 전파 속도
+	
+	_float m_fMaxPillarDistance = {};
+	_float m_fMaxSkillDuration = { 2.2f }; // [추가] 가장 먼 거리를 계산하기 위한 로직
 
 public:
 	void Start_Dissolve(_float fDuration = 0.f); // Dissolve 재생.

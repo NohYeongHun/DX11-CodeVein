@@ -26,6 +26,15 @@ HRESULT CCollider_Manager::Add_Collider_To_Manager(CCollider* pCollider, _uint i
 	return S_OK;
 }
 
+HRESULT CCollider_Manager::Remove_Collider_To_Manager(CCollider* pCollider, _uint iLevelIndex)
+{
+	if (nullptr == pCollider || iLevelIndex >= m_iNumLevels)
+		return E_FAIL;
+
+
+	return S_OK;
+}
+
 HRESULT CCollider_Manager::Clear(_uint iLevelIndex)
 {
 	if (iLevelIndex >= m_iNumLevels)

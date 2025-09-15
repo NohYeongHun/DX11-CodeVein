@@ -204,6 +204,9 @@ BT_RESULT CBT_QueenKnight_TripleDownStrikeAction::Update_Hang(_float fTimeDelta)
                 m_eAttackPhase = ATTACK_PHASE::DESCEND;
                 m_pOwner->Set_Animation_Speed(m_pOwner->Find_AnimationIndex(L"WARP_SKILL"), 1.6f);
                 m_pOwner->RemoveBuff(CMonster::BUFF_NAVIGATION_OFF, true);
+
+                // 스킬 시작.
+                m_pOwner->Start_PillarSkill();
             }
         }
     }
@@ -219,6 +222,8 @@ BT_RESULT CBT_QueenKnight_TripleDownStrikeAction::Update_Hang(_float fTimeDelta)
             // 3. Navigation Off 해제. => 다시 Navigation을 타게 만듭니다.
             m_pOwner->RemoveBuff(CMonster::BUFF_NAVIGATION_OFF, true);
 
+            // 4. 스킬 시작.
+            m_pOwner->Start_PillarSkill();
         }
     }
 

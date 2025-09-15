@@ -128,6 +128,7 @@ HRESULT CRenderer::Draw()
     //// 3. G-Buffer 합성 및 스카이박스 렌더링으로 최종 씬 완성
     if (FAILED(Render_Combined()))
         return E_FAIL;
+    
 
     // 4. 모든 반투명 객체(HitFlashEffect 포함)를 최종 씬 위에 렌더링
     if (FAILED(Render_Blend()))
@@ -297,7 +298,7 @@ HRESULT CRenderer::Render_Combined()
     m_pGameInstance->Bind_RT_ShaderResource(TEXT("Target_Shade"), m_pDefferedShader, "g_ShadeTexture");
     m_pGameInstance->Bind_RT_ShaderResource(TEXT("Target_Emissive"), m_pDefferedShader, "g_EmissiveTexture");
     m_pGameInstance->Bind_RT_ShaderResource(TEXT("Target_Depth"), m_pDefferedShader, "g_DepthTexture");
-    m_pGameInstance->Bind_RT_ShaderResource(TEXT("Target_SkyBox"), m_pDefferedShader, "g_SkyTexture");
+    //m_pGameInstance->Bind_RT_ShaderResource(TEXT("Target_SkyBox"), m_pDefferedShader, "g_SkyTexture");
         
 
     _uint iCombinedShaderIndex = static_cast<_uint>(DEFFERED_SHADERTYPE::COMBINED);
@@ -308,6 +309,11 @@ HRESULT CRenderer::Render_Combined()
     m_pGameInstance->End_MRT();
 
     
+    return S_OK;
+}
+
+HRESULT CRenderer::Render_Distiotion()
+{
     return S_OK;
 }
 
@@ -555,7 +561,7 @@ HRESULT CRenderer::Render_Debug()
     if (FAILED(m_pDefferedShader->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
         return E_FAIL;
 
-    m_pGameInstance->Render_RT_Debug(m_pDefferedShader, m_pVIBuffer);
+    //m_pGameInstance->Render_RT_Debug(m_pDefferedShader, m_pVIBuffer);
 
     return S_OK;
 }
