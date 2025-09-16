@@ -110,6 +110,8 @@ private:
     // --- 성장 애니메이션용 변수 ---
     _bool  m_bIsGrowing = false;   // 애니메이션이 진행 중인지 여부
     _float m_fCurrentTime = 0.0f;        // 현재 경과 시간
+
+    _float m_fGrowTime = {};
     
     _float m_fGrowDuration = 0.f;      // 총 성장 시간
     _float m_fStayDuration = 0.f;      // 총 성장 시간

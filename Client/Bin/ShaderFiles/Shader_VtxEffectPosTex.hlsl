@@ -79,9 +79,6 @@ PS_OUT PS_HITFLASH_MAIN(PS_IN In)
     // 부드러운 빛무리 효과를 위해 Radial 텍스처를 더해줍니다.
     float radialGlow = g_OtherTexture[2].Sample(DefaultSampler, In.vTexcoord).r;
     
-    // ▼▼▼ [핵심 수정] radialGlow의 강도를 0.25배로 줄여 은은하게 만듭니다 ▼▼▼
-    // 이 숫자(0.25f)를 조절하여 빛무리의 밝기를 원하는 대로 바꿀 수 있습니다.
-    
     // radialGlow 관련 두 줄을 삭제하고 아래와 같이 수정합니다.
     //float finalShape = sparkShape;
     float finalShape = saturate(sparkShape + (radialGlow * 0.1f));

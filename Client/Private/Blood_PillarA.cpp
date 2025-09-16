@@ -149,6 +149,7 @@ void CBlood_PillarA::Shape_Control(_float fTimeDelta)
 	RotateTurn_ToYaw(fTimeDelta);
 
 	m_fCurrentTime += fTimeDelta;
+
 	switch (m_eState)
 	{
 	case STATE_GROW:
@@ -183,6 +184,7 @@ void CBlood_PillarA::Update_Grow(_float fTimeDelta)
 	}
 
 	_float fRatio = m_fCurrentTime / m_fGrowDuration;
+	m_fGrowTime += fTimeDelta;
 
 	_float fCurrentRadius = 0.01f + (m_fTargetRadius - 0.01f) * fRatio;
 	_float fCurrentHeight = 0.f + (m_fTargetHeight - 0.f) * fRatio;
@@ -284,7 +286,14 @@ HRESULT CBlood_PillarA::Bind_ShaderResources()
 		return E_FAIL;
 	}
 
-	
+	_float fGrowRatio = m_fGrowTime / m_fGrowDuration;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fGrowTime", &fGrowRatio, sizeof(_float))))
+	{
+		CRASH("Failed Bind g_fGrowTime");
+		return E_FAIL;
+	}
+
+
 	_float fDisolveRatio = m_fDissolveTime / m_fDecreaseDuration;
 	
 

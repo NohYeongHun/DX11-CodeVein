@@ -1,5 +1,4 @@
-﻿#include "EffectParticle.h"
-CEffectParticle::CEffectParticle(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿CEffectParticle::CEffectParticle(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CGameObject{ pDevice, pContext }
 {
 }
@@ -82,6 +81,8 @@ void CEffectParticle::Update(_float fTimeDelta)
             m_pTransformCom->Move_Direction(XMVector3Normalize(vVelocity), fTimeDelta * 2.f);
 
     }
+
+
 #pragma region 파티클 타입 에 따른 업데이트
 
     m_pVIBufferCom->Update(fTimeDelta);
@@ -579,11 +580,14 @@ void CEffectParticle::OnActivate(void* pArg)
     {
         _vector vTargetPos = m_pTargetTransform->Get_State(STATE::POSITION);
         m_pTransformCom->Set_State(STATE::POSITION, vTargetPos);
-
+        m_fDisplayTime = particleInit.lifeTime;
+        // Fillar의 생성, 소멸시간에 영향받아야 하므로 기존 LifeTime으로 설정하면 안됌 m_vLifeTime(X)
         m_pVIBufferCom->Create_TornadoParticle(particleInit.pos, particleInit.fRadius, particleInit.fHeight, particleInit.lifeTime);
     }
     break;
     }
+
+    
 
 }
 

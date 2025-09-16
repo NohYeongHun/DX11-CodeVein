@@ -20,6 +20,8 @@ typedef struct ParticleVertexInfo
 }PARTICLE_VERTEX_INFO;
 
 
+
+
 class CVIBuffer_PointParticleDir_Instance final : public Engine::CVIBuffer_Instance
 {
 public:
@@ -102,6 +104,25 @@ private:
 	queue<_uint> m_DeadParticleIndices;
 	list<_uint> m_LiveParticleIndices;
 	queue<pair<_uint, PARTICLE_VERTEX_INFO>> m_ReadyparticleIndices;
+
+private:
+	// 각 정점에 대한 회전 값을 저장할 배열.
+	struct ParticleAttribute
+	{
+		// 토네이도 전용 속성
+		_float fInitialAngle;      // 초기 각도 (0~360)
+		_float fAngularVelocity;    // 회전 속도 (라디안/초)
+		_float fRadius;             // 현재 반경
+		_float fInitialRadius;      // 초기 반경
+		_float fMaxRadius;          // 최대 반경
+		_float fUpwardSpeed;        // 상승 속도
+		_float fRadialExpansion;    // 반경 확장 속도
+		_float fTurbulence;         // 난류 강도
+		_float fPhaseOffset;        // 위상 오프셋 (파티클마다 다른 시작 각도)
+		_float fSpawnDelay;		// 기타 속성 추가 가능
+	};
+
+	ParticleAttribute* m_pParticleAttributes = { nullptr };
 #pragma endregion
 
 
@@ -115,7 +136,7 @@ private:
 
 
 private:
-	_float3	m_vPivot = {};
+	_float3	m_vPivot = {}; // 파티클 생성 위치 기준점.
 	_float3 m_vDir = {}; // 방향성.
 	_float3 m_vRange = {}; // 파티클 범위
 	_float2 m_vLifeTime = {}; // 파티클 생명시간 범위 (min, max)

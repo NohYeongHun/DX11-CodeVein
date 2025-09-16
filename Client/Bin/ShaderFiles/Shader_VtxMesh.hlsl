@@ -24,6 +24,7 @@ vector g_vMtrlSpecular = 1.f;
 
 // 시간.
 float g_fDissolveTime;
+float g_fGrowTime;
 
 
 float g_fTime;
@@ -229,12 +230,21 @@ PS_OUT_BACKBUFFER PS_DEFFERED_BLOODPILLARA_MAIN(PS_BACKBUFFER_IN In)
     Out.vDiffuse.rgb = vMtrlDiffuse.rgb;
     
     float fRatio = saturate(1.f - g_fRatio);
-    Out.vDiffuse.a = vMtrlDiffuse.a * fRatio; // 시간에 따라 알파값 감소.
+    if (g_fDissolveTime > 0.01f)
+    {
+        Out.vDiffuse.a = vMtrlDiffuse.a * fRatio; // 시간에 따라 알파값 감소.    
+    }
+    else 
+        Out.vDiffuse.a = vMtrlDiffuse.a;
+    
     
     Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w, 0.f, 0.f);
     
     // 알파 값을 시간에 따라 감소?
+    
+    //if (g_fDissolveTime < 0.01f)
+    //    clip(g_fTime - vMtrlDiffuse.r);
     
     // 안에 숫자가 0이되면 안그린다.
     clip(vMtrlDissolve.r - g_fDissolveTime);

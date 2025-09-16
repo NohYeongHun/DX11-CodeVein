@@ -9,6 +9,8 @@ CVIBuffer_PointParticleDir_Instance::CVIBuffer_PointParticleDir_Instance(const C
     , m_vPivot{ Prototype.m_vPivot }
     , m_isLoop{ Prototype.m_isLoop }
 {
+    // 복사 생성자에서는 ParticleAttributes 할당하지 않음 (m_isCloned = true이므로)
+    m_pParticleAttributes = nullptr;
 }
 
 #pragma region 기본 함수들
@@ -25,8 +27,12 @@ HRESULT CVIBuffer_PointParticleDir_Instance::Initialize_Prototype(const INSTANCE
     m_vSpeed = pPointDirDesc->vSpeed;
     m_eParticleType = pPointDirDesc->eParticleType;
 
+
     m_iInstanceVertexStride = sizeof(VTXINSTANCEPOINTDIR_PARTICLE);
     m_iNumInstance = pPointDirDesc->iNumInstance;
+
+    // 파티클 속성 배열 메모리 할당 (m_iNumInstance 설정 후에 할당)
+    m_pParticleAttributes = new ParticleAttribute[m_iNumInstance];
 
 #pragma region 1. 기본 VERTEX 생성
     m_iNumVertices = 1;
@@ -68,26 +74,6 @@ HRESULT CVIBuffer_PointParticleDir_Instance::Initialize_Prototype(const INSTANCE
 
 
     m_pInstanceVertices = new VTXINSTANCEPOINTDIR_PARTICLE[m_iNumInstance];
-
-    //for (size_t i = 0; i < m_iNumInstance; i++)
-    //{
-    //    VTXINSTANCEPOINTDIR_PARTICLE* pInstanceVertices = static_cast<VTXINSTANCEPOINTDIR_PARTICLE*>(m_pInstanceVertices);
-
-    //    _float		fScale = m_pGameInstance->Rand(pPointDirDesc->vSize.x, pPointDirDesc->vSize.y);
-
-    //    _float		fLifeTime = m_pGameInstance->Rand(pPointDirDesc->vLifeTime.x, pPointDirDesc->vLifeTime.y);
-    //    _float      fDirSpeed = m_pGameInstance->Rand(pPointDirDesc->vSpeed.x, pPointDirDesc->vSpeed.y);
-    //    //m_pSpeeds[i] = m_pGameInstance->Rand(pPointDirDesc->vSpeed.x, pPointDirDesc->vSpeed.y);
-
-    //    pInstanceVertices[i].vRight = _float4(fScale, 0.f, 0.f, 0.f);
-    //    pInstanceVertices[i].vUp = _float4(0.f, fScale, 0.f, 0.f);
-    //    pInstanceVertices[i].vLook = _float4(0.f, 0.f, fScale, 0.f);
-    //    pInstanceVertices[i].vTranslation = _float4(0.f, 0.f, 0.f, 1.f);
-    //    pInstanceVertices[i].vLifeTime = _float2(0.f, fLifeTime);
-    //    pInstanceVertices[i].vDir = _float3(0.f, 0.f, 0.f);
-    //    pInstanceVertices[i].fDirSpeed = fDirSpeed;
-    //    pInstanceVertices[i].iMaskTextureIndex = i % 15; // 0-15 순환
-    //}
 
     for (size_t i = 0; i < m_iNumInstance; i++)
     {
@@ -572,20 +558,207 @@ void CVIBuffer_PointParticleDir_Instance::Tornado_Update(VTXINSTANCEPOINTDIR_PAR
     {
         auto info = m_ReadyparticleIndices.front();
         m_ReadyparticleIndices.pop();
+
         _uint index = info.first;
         ParticleVertexInfo particleInfo = info.second;
+
+        // 파티클 초기화
+        pVertices[index].vDir = particleInfo.dir;
+        pVertices[index].vTranslation = _float4(particleInfo.pos.x, particleInfo.pos.y, particleInfo.pos.z, 1.f);
+        pVertices[index].vLifeTime.x = 0.f;
+        pVertices[index].vLifeTime.y = particleInfo.lifeTime;
+        pVertices[index].vRight.w = 1.f;
+        pVertices[index].vUp = _float4(particleInfo.pos.x, particleInfo.pos.y, particleInfo.pos.z, 0.f);
+        pVertices[index].vLook = _float4(particleInfo.dir.x, particleInfo.dir.y, particleInfo.dir.z, 0.f);
 
         m_LiveParticleIndices.emplace_back(index);
     }
 
-    // 2. 활성화된 파티클들의 토네이도 움직임 계산
+    // 2. 활성화된 파티클들의 나선형 토네이도 움직임 계산
     for (auto it = m_LiveParticleIndices.begin(); it != m_LiveParticleIndices.end(); )
     {
         _uint index = *it;
         pVertices[index].vLifeTime.x += fTimeDelta;
-        // ...
+
+        // 파티클의 수명이 다했는지 확인
+        if (pVertices[index].vLifeTime.x >= pVertices[index].vLifeTime.y)
+        {
+            // 수명이 다한 파티클을 Dead Queue로 이동
+            m_DeadParticleIndices.emplace(*it);
+            it = m_LiveParticleIndices.erase(it);
+        }
+        else
+        {
+            // *** 핵심: 나선형 토네이도 패턴 계산 ***
+            ParticleAttribute& attr = m_pParticleAttributes[index];
+            _float fCurrentTime = pVertices[index].vLifeTime.x;
+            _float fLifeRatio = fCurrentTime / pVertices[index].vLifeTime.y;
+
+            // === 1. 회전 각도 계산 (시간에 따라 증가) - 속도 증가 ===
+            // 각속도를 크게 증가 (기존 2-4 -> 8-12 라디안/초)
+            _float fCurrentAngle = attr.fInitialAngle + (attr.fAngularVelocity * fCurrentTime) + attr.fPhaseOffset;
+
+            // === 2. 반경 계산 (시간에 따라 서서히 확장) - 더 빠른 확장 ===
+            _float fCurrentRadius = attr.fInitialRadius + (attr.fRadialExpansion * fCurrentTime * 1.5f);
+
+            // 최대 반경 제한
+            fCurrentRadius = min(fCurrentRadius, attr.fMaxRadius);
+
+            // 생명주기에 따른 반경 조절 (후반부에 수축 옵션)
+            if (fLifeRatio > 0.7f)  // 마지막 30%에서 수축
+            {
+                _float fShrinkRatio = (fLifeRatio - 0.7f) / 0.3f;
+                fCurrentRadius *= (1.0f - fShrinkRatio * 0.3f);  // 최대 30% 수축
+            }
+
+            // === 3. 난류 효과 추가 (자연스러운 움직임) - 더 강한 난류 ===
+            _float fTurbulenceX = attr.fTurbulence * sinf(fCurrentTime * 5.0f + attr.fPhaseOffset) * 0.15f;
+            _float fTurbulenceZ = attr.fTurbulence * cosf(fCurrentTime * 4.5f + attr.fPhaseOffset) * 0.15f;
+
+            // === 4. XZ 평면에서의 위치 계산 (원형 운동) ===
+            _float3 vPosition;
+            vPosition.x = m_vPivot.x + (cosf(fCurrentAngle) * fCurrentRadius) + fTurbulenceX;
+            vPosition.z = m_vPivot.z + (sinf(fCurrentAngle) * fCurrentRadius) + fTurbulenceZ;
+
+            // === 5. Y축 위치 계산 (상승 운동) - 더 빠른 상승 ===
+            // 가속도가 있는 상승 (시간이 지날수록 더 빠르게)
+            _float fAcceleration = 1.0f + fLifeRatio * 1.5f;
+            vPosition.y = m_vPivot.y + (attr.fUpwardSpeed * fCurrentTime * fAcceleration);
+
+            // === 6. 파티클 속도 벡터 계산 (접선 방향) ===
+            // 원형 궤도의 접선 방향 벡터
+            _float3 vTangent;
+            vTangent.x = -sinf(fCurrentAngle) * attr.fAngularVelocity * fCurrentRadius;
+            vTangent.y = attr.fUpwardSpeed * fAcceleration;
+            vTangent.z = cosf(fCurrentAngle) * attr.fAngularVelocity * fCurrentRadius;
+
+            // === 7. 투명도 및 크기 효과 ===
+            _float fAlpha = 1.0f;
+            _float fSizeScale = 1.0f;
+
+            // 페이드 인 (초반 5% - 더 빠른 페이드인)
+            if (fLifeRatio < 0.05f)
+            {
+                fAlpha = fLifeRatio / 0.05f;
+                fSizeScale = 0.7f + (fLifeRatio / 0.05f) * 0.3f;
+            }
+            // 페이드 아웃 (마지막 15%)
+            else if (fLifeRatio > 0.85f)
+            {
+                fAlpha = 1.0f - ((fLifeRatio - 0.85f) / 0.15f);
+                fSizeScale = 1.0f - ((fLifeRatio - 0.85f) / 0.15f) * 0.5f;
+            }
+
+            // 높이에 따른 크기 변화 (위로 갈수록 약간 커짐)
+            _float fHeightScale = 1.0f + (vPosition.y - m_vPivot.y) * 0.02f;
+            fSizeScale *= fHeightScale;
+
+            // === 8. 계산된 값들을 버텍스 데이터에 적용 ===
+            pVertices[index].vTranslation = _float4(vPosition.x, vPosition.y, vPosition.z, 1.f);
+
+            // 파티클이 이동 방향을 바라보도록 설정
+            pVertices[index].vLook = _float4(vTangent.x, vTangent.y, vTangent.z, 0.f);
+
+            // 크기 및 투명도 정보 저장
+            pVertices[index].vRight.w = fSizeScale;
+            pVertices[index].vUp.w = fAlpha;
+
+            ++it;
+        }
     }
 }
+
+//void CVIBuffer_PointParticleDir_Instance::Tornado_Update(VTXINSTANCEPOINTDIR_PARTICLE* pVertices, _float fTimeDelta)
+//{
+//    // 1. 생성 대기 중인 파티클을 활성 목록으로 이동
+//    while (!m_ReadyparticleIndices.empty())
+//    {
+//        auto info = m_ReadyparticleIndices.front();
+//        m_ReadyparticleIndices.pop();
+//        _uint index = info.first;
+//        ParticleVertexInfo particleInfo = info.second;
+//
+//        // 파티클 초기화
+//        pVertices[index].vDir = particleInfo.dir;
+//        pVertices[index].vTranslation = _float4(particleInfo.pos.x, particleInfo.pos.y, particleInfo.pos.z, 1.f);
+//        pVertices[index].vLifeTime.x = 0.f;
+//        pVertices[index].vLifeTime.y = particleInfo.lifeTime;
+//        pVertices[index].fDirSpeed = m_pParticleAttributes[index].fAngularSpeed;
+//        pVertices[index].vRight.w = 1.f;
+//        pVertices[index].vUp = _float4(particleInfo.pos.x, particleInfo.pos.y, particleInfo.pos.z, 0.f);
+//        pVertices[index].vLook = _float4(particleInfo.dir.x, particleInfo.dir.y, particleInfo.dir.z, 0.f);
+//
+//        // 초기 위치를 토네이도 궤도 상에 배치
+//        ParticleAttribute& attribute = m_pParticleAttributes[index];
+//        _float fInitialAngleRad = XMConvertToRadians(attribute.fInitialAngle);
+//
+//        _float3 vInitialOffset = {};
+//        vInitialOffset.x = attribute.fRadius * cosf(fInitialAngleRad);
+//        vInitialOffset.z = attribute.fRadius * sinf(fInitialAngleRad);
+//        vInitialOffset.y = 0.f;  // 바닥부터 시작
+//
+//        _float3 vInitialPosition = {};
+//        XMStoreFloat3(&vInitialPosition, XMLoadFloat3(&m_vPivot) + XMLoadFloat3(&vInitialOffset));
+//        pVertices[index].vTranslation = _float4(vInitialPosition.x, vInitialPosition.y, vInitialPosition.z, 1.f);
+//
+//        m_LiveParticleIndices.emplace_back(index);
+//    }
+//
+//    // 2. 활성화된 파티클들의 토네이도 움직임 계산
+//    for (auto it = m_LiveParticleIndices.begin(); it != m_LiveParticleIndices.end(); )
+//    {
+//        _uint index = *it;
+//        pVertices[index].vLifeTime.x += fTimeDelta;
+//
+//        // 파티클의 수명이 다했는지 확인
+//        if (pVertices[index].vLifeTime.x >= pVertices[index].vLifeTime.y)
+//        {
+//            // 수명이 다한 파티클을 Dead Queue로 이동
+//            m_DeadParticleIndices.emplace(*it);
+//            it = m_LiveParticleIndices.erase(it);
+//        }
+//        else
+//        {
+//            // 1. 해당 파티클의 고유 속성을 C++ 배열에서 가져옴
+//            ParticleAttribute& attribute = m_pParticleAttributes[index];
+//
+//            // 2. 현재 시간을 가져옴
+//            _float fCurrentTime = pVertices[index].vLifeTime.x;
+//
+//            // 3. 시간에 따른 동적 효과 계산
+//            _float fLifeRatio = fCurrentTime / pVertices[index].vLifeTime.y; // 0~1
+//
+//            // 회전 속도가 높이에 따라 증가 (위로 올라갈수록 빨라짐)
+//            _float fDynamicAngularSpeed = attribute.fAngularSpeed * (1.0f + fLifeRatio * 2.0f);
+//
+//            // 반지름이 시간에 따라 변화 (용솟음치는 효과 + 나선형 확장)
+//            _float fRadiusWave = 0.8f + 0.4f * sinf(fCurrentTime * 3.0f); // 파동 효과
+//            _float fSpiralExpansion = 1.0f + fLifeRatio * 0.5f; // 위로 올라갈수록 조금씩 확장
+//            _float fDynamicRadius = attribute.fRadius * fRadiusWave * fSpiralExpansion;
+//
+//            // 현재 각도 계산
+//            _float fCurrentAngleRad = XMConvertToRadians(attribute.fInitialAngle + fDynamicAngularSpeed * fCurrentTime);
+//
+//            // 4. 중심점(Pivot) 기준 오프셋 계산
+//            _float3 vOffset = {};
+//            vOffset.x = fDynamicRadius * cosf(fCurrentAngleRad);
+//            vOffset.z = fDynamicRadius * sinf(fCurrentAngleRad);
+//            vOffset.y = attribute.fUpwardSpeed * fCurrentTime;  // 시간에 따라 위로 상승
+//
+//            // 5. 최종 위치 계산
+//            _float3 vFinalPosition = {};
+//            XMStoreFloat3(&vFinalPosition, XMLoadFloat3(&m_vPivot) + XMLoadFloat3(&vOffset));
+//
+//            // 6. 계산된 최종 위치를 버텍스 데이터에 덮어쓰기
+//            pVertices[index].vTranslation = _float4(vFinalPosition.x, vFinalPosition.y, vFinalPosition.z, 1.f);
+//
+//            ++it;
+//        }
+//    }
+//}
+
+
+
 
 void CVIBuffer_PointParticleDir_Instance::CreateAllParticles(_float3 vCenterPos, _float3 vBaseDir, _float fLifeTime)
 {
@@ -928,47 +1101,177 @@ void CVIBuffer_PointParticleDir_Instance::Create_HitParticle(_float3 vCenterPos,
   4. _float fRotationSpeed - 회전 속도 (라디안/초)
   5. _float fLifeTime - 파티클 생명시간
 */
+//void CVIBuffer_PointParticleDir_Instance::Create_TornadoParticle(_float3 vCenterPos, _float fRadius, _float fHeight, _float fLifeTime)
+//{
+//
+//    while (!m_DeadParticleIndices.empty())
+//    {
+//        _uint index = m_DeadParticleIndices.front();
+//        m_DeadParticleIndices.pop();
+//
+//        ParticleVertexInfo info{};
+//        // 1. 수명: 풀링시 설정한 범위 또는 매개변수값 사용 => Effect Pillar의 소멸시간에 영향받아야함.
+//        info.lifeTime = m_pGameInstance->Rand(fLifeTime - 1.f, fLifeTime);
+//
+//        // 2. 시작 각도는 0~360도 사이에서 완전 무작위
+//        info.fAngle = m_pGameInstance->Rand(0.f, 360.f);
+//
+//        // 3. 각 파티클의 회전 반지름 (0부터 최대 반지름까지 무작위)
+//        info.fRadius = m_pGameInstance->Rand(1.f, fRadius);
+//
+//        // 4. 회전 속도
+//        info.fAngularSpeed = m_pGameInstance->Rand(m_vSpeed.x, m_vSpeed.y);
+//
+//        // 5. 상승 속도는 파티클이 자신의 수명 동안 최대 높이에 도달하도록 계산 => 모두 동일?
+//        info.fUpwardSpeed = fabs(fHeight) / info.lifeTime; // 절댓값을 사용해서 항상 위로 상승
+//
+//        // 6. 초기 위치 계산 (원형 궤도 상의 위치)
+//        _float fRadian = XMConvertToRadians(info.fAngle);
+//        _float fInitialX = m_vPivot.x + info.fRadius * cosf(fRadian);
+//        _float fInitialZ = m_vPivot.z + info.fRadius * sinf(fRadian);
+//        info.dir = { 0.f, 1.f, 0.f }; // 위로 향하는 방향으로 늘어짐.
+//        info.pos = { fInitialX, m_vPivot.y, fInitialZ };
+//        info.initialPos = info.pos;
+//        info.fHeight = fHeight;
+//
+//        // 3. 파티클을 생성 대기열에 추가
+//        m_ReadyparticleIndices.emplace(make_pair(index, info));
+//    }
+//}
+
+
+
+
+
+//void CVIBuffer_PointParticleDir_Instance::Create_TornadoParticle(_float3 vCenterPos, _float fRadius, _float fHeight, _float fLifeTime)
+//{
+//    // 토네이도 중심점 업데이트
+//    m_vPivot = vCenterPos;
+//
+//    while (!m_DeadParticleIndices.empty())
+//    {
+//        _uint index = m_DeadParticleIndices.front();
+//        m_DeadParticleIndices.pop();
+//
+//        // 파티클의 고유 특성을 계산
+//        _float fParticleLifeTime = m_pGameInstance->Rand(fLifeTime - 1.f, fLifeTime);
+//        _float fParticleRadius = m_pGameInstance->Rand(fRadius * 0.3f, fRadius);
+//        _float fInitialAngle = m_pGameInstance->Rand(0.f, 360.f);
+//        _float fAngularSpeed = m_pGameInstance->Rand(m_vSpeed.x * 2.0f, m_vSpeed.y * 3.0f); // 회전 속도 2-3배 증가
+//        _float fUpwardSpeed = (fabs(fHeight) / fParticleLifeTime) * 1.5f; // 상승 속도 1.5배 증가
+//
+//        // ▼▼▼ [핵심] C++ 멤버 변수인 속성 배열에 저장 ▼▼▼
+//        m_pParticleAttributes[index].fRadius = fParticleRadius;
+//        m_pParticleAttributes[index].fInitialAngle = fInitialAngle;
+//        m_pParticleAttributes[index].fAngularSpeed = fAngularSpeed;
+//        m_pParticleAttributes[index].fUpwardSpeed = m_pGameInstance->Rand(fUpwardSpeed - 3.f, fUpwardSpeed + 3.f);
+//
+//        ParticleVertexInfo info{};
+//        info.lifeTime = fParticleLifeTime;
+//        info.dir = { 0.f, 1.f, 1.f }; // 위로 향하는 방향으로 늘어짐.
+//        info.pos = vCenterPos;  // 중심점에서 시작
+//        info.initialPos = vCenterPos;
+//
+//        // 생성 대기열에는 인덱스와 파티클 정보 전달
+//        m_ReadyparticleIndices.emplace(make_pair(index, info));
+//    }
+//}
+
 void CVIBuffer_PointParticleDir_Instance::Create_TornadoParticle(_float3 vCenterPos, _float fRadius, _float fHeight, _float fLifeTime)
 {
+    // 토네이도 중심점 업데이트
+    m_vPivot = vCenterPos;
 
-    while (!m_DeadParticleIndices.empty())
+    // ★★★ 문제 해결 1: 모든 Dead 파티클을 사용 ★★★
+    _uint uiTotalAvailable = m_DeadParticleIndices.size();
+    _uint uiToCreate = min(uiTotalAvailable, m_iNumInstance); // Instance 수만큼 생성
+
+    // 토네이도 파라미터 (더 많은 파티클)
+    const _uint uiLayerCount = 5;  // 레이어 수 증가 (3->5)
+    _uint uiParticlesPerLayer = uiToCreate / uiLayerCount;
+    if (uiParticlesPerLayer == 0)
+        uiParticlesPerLayer = 1;
+
+    _uint uiCreatedCount = 0;
+
+    // ★★★ 한 번에 모든 파티클 생성 ★★★
+    while (!m_DeadParticleIndices.empty() && uiCreatedCount < uiToCreate)
     {
         _uint index = m_DeadParticleIndices.front();
         m_DeadParticleIndices.pop();
 
+        // 현재 레이어와 레이어 내 위치 계산
+        _uint uiLayer = uiCreatedCount % uiLayerCount;  // 레이어별 고른 분포
+        _uint uiPosInLayer = uiCreatedCount / uiLayerCount;
+
+        // 레이어별 속성 설정
+        _float fLayerRadiusScale = 0.3f + ((_float)uiLayer / (_float)uiLayerCount) * 0.7f;
+        _float fLayerSpeedScale = 1.5f - ((_float)uiLayer / (_float)uiLayerCount) * 0.5f;
+
+        // 파티클의 고유 특성을 계산
+        _float fParticleLifeTime = m_pGameInstance->Rand(fLifeTime * 0.7f, fLifeTime * 1.3f);
+
+        // 초기 각도 (전체 360도에 고르게 분포)
+        _float fInitialAngle = m_pGameInstance->Rand(0.f, 360.f);
+        fInitialAngle = XMConvertToRadians(fInitialAngle);
+
+        // ★★★ 문제 해결 2: 회전 속도 대폭 증가 ★★★
+        _float fAngularVelocity = m_pGameInstance->Rand(8.0f, 12.0f) * fLayerSpeedScale;
+
+        // 반경 설정
+        _float fInitialRadius = fRadius * 0.1f * fLayerRadiusScale;  // 더 작게 시작
+        _float fMaxRadius = fRadius * fLayerRadiusScale * 1.2f;      // 더 큰 최대 반경
+        _float fRadialExpansion = (fMaxRadius - fInitialRadius) / (fParticleLifeTime * 0.5f);  // 더 빠른 확장
+
+        // ★★★ 상승 속도 증가 ★★★
+        _float fUpwardSpeed = (fHeight * 1.5f) / fParticleLifeTime;
+        fUpwardSpeed *= m_pGameInstance->Rand(0.8f, 1.2f);
+
+        // 난류 강도 증가
+        _float fTurbulence = m_pGameInstance->Rand(1.0f, 2.5f);
+
+        // 위상 오프셋
+        _float fPhaseOffset = m_pGameInstance->Rand(0.f, XM_2PI);
+
+        // ★★★ 생성 지연 시간 (순차적 생성 효과) ★★★
+        _float fSpawnDelay = ((_float)uiCreatedCount / (_float)uiToCreate) * 0.3f; // 0.3초에 걸쳐 순차 생성
+
+        // 속성 배열에 저장
+        m_pParticleAttributes[index].fInitialAngle = fInitialAngle;
+        m_pParticleAttributes[index].fAngularVelocity = fAngularVelocity;
+        m_pParticleAttributes[index].fInitialRadius = fInitialRadius;
+        m_pParticleAttributes[index].fMaxRadius = fMaxRadius;
+        m_pParticleAttributes[index].fRadialExpansion = fRadialExpansion;
+        m_pParticleAttributes[index].fUpwardSpeed = fUpwardSpeed;
+        m_pParticleAttributes[index].fTurbulence = fTurbulence;
+        m_pParticleAttributes[index].fPhaseOffset = fPhaseOffset;
+        m_pParticleAttributes[index].fSpawnDelay = fSpawnDelay;
+
+        vCenterPos.y -= 1.f;
+        // 파티클 정보 설정
         ParticleVertexInfo info{};
-
-        // 1. 수명: 풀링시 설정한 범위 또는 매개변수값 사용
-        info.lifeTime = m_pGameInstance->Rand(0.1f, fLifeTime);
-
-        // 2. 시작 각도는 0~360도 사이에서 완전 무작위
-        info.fAngle = m_pGameInstance->Rand(0.f, 360.f);
-
-        // 3. 각 파티클의 회전 반지름 (0부터 최대 반지름까지 무작위)
-        info.fRadius = m_pGameInstance->Rand(1.f, fRadius);
-
-        // 4. 회전 속도
-        info.fAngularSpeed = m_pGameInstance->Rand(m_vSpeed.x, m_vSpeed.y);
-
-        // 5. 상승 속도는 파티클이 자신의 수명 동안 최대 높이에 도달하도록 계산
-        info.fUpwardSpeed = fabs(fHeight) / info.lifeTime; // 절댓값을 사용해서 항상 위로 상승
-
-        // 6. 초기 위치 계산 (원형 궤도 상의 위치)
-        _float fRadian = XMConvertToRadians(info.fAngle);
-        _float fInitialX = vCenterPos.x + info.fRadius * cosf(fRadian);
-        _float fInitialZ = vCenterPos.z + info.fRadius * sinf(fRadian);
-
-        // 최종 정보 설정
-        info.pos = { fInitialX, vCenterPos.y, fInitialZ };
+        info.lifeTime = fParticleLifeTime;
+        info.dir = { 0.f, 1.f, 0.f };
+        info.pos = vCenterPos;
         info.initialPos = vCenterPos;
-        info.dir = { 0.f, 0.f, 0.f };
-        info.fHeight = fHeight;
-        info.fRandomSpeed = info.fAngularSpeed;
 
-        // 3. 파티클을 생성 대기열에 추가
+        // 생성 대기열에 추가
         m_ReadyparticleIndices.emplace(make_pair(index, info));
+
+        uiCreatedCount++;
     }
+
+    // 디버그 출력
+#ifdef _DEBUG
+    OutputDebugString(L"[Tornado] Created Particles: ");
+    OutputDebugString(to_wstring(uiCreatedCount).c_str());
+    OutputDebugString(L" / Total Instance: ");
+    OutputDebugString(to_wstring(m_iNumInstance).c_str());
+    OutputDebugString(L"\n");
+#endif
 }
+
+
 
 
 #pragma endregion
@@ -1005,4 +1308,6 @@ CComponent* CVIBuffer_PointParticleDir_Instance::Clone(void* pArg)
 void CVIBuffer_PointParticleDir_Instance::Free()
 {
     CVIBuffer_Instance::Free();
+    if (false == m_isCloned)
+        Safe_Delete_Array(m_pParticleAttributes);
 }

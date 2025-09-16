@@ -92,7 +92,7 @@ void CEffect_Pillar::OnActivate(void* pArg)
     /* 값 채워주기 */
     m_eCurLevel = pDesc->eCurLevel; // Move GameObjects To Pools에서 현재 레벨이 결정된다.
     m_ActivateDesc = *pDesc;
-    m_fDuration = m_ActivateDesc.fDuration;
+    m_fDuration = m_ActivateDesc.fDuration * 2.f;
     m_fAttackPower = pDesc->fAttackPower; // 데미지
     Reset_Timer();
 
@@ -109,9 +109,9 @@ void CEffect_Pillar::OnActivate(void* pArg)
     PillarADesc.fTargetRadius = 4.f;
     PillarADesc.fDecreaseTargetRadius = 2.f;
     PillarADesc.fTargetHeight = 4.f;
-    PillarADesc.fGrowDuration = 1.f;
-    PillarADesc.fStayDuration = 0.2f;
-    PillarADesc.fDecreaseDuration = 0.8f;
+    PillarADesc.fGrowDuration = 1.f * 2.f;
+    PillarADesc.fStayDuration = 0.2f * 2.f;
+    PillarADesc.fDecreaseDuration = 0.8f * 2.f;
     m_pBloodPillarA->OnActivate(&PillarADesc);
     
 
@@ -123,9 +123,9 @@ void CEffect_Pillar::OnActivate(void* pArg)
     PillarBDesc.fTargetRadius = 4.2f;
     PillarBDesc.fDecreaseTargetRadius = 2.f;
     PillarBDesc.fTargetHeight = 4.f;
-    PillarBDesc.fGrowDuration = 1.f;
-    PillarBDesc.fStayDuration = 0.2f;
-    PillarBDesc.fDecreaseDuration = 0.8f;
+    PillarBDesc.fGrowDuration = 1.f * 2.f;
+    PillarBDesc.fStayDuration = 0.2f * 2.f;
+    PillarBDesc.fDecreaseDuration = 0.8f * 2.f;
     m_pBloodPillarB->OnActivate(&PillarBDesc);
 
 
@@ -137,26 +137,28 @@ void CEffect_Pillar::OnActivate(void* pArg)
     PillarCDesc.fTargetRadius = 5.f;
     PillarCDesc.fDecreaseTargetRadius = 2.f;
     PillarCDesc.fTargetHeight = 5.f;
-    PillarCDesc.fGrowDuration = 1.f;
-    PillarCDesc.fStayDuration = 0.2f;
-    PillarCDesc.fDecreaseDuration = 0.8f;
+    PillarCDesc.fGrowDuration = 1.f * 2.f;
+    PillarCDesc.fStayDuration = 0.2f * 2.f;
+    PillarCDesc.fDecreaseDuration = 0.8f * 2.f;
     m_pBloodPillarC->OnActivate(&PillarCDesc);
 
     /* Effect 파티클 활성화 */
-    //CEffectParticle::EFFECTPARTICLE_ENTER_DESC TornadoDesc{};
-    //TornadoDesc.vStartPos = m_pTransformCom->Get_State(STATE::POSITION); // 몬스터 현재위치로 생성.
-    //
-    //PARTICLE_INIT_INFO Info = {};
-    //Info.lifeTime = m_fDuration * 5.f;
-    //Info.dir = { 0.f, 0.f, 0.f };
-    //Info.fHeight = 7.f;
-    //Info.fRadius = 6.f;
-    //Info.pos = { 0.f, 0.f, 0.f };
-    //TornadoDesc.particleInitInfo = Info;
-    //TornadoDesc.pTargetTransform = m_pTransformCom;
-    //
-    //m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(m_eCurLevel)
-    //    , TEXT("TORNADO"), TEXT("Layer_Effect"), 1, ENUM_CLASS(EFFECTTYPE::PARTICLE), &TornadoDesc);
+    CEffectParticle::EFFECTPARTICLE_ENTER_DESC TornadoDesc{};
+    TornadoDesc.vStartPos = m_pTransformCom->Get_State(STATE::POSITION); // 몬스터 현재위치로 생성.
+    
+    PARTICLE_INIT_INFO Info = {};
+    Info.lifeTime = m_fDuration;
+    Info.fHeight = 7.f;
+    Info.fRadius = 4.f;
+    Info.dir = { 0.f, 1.f, 0.f };
+    XMStoreFloat3(&Info.pos, m_pTransformCom->Get_State(STATE::POSITION));
+
+    // 지정한 정보들 전달.
+    TornadoDesc.particleInitInfo = Info;
+    TornadoDesc.pTargetTransform = m_pTransformCom;
+    
+    m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(m_eCurLevel)
+        , TEXT("TORNADO"), TEXT("Layer_Effect"), 1, ENUM_CLASS(EFFECTTYPE::PARTICLE), &TornadoDesc);
 
     m_pColliderCom->Set_Active(true);
 
