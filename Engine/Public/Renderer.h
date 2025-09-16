@@ -76,8 +76,9 @@ private:
 
 
 private:
+	HRESULT Render_Shadow();
 	HRESULT Render_Priority();
-	//HRESULT Render_Shadow();
+	
 	HRESULT Render_NonBlend();
 	HRESULT Render_Lights();
 	HRESULT Render_Combined();
@@ -89,13 +90,6 @@ private:
 	HRESULT Render_NonLight();
 	HRESULT Render_BloomBlur();
 	HRESULT Render_BloomCombine();
-	
-	
-	
-	
-	
-
-
 	HRESULT Render_UI();
 	HRESULT Render_StaticUI();
 
@@ -104,6 +98,17 @@ private:
 	HRESULT Render_Debug();
 
 #endif // _DEBUG
+
+#pragma region 그림자 용도
+private:
+	HRESULT Ready_Shadow_Depth_Stencil_View();
+	HRESULT SetUp_Viewport(_float fWidth, _float fHeight);
+
+private:
+	ID3D11DepthStencilView* m_pShadowDSV = { nullptr };
+	_float m_fViewportWidth{}, m_fViewportHeight{};
+
+#pragma endregion
 
 
 public:

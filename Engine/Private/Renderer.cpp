@@ -1,4 +1,5 @@
-﻿CRenderer::CRenderer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿#include "Renderer.h"
+CRenderer::CRenderer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : m_pDevice { pDevice }
     , m_pContext { pContext }
     , m_pGameInstance {CGameInstance::GetInstance()}
@@ -18,6 +19,8 @@ HRESULT CRenderer::Initialize()
     m_pContext->RSGetViewports(&iNumViewports, &ViewportDesc);
     m_ViewPortDesc = ViewportDesc;
     
+    m_fViewportWidth = ViewportDesc.Width;
+    m_fViewportHeight = ViewportDesc.Height;
 
     m_fThreShold = 0.9f;
     m_fSoft = 0.3f;
@@ -31,11 +34,10 @@ HRESULT CRenderer::Initialize()
     m_pGameInstance->Add_RenderTarget(TEXT("Target_Depth"), ViewportDesc.Width, ViewportDesc.Height, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(0.f, 0.f, 0.f, 1.f));
     m_pGameInstance->Add_RenderTarget(TEXT("Target_Emissive"), ViewportDesc.Width, ViewportDesc.Height, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(0.f, 0.f, 0.f, 1.f));
         
-    m_pGameInstance->Add_RenderTarget(TEXT("Target_Shade"), ViewportDesc.Width, ViewportDesc.Height, DXGI_FORMAT_R16G16B16A16_UNORM, _float4(1.f, 1.f, 1.f, 1.f));
-    //m_pGameInstance->Add_RenderTarget(TEXT("Target_LightDepth"), ViewportDesc.Width, ViewportDesc.Height, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(0.f, 0.f, 0.f, 0.f));
-    m_pGameInstance->Add_RenderTarget(TEXT("Combine_Shade"), ViewportDesc.Width, ViewportDesc.Height, DXGI_FORMAT_R16G16B16A16_FLOAT, _float4(1.f, 0.f, 1.f, 1.f));
-
-    m_pGameInstance->Add_RenderTarget(TEXT("Target_Distotion"), ViewportDesc.Width, ViewportDesc.Height, DXGI_FORMAT_R16G16B16A16_FLOAT, _float4(1.f, 0.f, 1.f, 1.f));
+    m_pGameInstance->Add_RenderTarget(TEXT("Target_Shade"), ViewportDesc.Width, ViewportDesc.Height, DXGI_FORMAT_R16G16B16A16_UNORM, _float4(0.f, 0.f, 0.f, 0.f));
+    /* Target Light Depth */
+    m_pGameInstance->Add_RenderTarget(TEXT("Target_LightDepth"), g_iMaxWidth, g_iMaxHeight, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(1.0f, 1.0f, 1.0f, 1.0f));
+    m_pGameInstance->Add_RenderTarget(TEXT("Combine_Shade"), ViewportDesc.Width, ViewportDesc.Height, DXGI_FORMAT_R16G16B16A16_FLOAT, _float4(0.f, 0.f, 0.f, 0.f));
 
 
     m_pGameInstance->Add_RenderTarget(TEXT("Target_BrightPass"), ViewportDesc.Width, ViewportDesc.Height, DXGI_FORMAT_R8G8B8A8_UNORM, _float4(0.f, 0.f, 0.f, 1.f));
@@ -51,8 +53,10 @@ HRESULT CRenderer::Initialize()
     m_pGameInstance->Add_MRT(TEXT("MRT_GameObjects"), TEXT("Target_Emissive"));
 
     m_pGameInstance->Add_MRT(TEXT("MRT_LightAcc"), TEXT("Target_Shade"));
+    /* MRT Shadow 생성*/
+    m_pGameInstance->Add_MRT(TEXT("MRT_Shadow"), TEXT("Target_LightDepth"));
     m_pGameInstance->Add_MRT(TEXT("MRT_Combine"), TEXT("Combine_Shade"));
-    //m_pGameInstance->Add_MRT(TEXT("MRT_Shadow"), TEXT("Target_LightDepth"));
+    
 
     m_pGameInstance->Add_MRT(TEXT("MRT_BrightPass"), TEXT("Target_BrightPass"));
     m_pGameInstance->Add_MRT(TEXT("MRT_BloomBlurX"), TEXT("Target_BloomBlurX"));
@@ -79,6 +83,9 @@ HRESULT CRenderer::Initialize()
     XMStoreFloat4x4(&m_ViewMatrix, XMMatrixIdentity());
     XMStoreFloat4x4(&m_ProjMatrix, XMMatrixOrthographicLH(ViewportDesc.Width, ViewportDesc.Height, 0.f, 1.f));
 
+    /* 쉐도우 용도 Depth Stencil View 생성*/
+    if (FAILED(Ready_Shadow_Depth_Stencil_View()))
+        return E_FAIL;
 
 #pragma region DEBUGING 용도 Render Target 화면 추가
 #ifdef _DEBUG
@@ -86,10 +93,10 @@ HRESULT CRenderer::Initialize()
     m_pGameInstance->Ready_RT_Debug(TEXT("Target_Diffuse"), 150.0f, 150.0f, 300.f, 300.f);
     m_pGameInstance->Ready_RT_Debug(TEXT("Target_Normal"), 150.0f, 450.0f, 300.f, 300.f);
     m_pGameInstance->Ready_RT_Debug(TEXT("Target_Depth"), 150.0f, 750.0f, 300.f, 300.f);
-    m_pGameInstance->Ready_RT_Debug(TEXT("Target_Shade"), 450.0f, 150.0f, 300.f, 300.f);
-    m_pGameInstance->Ready_RT_Debug(TEXT("Combine_Shade"), 450.0f, 450.0f, 300.f, 300.f);
-    m_pGameInstance->Ready_RT_Debug(TEXT("Target_Distotion"), 450.0f, 750.0f, 300.f, 300.f);
-    //m_pGameInstance->Ready_RT_Debug(TEXT("Target_LightDepth"), ViewportDesc.Width - 150.0f, 150.0f, 300.f, 300.f);
+    m_pGameInstance->Ready_RT_Debug(TEXT("Target_Shade"), 450.0f, 150.0f, 300.f, 300.f); // 오른쪽 위에서 첫번째.
+    m_pGameInstance->Ready_RT_Debug(TEXT("Target_LightDepth"), 450.f, 450.0f, 300.f, 300.f); // 그림자 전용
+    m_pGameInstance->Ready_RT_Debug(TEXT("Combine_Shade"), 450.0f, 750.0f, 300.f, 300.f);
+    
     
     m_pGameInstance->Ready_RT_Debug(TEXT("Target_BrightPass"), ViewportDesc.Width - 150.0f, 150.0f, 300.f, 300.f);
     m_pGameInstance->Ready_RT_Debug(TEXT("Target_BloomBlurX"), ViewportDesc.Width - 150.0f, 450.0f, 300.f, 300.f);
@@ -118,9 +125,14 @@ HRESULT CRenderer::Add_RenderGroup(RENDERGROUP eRenderGroup, CGameObject* pRende
 // Renderer.cpp
 HRESULT CRenderer::Draw()
 {
+    if (FAILED(Render_Shadow()))
+        return E_FAIL;
+
     // 0. Priority 렌더링 (스카이박스 등) - 백버퍼에 직접
     if (FAILED(Render_Priority()))
         return E_FAIL;
+
+    
 
     // 1. G-Buffer 생성 (불투명 객체)
     if (FAILED(Render_NonBlend()))
@@ -197,9 +209,36 @@ HRESULT CRenderer::Add_DebugComponent(CComponent* pComponent)
 #endif // _DEBUG
 
 
+HRESULT CRenderer::Render_Shadow()
+{
+    if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_Shadow"), m_pShadowDSV)))
+        return E_FAIL;
+
+    if (FAILED(SetUp_Viewport(g_iMaxWidth, g_iMaxHeight)))
+        return E_FAIL;
+
+    for (auto& pRenderObject : m_RenderObjects[ENUM_CLASS(RENDERGROUP::SHADOW)])
+    {
+        if (nullptr != pRenderObject)
+            pRenderObject->Render_Shadow();
+
+        Safe_Release(pRenderObject);
+    }
+
+    m_RenderObjects[ENUM_CLASS(RENDERGROUP::SHADOW)].clear();
+
+    if (FAILED(m_pGameInstance->End_MRT()))
+        return E_FAIL;
+
+    if (FAILED(SetUp_Viewport(m_fViewportWidth, m_fViewportHeight)))
+        return E_FAIL;
+
+    return S_OK;
+}
+
 HRESULT CRenderer::Render_Priority()
 {
-    if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_GameObjects"))))
+    if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_GameObjects"), nullptr)))
         return E_FAIL;
     
     for (auto& pRenderObject : m_RenderObjects[ENUM_CLASS(RENDERGROUP::PRIORITY)])
@@ -217,27 +256,6 @@ HRESULT CRenderer::Render_Priority()
     return S_OK;
 }
 
-//HRESULT CRenderer::Render_Shadow()
-//{
-//    if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_Shadow"))))
-//        return E_FAIL;
-//
-//    for (auto& pRenderObject : m_RenderObjects[ENUM_CLASS(RENDERGROUP::SHADOW)])
-//    {
-//        if (nullptr != pRenderObject)
-//            pRenderObject->Render();
-//
-//        Safe_Release(pRenderObject);
-//    }
-//
-//    m_RenderObjects[ENUM_CLASS(RENDERGROUP::SHADOW)].clear();
-//
-//    if (FAILED(m_pGameInstance->End_MRT()))
-//        return E_FAIL;
-//
-//    return S_OK;
-//}
-
 HRESULT CRenderer::Render_NonBlend()
 {
     // 후처리 쉐이딩.
@@ -252,7 +270,6 @@ HRESULT CRenderer::Render_NonBlend()
 
         Safe_Release(pRenderObject);
     }
-
     m_RenderObjects[ENUM_CLASS(RENDERGROUP::NONBLEND)].clear();
 
     m_pGameInstance->End_MRT();
@@ -264,7 +281,7 @@ HRESULT CRenderer::Render_NonBlend()
 HRESULT CRenderer::Render_Lights()
 {
     /* Shade */
-    if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_LightAcc"))))
+    if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_LightAcc"), nullptr)))
         return E_FAIL;
 
     /* Shade타겟을 채워줄 수 있는 리소스를 그려주자 == 쉐이드타겟의 모든 픽셀에 값을 채우낟. */
@@ -298,7 +315,7 @@ HRESULT CRenderer::Render_Lights()
 HRESULT CRenderer::Render_Combined()
 { 
     // 1. Combine_Shade에 렌더링 시작 => Begin MRT 사용시 RenderTarget을 Clear하므로 Begin_MRT를 조심해서 쓸것.
-    m_pGameInstance->Begin_MRT(TEXT("MRT_Combine"));
+    m_pGameInstance->Begin_MRT(TEXT("MRT_Combine"), nullptr);
 
     m_pDefferedShader->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix);
     m_pDefferedShader->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix);
@@ -308,8 +325,19 @@ HRESULT CRenderer::Render_Combined()
     m_pGameInstance->Bind_RT_ShaderResource(TEXT("Target_Shade"), m_pDefferedShader, "g_ShadeTexture");
     m_pGameInstance->Bind_RT_ShaderResource(TEXT("Target_Emissive"), m_pDefferedShader, "g_EmissiveTexture");
     m_pGameInstance->Bind_RT_ShaderResource(TEXT("Target_Depth"), m_pDefferedShader, "g_DepthTexture");
-    //m_pGameInstance->Bind_RT_ShaderResource(TEXT("Target_SkyBox"), m_pDefferedShader, "g_SkyTexture");
-        
+    
+
+#pragma region 그림자 정보 바인딩
+    if (FAILED(m_pDefferedShader->Bind_Matrix("g_LightViewMatrix", m_pGameInstance->Get_ShadowLight_Transform_Float4x4(D3DTS::VIEW))))
+        return E_FAIL;
+    if (FAILED(m_pDefferedShader->Bind_Matrix("g_LightProjMatrix", m_pGameInstance->Get_ShadowLight_Transform_Float4x4(D3DTS::PROJ))))
+        return E_FAIL;
+
+    if (FAILED(m_pGameInstance->Bind_RT_ShaderResource(TEXT("Target_LightDepth"), m_pDefferedShader, "g_LightDepthTexture")))
+        return E_FAIL;
+#pragma endregion
+
+
 
     _uint iCombinedShaderIndex = static_cast<_uint>(DEFFERED_SHADERTYPE::COMBINED);
     m_pDefferedShader->Begin(iCombinedShaderIndex);
@@ -327,7 +355,7 @@ HRESULT CRenderer::Render_Combined()
 HRESULT CRenderer::Render_Distortion()
 {
     // 1. Combine Texture에 Blend 객체들 덮어 그리기.
-    if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_Combine"), false)))
+    if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_Combine"),nullptr, false)))
         return E_FAIL;
 
 
@@ -355,7 +383,7 @@ HRESULT CRenderer::Render_Distortion()
 HRESULT CRenderer::Render_Blend()
 {
     // 1. Combine Texture에 Blend 객체들 덮어 그리기.
-    if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_Combine"), false)))
+    if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_Combine"), nullptr, false)))
         return E_FAIL;
 
 
@@ -425,7 +453,7 @@ HRESULT CRenderer::Render_BloomBlur()
     D3D11_VIEWPORT originalVP = m_ViewPortDesc;
 
     // Target_BrightPass에 밝은 부분만 추출
-    if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_BrightPass"))))
+    if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_BrightPass"), nullptr)))
         return E_FAIL;
 
     // 다운 샘플링된 월드행렬을 그대로 사용해서. 
@@ -455,7 +483,7 @@ HRESULT CRenderer::Render_BloomBlur()
     m_pGameInstance->End_MRT();
 
     // 수평 블러 (BrightPass -> BloomBlur1)
-    if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_BloomBlurX"))))
+    if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_BloomBlurX"), nullptr)))
         return E_FAIL;
 
     // 1/4 크기로 스케일 조정
@@ -494,7 +522,7 @@ HRESULT CRenderer::Render_BloomBlur()
 
 
     // 수직 블러 (BloomBlur1 -> BloomBlur2)
-    m_pGameInstance->Begin_MRT(TEXT("MRT_BloomBlurY"));
+    m_pGameInstance->Begin_MRT(TEXT("MRT_BloomBlurY"), nullptr);
 
     m_pPostLightShader->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix);
     m_pPostLightShader->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix);
@@ -601,6 +629,64 @@ HRESULT CRenderer::Render_Debug()
     return S_OK;
 }
 
+HRESULT CRenderer::Ready_Shadow_Depth_Stencil_View()
+{
+    ID3D11Texture2D* pDepthStencilTexture = nullptr;
+
+    D3D11_TEXTURE2D_DESC	TextureDesc;
+    ZeroMemory(&TextureDesc, sizeof(D3D11_TEXTURE2D_DESC));
+
+    /* 깊이 버퍼의 픽셀은 백버퍼의 픽셀과 갯수가 동일해야만 깊이 텍스트가 가능해진다. */
+    /* 픽셀의 수가 다르면 아에 렌더링을 못함. */
+    TextureDesc.Width = g_iMaxWidth;
+    TextureDesc.Height = g_iMaxHeight;
+    TextureDesc.MipLevels = 1;
+    TextureDesc.ArraySize = 1;
+    TextureDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+
+    TextureDesc.SampleDesc.Quality = 0;
+    TextureDesc.SampleDesc.Count = 1;
+
+    /* 동적? 정적?  */
+    TextureDesc.Usage = D3D11_USAGE_DEFAULT /* 정적 */;
+    /* 추후에 어떤 용도로 바인딩 될 수 있는 View타입의 텍스쳐를 만들기위한 Texture2D입니까? */
+    TextureDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL
+        /*| D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE*/;
+    TextureDesc.CPUAccessFlags = 0;
+    TextureDesc.MiscFlags = 0;
+
+    if (FAILED(m_pDevice->CreateTexture2D(&TextureDesc, nullptr, &pDepthStencilTexture)))
+        return E_FAIL;
+
+    /* RenderTargetView */
+    /* ShaderResourceView */
+    /* DepthStencilView */
+
+    if (FAILED(m_pDevice->CreateDepthStencilView(pDepthStencilTexture, nullptr, &m_pShadowDSV)))
+        return E_FAIL;
+
+    Safe_Release(pDepthStencilTexture);
+
+
+    return S_OK;
+}
+
+HRESULT CRenderer::SetUp_Viewport(_float fWidth, _float fHeight)
+{
+    D3D11_VIEWPORT			ViewPortDesc;
+    ZeroMemory(&ViewPortDesc, sizeof(D3D11_VIEWPORT));
+    ViewPortDesc.TopLeftX = 0;
+    ViewPortDesc.TopLeftY = 0;
+    ViewPortDesc.Width = fWidth;
+    ViewPortDesc.Height = fHeight;
+    ViewPortDesc.MinDepth = 0.f;
+    ViewPortDesc.MaxDepth = 1.f;
+
+    m_pContext->RSSetViewports(1, &ViewPortDesc);
+
+    return S_OK;
+}
+
 #endif
 
 
@@ -640,10 +726,13 @@ void CRenderer::Free()
         m_RenderObjects[i].clear();
     }
 
+    Safe_Release(m_pShadowDSV); // 그림자전용.
+
     Safe_Release(m_pDefferedShader);
     Safe_Release(m_pDistortionShader);
     Safe_Release(m_pPostLightShader);
     Safe_Release(m_pVIBuffer);
+    
 
     Safe_Release(m_pGameInstance);
     Safe_Release(m_pDevice);

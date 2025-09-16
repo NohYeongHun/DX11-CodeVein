@@ -13,6 +13,7 @@ public:
 public:
 	HRESULT Initialize(_uint iWinSizeX, _uint iWinSizeY);
 	HRESULT Ready_ShadowLight(SHADOW_LIGHT_DESC LightDesc);
+	void Update(_float fTimeDelta);
 
 private:
 	_float				m_fViewportWidth{}, m_fViewportHeight{};

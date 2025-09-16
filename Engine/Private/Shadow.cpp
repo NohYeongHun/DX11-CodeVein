@@ -1,5 +1,7 @@
-﻿CShadow::CShadow()
+﻿#include "Shadow.h"
+CShadow::CShadow()
 {
+	ZeroMemory(&m_Matrices, sizeof(m_Matrices));
 }
 
 const _float4x4* CShadow::Get_Transform_Float4x4(D3DTS eTransformState) const
@@ -24,6 +26,10 @@ HRESULT CShadow::Ready_ShadowLight(SHADOW_LIGHT_DESC LightDesc)
 		XMMatrixPerspectiveFovLH(LightDesc.fFovy, m_fViewportWidth / m_fViewportHeight, LightDesc.fNear, LightDesc.fFar));
 
 	return S_OK;
+}
+
+void CShadow::Update(_float fTimeDelta)
+{
 }
 
 CShadow* CShadow::Create(_uint iWinSizeX, _uint iWinSizeY)

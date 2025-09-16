@@ -25,6 +25,7 @@ public:
 	virtual void Update(_float fTimeDelta);
 	virtual void Late_Update(_float fTimeDelta);
 	virtual HRESULT Render();
+	virtual HRESULT Render_Shadow() override;
 
 #pragma region 충돌 함수 정의
 public:

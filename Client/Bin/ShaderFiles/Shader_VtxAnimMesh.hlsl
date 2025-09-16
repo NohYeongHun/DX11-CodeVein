@@ -273,16 +273,16 @@ technique11 DefaultTechnique
 
     }
 
-    //pass ShadowPass // 3
-    //{
-    //    SetRasterizerState(RS_Default);
-    //    SetDepthStencilState(DSS_Default, 0);
-    //    SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+    pass ShadowPass // 3
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 
-    //    VertexShader = compile vs_5_0 VS_MAIN_SHADOW();
-    //    GeometryShader = NULL;
-    //    //PixelShader = compile ps_5_0 PS_MAIN();
-    //    PixelShader = compile ps_5_0 PS_MAIN_SHADOW();
-    //}
+        VertexShader = compile vs_5_0 VS_MAIN_SHADOW();
+        GeometryShader = NULL;
+        //PixelShader = compile ps_5_0 PS_MAIN();
+        PixelShader = compile ps_5_0 PS_MAIN_SHADOW();
+    }
    
 }

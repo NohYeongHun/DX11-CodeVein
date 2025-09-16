@@ -153,8 +153,8 @@ void CPlayer::Late_Update(_float fTimeDelta)
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::NONBLEND, this)))
         return;
 
-    //if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::SHADOW, this)))
-    //    return;
+    if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::SHADOW, this)))
+        return;
 
 #ifdef _DEBUG
     if (FAILED(m_pGameInstance->Add_DebugComponent(m_pColliderCom)))
@@ -173,7 +173,7 @@ void CPlayer::Late_Update(_float fTimeDelta)
 HRESULT CPlayer::Render()
 {
 #ifdef _DEBUG
-    //ImGui_Render();
+    ImGui_Render();
 #endif // _DEBUG
 
 

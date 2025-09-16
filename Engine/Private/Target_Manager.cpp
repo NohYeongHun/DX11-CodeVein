@@ -56,7 +56,7 @@ HRESULT CTarget_Manager::Add_MRT(const _wstring& strMRTTag, const _wstring& strT
 	return S_OK;
 }
 
-HRESULT CTarget_Manager::Begin_MRT(const _wstring& strMRTTag, _bool bClear)
+HRESULT CTarget_Manager::Begin_MRT(const _wstring& strMRTTag, ID3D11DepthStencilView* pDSV, _bool bClear)
 {
 	list<CRenderTarget*>* pMRTList = Find_MRT(strMRTTag);
 
@@ -79,7 +79,6 @@ HRESULT CTarget_Manager::Begin_MRT(const _wstring& strMRTTag, _bool bClear)
 		RenderTargets[iNumRenderTargets++] = pRenderTarget->Get_RTV();
 	}
 
-	ID3D11DepthStencilView* pDSV = m_pOriginalDSV;
 
 	//// 2. 만약 MRT 이름이 블러용 MRT라면, 뎁스 버퍼를 사용하지 않도록 nullptr로 변경
 	if (strMRTTag == TEXT("MRT_BloomBlurX") ||
@@ -91,8 +90,11 @@ HRESULT CTarget_Manager::Begin_MRT(const _wstring& strMRTTag, _bool bClear)
 		pDSV = nullptr;
 	}
 
+	if (nullptr != pDSV)
+		m_pContext->ClearDepthStencilView(pDSV, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.f, 0);
+
 	// 3. 최종적으로 위에서 결정된 pDSV를 사용해 렌더 타겟 설정
-	m_pContext->OMSetRenderTargets(iNumRenderTargets, RenderTargets, pDSV);
+	m_pContext->OMSetRenderTargets(iNumRenderTargets, RenderTargets, nullptr == pDSV ? m_pOriginalDSV : pDSV);
 	//m_pContext->OMSetRenderTargets(iNumRenderTargets, RenderTargets, m_pOriginalDSV);
 
 	return S_OK;

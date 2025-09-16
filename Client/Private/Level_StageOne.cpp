@@ -5,6 +5,12 @@
 
 HRESULT CLevel_StageOne::Initialize_Clone()
 {
+	if (FAILED(Ready_Lights()))
+	{
+		CRASH("Failed Light");
+		return E_FAIL;
+	}
+
 	if (FAILED(Ready_Layer_FadeOut(TEXT("Layer_FadeOut"))))
 	{
 		CRASH("Failed Layer_FadeOut");
@@ -38,11 +44,7 @@ HRESULT CLevel_StageOne::Initialize_Clone()
 		return E_FAIL;
 	}
 
-	if (FAILED(Ready_Lights()))
-	{
-		CRASH("Failed Light");
-		return E_FAIL;
-	}
+	
 
 	if (FAILED(Ready_Layer_SkyBox(TEXT("Layer_SkyBox"))))
 	{
@@ -141,16 +143,21 @@ HRESULT CLevel_StageOne::Ready_Lights()
 	if (FAILED(m_pGameInstance->Add_Light(LightDesc)))
 		return E_FAIL;
 
-	/*LightDesc.eType = LIGHT_DESC::TYPE::POINT;
-	LightDesc.vPosition = _float4(20.f, 5.f, 20.f, 1.f);
-	LightDesc.fRange = 10.f;
+	// 전체 적으로 맵을 어둡게하기.
+	LightDesc.eType = LIGHT_DESC::TYPE::POINT;
+	LightDesc.vPosition = _float4(0.f, 200.f, 100.f, 1.f);
+	LightDesc.fRange = 1000.f;
 
-	LightDesc.vDiffuse = _float4(1.f, 0.f, 0.f, 1.f);
-	LightDesc.vAmbient = _float4(0.4f, 0.1f, 0.1f, 1.f);
+	LightDesc.vDiffuse = _float4(0.8f, 0.8f, 0.8f, 1.f);
+	LightDesc.vAmbient = _float4(0.2f, 0.2f, 0.2f, 1.f);
 	LightDesc.vSpecular = LightDesc.vDiffuse;
 
 	if (FAILED(m_pGameInstance->Add_Light(LightDesc)))
 		return E_FAIL;
+
+	
+
+	/*
 
 	LightDesc.eType = LIGHT_DESC::TYPE::POINT;
 	LightDesc.vPosition = _float4(30.f, 5.f, 20.f, 1.f);
@@ -161,19 +168,27 @@ HRESULT CLevel_StageOne::Ready_Lights()
 	LightDesc.vSpecular = LightDesc.vDiffuse;
 
 	if (FAILED(m_pGameInstance->Add_Light(LightDesc)))
-		return E_FAIL;
+		return E_FAIL;*/
+
+	// 캐릭터 위치 왼쪽 위에서 아래로.
 
 
+	// 플레이어 등뒤에서 계속 쬐게?
 	SHADOW_LIGHT_DESC			ShadowLightDesc{};
-
-	ShadowLightDesc.vEye = _float4(-20.f, 20.f, -20.f, 1.f);
-	ShadowLightDesc.vAt = _float4(0.f, 0.f, 0.f, 1.f);
+	ShadowLightDesc.vEye = _float4(-20.f, 33.f, -28.f, 1.f);
+	ShadowLightDesc.vAt = _float4(0.f, 23.f, -28.f, 1.f);
 	ShadowLightDesc.fFovy = XMConvertToRadians(60.f);
 	ShadowLightDesc.fNear = 0.1f;
 	ShadowLightDesc.fFar = 1000.f;
 
+	/*ShadowLightDesc.vEye = _float4(0.f, 33.f, -28.f, 1.f);
+	ShadowLightDesc.vAt = _float4(0.f, 0.f, 0.f, 1.f);
+	ShadowLightDesc.fFovy = XMConvertToRadians(60.f);
+	ShadowLightDesc.fNear = 1.f;
+	ShadowLightDesc.fFar = 1000.f;*/
+	
 	if (FAILED(m_pGameInstance->Ready_ShadowLight(ShadowLightDesc)))
-		return E_FAIL;*/
+		return E_FAIL;
 
 	return S_OK;
 }
