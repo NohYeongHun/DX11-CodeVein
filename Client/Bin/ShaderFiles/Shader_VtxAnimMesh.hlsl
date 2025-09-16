@@ -79,6 +79,40 @@ VS_OUT VS_MAIN(VS_IN In)
     return Out;
 }
 
+struct VS_OUT_SHADOW
+{
+    float4 vPosition : SV_POSITION;
+    float4 vProjPos : TEXCOORD0;
+};
+
+
+VS_OUT_SHADOW VS_MAIN_SHADOW(VS_IN In)
+{
+    VS_OUT_SHADOW Out;
+      /* 정점의 로컬위치 * 월드 * 뷰 * 투영 */ 
+    
+    float fWeightW = 1.f - (In.vBlendWeight.x + In.vBlendWeight.y + In.vBlendWeight.z);
+    
+    matrix BoneMatrix =
+        g_BoneMatrices[In.vBlendIndex.x] * In.vBlendWeight.x +
+        g_BoneMatrices[In.vBlendIndex.y] * In.vBlendWeight.y +
+        g_BoneMatrices[In.vBlendIndex.z] * In.vBlendWeight.z +
+        g_BoneMatrices[In.vBlendIndex.w] * fWeightW;
+    
+    vector vPosition = mul(float4(In.vPosition, 1.f), BoneMatrix);
+    
+    float4x4 matWV, matWVP;
+    
+    matWV = mul(g_WorldMatrix, g_ViewMatrix);
+    matWVP = mul(matWV, g_ProjMatrix);
+    
+    Out.vPosition = mul(vPosition, matWVP);
+    Out.vProjPos = Out.vPosition;
+    
+    return Out;
+
+}
+
 /* /W을 수행한다. 투영스페이스로 변환 */
 /* 뷰포트로 변환하고.*/
 /* 래스터라이즈 : 픽셀을 만든다. */
@@ -176,6 +210,26 @@ PS_OUT_BACKBUFFER PS_DEFFERED_DISSOLVE_MAIN(PS_IN In)
     return Out;
 }
 
+struct PS_IN_SHADOW
+{
+    float4 vPosition : SV_POSITION;
+    float4 vProjPos : TEXCOORD0;
+};
+
+struct PS_OUT_SHADOW
+{
+    float4 vLightDepth : SV_TARGET0;
+};
+
+PS_OUT_SHADOW PS_MAIN_SHADOW(PS_IN_SHADOW In)
+{
+    PS_OUT_SHADOW Out;
+    
+    Out.vLightDepth = float4(In.vProjPos.w / 1000.0f, 0.f, 0.f, 0.f);
+    
+    return Out;
+}
+
 
 
 technique11 DefaultTechnique
@@ -183,7 +237,7 @@ technique11 DefaultTechnique
     /* 특정 패스를 이용해서 점정을 그려냈다. */
     /* 하나의 모델을 그려냈다. */ 
     /* 모델의 상황에 따라 다른 쉐이딩 기법 세트(명암 + 림라이트 + 스펙큘러 + 노멀맵 + ssao )를 먹여주기위해서 */
-    pass DefaultPass
+    pass DefaultPass // 0 
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_Default, 0);
@@ -195,7 +249,7 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_DEFFERED_MAIN();
     }
 
-    pass NormalPass
+    pass NormalPass // 1
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_Default, 0);
@@ -207,7 +261,7 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_DEFFERED_NORMAL_MAIN();
     }
     
-    pass DessolvePass
+    pass DessolvePass // 2
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_Default, 0);
@@ -217,6 +271,18 @@ technique11 DefaultTechnique
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_DEFFERED_DISSOLVE_MAIN();
 
+    }
+
+    pass ShadowPass // 3
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN_SHADOW();
+        GeometryShader = NULL;
+        //PixelShader = compile ps_5_0 PS_MAIN();
+        PixelShader = compile ps_5_0 PS_MAIN_SHADOW();
     }
    
 }

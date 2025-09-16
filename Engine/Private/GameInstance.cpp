@@ -92,6 +92,11 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11De
 	if (nullptr == m_pEffect_Manager)
 		return E_FAIL;
 
+	/* Shadow 생성. */
+	m_pShadow = CShadow::Create(EngineDesc.iWinSizeX, EngineDesc.iWinSizeY);
+	if (nullptr == m_pShadow)
+		return E_FAIL;
+
 	return S_OK;
 }
 
@@ -739,8 +744,22 @@ HRESULT CGameInstance::Render_RT_Debug(CShader* pShader, CVIBuffer_Rect* pVIBuff
 {
 	return m_pTarget_Manager->Render(pShader, pVIBuffer);
 }
+
+
+
 #endif
 
+#pragma endregion
+
+#pragma region SHADOW
+const _float4x4* CGameInstance::Get_ShadowLight_Transform_Float4x4(D3DTS eTransformState) const
+{
+	return m_pShadow->Get_Transform_Float4x4(eTransformState);
+}
+HRESULT CGameInstance::Ready_ShadowLight(SHADOW_LIGHT_DESC LightDesc)
+{
+	return m_pShadow->Ready_ShadowLight(LightDesc);
+}
 #pragma endregion
 
 
@@ -766,7 +785,7 @@ void CGameInstance::Release_Engine()
 	Safe_Release(m_pPicking);
 	Safe_Release(m_pCamera_Manager);
 	Safe_Release(m_pEffect_Manager);
-	
+	Safe_Release(m_pShadow);
 
 
 	Safe_Release(m_pInput_Device);

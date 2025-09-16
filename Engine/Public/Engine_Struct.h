@@ -6,6 +6,15 @@
 namespace Engine
 {
 
+#pragma region SHADOW
+	typedef struct tagShadowLightDesc
+	{
+		XMFLOAT4		vEye, vAt;
+		float			fFovy, fNear, fFar;
+	}SHADOW_LIGHT_DESC;
+#pragma endregion
+
+
 	typedef struct tagFaceIndices
 	{
 		unsigned long		_0, _1, _2;

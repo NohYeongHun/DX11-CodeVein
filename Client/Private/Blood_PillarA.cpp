@@ -270,8 +270,15 @@ HRESULT CBlood_PillarA::Bind_ShaderResources()
 	}
 
 	
-	_float fRatio = m_fTime / m_fDisplayTime;
+	
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_fTime", &m_fTime, sizeof(_float))))
+	{
+		CRASH("Failed Bind Cam Position");
+		return E_FAIL;
+	}
+
+	_float fRatio = m_fTime / m_fDisplayTime;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fRatio", &fRatio, sizeof(_float))))
 	{
 		CRASH("Failed Bind Cam Position");
 		return E_FAIL;

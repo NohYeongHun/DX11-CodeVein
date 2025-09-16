@@ -61,6 +61,10 @@ void CBlood_PillarB::Update(_float fTimeDelta)
 	XMStoreFloat4x4(&m_CombinedWorldMatrix,
 		m_pTransformCom->Get_WorldMatrix() *
 		XMLoadFloat4x4(m_pParentMatrix));
+
+	/* 쉐이더에 전달해줄 시간값. */
+	if (m_fTime < m_fDisplayTime)
+		m_fTime += fTimeDelta;
 }
 
 void CBlood_PillarB::Late_Update(_float fTimeDelta)
@@ -243,8 +247,14 @@ HRESULT CBlood_PillarB::Bind_ShaderResources()
 		return E_FAIL;
 	}
 	
-	_float fRatio = m_fTime / m_fDisplayTime;
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_fTime", &m_fTime, sizeof(_float))))
+	{
+		CRASH("Failed Bind Cam Position");
+		return E_FAIL;
+	}
+
+	_float fRatio = m_fTime / m_fDisplayTime;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fRatio", &fRatio, sizeof(_float))))
 	{
 		CRASH("Failed Bind Cam Position");
 		return E_FAIL;

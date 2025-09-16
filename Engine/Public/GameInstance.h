@@ -218,6 +218,12 @@ public:
 #endif
 #pragma endregion
 
+#pragma region SHADOW
+	const _float4x4* Get_ShadowLight_Transform_Float4x4(D3DTS eTransformState) const;
+	HRESULT Ready_ShadowLight(SHADOW_LIGHT_DESC LightDesc);
+#pragma endregion
+
+
 
 //
 //#pragma region PICKING 
@@ -245,6 +251,8 @@ private:
 	class CTrigger_Manager*		m_pTrigger_Manager = { nullptr };
 	class CEffect_Manager*		m_pEffect_Manager = { nullptr };
 	class CTarget_Manager*		m_pTarget_Manager = { nullptr };
+	class CShadow* m_pShadow = { nullptr };
+	class CFrustum* m_pFrustum = { nullptr };
 	
 	
 	_float m_fTimeDelta = {};

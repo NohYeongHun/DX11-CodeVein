@@ -11,11 +11,7 @@ HRESULT CLevel_StageOne::Initialize_Clone()
 		return E_FAIL;
 	}
 	
-	if (FAILED(Ready_Lights()))
-	{
-		CRASH("Failed Light");
-		return E_FAIL;
-	}
+	
 
 	if (FAILED(Ready_HUD()))
 	{
@@ -39,6 +35,12 @@ HRESULT CLevel_StageOne::Initialize_Clone()
 	if (FAILED(Ready_Layer_Camera(TEXT("Layer_Camera"))))
 	{
 		CRASH("Failed Ready_Layer_Camera");
+		return E_FAIL;
+	}
+
+	if (FAILED(Ready_Lights()))
+	{
+		CRASH("Failed Light");
 		return E_FAIL;
 	}
 
@@ -133,10 +135,44 @@ HRESULT CLevel_StageOne::Ready_Lights()
 	LightDesc.eType = LIGHT_DESC::TYPE::DIRECTIONAL;
 	LightDesc.vDirection = _float4(1.f, -1.f, 1.f, 0.f);
 	LightDesc.vDiffuse = _float4(1.f, 1.f, 1.f, 1.f);
-	LightDesc.vAmbient = _float4(0.3f, 0.3f, 0.3f, 1.f);
+	LightDesc.vAmbient = _float4(0.2f, 0.2f, 0.2f, 1.f);
 	LightDesc.vSpecular = _float4(1.f, 1.f, 1.f, 1.f);
 
 	if (FAILED(m_pGameInstance->Add_Light(LightDesc)))
+		return E_FAIL;
+
+	LightDesc.eType = LIGHT_DESC::TYPE::POINT;
+	LightDesc.vPosition = _float4(20.f, 5.f, 20.f, 1.f);
+	LightDesc.fRange = 10.f;
+
+	LightDesc.vDiffuse = _float4(1.f, 0.f, 0.f, 1.f);
+	LightDesc.vAmbient = _float4(0.4f, 0.1f, 0.1f, 1.f);
+	LightDesc.vSpecular = LightDesc.vDiffuse;
+
+	if (FAILED(m_pGameInstance->Add_Light(LightDesc)))
+		return E_FAIL;
+
+	LightDesc.eType = LIGHT_DESC::TYPE::POINT;
+	LightDesc.vPosition = _float4(30.f, 5.f, 20.f, 1.f);
+	LightDesc.fRange = 10.f;
+
+	LightDesc.vDiffuse = _float4(0.f, 1.f, 0.f, 1.f);
+	LightDesc.vAmbient = _float4(0.1f, 0.4f, 0.1f, 1.f);
+	LightDesc.vSpecular = LightDesc.vDiffuse;
+
+	if (FAILED(m_pGameInstance->Add_Light(LightDesc)))
+		return E_FAIL;
+
+
+	SHADOW_LIGHT_DESC			ShadowLightDesc{};
+
+	ShadowLightDesc.vEye = _float4(-20.f, 20.f, -20.f, 1.f);
+	ShadowLightDesc.vAt = _float4(0.f, 0.f, 0.f, 1.f);
+	ShadowLightDesc.fFovy = XMConvertToRadians(60.f);
+	ShadowLightDesc.fNear = 0.1f;
+	ShadowLightDesc.fFar = 1000.f;
+
+	if (FAILED(m_pGameInstance->Ready_ShadowLight(ShadowLightDesc)))
 		return E_FAIL;
 
 	return S_OK;

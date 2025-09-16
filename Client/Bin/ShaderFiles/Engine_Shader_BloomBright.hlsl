@@ -67,7 +67,8 @@ PS_OUT PS_BLUR_X(PS_IN In)
     float weights[5] = {
         0.227027, 0.1945946, 0.1216216, 0.054054, 0.016216
     }; // 가우시안 블러 가중치
-    vColor += g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord) * weights[0];
+    //vColor += g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord) * weights[0];
+    vColor += g_DiffuseTexture.Sample(ClampSampler, In.vTexcoord) * weights[0];
     // 수평 방향 블러
     for (int i = 1; i < 5; ++i)
     {
@@ -86,7 +87,8 @@ PS_OUT PS_BLUR_Y(PS_IN In)
     float weights[5] = {
         0.227027, 0.1945946, 0.1216216, 0.054054, 0.016216
     }; // 가수이안 블러 가중치
-    vColor += g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord) * weights[0];
+    //vColor += g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord) * weights[0];
+    vColor += g_DiffuseTexture.Sample(ClampSampler, In.vTexcoord) * weights[0];
     // 수평 방향 블러
     for (int i = 1; i < 5; ++i)
     {

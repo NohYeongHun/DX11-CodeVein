@@ -230,6 +230,7 @@ call copy.bat</Command>
     <ClCompile Include="..\Private\Renderer.cpp" />
     <ClCompile Include="..\Private\RenderTarget.cpp" />
     <ClCompile Include="..\private\Shader.cpp" />
+    <ClCompile Include="..\Private\Shadow.cpp" />
     <ClCompile Include="..\Private\State.cpp" />
     <ClCompile Include="..\Private\Target_Manager.cpp" />
     <ClCompile Include="..\Private\Texture.cpp" />
@@ -322,6 +323,7 @@ call copy.bat</Command>
     <ClInclude Include="..\Public\RenderTarget.h" />
     <ClInclude Include="..\Public\SaveFile_Define.h" />
     <ClInclude Include="..\public\Shader.h" />
+    <ClInclude Include="..\Public\Shadow.h" />
     <ClInclude Include="..\Public\State.h" />
     <ClInclude Include="..\Public\Target_Manager.h" />
     <ClInclude Include="..\Public\Texture.h" />
