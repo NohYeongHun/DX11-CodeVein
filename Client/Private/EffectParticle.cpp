@@ -578,11 +578,15 @@ void CEffectParticle::OnActivate(void* pArg)
 
     case PARTICLE_TYPE_TORNADO:
     {
-        _vector vTargetPos = m_pTargetTransform->Get_State(STATE::POSITION);
-        m_pTransformCom->Set_State(STATE::POSITION, vTargetPos);
         m_fDisplayTime = particleInit.lifeTime;
-        // Fillar의 생성, 소멸시간에 영향받아야 하므로 기존 LifeTime으로 설정하면 안됌 m_vLifeTime(X)
-        m_pVIBufferCom->Create_TornadoParticle(particleInit.pos, particleInit.fRadius, particleInit.fHeight, particleInit.lifeTime);
+
+        // VIBuffer에 파티클 생성 (중심점은 particleInit.pos 사용)
+        m_pVIBufferCom->Create_TornadoParticle(
+            particleInit.pos,      // 토네이도 중심점
+            particleInit.fRadius,   // 반경
+            particleInit.fHeight,   // 높이
+            particleInit.lifeTime   // 수명
+        );
     }
     break;
     }

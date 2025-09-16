@@ -190,8 +190,6 @@ void CBlood_PillarA::Update_Grow(_float fTimeDelta)
 	_float fCurrentHeight = 0.f + (m_fTargetHeight - 0.f) * fRatio;
 
 	m_pTransformCom->Set_Scale({ fCurrentRadius, fCurrentHeight, fCurrentRadius });
-
-	OutPutDebugFloat(fCurrentRadius);
 }
 
 void CBlood_PillarA::Update_Stay(_float fTimeDelta)

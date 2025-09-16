@@ -90,30 +90,27 @@ void CEffect_Pillar::OnActivate(void* pArg)
     ASSERT_CRASH(pDesc);
 
     /* 값 채워주기 */
-    m_eCurLevel = pDesc->eCurLevel; // Move GameObjects To Pools에서 현재 레벨이 결정된다.
+    m_eCurLevel = pDesc->eCurLevel;
     m_ActivateDesc = *pDesc;
     m_fDuration = m_ActivateDesc.fDuration * 2.f;
-    m_fAttackPower = pDesc->fAttackPower; // 데미지
+    m_fAttackPower = pDesc->fAttackPower;
     Reset_Timer();
 
-
+    // ★★★ 중요: 이미 월드 좌표로 전달받았으므로 그대로 사용 ★★★
     m_pTransformCom->Set_State(STATE::POSITION, m_ActivateDesc.vStartPos);
 
-    /* 하위 객체들 Actviate 실행. */
-
+    /* 하위 객체들 Activate 실행 */
+    // ... PillarA, B, C 활성화 코드 ...
     CBlood_PillarA::PILLARA_ACTIVATE_DESC PillarADesc{};
-    PillarADesc.eCurLevel = pDesc->eCurLevel;
-    PillarADesc.vColor = { 1.f, 0.f, 0.f };
-    PillarADesc.fEmissiveIntensity = 0.5f;
     PillarADesc.vStartPos = { 0.f, 0.f, 0.f }; // 최종 위치는 어차피 곱해진다. => 서서히 조절.
     PillarADesc.fTargetRadius = 4.f;
     PillarADesc.fDecreaseTargetRadius = 2.f;
     PillarADesc.fTargetHeight = 4.f;
-    PillarADesc.fGrowDuration = 1.f * 2.f;
-    PillarADesc.fStayDuration = 0.2f * 2.f;
-    PillarADesc.fDecreaseDuration = 0.8f * 2.f;
+    PillarADesc.fGrowDuration = 1.f;
+    PillarADesc.fStayDuration = 0.2f;
+    PillarADesc.fDecreaseDuration = 0.8f;
     m_pBloodPillarA->OnActivate(&PillarADesc);
-    
+
 
     CBlood_PillarB::PILLARB_ACTIVATE_DESC PillarBDesc{};
     PillarBDesc.eCurLevel = pDesc->eCurLevel;
@@ -123,9 +120,9 @@ void CEffect_Pillar::OnActivate(void* pArg)
     PillarBDesc.fTargetRadius = 4.2f;
     PillarBDesc.fDecreaseTargetRadius = 2.f;
     PillarBDesc.fTargetHeight = 4.f;
-    PillarBDesc.fGrowDuration = 1.f * 2.f;
-    PillarBDesc.fStayDuration = 0.2f * 2.f;
-    PillarBDesc.fDecreaseDuration = 0.8f * 2.f;
+    PillarBDesc.fGrowDuration = 1.f;
+    PillarBDesc.fStayDuration = 0.2f;
+    PillarBDesc.fDecreaseDuration = 0.8f;
     m_pBloodPillarB->OnActivate(&PillarBDesc);
 
 
@@ -137,35 +134,35 @@ void CEffect_Pillar::OnActivate(void* pArg)
     PillarCDesc.fTargetRadius = 5.f;
     PillarCDesc.fDecreaseTargetRadius = 2.f;
     PillarCDesc.fTargetHeight = 5.f;
-    PillarCDesc.fGrowDuration = 1.f * 2.f;
-    PillarCDesc.fStayDuration = 0.2f * 2.f;
-    PillarCDesc.fDecreaseDuration = 0.8f * 2.f;
+    PillarCDesc.fGrowDuration = 1.f;
+    PillarCDesc.fStayDuration = 0.2f;
+    PillarCDesc.fDecreaseDuration = 0.8f;
     m_pBloodPillarC->OnActivate(&PillarCDesc);
+
+    
 
     /* Effect 파티클 활성화 */
     CEffectParticle::EFFECTPARTICLE_ENTER_DESC TornadoDesc{};
-    TornadoDesc.vStartPos = m_pTransformCom->Get_State(STATE::POSITION); // 몬스터 현재위치로 생성.
-    
+
+    // ★★★ 파티클은 Effect_Pillar와 동일한 위치에서 시작 ★★★
+    TornadoDesc.vStartPos = m_pTransformCom->Get_State(STATE::POSITION);
+
     PARTICLE_INIT_INFO Info = {};
-    Info.lifeTime = m_fDuration;
+    Info.lifeTime = m_fDuration - 0.5f;
     Info.fHeight = 7.f;
     Info.fRadius = 4.f;
     Info.dir = { 0.f, 1.f, 0.f };
-    XMStoreFloat3(&Info.pos, m_pTransformCom->Get_State(STATE::POSITION));
 
-    // 지정한 정보들 전달.
+    // ★★★ 파티클의 중심점도 같은 위치로 설정 ★★★
+    Info.pos = { 0.f, -1.f, 0.f };
+
     TornadoDesc.particleInitInfo = Info;
-    TornadoDesc.pTargetTransform = m_pTransformCom;
-    
+    TornadoDesc.pTargetTransform = m_pTransformCom;  // Effect_Pillar의 Transform 전달
+
     m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(m_eCurLevel)
         , TEXT("TORNADO"), TEXT("Layer_Effect"), 1, ENUM_CLASS(EFFECTTYPE::PARTICLE), &TornadoDesc);
 
     m_pColliderCom->Set_Active(true);
-
-
-    /* Pool이 활성화될 때 등록. 
-    * 원래는 Pool이 빠질때 빼는 로직도 생성해야하나 => Destroy로 해결.
-    */
     m_pGameInstance->Add_Collider_To_Manager(m_pColliderCom, ENUM_CLASS(m_eCurLevel));
 }
 

@@ -1117,7 +1117,10 @@ void CPlayer::Create_HitEffects(_fvector vHitPosition, _fvector vAttackDirection
 {
     CEffectParticle::EFFECTPARTICLE_ENTER_DESC HitParticleDesc{};
     HitParticleDesc.eParticleType = CEffectParticle::PARTICLE_TYPE_PLAYERHIT_PARTCILE;
-    HitParticleDesc.vStartPos = vHitPosition; // 몬스터 현재위치로 생성.
+    //HitParticleDesc.vStartPos = vHitPosition; // 몬스터 현재위치로 생성.
+
+    _float vPosy = XMVectorGetY(m_pTransformCom->Get_State(STATE::POSITION));
+    HitParticleDesc.vStartPos = XMVectorSetY(m_pTransformCom->Get_State(STATE::POSITION), vPosy + 1.f); // 몬스터 현재위치로 생성.
     HitParticleDesc.particleInitInfo.lifeTime = 0.5f; // lisfeTime
     HitParticleDesc.particleInitInfo.fRadius = 0.3f; // 모일 반경
     HitParticleDesc.particleInitInfo.fExplositionTime = 0.1f;

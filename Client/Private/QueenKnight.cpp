@@ -793,25 +793,33 @@ void CQueenKnight::Update_BloodPillar(_float fTimeDelta)
 
         if (m_fSkillElapsedTime >= fRequiredTime)
         {
-            // 드디어 풀에서 Pillar를 꺼내와 활성화!
+
+
+            static _uint iCount = 0;
             CEffect_Pillar::PILLAR_ACTIVATE_DESC EffectPillarDesc{};
             EffectPillarDesc.eCurLevel = m_eCurLevel;
-            EffectPillarDesc.vStartPos = XMLoadFloat3(&m_vecPillarPositions[i]); // 계산된 위치를 넣어줌
-            _float fPillarDuration = m_fMaxSkillDuration - fRequiredTime;
-            EffectPillarDesc.fDuration = 2.2f;
-            //EffectPillarDesc.fDuration = m_fMaxSkillDuration;
+
+            // ★★★ 중요: QueenKnight의 월드 위치 + 상대 오프셋 = 최종 월드 좌표 ★★★
+            _vector vQueenPos = m_pTransformCom->Get_State(STATE::POSITION);
+            _vector vOffsetPos = XMLoadFloat3(&m_vecPillarPositions[i]);
+            _vector vFinalWorldPos = vQueenPos + vOffsetPos;
+            vFinalWorldPos = XMVectorSetY(vFinalWorldPos, XMVectorGetY(vQueenPos));
+            EffectPillarDesc.vStartPos = vFinalWorldPos; // 최종 월드 좌표 전달
+            EffectPillarDesc.fDuration = m_fMaxSkillDuration;
             EffectPillarDesc.fAttackPower = static_cast<_float>(m_pGameInstance->Rand_UnsignedInt(150, 200));
-            // ... 나머지 Desc 내용 채우기 ...
 
             m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(m_eCurLevel)
                 , TEXT("BLOOD_PILLAR"), TEXT("Layer_Effect"), 1, ENUM_CLASS(CEffect_Pillar::EffectType), &EffectPillarDesc);
 
-            // 소환되었다고 표시
             m_vecIsPillarActivated[i] = true;
+            iCount++;
+
+            //OutputDebugString(L"[QueenKnight] Pillar Particle : ");
+            //OutPutDebugInt(iCount);
+            //OutPutDebugFloat3(vFinalWorldPos);
         }
     }
 
-    // [추가] 스킬 종료 처리
     if (m_fSkillElapsedTime >= m_fMaxSkillDuration)
     {
         m_bIsSkillActive = false;

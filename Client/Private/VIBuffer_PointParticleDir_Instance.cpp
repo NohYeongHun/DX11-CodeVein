@@ -1179,64 +1179,45 @@ void CVIBuffer_PointParticleDir_Instance::Create_HitParticle(_float3 vCenterPos,
 
 void CVIBuffer_PointParticleDir_Instance::Create_TornadoParticle(_float3 vCenterPos, _float fRadius, _float fHeight, _float fLifeTime)
 {
-    // 토네이도 중심점 업데이트
-    m_vPivot = vCenterPos;
+    // ★★★ 전달받은 월드 좌표를 그대로 토네이도 중심점으로 사용 ★★★
+    m_vPivot = { 0.f, 0.f, 0.f };
 
-    // ★★★ 문제 해결 1: 모든 Dead 파티클을 사용 ★★★
     _uint uiTotalAvailable = m_DeadParticleIndices.size();
-    _uint uiToCreate = min(uiTotalAvailable, m_iNumInstance); // Instance 수만큼 생성
+    _uint uiToCreate = min(uiTotalAvailable, m_iNumInstance);
 
-    // 토네이도 파라미터 (더 많은 파티클)
-    const _uint uiLayerCount = 5;  // 레이어 수 증가 (3->5)
+    const _uint uiLayerCount = 5;
     _uint uiParticlesPerLayer = uiToCreate / uiLayerCount;
     if (uiParticlesPerLayer == 0)
         uiParticlesPerLayer = 1;
 
     _uint uiCreatedCount = 0;
 
-    // ★★★ 한 번에 모든 파티클 생성 ★★★
     while (!m_DeadParticleIndices.empty() && uiCreatedCount < uiToCreate)
     {
         _uint index = m_DeadParticleIndices.front();
         m_DeadParticleIndices.pop();
 
-        // 현재 레이어와 레이어 내 위치 계산
-        _uint uiLayer = uiCreatedCount % uiLayerCount;  // 레이어별 고른 분포
+        _uint uiLayer = uiCreatedCount % uiLayerCount;
         _uint uiPosInLayer = uiCreatedCount / uiLayerCount;
 
-        // 레이어별 속성 설정
         _float fLayerRadiusScale = 0.3f + ((_float)uiLayer / (_float)uiLayerCount) * 0.7f;
         _float fLayerSpeedScale = 1.5f - ((_float)uiLayer / (_float)uiLayerCount) * 0.5f;
 
-        // 파티클의 고유 특성을 계산
         _float fParticleLifeTime = m_pGameInstance->Rand(fLifeTime * 0.7f, fLifeTime * 1.3f);
-
-        // 초기 각도 (전체 360도에 고르게 분포)
-        _float fInitialAngle = m_pGameInstance->Rand(0.f, 360.f);
-        fInitialAngle = XMConvertToRadians(fInitialAngle);
-
-        // ★★★ 문제 해결 2: 회전 속도 대폭 증가 ★★★
+        _float fInitialAngle = XMConvertToRadians(m_pGameInstance->Rand(0.f, 360.f));
         _float fAngularVelocity = m_pGameInstance->Rand(8.0f, 12.0f) * fLayerSpeedScale;
 
-        // 반경 설정
-        _float fInitialRadius = fRadius * 0.1f * fLayerRadiusScale;  // 더 작게 시작
-        _float fMaxRadius = fRadius * fLayerRadiusScale * 1.2f;      // 더 큰 최대 반경
-        _float fRadialExpansion = (fMaxRadius - fInitialRadius) / (fParticleLifeTime * 0.5f);  // 더 빠른 확장
+        _float fInitialRadius = fRadius * 0.1f * fLayerRadiusScale;
+        _float fMaxRadius = fRadius * fLayerRadiusScale * 1.2f;
+        _float fRadialExpansion = (fMaxRadius - fInitialRadius) / (fParticleLifeTime * 0.5f);
 
-        // ★★★ 상승 속도 증가 ★★★
         _float fUpwardSpeed = (fHeight * 1.5f) / fParticleLifeTime;
         fUpwardSpeed *= m_pGameInstance->Rand(0.8f, 1.2f);
 
-        // 난류 강도 증가
         _float fTurbulence = m_pGameInstance->Rand(1.0f, 2.5f);
-
-        // 위상 오프셋
         _float fPhaseOffset = m_pGameInstance->Rand(0.f, XM_2PI);
 
-        // ★★★ 생성 지연 시간 (순차적 생성 효과) ★★★
-        _float fSpawnDelay = ((_float)uiCreatedCount / (_float)uiToCreate) * 0.3f; // 0.3초에 걸쳐 순차 생성
-
-        // 속성 배열에 저장
+        // 속성 저장
         m_pParticleAttributes[index].fInitialAngle = fInitialAngle;
         m_pParticleAttributes[index].fAngularVelocity = fAngularVelocity;
         m_pParticleAttributes[index].fInitialRadius = fInitialRadius;
@@ -1245,30 +1226,17 @@ void CVIBuffer_PointParticleDir_Instance::Create_TornadoParticle(_float3 vCenter
         m_pParticleAttributes[index].fUpwardSpeed = fUpwardSpeed;
         m_pParticleAttributes[index].fTurbulence = fTurbulence;
         m_pParticleAttributes[index].fPhaseOffset = fPhaseOffset;
-        m_pParticleAttributes[index].fSpawnDelay = fSpawnDelay;
 
-        vCenterPos.y -= 1.f;
-        // 파티클 정보 설정
+        // ★★★ 파티클 정보에도 정확한 중심점 전달 ★★★
         ParticleVertexInfo info{};
         info.lifeTime = fParticleLifeTime;
         info.dir = { 0.f, 1.f, 0.f };
-        info.pos = vCenterPos;
+        info.pos = vCenterPos;      // 월드 좌표 그대로 사용
         info.initialPos = vCenterPos;
 
-        // 생성 대기열에 추가
         m_ReadyparticleIndices.emplace(make_pair(index, info));
-
         uiCreatedCount++;
     }
-
-    // 디버그 출력
-#ifdef _DEBUG
-    OutputDebugString(L"[Tornado] Created Particles: ");
-    OutputDebugString(to_wstring(uiCreatedCount).c_str());
-    OutputDebugString(L" / Total Instance: ");
-    OutputDebugString(to_wstring(m_iNumInstance).c_str());
-    OutputDebugString(L"\n");
-#endif
 }
 
 
