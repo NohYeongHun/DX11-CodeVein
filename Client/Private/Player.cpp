@@ -153,8 +153,8 @@ void CPlayer::Late_Update(_float fTimeDelta)
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::NONBLEND, this)))
         return;
 
-    if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::SHADOW, this)))
-        return;
+    //if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::SHADOW, this)))
+    //    return;
 
 #ifdef _DEBUG
     if (FAILED(m_pGameInstance->Add_DebugComponent(m_pColliderCom)))
@@ -186,10 +186,16 @@ HRESULT CPlayer::Render()
     _uint iNumMeshes = m_pModelCom->Get_NumMeshes();
     for (_uint i = 0; i < iNumMeshes; i++)
     {
+        if (FAILED(m_pModelCom->Bind_Materials(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE, 0)))
+            return E_FAIL;
+
+        if (FAILED(m_pModelCom->Bind_Materials(m_pShaderCom, "g_NormalTexture", i, aiTextureType_NORMALS, 0)))
+            return E_FAIL;
+
         if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
             CRASH("Ready Bone Matrices Failed");
 
-        if (FAILED(m_pShaderCom->Begin(static_cast<_uint>(ANIMESH_SHADERPATH::SHADOW))))
+        if (FAILED(m_pShaderCom->Begin(static_cast<_uint>(ANIMESH_SHADERPATH::NORMAL))))
             CRASH("Ready Shader Begin Failed");
 
         if (FAILED(m_pModelCom->Render(i)))
@@ -220,7 +226,7 @@ HRESULT CPlayer::Render_Shadow()
         if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
             return E_FAIL;
 
-        m_pShaderCom->Begin(2);
+        m_pShaderCom->Begin(static_cast<_uint>(ANIMESH_SHADERPATH::SHADOW));
 
         m_pModelCom->Render(i);
     }

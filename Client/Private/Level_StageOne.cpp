@@ -135,13 +135,13 @@ HRESULT CLevel_StageOne::Ready_Lights()
 	LightDesc.eType = LIGHT_DESC::TYPE::DIRECTIONAL;
 	LightDesc.vDirection = _float4(1.f, -1.f, 1.f, 0.f);
 	LightDesc.vDiffuse = _float4(1.f, 1.f, 1.f, 1.f);
-	LightDesc.vAmbient = _float4(0.2f, 0.2f, 0.2f, 1.f);
+	LightDesc.vAmbient = _float4(0.3f, 0.3f, 0.3f, 1.f);
 	LightDesc.vSpecular = _float4(1.f, 1.f, 1.f, 1.f);
 
 	if (FAILED(m_pGameInstance->Add_Light(LightDesc)))
 		return E_FAIL;
 
-	LightDesc.eType = LIGHT_DESC::TYPE::POINT;
+	/*LightDesc.eType = LIGHT_DESC::TYPE::POINT;
 	LightDesc.vPosition = _float4(20.f, 5.f, 20.f, 1.f);
 	LightDesc.fRange = 10.f;
 
@@ -173,7 +173,7 @@ HRESULT CLevel_StageOne::Ready_Lights()
 	ShadowLightDesc.fFar = 1000.f;
 
 	if (FAILED(m_pGameInstance->Ready_ShadowLight(ShadowLightDesc)))
-		return E_FAIL;
+		return E_FAIL;*/
 
 	return S_OK;
 }
