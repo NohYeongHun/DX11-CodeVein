@@ -1,7 +1,9 @@
 ﻿#include "Shadow.h"
 CShadow::CShadow()
+	: m_pGameInstance { CGameInstance::GetInstance() }
 {
 	ZeroMemory(&m_Matrices, sizeof(m_Matrices));
+	Safe_AddRef(m_pGameInstance);
 }
 
 const _float4x4* CShadow::Get_Transform_Float4x4(D3DTS eTransformState) const
@@ -19,6 +21,8 @@ HRESULT CShadow::Initialize(_uint iWinSizeX, _uint iWinSizeY)
 
 HRESULT CShadow::Ready_ShadowLight(SHADOW_LIGHT_DESC LightDesc)
 {
+	m_ShadowLightDesc = LightDesc;
+
 	XMStoreFloat4x4(&m_Matrices[ENUM_CLASS(D3DTS::VIEW)],
 		XMMatrixLookAtLH(XMLoadFloat4(&LightDesc.vEye), XMLoadFloat4(&LightDesc.vAt), XMVectorSet(0.f, 1.f, 0.f, 0.f)));
 
@@ -28,9 +32,29 @@ HRESULT CShadow::Ready_ShadowLight(SHADOW_LIGHT_DESC LightDesc)
 	return S_OK;
 }
 
-void CShadow::Update(_float fTimeDelta)
+void CShadow::Update()
 {
+	_vector vCameraPos = XMLoadFloat4(m_pGameInstance->Get_CamPosition());
+
+	SHADOW_LIGHT_DESC ShadowLightDesc{};
+	_float4 vEye, vAt;
+	XMStoreFloat4(&vEye, vCameraPos + XMVectorSet(100.f, 100.f, 0.f, 0.f));
+	XMStoreFloat4(&vAt, vCameraPos);
+
+	ShadowLightDesc.vEye = vEye;
+	ShadowLightDesc.vAt = vAt;
+	ShadowLightDesc.fFovy = XMConvertToRadians(60.f);
+	ShadowLightDesc.fNear = 0.1f;
+	ShadowLightDesc.fFar = 1000.f;
+
+	m_pGameInstance->Ready_ShadowLight(ShadowLightDesc);
+
+
+
+
 }
+
+
 
 CShadow* CShadow::Create(_uint iWinSizeX, _uint iWinSizeY)
 {
@@ -47,7 +71,8 @@ CShadow* CShadow::Create(_uint iWinSizeX, _uint iWinSizeY)
 
 void CShadow::Free()
 {
-	__super::Free();
+	CBase::Free();
+	Safe_Release(m_pGameInstance);
 
 
 }

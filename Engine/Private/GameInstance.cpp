@@ -108,6 +108,8 @@ void CGameInstance::Update_Engine(_float fTimeDelta)
 	if (FAILED(Task()))
 		return;
 
+	
+
 	// 0. Trigger Manager => Object Manager Layer에 조건이 부합하면 추가.
 	m_pTrigger_Manager->Update(fTimeDelta); 
 
@@ -145,6 +147,8 @@ void CGameInstance::Update_Engine(_float fTimeDelta)
 	// 9. 피킹 업데이트
 	m_pPicking->Update();
 
+	// 10 .Shadow 업데이트
+	//m_pShadow->Update();
 
 	// 11. 레벨 업데이트
 	m_pLevel_Manager->Update(fTimeDelta);

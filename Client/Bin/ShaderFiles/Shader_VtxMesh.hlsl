@@ -225,11 +225,11 @@ PS_OUT_BACKBUFFER PS_DEFFERED_BLOODPILLARA_MAIN(PS_BACKBUFFER_IN In)
     
    
     // 노이즈 값(vMtrlNoise.r)에 따라 두 색상을 보간합니다.
-    //Out.vDiffuse.rgb = lerp(vDarkColor.rgb, vMtrlDiffuse.rgb, vMtrlNoise.r);
+    Out.vDiffuse.rgb = lerp(vDarkColor.rgb, vMtrlDiffuse.rgb, vMtrlNoise.r);
     Out.vDiffuse.rgb = vMtrlDiffuse.rgb;
     
-    float fAlpha = saturate(1.f - g_fRatio);
-    Out.vDiffuse.a = vMtrlDiffuse.a * fAlpha; // 시간에 따라 알파값 감소.
+    float fRatio = saturate(1.f - g_fRatio);
+    Out.vDiffuse.a = vMtrlDiffuse.a * fRatio; // 시간에 따라 알파값 감소.
     
     Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w, 0.f, 0.f);

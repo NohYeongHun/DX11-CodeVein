@@ -114,8 +114,8 @@ PS_OUT PS_SUM_BLUR(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
     
-    float4 vSceneColor = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
-    float4 vBloomColor = g_BloomTexture.Sample(DefaultSampler, In.vTexcoord);
+    float4 vSceneColor = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord); // Combine Texture
+    float4 vBloomColor = g_BloomTexture.Sample(DefaultSampler, In.vTexcoord); // Bloom Texture
 
     // 금빛 느낌을 강조하기 위해 약간의 오렌지색 틴트(Tint)를 곱해줍니다.
     float3 vBloomTint = float3(1.0f, 0.7f, 0.3f);

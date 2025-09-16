@@ -153,8 +153,8 @@ void CPlayer::Late_Update(_float fTimeDelta)
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::NONBLEND, this)))
         return;
 
-    if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::SHADOW, this)))
-        return;
+    //if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::SHADOW, this)))
+    //    return;
 
 #ifdef _DEBUG
     if (FAILED(m_pGameInstance->Add_DebugComponent(m_pColliderCom)))
@@ -218,6 +218,9 @@ HRESULT CPlayer::Render_Shadow()
 
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_ShadowLight_Transform_Float4x4(D3DTS::PROJ))))
         return E_FAIL;
+
+    _float fLightDepth = { 1000.f };
+    m_pShaderCom->Bind_RawValue("g_fLightDepth", &fLightDepth, sizeof(_float));
 
     _uint           iNumMeshes = m_pModelCom->Get_NumMeshes();
 

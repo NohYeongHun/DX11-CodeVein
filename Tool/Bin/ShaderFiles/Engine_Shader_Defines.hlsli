@@ -27,6 +27,16 @@ RasterizerState RS_Default
     FrontCounterClockwise = false;
 };
 
+RasterizerState RS_Shadow
+{
+    FillMode = SOLID;
+    CullMode = BACK;
+    // --- ÇÙ½É ¼³Á¤ ---
+    DepthBias = 3000;
+    SlopeScaledDepthBias = 1.0f;
+    DepthClipEnable = TRUE;
+};
+
 RasterizerState RS_Cull_CW
 {    
     CullMode = front;    

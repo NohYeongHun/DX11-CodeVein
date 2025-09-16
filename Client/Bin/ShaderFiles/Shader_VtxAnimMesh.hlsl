@@ -15,7 +15,6 @@ float g_fReverseDissolveTime;
 vector g_vMtrlAmbient = 1.f;
 vector g_vMtrlSpecular = 1.f;
 
-
 /* 모델 전체 뼈기준(x) */
 /* 특정 메시에 영향ㅇ르 주는 뼈들 */
 matrix g_BoneMatrices[512];
@@ -100,7 +99,6 @@ VS_OUT_SHADOW VS_MAIN_SHADOW(VS_IN In)
         g_BoneMatrices[In.vBlendIndex.w] * fWeightW;
     
     vector vPosition = mul(float4(In.vPosition, 1.f), BoneMatrix);
-    
     float4x4 matWV, matWVP;
     
     matWV = mul(g_WorldMatrix, g_ViewMatrix);
@@ -221,11 +219,13 @@ struct PS_OUT_SHADOW
     float4 vLightDepth : SV_TARGET0;
 };
 
+float g_fLightDepth;
+
 PS_OUT_SHADOW PS_MAIN_SHADOW(PS_IN_SHADOW In)
 {
     PS_OUT_SHADOW Out;
     
-    Out.vLightDepth = float4(In.vProjPos.w / 1000.0f, 0.f, 0.f, 0.f);
+    Out.vLightDepth = float4(In.vProjPos.w / g_fLightDepth, 0.f, 0.f, 0.f);
     
     return Out;
 }

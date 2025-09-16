@@ -629,6 +629,9 @@ HRESULT CRenderer::Render_Debug()
     return S_OK;
 }
 
+
+#endif
+
 HRESULT CRenderer::Ready_Shadow_Depth_Stencil_View()
 {
     ID3D11Texture2D* pDepthStencilTexture = nullptr;
@@ -686,9 +689,6 @@ HRESULT CRenderer::SetUp_Viewport(_float fWidth, _float fHeight)
 
     return S_OK;
 }
-
-#endif
-
 
 
 CRenderer* CRenderer::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

@@ -13,12 +13,15 @@ public:
 public:
 	HRESULT Initialize(_uint iWinSizeX, _uint iWinSizeY);
 	HRESULT Ready_ShadowLight(SHADOW_LIGHT_DESC LightDesc);
-	void Update(_float fTimeDelta);
+	void Update();
+
 
 private:
 	_float				m_fViewportWidth{}, m_fViewportHeight{};
 	_float4x4			m_Matrices[ENUM_CLASS(D3DTS::END)];
+	class CGameInstance* m_pGameInstance = { nullptr };
 
+	SHADOW_LIGHT_DESC m_ShadowLightDesc;
 public:
 	static CShadow* Create(_uint iWinSizeX, _uint iWinSizeY);
 	virtual void Free();
