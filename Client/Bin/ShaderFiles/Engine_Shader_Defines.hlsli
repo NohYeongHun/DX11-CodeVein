@@ -12,12 +12,29 @@ sampler PointSampler = sampler_state
     AddressV = wrap;
 };
 
+sampler ClampSampler = sampler_state
+{
+    filter = min_mag_mip_linear;
+    AddressU = clamp;
+    AddressV = clamp;
+};
+
 
 RasterizerState RS_Default
 {
     FillMode = solid;
     CullMode = back;
     FrontCounterClockwise = false;
+};
+
+RasterizerState RS_Shadow
+{
+    FillMode = SOLID;
+    CullMode = BACK;
+    // --- ÇÙ½É ¼³Á¤ ---
+    DepthBias = 3000;
+    SlopeScaledDepthBias = 1.0f;
+    DepthClipEnable = TRUE;
 };
 
 RasterizerState RS_Cull_CW

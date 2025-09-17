@@ -90,42 +90,39 @@ void CEffect_Pillar::OnActivate(void* pArg)
     ASSERT_CRASH(pDesc);
 
     /* 값 채워주기 */
-    m_eCurLevel = pDesc->eCurLevel; // Move GameObjects To Pools에서 현재 레벨이 결정된다.
+    m_eCurLevel = pDesc->eCurLevel;
     m_ActivateDesc = *pDesc;
     m_fDuration = m_ActivateDesc.fDuration;
-    m_fAttackPower = pDesc->fAttackPower; // 데미지
+    m_fAttackPower = pDesc->fAttackPower;
     Reset_Timer();
 
-
+    // ★★★ 중요: 이미 월드 좌표로 전달받았으므로 그대로 사용 ★★★
     m_pTransformCom->Set_State(STATE::POSITION, m_ActivateDesc.vStartPos);
 
-    /* 하위 객체들 Actviate 실행. */
-
+    /* 하위 객체들 Activate 실행 */
+    // ... PillarA, B, C 활성화 코드 ...
     CBlood_PillarA::PILLARA_ACTIVATE_DESC PillarADesc{};
-    PillarADesc.eCurLevel = pDesc->eCurLevel;
-    PillarADesc.vColor = { 1.f, 0.f, 0.f };
-    PillarADesc.fEmissiveIntensity = 0.5f;
     PillarADesc.vStartPos = { 0.f, 0.f, 0.f }; // 최종 위치는 어차피 곱해진다. => 서서히 조절.
-    PillarADesc.fTargetRadius = 4.f;
-    PillarADesc.fDecreaseTargetRadius = 2.f;
-    PillarADesc.fTargetHeight = 4.f;
-    PillarADesc.fGrowDuration = 1.f;
-    PillarADesc.fStayDuration = 0.2f;
-    PillarADesc.fDecreaseDuration = 0.8f;
+    PillarADesc.fTargetRadius = m_fTargetRadius;
+    PillarADesc.fDecreaseTargetRadius = 1.f;
+    PillarADesc.fTargetHeight = 7.f;
+    PillarADesc.fGrowDuration = m_fDuration * 0.5f;
+    PillarADesc.fStayDuration = m_fDuration * 0.1f;
+    PillarADesc.fDecreaseDuration = m_fDuration * 0.4f;
     m_pBloodPillarA->OnActivate(&PillarADesc);
-    
+
 
     CBlood_PillarB::PILLARB_ACTIVATE_DESC PillarBDesc{};
     PillarBDesc.eCurLevel = pDesc->eCurLevel;
     PillarBDesc.vColor = { 1.f, 0.f, 0.f };
     PillarBDesc.fEmissiveIntensity = 0.5f;
     PillarBDesc.vStartPos = { 0.f, 0.f, 0.f }; // 최종 위치는 어차피 곱해진다. => 서서히 조절.
-    PillarBDesc.fTargetRadius = 4.2f;
-    PillarBDesc.fDecreaseTargetRadius = 2.f;
-    PillarBDesc.fTargetHeight = 4.f;
-    PillarBDesc.fGrowDuration = 1.f;
-    PillarBDesc.fStayDuration = 0.2f;
-    PillarBDesc.fDecreaseDuration = 0.8f;
+    PillarBDesc.fTargetRadius = m_fTargetRadius;
+    PillarBDesc.fDecreaseTargetRadius = 1.f;
+    PillarBDesc.fTargetHeight = 7.f;
+    PillarBDesc.fGrowDuration = m_fDuration * 0.5f;
+    PillarBDesc.fStayDuration = m_fDuration * 0.1f;
+    PillarBDesc.fDecreaseDuration = m_fDuration * 0.4f;
     m_pBloodPillarB->OnActivate(&PillarBDesc);
 
 
@@ -134,19 +131,38 @@ void CEffect_Pillar::OnActivate(void* pArg)
     PillarCDesc.vColor = { 1.f, 0.f, 0.f };
     PillarCDesc.fEmissiveIntensity = 0.5f;
     PillarCDesc.vStartPos = { 0.f, 0.f, 0.f }; // 최종 위치는 어차피 곱해진다. => 서서히 조절.
-    PillarCDesc.fTargetRadius = 5.f;
-    PillarCDesc.fDecreaseTargetRadius = 2.f;
-    PillarCDesc.fTargetHeight = 5.f;
-    PillarCDesc.fGrowDuration = 1.f;
-    PillarCDesc.fStayDuration = 0.2f;
-    PillarCDesc.fDecreaseDuration = 0.8f;
+    PillarCDesc.fTargetRadius = m_fTargetRadius;
+    PillarCDesc.fDecreaseTargetRadius = 1.f;
+    PillarCDesc.fTargetHeight = 7.f;
+    PillarCDesc.fGrowDuration = m_fDuration * 0.5f;
+    PillarCDesc.fStayDuration = m_fDuration * 0.1f;
+    PillarCDesc.fDecreaseDuration = m_fDuration * 0.4f;
     m_pBloodPillarC->OnActivate(&PillarCDesc);
 
-    m_pColliderCom->Set_Active(true);
+    
 
-    /* Pool이 활성화될 때 등록. 
-    * 원래는 Pool이 빠질때 빼는 로직도 생성해야하나 => Destroy로 해결.
-    */
+    /* Effect 파티클 활성화 */
+    CEffectParticle::EFFECTPARTICLE_ENTER_DESC TornadoDesc{};
+
+    // ★★★ 파티클은 Effect_Pillar와 동일한 위치에서 시작 ★★★
+    TornadoDesc.vStartPos = m_pTransformCom->Get_State(STATE::POSITION);
+
+    PARTICLE_INIT_INFO Info = {};
+    Info.lifeTime = m_fDuration + 1.f;
+    Info.fHeight = 10.f;
+    Info.fRadius = 4.f;
+    Info.dir = { 0.f, 1.f, 0.f };
+
+    // ★★★ 파티클의 중심점도 같은 위치로 설정 ★★★
+    Info.pos = { 0.f, -1.f, 0.f };
+
+    TornadoDesc.particleInitInfo = Info;
+    TornadoDesc.pTargetTransform = m_pTransformCom;  // Effect_Pillar의 Transform 전달
+
+    m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(m_eCurLevel)
+        , TEXT("TORNADO"), TEXT("Layer_Effect"), 1, ENUM_CLASS(EFFECTTYPE::PARTICLE), &TornadoDesc);
+
+    m_pColliderCom->Set_Active(true);
     m_pGameInstance->Add_Collider_To_Manager(m_pColliderCom, ENUM_CLASS(m_eCurLevel));
 }
 
@@ -163,6 +179,9 @@ void CEffect_Pillar::Calc_Timer(_float fTimeDelta)
         m_fCurrentTime += fTimeDelta;
 
     /* 그냥 지우자 ~ Pooling 많이 만들고. */
+    if (m_fCurrentTime >= m_fDuration * 0.5f && m_pColliderCom->Is_Active() == true)
+        m_pColliderCom->Set_Active(false);
+
     if (m_fCurrentTime >= m_fDuration)
     {
         m_IsDestroy = true; 
@@ -181,9 +200,9 @@ HRESULT CEffect_Pillar::Ready_Components(EFFECT_PILLARDESC* pDesc)
 {
 
     CBounding_OBB::BOUNDING_OBB_DESC  OBBDesc{};
-    OBBDesc.vExtents = _float3(5.f, 5.f, 5.f);
+    OBBDesc.vExtents = _float3(m_fTargetRadius * 0.7f, m_fTargetRadius, m_fTargetRadius * 0.7f);
     OBBDesc.vRotation = _float3(0.f, 0.f, 0.f);
-    OBBDesc.vCenter = _float3(0.f, 4.f, 0.0f); // 중점.
+    OBBDesc.vCenter = _float3(0.f, m_fTargetRadius + 0.7f, 0.0f); // 중점.
 
     OBBDesc.pOwner = this;
     OBBDesc.eCollisionType = CCollider::COLLISION_TRIGGER;

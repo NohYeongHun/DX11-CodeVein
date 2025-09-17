@@ -56,7 +56,7 @@ HRESULT CTarget_Manager::Add_MRT(const _wstring& strMRTTag, const _wstring& strT
 	return S_OK;
 }
 
-HRESULT CTarget_Manager::Begin_MRT(const _wstring& strMRTTag, _bool bClear)
+HRESULT CTarget_Manager::Begin_MRT(const _wstring& strMRTTag, ID3D11DepthStencilView* pDSV, _bool bClear)
 {
 	list<CRenderTarget*>* pMRTList = Find_MRT(strMRTTag);
 
@@ -64,6 +64,7 @@ HRESULT CTarget_Manager::Begin_MRT(const _wstring& strMRTTag, _bool bClear)
 
 	Safe_Release(m_pBackBuffer);
 	Safe_Release(m_pOriginalDSV);
+
 
 	m_pContext->OMGetRenderTargets(1, &m_pBackBuffer, &m_pOriginalDSV);
 
@@ -79,22 +80,32 @@ HRESULT CTarget_Manager::Begin_MRT(const _wstring& strMRTTag, _bool bClear)
 		RenderTargets[iNumRenderTargets++] = pRenderTarget->Get_RTV();
 	}
 
-	ID3D11DepthStencilView* pDSV = m_pOriginalDSV;
 
-	//// 2. 만약 MRT 이름이 블러용 MRT라면, 뎁스 버퍼를 사용하지 않도록 nullptr로 변경
+	
+
+	if (nullptr != pDSV)
+		m_pContext->ClearDepthStencilView(pDSV, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.f, 0);
+
+	ID3D11DepthStencilView* pFinalDSV = pDSV;
+
+	// 2. 만약 함수 인자로 DSV가 들어오지 않았다면, 기존의 DSV를 사용하도록 설정합니다.
+	if (nullptr == pFinalDSV)
+		pFinalDSV = m_pOriginalDSV;
+
+	// 3. 특정 후처리 패스일 경우, 위 결정과 상관없이 DSV를 무조건 nullptr로 덮어씁니다.
 	if (strMRTTag == TEXT("MRT_BloomBlurX") ||
 		strMRTTag == TEXT("MRT_BloomBlurY") ||
-		strMRTTag == TEXT("MRT_BrightPass") || // BrightPass도 뎁스 버퍼 불필요
-		strMRTTag == TEXT("MRT_Post_BlurX") || // 이전 코드 호환
-		strMRTTag == TEXT("MRT_Post_BlurY"))   // 이전 코드 호환
+		strMRTTag == TEXT("MRT_BrightPass"))
 	{
-		pDSV = nullptr;
+		pFinalDSV = nullptr;
 	}
 
-	// 3. 최종적으로 위에서 결정된 pDSV를 사용해 렌더 타겟 설정
-	m_pContext->OMSetRenderTargets(iNumRenderTargets, RenderTargets, pDSV);
-	//m_pContext->OMSetRenderTargets(iNumRenderTargets, RenderTargets, m_pOriginalDSV);
+	// 4. 최종적으로 결정된 pFinalDSV를 사용하여 렌더 타겟을 한 번만 설정합니다.
+	m_pContext->OMSetRenderTargets(iNumRenderTargets, RenderTargets, pFinalDSV);
 
+
+
+	
 	return S_OK;
 }
 

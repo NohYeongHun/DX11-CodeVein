@@ -232,6 +232,9 @@
     <Filter Include="01. Utility\03. Component\VIBuffer\Particle">
       <UniqueIdentifier>{ae6b51f9-7518-4a01-8194-c27495a18ee7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01. Utility\15. Shadow">
+      <UniqueIdentifier>{7ab97518-0f4b-4760-885e-0059efb0b003}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Timer.cpp">
@@ -476,6 +479,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\VIBuffer_Particle_Instance.cpp">
       <Filter>01. Utility\03. Component\VIBuffer\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Shadow.cpp">
+      <Filter>01. Utility\15. Shadow</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -749,6 +755,9 @@
     <ClInclude Include="..\Public\VIBuffer_Particle_Instance.h">
       <Filter>01. Utility\03. Component\VIBuffer\Particle</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Shadow.h">
+      <Filter>01. Utility\15. Shadow</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="GameInstance.inl">
@@ -766,6 +775,9 @@
       <Filter>97. ShaderFiles</Filter>
     </FxCompile>
     <FxCompile Include="..\Bin\ShaderFiles\Engine_Shader_BloomBright.hlsl">
+      <Filter>97. ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Engine_Shader_Distortion.hlsl">
       <Filter>97. ShaderFiles</Filter>
     </FxCompile>
   </ItemGroup>

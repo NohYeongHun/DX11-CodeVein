@@ -340,7 +340,7 @@ PS_OUT PS_DIFFUSE_QUEENKNIGHTWARP_MAIN(PS_IN In)
     float fMaskBrightness = dot(vMask.rgb, float3(0.299, 0.587, 0.114));
     if (fMaskBrightness > 0.5f)
     {
-        vector vEmissive = vMask * g_fEmissiveIntensity * 4.0f;
+        vector vEmissive = vMask * g_fEmissiveIntensity * 2.0f;
         //vector vEmissive = vMask * 2.f;
         //vMtrlDiffuse.rgb = saturate(vMtrlDiffuse.rgb + vEmissive.rgb);
         vMtrlDiffuse.rgb += vEmissive.rgb;
@@ -370,8 +370,6 @@ PS_OUT PS_DIFFUSE_QUEENKNIGHTWARP_MAIN(PS_IN In)
     
     vector vMtrlDissolve = g_NoiseTextures[0].Sample(DefaultSampler, In.vTexcoord);
     clip(vMtrlDissolve.r - g_fTimeRatio); // r 0 ~ 1.f => g_fTimeRatio를 최소시간, 최대시간이 있잖아요 이걸 0 ~ 1.f로 정규화해서
-    
-    
 
     
     return Out;
@@ -563,6 +561,145 @@ PS_OUT PS_PLAYERHIT_PARTICLE(PS_IN In)
 }
 
 
+PS_OUT PS_TORNADO_MAIN(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+    
+    //Out.vColor = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
+    
+    vector vSourDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
+    vector vDestDiffuse = float4(0, 0, 0, 1);
+    vector vMask = float4(0, 0, 0, 0);
+    
+    // 동적 인덱싱을 조건문으로 처리
+    if (In.iMaskTextureIndex == 0)
+    {
+        vDestDiffuse = g_MaskTextures[0].Sample(DefaultSampler, In.vTexcoord);
+        vMask = g_MaskTextures[0].Sample(DefaultSampler, In.vTexcoord);
+    }
+    else if (In.iMaskTextureIndex == 1)
+    {
+        vDestDiffuse = g_MaskTextures[1].Sample(DefaultSampler, In.vTexcoord);
+        vMask = g_MaskTextures[1].Sample(DefaultSampler, In.vTexcoord);
+    }
+    else if (In.iMaskTextureIndex == 2)
+    {
+        vDestDiffuse = g_MaskTextures[2].Sample(DefaultSampler, In.vTexcoord);
+        vMask = g_MaskTextures[2].Sample(DefaultSampler, In.vTexcoord);
+    }
+    else if (In.iMaskTextureIndex == 3)
+    {
+        vDestDiffuse = g_MaskTextures[3].Sample(DefaultSampler, In.vTexcoord);
+        vMask = g_MaskTextures[3].Sample(DefaultSampler, In.vTexcoord);
+    }
+    else if (In.iMaskTextureIndex == 4)
+    {
+        vDestDiffuse = g_MaskTextures[4].Sample(DefaultSampler, In.vTexcoord);
+        vMask = g_MaskTextures[4].Sample(DefaultSampler, In.vTexcoord);
+    }
+    else if (In.iMaskTextureIndex == 5)
+    {
+        vDestDiffuse = g_MaskTextures[5].Sample(DefaultSampler, In.vTexcoord);
+        vMask = g_MaskTextures[5].Sample(DefaultSampler, In.vTexcoord);
+    }
+    else if (In.iMaskTextureIndex == 6)
+    {
+        vDestDiffuse = g_MaskTextures[6].Sample(DefaultSampler, In.vTexcoord);
+        vMask = g_MaskTextures[6].Sample(DefaultSampler, In.vTexcoord);
+    }
+    else if (In.iMaskTextureIndex == 7)
+    {
+        vDestDiffuse = g_MaskTextures[7].Sample(DefaultSampler, In.vTexcoord);
+        vMask = g_MaskTextures[7].Sample(DefaultSampler, In.vTexcoord);
+    }
+    else if (In.iMaskTextureIndex == 8)
+    {
+        vDestDiffuse = g_MaskTextures[8].Sample(DefaultSampler, In.vTexcoord);
+        vMask = g_MaskTextures[8].Sample(DefaultSampler, In.vTexcoord);
+    }
+    else if (In.iMaskTextureIndex == 9)
+    {
+        vDestDiffuse = g_MaskTextures[9].Sample(DefaultSampler, In.vTexcoord);
+        vMask = g_MaskTextures[9].Sample(DefaultSampler, In.vTexcoord);
+    }
+    else if (In.iMaskTextureIndex == 10)
+    {
+        vDestDiffuse = g_MaskTextures[10].Sample(DefaultSampler, In.vTexcoord);
+        vMask = g_MaskTextures[10].Sample(DefaultSampler, In.vTexcoord);
+    }
+    else if (In.iMaskTextureIndex == 11)
+    {
+        vDestDiffuse = g_MaskTextures[11].Sample(DefaultSampler, In.vTexcoord);
+        vMask = g_MaskTextures[11].Sample(DefaultSampler, In.vTexcoord);
+    }
+    else if (In.iMaskTextureIndex == 12)
+    {
+        vDestDiffuse = g_MaskTextures[12].Sample(DefaultSampler, In.vTexcoord);
+        vMask = g_MaskTextures[12].Sample(DefaultSampler, In.vTexcoord);
+    }
+    else if (In.iMaskTextureIndex == 13)
+    {
+        vDestDiffuse = g_MaskTextures[13].Sample(DefaultSampler, In.vTexcoord);
+        vMask = g_MaskTextures[13].Sample(DefaultSampler, In.vTexcoord);
+    }
+    else if (In.iMaskTextureIndex == 14)
+    {
+        vDestDiffuse = g_MaskTextures[14].Sample(DefaultSampler, In.vTexcoord);
+        vMask = g_MaskTextures[14].Sample(DefaultSampler, In.vTexcoord);
+    }
+    else if (In.iMaskTextureIndex == 15)
+    {
+        vDestDiffuse = g_MaskTextures[15].Sample(DefaultSampler, In.vTexcoord);
+        vMask = g_MaskTextures[15].Sample(DefaultSampler, In.vTexcoord);
+    }
+
+    if (vDestDiffuse.r < 0.1f && vDestDiffuse.g < 0.1f && vDestDiffuse.b < 0.1f)
+        discard;
+    
+    vector vMtrlDiffuse = vDestDiffuse * (1.f - vMask) + vSourDiffuse * (vMask);
+    
+    
+    //vMtrlDiffuse.rgb = pow(vMtrlDiffuse.rgb, 7.f);
+    
+    // Emissive 추가 발광효과.
+    float fMaskBrightness = dot(vMask.rgb, float3(0.299, 0.587, 0.114));
+    if (fMaskBrightness > 0.5f)
+    {
+        vector vEmissive = vMask * g_fEmissiveIntensity * 1.0f;
+        //vector vEmissive = vMask * 2.f;
+        //vMtrlDiffuse.rgb = saturate(vMtrlDiffuse.rgb + vEmissive.rgb);
+        vMtrlDiffuse.rgb += vEmissive.rgb;
+        
+    }
+    
+    float lifeRatio = In.vLifeTime.x / In.vLifeTime.y;
+    float lifeCurve = sin(lifeRatio * 3.14159f);
+
+    vector bloomColor = float4(float3(8.0f, 0.01f, 0.01f) * g_fBloomIntensity, 1.0f);
+    
+    // 3. 마스크가 밝은 부분에 블룸 색상을 더해줍니다.
+    //    fMaskBrightness 값은 이미 위에서 계산되었습니다.
+    if (fMaskBrightness > 0.1f) // 임계값은 0.1 ~ 0.5 사이에서 조정
+    {
+        // vMtrlDiffuse.rgb에 bloomColor.rgb를 더합니다.
+        // lifeCurve를 곱해줘서 파티클 수명에 따라 자연스럽게 빛나도록 합니다.
+        vMtrlDiffuse.rgb += bloomColor.rgb * vMask.rgb * lifeCurve;
+    }
+
+    // 4. 최종 알파 값을 계산하고 적용합니다.
+    float fadeAlpha = 1.0f - g_fTimeRatio; // 기존 코드
+    vMtrlDiffuse.a *= fadeAlpha; // 기존 코드
+    
+    Out.vColor = vMtrlDiffuse;
+
+    
+    vector vMtrlDissolve = g_NoiseTextures[0].Sample(DefaultSampler, In.vTexcoord);
+    clip(vMtrlDissolve.r - g_fTimeRatio); // r 0 ~ 1.f => g_fTimeRatio를 최소시간, 최대시간이 있잖아요 이걸 0 ~ 1.f로 정규화해서
+
+    
+    return Out;
+}
+
 
 
 technique11 DefaultTechnique
@@ -632,7 +769,17 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_PLAYERHIT_PARTICLE();
     }
 
-    pass DebugPass // 6
+    pass TornadoParticlePass // 6
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = compile gs_5_0 GS_Stretched_BillboardQueenKnight_MAIN();
+        PixelShader = compile ps_5_0 PS_TORNADO_MAIN();
+    }
+
+    pass DebugPass // 7
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_Default, 0);

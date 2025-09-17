@@ -68,6 +68,7 @@ public:
 
 	virtual void Late_Update(_float fTimeDelta);
 	virtual HRESULT Render();
+	virtual HRESULT Render_Shadow() override;
 #pragma endregion
 
 

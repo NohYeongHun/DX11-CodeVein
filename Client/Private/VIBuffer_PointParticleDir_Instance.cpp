@@ -9,6 +9,8 @@ CVIBuffer_PointParticleDir_Instance::CVIBuffer_PointParticleDir_Instance(const C
     , m_vPivot{ Prototype.m_vPivot }
     , m_isLoop{ Prototype.m_isLoop }
 {
+    // 복사 생성자에서는 ParticleAttributes 할당하지 않음 (m_isCloned = true이므로)
+    m_pParticleAttributes = nullptr;
 }
 
 #pragma region 기본 함수들
@@ -25,8 +27,12 @@ HRESULT CVIBuffer_PointParticleDir_Instance::Initialize_Prototype(const INSTANCE
     m_vSpeed = pPointDirDesc->vSpeed;
     m_eParticleType = pPointDirDesc->eParticleType;
 
+
     m_iInstanceVertexStride = sizeof(VTXINSTANCEPOINTDIR_PARTICLE);
     m_iNumInstance = pPointDirDesc->iNumInstance;
+
+    // 파티클 속성 배열 메모리 할당 (m_iNumInstance 설정 후에 할당)
+    m_pParticleAttributes = new ParticleAttribute[m_iNumInstance];
 
 #pragma region 1. 기본 VERTEX 생성
     m_iNumVertices = 1;
@@ -68,26 +74,6 @@ HRESULT CVIBuffer_PointParticleDir_Instance::Initialize_Prototype(const INSTANCE
 
 
     m_pInstanceVertices = new VTXINSTANCEPOINTDIR_PARTICLE[m_iNumInstance];
-
-    //for (size_t i = 0; i < m_iNumInstance; i++)
-    //{
-    //    VTXINSTANCEPOINTDIR_PARTICLE* pInstanceVertices = static_cast<VTXINSTANCEPOINTDIR_PARTICLE*>(m_pInstanceVertices);
-
-    //    _float		fScale = m_pGameInstance->Rand(pPointDirDesc->vSize.x, pPointDirDesc->vSize.y);
-
-    //    _float		fLifeTime = m_pGameInstance->Rand(pPointDirDesc->vLifeTime.x, pPointDirDesc->vLifeTime.y);
-    //    _float      fDirSpeed = m_pGameInstance->Rand(pPointDirDesc->vSpeed.x, pPointDirDesc->vSpeed.y);
-    //    //m_pSpeeds[i] = m_pGameInstance->Rand(pPointDirDesc->vSpeed.x, pPointDirDesc->vSpeed.y);
-
-    //    pInstanceVertices[i].vRight = _float4(fScale, 0.f, 0.f, 0.f);
-    //    pInstanceVertices[i].vUp = _float4(0.f, fScale, 0.f, 0.f);
-    //    pInstanceVertices[i].vLook = _float4(0.f, 0.f, fScale, 0.f);
-    //    pInstanceVertices[i].vTranslation = _float4(0.f, 0.f, 0.f, 1.f);
-    //    pInstanceVertices[i].vLifeTime = _float2(0.f, fLifeTime);
-    //    pInstanceVertices[i].vDir = _float3(0.f, 0.f, 0.f);
-    //    pInstanceVertices[i].fDirSpeed = fDirSpeed;
-    //    pInstanceVertices[i].iMaskTextureIndex = i % 15; // 0-15 순환
-    //}
 
     for (size_t i = 0; i < m_iNumInstance; i++)
     {
@@ -204,6 +190,9 @@ void CVIBuffer_PointParticleDir_Instance::Update(_float fTimeDelta)
         break;
     case PARTICLE_TYPE::PARTICLE_TYPE_HIT_PARTICLE:
         HitParticle_Update(pVertices, fTimeDelta);
+        break;
+    case PARTICLE_TYPE::PARTICLE_TYPE_TORNADO:
+        Tornado_Update(pVertices, fTimeDelta);
         break;
     default:
         break;
@@ -355,13 +344,6 @@ void CVIBuffer_PointParticleDir_Instance::QueenKnightWarp_Update(VTXINSTANCEPOIN
             _float3 direction = pVertices[index].vDir;
             _float speed = pVertices[index].fDirSpeed;
 
-
-            // 여기서 fDirSpeed 값이 0인지 확인
-            if (fabsf(speed) <= 0.01f)
-            {
-                // 0이면 디버그 메시지 출력
-                OutputDebugWstring(TEXT("Warning: Particle speed is 0. Particle is not moving.\n"));
-            }
 
             _float3 velocity = {
                 direction.x * speed * fTimeDelta,
@@ -564,6 +546,123 @@ void CVIBuffer_PointParticleDir_Instance::HitParticle_Update(VTXINSTANCEPOINTDIR
             _vector newPos = currentPos + (direction * speed * fTimeDelta);
 
             XMStoreFloat4(&pVertices[index].vTranslation, newPos);
+            ++it;
+        }
+    }
+}
+
+void CVIBuffer_PointParticleDir_Instance::Tornado_Update(VTXINSTANCEPOINTDIR_PARTICLE* pVertices, _float fTimeDelta)
+{
+    // 1. 생성 대기 중인 파티클을 활성 목록으로 이동
+    while (!m_ReadyparticleIndices.empty())
+    {
+        auto info = m_ReadyparticleIndices.front();
+        m_ReadyparticleIndices.pop();
+
+        _uint index = info.first;
+        ParticleVertexInfo particleInfo = info.second;
+
+        // 파티클 초기화
+        pVertices[index].vDir = particleInfo.dir;
+        pVertices[index].vTranslation = _float4(particleInfo.pos.x, particleInfo.pos.y, particleInfo.pos.z, 1.f);
+        pVertices[index].vLifeTime.x = 0.f;
+        pVertices[index].vLifeTime.y = particleInfo.lifeTime;
+        pVertices[index].vRight.w = 1.f;
+        pVertices[index].vUp = _float4(particleInfo.pos.x, particleInfo.pos.y, particleInfo.pos.z, 0.f);
+        pVertices[index].vLook = _float4(particleInfo.dir.x, particleInfo.dir.y, particleInfo.dir.z, 0.f);
+
+        m_LiveParticleIndices.emplace_back(index);
+    }
+
+    // 2. 활성화된 파티클들의 나선형 토네이도 움직임 계산
+    for (auto it = m_LiveParticleIndices.begin(); it != m_LiveParticleIndices.end(); )
+    {
+        _uint index = *it;
+        pVertices[index].vLifeTime.x += fTimeDelta;
+
+        // 파티클의 수명이 다했는지 확인
+        if (pVertices[index].vLifeTime.x >= pVertices[index].vLifeTime.y)
+        {
+            // 수명이 다한 파티클을 Dead Queue로 이동
+            m_DeadParticleIndices.emplace(*it);
+            it = m_LiveParticleIndices.erase(it);
+        }
+        else
+        {
+            // *** 핵심: 나선형 토네이도 패턴 계산 ***
+            ParticleAttribute& attr = m_pParticleAttributes[index];
+            _float fCurrentTime = pVertices[index].vLifeTime.x;
+            _float fLifeRatio = fCurrentTime / pVertices[index].vLifeTime.y;
+
+            // === 1. 회전 각도 계산 (시간에 따라 증가) - 속도 증가 ===
+            // 각속도를 크게 증가 (기존 2-4 -> 8-12 라디안/초)
+            _float fCurrentAngle = attr.fInitialAngle + (attr.fAngularVelocity * fCurrentTime) + attr.fPhaseOffset;
+
+            // === 2. 반경 계산 (시간에 따라 서서히 확장) - 더 빠른 확장 ===
+            _float fCurrentRadius = attr.fInitialRadius + (attr.fRadialExpansion * fCurrentTime * 1.5f);
+
+            // 최대 반경 제한
+            fCurrentRadius = min(fCurrentRadius, attr.fMaxRadius);
+
+            // 생명주기에 따른 반경 조절 (후반부에 수축 옵션)
+            if (fLifeRatio > 0.7f)  // 마지막 30%에서 수축
+            {
+                _float fShrinkRatio = (fLifeRatio - 0.7f) / 0.3f;
+                fCurrentRadius *= (1.0f - fShrinkRatio * 0.3f);  // 최대 30% 수축
+            }
+
+            // === 3. 난류 효과 추가 (자연스러운 움직임) - 더 강한 난류 ===
+            _float fTurbulenceX = attr.fTurbulence * sinf(fCurrentTime * 5.0f + attr.fPhaseOffset) * 0.15f;
+            _float fTurbulenceZ = attr.fTurbulence * cosf(fCurrentTime * 4.5f + attr.fPhaseOffset) * 0.15f;
+
+            // === 4. XZ 평면에서의 위치 계산 (원형 운동) ===
+            _float3 vPosition;
+            vPosition.x = m_vPivot.x + (cosf(fCurrentAngle) * fCurrentRadius) + fTurbulenceX;
+            vPosition.z = m_vPivot.z + (sinf(fCurrentAngle) * fCurrentRadius) + fTurbulenceZ;
+
+            // === 5. Y축 위치 계산 (상승 운동) - 더 빠른 상승 ===
+            // 가속도가 있는 상승 (시간이 지날수록 더 빠르게)
+            _float fAcceleration = 1.0f + fLifeRatio * 1.5f;
+            vPosition.y = m_vPivot.y + (attr.fUpwardSpeed * fCurrentTime * fAcceleration);
+
+            // === 6. 파티클 속도 벡터 계산 (접선 방향) ===
+            // 원형 궤도의 접선 방향 벡터
+            _float3 vTangent;
+            vTangent.x = -sinf(fCurrentAngle) * attr.fAngularVelocity * fCurrentRadius;
+            vTangent.y = attr.fUpwardSpeed * fAcceleration;
+            vTangent.z = cosf(fCurrentAngle) * attr.fAngularVelocity * fCurrentRadius;
+
+            // === 7. 투명도 및 크기 효과 ===
+            _float fAlpha = 1.0f;
+            _float fSizeScale = 1.0f;
+
+            // 페이드 인 (초반 5% - 더 빠른 페이드인)
+            if (fLifeRatio < 0.05f)
+            {
+                fAlpha = fLifeRatio / 0.05f;
+                fSizeScale = 0.7f + (fLifeRatio / 0.05f) * 0.3f;
+            }
+            // 페이드 아웃 (마지막 15%)
+            else if (fLifeRatio > 0.85f)
+            {
+                fAlpha = 1.0f - ((fLifeRatio - 0.85f) / 0.15f);
+                fSizeScale = 1.0f - ((fLifeRatio - 0.85f) / 0.15f) * 0.5f;
+            }
+
+            // 높이에 따른 크기 변화 (위로 갈수록 약간 커짐)
+            _float fHeightScale = 1.0f + (vPosition.y - m_vPivot.y) * 0.02f;
+            fSizeScale *= fHeightScale;
+
+            // === 8. 계산된 값들을 버텍스 데이터에 적용 ===
+            pVertices[index].vTranslation = _float4(vPosition.x, vPosition.y, vPosition.z, 1.f);
+
+            // 파티클이 이동 방향을 바라보도록 설정
+            pVertices[index].vLook = _float4(vTangent.x, vTangent.y, vTangent.z, 0.f);
+
+            // 크기 및 투명도 정보 저장
+            pVertices[index].vRight.w = fSizeScale;
+            pVertices[index].vUp.w = fAlpha;
+
             ++it;
         }
     }
@@ -844,15 +943,6 @@ void CVIBuffer_PointParticleDir_Instance::Create_ExplosionParticle(_float3 vNoma
         _float3 outwardDir;
         XMStoreFloat3(&outwardDir, XMVector3Normalize(vOutwardDir));
 
-        // ▼▼▼ [핵심 수정] ▼▼▼
-
-        // 2. ★파티클 초기 위치★를 중심에서 fRadius만큼 떨어진 곳으로 설정
-      /*  _float3 initialPos = {
-            vCenterPos.x + outwardDir.x * fRadius,
-            vCenterPos.y + outwardDir.y * fRadius,
-            vCenterPos.z + outwardDir.z * fRadius
-        };*/
-
         _float3 initialPos = vCenterPos;
 
         // 3. ★파티클 이동 방향★을 중심으로 향하도록 (-1을 곱해) 뒤집어 줌
@@ -861,8 +951,6 @@ void CVIBuffer_PointParticleDir_Instance::Create_ExplosionParticle(_float3 vNoma
             -outwardDir.y,
             -outwardDir.z
         };
-
-        // ▲▲▲ [핵심 수정 끝] ▲▲▲
 
         ParticleVertexInfo info{};
         info.pos = initialPos;          // 바깥에서 시작
@@ -914,6 +1002,72 @@ void CVIBuffer_PointParticleDir_Instance::Create_HitParticle(_float3 vCenterPos,
     }
 }
 
+
+void CVIBuffer_PointParticleDir_Instance::Create_TornadoParticle(_float3 vCenterPos, _float fRadius, _float fHeight, _float fLifeTime)
+{
+    // ★★★ 전달받은 월드 좌표를 그대로 토네이도 중심점으로 사용 ★★★
+    m_vPivot = { 0.f, 0.f, 0.f };
+
+    _uint uiTotalAvailable = m_DeadParticleIndices.size();
+    _uint uiToCreate = min(uiTotalAvailable, m_iNumInstance);
+
+    const _uint uiLayerCount = 5;
+    _uint uiParticlesPerLayer = uiToCreate / uiLayerCount;
+    if (uiParticlesPerLayer == 0)
+        uiParticlesPerLayer = 1;
+
+    _uint uiCreatedCount = 0;
+
+    while (!m_DeadParticleIndices.empty() && uiCreatedCount < uiToCreate)
+    {
+        _uint index = m_DeadParticleIndices.front();
+        m_DeadParticleIndices.pop();
+
+        _uint uiLayer = uiCreatedCount % uiLayerCount;
+        _uint uiPosInLayer = uiCreatedCount / uiLayerCount;
+
+        _float fLayerRadiusScale = 0.3f + ((_float)uiLayer / (_float)uiLayerCount) * 0.7f;
+        _float fLayerSpeedScale = 1.5f - ((_float)uiLayer / (_float)uiLayerCount) * 0.5f;
+
+        _float fParticleLifeTime = m_pGameInstance->Rand(fLifeTime * 0.7f, fLifeTime * 1.3f);
+        _float fInitialAngle = XMConvertToRadians(m_pGameInstance->Rand(0.f, 360.f));
+        _float fAngularVelocity = m_pGameInstance->Rand(6.0f, 9.0f) * fLayerSpeedScale;
+
+        _float fInitialRadius = fRadius * 0.1f * fLayerRadiusScale;
+        _float fMaxRadius = fRadius * fLayerRadiusScale * 1.2f;
+        _float fRadialExpansion = (fMaxRadius - fInitialRadius) / (fParticleLifeTime * 0.5f);
+
+        _float fUpwardSpeed = (fHeight * 0.8f) / fParticleLifeTime;
+        fUpwardSpeed *= m_pGameInstance->Rand(1.f, 4.f);
+
+        _float fTurbulence = m_pGameInstance->Rand(1.0f, 2.5f);
+        _float fPhaseOffset = m_pGameInstance->Rand(0.f, XM_2PI);
+
+        // 속성 저장
+        m_pParticleAttributes[index].fInitialAngle = fInitialAngle;
+        m_pParticleAttributes[index].fAngularVelocity = fAngularVelocity;
+        m_pParticleAttributes[index].fInitialRadius = fInitialRadius;
+        m_pParticleAttributes[index].fMaxRadius = fMaxRadius;
+        m_pParticleAttributes[index].fRadialExpansion = fRadialExpansion;
+        m_pParticleAttributes[index].fUpwardSpeed = fUpwardSpeed;
+        m_pParticleAttributes[index].fTurbulence = fTurbulence;
+        m_pParticleAttributes[index].fPhaseOffset = fPhaseOffset;
+
+        // ★★★ 파티클 정보에도 정확한 중심점 전달 ★★★
+        ParticleVertexInfo info{};
+        info.lifeTime = fParticleLifeTime;
+        info.dir = { 0.f, 1.f, 0.f };
+        info.pos = vCenterPos;      // 월드 좌표 그대로 사용
+        info.initialPos = vCenterPos;
+
+        m_ReadyparticleIndices.emplace(make_pair(index, info));
+        uiCreatedCount++;
+    }
+}
+
+
+
+
 #pragma endregion
 
 
@@ -948,4 +1102,6 @@ CComponent* CVIBuffer_PointParticleDir_Instance::Clone(void* pArg)
 void CVIBuffer_PointParticleDir_Instance::Free()
 {
     CVIBuffer_Instance::Free();
+    if (false == m_isCloned)
+        Safe_Delete_Array(m_pParticleAttributes);
 }

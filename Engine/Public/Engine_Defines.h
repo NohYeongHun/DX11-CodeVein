@@ -57,7 +57,13 @@ using namespace std;
 namespace Engine
 {
 	// 한 메시에서 최대로 사용가능한 Bone의 개수.
-	static const unsigned int g_iMaxNumBones = 512;
+    static const unsigned int g_iMaxNumBones = 512;
+
+    //const unsigned int g_iMaxWidth = 16384;
+    //const unsigned int g_iMaxHeight = 9216;	
+
+    const unsigned int g_iMaxWidth = 8192;
+    const unsigned int g_iMaxHeight = 4608;
 }
 
 

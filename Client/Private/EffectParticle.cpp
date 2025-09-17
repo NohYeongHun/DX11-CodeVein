@@ -1,5 +1,4 @@
-﻿#include "EffectParticle.h"
-CEffectParticle::CEffectParticle(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿CEffectParticle::CEffectParticle(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CGameObject{ pDevice, pContext }
 {
 }
@@ -82,6 +81,8 @@ void CEffectParticle::Update(_float fTimeDelta)
             m_pTransformCom->Move_Direction(XMVector3Normalize(vVelocity), fTimeDelta * 2.f);
 
     }
+
+
 #pragma region 파티클 타입 에 따른 업데이트
 
     m_pVIBufferCom->Update(fTimeDelta);
@@ -93,26 +94,6 @@ void CEffectParticle::Update(_float fTimeDelta)
 #pragma region 타이머 업데이트
     // 타이머 업데이트
     m_fCurrentTime += fTimeDelta;
-
-    // 활성 파티클 수 확인
-    //_uint liveParticleCount = m_pVIBufferCom->Get_LiveParticleCount();
-    //
-    //// 모든 파티클이 죽었거나 시간이 지나면 비활성화
-    //if (liveParticleCount == 0 || m_fCurrentTime >= m_fDisplayTime)
-    //{
-    //    // Loop면 다시 시작.
-    //    if (m_isLoop)
-    //    {
-    //        m_fCurrentTime = 0.f;
-    //    }
-    //    else
-    //    {
-    //        m_IsActivate = false;
-    //        Reset_Timer(); // 타이머 초기화.
-    //        return;
-    //    }
-    //}
-
 
     // 모든 파티클이 죽었거나 시간이 지나면 비활성화
     if (m_fCurrentTime >= m_fDisplayTime)
@@ -156,7 +137,7 @@ void CEffectParticle::Late_Update(_float fTimeDelta)
 HRESULT CEffectParticle::Render()
 {
 #ifdef _DEBUG
-    //ImGui_Render();
+    ImGui_Render();
 #endif // _DEBUG
 
     HRESULT hr;
@@ -507,6 +488,16 @@ void CEffectParticle::Create_PlayerHitParticle(_float3 vCenterPos, _float fRadiu
     }
 }
 
+void CEffectParticle::Create_TornadoParticle(_float3 vCenterPos, _float fRadius, _float fHeight, _float fLifeTime)
+{
+    if (m_pVIBufferCom)
+    {
+        m_pVIBufferCom->Create_TornadoParticle(vCenterPos, fRadius, fHeight, fLifeTime);
+    }
+}
+
+
+
 void CEffectParticle::Set_SpawnSettings(_float fInterval, _uint iCount, _bool bContinuous)
 {
     m_fSpawnInterval = fInterval;
@@ -536,6 +527,7 @@ void CEffectParticle::OnActivate(void* pArg)
     m_pTargetTransform = pDesc->pTargetTransform;
     // 1. 위치 지정. => WorldMatrix용
     m_pTransformCom->Set_State(STATE::POSITION, pDesc->vStartPos);
+
 
 
     // pDesc->vStartPos : 타격 지점. 
@@ -584,7 +576,22 @@ void CEffectParticle::OnActivate(void* pArg)
     }
     break;
 
+    case PARTICLE_TYPE_TORNADO:
+    {
+        m_fDisplayTime = particleInit.lifeTime;
+
+        // VIBuffer에 파티클 생성 (중심점은 particleInit.pos 사용)
+        m_pVIBufferCom->Create_TornadoParticle(
+            particleInit.pos,      // 토네이도 중심점
+            particleInit.fRadius,   // 반경
+            particleInit.fHeight,   // 높이
+            particleInit.lifeTime   // 수명
+        );
     }
+    break;
+    }
+
+    
 
 }
 

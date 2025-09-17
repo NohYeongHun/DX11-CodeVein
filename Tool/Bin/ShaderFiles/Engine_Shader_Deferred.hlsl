@@ -2,11 +2,14 @@
 
 matrix g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 matrix g_ViewMatrixInv, g_ProjMatrixInv;
+matrix g_LightViewMatrix, g_LightProjMatrix;
 texture2D g_Texture;
 
 vector g_vCamPosition;
 
 vector g_vLightDir;
+vector g_vLightPos;
+float g_fRange;
 vector g_vLightDiffuse;
 vector g_vLightAmbient;
 vector g_vLightSpecular;
@@ -18,6 +21,7 @@ texture2D g_NormalTexture;
 texture2D g_DepthTexture;
 texture2D g_ShadeTexture;
 texture2D g_SpecularTexture;
+texture2D g_LightDepthTexture;
 texture2D g_EmissiveTexture;
 
 // Bloom용 텍스처들
@@ -81,7 +85,7 @@ PS_OUT_BACKBUFFER PS_MAIN_DEBUG(PS_IN In)
 struct PS_OUT_LIGHT
 {
     vector vShade : SV_TARGET0;
-    //vector vSpecular : SV_TARGET1;
+    vector vSpecular : SV_TARGET1;
 };
 
 /* 빛연산 */
@@ -116,13 +120,12 @@ PS_OUT_LIGHT PS_MAIN_DIRECTIONAL(PS_IN In)
     
     vector vLook = vWorldPos - g_vCamPosition;
     
-    //float fSpecular = pow(max(dot(normalize(vReflect) * -1.f, normalize(vLook)), 0.f), 50.f);
+    float fSpecular = pow(max(dot(normalize(vReflect) * -1.f, normalize(vLook)), 0.f), 50.f);
     
     
     Out.vShade = g_vLightDiffuse * saturate(fShade + (g_vLightAmbient * g_vMtrlAmbient));
-    //Out.vSpecular = (g_vLightSpecular * g_vMtrlSpecular) * fSpecular;
+    Out.vSpecular = (g_vLightSpecular * g_vMtrlSpecular) * fSpecular;
     
-    //Out.vShade = vNormal; // 양수만 표현되므로 (vNormal * 0.5f + 0.5f) 로 하셔도 좋습니다.
     
     return Out;
 }
@@ -131,6 +134,47 @@ PS_OUT_LIGHT PS_MAIN_DIRECTIONAL(PS_IN In)
 PS_OUT_LIGHT PS_MAIN_POINT(PS_IN In)
 {
     PS_OUT_LIGHT Out = (PS_OUT_LIGHT) 0;
+    
+    vector vNormalDesc = g_NormalTexture.Sample(DefaultSampler, In.vTexcoord);
+    vector vNormal = normalize(vector(vNormalDesc.xyz * 2.f - 1.f, 0.f));
+    
+    vector vDepthDesc = g_DepthTexture.Sample(DefaultSampler, In.vTexcoord);
+    
+    vector vWorldPos;
+    
+    /* 투영공간상의 좌표를 구한다. */
+    /* 로컬위치 * 월드행렬 * 뷰행렬 * 투영행렬 * 1/(w == 뷰스페이스상의 z) */
+    vWorldPos.x = In.vTexcoord.x * 2.f - 1.f;
+    vWorldPos.y = In.vTexcoord.y * -2.f + 1.f;
+    vWorldPos.z = vDepthDesc.x;
+    vWorldPos.w = 1.f;
+    
+    /* 뷰공간상의 좌표를 구한다. */
+    /* 로컬위치 * 월드행렬 * 뷰행렬 * 투영행렬 */
+    vWorldPos = vWorldPos * vDepthDesc.y;
+    /* 로컬위치 * 월드행렬 * 뷰행렬 */
+    vWorldPos = mul(vWorldPos, g_ProjMatrixInv);
+    
+    /* 월드공간상의 좌표를 구한다. */
+    vWorldPos = mul(vWorldPos, g_ViewMatrixInv);
+    
+    vector vLightDir = vWorldPos - g_vLightPos;
+    float fDistance = length(vLightDir);
+    
+    float fAtt = saturate((g_fRange - fDistance) / g_fRange);
+    
+    float fShade = max(dot(vNormal * -1.f, normalize(vLightDir)), 0.f);
+    
+    vector vReflect = reflect(normalize(vLightDir), vNormal);
+    
+   
+    vector vLook = vWorldPos - g_vCamPosition;
+    
+    float fSpecular = pow(max(dot(normalize(vReflect) * -1.f, normalize(vLook)), 0.f), 50.f);
+    
+    
+    Out.vShade = g_vLightDiffuse * saturate(fShade + (g_vLightAmbient * g_vMtrlAmbient)) * fAtt;
+    Out.vSpecular = (g_vLightSpecular * g_vMtrlSpecular) * fSpecular * fAtt;
     
     return Out;
 }
@@ -141,23 +185,26 @@ PS_OUT_BACKBUFFER PS_MAIN_COMBINED(PS_IN In)
     
     
     // 1. 깊이 텍스처를 샘플링하여 깊이 값을 가져옵니다.
-    float fDepth = g_DepthTexture.Sample(DefaultSampler, In.vTexcoord).r;
+    //float fDepth = g_DepthTexture.Sample(DefaultSampler, In.vTexcoord).r;
     
-    // 2. 깊이 값이 1.0에 가깝다면 (배경이라면) 픽셀 렌더링을 중단합니다.
-    if (fDepth >= 0.9999f)
-    {
-        discard;
-    }
+    //// 2. 깊이 값이 1.0에 가깝다면 (배경이라면) 픽셀 렌더링을 중단합니다.
+    //if (fDepth >= 0.9999f)
+    //{
+    //    discard;
+    //}
     
     // 3. (오브젝트가 그려진 경우) 기존 로직을 그대로 수행합니다.
     vector vDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
     
+    //if (vDiffuse.r == 1.f && vDiffuse.g == 0.f && vDiffuse.b == 1.f && vDiffuse.a == 1.f)
+    //    discard;
+    
     if (vDiffuse.a == 0.f)
-        discard;
+        discard;    
     
     
     vector vShade = g_ShadeTexture.Sample(DefaultSampler, In.vTexcoord);
-    //vector vSpecular = g_SpecularTexture.Sample(DefaultSampler, In.vTexcoord);
+    vector vSpecular = g_SpecularTexture.Sample(DefaultSampler, In.vTexcoord);
     
     //Out.vColor = vDiffuse * vShade + vSpecular;
     
@@ -165,8 +212,48 @@ PS_OUT_BACKBUFFER PS_MAIN_COMBINED(PS_IN In)
     만약 vShade(조명 MRT)가 비어 있거나 0으로 클리어된 상태면, diffuse와 곱하면 전부 검정색 된다.
     → 하지만 디폴트 클리어 컬러가 (1,1,1,1)라서 최소한 흰색 조명은 나와야 하니까, 
     */
-
+    
     Out.vColor = vDiffuse * vShade;
+    
+    
+     /* 내 픽셀의 광원 기준의 깊이 */ 
+    vector vDepthDesc = g_DepthTexture.Sample(DefaultSampler, In.vTexcoord);
+    
+    vector vWorldPos;
+    
+    /* 투영공간상의 좌표를 구한다. */
+    /* 로컬위치 * 월드행렬 * 뷰행렬 * 투영행렬 * 1/(w == 뷰스페이스상의 z) */
+    vWorldPos.x = In.vTexcoord.x * 2.f - 1.f;
+    vWorldPos.y = In.vTexcoord.y * -2.f + 1.f;
+    vWorldPos.z = vDepthDesc.x;
+    vWorldPos.w = 1.f;
+    
+    /* 뷰공간상의 좌표를 구한다. */
+    /* 로컬위치 * 월드행렬 * 뷰행렬 * 투영행렬 */
+    vWorldPos = vWorldPos * vDepthDesc.y;
+    /* 로컬위치 * 월드행렬 * 뷰행렬 */
+    vWorldPos = mul(vWorldPos, g_ProjMatrixInv);
+    
+    /* 월드공간상의 좌표를 구한다. */
+    vWorldPos = mul(vWorldPos, g_ViewMatrixInv);
+    
+    vector vPosition = mul(vWorldPos, g_LightViewMatrix);
+    vPosition = mul(vPosition, g_LightProjMatrix);
+    
+    /* 광원기준으로 표현됐을때 그려져있어야할 위치에 이미 그려져있떤 누군가의 깊이 */
+    float2 vTexcoord;
+    
+    /* -1 ~ 1 -> 0 ~ 1 */
+    vTexcoord.x = (vPosition.x / vPosition.w) * 0.5f + 0.5f;
+    
+    /* 1 ~ -1 -> 0 ~ 1 */ 
+    vTexcoord.y = (vPosition.y / vPosition.w) * -0.5f + 0.5f;
+    
+    vector vLightDepth = g_LightDepthTexture.Sample(DefaultSampler, vTexcoord);
+    float fViewZ = vLightDepth.x * 1000.0f;
+    
+    if (vPosition.w - 0.1f > fViewZ)
+        Out.vColor = Out.vColor * 0.3f;
     
     return Out;
 }

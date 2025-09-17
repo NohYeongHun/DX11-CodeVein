@@ -61,6 +61,10 @@ void CBlood_PillarC::Update(_float fTimeDelta)
 	XMStoreFloat4x4(&m_CombinedWorldMatrix,
 		m_pTransformCom->Get_WorldMatrix() *
 		XMLoadFloat4x4(m_pParentMatrix));
+
+	/* 쉐이더에 전달해줄 시간값. */
+	if (m_fTime < m_fDisplayTime)
+		m_fTime += fTimeDelta;
 }
 
 void CBlood_PillarC::Late_Update(_float fTimeDelta)
@@ -195,8 +199,8 @@ void CBlood_PillarC::Update_Decrease(_float fTimeDelta)
 	}
 
 	_float fRatio = m_fCurrentTime / m_fDecreaseDuration;
-
-	fRatio = fRatio;
+	m_fDissolveTime += fTimeDelta;
+	
 
 	// [수정] 선형 보간 공식을 사용하여 반지름을 계산합니다.
 	// 시작값: m_fTargetRadius
@@ -239,11 +243,40 @@ HRESULT CBlood_PillarC::Bind_ShaderResources()
 		CRASH("Failed Bind Cam Position");
 		return E_FAIL;
 	}
+
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fTime", &m_fTime, sizeof(_float))))
+	{
+		CRASH("Failed Bind Cam Position");
+		return E_FAIL;
+	}
+
+	_float fRatio = m_fTime / m_fDisplayTime;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fRatio", &fRatio, sizeof(_float))))
+	{
+		CRASH("Failed Bind Cam Position");
+		return E_FAIL;
+	}
+
+
+	_float fDisolveRatio = m_fDissolveTime / m_fDecreaseDuration;
+
+
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fDissolveTime", &fDisolveRatio, sizeof(_float))))
+	{
+		CRASH("Failed Bind Cam Position");
+		return E_FAIL;
+	}
+
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fScrollSpeed", &m_fScrollSpeed, sizeof(_float))))
+	{
+		CRASH("Failed Bind Cam Position");
+		return E_FAIL;
+	}
 	
 #pragma endregion
 
 #pragma region TEXTURE 바인딩.
-	if (FAILED(m_pTextureCom[TEXTURE_DIFFUSE]->Bind_Shader_Resources(m_pShaderCom, "g_DiffuseTexture")))
+	if (FAILED(m_pTextureCom[TEXTURE_DIFFUSE]->Bind_Shader_Resources(m_pShaderCom, "g_DiffuseTextures")))
 	{
 		CRASH("Failed Bind Texture Diffuse Texture ");
 		return E_FAIL;

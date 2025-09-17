@@ -1,4 +1,5 @@
-﻿CMap::CMap(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿#include "Map.h"
+CMap::CMap(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CGameObject(pDevice, pContext)
 {
 }
@@ -74,6 +75,9 @@ void CMap::Late_Update(_float fTimeDelta)
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::NONBLEND, this)))
         return;
 
+    if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::SHADOW, this)))
+        return;
+
 #ifdef _DEBUG
     if (FAILED(m_pGameInstance->Add_DebugComponent(m_pNavigationCom)))
     {
@@ -115,6 +119,33 @@ HRESULT CMap::Render()
 #pragma endregion
 
   
+
+    return S_OK;
+}
+
+HRESULT CMap::Render_Shadow()
+{
+    if (FAILED(m_pTransformCom->Bind_Shader_Resource(m_pShaderCom, "g_WorldMatrix")))
+        return E_FAIL;
+
+    /* 그림자를 표현하고하는 특수한 광원을 정의하고 그 광원이 바라본 장면응로서 플레이어를 그려준다. */
+    if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance->Get_ShadowLight_Transform_Float4x4(D3DTS::VIEW))))
+        return E_FAIL;
+
+    if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_ShadowLight_Transform_Float4x4(D3DTS::PROJ))))
+        return E_FAIL;
+
+    //_float fLightDepth = { 1000.f };
+    //m_pShaderCom->Bind_RawValue("g_fLightDepth", &fLightDepth, sizeof(_float));
+
+    _uint           iNumMeshes = m_pModelCom->Get_NumMeshes();
+
+    for (size_t i = 0; i < iNumMeshes; i++)
+    {
+        m_pShaderCom->Begin(static_cast<_uint>(MESH_SHADERPATH::SHADOW));
+
+        m_pModelCom->Render(i);
+    }
 
     return S_OK;
 }

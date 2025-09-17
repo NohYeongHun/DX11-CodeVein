@@ -81,13 +81,6 @@ void CSlash::Late_Update(_float fTimeDelta)
 
     CGameObject::Late_Update(fTimeDelta);
 
-    // UI 렌더 그룹에 추가
-    //if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::NONLIGHT, this)))
-    //{
-    //    CRASH("Failed Add_RenderGroup Slash");
-    //    return;
-    //}
-
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::BLEND, this)))
     {
         CRASH("Failed Add_RenderGroup Slash");
@@ -267,6 +260,12 @@ HRESULT CSlash::Bind_ShaderResources()
     _float fScale = 0.54f + (fTimeRatio * 1.f);
     
     if (FAILED(m_pShaderCom->Bind_RawValue("g_fTimeRatio", &fTimeRatio, sizeof(_float))))
+    {
+        CRASH("Failed Bind TimeRatio");
+        return E_FAIL;
+    }
+
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fTime", &m_fCurrentTime, sizeof(_float))))
     {
         CRASH("Failed Bind TimeRatio");
         return E_FAIL;

@@ -67,7 +67,8 @@ PS_OUT PS_BLUR_X(PS_IN In)
     float weights[5] = {
         0.227027, 0.1945946, 0.1216216, 0.054054, 0.016216
     }; // 가우시안 블러 가중치
-    vColor += g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord) * weights[0];
+    //vColor += g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord) * weights[0];
+    vColor += g_DiffuseTexture.Sample(ClampSampler, In.vTexcoord) * weights[0];
     // 수평 방향 블러
     for (int i = 1; i < 5; ++i)
     {
@@ -86,7 +87,8 @@ PS_OUT PS_BLUR_Y(PS_IN In)
     float weights[5] = {
         0.227027, 0.1945946, 0.1216216, 0.054054, 0.016216
     }; // 가수이안 블러 가중치
-    vColor += g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord) * weights[0];
+    //vColor += g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord) * weights[0];
+    vColor += g_DiffuseTexture.Sample(ClampSampler, In.vTexcoord) * weights[0];
     // 수평 방향 블러
     for (int i = 1; i < 5; ++i)
     {
@@ -112,8 +114,8 @@ PS_OUT PS_SUM_BLUR(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
     
-    float4 vSceneColor = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
-    float4 vBloomColor = g_BloomTexture.Sample(DefaultSampler, In.vTexcoord);
+    float4 vSceneColor = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord); // Combine Texture
+    float4 vBloomColor = g_BloomTexture.Sample(DefaultSampler, In.vTexcoord); // Bloom Texture
 
     // 금빛 느낌을 강조하기 위해 약간의 오렌지색 틴트(Tint)를 곱해줍니다.
     float3 vBloomTint = float3(1.0f, 0.7f, 0.3f);

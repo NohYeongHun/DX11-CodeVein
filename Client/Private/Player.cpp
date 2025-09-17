@@ -153,6 +153,9 @@ void CPlayer::Late_Update(_float fTimeDelta)
     if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::NONBLEND, this)))
         return;
 
+    //if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::SHADOW, this)))
+    //    return;
+
 #ifdef _DEBUG
     if (FAILED(m_pGameInstance->Add_DebugComponent(m_pColliderCom)))
     {
@@ -170,7 +173,7 @@ void CPlayer::Late_Update(_float fTimeDelta)
 HRESULT CPlayer::Render()
 {
 #ifdef _DEBUG
-    //ImGui_Render();
+    ImGui_Render();
 #endif // _DEBUG
 
 
@@ -184,16 +187,15 @@ HRESULT CPlayer::Render()
     for (_uint i = 0; i < iNumMeshes; i++)
     {
         if (FAILED(m_pModelCom->Bind_Materials(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE, 0)))
-            CRASH("Ready Bine Materials Failed");
+            return E_FAIL;
 
         if (FAILED(m_pModelCom->Bind_Materials(m_pShaderCom, "g_NormalTexture", i, aiTextureType_NORMALS, 0)))
-            CRASH("Ready Bine Materials Failed");
+            return E_FAIL;
 
         if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
             CRASH("Ready Bone Matrices Failed");
 
-
-        if (FAILED(m_pShaderCom->Begin(m_iShaderPath)))
+        if (FAILED(m_pShaderCom->Begin(static_cast<_uint>(ANIMESH_SHADERPATH::NORMAL))))
             CRASH("Ready Shader Begin Failed");
 
         if (FAILED(m_pModelCom->Render(i)))
@@ -203,6 +205,36 @@ HRESULT CPlayer::Render()
 
     return S_OK;
 
+}
+
+HRESULT CPlayer::Render_Shadow()
+{
+    if (FAILED(m_pTransformCom->Bind_Shader_Resource(m_pShaderCom, "g_WorldMatrix")))
+        return E_FAIL;
+
+    /* 그림자를 표현하고하는 특수한 광원을 정의하고 그 광원이 바라본 장면응로서 플레이어를 그려준다. */
+    if (FAILED(m_pShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance->Get_ShadowLight_Transform_Float4x4(D3DTS::VIEW))))
+        return E_FAIL;
+
+    if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_ShadowLight_Transform_Float4x4(D3DTS::PROJ))))
+        return E_FAIL;
+
+    _float fLightDepth = { 1000.f };
+    m_pShaderCom->Bind_RawValue("g_fLightDepth", &fLightDepth, sizeof(_float));
+
+    _uint           iNumMeshes = m_pModelCom->Get_NumMeshes();
+
+    for (size_t i = 0; i < iNumMeshes; i++)
+    {
+        if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
+            return E_FAIL;
+
+        m_pShaderCom->Begin(static_cast<_uint>(ANIMESH_SHADERPATH::SHADOW));
+
+        m_pModelCom->Render(i);
+    }
+
+    return S_OK;
 }
 
 #pragma endregion
@@ -838,9 +870,8 @@ void CPlayer::On_Collision_Enter(CGameObject* pOther)
     // 이미 충돌 레이어를 몬스터, 몬스터 Weapon으로 한정했으므로 이건 Weapon 충돌.
     if (nullptr != pWeapon)
     {
-        if (HasBuff(BUFF_INVINCIBLE))
+        if (HasAnyBuff(BUFF_INVINCIBLE | BUFF_HIT))
         {
-            OutputDebugWstring(TEXT("Buff Has Invincible"));
             return;
         }
             
@@ -896,6 +927,16 @@ void CPlayer::On_Collision_Enter(CGameObject* pOther)
 
                 Create_HitEffects(vClosestPoint, vAttackDirection);
 
+                //_float3 vPos = { 0.f, 1.f, 0.f };
+                //CEffect_Pillar::PILLAR_ACTIVATE_DESC EffectPillarDesc{};
+                //EffectPillarDesc.eCurLevel = m_eCurLevel;
+                //EffectPillarDesc.vStartPos = XMLoadFloat3(&vPos); // 계산된 위치를 넣어줌
+                //EffectPillarDesc.fDuration = 2.f;
+                //EffectPillarDesc.fAttackPower = static_cast<_float>(m_pGameInstance->Rand_UnsignedInt(150, 200));
+                //// ... 나머지 Desc 내용 채우기 ...
+
+                //m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(m_eCurLevel)
+                //    , TEXT("BLOOD_PILLAR"), TEXT("Layer_Effect"), 1, ENUM_CLASS(CEffect_Pillar::EffectType), &EffectPillarDesc);
             }
            
         }
@@ -954,9 +995,6 @@ void CPlayer::On_Collision_Enter(CGameObject* pOther)
         {
             vAttackDirection = XMVectorScale(vAttackDirection, 1.0f / fSwingLength);
         }
-
-
-        
 
 
         Create_HitEffects(vClosestPoint, vAttackDirection);
@@ -1079,7 +1117,10 @@ void CPlayer::Create_HitEffects(_fvector vHitPosition, _fvector vAttackDirection
 {
     CEffectParticle::EFFECTPARTICLE_ENTER_DESC HitParticleDesc{};
     HitParticleDesc.eParticleType = CEffectParticle::PARTICLE_TYPE_PLAYERHIT_PARTCILE;
-    HitParticleDesc.vStartPos = vHitPosition; // 몬스터 현재위치로 생성.
+    //HitParticleDesc.vStartPos = vHitPosition; // 몬스터 현재위치로 생성.
+
+    _float vPosy = XMVectorGetY(m_pTransformCom->Get_State(STATE::POSITION));
+    HitParticleDesc.vStartPos = XMVectorSetY(m_pTransformCom->Get_State(STATE::POSITION), vPosy + 1.f); // 몬스터 현재위치로 생성.
     HitParticleDesc.particleInitInfo.lifeTime = 0.5f; // lisfeTime
     HitParticleDesc.particleInitInfo.fRadius = 0.3f; // 모일 반경
     HitParticleDesc.particleInitInfo.fExplositionTime = 0.1f;
@@ -1233,7 +1274,7 @@ void CPlayer::Take_Damage(_float fDamage, CEffect_Pillar* pEffectPillar)
     if (fDamage <= 0.f)
         return;
 
-    AddBuff(BUFF_INVINCIBLE, 3.f); // 아프니까.. 좀 길게.
+    AddBuff(BUFF_INVINCIBLE, 2.f); // 아프니까.. 좀 길게.
     AddBuff(BUFF_HIT);
 
     // 공격자로부터 피격 방향 계산

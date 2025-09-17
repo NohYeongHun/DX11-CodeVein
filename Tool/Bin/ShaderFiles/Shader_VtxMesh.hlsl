@@ -55,6 +55,49 @@ VS_OUT VS_MAIN(VS_IN In)
 }
 
 
+float g_fSwayFrequency = 0.5f;
+float g_fSwaySpeed = 2.f;
+float g_fSwayAmount = 1.f;
+
+//VS_OUT VS_MAIN(VS_IN In)
+//{
+//    VS_OUT Out = (VS_OUT) 0;
+
+//    // 복사본으로 작업
+//    float3 vPosition = In.vPosition;
+
+//    // --- 요동치는 효과 추가 ---
+//    // 1. sin 함수를 이용해 시간에 따라 좌우로 움직이는 값을 계산합니다.
+//    //    정점의 y값(높이)을 sin 함수에 넣어주어, 높이에 따라 다른 위치에서 휘어지게 만듭니다.
+//    float sway = sin(vPosition.y * g_fSwayFrequency + g_fTime * g_fSwaySpeed) * g_fSwayAmount;
+
+//    // 2. 토네이도의 아랫부분(y=0)은 땅에 고정되어야 하므로, 높이에 따라 효과의 강도를 조절합니다.
+//    //    (vPosition.y가 0에 가까울수록 sway_factor는 0이 되고, 높을수록 1에 가까워집니다.)
+//    float sway_factor = saturate(vPosition.y / 5.f); // 5.f는 토네이도의 대략적인 높이, 조절 필요
+    
+//    // 3. 계산된 값을 x축 위치에 더해줍니다.
+//    vPosition.x += sway * sway_factor;
+//    // -------------------------
+
+//    float4x4 matWV, matWVP;
+//    matWV = mul(g_WorldMatrix, g_ViewMatrix);
+//    matWVP = mul(matWV, g_ProjMatrix);
+    
+//    // 변형된 vPosition을 사용해 최종 위치를 계산합니다.
+//    Out.vPosition = mul(float4(vPosition, 1.f), matWVP);
+
+//    // --- 이하 나머지 코드는 동일 ---
+//    Out.vNormal = normalize(mul(float4(In.vNormal, 0.f), g_WorldMatrix));
+//    Out.vTangent = normalize(mul(float4(In.vTangent, 0.f), g_WorldMatrix));
+//    Out.vBinormal = normalize(mul(float4(In.vBinormal, 0.f), g_WorldMatrix));
+//    Out.vTexcoord = In.vTexcoord;
+//    Out.vWorldPos = mul(float4(vPosition, 1.f), g_WorldMatrix);
+//    Out.vProjPos = Out.vPosition;
+    
+//    return Out;
+//}
+
+
 struct PS_IN
 {
     float4 vPosition : SV_POSITION;

@@ -63,6 +63,12 @@ BT_RESULT CBT_Monster_EncounterAction::Update_Encounter(_float fTimeDelta)
         _uint iNextAnimationIdx = m_pOwner->Find_AnimationIndex(L"IDLE");
         m_pOwner->Change_Animation_NonBlend(iNextAnimationIdx, false);
         m_pOwner->Set_Encountered(true);
+
+        
+        CQueenKnight* pQueenKnight = dynamic_cast<CQueenKnight*>(m_pOwner);
+        if (nullptr != pQueenKnight)
+            pQueenKnight->IncreaseDetection();
+
     }
 
     return BT_RESULT::RUNNING;
