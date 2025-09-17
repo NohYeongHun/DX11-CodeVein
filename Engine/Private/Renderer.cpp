@@ -1,5 +1,4 @@
-﻿#include "Renderer.h"
-CRenderer::CRenderer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿CRenderer::CRenderer(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : m_pDevice { pDevice }
     , m_pContext { pContext }
     , m_pGameInstance {CGameInstance::GetInstance()}
@@ -35,6 +34,7 @@ HRESULT CRenderer::Initialize()
     m_pGameInstance->Add_RenderTarget(TEXT("Target_Emissive"), ViewportDesc.Width, ViewportDesc.Height, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(0.f, 0.f, 0.f, 1.f));
         
     m_pGameInstance->Add_RenderTarget(TEXT("Target_Shade"), ViewportDesc.Width, ViewportDesc.Height, DXGI_FORMAT_R16G16B16A16_UNORM, _float4(0.f, 0.f, 0.f, 0.f));
+    m_pGameInstance->Add_RenderTarget(TEXT("Target_Specular"), ViewportDesc.Width, ViewportDesc.Height, DXGI_FORMAT_R16G16B16A16_UNORM, _float4(0.f, 0.f, 0.f, 0.f));
     /* Target Light Depth */
     m_pGameInstance->Add_RenderTarget(TEXT("Target_LightDepth"), g_iMaxWidth, g_iMaxHeight, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(1.0f, 1.0f, 1.0f, 1.0f));
     m_pGameInstance->Add_RenderTarget(TEXT("Combine_Shade"), ViewportDesc.Width, ViewportDesc.Height, DXGI_FORMAT_R16G16B16A16_FLOAT, _float4(0.f, 0.f, 0.f, 0.f));
@@ -53,6 +53,8 @@ HRESULT CRenderer::Initialize()
     m_pGameInstance->Add_MRT(TEXT("MRT_GameObjects"), TEXT("Target_Emissive"));
 
     m_pGameInstance->Add_MRT(TEXT("MRT_LightAcc"), TEXT("Target_Shade"));
+    m_pGameInstance->Add_MRT(TEXT("MRT_LightAcc"), TEXT("Target_Specular"));
+
     /* MRT Shadow 생성*/
     m_pGameInstance->Add_MRT(TEXT("MRT_Shadow"), TEXT("Target_LightDepth"));
     m_pGameInstance->Add_MRT(TEXT("MRT_Combine"), TEXT("Combine_Shade"));
@@ -89,18 +91,20 @@ HRESULT CRenderer::Initialize()
 
 #pragma region DEBUGING 용도 Render Target 화면 추가
 #ifdef _DEBUG
+    //m_pGameInstance->Ready_RT_Debug(TEXT("Target_Specular"), 450.0f, 150.0f, 300.f, 300.f); // 오른쪽 위에서 첫번째.
+
+    //m_pGameInstance->Ready_RT_Debug(TEXT("Target_Diffuse"), 150.0f, 150.0f, 300.f, 300.f);
+    //m_pGameInstance->Ready_RT_Debug(TEXT("Target_Normal"), 150.0f, 450.0f, 300.f, 300.f);
+    //m_pGameInstance->Ready_RT_Debug(TEXT("Target_Depth"), 150.0f, 750.0f, 300.f, 300.f);
+    //m_pGameInstance->Ready_RT_Debug(TEXT("Target_Shade"), 450.0f, 150.0f, 300.f, 300.f); // 오른쪽 위에서 첫번째.
     
-    m_pGameInstance->Ready_RT_Debug(TEXT("Target_Diffuse"), 150.0f, 150.0f, 300.f, 300.f);
-    m_pGameInstance->Ready_RT_Debug(TEXT("Target_Normal"), 150.0f, 450.0f, 300.f, 300.f);
-    m_pGameInstance->Ready_RT_Debug(TEXT("Target_Depth"), 150.0f, 750.0f, 300.f, 300.f);
-    m_pGameInstance->Ready_RT_Debug(TEXT("Target_Shade"), 450.0f, 150.0f, 300.f, 300.f); // 오른쪽 위에서 첫번째.
-    m_pGameInstance->Ready_RT_Debug(TEXT("Target_LightDepth"), 450.f, 450.0f, 300.f, 300.f); // 그림자 전용
-    m_pGameInstance->Ready_RT_Debug(TEXT("Combine_Shade"), 450.0f, 750.0f, 300.f, 300.f);
+    //m_pGameInstance->Ready_RT_Debug(TEXT("Target_LightDepth"), 450.f, 450.0f, 300.f, 300.f); // 그림자 전용
+    //m_pGameInstance->Ready_RT_Debug(TEXT("Combine_Shade"), 450.0f, 750.0f, 300.f, 300.f);
     
     
-    m_pGameInstance->Ready_RT_Debug(TEXT("Target_BrightPass"), ViewportDesc.Width - 150.0f, 150.0f, 300.f, 300.f);
-    m_pGameInstance->Ready_RT_Debug(TEXT("Target_BloomBlurX"), ViewportDesc.Width - 150.0f, 450.0f, 300.f, 300.f);
-    m_pGameInstance->Ready_RT_Debug(TEXT("Target_BloomBlurY"), ViewportDesc.Width - 150.0f, 750.0f, 300.f, 300.f);
+    //m_pGameInstance->Ready_RT_Debug(TEXT("Target_BrightPass"), ViewportDesc.Width - 150.0f, 150.0f, 300.f, 300.f);
+    //m_pGameInstance->Ready_RT_Debug(TEXT("Target_BloomBlurX"), ViewportDesc.Width - 150.0f, 450.0f, 300.f, 300.f);
+    //m_pGameInstance->Ready_RT_Debug(TEXT("Target_BloomBlurY"), ViewportDesc.Width - 150.0f, 750.0f, 300.f, 300.f);
         
 #endif
 #pragma endregion
@@ -147,8 +151,8 @@ HRESULT CRenderer::Draw()
         return E_FAIL;
     
     // 4. Distotion 추가.
-    if (FAILED(Render_Distortion()))
-        return E_FAIL;
+    //if (FAILED(Render_Distortion()))
+    //    return E_FAIL;
 
     // 5. 모든 반투명 객체(HitFlashEffect 포함)를 최종 씬 위에 렌더링
     if (FAILED(Render_Blend()))
@@ -211,6 +215,9 @@ HRESULT CRenderer::Add_DebugComponent(CComponent* pComponent)
 
 HRESULT CRenderer::Render_Shadow()
 {
+    ID3D11ShaderResourceView* pNullSRVs[8] = { nullptr, nullptr };
+    m_pContext->PSSetShaderResources(0, 8, pNullSRVs);
+
     if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_Shadow"), m_pShadowDSV)))
         return E_FAIL;
 
@@ -238,6 +245,9 @@ HRESULT CRenderer::Render_Shadow()
 
 HRESULT CRenderer::Render_Priority()
 {
+    ID3D11ShaderResourceView* pNullSRVs[8] = { nullptr, nullptr };
+    m_pContext->PSSetShaderResources(0, 8, pNullSRVs);
+
     if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_GameObjects"), nullptr)))
         return E_FAIL;
     
@@ -280,6 +290,11 @@ HRESULT CRenderer::Render_NonBlend()
 
 HRESULT CRenderer::Render_Lights()
 {
+    // [추가] Light Pass에서 입력으로 사용할 G-Buffer 텍스처들을 미리 해제합니다.
+   // g_NormalTexture(0번), g_DepthTexture(1번) 슬롯을 해제한다고 가정합니다.
+    ID3D11ShaderResourceView* pNullSRVs[8] = { nullptr, nullptr };
+    m_pContext->PSSetShaderResources(0, 8, pNullSRVs);
+
     /* Shade */
     if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_LightAcc"), nullptr)))
         return E_FAIL;
@@ -314,6 +329,11 @@ HRESULT CRenderer::Render_Lights()
 
 HRESULT CRenderer::Render_Combined()
 { 
+    // [추가] Combine Pass에서 입력으로 사용할 모든 G-Buffer와 조명 텍스처들을 미리 해제합니다.
+   // 보통 5-6개 이상 사용되므로, 넉넉하게 8개 슬롯을 모두 비웁니다.
+    ID3D11ShaderResourceView* pNullSRVs[8] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
+    m_pContext->PSSetShaderResources(0, 8, pNullSRVs);
+
     // 1. Combine_Shade에 렌더링 시작 => Begin MRT 사용시 RenderTarget을 Clear하므로 Begin_MRT를 조심해서 쓸것.
     m_pGameInstance->Begin_MRT(TEXT("MRT_Combine"), nullptr);
 
@@ -323,6 +343,7 @@ HRESULT CRenderer::Render_Combined()
 
     m_pGameInstance->Bind_RT_ShaderResource(TEXT("Target_Diffuse"), m_pDefferedShader, "g_DiffuseTexture");
     m_pGameInstance->Bind_RT_ShaderResource(TEXT("Target_Shade"), m_pDefferedShader, "g_ShadeTexture");
+    m_pGameInstance->Bind_RT_ShaderResource(TEXT("Target_Specular"), m_pDefferedShader, "g_SpecularTexture");
     m_pGameInstance->Bind_RT_ShaderResource(TEXT("Target_Emissive"), m_pDefferedShader, "g_EmissiveTexture");
     m_pGameInstance->Bind_RT_ShaderResource(TEXT("Target_Depth"), m_pDefferedShader, "g_DepthTexture");
     
@@ -352,36 +373,39 @@ HRESULT CRenderer::Render_Combined()
 
 //[추가] 왜곡 효과 렌더링
 // Render_Combined의 결과물을 배경으로 사용
-HRESULT CRenderer::Render_Distortion()
-{
-    // 1. Combine Texture에 Blend 객체들 덮어 그리기.
-    if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_Combine"),nullptr, false)))
-        return E_FAIL;
-
-
-    m_RenderObjects[ENUM_CLASS(RENDERGROUP::DISTOTION)].sort([](CGameObject* pSour, CGameObject* pDest)->_bool
-        {
-            return pSour->Get_CamDistance() > pDest->Get_CamDistance();
-        });
-
-    for (auto& pRenderObject : m_RenderObjects[ENUM_CLASS(RENDERGROUP::DISTOTION)])
-    {
-        if (nullptr != pRenderObject)
-            pRenderObject->Render();
-
-        Safe_Release(pRenderObject);
-    }
-
-    m_RenderObjects[ENUM_CLASS(RENDERGROUP::DISTOTION)].clear();
-
-    // 2. 최종 Combine Texture 완료.
-    m_pGameInstance->End_MRT();
-
-    return S_OK;
-}
+//HRESULT CRenderer::Render_Distortion()
+//{
+//    // 1. Combine Texture에 Blend 객체들 덮어 그리기.
+//    if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_Combine"),nullptr, false)))
+//        return E_FAIL;
+//
+//
+//    m_RenderObjects[ENUM_CLASS(RENDERGROUP::DISTOTION)].sort([](CGameObject* pSour, CGameObject* pDest)->_bool
+//        {
+//            return pSour->Get_CamDistance() > pDest->Get_CamDistance();
+//        });
+//
+//    for (auto& pRenderObject : m_RenderObjects[ENUM_CLASS(RENDERGROUP::DISTOTION)])
+//    {
+//        if (nullptr != pRenderObject)
+//            pRenderObject->Render();
+//
+//        Safe_Release(pRenderObject);
+//    }
+//
+//    m_RenderObjects[ENUM_CLASS(RENDERGROUP::DISTOTION)].clear();
+//
+//    // 2. 최종 Combine Texture 완료.
+//    m_pGameInstance->End_MRT();
+//
+//    return S_OK;
+//}
 
 HRESULT CRenderer::Render_Blend()
 {
+    ID3D11ShaderResourceView* pNullSRVs[8] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
+    m_pContext->PSSetShaderResources(0, 8, pNullSRVs);
+
     // 1. Combine Texture에 Blend 객체들 덮어 그리기.
     if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_Combine"), nullptr, false)))
         return E_FAIL;
@@ -450,7 +474,12 @@ HRESULT CRenderer::Render_NonLight()
 
 HRESULT CRenderer::Render_BloomBlur()
 {
+    // 0. 원본 뷰포트 정보 저장
     D3D11_VIEWPORT originalVP = m_ViewPortDesc;
+
+
+    ID3D11ShaderResourceView* pNullSRVs[8] = { nullptr, nullptr };
+    m_pContext->PSSetShaderResources(0, 8, pNullSRVs);
 
     // Target_BrightPass에 밝은 부분만 추출
     if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_BrightPass"), nullptr)))
@@ -482,19 +511,17 @@ HRESULT CRenderer::Render_BloomBlur()
 
     m_pGameInstance->End_MRT();
 
+
+    // --- 2. Horizontal Blur ---
+   // [수정] 다음 단계의 입력이 될 'Target_BrightPass'가 바인딩된 슬롯을 미리 해제합니다.
+    m_pContext->PSSetShaderResources(0, 1, &pNullSRVs[0]); // g_DiffuseTexture 슬롯(0번) 해제
+
+
     // 수평 블러 (BrightPass -> BloomBlur1)
     if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_BloomBlurX"), nullptr)))
         return E_FAIL;
 
-    // 1/4 크기로 스케일 조정
      // 쿼터 해상도 뷰포트 생성
-    /*D3D11_VIEWPORT quarterVP = m_ViewPortDesc;
-    quarterVP.Width = m_ViewPortDesc.Width / 4.f;
-    quarterVP.Height = m_ViewPortDesc.Height / 4.f;
-    quarterVP.TopLeftX = 0.f;
-    quarterVP.TopLeftY = 0.f;
-    quarterVP.MinDepth = 0.f;
-    quarterVP.MaxDepth = 1.f;*/
 
     D3D11_VIEWPORT quarterVP = m_ViewPortDesc;
     quarterVP.Width = m_ViewPortDesc.Width / 8.f;
@@ -520,6 +547,9 @@ HRESULT CRenderer::Render_BloomBlur()
     m_pGameInstance->End_MRT();
 
 
+    // --- 3. Vertical Blur ---
+    // [수정] 다음 단계의 입력이 될 'Target_BloomBlurX'가 바인딩된 슬롯을 미리 해제합니다.
+    m_pContext->PSSetShaderResources(0, 1, &pNullSRVs[0]); // g_DiffuseTexture 슬롯(0번) 해제
 
     // 수직 블러 (BloomBlur1 -> BloomBlur2)
     m_pGameInstance->Begin_MRT(TEXT("MRT_BloomBlurY"), nullptr);
@@ -542,50 +572,15 @@ HRESULT CRenderer::Render_BloomBlur()
     return S_OK;
 }
 
-
-
-
-
-
-HRESULT CRenderer::Render_UI()
-{
-
-    for (auto& pRenderObject : m_RenderObjects[ENUM_CLASS(RENDERGROUP::UI)])
-    {
-        if (nullptr != pRenderObject)
-            pRenderObject->Render();
-
-        Safe_Release(pRenderObject);
-    }
-
-    m_RenderObjects[ENUM_CLASS(RENDERGROUP::UI)].clear();
-
-    return S_OK;
-}
-
-HRESULT CRenderer::Render_StaticUI()
-{
-    for (auto& pRenderObject : m_RenderObjects[ENUM_CLASS(RENDERGROUP::STATIC_UI)])
-    {
-        if (nullptr != pRenderObject)
-            pRenderObject->Render();
-
-        Safe_Release(pRenderObject);
-    }
-
-    m_RenderObjects[ENUM_CLASS(RENDERGROUP::STATIC_UI)].clear();
-
-    return S_OK;
-}
-
-
-
 HRESULT CRenderer::Render_BloomCombine()
 {
+    ID3D11ShaderResourceView* pNullSRVs[8] = { nullptr, nullptr };
+    m_pContext->PSSetShaderResources(0, 8, pNullSRVs);
+
 
     D3D11_VIEWPORT ViewPort{};
     _uint iNumViewports = { 1 };
-    m_pContext->RSGetViewports(&iNumViewports, & ViewPort);
+    m_pContext->RSGetViewports(&iNumViewports, &ViewPort);
     // 백버퍼에 최종 합성
     m_pPostLightShader->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix);
     m_pPostLightShader->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix);
@@ -603,6 +598,47 @@ HRESULT CRenderer::Render_BloomCombine()
 
     return S_OK;
 }
+
+
+
+HRESULT CRenderer::Render_UI()
+{
+    ID3D11ShaderResourceView* pNullSRVs[8] = { nullptr, nullptr };
+    m_pContext->PSSetShaderResources(0, 8, pNullSRVs);
+
+    for (auto& pRenderObject : m_RenderObjects[ENUM_CLASS(RENDERGROUP::UI)])
+    {
+        if (nullptr != pRenderObject)
+            pRenderObject->Render();
+
+        Safe_Release(pRenderObject);
+    }
+
+    m_RenderObjects[ENUM_CLASS(RENDERGROUP::UI)].clear();
+
+    return S_OK;
+}
+
+HRESULT CRenderer::Render_StaticUI()
+{
+    ID3D11ShaderResourceView* pNullSRVs[8] = { nullptr, nullptr };
+    m_pContext->PSSetShaderResources(0, 8, pNullSRVs);
+
+    for (auto& pRenderObject : m_RenderObjects[ENUM_CLASS(RENDERGROUP::STATIC_UI)])
+    {
+        if (nullptr != pRenderObject)
+            pRenderObject->Render();
+
+        Safe_Release(pRenderObject);
+    }
+
+    m_RenderObjects[ENUM_CLASS(RENDERGROUP::STATIC_UI)].clear();
+
+    return S_OK;
+}
+
+
+
 
 #ifdef _DEBUG
 HRESULT CRenderer::Render_Debug()
@@ -624,7 +660,7 @@ HRESULT CRenderer::Render_Debug()
     if (FAILED(m_pDefferedShader->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
         return E_FAIL;
 
-    //m_pGameInstance->Render_RT_Debug(m_pDefferedShader, m_pVIBuffer);
+    m_pGameInstance->Render_RT_Debug(m_pDefferedShader, m_pVIBuffer);
 
     return S_OK;
 }

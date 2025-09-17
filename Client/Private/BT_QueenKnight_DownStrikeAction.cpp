@@ -24,7 +24,7 @@ CBT_QueenKnight_DownStrikeAction::CBT_QueenKnight_DownStrikeAction(CQueenKnight*
     m_fAttackReady_EndRatio = 20.f / 136.f;
 
     m_fAttack_StartRatio = 21.f / 136.f;
-    m_fAttack_EndRatio = 40.f / 136.f;
+    m_fAttack_EndRatio = 44.f / 136.f;
 }
 
 BT_RESULT CBT_QueenKnight_DownStrikeAction::Perform_Action(_float fTimeDelta)
@@ -67,6 +67,9 @@ void CBT_QueenKnight_DownStrikeAction::Reset()
     // 위치 변수들을 명확히 초기화
     m_vAscendTarget = _float3{ 0.f, 0.f, 0.f };
     m_vDesecndTarget = _float3{ 0.f, 0.f, 0.f };
+
+    m_pOwner->Enable_Collider(CQueenKnight::PART_BODY);
+    m_pOwner->Disable_Collider(CQueenKnight::PART_WEAPON);
 }
 
 BT_RESULT CBT_QueenKnight_DownStrikeAction::Enter_Attack(_float fTimeDelta)
@@ -275,6 +278,13 @@ BT_RESULT CBT_QueenKnight_DownStrikeAction::Update_Hang(_float fTimeDelta)
 
 BT_RESULT CBT_QueenKnight_DownStrikeAction::Update_Descend(_float fTimeDelta)
 {
+    _float fCurrentRatio = m_pOwner->Get_CurrentAnimationRatio();
+
+    if (fCurrentRatio >= m_fAttack_EndRatio)
+    {
+        m_pOwner->Set_Animation_Speed(m_pOwner->Find_AnimationIndex(L"WARP_END"), 2.f);
+    }
+
     if (m_pOwner->Is_Animation_Finished())
     {
         m_eAttackPhase = ATTACK_PHASE::COMPLETED;
@@ -284,6 +294,11 @@ BT_RESULT CBT_QueenKnight_DownStrikeAction::Update_Descend(_float fTimeDelta)
 
         //m_pOwner->Change_Animation_Blend(iNextAnimationIdx, false, 0.1f, true, true, false);
         m_pOwner->Change_Animation_NonBlend(iNextAnimationIdx, false);
+
+
+        //m_pOwner->Reset_Collider_ActiveInfo();
+        //m_pOwner->Enable_Collider(CQueenKnight::PART_BODY);
+        //m_pOwner->Disable_Collider(CQueenKnight::PART_WEAPON);
     }
 
     return BT_RESULT::RUNNING;

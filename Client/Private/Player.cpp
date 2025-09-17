@@ -870,7 +870,7 @@ void CPlayer::On_Collision_Enter(CGameObject* pOther)
     // 이미 충돌 레이어를 몬스터, 몬스터 Weapon으로 한정했으므로 이건 Weapon 충돌.
     if (nullptr != pWeapon)
     {
-        if (HasBuff(BUFF_INVINCIBLE))
+        if (HasAnyBuff(BUFF_INVINCIBLE | BUFF_HIT))
         {
             return;
         }
@@ -927,16 +927,16 @@ void CPlayer::On_Collision_Enter(CGameObject* pOther)
 
                 Create_HitEffects(vClosestPoint, vAttackDirection);
 
-                _float3 vPos = { 0.f, 1.f, 0.f };
-                CEffect_Pillar::PILLAR_ACTIVATE_DESC EffectPillarDesc{};
-                EffectPillarDesc.eCurLevel = m_eCurLevel;
-                EffectPillarDesc.vStartPos = XMLoadFloat3(&vPos); // 계산된 위치를 넣어줌
-                EffectPillarDesc.fDuration = 2.f;
-                EffectPillarDesc.fAttackPower = static_cast<_float>(m_pGameInstance->Rand_UnsignedInt(150, 200));
-                // ... 나머지 Desc 내용 채우기 ...
+                //_float3 vPos = { 0.f, 1.f, 0.f };
+                //CEffect_Pillar::PILLAR_ACTIVATE_DESC EffectPillarDesc{};
+                //EffectPillarDesc.eCurLevel = m_eCurLevel;
+                //EffectPillarDesc.vStartPos = XMLoadFloat3(&vPos); // 계산된 위치를 넣어줌
+                //EffectPillarDesc.fDuration = 2.f;
+                //EffectPillarDesc.fAttackPower = static_cast<_float>(m_pGameInstance->Rand_UnsignedInt(150, 200));
+                //// ... 나머지 Desc 내용 채우기 ...
 
-                m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(m_eCurLevel)
-                    , TEXT("BLOOD_PILLAR"), TEXT("Layer_Effect"), 1, ENUM_CLASS(CEffect_Pillar::EffectType), &EffectPillarDesc);
+                //m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(m_eCurLevel)
+                //    , TEXT("BLOOD_PILLAR"), TEXT("Layer_Effect"), 1, ENUM_CLASS(CEffect_Pillar::EffectType), &EffectPillarDesc);
             }
            
         }
@@ -1274,7 +1274,7 @@ void CPlayer::Take_Damage(_float fDamage, CEffect_Pillar* pEffectPillar)
     if (fDamage <= 0.f)
         return;
 
-    AddBuff(BUFF_INVINCIBLE, 3.f); // 아프니까.. 좀 길게.
+    AddBuff(BUFF_INVINCIBLE, 2.f); // 아프니까.. 좀 길게.
     AddBuff(BUFF_HIT);
 
     // 공격자로부터 피격 방향 계산

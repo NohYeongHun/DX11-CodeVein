@@ -82,10 +82,8 @@ private:
 	HRESULT Render_NonBlend();
 	HRESULT Render_Lights();
 	HRESULT Render_Combined();
-	HRESULT Render_Distortion();
-
+	//HRESULT Render_Distortion();
 	HRESULT Render_Blend();
-
 	HRESULT Render_DebugCombined();
 	HRESULT Render_NonLight();
 	HRESULT Render_BloomBlur();

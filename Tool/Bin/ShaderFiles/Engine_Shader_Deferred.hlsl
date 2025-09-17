@@ -20,8 +20,8 @@ vector g_vMtrlSpecular = vector(1.f, 1.f, 1.f, 1.f);
 texture2D g_NormalTexture;
 texture2D g_DepthTexture;
 texture2D g_ShadeTexture;
-texture2D g_LightDepthTexture;
 texture2D g_SpecularTexture;
+texture2D g_LightDepthTexture;
 texture2D g_EmissiveTexture;
 
 // Bloom용 텍스처들
@@ -85,7 +85,7 @@ PS_OUT_BACKBUFFER PS_MAIN_DEBUG(PS_IN In)
 struct PS_OUT_LIGHT
 {
     vector vShade : SV_TARGET0;
-    //vector vSpecular : SV_TARGET1;
+    vector vSpecular : SV_TARGET1;
 };
 
 /* 빛연산 */
@@ -120,13 +120,12 @@ PS_OUT_LIGHT PS_MAIN_DIRECTIONAL(PS_IN In)
     
     vector vLook = vWorldPos - g_vCamPosition;
     
-    //float fSpecular = pow(max(dot(normalize(vReflect) * -1.f, normalize(vLook)), 0.f), 50.f);
+    float fSpecular = pow(max(dot(normalize(vReflect) * -1.f, normalize(vLook)), 0.f), 50.f);
     
     
     Out.vShade = g_vLightDiffuse * saturate(fShade + (g_vLightAmbient * g_vMtrlAmbient));
-    //Out.vSpecular = (g_vLightSpecular * g_vMtrlSpecular) * fSpecular;
+    Out.vSpecular = (g_vLightSpecular * g_vMtrlSpecular) * fSpecular;
     
-    //Out.vShade = vNormal; // 양수만 표현되므로 (vNormal * 0.5f + 0.5f) 로 하셔도 좋습니다.
     
     return Out;
 }
@@ -175,7 +174,7 @@ PS_OUT_LIGHT PS_MAIN_POINT(PS_IN In)
     
     
     Out.vShade = g_vLightDiffuse * saturate(fShade + (g_vLightAmbient * g_vMtrlAmbient)) * fAtt;
-    //Out.vSpecular = (g_vLightSpecular * g_vMtrlSpecular) * fSpecular * fAtt;
+    Out.vSpecular = (g_vLightSpecular * g_vMtrlSpecular) * fSpecular * fAtt;
     
     return Out;
 }
@@ -201,11 +200,11 @@ PS_OUT_BACKBUFFER PS_MAIN_COMBINED(PS_IN In)
     //    discard;
     
     if (vDiffuse.a == 0.f)
-        discard;
+        discard;    
     
     
     vector vShade = g_ShadeTexture.Sample(DefaultSampler, In.vTexcoord);
-    //vector vSpecular = g_SpecularTexture.Sample(DefaultSampler, In.vTexcoord);
+    vector vSpecular = g_SpecularTexture.Sample(DefaultSampler, In.vTexcoord);
     
     //Out.vColor = vDiffuse * vShade + vSpecular;
     
@@ -214,7 +213,7 @@ PS_OUT_BACKBUFFER PS_MAIN_COMBINED(PS_IN In)
     → 하지만 디폴트 클리어 컬러가 (1,1,1,1)라서 최소한 흰색 조명은 나와야 하니까, 
     */
     
-    Out.vColor = vDiffuse * vShade;    
+    Out.vColor = vDiffuse * vShade;
     
     
      /* 내 픽셀의 광원 기준의 깊이 */ 

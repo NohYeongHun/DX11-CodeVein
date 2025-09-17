@@ -92,7 +92,7 @@ void CEffect_Pillar::OnActivate(void* pArg)
     /* 값 채워주기 */
     m_eCurLevel = pDesc->eCurLevel;
     m_ActivateDesc = *pDesc;
-    m_fDuration = m_ActivateDesc.fDuration * 2.f;
+    m_fDuration = m_ActivateDesc.fDuration;
     m_fAttackPower = pDesc->fAttackPower;
     Reset_Timer();
 
@@ -103,12 +103,12 @@ void CEffect_Pillar::OnActivate(void* pArg)
     // ... PillarA, B, C 활성화 코드 ...
     CBlood_PillarA::PILLARA_ACTIVATE_DESC PillarADesc{};
     PillarADesc.vStartPos = { 0.f, 0.f, 0.f }; // 최종 위치는 어차피 곱해진다. => 서서히 조절.
-    PillarADesc.fTargetRadius = 4.f;
-    PillarADesc.fDecreaseTargetRadius = 2.f;
-    PillarADesc.fTargetHeight = 4.f;
-    PillarADesc.fGrowDuration = 1.f;
-    PillarADesc.fStayDuration = 0.2f;
-    PillarADesc.fDecreaseDuration = 0.8f;
+    PillarADesc.fTargetRadius = m_fTargetRadius;
+    PillarADesc.fDecreaseTargetRadius = 1.f;
+    PillarADesc.fTargetHeight = 7.f;
+    PillarADesc.fGrowDuration = m_fDuration * 0.5f;
+    PillarADesc.fStayDuration = m_fDuration * 0.1f;
+    PillarADesc.fDecreaseDuration = m_fDuration * 0.4f;
     m_pBloodPillarA->OnActivate(&PillarADesc);
 
 
@@ -117,12 +117,12 @@ void CEffect_Pillar::OnActivate(void* pArg)
     PillarBDesc.vColor = { 1.f, 0.f, 0.f };
     PillarBDesc.fEmissiveIntensity = 0.5f;
     PillarBDesc.vStartPos = { 0.f, 0.f, 0.f }; // 최종 위치는 어차피 곱해진다. => 서서히 조절.
-    PillarBDesc.fTargetRadius = 4.2f;
-    PillarBDesc.fDecreaseTargetRadius = 2.f;
-    PillarBDesc.fTargetHeight = 4.f;
-    PillarBDesc.fGrowDuration = 1.f;
-    PillarBDesc.fStayDuration = 0.2f;
-    PillarBDesc.fDecreaseDuration = 0.8f;
+    PillarBDesc.fTargetRadius = m_fTargetRadius;
+    PillarBDesc.fDecreaseTargetRadius = 1.f;
+    PillarBDesc.fTargetHeight = 7.f;
+    PillarBDesc.fGrowDuration = m_fDuration * 0.5f;
+    PillarBDesc.fStayDuration = m_fDuration * 0.1f;
+    PillarBDesc.fDecreaseDuration = m_fDuration * 0.4f;
     m_pBloodPillarB->OnActivate(&PillarBDesc);
 
 
@@ -131,12 +131,12 @@ void CEffect_Pillar::OnActivate(void* pArg)
     PillarCDesc.vColor = { 1.f, 0.f, 0.f };
     PillarCDesc.fEmissiveIntensity = 0.5f;
     PillarCDesc.vStartPos = { 0.f, 0.f, 0.f }; // 최종 위치는 어차피 곱해진다. => 서서히 조절.
-    PillarCDesc.fTargetRadius = 5.f;
-    PillarCDesc.fDecreaseTargetRadius = 2.f;
-    PillarCDesc.fTargetHeight = 5.f;
-    PillarCDesc.fGrowDuration = 1.f;
-    PillarCDesc.fStayDuration = 0.2f;
-    PillarCDesc.fDecreaseDuration = 0.8f;
+    PillarCDesc.fTargetRadius = m_fTargetRadius;
+    PillarCDesc.fDecreaseTargetRadius = 1.f;
+    PillarCDesc.fTargetHeight = 7.f;
+    PillarCDesc.fGrowDuration = m_fDuration * 0.5f;
+    PillarCDesc.fStayDuration = m_fDuration * 0.1f;
+    PillarCDesc.fDecreaseDuration = m_fDuration * 0.4f;
     m_pBloodPillarC->OnActivate(&PillarCDesc);
 
     
@@ -148,8 +148,8 @@ void CEffect_Pillar::OnActivate(void* pArg)
     TornadoDesc.vStartPos = m_pTransformCom->Get_State(STATE::POSITION);
 
     PARTICLE_INIT_INFO Info = {};
-    Info.lifeTime = m_fDuration - 0.5f;
-    Info.fHeight = 7.f;
+    Info.lifeTime = m_fDuration + 1.f;
+    Info.fHeight = 10.f;
     Info.fRadius = 4.f;
     Info.dir = { 0.f, 1.f, 0.f };
 
@@ -179,6 +179,9 @@ void CEffect_Pillar::Calc_Timer(_float fTimeDelta)
         m_fCurrentTime += fTimeDelta;
 
     /* 그냥 지우자 ~ Pooling 많이 만들고. */
+    if (m_fCurrentTime >= m_fDuration * 0.5f && m_pColliderCom->Is_Active() == true)
+        m_pColliderCom->Set_Active(false);
+
     if (m_fCurrentTime >= m_fDuration)
     {
         m_IsDestroy = true; 
@@ -197,9 +200,9 @@ HRESULT CEffect_Pillar::Ready_Components(EFFECT_PILLARDESC* pDesc)
 {
 
     CBounding_OBB::BOUNDING_OBB_DESC  OBBDesc{};
-    OBBDesc.vExtents = _float3(5.f, 5.f, 5.f);
+    OBBDesc.vExtents = _float3(m_fTargetRadius * 0.7f, m_fTargetRadius, m_fTargetRadius * 0.7f);
     OBBDesc.vRotation = _float3(0.f, 0.f, 0.f);
-    OBBDesc.vCenter = _float3(0.f, 4.f, 0.0f); // 중점.
+    OBBDesc.vCenter = _float3(0.f, m_fTargetRadius + 0.7f, 0.0f); // 중점.
 
     OBBDesc.pOwner = this;
     OBBDesc.eCollisionType = CCollider::COLLISION_TRIGGER;

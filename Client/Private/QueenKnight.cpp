@@ -430,9 +430,6 @@ HRESULT CQueenKnight::InitializeAction_ToAnimationMap()
 #pragma region 특수 공격
 
     /* 연속 3번 공격. => 방패 위치가 반대임 바꿔야댐47 */
-    //m_Action_AnimMap.emplace(L"PHASE_ATTACK1", AS_TStdKnight_TShieldSword_AttackShield02B_N);
-    //m_Action_AnimMap.emplace(L"PHASE_ATTACK2", AS_TStdKnight_TShieldSword_AttackShield02C_N);
-    //m_Action_AnimMap.emplace(L"PHASE_ATTACK3", AS_TStdKnight_TShieldSword_AttackShield02A_N);
     m_Action_AnimMap.emplace(L"PHASE_ATTACK1", AS_TStdKnight_TLanceGCS_AttackNormal01_N);
     m_Action_AnimMap.emplace(L"PHASE_ATTACK2", AS_TStdKnight_TLanceGCS_AttackNormal02_N);
 
@@ -452,16 +449,18 @@ HRESULT CQueenKnight::InitializeAction_ToAnimationMap()
     
 #pragma region 재생 속도 증가.
 
-    /* 삼연 내려찍기 */
+    
     /* Down Strike 시 애니메이션 별 재생 구간이 다름. => Node에서 제어. */
-    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"DOWN_STRIKE"], 1.8f);
+    //m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"DOWN_STRIKE"], 1.8f);
     
     // 250frame.
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"DOWN_STRIKE_SKILL"], 1.5f);
 
 
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"WARP_START"], 1.8f);
-    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"WARP_AEND"], 1.6f);
+
+    /* 삼연 내려찍기 */
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"WARP_END"], 1.6f);
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"WARP_SKILL"], 1.8f);
 
 
@@ -490,9 +489,9 @@ HRESULT CQueenKnight::InitializeAction_ToAnimationMap()
     Add_Collider_Frame(m_Action_AnimMap[TEXT("DASH_ATTACK_END")], 0.f / 130.f, 120.f / 130.f, PART_WEAPON);     // Dash Attack
 
 
-    Add_Collider_Frame(m_Action_AnimMap[TEXT("WARP_END")], 20.f / 137.f, 40.f / 137.f, PART_WEAPON);     // Dash Attack
+    Add_Collider_Frame(m_Action_AnimMap[TEXT("WARP_END")], 20.f / 137.f, 45.f / 137.f, PART_WEAPON);     // Dash Attack
     // 공격 프레임 60 ~ 100프레임.1
-    Add_Collider_Frame(m_Action_AnimMap[TEXT("DOWN_STRIKE")], 60.f / 224.f, 85.f / 224.f, PART_WEAPON);     // Dash Attack
+    //Add_Collider_Frame(m_Action_AnimMap[TEXT("DOWN_STRIKE")], 60.f / 224.f, 85.f / 224.f, PART_WEAPON);     // Dash Attack
     
     Add_Collider_Frame(m_Action_AnimMap[TEXT("ATTACK")], 54.f / 194.f, 75.f / 194.f, PART_WEAPON);       // Weapon attack
 
@@ -800,10 +799,11 @@ void CQueenKnight::Update_BloodPillar(_float fTimeDelta)
             EffectPillarDesc.eCurLevel = m_eCurLevel;
 
             // ★★★ 중요: QueenKnight의 월드 위치 + 상대 오프셋 = 최종 월드 좌표 ★★★
-            _vector vQueenPos = m_pTransformCom->Get_State(STATE::POSITION);
+            //_vector vQueenPos = m_pTransformCom->Get_State(STATE::POSITION);
+            _vector vQueenPos = XMLoadFloat3(&m_vSkillCenterPos);
             _vector vOffsetPos = XMLoadFloat3(&m_vecPillarPositions[i]);
-            _vector vFinalWorldPos = vQueenPos + vOffsetPos;
-            vFinalWorldPos = XMVectorSetY(vFinalWorldPos, XMVectorGetY(vQueenPos));
+            _vector vFinalWorldPos = XMVectorSetY(vQueenPos, XMVectorGetY(vQueenPos) -2.f) + vOffsetPos;
+            //vFinalWorldPos = XMVectorSetY(vFinalWorldPos, XMVectorGetY(vQueenPos));
             EffectPillarDesc.vStartPos = vFinalWorldPos; // 최종 월드 좌표 전달
             EffectPillarDesc.fDuration = m_fMaxSkillDuration;
             EffectPillarDesc.fAttackPower = static_cast<_float>(m_pGameInstance->Rand_UnsignedInt(150, 200));

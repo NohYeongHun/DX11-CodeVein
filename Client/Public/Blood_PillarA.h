@@ -82,6 +82,15 @@ private:
     _float m_fTime = {};; // C++에서 계속 증가하는 시간 값을 전달받을 변수
     _float m_fScrollSpeed = 2.f; // 흐르는 속도를 제어할 변수
     _float m_fDissolveTime = 0.f;
+
+    _float m_fVortexStrength = {};
+    _float m_fVortexSpeed = {};
+    _float m_fHeightGradient = {};
+    _float m_fTurbulence = {};
+    _float m_fVerticalFlow = {};
+    _float m_fErosionThreshold = {};
+    _float m_fEnhancedFresnelPower = {};
+    _float4 m_vDynamicFresnelColor = {};
 #pragma endregion
 
 

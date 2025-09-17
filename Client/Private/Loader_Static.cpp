@@ -785,6 +785,15 @@ HRESULT CLoader_Static::Add_Prototype_BloodPillar_Effects(ID3D11Device* pDevice,
 		return E_FAIL;
 	}
 
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
+		, TEXT("Prototype_Component_Texture_BloodPillarOther")
+		, CTexture::Create(pDevice, pContext
+			, TEXT("../Bin/Resources/Models/EffectMesh/Other/Other%d.png"), 12))))
+	{
+		CRASH("Failed Load Effect TrailGlow Texture");
+		return E_FAIL;
+	}
+
 
 #pragma endregion
 

@@ -137,7 +137,7 @@ void CEffectParticle::Late_Update(_float fTimeDelta)
 HRESULT CEffectParticle::Render()
 {
 #ifdef _DEBUG
-    //ImGui_Render();
+    ImGui_Render();
 #endif // _DEBUG
 
     HRESULT hr;

@@ -79,7 +79,7 @@ BT_RESULT CBT_QueenKnight_DashAttackAction::Enter_Attack(_float fTimeDelta)
 
     // 3. 크기 증가.
     _float3 vExtents = m_pOwner->Get_WeaponOBBExtents();
-    m_pOwner->WeaponOBB_ChangeExtents({ 1.f, 1.5f, vExtents.z * 2.f });
+    m_pOwner->WeaponOBB_ChangeExtents({ 1.f, 2.f, vExtents.z * 2.f });
     
     return BT_RESULT::RUNNING;
 }
