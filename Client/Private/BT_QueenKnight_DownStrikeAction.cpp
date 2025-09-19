@@ -44,7 +44,11 @@ BT_RESULT CBT_QueenKnight_DownStrikeAction::Perform_Action(_float fTimeDelta)
     case ATTACK_PHASE::DESCEND:
         return Update_Descend(fTimeDelta);
     case ATTACK_PHASE::COMPLETED:
+    {
+        m_pOwner->Set_Visible(true);
         return BT_RESULT::SUCCESS;
+    }
+        
     }
 
     return BT_RESULT::FAILURE;
@@ -70,6 +74,7 @@ void CBT_QueenKnight_DownStrikeAction::Reset()
 
     m_pOwner->Enable_Collider(CQueenKnight::PART_BODY);
     m_pOwner->Disable_Collider(CQueenKnight::PART_WEAPON);
+    m_pOwner->Set_Visible(true);
 }
 
 BT_RESULT CBT_QueenKnight_DownStrikeAction::Enter_Attack(_float fTimeDelta)
@@ -202,7 +207,7 @@ BT_RESULT CBT_QueenKnight_DownStrikeAction::Update_Ascend(_float fTimeDelta)
         //    m_pOwner->RemoveBuff(CMonster::BUFF_DISSOLVE);
         //7. 파티클 생성
 
-        m_pOwner->Set_Visible(true);
+        //m_pOwner->Set_Visible(true);
 
     }
     return BT_RESULT::RUNNING;
@@ -251,6 +256,7 @@ BT_RESULT CBT_QueenKnight_DownStrikeAction::Update_Hang(_float fTimeDelta)
             // 목표 지점에 도착했으므로 공격 페이즈로 전환
             if (m_pOwner->Get_CurrentAnimationRatio() >= m_fAttack_StartRatio)
             {
+                m_pOwner->Set_Visible(true);
                 m_eAttackPhase = ATTACK_PHASE::DESCEND;
                 m_pOwner->Set_Animation_Speed(m_pOwner->Find_AnimationIndex(L"WARP_END"), 1.6f);
                 m_pOwner->RemoveBuff(CMonster::BUFF_NAVIGATION_OFF, true);
@@ -261,6 +267,7 @@ BT_RESULT CBT_QueenKnight_DownStrikeAction::Update_Hang(_float fTimeDelta)
     {
         if (fCurrentRatio >= m_fAttack_StartRatio)
         {
+            m_pOwner->Set_Visible(true);
             // 1. 공격 시작 애니메이션에 페이즈 변경.
             m_eAttackPhase = ATTACK_PHASE::DESCEND;
 

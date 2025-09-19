@@ -186,8 +186,8 @@ HRESULT CRenderer::Draw()
     if (FAILED(Render_StaticUI()))
         return E_FAIL;
 
-    if (FAILED(Render_LastEffect()))
-        return E_FAIL;
+    //if (FAILED(Render_LastEffect()))
+    //    return E_FAIL;
 
     return S_OK;
 }

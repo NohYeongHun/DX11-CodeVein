@@ -122,7 +122,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>d3d11.lib;dxguid.lib;dinput8.lib;Effects11d.lib;DirectXTKd.lib;assimp-vc143-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d11.lib;dxguid.lib;dinput8.lib;Effects11d.lib;DirectXTKd.lib;assimp-vc143-mtd.lib;fmodL_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>../ThirdPartyLib/</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
@@ -156,7 +156,7 @@ call copy.bat</Command>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>d3d11.lib;dxguid.lib;dinput8.lib;Effects11.lib;DirectXTK.lib;assimp-vc143-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d11.lib;dxguid.lib;dinput8.lib;Effects11.lib;DirectXTK.lib;assimp-vc143-mt.lib;fmod_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>../ThirdPartyLib/</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
@@ -231,6 +231,7 @@ call copy.bat</Command>
     <ClCompile Include="..\Private\RenderTarget.cpp" />
     <ClCompile Include="..\private\Shader.cpp" />
     <ClCompile Include="..\Private\Shadow.cpp" />
+    <ClCompile Include="..\Private\SoundManager.cpp" />
     <ClCompile Include="..\Private\State.cpp" />
     <ClCompile Include="..\Private\Target_Manager.cpp" />
     <ClCompile Include="..\Private\Texture.cpp" />
@@ -324,6 +325,7 @@ call copy.bat</Command>
     <ClInclude Include="..\Public\SaveFile_Define.h" />
     <ClInclude Include="..\public\Shader.h" />
     <ClInclude Include="..\Public\Shadow.h" />
+    <ClInclude Include="..\Public\SoundManager.h" />
     <ClInclude Include="..\Public\State.h" />
     <ClInclude Include="..\Public\Target_Manager.h" />
     <ClInclude Include="..\Public\Texture.h" />

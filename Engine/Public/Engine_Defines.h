@@ -27,6 +27,18 @@
 
 using namespace DirectX;
 
+#pragma region FMOD
+#include "FMod/fmod.h"
+#include "FMod/fmod.hpp"
+#include "FMod/fmod_codec.h"
+#include "FMod/fmod_common.h"
+#include "FMod/fmod_dsp.h"
+#include "FMod/fmod_dsp_effects.h"
+#include "FMod/fmod_errors.h"
+#include "FMod/fmod_output.h"
+#pragma endregion
+
+
 
 
 #include <memory>

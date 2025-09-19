@@ -105,16 +105,12 @@ void CPlayer_AttackState::Enter(void* pArg)
 	WindActivate_Desc.eCurLevel = m_pPlayer->Get_CurrentLevel();
 	WindActivate_Desc.fDuration = 10.f; // 지속시간,,
 
-	// ✅ 플레이어 기준 상대 위치 (Local Offset)
 	WindActivate_Desc.vStartPos = { 0.f, 0.f, 5.f }; // {오른쪽, 위, 앞}
 
 	WindActivate_Desc.vStartRotation = { 0.f, 0.f, 0.f }; // 각도 단위
 
-	// ✅ 카메라의 Look 방향을 회전축으로 설정 (소용돌이 회전)
 	_vector vCamLook = m_pGameInstance->Get_MainCamera()->Get_Transform()->Get_State(STATE::LOOK);
 	XMStoreFloat3(&WindActivate_Desc.vRotationAxis, XMVector3Normalize(vCamLook));
-
-	// ✅ 부모-자식 관계 설정 (플레이어를 따라다니게)
 	WindActivate_Desc.pParentMatrix = m_pPlayer->Get_Transform()->Get_WorldMatrixPtr();
 	WindActivate_Desc.pTargetTransform = m_pPlayer->Get_Transform();
 

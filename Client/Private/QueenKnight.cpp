@@ -798,12 +798,9 @@ void CQueenKnight::Update_BloodPillar(_float fTimeDelta)
             CEffect_Pillar::PILLAR_ACTIVATE_DESC EffectPillarDesc{};
             EffectPillarDesc.eCurLevel = m_eCurLevel;
 
-            // ★★★ 중요: QueenKnight의 월드 위치 + 상대 오프셋 = 최종 월드 좌표 ★★★
-            //_vector vQueenPos = m_pTransformCom->Get_State(STATE::POSITION);
             _vector vQueenPos = XMLoadFloat3(&m_vSkillCenterPos);
             _vector vOffsetPos = XMLoadFloat3(&m_vecPillarPositions[i]);
             _vector vFinalWorldPos = XMVectorSetY(vQueenPos, XMVectorGetY(vQueenPos) -2.f) + vOffsetPos;
-            //vFinalWorldPos = XMVectorSetY(vFinalWorldPos, XMVectorGetY(vQueenPos));
             EffectPillarDesc.vStartPos = vFinalWorldPos; // 최종 월드 좌표 전달
             EffectPillarDesc.fDuration = m_fMaxSkillDuration;
             EffectPillarDesc.fAttackPower = static_cast<_float>(m_pGameInstance->Rand_UnsignedInt(150, 200));

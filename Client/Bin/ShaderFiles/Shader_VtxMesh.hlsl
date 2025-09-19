@@ -688,241 +688,6 @@ float T3_Implementation(float2 InUV, const float g_fTime)
     return saturate(powered_result);
 }
 
-
-//PS_OUT_BACKBUFFER PS_SWORDWIND_IMPROVED(PS_BACKBUFFER_IN In)
-//{
-//    PS_OUT_BACKBUFFER Out = (PS_OUT_BACKBUFFER) 0;
-    
-//    // 0 . T1 패스 구현
-//    // 1. 외부에서 받아온 크기 값을 곱해줍니다.
-//    float2 vTexcoord = In.vTexcoord;
-//    vTexcoord *= g_fTextureScale;
-    
-//    // 2. 처음 텍스쳐 두개의 RGB를 빼줍니다.
-//    float4 vSwirl1 = g_SwirlTextures[0].Sample(DefaultSampler, vTexcoord);
-//    float4 vSwirl2 = g_SwirlTextures[1].Sample(DefaultSampler, vTexcoord);
-//    float3 vSubStract0 = vSwirl1.rgb - vSwirl2.rgb;
-    
-//    // 3. 두 텍스쳐를 빼줍니다.
-//    float4 vSwirl3 = g_SwirlTextures[2].Sample(DefaultSampler, vTexcoord);
-//    float4 vSwirl4 = g_SwirlTextures[3].Sample(DefaultSampler, vTexcoord);
-    
-//    float3 vSubStract1 = vSwirl3.rgb - vSwirl4.rgb;
-    
-//    // 4. MaskOrient 스위치로 두 Subtract 결과 중 하나를 선택합니다.
-//    // 원래는 bool값으로 결정하지만 일단 임의로 0결정.
-//    //float3 vMaskResult = g_bMaskOrient ? vSubStract0 : vSubStract1;
-//    float3 vMaskResult = vSubStract0;
-//    vMaskResult *= 1.3f;
-    
-//    // 5. Clamp 노드로 최종 결과값을 0과 1 사이로 제한합니다.
-//    float3 vFinalResult_T1 = saturate(vMaskResult);
-    
-//    // 6. T0 패스 구현.
-//    float vFinalResult_T0 = BorderMask_Implementation(In.vTexcoord);
-    
-//    // 7. T2 패스 구현 진행.
-//    float result_T2 = T2_Implementation(In.vTexcoord, g_fTime);
-//    float result_T3 = T3_Implementation(In.vTexcoord, g_fTime);
-    
-//    // 8. T0 * T2
-//    //float vFinalResult_T2_T3 = result_T3;
-//    float vFinalResult_T2_T3 = result_T2;
-    
-//    // 기본 Color
-//    float4 vBaseColor = float4(1.f, 1.f, 1.f, 1.f);
-//    //float final_mask = vFinalResult_T0 * vFinalResult_T2_T3;
-//    //float3 final_color = vFinalResult_T1 * final_mask * vBaseColor.rgb;
-    
-//    //Out.vDiffuse = float4(final_color, 0.8f);
-    
-//    float final_mask = vFinalResult_T0 * vFinalResult_T2_T3;
-//    float3 final_color = vFinalResult_T1 * final_mask * vBaseColor.rgb;
-    
-//    // 색상의 밝기를 계산 (더 정확한 luminance 공식 사용)
-//    float luminance = dot(final_color, float3(0.299f, 0.587f, 0.114f));
-    
-//    // 밝기가 임계값 이하면 완전 투명하게 처리
-//    float threshold = 0.1f; // 이 값을 조절해서 검은색 제거 정도 조절
-//    float alpha_from_brightness = smoothstep(0.0f, threshold, luminance);
-    
-//    // 최종 알파값 계산
-//    float final_alpha = alpha_from_brightness * 0.8f * g_fGlobalAlpha;
-    
-//    // 검은색에 가까울수록 discard
-//    if (final_alpha < 0.01f)
-//        discard;
-    
-//    Out.vDiffuse = float4(final_color, 1.f);
-    
-    
-//    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
-//    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w, 0.f, 0.f);
-    
-//    return Out;
-//}
-
-//PS_OUT_BACKBUFFER PS_SWORDWIND_IMPROVED(PS_BACKBUFFER_IN In)
-//{
-//    PS_OUT_BACKBUFFER Out = (PS_OUT_BACKBUFFER) 0;
-    
-//    // 0 . T1 패스 구현
-//    // 1. 외부에서 받아온 크기 값을 곱해줍니다.
-//    float2 vTexcoord = In.vTexcoord;
-//    vTexcoord *= g_fTextureScale;
-    
-//    // 2. 처음 텍스쳐 두개의 RGB를 빼줍니다.
-//    float4 vSwirl1 = g_SwirlTextures[0].Sample(DefaultSampler, vTexcoord);
-//    float4 vSwirl2 = g_SwirlTextures[1].Sample(DefaultSampler, vTexcoord);
-//    float3 vSubStract0 = vSwirl1.rgb - vSwirl2.rgb;
-    
-//    // 3. 두 텍스쳐를 빼줍니다.
-//    float4 vSwirl3 = g_SwirlTextures[2].Sample(DefaultSampler, vTexcoord);
-//    float4 vSwirl4 = g_SwirlTextures[3].Sample(DefaultSampler, vTexcoord);
-    
-//    float3 vSubStract1 = vSwirl3.rgb - vSwirl4.rgb;
-    
-//    // 4. MaskOrient 스위치로 두 Subtract 결과 중 하나를 선택합니다.
-//    // 원래는 bool값으로 결정하지만 일단 임의로 0결정.
-//    //float3 vMaskResult = g_bMaskOrient ? vSubStract0 : vSubStract1;
-//    float3 vMaskResult = vSubStract0;
-//    vMaskResult *= 1.3f;
-    
-//    // 5. Clamp 노드로 최종 결과값을 0과 1 사이로 제한합니다.
-//    float3 vFinalResult_T1 = saturate(vMaskResult);
-    
-//    // 6. T0 패스 구현.
-//    float vFinalResult_T0 = BorderMask_Implementation(In.vTexcoord);
-    
-//    // 7. T2 패스 구현 진행.
-//    float result_T2 = T2_Implementation(In.vTexcoord, g_fTime);
-//    float result_T3 = T3_Implementation(In.vTexcoord, g_fTime);
-    
-//    // 8. T0 * T2
-//    //float vFinalResult_T2_T3 = result_T3;
-//    float vFinalResult_T2_T3 = result_T2;
-    
-//    // 기본 Color
-//    float4 vBaseColor = float4(1.f, 1.f, 1.f, 1.f);
-//    //float final_mask = vFinalResult_T0 * vFinalResult_T2_T3;
-//    //float3 final_color = vFinalResult_T1 * final_mask * vBaseColor.rgb;
-    
-//    //Out.vDiffuse = float4(final_color, 0.8f);
-    
-//    float final_mask = vFinalResult_T0 * vFinalResult_T2_T3;
-//    float3 final_color = vFinalResult_T1 * final_mask * vBaseColor.rgb;
-    
-//    // 마스크 값이 너무 낮으면 픽셀을 버림
-//    float mask_threshold = 0.05f;
-//    if (final_mask < mask_threshold)
-//        discard;
-    
-//    // 마스크를 알파에도 적용
-//    float final_alpha = saturate(final_mask * 2.0f) * 0.8f;
-    
-//    Out.vDiffuse = float4(final_color, final_alpha);
-//    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
-//    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w, 0.f, 0.f);
-    
-//    return Out;
-//}
-
-
-
-
-//PS_OUT_BACKBUFFER PS_SWORDWIND_IMPROVED(PS_BACKBUFFER_IN In)
-//{
-//    PS_OUT_BACKBUFFER Out = (PS_OUT_BACKBUFFER) 0;
-    
-//    // 0 . T1 패스 구현
-//    // 1. 외부에서 받아온 크기 값을 곱해줍니다.
-//    float2 vTexcoord = In.vTexcoord;
-//    vTexcoord *= g_fTextureScale;
-    
-//    // 2. 처음 텍스쳐 두개의 RGB를 빼줍니다.
-//    float4 vSwirl1 = g_SwirlTextures[0].Sample(DefaultSampler, vTexcoord);
-//    float4 vSwirl2 = g_SwirlTextures[1].Sample(DefaultSampler, vTexcoord);
-//    float3 vSubStract0 = vSwirl1.rgb - vSwirl2.rgb;
-    
-//    // 3. 두 텍스쳐를 빼줍니다.
-//    float4 vSwirl3 = g_SwirlTextures[2].Sample(DefaultSampler, vTexcoord);
-//    float4 vSwirl4 = g_SwirlTextures[3].Sample(DefaultSampler, vTexcoord);
-    
-//    float3 vSubStract1 = vSwirl3.rgb - vSwirl4.rgb;
-    
-//    // 4. MaskOrient 스위치로 두 Subtract 결과 중 하나를 선택합니다.
-//    float3 vMaskResult = vSubStract0;
-//    vMaskResult *= 1.3f;
-    
-//    // 5. Clamp 노드로 최종 결과값을 0과 1 사이로 제한합니다.
-//    float3 vFinalResult_T1 = saturate(vMaskResult);
-    
-//    // 6. T0 패스 구현.
-//    float vFinalResult_T0 = BorderMask_Implementation(In.vTexcoord);
-    
-//    // 7. T2 패스 구현 진행.
-//    float result_T2 = T2_Implementation(In.vTexcoord, g_fTime);
-//    float result_T3 = T3_Implementation(In.vTexcoord, g_fTime);
-    
-//    // 8. T0 * T2
-//    float vFinalResult_T2_T3 = result_T2;
-    
-//    // 마스크 계산
-//    float final_mask = vFinalResult_T0 * vFinalResult_T2_T3;
-    
-//    // 마스크 값이 너무 낮으면 픽셀을 버림 (검은색 제거)
-//    float mask_threshold = 0.05f;
-//    if (final_mask < mask_threshold)
-//        discard;
-    
-//    // ===== 연기 색상 처리 =====
-//    // 1. 기본 연기 색상 설정 (회색톤)
-//    //float3 smokeBaseColor = float3(0.7f, 0.7f, 0.8f); // 약간 푸른빛이 도는 회색
-    
-//    // 2. 마스크를 사용해 색상 변화 추가
-//    float colorVariation = pow(final_mask, 0.5f); // 마스크를 부드럽게 만듦
-    
-//    //// 3. 연기 색상 계산 - 가장자리는 더 밝고 투명하게, 중심은 더 진하게
-//    //float3 smokeColor = lerp(
-//    //    float3(0.9f, 0.9f, 0.95f), // 밝은 연기 (가장자리)
-//    //    float3(0.5f, 0.5f, 0.6f), // 진한 연기 (중심)
-//    //    colorVariation
-//    //);
-    
-//    // 색상 부분만 교체
-//    float3 smokeBaseColor = float3(0.85f, 0.85f, 0.9f);
-//    float3 smokeColor = smokeBaseColor * (0.7f + colorVariation * 0.3f);
-//    float3 final_color = smokeColor; // 텍스처 영향 제거
-    
-//    // 4. 원본 텍스처 패턴을 약하게 적용
-//    float3 textureInfluence = vFinalResult_T1 * 0.3f; // 텍스처 영향을 줄임
-    
-//    // 5. 최종 색상 계산
-//    //float3 final_color = smokeColor + textureInfluence;
-    
-//    // ===== 알파값 처리 =====
-//    // 1. 마스크 기반 알파 계산
-//    float base_alpha = saturate(final_mask * 1.5f); // 마스크를 조금 더 강하게
-    
-//    // 2. 가장자리 페이드 효과
-//    float edge_fade = smoothstep(mask_threshold, mask_threshold + 0.1f, final_mask);
-    
-//    // 3. 전체적인 투명도 조절
-//    float final_alpha = base_alpha * edge_fade * 0.6f; // 전체적으로 반투명하게
-    
-//    // 4. 중심부는 조금 더 불투명하게
-//    float center_boost = smoothstep(0.2f, 0.7f, final_mask);
-//    final_alpha = lerp(final_alpha, final_alpha * 1.3f, center_boost);
-//    final_alpha = saturate(final_alpha);
-    
-//    Out.vDiffuse = float4(final_color, final_alpha);
-//    Out.vDiffuse = float4(final_color, 1.f);
-//    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
-//    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w, 0.f, 0.f);
-    
-//    return Out;
-//}
-
 float g_fTextureScale = 1.f;
 float g_fGlobalAlpha = 0.3f;
 float BorderMask_Implementation(float2 InUV)
@@ -940,117 +705,271 @@ float BorderMask_Implementation(float2 InUV)
     return center_line * directional_fade;
 }
 
+//PS_OUT_BACKBUFFER PS_SWORDWIND_IMPROVED(PS_BACKBUFFER_IN In)
+//{
+//    PS_OUT_BACKBUFFER Out = (PS_OUT_BACKBUFFER) 0;
+    
+//    // 텍스처 좌표 설정
+//    float2 vTexcoord = In.vTexcoord;
+//    vTexcoord *= g_fTextureScale;
+    
+//    // 왜곡 효과 추가 (풍압의 움직임)
+//    float2 distortion = float2(sin(g_fTime * 3.0f) * 0.02f, cos(g_fTime * 2.0f) * 0.01f);
+//    vTexcoord += distortion;
+    
+//    // 텍스처 샘플링
+//    float4 vSwirl1 = g_SwirlTextures[0].Sample(DefaultSampler, vTexcoord);
+//    float4 vSwirl2 = g_SwirlTextures[1].Sample(DefaultSampler, vTexcoord);
+//    float3 vSubstract0 = vSwirl1.rgb - vSwirl2.rgb;
+    
+//    float4 vSwirl3 = g_SwirlTextures[2].Sample(DefaultSampler, vTexcoord);
+//    float4 vSwirl4 = g_SwirlTextures[3].Sample(DefaultSampler, vTexcoord);
+//    float3 vSubStract1 = vSwirl3.rgb - vSwirl4.rgb;
+    
+//    // 더 강한 대비를 위해 값 증폭
+//    float3 vMaskResult = vSubstract0;
+//    vMaskResult *= 2.0f; // 1.3f에서 2.0f로 증가
+    
+//    float3 vFinalResult_T1 = saturate(vMaskResult);
+    
+//    // 개선된 BorderMask 적용
+//    float vFinalResult_T0 = BorderMask_Implementation(In.vTexcoord);
+    
+//    // T2, T3 결과
+//    float result_T2 = T2_Implementation(In.vTexcoord, g_fTime);
+//    float result_T3 = T3_Implementation(In.vTexcoord, g_fTime);
+    
+//    // T3를 섞어서 더 날카로운 효과
+//    float vFinalResult_T2_T3 = lerp(result_T2, result_T3, 0.3f);
+    
+//    // 마스크 계산
+//    float final_mask = vFinalResult_T0 * vFinalResult_T2_T3;
+    
+//    // 더 높은 threshold로 날카로운 경계
+//    float mask_threshold = 0.1f; // 0.05f에서 0.1f로 증가
+//    if (final_mask < mask_threshold)
+//        discard;
+    
+//    // ===== 칼바람 색상 처리 =====
+//    // 풍압 강도 계산
+//    float windPressure = pow(final_mask, 0.7f);
+    
+//    // 칼바람 색상 팔레트 (차갑고 날카로운 느낌)
+//    float3 coreColor = float3(0.9f, 0.95f, 1.0f); // 중심부 - 거의 흰색
+//    float3 midColor = float3(0.6f, 0.7f, 0.85f); // 중간 - 차가운 청백색
+//    float3 edgeColor = float3(0.3f, 0.4f, 0.6f); // 가장자리 - 진한 청회색
+    
+//    // 3단계 그라데이션으로 날카로운 층 생성
+//    float3 windColor;
+//    if (windPressure > 0.7f)
+//    {
+//        // 핵심부 - 가장 밝고 강렬
+//        windColor = lerp(midColor, coreColor, (windPressure - 0.7f) / 0.3f);
+//    }
+//    else if (windPressure > 0.3f)
+//    {
+//        // 중간층
+//        windColor = lerp(edgeColor, midColor, (windPressure - 0.3f) / 0.4f);
+//    }
+//    else
+//    {
+//        // 가장자리 - 흩어지는 바람
+//        windColor = edgeColor * windPressure / 0.3f;
+//    }
+    
+//    // 속도감을 위한 스트릭(줄무늬) 효과 추가
+//    float streak = sin(In.vTexcoord.x * 50.0f + g_fTime * 5.0f) * 0.1f + 0.9f;
+//    windColor *= streak;
+    
+//    // 텍스처 디테일을 약간 추가 (너무 많으면 흐려짐)
+//    float3 textureDetail = vFinalResult_T1 * 0.2f;
+//    float3 final_color = windColor + textureDetail;
+    
+//    // 에너지 효과 (선택적 - 더 강렬한 느낌)
+//    float energyPulse = sin(g_fTime * 4.0f) * 0.1f + 0.9f;
+//    final_color *= energyPulse;
+    
+//    // ===== 알파값 처리 =====
+//    // 중심은 불투명, 가장자리는 투명
+//    float core_alpha = saturate(pow(final_mask, 0.5f));
+    
+//    // 날카로운 경계를 위한 스텝 함수
+//    float sharp_edge = smoothstep(mask_threshold, mask_threshold + 0.15f, final_mask);
+    
+//    // 풍압 끝부분 흩날림 효과
+//    float scatter = 1.0f - pow(In.vTexcoord.y, 3.0f);
+    
+//    // 최종 알파
+//    float final_alpha = core_alpha * sharp_edge * scatter;
+//    final_alpha = saturate(final_alpha * 1.2f); // 전체적으로 더 선명하게
+    
+//    // 중심부 강조
+//    if (windPressure > 0.6f)
+//    {
+//        final_alpha = lerp(final_alpha, 1.0f, (windPressure - 0.6f) / 0.4f);
+//    }
+    
+//    //Out.vDiffuse = float4(final_color, final_alpha);
+//    Out.vDiffuse = float4(final_color, 1.f);
+//    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+//    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w, 0.f, 0.f);
+    
+//    return Out;
+//}
+
+
 PS_OUT_BACKBUFFER PS_SWORDWIND_IMPROVED(PS_BACKBUFFER_IN In)
 {
     PS_OUT_BACKBUFFER Out = (PS_OUT_BACKBUFFER) 0;
     
-    // 텍스처 좌표 설정
-    float2 vTexcoord = In.vTexcoord;
-    vTexcoord *= g_fTextureScale;
+    // ===== 1. UV 좌표 기반 마스킹 =====
+    // 검풍의 중심축과 가장자리 페이드 계산
+    float2 uv = In.vTexcoord;
     
-    // 왜곡 효과 추가 (풍압의 움직임)
-    float2 distortion = float2(sin(g_fTime * 3.0f) * 0.02f, cos(g_fTime * 2.0f) * 0.01f);
-    vTexcoord += distortion;
+    // 중심선으로부터의 거리 계산 (수평 검풍 기준)
+    float distFromCenter = abs(uv.y - 0.5f) * 2.0f;
     
-    // 텍스처 샘플링
-    float4 vSwirl1 = g_SwirlTextures[0].Sample(DefaultSampler, vTexcoord);
-    float4 vSwirl2 = g_SwirlTextures[1].Sample(DefaultSampler, vTexcoord);
-    float3 vSubstract0 = vSwirl1.rgb - vSwirl2.rgb;
+    // 날카로운 가장자리 마스크 생성
+    float edgeMask = 1.0f - pow(distFromCenter, 2.0f);
+    edgeMask = saturate(edgeMask);
     
-    float4 vSwirl3 = g_SwirlTextures[2].Sample(DefaultSampler, vTexcoord);
-    float4 vSwirl4 = g_SwirlTextures[3].Sample(DefaultSampler, vTexcoord);
-    float3 vSubStract1 = vSwirl3.rgb - vSwirl4.rgb;
+    // 진행 방향 페이드 (앞쪽이 더 강함)
+    float directionalFade = pow(uv.x, 0.3f);
     
-    // 더 강한 대비를 위해 값 증폭
-    float3 vMaskResult = vSubstract0;
-    vMaskResult *= 2.0f; // 1.3f에서 2.0f로 증가
+    // ===== 2. 동적 노이즈 패턴 생성 =====
+    // 속도선용 스트릭 패턴 (Image 1 스타일 - 대각선 패턴)
+    float2 streakUV = uv;
+    streakUV.x *= 3.0f; // 가로로 늘려서 속도감 강화
+    streakUV.x += g_fTime * 4.0f; // 빠른 스크롤
+    float streakNoise = g_SwirlTextures[3].Sample(DefaultSampler, streakUV).r;
     
-    float3 vFinalResult_T1 = saturate(vMaskResult);
+    // 왜곡용 물결 패턴 (Image 4 스타일)
+    float2 waveUV = uv * 1.5f;
+    waveUV.y += sin(uv.x * 5.0f + g_fTime * 3.0f) * 0.1f;
+    float waveNoise = g_SwirlTextures[0].Sample(DefaultSampler, waveUV).r;
     
-    // 개선된 BorderMask 적용
-    float vFinalResult_T0 = BorderMask_Implementation(In.vTexcoord);
+    // 부드러운 연기 패턴 (Image 10/11 스타일)
+    float2 smokeUV = uv * 0.7f + float2(g_fTime * 0.5f, 0.0f);
+    float smokeNoise = g_NoiseTextures[2].Sample(DefaultSampler, smokeUV).r;
     
-    // T2, T3 결과
-    float result_T2 = T2_Implementation(In.vTexcoord, g_fTime);
-    float result_T3 = T3_Implementation(In.vTexcoord, g_fTime);
+    // 노이즈 합성 - 각 용도별로 가중치 조절
+    float combinedNoise = streakNoise * 0.6f + waveNoise * 0.3f + smokeNoise * 0.1f;
+    combinedNoise = pow(combinedNoise, 1.2f);
     
-    // T3를 섞어서 더 날카로운 효과
-    float vFinalResult_T2_T3 = lerp(result_T2, result_T3, 0.3f);
+    // ===== 3. 왜곡 효과 (바람의 흐름) =====
+    // 물결 패턴 기반 왜곡 (Image 4/5 스타일 활용)
+    float2 distortion;
+    distortion.x = waveNoise * 0.03f * sin(uv.y * 8.0f + g_fTime * 5.0f);
+    distortion.y = waveNoise * 0.02f * cos(uv.x * 6.0f + g_fTime * 4.0f);
     
-    // 마스크 계산
-    float final_mask = vFinalResult_T0 * vFinalResult_T2_T3;
+    float2 distortedUV = uv + distortion * edgeMask;
     
-    // 더 높은 threshold로 날카로운 경계
-    float mask_threshold = 0.1f; // 0.05f에서 0.1f로 증가
-    if (final_mask < mask_threshold)
+    // ===== 4. 속도선 효과 =====
+    // 스트릭 패턴 활용 (Image 1/6 스타일)
+    float speedLines = streakNoise;
+    
+    // 추가 디테일용 날카로운 선
+    float sharpLines = sin((distortedUV.x * 40.0f) - (g_fTime * 15.0f));
+    sharpLines = saturate(sharpLines * sharpLines); // 더 날카롭게
+    
+    // 속도선 합성
+    speedLines = lerp(speedLines, sharpLines, 0.4f);
+    speedLines = pow(speedLines, 2.0f);
+    
+    // ===== 5. 에너지 파동 =====
+    float energyWave = sin(uv.x * 3.14159f + g_fTime * 4.0f) * 0.5f + 0.5f;
+    energyWave *= sin(uv.y * 6.28318f + g_fTime * 3.0f) * 0.3f + 0.7f;
+    
+    // ===== 6. 최종 마스크 조합 =====
+    float finalMask = edgeMask * directionalFade * combinedNoise;
+    finalMask *= (speedLines * 0.7f + 0.3f);
+    finalMask *= energyWave;
+    
+    // 임계값 처리 (날카로운 엣지)
+    float threshold = 0.15f;
+    if (finalMask < threshold)
         discard;
     
-    // ===== 칼바람 색상 처리 =====
-    // 풍압 강도 계산
-    float windPressure = pow(final_mask, 0.7f);
+    // Soft edge 처리
+    float softEdge = smoothstep(threshold, threshold + 0.1f, finalMask);
     
-    // 칼바람 색상 팔레트 (차갑고 날카로운 느낌)
-    float3 coreColor = float3(0.9f, 0.95f, 1.0f); // 중심부 - 거의 흰색
-    float3 midColor = float3(0.6f, 0.7f, 0.85f); // 중간 - 차가운 청백색
-    float3 edgeColor = float3(0.3f, 0.4f, 0.6f); // 가장자리 - 진한 청회색
+    // ===== 7. 색상 처리 =====
+    // 검풍 색상 그라데이션
+    float3 coreColor = float3(0.95f, 0.98f, 1.0f); // 중심 - 거의 흰색
+    float3 midColor = float3(0.7f, 0.85f, 0.95f); // 중간 - 하늘색
+    float3 edgeColor = float3(0.3f, 0.5f, 0.7f); // 가장자리 - 진한 청색
     
-    // 3단계 그라데이션으로 날카로운 층 생성
+    // 강도에 따른 색상 보간
     float3 windColor;
-    if (windPressure > 0.7f)
+    float intensity = pow(finalMask, 0.7f);
+    
+    if (intensity > 0.6f)
     {
-        // 핵심부 - 가장 밝고 강렬
-        windColor = lerp(midColor, coreColor, (windPressure - 0.7f) / 0.3f);
+        float t = (intensity - 0.6f) / 0.4f;
+        windColor = lerp(midColor, coreColor, t);
     }
-    else if (windPressure > 0.3f)
+    else if (intensity > 0.3f)
     {
-        // 중간층
-        windColor = lerp(edgeColor, midColor, (windPressure - 0.3f) / 0.4f);
+        float t = (intensity - 0.3f) / 0.3f;
+        windColor = lerp(edgeColor, midColor, t);
     }
     else
     {
-        // 가장자리 - 흩어지는 바람
-        windColor = edgeColor * windPressure / 0.3f;
+        windColor = edgeColor * (intensity / 0.3f);
     }
     
-    // 속도감을 위한 스트릭(줄무늬) 효과 추가
-    float streak = sin(In.vTexcoord.x * 50.0f + g_fTime * 5.0f) * 0.1f + 0.9f;
-    windColor *= streak;
+    // ===== 8. 프레넬 효과 (림 라이팅) =====
+    float3 viewDir = normalize(g_vCamPosition.xyz - In.vWorldPos.xyz);
+    float fresnel = 1.0f - saturate(dot(viewDir, In.vNormal.xyz));
+    fresnel = pow(fresnel, 2.0f);
     
-    // 텍스처 디테일을 약간 추가 (너무 많으면 흐려짐)
-    float3 textureDetail = vFinalResult_T1 * 0.2f;
-    float3 final_color = windColor + textureDetail;
+    // 프레넬 글로우 추가
+    float3 fresnelGlow = float3(0.5f, 0.7f, 1.0f) * fresnel * 0.5f;
+    windColor += fresnelGlow;
     
-    // 에너지 효과 (선택적 - 더 강렬한 느낌)
-    float energyPulse = sin(g_fTime * 4.0f) * 0.1f + 0.9f;
-    final_color *= energyPulse;
+    // ===== 9. 펄스 애니메이션 =====
+    float pulse = sin(g_fTime * 8.0f) * 0.1f + 0.9f;
+    windColor *= pulse;
     
-    // ===== 알파값 처리 =====
-    // 중심은 불투명, 가장자리는 투명
-    float core_alpha = saturate(pow(final_mask, 0.5f));
+    // ===== 10. 스캐터링 효과 =====
+    // 끝부분이 흩날리는 효과
+    float scatter = 1.0f - pow(uv.x, 3.0f);
+    float scatterNoise = g_NoiseTextures[2].Sample(DefaultSampler, uv * 3.0f + g_fTime).r;
+    scatter *= (scatterNoise * 0.5f + 0.5f);
     
-    // 날카로운 경계를 위한 스텝 함수
-    float sharp_edge = smoothstep(mask_threshold, mask_threshold + 0.15f, final_mask);
+    // ===== 11. 최종 알파 계산 =====
+    float finalAlpha = softEdge * intensity * scatter;
     
-    // 풍압 끝부분 흩날림 효과
-    float scatter = 1.0f - pow(In.vTexcoord.y, 3.0f);
-    
-    // 최종 알파
-    float final_alpha = core_alpha * sharp_edge * scatter;
-    final_alpha = saturate(final_alpha * 1.2f); // 전체적으로 더 선명하게
-    
-    // 중심부 강조
-    if (windPressure > 0.6f)
+    // 중심부는 더 불투명하게
+    if (intensity > 0.7f)
     {
-        final_alpha = lerp(final_alpha, 1.0f, (windPressure - 0.6f) / 0.4f);
+        finalAlpha = lerp(finalAlpha, 1.0f, (intensity - 0.7f) / 0.3f);
     }
     
-    //Out.vDiffuse = float4(final_color, final_alpha);
-    Out.vDiffuse = float4(final_color, 1.f);
+    // 시간에 따른 페이드 (g_fRatio 사용)
+    finalAlpha *= (1.0f - g_fRatio);
+    
+    // ===== 12. 모션 블러 효과 시뮬레이션 =====
+    // 이전 프레임과의 블렌딩을 시뮬레이션
+    float motionBlur = 1.0f - (abs(uv.x - 0.5f) * 2.0f);
+    windColor = lerp(windColor, windColor * 0.7f, motionBlur * 0.3f);
+    
+    // ===== 13. HDR 컬러 부스트 =====
+    // 밝은 부분을 더 밝게
+    float luminance = dot(windColor, float3(0.299f, 0.587f, 0.114f));
+    if (luminance > 0.7f)
+    {
+        windColor *= 1.2f;
+    }
+    
+    // ===== 최종 출력 =====
+    Out.vDiffuse = float4(saturate(windColor), saturate(finalAlpha));
     Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w, 0.f, 0.f);
     
     return Out;
 }
+
 
 struct PS_IN_SHADOW
 {

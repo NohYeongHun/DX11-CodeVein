@@ -80,13 +80,15 @@ HRESULT CMainApp::Initialize()
 void CMainApp::Update(_float fTimeDelta)
 {
 	m_pGameInstance->Update_Engine(fTimeDelta);
+
+
+
 }
 
 HRESULT CMainApp::Render()
 {
 	_float4		vClearColor = _float4(0.0f, 0.0f, 0.f, 1.f);
 	
-	// bool Return;
 
 	m_pGameInstance->Render_Begin(&vClearColor);
 	m_pImGui_Manager->Render_Begin();

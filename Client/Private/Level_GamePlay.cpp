@@ -70,12 +70,15 @@ HRESULT CLevel_GamePlay::Initialize_Clone()
 	m_pGameInstance->Setting_Threshold(0.9f);
 	m_pGameInstance->Setting_Soft(0.2f);
 	
+	// 한번만 실행.
+	m_pGameInstance->PlayBGM(L"NormalBgm.wav", 0.4f, true);
 
 	return S_OK;
 }
 
 void CLevel_GamePlay::Update(_float fTimeDelta)
 {
+	// 새로운 BGM을 재생하면 이전 BGM은 자동으로 멈추고 새로운 곡으로 교체됩니다.
 	
 }
 
@@ -549,4 +552,7 @@ CLevel_GamePlay* CLevel_GamePlay::Create(ID3D11Device* pDevice, ID3D11DeviceCont
 void CLevel_GamePlay::Free()
 {
 	CLevel::Free();
+
+	// 배경음 끄기.
+	m_pGameInstance->StopBGM();
 }

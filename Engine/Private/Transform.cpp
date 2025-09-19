@@ -34,7 +34,7 @@ void CTransform::Set_State(STATE eState, _fvector vState)
 		};
 
 		m_QuatRotation = XMQuaternionRotationMatrix(matRot);
-		m_bIsDirty = true; // ✅ 수정: 월드 행렬 갱신 필요
+		m_bIsDirty = true;
 	}
 	break;
 	default:

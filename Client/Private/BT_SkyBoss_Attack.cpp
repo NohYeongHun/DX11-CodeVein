@@ -24,7 +24,6 @@ BT_RESULT CBT_SkyBoss_Attack::Perform_Action(_float fTimeDelta)
         return StartAttack();
 
     case ATTACK_PHASE::PREPARING:
-        // ✅ PREPARING 단계에서만 회전
        /* if (m_pOwner->Get_Target())
         {
             m_pOwner->Smooth_Rotate_To_Target(fTimeDelta, m_pOwner->Get_RotationSpeed());

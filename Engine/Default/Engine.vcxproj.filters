@@ -235,6 +235,9 @@
     <Filter Include="01. Utility\15. Shadow">
       <UniqueIdentifier>{7ab97518-0f4b-4760-885e-0059efb0b003}</UniqueIdentifier>
     </Filter>
+    <Filter Include="01. Utility\16. Sound">
+      <UniqueIdentifier>{0efd5c1e-20cc-4f06-83ef-b14ea996275e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Private\Timer.cpp">
@@ -482,6 +485,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Shadow.cpp">
       <Filter>01. Utility\15. Shadow</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\SoundManager.cpp">
+      <Filter>01. Utility\16. Sound</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -757,6 +763,9 @@
     </ClInclude>
     <ClInclude Include="..\Public\Shadow.h">
       <Filter>01. Utility\15. Shadow</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\SoundManager.h">
+      <Filter>01. Utility\16. Sound</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

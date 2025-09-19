@@ -106,7 +106,6 @@ private:
     _float m_fDissolveThreshold = {};
 
 	_float4x4 m_CombinedWorldMatrix = {};
-    // ✅ 회전 제어를 위한 추가 멤버 변수
     _vector     m_InitialQuaternion = XMQuaternionIdentity(); // 초기 X축 -50도 회전 저장
     _float      m_fAccumulatedRotation = 0.f;
 #pragma endregion
