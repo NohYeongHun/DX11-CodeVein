@@ -44,7 +44,6 @@ HRESULT CLevel_StageOne::Initialize_Clone()
 		return E_FAIL;
 	}
 
-	
 
 	if (FAILED(Ready_Layer_SkyBox(TEXT("Layer_SkyBox"))))
 	{

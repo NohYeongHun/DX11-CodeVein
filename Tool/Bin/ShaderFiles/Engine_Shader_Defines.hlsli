@@ -91,6 +91,13 @@ DepthStencilState DSS_WeightBlend
     DepthFunc = LESS_EQUAL;
 };
 
+DepthStencilState DSS_SwordWind
+{
+    DepthEnable = FALSE;
+    DepthWriteMask = ZERO;
+    DepthFunc = LESS_EQUAL; // 또는 ALWAYS로 설정하여 항상 통과
+};
+
 BlendState BS_Default
 {
     BlendEnable[0] = false;

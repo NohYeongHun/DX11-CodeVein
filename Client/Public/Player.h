@@ -136,6 +136,8 @@ public:
 
 	void Take_Damage(_float fDamage, class CMonster* pMonster);
 	void Take_Damage(_float fDamage, class CEffect_Pillar* pEffectPillar);
+
+	LEVEL Get_CurrentLevel() { return m_eCurLevel; }
 #pragma endregion
 
 

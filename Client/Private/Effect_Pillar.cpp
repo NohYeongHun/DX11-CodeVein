@@ -179,7 +179,7 @@ void CEffect_Pillar::Calc_Timer(_float fTimeDelta)
         m_fCurrentTime += fTimeDelta;
 
     /* 그냥 지우자 ~ Pooling 많이 만들고. */
-    if (m_fCurrentTime >= m_fDuration * 0.5f && m_pColliderCom->Is_Active() == true)
+    if (m_fCurrentTime >= m_fDuration * 0.8f && m_pColliderCom->Is_Active() == true)
         m_pColliderCom->Set_Active(false);
 
     if (m_fCurrentTime >= m_fDuration)

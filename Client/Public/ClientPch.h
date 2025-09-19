@@ -50,6 +50,8 @@
 #include "Blood_PillarB.h"
 #include "Blood_PillarC.h"
 #include "Effect_Pillar.h"
+#include "Effect_Wind.h"
+#include "SwordWind.h"
 
 #include "SwordTrail.h"
 #pragma endregion
