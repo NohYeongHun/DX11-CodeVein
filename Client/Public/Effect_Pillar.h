@@ -18,6 +18,8 @@ public:
         _float fAttackPower = {};
     }PILLAR_ACTIVATE_DESC;
 
+
+
 private:
     explicit CEffect_Pillar(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
     explicit CEffect_Pillar(const CEffect_Pillar& Prototype);
@@ -74,7 +76,7 @@ private:
     _float m_fCurrentTime = {};
     _float m_fDuration = {};
     _float m_fAttackPower = {};
-    _float m_fTargetRadius = { 3.f };
+    _float m_fTargetRadius = { 4.f };
     PILLAR_ACTIVATE_DESC m_ActivateDesc = {};
 
 

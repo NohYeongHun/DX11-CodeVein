@@ -151,40 +151,6 @@ PS_OUT PS_MULTI_TRAIL(PS_IN In)
     return Out;
 }
 
-//PS_OUT PS_STRETCH_TRAIL(PS_IN In)
-//{
-//    PS_OUT Out = (PS_OUT) 0;
-    
-//    // 1. UV 스크롤 (시간 기반) - 리본이 잡아당겨지는 효과
-//    float2 scrollUV = In.vTexcoord;
-//    //scrollUV.x += g_Time * g_ScrollSpeed; // U 방향으로 스크롤
-//    //scrollUV.x += g_Time * g_ScrollSpeed; // U 방향으로 스크롤
-    
-//    // 2. SP_Weapon 텍스처 샘플링 (GlowTexture 사용)
-//    //float4 weaponColor = g_GlowTexture.Sample(DefaultSampler, scrollUV);
-//    float4 weaponColor = g_BaseTexture.Sample(DefaultSampler, scrollUV);
-    
-//    // 3. 시간 기반 페이드 (거리가 멀수록 투명)
-//    float fade = pow(In.fFade, g_FadePower);
-    
-//    // 4. 엣지 페이드 (리본 가장자리 부드럽게)
-//    float edgeFade = abs(In.vTexcoord.y - 0.5f) * 2.0f; // 0.0(중앙) ~ 1.0(가장자리)
-//    edgeFade = 1.0f - smoothstep(0.5f, 1.0f, edgeFade); // 더 넓은 범위로 부드럽게
-    
-//    // 5. SP_Weapon 텍스처의 원본 색상을 그대로 사용 (리본 형태로)
-//    Out.vDiffuse = float4(1.0f, 0.0f, 0.0f, 1.0f); // 강제 빨간색
-    
-//    //Out.vDiffuse = weaponColor; // SP_Weapon 원본 색상
-//    //Out.vDiffuse.rgb = float3(1.f, 0.f, 0.f);
-//    //Out.vDiffuse.a = weaponColor.a * fade * edgeFade * g_Intensity * g_fAlpha; // 알파는 텍스처의 원본 알파 채널 사용
-    
-    
-//    //if (Out.vDiffuse.a <= 0.01f)
-//    //    discard;
-    
-//    return Out;
-//}
-
 PS_OUT PS_STRETCH_TRAIL(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;

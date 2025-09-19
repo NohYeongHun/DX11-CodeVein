@@ -486,7 +486,7 @@ HRESULT CQueenKnight::InitializeAction_ToAnimationMap()
 #pragma region COllider 활성화 프레임 관리
     // 100 ~ 136 Frame 활성화
     Add_Collider_Frame(m_Action_AnimMap[TEXT("DASH_ATTACK_START")], 100.f / 136.f, 136.f / 136.f, PART_WEAPON);     // Dash Attack
-    Add_Collider_Frame(m_Action_AnimMap[TEXT("DASH_ATTACK_END")], 0.f / 130.f, 120.f / 130.f, PART_WEAPON);     // Dash Attack
+    Add_Collider_Frame(m_Action_AnimMap[TEXT("DASH_ATTACK_END")], 0.f / 130.f, 100.f / 130.f, PART_WEAPON);     // Dash Attack
 
 
     Add_Collider_Frame(m_Action_AnimMap[TEXT("WARP_END")], 20.f / 137.f, 45.f / 137.f, PART_WEAPON);     // Dash Attack

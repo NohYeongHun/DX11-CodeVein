@@ -119,6 +119,55 @@ struct PS_OUT
     float4 vDepth : SV_TARGET2;
 };
 
+//PS_OUT PS_MAIN(PS_IN In)
+//{
+//    PS_OUT Out = (PS_OUT) 0;
+    
+//    vector vMtrlDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
+    
+//    if (vMtrlDiffuse.a < 0.3f)
+//        discard;
+    
+//     /* 노멀 벡터 하나를 정의하기위한 독립적인 로컬스페이스를 만들고 그 공간안에서의 방향벡터를 정의 */
+//    vector vNormalDesc = g_NormalTexture.Sample(DefaultSampler, In.vTexcoord);
+//    float3 vNormal = vNormalDesc.xyz * 2.f - 1.f;
+    
+//    float3x3 WorldMatrix = float3x3(In.vTangent.xyz, In.vBinormal.xyz * -1.f, In.vNormal.xyz);
+//    vNormal = mul(vNormal, WorldMatrix);
+    
+//    Out.vDiffuse = vMtrlDiffuse;
+//    //Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+//    Out.vNormal = vector(vNormal * 0.5f + 0.5f, 0.f);
+//    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w, 0.f, 0.f);
+    
+//    return Out;
+//}
+
+//PS_OUT PS_MAIN(PS_IN In)
+//{
+//    PS_OUT Out = (PS_OUT) 0;
+    
+//    vector vMtrlDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
+    
+//    if (vMtrlDiffuse.a < 0.3f)
+//        discard;
+    
+//     /* 노멀 벡터 하나를 정의하기위한 독립적인 로컬스페이스를 만들고 그 공간안에서의 방향벡터를 정의 */
+//    vector vNormalDesc = g_NormalTexture.Sample(DefaultSampler, In.vTexcoord);
+//    float3 vNormal = vNormalDesc.xyz * 2.f - 1.f;
+    
+//    float3x3 WorldMatrix = float3x3(In.vTangent.xyz, In.vBinormal.xyz * -1.f, In.vNormal.xyz);
+//    vNormal = mul(vNormal, WorldMatrix);
+    
+//    Out.vDiffuse = vMtrlDiffuse;
+//    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+//    //Out.vNormal = vector(vNormal * 0.5f + 0.5f, 0.f);
+//    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w, 0.f, 0.f);
+    
+//    return Out;
+//}
+
+
 PS_OUT PS_MAIN(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
@@ -128,20 +177,14 @@ PS_OUT PS_MAIN(PS_IN In)
     if (vMtrlDiffuse.a < 0.3f)
         discard;
     
-     /* 노멀 벡터 하나를 정의하기위한 독립적인 로컬스페이스를 만들고 그 공간안에서의 방향벡터를 정의 */
-    vector vNormalDesc = g_NormalTexture.Sample(DefaultSampler, In.vTexcoord);
-    float3 vNormal = vNormalDesc.xyz * 2.f - 1.f;
-    
-    float3x3 WorldMatrix = float3x3(In.vTangent.xyz, In.vBinormal.xyz * -1.f, In.vNormal.xyz);
-    vNormal = mul(vNormal, WorldMatrix);
-    
     Out.vDiffuse = vMtrlDiffuse;
-    //Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
-    Out.vNormal = vector(vNormal * 0.5f + 0.5f, 0.f);
+    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w, 0.f, 0.f);
     
     return Out;
 }
+
+
 
 
 

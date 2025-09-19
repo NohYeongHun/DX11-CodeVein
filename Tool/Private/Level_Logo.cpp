@@ -14,6 +14,10 @@ HRESULT CLevel_Logo::Initialize_Clone()
 	/* 현재 레벨을 구성해주기 위한 객체들을 생성한다. */
 	if (FAILED(Ready_Layer_Title(TEXT("Layer_Title"))))
 		return E_FAIL;
+	
+	if (FAILED(Ready_Lights()))
+		return E_FAIL;
+
 
 	//if (FAILED(Ready_Layer_Map(TEXT("Layer_Map"))))
 	//	return E_FAIL;
@@ -27,6 +31,7 @@ HRESULT CLevel_Logo::Initialize_Clone()
 
 	if (FAILED(Ready_Layer_Camera(TEXT("Layer_Camera"))))
 		return E_FAIL;
+
 
 	if (FAILED(Ready_Events()))
 		return E_FAIL;
@@ -169,6 +174,33 @@ HRESULT CLevel_Logo::Ready_Layer_Camera(const _wstring& strLayerTag)
 
 	if (FAILED(m_pGameInstance->Add_GameObject_ToLayer(ENUM_CLASS(m_eCurLevel), strLayerTag,
 		ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_Camera_Free"), &CameraDesc)))
+		return E_FAIL;
+
+	return S_OK;
+}
+
+HRESULT CLevel_Logo::Ready_Lights()
+{
+	LIGHT_DESC			LightDesc{};
+
+	LightDesc.eType = LIGHT_DESC::TYPE::DIRECTIONAL;
+	LightDesc.vDirection = _float4(1.f, -1.f, 1.f, 0.f);
+	LightDesc.vDiffuse = _float4(1.f, 1.f, 1.f, 1.f);
+	LightDesc.vAmbient = _float4(0.3f, 0.3f, 0.3f, 1.f);
+	LightDesc.vSpecular = _float4(1.f, 1.f, 1.f, 1.f);
+
+	if (FAILED(m_pGameInstance->Add_Light(LightDesc)))
+		return E_FAIL;
+
+	SHADOW_LIGHT_DESC			ShadowLightDesc{};
+	ShadowLightDesc.vEye = _float4(0.f, 100.f, -100.f, 1.f);
+	ShadowLightDesc.vAt = _float4(0.f, 0.f, 1.f, 1.f); // 오른쪽 보게?
+	ShadowLightDesc.fFovy = XMConvertToRadians(60.f);
+	ShadowLightDesc.fNear = 0.1f;
+	ShadowLightDesc.fFar = 1000.f;
+
+
+	if (FAILED(m_pGameInstance->Ready_ShadowLight(ShadowLightDesc)))
 		return E_FAIL;
 
 	return S_OK;

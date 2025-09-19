@@ -1,30 +1,36 @@
 ﻿#pragma once
 
 NS_BEGIN(Client)
-class CEffect_Wind final : public CGameObject
+class CEffect_Wind final : public CContainerObject
 {
-public:
-    enum TEXTURE { TEXTURE_DIFFUSE, TEXTURE_MASK, TEXTURE_END };
-
 
 public:
-    typedef struct tagEffectWindDesc : public CGameObject::GAMEOBJECT_DESC
+    /* 클론시 전달할 정보들 */
+    typedef struct tagEffectPillarDesc : public CContainerObject::GAMEOBJECT_DESC
     {
-        LEVEL eCurLevel = { LEVEL::END };
-    }EFFECT_WIND;
+    }EFFECTWIND_DESC;
 
-    typedef struct tagWindEffectEnterDesc
+    typedef struct tagPillarActivateDesc
     {
         LEVEL eCurLevel = { LEVEL::END };
-        _vector vHitDirection = {};
-        _vector vHitPosition = {};
-        _float  fDisPlayTime = {};
-        _float3 vScale = {};
-    }WINDENTER_DESC;
+        _float3 vStartPos = {}; // 시작 포지션.
+        _float fDuration = {}; // 모든 성장이 일어나는데 걸리는 총 시간.
+        _float3 vStartRotation = {}; // 시작 회전.
+		_float3 vRotationAxis = {}; // 회전 축.
+        const _float4x4* pParentMatrix = { nullptr };
+		class CTransform* pTargetTransform = { nullptr };
+    }EFFECTWIND_ACTIVATE_DESC;
+
+private:
+    struct SwordWindEvent
+    {
+        _bool bIsActive = { false };
+        _float fWindEventTime = {};
+    };
 
 private:
     explicit CEffect_Wind(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
-    explicit CEffect_Wind(const CHitFlashEffect& Prototype);
+    explicit CEffect_Wind(const CEffect_Wind& Prototype);
     virtual ~CEffect_Wind() = default;
 
 #pragma region  기본 함수
@@ -37,6 +43,7 @@ public:
     virtual void Late_Update(_float fTimeDelta);
     virtual HRESULT Render();
 
+
 #pragma region 풀링 전용 함수
 public:
     virtual void OnActivate(void* pArg) override;
@@ -45,49 +52,77 @@ public:
 
 
 
+
 #pragma endregion
 
 
+
+#pragma region 사용하는 컴포넌트
+
+#pragma endregion
+
+#pragma region 사용하는 멤버 변수
 public:
     // 타이머 리셋
     void Reset_Timer() { m_fCurrentTime = 0.0f; }
+    void Calc_Timer(_float fTimeDelta);
 
-public:
-    void Initialize_Transform();
 
 private:
-    // 컴포넌트
-    class CShader* m_pShaderCom = { nullptr };
-    class CTexture* m_pTextureCom[TEXTURE_END] = { nullptr };
-
     LEVEL m_eCurLevel = { LEVEL::END };
-    // LockOn 관련
-    CGameObject* m_pTarget = { nullptr };
     _bool m_bActive = false;
 
+    _float m_fCurrentTime = {};
+    _float m_fDuration = {};
+    EFFECTWIND_ACTIVATE_DESC m_ActivateDesc = {};
+    _float3 m_vStartRotation = {};
+    _float3 m_vRotationAxis = {};
+    
 
-    // 타이머
-    //_float m_fDisplayTime = 1.0f;        // 표시 시간 (초)
-    _float m_fDisplayTime = 10.0f;        // 테스트용 표시 시간 (초)
-    _float m_fCurrentTime = 0.0f;        // 현재 경과 시간
-    // 회전 정보
-    _float m_fRotationAngle = 0.0f; // Z축 회전 각도 (라디안)
-    _bool m_bDirectionCalculated = false; // 방향이 계산되었는지 여부
-    _vector m_vHitDirection = {};
-    _float3 m_vScale = {};
+    // PartObject들
+private:
+    vector<class CSwordWind*> m_vecSwordWinds;
+	
+
+    vector<SwordWindEvent> m_vecSwordWindEvents;
+    const _float4x4* m_pParentMatrix = { nullptr };
+    class CTransform* m_pTargetTransform = { nullptr };
+    _float3 m_vStartPos = {};
+    
+
+
 
 public:
-    static const EFFECTTYPE EffectType = EFFECTTYPE::TEXTURE;
+    static const EFFECTTYPE EffectType = EFFECTTYPE::MESH;
+
+#pragma endregion
 
 
+
+#pragma region 기본 준비 함수들
 private:
-    HRESULT Bind_ShaderResources();
-    HRESULT Ready_Components();
+    HRESULT Ready_Components(EFFECTWIND_DESC* pDesc);
+    HRESULT Ready_PartObjects();
+#pragma endregion
+
+
+#pragma region IMGUI
+#ifdef _DEBUG
+private:
+    void ImGui_Render();
+#endif // _DEBUG
+
+
+
+#pragma endregion
+
+
 
 public:
     static CEffect_Wind* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
     virtual CGameObject* Clone(void* pArg) override;
     virtual void Free() override;
+
 };
 NS_END
 

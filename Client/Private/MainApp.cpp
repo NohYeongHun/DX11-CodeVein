@@ -64,12 +64,12 @@ HRESULT CMainApp::Initialize()
 	}
 
 
-	//if (FAILED(Start_Level(LEVEL::GAMEPLAY)))
-	//	return E_FAIL;
+	if (FAILED(Start_Level(LEVEL::GAMEPLAY)))
+		return E_FAIL;
 
 	// 원본
-	if (FAILED(Start_Level(LEVEL::LOGO)))
-		return E_FAIL;
+	//if (FAILED(Start_Level(LEVEL::LOGO)))
+	//	return E_FAIL;
 
 	//if (FAILED(Start_Level(LEVEL::DEBUG)))
 	//	return E_FAIL;
@@ -193,6 +193,24 @@ HRESULT CMainApp::Ready_Pooling()
 		}
 		m_pGameInstance->Add_GameObject_ToPools(TEXT("BLOOD_PILLAR"), ENUM_CLASS(CEffect_Pillar::EffectType), pGameObject);
 	}
+
+	pGameObject = nullptr;
+
+
+	CEffect_Wind::EFFECTWIND_DESC EffectWindDesc{};
+	//한번에 십자모양 12개씩 사용 예정. => 넉넉하게 넣자.
+	for (_uint i = 0; i < 300; ++i)
+	{
+		pGameObject = dynamic_cast<CGameObject*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT
+			, ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_EffectWind"), &EffectWindDesc));
+		if (nullptr == pGameObject)
+		{
+			CRASH("Failed Create GameObject");
+			return E_FAIL;
+		}
+		m_pGameInstance->Add_GameObject_ToPools(TEXT("SWORD_WIND"), ENUM_CLASS(CEffect_Wind::EffectType), pGameObject);
+	}
+
 
 	pGameObject = nullptr;
 #pragma endregion

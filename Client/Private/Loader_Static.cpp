@@ -1,5 +1,4 @@
-﻿#include "Loader_Static.h"
-HRESULT CLoader_Static::Loading_Resource(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
+﻿HRESULT CLoader_Static::Loading_Resource(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
 {
 	if (FAILED(Add_Prototype_ForShader(pDevice, pContext, pGameInstance)))
 	{
@@ -529,6 +528,14 @@ HRESULT CLoader_Static::Add_Prototype_Effects(ID3D11Device* pDevice, ID3D11Devic
 		return E_FAIL;
 	}
 
+	if (FAILED(Add_Prototype_SwordWind_Effects(pDevice, pContext, pGameInstance)))
+	{
+		CRASH("Failed CLone SwordWind Effects");
+		return E_FAIL;
+	}
+		
+
+
 	return S_OK;
 }
 
@@ -804,16 +811,6 @@ HRESULT CLoader_Static::Add_Prototype_BloodPillar_Effects(ID3D11Device* pDevice,
 	PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XM_PI);
 
 	/* Prototype_Component_Model */
-	
-	//if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
-	//	, TEXT("Prototype_Component_Model_Effect_BloodPillarA")
-	//	, CLoad_Model::Create(pDevice, pContext, MODELTYPE::NONANIM, PreTransformMatrix, "../../SaveFile/Model/Effect/BloodPillarA.dat", L""))))
-	//	CRASH("Failed Prototype Blood Pillar Effects");
-
-	/*if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
-		, TEXT("Prototype_Component_Model_Effect_BloodPillarB")
-		, CLoad_Model::Create(pDevice, pContext, MODELTYPE::NONANIM, PreTransformMatrix, "../../SaveFile/Model/Effect/BloodPillarB.dat", L""))))
-		CRASH("Failed Prototype Blood Pillar Effects");*/
 
 
 	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
@@ -839,7 +836,7 @@ HRESULT CLoader_Static::Add_Prototype_BloodPillar_Effects(ID3D11Device* pDevice,
 
 	
 
-	/* 최종 명령을 내리는 주체.*/
+	/* 부품 메시들. */
 	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
 		, TEXT("Prototype_GameObject_BloodPillarA")
 		, CBlood_PillarA::Create(pDevice, pContext))))
@@ -864,6 +861,76 @@ HRESULT CLoader_Static::Add_Prototype_BloodPillar_Effects(ID3D11Device* pDevice,
 
 
 
+	return S_OK;
+}
+
+HRESULT CLoader_Static::Add_Prototype_SwordWind_Effects(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
+{
+#pragma region TEXTURE
+	// 발광 효과 텍스처 등록  
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
+		, TEXT("Prototype_Component_Texture_SwordWindDiffuse")
+		, CTexture::Create(pDevice, pContext
+			, TEXT("../Bin/Resources/Models/EffectMesh/SwordWind/Diffuse/Diffuse%d.png"), 6))))
+	{
+		CRASH("Failed Load Effect SwordDiffuse Texture");
+		return E_FAIL;
+	}
+
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
+		, TEXT("Prototype_Component_Texture_SwordWindOther")
+		, CTexture::Create(pDevice, pContext
+			, TEXT("../Bin/Resources/Models/EffectMesh/SwordWind/Other/Other%d.png"), 13))))
+	{
+		CRASH("Failed Load Effect SwordOther Texture");
+		return E_FAIL;
+	}
+
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
+		, TEXT("Prototype_Component_Texture_SwordWindNoise")
+		, CTexture::Create(pDevice, pContext
+			, TEXT("../Bin/Resources/Models/EffectMesh/SwordWind/Noise/Noise%d.png"), 5))))
+	{
+		CRASH("Failed Load Effect SwordOther Texture");
+		return E_FAIL;
+	}
+
+
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
+		, TEXT("Prototype_Component_Texture_SwordWindSwirl")
+		, CTexture::Create(pDevice, pContext
+			, TEXT("../Bin/Resources/Models/EffectMesh/SwordWind/Swirl/Swirl%d.png"), 6))))
+	{
+		CRASH("Failed Load Effect SwordOther Texture");
+		return E_FAIL;
+	}
+
+
+#pragma endregion
+
+	_matrix		PreTransformMatrix = XMMatrixIdentity();
+
+	PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XM_PI);
+
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
+		, TEXT("Prototype_Component_Model_Effect_SwordWind")
+		, CLoad_Model::Create(pDevice, pContext, MODELTYPE::NONANIM, PreTransformMatrix, "../../SaveFile/Model/Effect/SwordWind.dat", L""))))
+	{
+		CRASH("Failed Prototype_Component_Model_Effect_SwordWind");
+		return E_FAIL;
+	}
+		
+	/* 부품 메시들. */
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
+		, TEXT("Prototype_GameObject_SwordWind")
+		, CSwordWind::Create(pDevice, pContext))))
+		CRASH("Failed Prototype Sword Wind Effects");
+
+	/* 최종 명령을 내리는 주체.*/
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
+		, TEXT("Prototype_GameObject_EffectWind")
+		, CEffect_Wind::Create(pDevice, pContext))))
+		CRASH("Failed Prototype Effects Wind");
 	return S_OK;
 }
 

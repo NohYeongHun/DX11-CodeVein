@@ -76,6 +76,8 @@ public:
 		return m_QuatRotation;
 	}
 
+	_float Get_RotationSpeed() { return m_fRotationPerSec; }
+
 	_float  GetYawFromQuaternion() const;
 	_float  GetPitchFromQuaternion() const;
 	_float  GetRollFromQuaternion() const;

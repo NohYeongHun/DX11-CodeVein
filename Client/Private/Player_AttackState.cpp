@@ -59,11 +59,11 @@ void CPlayer_AttackState::Enter(void* pArg)
 	m_isLoop = false;
 	m_iCurAnimIdx = pDesc->iAnimation_Idx;
 	m_eDir = pDesc->eDirection;
-	
+
 	m_pModelCom->Set_RootMotionRotation(true);
 	m_pModelCom->Set_RootMotionTranslate(true);
 	m_pModelCom->Set_Animation(m_iCurAnimIdx, m_isLoop);
-	
+
 	// 콜라이더 활성화 정보 초기화
 	CPlayerState::Reset_ColliderActiveInfo();
 
@@ -83,12 +83,12 @@ void CPlayer_AttackState::Enter(void* pArg)
 			_float x = XMVectorGetX(vLockOnDirection);
 			_float z = XMVectorGetZ(vLockOnDirection);
 			_float fTargetYaw = atan2f(x, z);
-			
+
 			_vector qNewRot = XMQuaternionRotationAxis(XMVectorSet(0.f, 1.f, 0.f, 0.f), fTargetYaw);
 			m_pPlayer->Get_Transform()->Set_Quaternion(qNewRot);
 		}
 	}
-	
+
 	// 1. 스테미나 감소.
 	STEMINA_CHANGE_DESC SteminaDesc{};
 	SteminaDesc.bIncrease = false;
@@ -96,11 +96,30 @@ void CPlayer_AttackState::Enter(void* pArg)
 	SteminaDesc.fTime = 1.f;
 	m_pGameInstance->Publish(EventType::STEMINA_CHANGE, &SteminaDesc);
 
-	// 임시 피기둥 만들어보기?
 
 	_float3 vStartPos = {};
 	XMStoreFloat3(&vStartPos, m_pPlayer->Get_Transform()->Get_State(STATE::POSITION));
-	
+
+	// 2. 검풍 생성 부분 수정
+	CEffect_Wind::EFFECTWIND_ACTIVATE_DESC WindActivate_Desc{};
+	WindActivate_Desc.eCurLevel = m_pPlayer->Get_CurrentLevel();
+	WindActivate_Desc.fDuration = 10.f; // 지속시간,,
+
+	// ✅ 플레이어 기준 상대 위치 (Local Offset)
+	WindActivate_Desc.vStartPos = { 0.f, 0.f, 5.f }; // {오른쪽, 위, 앞}
+
+	WindActivate_Desc.vStartRotation = { 0.f, 0.f, 0.f }; // 각도 단위
+
+	// ✅ 카메라의 Look 방향을 회전축으로 설정 (소용돌이 회전)
+	_vector vCamLook = m_pGameInstance->Get_MainCamera()->Get_Transform()->Get_State(STATE::LOOK);
+	XMStoreFloat3(&WindActivate_Desc.vRotationAxis, XMVector3Normalize(vCamLook));
+
+	// ✅ 부모-자식 관계 설정 (플레이어를 따라다니게)
+	WindActivate_Desc.pParentMatrix = m_pPlayer->Get_Transform()->Get_WorldMatrixPtr();
+	WindActivate_Desc.pTargetTransform = m_pPlayer->Get_Transform();
+
+	m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(m_pGameInstance->Get_CurrentLevelID())
+		, TEXT("SWORD_WIND"), TEXT("Layer_Effect"), 1, ENUM_CLASS(CEffect_Wind::EffectType), &WindActivate_Desc);
 
 	
 

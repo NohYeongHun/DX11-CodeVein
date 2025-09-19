@@ -262,6 +262,9 @@
     <Filter Include="02. GameObject\Effect\Mesh\Boss\QueenKnight\BloodPillar">
       <UniqueIdentifier>{39bdd772-2c2f-4fa7-9139-5aedc0ab25e9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. GameObject\Effect\Mesh\Player\CirculatePurge\SwordWind">
+      <UniqueIdentifier>{e55cadba-582d-4f8a-9da6-e312841c0842}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -690,9 +693,6 @@
     <ClInclude Include="..\Public\ParticlePresets.h">
       <Filter>99. Defines</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\Effect_Wind.h">
-      <Filter>02. GameObject\Effect\Mesh\Player\CirculatePurge</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\Effect_Pillar.h">
       <Filter>02. GameObject\Effect\Mesh\Boss\QueenKnight</Filter>
     </ClInclude>
@@ -704,6 +704,12 @@
     </ClInclude>
     <ClInclude Include="..\Public\Blood_PillarC.h">
       <Filter>02. GameObject\Effect\Mesh\Boss\QueenKnight\BloodPillar</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Effect_Wind.h">
+      <Filter>02. GameObject\Effect\Mesh\Player\CirculatePurge</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\SwordWind.h">
+      <Filter>02. GameObject\Effect\Mesh\Player\CirculatePurge\SwordWind</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1104,9 +1110,6 @@
     <ClCompile Include="..\Private\Loader_Static.cpp">
       <Filter>01. Levels\99. Loading\Loader\Personal</Filter>
     </ClCompile>
-    <ClCompile Include="..\Private\Effect_Wind.cpp">
-      <Filter>02. GameObject\Effect\Mesh\Player\CirculatePurge</Filter>
-    </ClCompile>
     <ClCompile Include="..\Private\Effect_Pillar.cpp">
       <Filter>02. GameObject\Effect\Mesh\Boss\QueenKnight</Filter>
     </ClCompile>
@@ -1118,6 +1121,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\Blood_PillarC.cpp">
       <Filter>02. GameObject\Effect\Mesh\Boss\QueenKnight\BloodPillar</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Effect_Wind.cpp">
+      <Filter>02. GameObject\Effect\Mesh\Player\CirculatePurge</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\SwordWind.cpp">
+      <Filter>02. GameObject\Effect\Mesh\Player\CirculatePurge\SwordWind</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -167,25 +167,19 @@ HRESULT CToolMap_Part::Render()
         }
 
         // 플레이어 맵 용도 => 주기적으로 주석 했따 안했따하자..
-        //if (FAILED(m_pModelCom->Bind_Materials(m_pShaderCom, "g_NormalTexture", i, aiTextureType_NORMALS, 0)))
-        //{
-        //    CRASH("Failed Bind Diffuse Texture");
-        //    return E_FAIL;
-        //}
-		//m_pModelCom->Bind_Materials(m_pShaderCom, "g_NormalTexture", i, aiTextureType_NORMALS, 0);
+        /*if (FAILED(m_pModelCom->Bind_Materials(m_pShaderCom, "g_NormalTexture", i, aiTextureType_NORMALS, 0)))
+        {
+            CRASH("Failed Bind Normal Texture");
+            return E_FAIL;
+        }*/
 
+		//m_pModelCom->Bind_Materials(m_pShaderCom, "g_NormalTexture", i, aiTextureType_NORMALS, 0);
 
         if (FAILED(m_pShaderCom->Begin(m_iShaderPath)))
         {
             CRASH("Failed Begin Failed");
             return E_FAIL;
         }
-         
-        //if (FAILED(m_pShaderCom->Begin(0)))
-        //{
-        //    CRASH("Failed Begin Failed");
-        //    return E_FAIL;
-        //}
 
         if (FAILED(m_pModelCom->Render(i)))
         {

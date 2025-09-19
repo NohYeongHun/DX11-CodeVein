@@ -90,6 +90,7 @@ private:
 	HRESULT Render_BloomCombine();
 	HRESULT Render_UI();
 	HRESULT Render_StaticUI();
+	HRESULT Render_LastEffect();
 
 #ifdef _DEBUG
 private:
