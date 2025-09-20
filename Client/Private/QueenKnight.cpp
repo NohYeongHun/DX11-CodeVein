@@ -129,6 +129,13 @@ void CQueenKnight::Update(_float fTimeDelta)
 
     Update_AI(fTimeDelta);
 
+    if (m_IsEncountered && m_isBgm)
+    {
+        m_isBgm = false;
+        m_pGameInstance->PlayBGM(L"BossStage.mp3", 0.4f, true);
+    }
+    
+
     // 스킬 체크
     Update_BloodPillar(fTimeDelta);
 
@@ -870,6 +877,12 @@ void CQueenKnight::End_Dissolve()
     m_pShield->End_Dissolve();
 }
 
+void CQueenKnight::Dead_Action()
+{
+    CMonster::Dead_Action();
+    Start_Dissolve(3.5f);
+}
+
 void CQueenKnight::Enable_Trail(_uint iPartType)
 {
 
@@ -905,7 +918,7 @@ void CQueenKnight::Disable_Trail(_uint iPartType)
 #pragma region 0. 기본 함수들 정의 => 콜라이더도 정의
 HRESULT CQueenKnight::Ready_Components(QUEENKNIGHT_DESC* pDesc)
 {
-    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxAnimMesh"),
+    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("dd"),
         TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom), nullptr)))
         return E_FAIL;
 
@@ -1152,13 +1165,7 @@ HRESULT CQueenKnight::Bind_Shader_Resource()
         CRASH("Failed Dissolve Texture");
         return E_FAIL;
     }
-
-
-    //if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
-    //{
-    //    CRASH("Failed Bind CamPosition");
-    //    return E_FAIL;
-    //}
+ 
         
     return S_OK;
 }
@@ -1206,6 +1213,8 @@ void CQueenKnight::Free()
     Safe_Release(m_pShield);
     Safe_Release(m_pTree);
     Safe_Release(m_pDissolveTexture);
+
+    m_pGameInstance->StopBGM();
 }
 
 

@@ -94,6 +94,8 @@ private:
     // PartObject들
 private:
     class CEffect_FloorAura* m_pFloorAura = { nullptr };
+    class CEffect_BodyAura* m_pBodyAura = { nullptr };
+    class CEffect_BodyAura* m_pBodyAura_Second = { nullptr };
     const _float4x4* m_pParentMatrix = { nullptr };
     class CTransform* m_pTargetTransform = { nullptr };
     _float3 m_vStartPos = {};

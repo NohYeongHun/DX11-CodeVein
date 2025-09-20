@@ -982,7 +982,7 @@ HRESULT CLoader_Static::Add_Prototype_BloodAura_Effects(ID3D11Device* pDevice, I
 	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
 		, TEXT("Prototype_Component_Texture_BloodAuraOther")
 		, CTexture::Create(pDevice, pContext
-			, TEXT("../Bin/Resources/Models/EffectMesh/SwordWind/Other/Other%d.png"), 13))))
+			, TEXT("../Bin/Resources/Models/EffectMesh/BloodAura/Other/Other%d.png"), 13))))
 	{
 		CRASH("Failed Load Effect SwordOther Texture");
 		return E_FAIL;
@@ -991,7 +991,7 @@ HRESULT CLoader_Static::Add_Prototype_BloodAura_Effects(ID3D11Device* pDevice, I
 	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
 		, TEXT("Prototype_Component_Texture_BloodAuraNoise")
 		, CTexture::Create(pDevice, pContext
-			, TEXT("../Bin/Resources/Models/EffectMesh/BloodAura/Noise/Noise%d.png"), 5))))
+			, TEXT("../Bin/Resources/Models/EffectMesh/BloodAura/Noise/Noise%d.png"), 8))))
 	{
 		CRASH("Failed Load Effect SwordOther Texture");
 		return E_FAIL;
@@ -1014,19 +1014,35 @@ HRESULT CLoader_Static::Add_Prototype_BloodAura_Effects(ID3D11Device* pDevice, I
 
 	PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XM_PI);
 
+	/* 바닥 객체. */
 	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
-		, TEXT("Prototype_Component_Model_Effect_BloodAura")
-		, CLoad_Model::Create(pDevice, pContext, MODELTYPE::NONANIM, PreTransformMatrix, "../../SaveFile/Model/Effect/BloodAura.dat", L""))))
+		, TEXT("Prototype_Component_Model_Effect_BloodFloorAura")
+		, CLoad_Model::Create(pDevice, pContext, MODELTYPE::NONANIM, PreTransformMatrix, "../../SaveFile/Model/Effect/BloodFloorAura.dat", L""))))
 	{
-		CRASH("Failed Prototype_Component_Model_Effect_BloodAura");
+		CRASH("Failed Prototype_Component_Model_Effect_BloodFloorAura");
 		return E_FAIL;
 	}
 
-	/* 부품 메시들. */
+
 	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
-		, TEXT("Prototype_GameObject_BloodAura")
+		, TEXT("Prototype_GameObject_BloodFloorAura")
 		, CEffect_FloorAura::Create(pDevice, pContext))))
 		CRASH("Failed Prototype Blood Aura Effects");
+
+	/* Body 객체. */
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
+		, TEXT("Prototype_Component_Model_Effect_BloodBodyAura")
+		, CLoad_Model::Create(pDevice, pContext, MODELTYPE::NONANIM, PreTransformMatrix, "../../SaveFile/Model/Effect/BloodBodyAura.dat", L""))))
+	{
+		CRASH("Failed Prototype_Component_Model_Effect_BloodBodyAura");
+		return E_FAIL;
+	}
+
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
+		, TEXT("Prototype_GameObject_BloodBodyAura")
+		, CEffect_BodyAura::Create(pDevice, pContext))))
+		CRASH("Failed Prototype Blood Body Aura Effects");
+
 
 	/* 최종 명령을 내리는 주체.*/
 	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)

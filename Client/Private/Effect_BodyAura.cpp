@@ -1,4 +1,5 @@
-﻿#pragma region  기본 함수들
+﻿#include "Effect_BodyAura.h"
+#pragma region  기본 함수들
 CEffect_BodyAura::CEffect_BodyAura(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CPartObject{ pDevice, pContext }
 {
@@ -68,6 +69,8 @@ void CEffect_BodyAura::Update(_float fTimeDelta)
 	Shape_Control(fTimeDelta);
 
 	/* 위치를 설정. */
+	_vector vAxis = XMVectorSet(0.f, 1.f, 0.f, 0.f);
+	m_pTransformCom->Turn(vAxis, fTimeDelta * 10.f);
 
 
 	/* 오프셋 위치를 초기에 설정하고 Target에 바인딩합니다. */
@@ -113,9 +116,8 @@ HRESULT CEffect_BodyAura::Render()
 
 	for (_uint i = 0; i < iNumMeshes; i++)
 	{
-		// 기본 Texture를 NoiseTexture로 지정.
-		//if (FAILED(m_pModelCom->Bind_Materials(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE, 0)))
-		//	return E_FAIL;
+	/*	if (FAILED(m_pModelCom->Bind_Materials(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE, 0)))
+			return E_FAIL;*/
 
 		m_pShaderCom->Begin(m_iShaderPath);
 		m_pModelCom->Render(i);
@@ -137,31 +139,27 @@ void CEffect_BodyAura::OnActivate(void* pArg)
 
 
 	m_bIsGrowing = true;
-	m_fGrowDuration = pDesc->fGrowDuration;
 	m_fStayDuration = pDesc->fStayDuration;
 	m_fDissolveDuration = pDesc->fDissolveDuration;
 
-	m_fDisplayTime = m_fGrowDuration + m_fStayDuration + m_fDissolveDuration;
+	m_fDisplayTime = m_fStayDuration + m_fDissolveDuration;
 	m_fDissolveTime = 0.f;
 	m_fDissolveThreshold = 0.f; // 초기화
 
 	m_pTargetTransform = pDesc->pTargetTransform;
 
 	m_vStartScale = pDesc->vStartScale;
-	m_vEndScale = pDesc->vEndScale;
 
-	// 카메라 기준 위치 설정 (기존 코드 유지)
-	// 초기 회전은 유지하되, Update에서는 회전시키지 않음
-	/*m_pTransformCom->Add_Rotation(
-		XMConvertToRadians(pDesc->vStartRotation.x),
-		XMConvertToRadians(pDesc->vStartRotation.y),
-		XMConvertToRadians(pDesc->vStartRotation.z)
-	);*/
 
 
 	m_pTransformCom->Set_Scale(m_vStartScale);
 
-	m_eState = STATE_GROW;
+	m_pTransformCom->Add_Rotation(
+		XMConvertToRadians(pDesc->vStartRotation.x),
+		XMConvertToRadians(pDesc->vStartRotation.y),
+		XMConvertToRadians(pDesc->vStartRotation.z));
+
+	m_eState = STATE_STAY;
 }
 
 
@@ -178,9 +176,6 @@ void CEffect_BodyAura::Shape_Control(_float fTimeDelta)
 	m_fCurrentTime += fTimeDelta;
 	switch(m_eState)
 	{
-	case STATE_GROW:
-		Update_Grow(fTimeDelta);
-		break;
 	case STATE_STAY:
 		Update_Stay(fTimeDelta);
 		break;
@@ -189,23 +184,16 @@ void CEffect_BodyAura::Shape_Control(_float fTimeDelta)
 		break;
 	}
 }
+
 void CEffect_BodyAura::Update_Grow(_float fTimeDelta)
 {
 	if (m_fCurrentTime >= m_fGrowDuration)
 	{
-		m_eState = STATE_STAY; // '유지' 상태로 변경
-		m_fCurrentTime = 0.f;  // 타이머 리셋!
-		m_pTransformCom->Set_Scale({ m_vEndScale.x, m_vEndScale.y, m_vEndScale.z }); // 최종 크기로 고정
-		return;
+		m_eState = STATE_STAY; // '중간' 상태로 변경
+		m_fCurrentTime = 0.f;     // 타이머 리셋!
 	}
-
-	_float fRatio = m_fCurrentTime / m_fGrowDuration;
-	m_fGrowTime += fTimeDelta;
-
-	_float fCurrentRadius = 0.01f + (m_vEndScale.x - 0.01f) * fRatio;
-	_float fCurrentHeight = 0.f + (m_vEndScale.z - 0.f) * fRatio;
-	m_pTransformCom->Set_Scale({ fCurrentRadius, fCurrentHeight, fCurrentRadius });
 }
+
 void CEffect_BodyAura::Update_Stay(_float fTimeDelta)
 {
 	if (m_fCurrentTime >= m_fStayDuration)
@@ -213,6 +201,8 @@ void CEffect_BodyAura::Update_Stay(_float fTimeDelta)
 		m_eState = STATE_DISSOLVE; // '감소' 상태로 변경
 		m_fCurrentTime = 0.f;     // 타이머 리셋!
 	}
+
+	m_fStayTime += fTimeDelta;
 }
 void CEffect_BodyAura::Update_Dissolve(_float fTimeDelta)
 {
@@ -307,8 +297,8 @@ HRESULT CEffect_BodyAura::Bind_ShaderResources()
 		return E_FAIL;
 	}
 
-	_float fGrowRatio = m_fGrowTime / m_fGrowDuration;
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_fGrowTime", &fGrowRatio, sizeof(_float))))
+	_float fStayRatio = m_fStayTime / m_fStayDuration;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fGrowTime", &fStayRatio, sizeof(_float))))
 	{
 		CRASH("Failed Bind g_fGrowTime");
 		return E_FAIL;
@@ -324,17 +314,6 @@ HRESULT CEffect_BodyAura::Bind_ShaderResources()
 		return E_FAIL;
 	}
 
-	
-
-	//_float4 vDynamicFresnelColor = {
-	//	1.0f,
-	//	0.2f + sin(m_fTime * 2.0f) * 0.1f,  // 초록 성분 변화
-	//	0.1f + cos(m_fTime * 1.5f) * 0.05f, // 파랑 성분 변화
-	//	1.0f
-	//};
-
-	//if (FAILED(m_pShaderCom->Bind_RawValue("g_vFresnelColor", &vDynamicFresnelColor, sizeof(_float4))))
-	//	return E_FAIL;
 #pragma endregion
 
 	
@@ -345,7 +324,7 @@ HRESULT CEffect_BodyAura::Bind_ShaderResources()
 
 #pragma region TEXTURE 바인딩.
 	// 피색 Diffuse
-	if (FAILED(m_pTextureCom[TEXTURE_DIFFUSE]->Bind_Shader_Resource(m_pShaderCom, "g_DiffuseTexture", 0)))
+	if (FAILED(m_pTextureCom[TEXTURE::TEXTURE_DIFFUSE]->Bind_Shader_Resource(m_pShaderCom, "g_DiffuseTexture", 0)))
 	{
 		CRASH("Failed Bind Texture Diffuse Texture ");
 		return E_FAIL;
@@ -382,7 +361,7 @@ HRESULT CEffect_BodyAura::Ready_Components(EFFECTBODYAURA_DESC* pDesc)
 	CLoad_Model::LOADMODEL_DESC Desc{};
 	Desc.pGameObject = this;
 
-	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Model_Effect_BloodAura"),
+	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Model_Effect_BloodBodyAura"),
 		TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom), &Desc)))
 		CRASH("Failed BloodPillarA Components");
 

@@ -22,7 +22,8 @@ HRESULT CLevel_Logo::Initialize_Clone()
 		CRASH("Failed to Ready Events in CLevel_Logo");
 		return E_FAIL;
 	}
-		
+
+	//m_pGameInstance->PlayBGM(L"MainTheme.mp3", 0.4f, true);
 	
 	
 	return S_OK;
@@ -121,4 +122,5 @@ void CLevel_Logo::Free()
 	for (auto& Event : m_Events)
 		m_pGameInstance->UnSubscribe(Event.first, Event.second);
 
+	//m_pGameInstance->StopBGM();
 }

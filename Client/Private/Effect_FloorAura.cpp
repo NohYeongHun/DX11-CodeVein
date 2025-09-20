@@ -330,7 +330,7 @@ HRESULT CEffect_FloorAura::Bind_ShaderResources()
 	//_float4 vDynamicFresnelColor = {
 	//	1.0f,
 	//	0.2f + sin(m_fTime * 2.0f) * 0.1f,  // 초록 성분 변화
-	//	0.1f + cos(m_fTime * 1.5f) * 0.05f, // 파랑 성분 변화
+	//	0.1f + cos(m_fTime * 1.5f) * 0.05f, // 파랑 성분 변화 
 	//	1.0f
 	//};
 
@@ -346,7 +346,7 @@ HRESULT CEffect_FloorAura::Bind_ShaderResources()
 
 #pragma region TEXTURE 바인딩.
 	// 피색 Diffuse
-	if (FAILED(m_pTextureCom[TEXTURE_DIFFUSE]->Bind_Shader_Resource(m_pShaderCom, "g_DiffuseTexture", 0)))
+	if (FAILED(m_pTextureCom[TEXTURE_DIFFUSE]->Bind_Shader_Resource(m_pShaderCom, "g_DiffuseTexture", 1)))
 	{
 		CRASH("Failed Bind Texture Diffuse Texture ");
 		return E_FAIL;
@@ -383,7 +383,7 @@ HRESULT CEffect_FloorAura::Ready_Components(EFFECTFLOORAURA_DESC* pDesc)
 	CLoad_Model::LOADMODEL_DESC Desc{};
 	Desc.pGameObject = this;
 
-	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Model_Effect_BloodAura"),
+	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Model_Effect_BloodFloorAura"),
 		TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom), &Desc)))
 		CRASH("Failed BloodPillarA Components");
 

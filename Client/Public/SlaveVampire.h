@@ -57,8 +57,15 @@ private:
 public:
 	virtual void Update_AI(_float fTimeDelta) override;
 
+	virtual void Start_Dissolve(_float fDuration = 0.f) override; // Dissolve 재생.
+	virtual void ReverseStart_Dissolve(_float fDuration = 0.f) override; // Dissolve 역재생
+	virtual void End_Dissolve() override;
+	virtual void Dead_Action() override;
+
 private:
 	class CMonsterTree* m_pTree = { nullptr };
+
+	class CTexture* m_pDissolveTexture = { nullptr };
 
 #pragma endregion
 

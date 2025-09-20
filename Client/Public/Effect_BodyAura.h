@@ -22,11 +22,10 @@ public:
         LEVEL eCurLevel = { LEVEL::END }; // 현재 레벨.
         _float3 vOffsetPos = {}; // 이동할 위치.
         _float4 vColor = {}; // 추가할 컬러.
-        _float3 vStartScale = {}; // 시작 크기
-        _float3 vEndScale = {}; // 끝 크기.
-        _float fGrowDuration = {}; // 커지는 시간.
+        _float3 vStartScale = {}; // 크기는 변하지 않음.
         _float fStayDuration = {}; // 유지 시간
         _float fDissolveDuration = {}; // 사라지는 시간
+        _float3 vStartRotation = {}; // 사라지는 시간
         CTransform* pTargetTransform = { nullptr };
     }EFFECTFBODYAURA_ACTIVATE_DESC;
 
@@ -83,7 +82,7 @@ private:
 
     _float m_fCurrentTime = 0.0f;        // 현재 경과 시간
 
-    _float m_fGrowTime = {};
+    _float m_fStayTime = {};
 
     _float m_fGrowDuration = 0.f;      // 총 성장 시간
     _float m_fStayDuration = 0.f;      // 총 성장 시간

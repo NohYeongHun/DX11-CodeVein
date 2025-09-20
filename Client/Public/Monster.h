@@ -321,7 +321,7 @@ public:
     
     /* Reset 시 파츠 콜라이더 비활성화 */
     virtual void Reset_Part_Colliders();
-    virtual void Dead_Action();
+
 
     /* 무기 회전*/
     virtual void Weapon_Rotation(_uint iPartType, _float3 vRadians, _bool bInverse = false) {};
@@ -354,6 +354,25 @@ public:
 #pragma region 7. 몬스터 삭제 처리.
 public:
     virtual _bool Monster_Dead();
+
+
+public:
+    virtual void Dead_Action();
+    virtual void Start_Dissolve(_float fDuration = 0.f) {};
+    virtual void ReverseStart_Dissolve(_float fDuration = 0.f) {}; // Dissolve 역재생
+    virtual void End_Dissolve() {};
+
+protected:
+    _float m_fDissolveTime = {};
+
+    _float m_fMaxDissolveTime = {};
+    _float m_fCurDissolveTime = {};
+
+    _float m_fReverseDissolveTime = {};
+    _float m_fEndReverseDissolveTime = {};
+
+    _bool m_IsDissolve = { false };
+    _bool m_IsReverseDissolve = { false };
 
 #pragma endregion
 
@@ -401,6 +420,11 @@ protected:
     MONSTERTYPE m_eMonsterType = { MONSTERTYPE::END };
 
     _float m_fOffsetY = {};
+    _bool m_isBgm = { false };
+
+public:
+    void Set_BGM(_bool bIsBgm) { m_isBgm = bIsBgm; }
+
     
 #pragma endregion
 

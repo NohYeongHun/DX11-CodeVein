@@ -188,9 +188,11 @@ private:
 	_float m_fMaxSkillDuration = { 2.2f }; // [추가] 가장 먼 거리를 계산하기 위한 로직
 
 public:
-	void Start_Dissolve(_float fDuration = 0.f); // Dissolve 재생.
-	void ReverseStart_Dissolve(_float fDuration = 0.f); // Dissolve 역재생
-	void End_Dissolve();
+	virtual void Start_Dissolve(_float fDuration = 0.f); // Dissolve 재생.
+	virtual void ReverseStart_Dissolve(_float fDuration = 0.f); // Dissolve 역재생
+	virtual void End_Dissolve();
+
+	virtual void Dead_Action() override;
 
 
 public:
@@ -199,17 +201,7 @@ public:
 
 private:
 	_uint m_iShaderPath = {};
-	_float m_fDissolveTime = {};
-
-	_float m_fMaxDissolveTime = {};
-	_float m_fCurDissolveTime = {};
-
-	_float m_fReverseDissolveTime = {};
-	_float m_fEndReverseDissolveTime = {};
-
-	_bool m_IsDissolve = { false };
-	_bool m_IsReverseDissolve = { false };
-
+	
 
 private:
 	class CTexture* m_pDissolveTexture = { nullptr };

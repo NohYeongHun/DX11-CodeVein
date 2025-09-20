@@ -101,8 +101,13 @@ void CEffect_PlayerSkill::OnActivate(void* pArg)
     */
 
 
+    /* Effect Trigger 호출. */
     m_EffectTrigger.emplace_back(
-        EFFECTTRIGGER{ 0.0f, false, TEXT("Com_BloodAura") }
+        EFFECTTRIGGER{ 0.0f, false, TEXT("Com_BloodFloorAura") }
+    );
+
+    m_EffectTrigger.emplace_back(
+        EFFECTTRIGGER{ 0.1f, false, TEXT("Com_BloodBodyAura") }
     );
 
 }
@@ -131,7 +136,7 @@ void CEffect_PlayerSkill::Effect_TriggerCheck(_float fTimeDelta)
 
 void CEffect_PlayerSkill::Initialize_EffectTrigger(const _wstring& strTag)
 {
-    if (strTag == TEXT("Com_BloodAura"))
+    if (strTag == TEXT("Com_BloodFloorAura"))
     {
         CEffect_FloorAura::EFFECTFLOORAURA_ACTIVATE_DESC FloorAuraDesc{};
         FloorAuraDesc.eCurLevel = m_eCurLevel;
@@ -139,15 +144,28 @@ void CEffect_PlayerSkill::Initialize_EffectTrigger(const _wstring& strTag)
         FloorAuraDesc.vColor = { 0.f, 0.f, 0.f, 1.f };
         FloorAuraDesc.vStartScale = { 0.01f, 1.f, 0.01f };
         FloorAuraDesc.vEndScale = { 0.7f, 0.7f, 0.7f };
-        FloorAuraDesc.fGrowDuration = 0.4f;
-        FloorAuraDesc.fStayDuration = 0.8f;
-        FloorAuraDesc.fDissolveDuration = 0.8f;
-        //FloorAuraDesc.fGrowDuration = m_fDuration * 0.2f;
-        //FloorAuraDesc.fStayDuration = m_fDuration * 0.4f;
-        //FloorAuraDesc.fDissolveDuration = m_fDuration * 0.4f;
+        FloorAuraDesc.fGrowDuration = 0.2f;
+        FloorAuraDesc.fStayDuration = 0.4f;
+        FloorAuraDesc.fDissolveDuration = 0.4f;
+
 
         FloorAuraDesc.pTargetTransform = m_pTargetTransform;
         m_pFloorAura->OnActivate(&FloorAuraDesc);
+    }
+    else if (strTag == TEXT("Com_BloodBodyAura"))
+    {
+        CEffect_BodyAura::EFFECTFBODYAURA_ACTIVATE_DESC BodyAuraDesc{};
+        BodyAuraDesc.eCurLevel = m_eCurLevel;
+        BodyAuraDesc.vOffsetPos = { 0.f, 0.f, 0.f };
+        BodyAuraDesc.vColor = { 0.f, 0.f, 0.f, 1.f };
+        BodyAuraDesc.vStartScale = { 4.5f, 2.5f, 4.5f };
+        //BodyAuraDesc.vStartScale = { 8.f, 6.f, 8.f };
+        BodyAuraDesc.fStayDuration = 0.7f;
+        BodyAuraDesc.fDissolveDuration = 0.3f;
+        BodyAuraDesc.vStartRotation = { 0.f, 0.f, 0.f };
+
+        BodyAuraDesc.pTargetTransform = m_pTargetTransform;
+        m_pBodyAura->OnActivate(&BodyAuraDesc);
     }
 
     
@@ -186,14 +204,39 @@ HRESULT CEffect_PlayerSkill::Ready_PartObjects()
 {
 
     /* Clone시 지정될 값들 => 초기 설정 값들.*/
-    CEffect_FloorAura::EFFECTFLOORAURA_DESC BloodAuraDesc{};
-    _wstring strComTag = TEXT("Com_BloodAura");
-    BloodAuraDesc.pOwner = this;
-    BloodAuraDesc.eShaderPath = MESH_SHADERPATH::BLOOD_CIRCLE;
+    CEffect_FloorAura::EFFECTFLOORAURA_DESC BloodFloorAuraDesc{};
+    _wstring strComTag = TEXT("Com_BloodFloorAura");
+    BloodFloorAuraDesc.pOwner = this;
+    BloodFloorAuraDesc.eShaderPath = MESH_SHADERPATH::BLOOD_CIRCLE;
     //BloodAuraDesc.eCurLevel = m_eCurLevel; => Pooling에 넣는 시점에는 지정되지 않음. => 풀링에서 빼낼때 지정.
     if (FAILED(CContainerObject::Add_PartObject(strComTag,
-        ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_BloodAura")
-        , reinterpret_cast<CPartObject**>(&m_pFloorAura), &BloodAuraDesc)))
+        ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_BloodFloorAura")
+        , reinterpret_cast<CPartObject**>(&m_pFloorAura), &BloodFloorAuraDesc)))
+    {
+        CRASH("Failed Create BloodAura");
+        return E_FAIL;
+    }
+
+    CEffect_BodyAura::EFFECTBODYAURA_DESC BloodBodyAuraDesc{};
+    strComTag = TEXT("Com_BloodBodyAura");
+    BloodBodyAuraDesc.pOwner = this;
+    BloodBodyAuraDesc.eShaderPath = MESH_SHADERPATH::BLOOD_AURA;
+    //BloodAuraDesc.eCurLevel = m_eCurLevel; => Pooling에 넣는 시점에는 지정되지 않음. => 풀링에서 빼낼때 지정.
+    if (FAILED(CContainerObject::Add_PartObject(strComTag,
+        ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_BloodBodyAura")
+        , reinterpret_cast<CPartObject**>(&m_pBodyAura), &BloodBodyAuraDesc)))
+    {
+        CRASH("Failed Create BloodAura");
+        return E_FAIL;
+    }
+
+    strComTag = TEXT("Com_BloodBodyAura2");
+    BloodBodyAuraDesc.pOwner = this;
+    BloodBodyAuraDesc.eShaderPath = MESH_SHADERPATH::BLOOD_AURA;
+    //BloodAuraDesc.eCurLevel = m_eCurLevel; => Pooling에 넣는 시점에는 지정되지 않음. => 풀링에서 빼낼때 지정.
+    if (FAILED(CContainerObject::Add_PartObject(strComTag,
+        ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_BloodBodyAura")
+        , reinterpret_cast<CPartObject**>(&m_pBodyAura_Second), &BloodBodyAuraDesc)))
     {
         CRASH("Failed Create BloodAura");
         return E_FAIL;
@@ -259,6 +302,8 @@ void CEffect_PlayerSkill::Free()
 {
     CContainerObject::Free();
     Safe_Release(m_pFloorAura);
+    Safe_Release(m_pBodyAura);
+    Safe_Release(m_pBodyAura_Second);
 
    
     

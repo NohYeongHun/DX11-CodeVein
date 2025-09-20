@@ -13,7 +13,8 @@ vector g_vCamPosition;
 texture2D g_DiffuseTexture;
 texture2D g_DiffuseTextures[6];
 texture2D g_OtherTextures[13];
-texture2D g_NoiseTextures[5];
+texture2D g_NoiseTextures[8];
+
 texture2D g_SwirlTextures[6];
 
 texture2D g_NormalTexture;
@@ -944,63 +945,6 @@ PS_OUT_SHADOW PS_MAIN_SHADOW(PS_IN_SHADOW In)
     return Out;
 }
 
-/* 땅바닥 Blood Aura */
-//PS_OUT_BACKBUFFER PS_BLOOD_CIRCLE_MAIN(PS_BACKBUFFER_IN In)
-//{
-//    PS_OUT_BACKBUFFER Out = (PS_OUT_BACKBUFFER) 0;
-
-//    // ===== 1. UV 회전 (텍스처 스크롤링) =====
-//    float2 centerUV = In.vTexcoord - 0.5f;
-//    float distance = length(centerUV);
-//    float angle = atan2(centerUV.y, centerUV.x);
-    
-//    // 시간에 따라 각도 회전 (텍스처가 회전하는 효과)
-//    float rotationSpeed = 2.0f;
-//    angle += g_fTime * rotationSpeed;
-    
-//    // 회전된 UV 재구성
-//    float2 rotatedUV;
-//    rotatedUV.x = cos(angle) * distance + 0.5f;
-//    rotatedUV.y = sin(angle) * distance + 0.5f;
-
-//    // ===== 2. 텍스처 샘플링 =====
-//    vector vDiffuseColor = g_DiffuseTexture.Sample(DefaultSampler, rotatedUV);
-    
-//    // ===== 3. 색상 처리 =====
-//    // 붉은색 톤 강화
-//    vector finalColor = vDiffuseColor;
-//    finalColor.r = pow(finalColor.r, 0.7f) * 1.2f;
-//    finalColor.g *= 0.2f;
-//    finalColor.b *= 0.1f;
-    
-//    // 회전 패턴 추가 (선택사항)
-//    float pattern = sin(angle * 8.0f - g_fTime * 3.0f) * 0.2f + 0.8f;
-//    finalColor.rgb *= pattern;
-
-//    // ===== 4. 알파 처리 =====
-//    // 기본 알파값 (텍스처의 알파 사용)
-//    float baseAlpha = vDiffuseColor.a;
-    
-//    // Grow 효과 (시작시 페이드 인)
-//    float growAlpha = saturate(g_fGrowTime * 2.0f);
-    
-//    // Dissolve 효과 (종료시 페이드 아웃)
-//    float dissolveAlpha = 1.0f - g_fDissolveTime;
-    
-//    // 최종 알파 = 텍스처 알파 * 성장 * 소멸
-//    float finalAlpha = baseAlpha * growAlpha * dissolveAlpha;
-
-//    // ===== 5. 메쉬 형태 유지 =====
-//    // 도넛 메쉬이므로 별도의 마스킹 없이 그대로 렌더링
-//    // 메쉬가 이미 도넛 형태이므로 추가 clip이나 discard 불필요
-
-//    // ===== 최종 출력 =====
-//    Out.vDiffuse = float4(saturate(finalColor.rgb), saturate(finalAlpha));
-//    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
-//    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w, 0.f, 0.f);
-
-//    return Out;
-//}
 
 PS_OUT_BACKBUFFER PS_BLOOD_CIRCLE_MAIN(PS_BACKBUFFER_IN In)
 {
@@ -1055,7 +999,7 @@ PS_OUT_BACKBUFFER PS_BLOOD_CIRCLE_MAIN(PS_BACKBUFFER_IN In)
     fadeAlpha *= saturate(g_fGrowTime * 3.0f);
     fadeAlpha *= (1.0f - g_fDissolveTime);
     
-    fadeAlpha -= 0.3f;
+    
 
     // ===== 출력 =====
     Out.vDiffuse = float4(saturate(finalColor.rgb), saturate(fadeAlpha));
@@ -1066,20 +1010,153 @@ PS_OUT_BACKBUFFER PS_BLOOD_CIRCLE_MAIN(PS_BACKBUFFER_IN In)
 }
 
 
-//PS_OUT_BACKBUFFER PS_BLOOD_CIRCLE_MAIN(PS_BACKBUFFER_IN In)
+PS_OUT_BACKBUFFER PS_BLOOD_BODYAURA_MAIN(PS_BACKBUFFER_IN In)
+{
+    PS_OUT_BACKBUFFER Out = (PS_OUT_BACKBUFFER) 0;
+
+    // ===== 1. 알파(Alpha) 계산: 오라의 '형태' 결정 =====
+
+    // 1-1. 대각선 방향으로 스크롤되는 UV 생성
+    float2 animatedUV = In.vTexcoord;
+    animatedUV.x += g_fTime * 0.5f; // X축 이동 (회전)
+    animatedUV.y -= g_fTime * 0.8f; // Y축 이동 (상승)
+
+    // 1-2. 스크롤된 UV로 노이즈 텍스처를 샘플링하여 기본 모양 생성
+    float noiseMask = g_NoiseTextures[5].Sample(DefaultSampler, frac(animatedUV)).r;
+    noiseMask = smoothstep(0.4f, 0.6f, noiseMask); // 경계를 선명하게
+
+    // 1-3. 물결 마스크(Wave Mask) 추가하여 사선으로 휘감는 느낌 강화
+    float waveFrequency = 4.0f; // 물결의 갯수
+    float waveSpeed = 3.0f;
+    // UV의 y값(높이)과 시간에 따라 sin 값이 변하도록 하여 물결 생성
+    float wave = sin(In.vTexcoord.y * waveFrequency + g_fTime * waveSpeed);
+    // sin 결과(-1~1)를 0~1 범위로 변환
+    float waveMask = wave * 0.5f + 0.5f;
+    
+    // 1-4. 높이 마스크 생성 (기존 로직 유지)
+    float heightMask = 1.0f;
+    heightMask *= smoothstep(0.0f, 0.2f, In.vTexcoord.y);
+    heightMask *= (1.0f - smoothstep(0.8f, 1.0f, In.vTexcoord.y));
+
+    // 최종 알파 = (기본 노이즈 모양) * (물결 모양) * (높이 마스크)
+    float finalAlpha = noiseMask * waveMask * heightMask;
+    finalAlpha *= (1.0f - g_fDissolveTime); // Dissolve 효과
+
+    clip(finalAlpha - 0.01f);
+
+    // ===== 2. 색상(Color) 계산 =====
+    vector finalColor = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
+
+    // ===== 최종 출력 =====
+    Out.vDiffuse = float4(saturate(finalColor.rgb), saturate(finalAlpha));
+    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w, 0.f, 0.f);
+
+    return Out;
+}
+
+
+
+//PS_OUT_BACKBUFFER PS_BLOOD_BODYAURA_MAIN(PS_BACKBUFFER_IN In)
 //{
 //    PS_OUT_BACKBUFFER Out = (PS_OUT_BACKBUFFER) 0;
 
-//    // ===== 1. 회전하는 UV 생성 =====
-//    vector vSwirlColor = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
+//     --- 1. UV 스크롤링으로 회전 느낌 주기 ---
+//    float2 animatedUV = In.vTexcoord;
+//    animatedUV.x += g_fTime * 0.5f;
+//    animatedUV.y -= g_fTime * 0.8f;
 
-//    // ===== 최종 출력 =====
-//    Out.vDiffuse = vSwirlColor;
+//     --- 2. Noise 마스크 생성 및 '검은 부분 버리기' ---
+//    float noiseValue = g_NoiseTextures[6].Sample(DefaultSampler, frac(animatedUV)).r;
+//    float noiseMask = smoothstep(0.4f, 0.6f, noiseValue);
+
+//     [핵심] clip 함수를 사용하여 noiseMask 값이 매우 낮은 (거의 검은색) 픽셀을 완전히 제거(버림)
+//    clip(noiseMask - 0.01f);
+    
+//     --- 3. '흰색 부분에 Diffuse 색상 입히기' ---
+//     clip을 통과한 픽셀들만 아래 코드를 실행하게 됩니다.
+//    vector vDiffuseColor = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
+
+//     최종 출력: 색상은 Diffuse, 투명도는 noiseMask 값을 그대로 사용하여 가장자리를 부드럽게 처리
+//    Out.vDiffuse = float4(vDiffuseColor.rgb, 1.f);
+    
+//     나머지 G-Buffer 출력은 기본값으로 설정합니다.
 //    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
 //    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w, 0.f, 0.f);
 
 //    return Out;
 //}
+
+//PS_OUT_BACKBUFFER PS_BLOOD_BODYAURA_MAIN(PS_BACKBUFFER_IN In)
+//{
+//    PS_OUT_BACKBUFFER Out = (PS_OUT_BACKBUFFER) 0;
+
+//    // ===== 1. UV 왜곡(Distortion) 생성 =====
+//    // 왜곡을 만들기 위한 노이즈 텍스처의 UV를 스크롤합니다.
+//    float2 distortionUV = In.vTexcoord * 1.5f; // 왜곡 패턴의 크기 조절
+//    distortionUV.y += g_fTime * 0.4f;
+
+//    // 노이즈 텍스처를 샘플링하여 왜곡 방향과 강도를 얻습니다. (.rg 값을 -1~1 범위로 사용)
+//    float2 distortionVector = (g_NoiseTextures[5].Sample(DefaultSampler, distortionUV).rg * 2.0f - 1.0f);
+//    float distortionStrength = 0.2f; // 왜곡 강도
+
+//    // 원래 UV 좌표에 왜곡 벡터를 더해 최종 UV를 만듭니다.
+//    float2 distortedUV = In.vTexcoord + distortionVector * distortionStrength;
+
+
+//    // ===== 2. 최종 알파(Alpha) 계산: 왜곡된 UV로 '형태' 결정 =====
+    
+//    // 2-1. 왜곡된 UV로 메인 패턴 텍스처를 샘플링합니다.
+//    // (이 텍스처가 핏줄기의 주된 모양을 결정합니다. 다른 노이즈나 핏줄기 텍스처를 사용해도 좋습니다.)
+//    float2 patternUV = distortedUV;
+//    patternUV.y -= g_fTime * 0.5f; // 패턴 자체도 흐르도록 처리
+//    float patternMask = g_NoiseTextures[6].Sample(DefaultSampler, patternUV).r;
+
+//    // 2-2. 대비를 강화하여 핏줄기 형태를 날카롭게 만듭니다.
+//    patternMask = pow(patternMask, 2.5f);
+//    float sharpMask = smoothstep(0.4f, 0.6f, patternMask);
+    
+//    // 2-3. 높이 마스크 생성 (기존 로직 유지)
+//    float heightMask = 1.0f;
+//    heightMask *= smoothstep(0.0f, 0.2f, In.vTexcoord.y);
+//    heightMask *= (1.0f - smoothstep(0.8f, 1.0f, In.vTexcoord.y));
+
+//    // 최종 알파 계산
+//    float finalAlpha = sharpMask * heightMask;
+//    finalAlpha *= (1.0f - g_fDissolveTime);
+    
+//    clip(finalAlpha - 0.01f);
+
+//    // ===== 3. 색상(Color) 계산 =====
+//    // Diffuse 텍스처를 샘플링하여 그대로 색상으로 사용
+//    vector finalColor = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
+
+//    // ===== 최종 출력 =====
+//    Out.vDiffuse = float4(saturate(finalColor.rgb), saturate(finalAlpha));
+//    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+//    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w, 0.f, 0.f);
+    
+//    return Out;
+//}
+
+//PS_OUT_BACKBUFFER PS_BLOOD_BODYAURA_MAIN(PS_BACKBUFFER_IN In)
+//{
+//    PS_OUT_BACKBUFFER Out = (PS_OUT_BACKBUFFER) 0;
+   
+    
+    
+//    // ===== 최종 출력 =====
+//    Out.vDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
+//    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+//    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w, 0.f, 0.f);
+    
+//    return Out;
+//}
+
+
+
+
+
 
 
 technique11 DefaultTechnique
@@ -1191,7 +1268,7 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_MAIN_SHADOW();
     }
 
-    pass BloodAuraPass // 8
+    pass BloodFloorAuraPass // 8
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_Default, 0);
@@ -1201,6 +1278,19 @@ technique11 DefaultTechnique
         GeometryShader = NULL;
         //PixelShader = compile ps_5_0 PS_SWORDWIND_IMPROVED();
         PixelShader = compile ps_5_0 PS_BLOOD_CIRCLE_MAIN();
+    }
+
+
+    pass BloodBodyAuraPass // 9
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        //PixelShader = compile ps_5_0 PS_SWORDWIND_IMPROVED();
+        PixelShader = compile ps_5_0 PS_BLOOD_BODYAURA_MAIN();
     }
 
 

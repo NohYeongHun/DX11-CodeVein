@@ -44,6 +44,8 @@ BT_RESULT CBT_Monster_EncounterAction::Enter_Encounter(_float fTimeDelta)
 
     m_eEncounterPhase = ENCOUNTER_PHASE::LOOP;
 
+    m_pOwner->Set_BGM(true);
+
     // 0. 회전.
     m_pOwner->RotateTurn_ToTargetYaw();
 
