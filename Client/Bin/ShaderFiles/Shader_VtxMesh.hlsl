@@ -705,118 +705,6 @@ float BorderMask_Implementation(float2 InUV)
     return center_line * directional_fade;
 }
 
-//PS_OUT_BACKBUFFER PS_SWORDWIND_IMPROVED(PS_BACKBUFFER_IN In)
-//{
-//    PS_OUT_BACKBUFFER Out = (PS_OUT_BACKBUFFER) 0;
-    
-//    // 텍스처 좌표 설정
-//    float2 vTexcoord = In.vTexcoord;
-//    vTexcoord *= g_fTextureScale;
-    
-//    // 왜곡 효과 추가 (풍압의 움직임)
-//    float2 distortion = float2(sin(g_fTime * 3.0f) * 0.02f, cos(g_fTime * 2.0f) * 0.01f);
-//    vTexcoord += distortion;
-    
-//    // 텍스처 샘플링
-//    float4 vSwirl1 = g_SwirlTextures[0].Sample(DefaultSampler, vTexcoord);
-//    float4 vSwirl2 = g_SwirlTextures[1].Sample(DefaultSampler, vTexcoord);
-//    float3 vSubstract0 = vSwirl1.rgb - vSwirl2.rgb;
-    
-//    float4 vSwirl3 = g_SwirlTextures[2].Sample(DefaultSampler, vTexcoord);
-//    float4 vSwirl4 = g_SwirlTextures[3].Sample(DefaultSampler, vTexcoord);
-//    float3 vSubStract1 = vSwirl3.rgb - vSwirl4.rgb;
-    
-//    // 더 강한 대비를 위해 값 증폭
-//    float3 vMaskResult = vSubstract0;
-//    vMaskResult *= 2.0f; // 1.3f에서 2.0f로 증가
-    
-//    float3 vFinalResult_T1 = saturate(vMaskResult);
-    
-//    // 개선된 BorderMask 적용
-//    float vFinalResult_T0 = BorderMask_Implementation(In.vTexcoord);
-    
-//    // T2, T3 결과
-//    float result_T2 = T2_Implementation(In.vTexcoord, g_fTime);
-//    float result_T3 = T3_Implementation(In.vTexcoord, g_fTime);
-    
-//    // T3를 섞어서 더 날카로운 효과
-//    float vFinalResult_T2_T3 = lerp(result_T2, result_T3, 0.3f);
-    
-//    // 마스크 계산
-//    float final_mask = vFinalResult_T0 * vFinalResult_T2_T3;
-    
-//    // 더 높은 threshold로 날카로운 경계
-//    float mask_threshold = 0.1f; // 0.05f에서 0.1f로 증가
-//    if (final_mask < mask_threshold)
-//        discard;
-    
-//    // ===== 칼바람 색상 처리 =====
-//    // 풍압 강도 계산
-//    float windPressure = pow(final_mask, 0.7f);
-    
-//    // 칼바람 색상 팔레트 (차갑고 날카로운 느낌)
-//    float3 coreColor = float3(0.9f, 0.95f, 1.0f); // 중심부 - 거의 흰색
-//    float3 midColor = float3(0.6f, 0.7f, 0.85f); // 중간 - 차가운 청백색
-//    float3 edgeColor = float3(0.3f, 0.4f, 0.6f); // 가장자리 - 진한 청회색
-    
-//    // 3단계 그라데이션으로 날카로운 층 생성
-//    float3 windColor;
-//    if (windPressure > 0.7f)
-//    {
-//        // 핵심부 - 가장 밝고 강렬
-//        windColor = lerp(midColor, coreColor, (windPressure - 0.7f) / 0.3f);
-//    }
-//    else if (windPressure > 0.3f)
-//    {
-//        // 중간층
-//        windColor = lerp(edgeColor, midColor, (windPressure - 0.3f) / 0.4f);
-//    }
-//    else
-//    {
-//        // 가장자리 - 흩어지는 바람
-//        windColor = edgeColor * windPressure / 0.3f;
-//    }
-    
-//    // 속도감을 위한 스트릭(줄무늬) 효과 추가
-//    float streak = sin(In.vTexcoord.x * 50.0f + g_fTime * 5.0f) * 0.1f + 0.9f;
-//    windColor *= streak;
-    
-//    // 텍스처 디테일을 약간 추가 (너무 많으면 흐려짐)
-//    float3 textureDetail = vFinalResult_T1 * 0.2f;
-//    float3 final_color = windColor + textureDetail;
-    
-//    // 에너지 효과 (선택적 - 더 강렬한 느낌)
-//    float energyPulse = sin(g_fTime * 4.0f) * 0.1f + 0.9f;
-//    final_color *= energyPulse;
-    
-//    // ===== 알파값 처리 =====
-//    // 중심은 불투명, 가장자리는 투명
-//    float core_alpha = saturate(pow(final_mask, 0.5f));
-    
-//    // 날카로운 경계를 위한 스텝 함수
-//    float sharp_edge = smoothstep(mask_threshold, mask_threshold + 0.15f, final_mask);
-    
-//    // 풍압 끝부분 흩날림 효과
-//    float scatter = 1.0f - pow(In.vTexcoord.y, 3.0f);
-    
-//    // 최종 알파
-//    float final_alpha = core_alpha * sharp_edge * scatter;
-//    final_alpha = saturate(final_alpha * 1.2f); // 전체적으로 더 선명하게
-    
-//    // 중심부 강조
-//    if (windPressure > 0.6f)
-//    {
-//        final_alpha = lerp(final_alpha, 1.0f, (windPressure - 0.6f) / 0.4f);
-//    }
-    
-//    //Out.vDiffuse = float4(final_color, final_alpha);
-//    Out.vDiffuse = float4(final_color, 1.f);
-//    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
-//    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w, 0.f, 0.f);
-    
-//    return Out;
-//}
-
 
 PS_OUT_BACKBUFFER PS_SWORDWIND_IMPROVED(PS_BACKBUFFER_IN In)
 {
@@ -963,13 +851,78 @@ PS_OUT_BACKBUFFER PS_SWORDWIND_IMPROVED(PS_BACKBUFFER_IN In)
     }
     
     // ===== 최종 출력 =====
-    Out.vDiffuse = float4(saturate(windColor), saturate(finalAlpha));
+    //Out.vDiffuse = float4(saturate(windColor), saturate(finalAlpha));
+    Out.vDiffuse = float4(saturate(windColor), saturate(1.f));
     Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w, 0.f, 0.f);
     
     return Out;
 }
 
+
+PS_OUT_BACKBUFFER PS_VORTEXWIND_MAIN(PS_BACKBUFFER_IN In)
+{
+    PS_OUT_BACKBUFFER Out = (PS_OUT_BACKBUFFER) 0;
+
+    // ===== 1. UV 좌표를 중심으로 이동 (-0.5 ~ 0.5 범위로) =====
+    float2 centerUV = In.vTexcoord - 0.5f;
+
+    // ===== 2. 극좌표계로 변환 (각도와 거리 계산) =====
+    float distance = length(centerUV) * 2.0f; // 거리를 0~1 범위로 정규화
+    float angle = atan2(centerUV.y, centerUV.x);
+
+    // ===== 3. 애니메이션 적용 =====
+    // 회전: 시간에 따라 각도를 변화시켜 회전 효과 생성
+    float rotationSpeed = -3.0f; // 음수 = 시계방향, 양수 = 반시계방향
+    angle += g_fTime * rotationSpeed;
+
+    // 빨려 들어가는 효과: 시간에 따라 거리를 변화시켜 텍스처를 안쪽으로 이동
+    // g_fTime이 증가할수록 distance를 더해서 샘플링할 UV를 바깥쪽으로 밀어냅니다.
+    // 결과적으로 텍스처는 안쪽으로 흐르는 것처럼 보입니다.
+    float inwardSpeed = 1.5f;
+    distance += g_fTime * inwardSpeed;
+    
+    // ===== 4. 다시 직교좌표계 UV로 변환 =====
+    float2 vortexUV;
+    vortexUV.x = cos(angle) * distance * 0.5f + 0.5f;
+    vortexUV.y = sin(angle) * distance * 0.5f + 0.5f;
+
+    // ===== 5. 텍스처 샘플링 =====
+    // 소용돌이(Swirl) 텍스처나 노이즈(Noise) 텍스처를 왜곡된 vortexUV로 샘플링합니다.
+    float swirlNoise = g_SwirlTextures[0].Sample(DefaultSampler, vortexUV).r;
+    float detailNoise = g_NoiseTextures[3].Sample(DefaultSampler, vortexUV * 2.0f + g_fTime).r; // 더 자글자글한 노이즈
+
+    float combinedNoise = pow(swirlNoise * detailNoise, 1.5f);
+
+    // ===== 6. 최종 마스크 및 알파 계산 =====
+    // 중심에서 멀어질수록 투명해지는 마스크
+    float distFromCenter = length(centerUV) * 2.0f;
+    float edgeMask = 1.0f - saturate(pow(distFromCenter, 2.0f));
+
+    // 최종 마스크
+    float finalMask = combinedNoise * edgeMask;
+
+    // 임계값 처리로 날카로운 경계 만들기
+    float threshold = 0.2f;
+    if (finalMask < threshold)
+        discard;
+    
+    float softEdge = smoothstep(threshold, threshold + 0.2f, finalMask);
+    
+    // ===== 7. 색상 및 최종 알파 결정 =====
+    float3 windColor = float3(0.7f, 0.85f, 0.95f); // 원하는 색상으로 변경 (예: 하늘색)
+    windColor *= finalMask; // 마스크 강도에 따라 밝기 조절
+
+    // 전체적인 페이드 아웃 (C++에서 g_fRatio 전달)
+    float finalAlpha = softEdge * (1.0f - g_fRatio);
+
+    // ===== 최종 출력 =====
+    Out.vDiffuse = float4(saturate(windColor), saturate(finalAlpha));
+    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w, 0.f, 0.f);
+
+    return Out;
+}
 
 struct PS_IN_SHADOW
 {
@@ -1076,12 +1029,14 @@ technique11 DefaultTechnique
         SetDepthStencilState(DSS_Default, 0);
         SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
 
-        VertexShader = compile vs_5_0 VS_MAIN();
+        //VertexShader = compile vs_5_0 VS_MAIN();
         //GeometryShader = NULL;
         //PixelShader = compile ps_5_0 PS_SWORDWIND_MAIN();
-        //VertexShader = compile vs_5_0 VS_SWORDWIND_MAIN();
+        
+        VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
-        PixelShader = compile ps_5_0 PS_SWORDWIND_IMPROVED();
+        //PixelShader = compile ps_5_0 PS_SWORDWIND_IMPROVED();
+        PixelShader = compile ps_5_0 PS_VORTEXWIND_MAIN();
     }
 
 

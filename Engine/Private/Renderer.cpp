@@ -39,6 +39,13 @@ HRESULT CRenderer::Initialize()
     m_pGameInstance->Add_RenderTarget(TEXT("Target_LightDepth"), g_iMaxWidth, g_iMaxHeight, DXGI_FORMAT_R32G32B32A32_FLOAT, _float4(1.0f, 1.0f, 1.0f, 1.0f));
     m_pGameInstance->Add_RenderTarget(TEXT("Combine_Shade"), ViewportDesc.Width, ViewportDesc.Height, DXGI_FORMAT_R16G16B16A16_FLOAT, _float4(0.f, 0.f, 0.f, 0.f));
 
+    // Distortion
+    m_pGameInstance->Add_RenderTarget(TEXT("Target_Distortion"), ViewportDesc.Width, ViewportDesc.Height, DXGI_FORMAT_R16G16B16A16_FLOAT, _float4(0.5f, 0.5f, 0.5f, 0.5f));
+    /* Clear Color 문제. */
+    m_pGameInstance->Add_RenderTarget(TEXT("Combine_Distortion"), ViewportDesc.Width, ViewportDesc.Height, DXGI_FORMAT_R16G16B16A16_FLOAT, _float4(0.5f, 0.5f, 0.5f, 0.5f));
+
+
+
 
     m_pGameInstance->Add_RenderTarget(TEXT("Target_BrightPass"), ViewportDesc.Width, ViewportDesc.Height, DXGI_FORMAT_R8G8B8A8_UNORM, _float4(0.f, 0.f, 0.f, 1.f));
     m_pGameInstance->Add_RenderTarget(TEXT("Target_BloomBlurX"), ViewportDesc.Width / 8, ViewportDesc.Height / 8, DXGI_FORMAT_R8G8B8A8_UNORM, _float4(0.f, 0.f, 0.f, 1.f));
@@ -59,10 +66,16 @@ HRESULT CRenderer::Initialize()
     m_pGameInstance->Add_MRT(TEXT("MRT_Shadow"), TEXT("Target_LightDepth"));
     m_pGameInstance->Add_MRT(TEXT("MRT_Combine"), TEXT("Combine_Shade"));
     
+    
 
     m_pGameInstance->Add_MRT(TEXT("MRT_BrightPass"), TEXT("Target_BrightPass"));
     m_pGameInstance->Add_MRT(TEXT("MRT_BloomBlurX"), TEXT("Target_BloomBlurX"));
     m_pGameInstance->Add_MRT(TEXT("MRT_BloomBlurY"), TEXT("Target_BloomBlurY"));
+
+
+    /* 최종 과정 */
+    m_pGameInstance->Add_MRT(TEXT("MRT_Distortion"), TEXT("Target_Distortion")); // Distortion 객체들을 그린다.
+    m_pGameInstance->Add_MRT(TEXT("MRT_DistortionCombine"), TEXT("Combine_Distortion")); // Distortion 객체들을 합친다.
     
 
 
@@ -93,14 +106,20 @@ HRESULT CRenderer::Initialize()
 #ifdef _DEBUG
     //m_pGameInstance->Ready_RT_Debug(TEXT("Target_Specular"), 450.0f, 150.0f, 300.f, 300.f); // 오른쪽 위에서 첫번째.
 
-    m_pGameInstance->Ready_RT_Debug(TEXT("Target_Diffuse"), 150.0f, 150.0f, 300.f, 300.f);
-    m_pGameInstance->Ready_RT_Debug(TEXT("Target_Normal"), 150.0f, 450.0f, 300.f, 300.f);
-    m_pGameInstance->Ready_RT_Debug(TEXT("Target_Depth"), 150.0f, 750.0f, 300.f, 300.f);
-    m_pGameInstance->Ready_RT_Debug(TEXT("Target_Shade"), 450.0f, 150.0f, 300.f, 300.f); // 오른쪽 위에서 첫번째.
+    //m_pGameInstance->Ready_RT_Debug(TEXT("Target_Diffuse"), 150.0f, 150.0f, 300.f, 300.f);
+    //m_pGameInstance->Ready_RT_Debug(TEXT("Target_Normal"), 150.0f, 450.0f, 300.f, 300.f);
+    //m_pGameInstance->Ready_RT_Debug(TEXT("Target_Depth"), 150.0f, 750.0f, 300.f, 300.f);
+    //m_pGameInstance->Ready_RT_Debug(TEXT("Target_Shade"), 450.0f, 150.0f, 300.f, 300.f); // 오른쪽 위에서 첫번째.
+    //
+    //m_pGameInstance->Ready_RT_Debug(TEXT("Target_LightDepth"), 450.f, 450.0f, 300.f, 300.f); // 그림자 전용
+    //m_pGameInstance->Ready_RT_Debug(TEXT("Combine_Shade"), 450.0f, 750.0f, 300.f, 300.f);
+
+    //m_pGameInstance->Ready_RT_Debug(TEXT("Target_Distortion"), 750.0f, 150.0f, 300.f, 300.f);
+    //m_pGameInstance->Ready_RT_Debug(TEXT("Combine_Distortion"), 750.0f, 450.0f, 300.f, 300.f);
+
     
-    m_pGameInstance->Ready_RT_Debug(TEXT("Target_LightDepth"), 450.f, 450.0f, 300.f, 300.f); // 그림자 전용
-    m_pGameInstance->Ready_RT_Debug(TEXT("Combine_Shade"), 450.0f, 750.0f, 300.f, 300.f);
-    
+    m_pGameInstance->Ready_RT_Debug(TEXT("Target_Distortion"), 150.0f, 150.0f, 300.f, 300.f);
+    m_pGameInstance->Ready_RT_Debug(TEXT("Combine_Distortion"), 150.0f, 450.0f, 300.f, 300.f);
     
     m_pGameInstance->Ready_RT_Debug(TEXT("Target_BrightPass"), ViewportDesc.Width - 150.0f, 150.0f, 300.f, 300.f);
     m_pGameInstance->Ready_RT_Debug(TEXT("Target_BloomBlurX"), ViewportDesc.Width - 150.0f, 450.0f, 300.f, 300.f);
@@ -149,28 +168,35 @@ HRESULT CRenderer::Draw()
     // 3. G-Buffer 합성 및 스카이박스 렌더링으로 최종 씬 완성
     if (FAILED(Render_Combined()))
         return E_FAIL;
-    
-    // 4. Distotion 추가.
-    //if (FAILED(Render_Distortion()))
-    //    return E_FAIL;
 
     // 5. 모든 반투명 객체(HitFlashEffect 포함)를 최종 씬 위에 렌더링
     if (FAILED(Render_Blend()))
         return E_FAIL;
 
+    // 6. Distortion 추가 => 왜곡 효과가 적용되어야할 모든 배경이 그려진 상태
+    if (FAILED(Render_Distortion()))
+        return E_FAIL;
+
+    if (FAILED(Render_DistortionCombine()))
+        return E_FAIL;
    
 
-    // 6. 반투명 객체까지 포함된 씬으로 블룸 효과 생성
+    // 7. 반투명 객체까지 포함된 씬으로 블룸 효과 생성
     if (FAILED(Render_BloomBlur()))
         return E_FAIL;
     //
-    // 7. 씬과 블룸 효과를 최종 합성하여 화면에 출력
+    //// 8. 씬과 블룸 효과를 최종 합성하여 화면에 출력
     if (FAILED(Render_BloomCombine()))
         return E_FAIL;
+
+
+
 
     // 8. NonLight,  등 나머지 렌더링 => 사실상 안씀.
     if (FAILED(Render_NonLight()))
         return E_FAIL;
+
+   
 
 #ifdef _DEBUG
     if (FAILED(Render_Debug()))
@@ -376,35 +402,8 @@ HRESULT CRenderer::Render_Combined()
     return S_OK;
 }
 
-//[추가] 왜곡 효과 렌더링
-// Render_Combined의 결과물을 배경으로 사용
-//HRESULT CRenderer::Render_Distortion()
-//{
-//    // 1. Combine Texture에 Blend 객체들 덮어 그리기.
-//    if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_Combine"),nullptr, false)))
-//        return E_FAIL;
-//
-//
-//    m_RenderObjects[ENUM_CLASS(RENDERGROUP::DISTOTION)].sort([](CGameObject* pSour, CGameObject* pDest)->_bool
-//        {
-//            return pSour->Get_CamDistance() > pDest->Get_CamDistance();
-//        });
-//
-//    for (auto& pRenderObject : m_RenderObjects[ENUM_CLASS(RENDERGROUP::DISTOTION)])
-//    {
-//        if (nullptr != pRenderObject)
-//            pRenderObject->Render();
-//
-//        Safe_Release(pRenderObject);
-//    }
-//
-//    m_RenderObjects[ENUM_CLASS(RENDERGROUP::DISTOTION)].clear();
-//
-//    // 2. 최종 Combine Texture 완료.
-//    m_pGameInstance->End_MRT();
-//
-//    return S_OK;
-//}
+
+
 
 HRESULT CRenderer::Render_Blend()
 {
@@ -436,6 +435,76 @@ HRESULT CRenderer::Render_Blend()
 
     return S_OK;
 }
+
+/* Distortion 객체들을 새 도화지에 그려놓는다. */
+HRESULT CRenderer::Render_Distortion()
+{
+    ID3D11ShaderResourceView* pNullSRVs[8] = { nullptr, nullptr };
+    m_pContext->PSSetShaderResources(0, 8, pNullSRVs);
+
+    if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_Distortion"), nullptr)))
+        return E_FAIL;
+
+
+    for (auto& pGameObject : m_RenderObjects[ENUM_CLASS(RENDERGROUP::DISTORTION)])
+    {
+        if (nullptr != pGameObject)
+            pGameObject->Render_Distortion();
+
+        Safe_Release(pGameObject);
+    }
+
+    m_RenderObjects[ENUM_CLASS(RENDERGROUP::DISTORTION)].clear();
+
+
+
+
+    if (FAILED(m_pGameInstance->End_MRT()))
+        return E_FAIL;
+
+    return S_OK;
+}
+
+/* 그려놓은 도화지와 Combine Shade를 합친다.*/
+HRESULT CRenderer::Render_DistortionCombine()
+{
+
+    m_pContext->RSSetViewports(1, &m_ViewPortDesc);
+
+    // Distortion을 합칠 객체.
+    if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_DistortionCombine"), nullptr)))
+        return E_FAIL;
+
+    if (FAILED(m_pDistortionShader->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix)))
+        return E_FAIL;
+    if (FAILED(m_pDistortionShader->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix)))
+        return E_FAIL;
+    if (FAILED(m_pDistortionShader->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
+        return E_FAIL;
+
+    D3D11_VIEWPORT viewport;
+    _uint numViewports = 1;
+    m_pContext->RSGetViewports(&numViewports, &viewport);
+    _float2 vScreenSize = { viewport.Width, viewport.Height };
+    if (FAILED(m_pDistortionShader->Bind_RawValue("g_vScreenSize", &vScreenSize, sizeof(_float2))))
+        return E_FAIL;
+
+    // 입력 1: 왜곡시킬 원본 이미지 (Bloom까지 완료된 씬)
+    m_pGameInstance->Bind_RT_ShaderResource(TEXT("Combine_Shade"), m_pDistortionShader, "g_CombineTexture");
+    // 입력 2: 왜곡 정보 맵 (Render_Distortion에서 생성)
+    m_pGameInstance->Bind_RT_ShaderResource(TEXT("Target_Distortion"), m_pDistortionShader, "g_DistortionTexture");
+
+    m_pDistortionShader->Begin(static_cast<_uint>(DISTORTION_SHADERTYPE::DEFAULT));
+    m_pVIBuffer->Bind_Resources();
+    m_pVIBuffer->Render();
+
+    // [추가!] 렌더링 완료 후 MRT 종료
+    if (FAILED(m_pGameInstance->End_MRT()))
+        return E_FAIL;
+
+    return S_OK;
+}
+
 
 #pragma region 디버깅 용도 Combine Texture만 출력.
 HRESULT CRenderer::Render_DebugCombined()
@@ -505,7 +574,10 @@ HRESULT CRenderer::Render_BloomBlur()
 
 
     // 원본 씬 텍스처를 바인딩 => Combine Shader
-    if (FAILED(m_pGameInstance->Bind_RT_ShaderResource(TEXT("Combine_Shade"), m_pPostLightShader, "g_DiffuseTexture")))
+    //if (FAILED(m_pGameInstance->Bind_RT_ShaderResource(TEXT("Combine_Shade"), m_pPostLightShader, "g_DiffuseTexture")))
+    //    return E_FAIL;
+
+    if (FAILED(m_pGameInstance->Bind_RT_ShaderResource(TEXT("Combine_Distortion"), m_pPostLightShader, "g_DiffuseTexture")))
         return E_FAIL;
 
     // Bright Pass 쉐이더로 렌더링
@@ -582,18 +654,23 @@ HRESULT CRenderer::Render_BloomCombine()
     ID3D11ShaderResourceView* pNullSRVs[8] = { nullptr, nullptr };
     m_pContext->PSSetShaderResources(0, 8, pNullSRVs);
 
+    m_pContext->RSSetViewports(1, &m_ViewPortDesc);
 
     D3D11_VIEWPORT ViewPort{};
     _uint iNumViewports = { 1 };
     m_pContext->RSGetViewports(&iNumViewports, &ViewPort);
+
+    // WorldMatrix를 전체 화면 크기로 재설정 (추가!)
+
     // 백버퍼에 최종 합성
     m_pPostLightShader->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix);
     m_pPostLightShader->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix);
     m_pPostLightShader->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix);
 
     // 원본 씬과 블룸 텍스처를 바인딩
-    m_pGameInstance->Bind_RT_ShaderResource(TEXT("Combine_Shade"), m_pPostLightShader, "g_DiffuseTexture");
-    m_pGameInstance->Bind_RT_ShaderResource(TEXT("Target_BloomBlurY"), m_pPostLightShader, "g_BloomTexture");
+    //m_pGameInstance->Bind_RT_ShaderResource(TEXT("Combine_Shade"), m_pPostLightShader, "g_DiffuseTexture");
+    m_pGameInstance->Bind_RT_ShaderResource(TEXT("Combine_Distortion"), m_pPostLightShader, "g_DiffuseTexture");
+    m_pGameInstance->Bind_RT_ShaderResource(TEXT("Target_BloomBlurY"), m_pPostLightShader, "g_BloomTexture"); // 블룸 텍스쳐. 
 
     _uint iBloomCombineIndex = static_cast<_uint>(SHADER_POSTLIGHT::SUM_BLUR);
     m_pPostLightShader->Begin(iBloomCombineIndex);
@@ -603,7 +680,6 @@ HRESULT CRenderer::Render_BloomCombine()
 
     return S_OK;
 }
-
 
 
 HRESULT CRenderer::Render_UI()
@@ -685,7 +761,7 @@ HRESULT CRenderer::Render_Debug()
     if (FAILED(m_pDefferedShader->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
         return E_FAIL;
 
-    //m_pGameInstance->Render_RT_Debug(m_pDefferedShader, m_pVIBuffer);
+    m_pGameInstance->Render_RT_Debug(m_pDefferedShader, m_pVIBuffer);
 
     return S_OK;
 }

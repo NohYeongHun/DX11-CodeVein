@@ -56,6 +56,8 @@ public:
     virtual void Update(_float fTimeDelta);
     virtual void Late_Update(_float fTimeDelta);
     virtual HRESULT Render();
+    virtual HRESULT Render_Distortion() override;
+    
 #pragma endregion
 
 
@@ -72,6 +74,7 @@ private:
 private:
     // 컴포넌트
     class CShader* m_pShaderCom = { nullptr };
+    class CShader* m_pDistortionShaderCom = { nullptr };
     _uint m_iShaderPath = {};
 
 
@@ -175,6 +178,7 @@ private:
 #pragma region 기본 준비 함수들
 private:
     HRESULT Bind_ShaderResources();
+    HRESULT Bind_ShaderResources_Distortion();
     HRESULT Ready_Components(SWORDWIND_DESC* pDesc);
 #pragma endregion
 

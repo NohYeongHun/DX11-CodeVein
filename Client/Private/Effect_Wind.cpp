@@ -92,40 +92,47 @@ void CEffect_Wind::OnActivate(void* pArg)
     m_vStartPos = pDesc->vStartPos;
     Reset_Timer();
 
-    // 흠..
-
-    /* 하위 객체들 Activate 실행 */
-    // ... PillarA, B, C 활성화 코드 ...
+    /* 검풍 4개 순차적으로 생성 */
     CSwordWind::SWORDWIND_ACTIVATE_DESC ActivateDesc{};
     ActivateDesc.eCurLevel = m_eCurLevel;
-    ActivateDesc.fGrowDuration = m_fDuration * 0.4f;
-    ActivateDesc.fStayDuration = m_fDuration * 0.2f;
-    ActivateDesc.fDecreaseDuration = m_fDuration * 0.4f;
+
+    // 애니메이션 타이밍 설정
+    // 전체 시간을 4개의 검풍이 나눠 사용
+    _float fTotalDuration = m_fDuration;
+    _float fOverlapTime = 0.3f; // 겹치는 시간
+
+    // 각 검풍의 지속시간
+
     ActivateDesc.vStartRotation = m_vStartRotation;
     ActivateDesc.vRotationAxis = m_vRotationAxis;
     ActivateDesc.pTargetTransform = pDesc->pTargetTransform;
     ActivateDesc.pParentMatrix = pDesc->pParentMatrix;
     ActivateDesc.vStartPos = pDesc->vStartPos;
-    
 
+    // 타이밍 조정
+    ActivateDesc.fGrowDuration = 0.1f;    // 0.1초 - 매우 빠른 확장
+    ActivateDesc.fStayDuration = 0.05f;   // 0.05초 - 짧은 유지
+    ActivateDesc.fDecreaseDuration = 0.3f; // 0.3초 - 천천히 퍼지며 사라짐
 
-
+    // 4개의 검풍을 순차적으로 생성
     for (_uint i = 0; i < m_vecSwordWinds.size(); ++i)
     {
         ActivateDesc.fRotationSpeed = 0.0f;
-        ActivateDesc.fCreateTime = 0.02f * i; // 더 짧은 간격
 
-        // 각도를 줄여서 더 집중된 효과wwww
-        _float fAngleOffset = (i - 1.5f) * 5.0f; // -7.5, -2.5, 2.5, 7.5도
-        ActivateDesc.vStartRotation.y += fAngleOffset;
+        // 매우 짧은 간격으로 순차 생성 (거의 동시에)
+        ActivateDesc.fCreateTime = i * 0.02f; // 0.02초 간격
 
-        // 크기를 크게 해서 더 진한 효과
-        _float3 vScale = { 1.0f, 1.0f, 1.0f }; // 기본 크기 증가
+        // 같은 크기로 시작, 약간씩 다른 층 형성
+        _float fScaleOffset = 1.0f + i * 0.1f; // 1.0, 1.1, 1.2, 1.3
+        _float3 vScale = {
+            1.0f * fScaleOffset,
+            1.0f * fScaleOffset,
+            0.3f  // Z축은 얇게 (원판 형태)
+        };
         XMStoreFloat3(&ActivateDesc.vStartScale, XMLoadFloat3(&vScale));
 
         m_vecSwordWinds[i]->OnActivate(&ActivateDesc);
     }
-
 
 
 }
@@ -171,20 +178,30 @@ HRESULT CEffect_Wind::Ready_PartObjects()
     WindDesc.pOwner = this;
     WindDesc.eCurLevel = m_eCurLevel;
     WindDesc.eShaderPath = MESH_SHADERPATH::SWORD_WIND;
-    WindDesc.iTextureIndexArray[TEXTURE::TEXTURE_DIFFUSE] = 0; // 사용할 인덱스.
 
-    _float3 vScale = { 1.5f, 1.5f, 1.5f }; // 기본 크기.
+    // 텍스처 인덱스 설정
+    WindDesc.iTextureIndexArray[TEXTURE::TEXTURE_DIFFUSE] = 0;
+    WindDesc.iTextureIndexArray[TEXTURE::TEXTURE_OTHER] = 0;
+    WindDesc.iTextureIndexArray[TEXTURE::TEXTURE_NOISE] = 0;
+    WindDesc.iTextureIndexArray[TEXTURE::TEXTURE_SWIRL] = 0;
+
     _wstring strComTag = TEXT("Com_SwordWind");
-    m_vecSwordWinds.resize(4);
+    m_vecSwordWinds.resize(4); // 4개의 검풍
+
     for (_uint i = 0; i < m_vecSwordWinds.size(); ++i)
     {
-        // Com Tag 다르게 설정. 
-        strComTag += to_wstring(i);
+        // Com Tag 다르게 설정
+        _wstring strUniqueTag = strComTag + to_wstring(i);
+
         WindDesc.fDisplayTime = m_fDuration;
-        XMStoreFloat3(&WindDesc.vStartScale, XMLoadFloat3(&vScale) * (1.f + i * 0.5f)); // 1.f, 1.15f, 1.3f, 1.45f
-        if (FAILED(CContainerObject::Add_PartObject(strComTag,
-            ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_SwordWind")
-            , reinterpret_cast<CPartObject**>(&m_vecSwordWinds[i]), &WindDesc)))
+
+        // 기본 크기는 OnActivate에서 설정
+        _float3 vScale = { 1.0f, 1.0f, 1.0f };
+        XMStoreFloat3(&WindDesc.vStartScale, XMLoadFloat3(&vScale));
+
+        if (FAILED(CContainerObject::Add_PartObject(strUniqueTag,
+            ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_SwordWind"),
+            reinterpret_cast<CPartObject**>(&m_vecSwordWinds[i]), &WindDesc)))
         {
             CRASH("Failed Create SwordWind");
             return E_FAIL;

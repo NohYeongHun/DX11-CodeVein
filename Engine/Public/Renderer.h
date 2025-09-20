@@ -82,12 +82,16 @@ private:
 	HRESULT Render_NonBlend();
 	HRESULT Render_Lights();
 	HRESULT Render_Combined();
-	//HRESULT Render_Distortion();
 	HRESULT Render_Blend();
+	HRESULT Render_Distortion(); // Distortion을 발생시키는 주체.
+	HRESULT Render_DistortionCombine(); // Distortion을 합성 시키는 렌더타겟.
 	HRESULT Render_DebugCombined();
 	HRESULT Render_NonLight();
 	HRESULT Render_BloomBlur();
 	HRESULT Render_BloomCombine();
+
+	
+
 	HRESULT Render_UI();
 	HRESULT Render_StaticUI();
 	HRESULT Render_LastEffect();

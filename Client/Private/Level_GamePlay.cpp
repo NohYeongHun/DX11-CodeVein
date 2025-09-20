@@ -71,7 +71,7 @@ HRESULT CLevel_GamePlay::Initialize_Clone()
 	m_pGameInstance->Setting_Soft(0.2f);
 	
 	// 한번만 실행.
-	m_pGameInstance->PlayBGM(L"NormalBgm.wav", 0.4f, true);
+	//m_pGameInstance->PlayBGM(L"NormalBgm.wav", 0.4f, true);
 
 	return S_OK;
 }

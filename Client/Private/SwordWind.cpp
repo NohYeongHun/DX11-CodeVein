@@ -56,20 +56,48 @@ void CSwordWind::Update(_float fTimeDelta)
 		return;
 
 	CPartObject::Update(fTimeDelta);
+	m_fTime += fTimeDelta; // 시간은 계속 셰이더로 보내야 합니다.
 
-	m_fTime += fTimeDelta;
+	_float3 vScale = m_vStartScale; // 시작 스케일을 기본으로 설정
+	_float fAnimTime = m_fTime - m_fCreateTime;
 
-	// 1. 크기 확장 애니메이션 (전진 없음)
-	/*_float3 vScale = m_pTransformCom->Get_Scale();
+	if (fAnimTime < 0.f)
+	{
+		m_pTransformCom->Set_Scale(_float3(0.f, 0.f, 0.f));
+	}
+	else
+	{
+		if (fAnimTime < m_fGrowDuration) // 나타나는 단계
+		{
+			_float fRatio = fAnimTime / m_fGrowDuration;
+			vScale.x *= fRatio;
+			vScale.y *= fRatio;
+		}
+		else if (fAnimTime < m_fGrowDuration + m_fStayDuration) // 유지 단계
+		{
+			// 최대 크기 유지
+			vScale = m_vStartScale;
+		}
+		else if (fAnimTime < m_fGrowDuration + m_fStayDuration + m_fDecreaseDuration) // 사라지는 단계
+		{
+			_float fDecreaseTime = fAnimTime - m_fGrowDuration - m_fStayDuration;
+			_float fRatio = 1.0f - (fDecreaseTime / m_fDecreaseDuration);
+			vScale.x *= fRatio;
+			vScale.y *= fRatio;
+		}
+		else
+		{
+			OnDeActivate();
+			return;
+		}
+		m_pTransformCom->Set_Scale(vScale);
+	}
 
-	vScale.x += fTimeDelta;
-	vScale.y += fTimeDelta;
-	vScale.z += fTimeDelta;
-	m_pTransformCom->Set_Scale(vScale);*/
 
 	m_pTransformCom->Update_WorldMatrix();
 	XMStoreFloat4x4(&m_CombinedWorldMatrix, m_pTransformCom->Get_WorldMatrix());
 }
+
 
 void CSwordWind::Priority_Update(_float fTimeDelta)
 {
@@ -89,9 +117,11 @@ void CSwordWind::Late_Update(_float fTimeDelta)
 
 	CPartObject::Late_Update(fTimeDelta);
 
-	
-
 	if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::BLEND, this)))
+		return;
+
+	/* Distortion은 Renderer의 Combine이후에 모든 과정이 끝나고 나서 출력.*/
+	if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::DISTORTION, this)))
 		return;
 }
 
@@ -120,6 +150,31 @@ HRESULT CSwordWind::Render()
 
 	return S_OK;
 }
+
+HRESULT CSwordWind::Render_Distortion()
+{
+	if (FAILED(Bind_ShaderResources_Distortion()))
+	{
+		CRASH("Ready Render Resource Distortion Failed");
+		return E_FAIL;
+	}
+
+	_uint           iNumMeshes = m_pModelCom->Get_NumMeshes();
+
+	for (_uint i = 0; i < iNumMeshes; i++)
+	{
+		// 기본 Texture를 NoiseTexture로 지정.
+		if (FAILED(m_pModelCom->Bind_Materials(m_pDistortionShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE, 0)))
+			return E_FAIL;
+
+
+		//m_pDistortionShaderCom->Begin(static_cast<_uint>(DISTORTION_SHADERPATH::SWORD_WIND));
+		m_pDistortionShaderCom->Begin(static_cast<_uint>(DISTORTION_SHADERPATH::SWORD_WIND));
+		m_pModelCom->Render(i);
+	}
+
+	return S_OK;
+}
 #pragma endregion
 
 
@@ -140,53 +195,45 @@ void CSwordWind::OnActivate(void* pArg)
 	m_vRotationAxis = pDesc->vRotationAxis;
 	m_fRotationSpeed = pDesc->fRotationSpeed;
 	m_fDissolveTime = 0.f;
+	m_fDissolveThreshold = 0.f; // 초기화
 
 	m_pParentMatrix = pDesc->pParentMatrix;
 	m_pTargetTransform = pDesc->pTargetTransform;
 
-	m_fCreateTime = pDesc->fCreateTime; // Dissolve Threshold 타임.
+	m_fCreateTime = pDesc->fCreateTime; // 순차적 생성 시간
 	m_vStartScale = pDesc->vStartScale;
 
-
-
-	//m_pTransformCom->Set_Position(pDesc->vStartPos);
-
-
-// 1. 타겟(플레이어)의 현재 상태(위치, 방향)를 가져옵니다.
+	// 카메라 기준 위치 설정 (기존 코드 유지)
 	CTransform* pCameraTransform = m_pGameInstance->Get_MainCamera()->Get_Transform();
 
 	_vector vTargetPos = pCameraTransform->Get_State(STATE::POSITION);
 	_vector vTargetRight = pCameraTransform->Get_State(STATE::RIGHT);
-	_vector vTargetUp = pCameraTransform->Get_State(STATE::UP); // '위' 방향 벡터
+	_vector vTargetUp = pCameraTransform->Get_State(STATE::UP);
 	_vector vTargetLook = pCameraTransform->Get_State(STATE::LOOK);
 
-	// 1-1. 눈 높이(Y축 오프셋)를 설정합니다. (캐릭터 모델에 맞게 이 값을 조절해야 합니다)
-	_float fEyeHeight = 0.f; // 예시: 1.6미터 또는 160유닛
-
-	// 1-2. 플레이어 발밑 위치에 눈 높이만큼의 오프셋을 더해 '눈 위치'를 계산합니다.
+	_float fEyeHeight = 0.f;
 	_vector vEyeLevelPos = vTargetPos + (XMVector3Normalize(vTargetUp) * fEyeHeight);
 
-	// 2. 타겟 정면으로 얼마나 멀리 이펙트를 생성할지 거리를 설정합니다.
 	_float fDistance = 7.f;
-
-	// 3. 방향 벡터 정규화 (안전장치)
 	vTargetLook = XMVector3Normalize(vTargetLook);
-
-	// 4. 최종 위치 계산: 이제 '눈 위치'에서 정면으로 fDistance만큼 떨어진 곳을 계산합니다.
 	_vector vFinalPos = vEyeLevelPos + (vTargetLook * fDistance);
 
-	// 5. 이펙트의 방향(회전)을 타겟과 동일하게 설정합니다.
 	m_pTransformCom->Set_State(STATE::RIGHT, vTargetRight);
 	m_pTransformCom->Set_State(STATE::UP, vTargetUp);
 	m_pTransformCom->Set_State(STATE::LOOK, vTargetLook);
-
-	// 6. 이펙트의 위치를 최종 계산된 위치로 설정합니다.
 	m_pTransformCom->Set_State(STATE::POSITION, vFinalPos);
 
+	// 초기 크기를 0으로 설정 (순차적 생성 효과)
+	if (m_fCreateTime > 0.f)
+	{
+		m_pTransformCom->Set_Scale(_float3(0.f, 0.f, 0.f));
+	}
+	else
+	{
+		m_pTransformCom->Set_Scale(pDesc->vStartScale);
+	}
 
-	m_pTransformCom->Set_Scale(pDesc->vStartScale);
-
-
+	// 초기 회전은 유지하되, Update에서는 회전시키지 않음
 	m_pTransformCom->Add_Rotation(
 		XMConvertToRadians(pDesc->vStartRotation.x),
 		XMConvertToRadians(pDesc->vStartRotation.y),
@@ -443,12 +490,136 @@ HRESULT CSwordWind::Bind_ShaderResources()
 	return S_OK;
 }
 
+HRESULT CSwordWind::Bind_ShaderResources_Distortion()
+{
+
+#pragma region 행렬 바인딩
+	// 쉐이더에 바인딩
+	if (FAILED(m_pDistortionShaderCom->Bind_Matrix("g_WorldMatrix", &m_CombinedWorldMatrix)))
+	{
+		CRASH("Failed Bind World Matrix");
+		return E_FAIL;
+	}
+
+
+	if (FAILED(m_pDistortionShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance->Get_Transform_Float4x4(D3DTS::VIEW))))
+	{
+		CRASH("Failed Bind View Matrix");
+		return E_FAIL;
+	}
+
+	if (FAILED(m_pDistortionShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_Transform_Float4x4(D3DTS::PROJ))))
+	{
+		CRASH("Failed Bind Proj Matrix");
+		return E_FAIL;
+	}
+
+	if (FAILED(m_pDistortionShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
+	{
+		CRASH("Failed Bind Cam Position");
+		return E_FAIL;
+	}
+
+
+
+
+#pragma region SHADER변수
+
+	//if (FAILED(m_pDistortionShaderCom->Bind_RawValue("g_fTime", &m_fTime, sizeof(_float))))
+	//{
+	//	CRASH("Failed Bind Cam Position");
+	//	return E_FAIL;
+	//}
+
+	//if (FAILED(m_pDistortionShaderCom->Bind_RawValue("g_fDissolveThresold", &m_fDissolveThreshold, sizeof(_float))))
+	//{
+	//	CRASH("Failed Bind Cam Position");
+	//	return E_FAIL;
+	//}
+
+	//_float fRatio = m_fTime / m_fDisplayTime;
+	//if (FAILED(m_pDistortionShaderCom->Bind_RawValue("g_fRatio", &fRatio, sizeof(_float))))
+	//{
+	//	CRASH("Failed Bind Cam Position");
+	//	return E_FAIL;
+	//}
+
+	//_float fGrowRatio = m_fGrowTime / m_fGrowDuration;
+	//if (FAILED(m_pDistortionShaderCom->Bind_RawValue("g_fGrowTime", &fGrowRatio, sizeof(_float))))
+	//{
+	//	CRASH("Failed Bind g_fGrowTime");
+	//	return E_FAIL;
+	//}
+
+
+	//_float fDisolveRatio = m_fDissolveTime / m_fDecreaseDuration;
+
+
+	//if (FAILED(m_pDistortionShaderCom->Bind_RawValue("g_fDissolveTime", &m_fDissolveThreshold, sizeof(_float))))
+	//{
+	//	CRASH("Failed Bind Cam Position");
+	//	return E_FAIL;
+	//}
+
+	//if (FAILED(m_pDistortionShaderCom->Bind_RawValue("g_fScrollSpeed", &m_fScrollSpeed, sizeof(_float))))
+	//{
+	//	CRASH("Failed Bind Cam Position");
+	//	return E_FAIL;
+	//}
+
+
+	//_float4 vDynamicFresnelColor = {
+	//	1.0f,
+	//	0.2f + sin(m_fTime * 2.0f) * 0.1f,  // 초록 성분 변화
+	//	0.1f + cos(m_fTime * 1.5f) * 0.05f, // 파랑 성분 변화
+	//	1.0f
+	//};
+
+	//if (FAILED(m_pDistortionShaderCom->Bind_RawValue("g_vFresnelColor", &vDynamicFresnelColor, sizeof(_float4))))
+	//	return E_FAIL;
+
+	//if (FAILED(m_pDistortionShaderCom->Bind_RawValue("g_fDissolveThresold", &m_fDissolveThreshold, sizeof(_float))))
+	//{
+	//	CRASH("Failed Bind Cam Position");
+	//	return E_FAIL;
+	//}
+#pragma endregion
+
+
+
+
+
+#pragma endregion
+
+#pragma region TEXTURE 바인딩.
+	if (FAILED(m_pTextureCom[TEXTURE_DIFFUSE]->Bind_Shader_Resources(m_pDistortionShaderCom, "g_DiffuseTextures")))
+	{
+		CRASH("Failed Bind Texture Diffuse Texture ");
+		return E_FAIL;
+	}
+
+	if (FAILED(m_pTextureCom[TEXTURE::TEXTURE_OTHER]->Bind_Shader_Resources(m_pDistortionShaderCom, "g_OtherTextures")))
+	{
+		CRASH("Failed Bind Texture Other Texture ");
+		return E_FAIL;
+	}
+#pragma endregion
+
+
+	return S_OK;
+}
+
 HRESULT CSwordWind::Ready_Components(SWORDWIND_DESC* pDesc)
 {
 	/* 사용할 쉐이더.*/
 	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxMesh"),
 		TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom), nullptr)))
-		CRASH("Failed BloodPillarA Components");
+		CRASH("Failed SwordWind Components");
+
+
+	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxMeshDistortion"),
+		TEXT("Com_DistortionShader"), reinterpret_cast<CComponent**>(&m_pDistortionShaderCom), nullptr)))
+		CRASH("Failed SwordWind Components");
 
 	
 
@@ -534,6 +705,7 @@ void CSwordWind::Free()
 {
 	CPartObject::Free();
 	Safe_Release(m_pShaderCom);
+	Safe_Release(m_pDistortionShaderCom);
 	Safe_Release(m_pModelCom);
 	for (auto& pTextureCom : m_pTextureCom)
 		Safe_Release(pTextureCom);

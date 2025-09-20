@@ -21,12 +21,18 @@ public:
 	virtual void Update(_float fTimeDelta) override;
 	virtual void Late_Update(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
+	virtual HRESULT Render_Distortion() override;
+
 	void Update_Trail_Point(_float3 vPointDown, _float3 vPointUp, _fmatrix WeaponMatrix);
 
 
 private:
 	virtual HRESULT Ready_Components(SWORDTRAIL_DESC* pDesc);
 	virtual HRESULT Bind_ShaderResources();
+
+	virtual HRESULT Bind_DistortionShaderResources();
+
+
 	
 
 private:
@@ -36,11 +42,15 @@ private:
 	class CPlayer* m_pPlayer = { nullptr };
 	class CVIBuffer_SwordTrail* m_pVIBufferCom = { nullptr } ;
 	class CShader* m_pShaderCom = { nullptr };
+	
+	class CShader* m_pDistortionShaderCom = { nullptr }; // Distortion
+	
 	// 멀티 텍스처 시스템
 	class CTexture* m_pBaseTexture = { nullptr };      // 기본 검 궤적
 	_uint			m_iBaseTextureIndex = {};
 	class CTexture* m_pDetailTexture = { nullptr };    // 슬래시 디테일
 	class CTexture* m_pGlowTexture = { nullptr };      // 발광 효과
+	class CTexture* m_pDistortionTexture = { nullptr };      // 발광 효과
 	_vector	m_vColorBack = XMVectorSet(1.f, 1.f, 1.f, 1.f);
 	_vector	m_vColorFront = XMVectorSet(1.f, 1.f, 1.f, 1.f);
 	_float			m_fAlpha = 1.f;

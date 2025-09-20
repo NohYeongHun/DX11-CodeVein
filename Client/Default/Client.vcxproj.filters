@@ -1160,6 +1160,12 @@
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxEffectPosTex.hlsl">
       <Filter>96. ShaderFiles</Filter>
     </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxMeshDistortion.hlsl">
+      <Filter>96. ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxEffectTrailDistortion.hlsl">
+      <Filter>96. ShaderFiles</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\Public\PlayerAnimation.txt">

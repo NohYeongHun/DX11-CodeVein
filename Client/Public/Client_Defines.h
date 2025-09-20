@@ -62,11 +62,19 @@ namespace Client
 		, NONE
 	};
 
+	enum class EFFECTTRAIL_DISTORTIONSHADERPATH : _uint {
+		SWORD_TRAIL = 0, NONE
+	};
+
 	enum class POINTDIRPARTICLE_SHADERPATH : _uint
 	{
 		DEFAULT = 0, QUEENKNIGHTWARP = 1, EXPLOSION = 2,QUEENKINGHT_PARTICLE = 3, HITPARTICLE = 4, PLAYERHITPARTICLE = 5,
 		TORNADO = 6, DEBUG = 7,
 		NONE
+	};
+
+	enum class DISTORTION_SHADERPATH : _uint {
+		DEFAULT = 0, SWORD_WIND = 1, NONE
 	};
 
 	/* 기본 스탯 구조체 */

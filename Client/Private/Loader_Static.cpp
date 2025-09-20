@@ -125,6 +125,15 @@ HRESULT CLoader_Static::Add_Prototype_ForShader(ID3D11Device* pDevice, ID3D11Dev
 		return E_FAIL;
 	}
 
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel), TEXT("Prototype_Component_Shader_VtxMeshDistortion"),
+		CShader::Create(pDevice, pContext, TEXT("../Bin/ShaderFiles/Shader_VtxMeshDistortion.hlsl"), VTXANIMMESH::Elements, VTXANIMMESH::iNumElements))))
+	{
+		CRASH("Failed Create Shader Cube");
+		return E_FAIL;
+	}
+
+	
+
 
 	
 
@@ -689,6 +698,13 @@ HRESULT CLoader_Static::Add_Prototype_Trail_Effects(ID3D11Device* pDevice, ID3D1
 		return E_FAIL;
 	}
 
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel), TEXT("Prototype_Component_Shader_VtxSwordTrailDistortion"),
+		CShader::Create(pDevice, pContext, TEXT("../Bin/ShaderFiles/Shader_VtxEffectTrailDistortion.hlsl"), VTXPOSTEX::Elements, VTXPOSTEX::iNumElements))))
+	{
+		CRASH("Failed Load Point Effect Shader");
+		return E_FAIL;
+	}
+
 	/*For.Prototype_Component_VIBuffer_Swordtrail*/
 	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel), TEXT("Prototype_Component_VIBuffer_SwordTrail"),
 		CVIBuffer_SwordTrail::Create(pDevice, pContext))))
@@ -724,6 +740,16 @@ HRESULT CLoader_Static::Add_Prototype_Trail_Effects(ID3D11Device* pDevice, ID3D1
 			, TEXT("../Bin/Resources/Textures/Effects/Texture/Trail/Trail_SpWeapon%d.png"), 1))))
 	{
 		CRASH("Failed Load Effect TrailGlow Texture");
+		return E_FAIL;
+	}
+
+	// 왜곡 효과 텍스처 등록  
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
+		, TEXT("Prototype_Component_Texture_TrailDistortion")
+		, CTexture::Create(pDevice, pContext
+			, TEXT("../Bin/Resources/Textures/Effects/Texture/Trail/Distortion%d.png"), 1))))
+	{
+		CRASH("Failed Load Effect TrailDistortion Texture");
 		return E_FAIL;
 	}
 

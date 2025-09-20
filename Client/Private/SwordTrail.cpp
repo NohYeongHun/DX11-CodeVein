@@ -1,4 +1,5 @@
-﻿CSwordTrail::CSwordTrail(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿#include "SwordTrail.h"
+CSwordTrail::CSwordTrail(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CGameObject{pDevice, pContext }
 {
 }
@@ -73,6 +74,8 @@ void CSwordTrail::Update(_float fTimeDelta)
 void CSwordTrail::Late_Update(_float fTimeDelta)
 {
 	m_pGameInstance->Add_RenderGroup(RENDERGROUP::BLEND, this);
+
+	m_pGameInstance->Add_RenderGroup(RENDERGROUP::DISTORTION, this);
 }
 
 HRESULT CSwordTrail::Render()
@@ -84,8 +87,6 @@ HRESULT CSwordTrail::Render()
 #ifdef _DEBUG
 	//ImGui_Render();
 #endif // _DEBUG
-
-
 
 
 
@@ -112,6 +113,21 @@ HRESULT CSwordTrail::Render()
 		CRASH("Failed VIBufferCom Render");
 		return E_FAIL;
 	}
+
+	return S_OK;
+}
+
+HRESULT CSwordTrail::Render_Distortion()
+{
+	Bind_DistortionShaderResources();
+
+	m_pDistortionTexture->Bind_Shader_Resource(m_pDistortionShaderCom, "g_DistortionTexture", 0);
+
+	m_pDistortionShaderCom->Begin(static_cast<_uint>(EFFECTTRAIL_DISTORTIONSHADERPATH::SWORD_TRAIL));
+	m_pVIBufferCom->Bind_Resources();
+	m_pVIBufferCom->Render();
+
+
 
 	return S_OK;
 }
@@ -157,6 +173,15 @@ HRESULT CSwordTrail::Ready_Components(SWORDTRAIL_DESC* pDesc)
 		CRASH("Failed Create Glow Texture Sword Trail");
 		return E_FAIL;
 	}
+	
+	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC)
+		, TEXT("Prototype_Component_Texture_TrailDistortion")
+		,TEXT("Com_DistortionTexture")
+	, reinterpret_cast<CComponent**>(&m_pDistortionTexture))))
+	{
+		CRASH("Failed Create Glow Texture Trail Distortion");
+		return E_FAIL;
+	}
 
 	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC)
 		, TEXT("Prototype_Component_VIBuffer_SwordTrail")
@@ -170,6 +195,11 @@ HRESULT CSwordTrail::Ready_Components(SWORDTRAIL_DESC* pDesc)
 	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC)
 		, TEXT("Prototype_Component_Shader_Effect")
 		, TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom))))
+		return E_FAIL;
+
+	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC)
+		, TEXT("Prototype_Component_Shader_VtxSwordTrailDistortion")
+		, TEXT("Com_DistortionShader"), reinterpret_cast<CComponent**>(&m_pDistortionShaderCom))))
 		return E_FAIL;
 
     return S_OK;
@@ -254,6 +284,34 @@ HRESULT CSwordTrail::Bind_ShaderResources()
     return S_OK;
 }
 
+HRESULT CSwordTrail::Bind_DistortionShaderResources()
+{
+#pragma region 행렬 바인딩
+	// 트레일 정점은 이미 월드 좌표계로 변환된 상태이므로 단위 행렬 사용
+	if (FAILED(m_pTransformCom->Bind_Shader_Resource(m_pDistortionShaderCom, "g_WorldMatrix")))
+	{
+		CRASH("Failed Bind Identity WorldMatrix");
+		return E_FAIL;
+	}
+
+	if (FAILED(m_pDistortionShaderCom->Bind_Matrix("g_ViewMatrix", m_pGameInstance->Get_Transform_Float4x4(D3DTS::VIEW))))
+	{
+		CRASH("Failed Bind View Matrix SwordTrail");
+		return E_FAIL;
+	}
+
+	if (FAILED(m_pDistortionShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_Transform_Float4x4(D3DTS::PROJ))))
+	{
+		CRASH("Failed Bind Proj Matrix SwordTrail");
+		return E_FAIL;
+	}
+
+
+
+#pragma endregion
+	return S_OK;
+}
+
 CSwordTrail* CSwordTrail::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
 	CSwordTrail* pInstance = new CSwordTrail(pDevice, pContext);
@@ -285,9 +343,12 @@ void CSwordTrail::Free()
 	CGameObject::Free();
 	Safe_Release(m_pVIBufferCom);
 	Safe_Release(m_pShaderCom);
+	Safe_Release(m_pDistortionShaderCom);
+	
 	Safe_Release(m_pBaseTexture);
 	Safe_Release(m_pDetailTexture);
 	Safe_Release(m_pGlowTexture);
+	Safe_Release(m_pDistortionTexture);
 }
 
 #ifdef _DEBUG
