@@ -96,11 +96,9 @@ void CEffect_Pillar::OnActivate(void* pArg)
     m_fAttackPower = pDesc->fAttackPower;
     Reset_Timer();
 
-    // ★★★ 중요: 이미 월드 좌표로 전달받았으므로 그대로 사용 ★★★
     m_pTransformCom->Set_State(STATE::POSITION, m_ActivateDesc.vStartPos);
 
     /* 하위 객체들 Activate 실행 */
-    // ... PillarA, B, C 활성화 코드 ...
     CBlood_PillarA::PILLARA_ACTIVATE_DESC PillarADesc{};
     PillarADesc.vStartPos = { 0.f, 0.f, 0.f }; // 최종 위치는 어차피 곱해진다. => 서서히 조절.
     PillarADesc.fTargetRadius = m_fTargetRadius;

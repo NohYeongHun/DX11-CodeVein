@@ -274,16 +274,6 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_MAIN();
     }
 
-    //pass SkyPass // 하늘 전용 패스
-    //{
-    //    SetRasterizerState(RS_Cull_CW);
-    //    SetDepthStencilState(DSS_None, 0);
-    //    SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
-
-    //    VertexShader = compile vs_5_0 VS_MAIN();
-    //    GeometryShader = NULL;
-    //    PixelShader = compile ps_5_0 PS_MAIN2();
-    //}
 
     pass WindEffectPass
     {

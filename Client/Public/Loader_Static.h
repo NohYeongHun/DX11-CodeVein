@@ -44,6 +44,7 @@ private:
 	HRESULT Add_Prototype_ParticleSystem(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance);
 	HRESULT Add_Prototype_BloodPillar_Effects(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance);
 	HRESULT Add_Prototype_SwordWind_Effects(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance);
+	HRESULT Add_Prototype_BloodAura_Effects(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance);
 
 #pragma endregion
 

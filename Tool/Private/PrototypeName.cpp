@@ -33,7 +33,8 @@ const MODEL_DESC Model_Prototypes[] =
 	//{ MODELTYPE::NONANIM,  TEXT("Prototype_Component_Model_Effect_Wind"), "../Bin/Resources/Models/EffectMesh/EffectWind.fbx",        "textures/"},
 	//{ MODELTYPE::NONANIM,  TEXT("Prototype_Component_Model_WindEffect"), "../Bin/Resources/Models/EffectMesh/WindEffect.fbx",        "textures/"},
 
-	{MODELTYPE::NONANIM,  TEXT("Prototype_Component_Model_Effect_SwordWind"), "../Bin/Resources/Models/EffectMesh/SwordWind.fbx",        "textures/" },
+	//{MODELTYPE::NONANIM,  TEXT("Prototype_Component_Model_Effect_SwordWind"), "../Bin/Resources/Models/EffectMesh/SwordWind.fbx",        "textures/" },
+	{MODELTYPE::NONANIM,  TEXT("Prototype_Component_Model_Effect_BloodAura"), "../Bin/Resources/Models/EffectMesh/BloodAura.fbx",        "textures/" },
 	
 	//{ MODELTYPE::ANIM,  TEXT("Prototype_Component_Model_WolfDevil"), "../Bin/Resources/Models/WolfDevil/WolfDevil.fbx",        "textures/"},
 	//{ MODELTYPE::ANIM,  TEXT("Prototype_Component_Model_BlackKnight"), "../Bin/Resources/Models/BlackKnight/BlackKnight.fbx",        "textures/"},

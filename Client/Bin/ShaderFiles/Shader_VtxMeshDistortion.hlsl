@@ -117,29 +117,12 @@ PS_OUT PS_DISTORTION_MAP_MAIN(VS_OUT In)
 }
 
 
-PS_OUT PS_DISTORTION_SWORDWIND_MAIN(VS_OUT In)
-{
-    PS_OUT Out = (PS_OUT) 0;
-    
-    // 텍스처에서 노멀 값을 읽어옵니다. (노멀맵 사용 시)
-    // float3 vNormal = g_NormalTexture.Sample(DefaultSampler, In.vTexcoord).xyz;
-    
-    // 노멀 벡터의 범위를 0 ~ 1로 변환하여 출력합니다.
-    // 렌더 타겟에는 음수 값을 저장할 수 없기 때문입니다.
-    
-    // 객체의 노말값.
-    Out.vNormal.xyz = In.vNormal * 0.5f + 0.5f;
-    Out.vNormal.w = 1.f; // 알파 값
-
-    return Out;
-}
-
 technique11 DefaultTechnique
 {
     /* 특정 패스를 이용해서 점정을 그려냈다. */
     /* 하나의 모델을 그려냈다. */ 
     /* 모델의 상황에 따라 다른 쉐이딩 기법 세트(명암 + 림라이트 + 스펙큘러 + 노멀맵 + ssao )를 먹여주기위해서 */
-    pass DefaultPass // 0 
+    pass SwordWindPass // 0 
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_Default, 0);
@@ -152,17 +135,5 @@ technique11 DefaultTechnique
     }
 
 
-    pass SwordWindPass // 1 
-    {
-        SetRasterizerState(RS_Default);
-        SetDepthStencilState(DSS_Default, 0);
-        SetBlendState(BS_Default, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
-
-        VertexShader = compile vs_5_0 VS_MAIN();
-        GeometryShader = NULL;
-        //PixelShader = compile ps_5_0 PS_MAIN();
-        PixelShader = compile ps_5_0 PS_DISTORTION_SWORDWIND_MAIN();
-    }
-   
    
 }

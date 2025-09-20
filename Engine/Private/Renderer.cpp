@@ -104,22 +104,22 @@ HRESULT CRenderer::Initialize()
 
 #pragma region DEBUGING 용도 Render Target 화면 추가
 #ifdef _DEBUG
-    //m_pGameInstance->Ready_RT_Debug(TEXT("Target_Specular"), 450.0f, 150.0f, 300.f, 300.f); // 오른쪽 위에서 첫번째.
+    m_pGameInstance->Ready_RT_Debug(TEXT("Target_Specular"), 450.0f, 150.0f, 300.f, 300.f); // 오른쪽 위에서 첫번째.
 
-    //m_pGameInstance->Ready_RT_Debug(TEXT("Target_Diffuse"), 150.0f, 150.0f, 300.f, 300.f);
-    //m_pGameInstance->Ready_RT_Debug(TEXT("Target_Normal"), 150.0f, 450.0f, 300.f, 300.f);
-    //m_pGameInstance->Ready_RT_Debug(TEXT("Target_Depth"), 150.0f, 750.0f, 300.f, 300.f);
-    //m_pGameInstance->Ready_RT_Debug(TEXT("Target_Shade"), 450.0f, 150.0f, 300.f, 300.f); // 오른쪽 위에서 첫번째.
-    //
-    //m_pGameInstance->Ready_RT_Debug(TEXT("Target_LightDepth"), 450.f, 450.0f, 300.f, 300.f); // 그림자 전용
-    //m_pGameInstance->Ready_RT_Debug(TEXT("Combine_Shade"), 450.0f, 750.0f, 300.f, 300.f);
+    m_pGameInstance->Ready_RT_Debug(TEXT("Target_Diffuse"), 150.0f, 150.0f, 300.f, 300.f);
+    m_pGameInstance->Ready_RT_Debug(TEXT("Target_Normal"), 150.0f, 450.0f, 300.f, 300.f);
+    m_pGameInstance->Ready_RT_Debug(TEXT("Target_Depth"), 150.0f, 750.0f, 300.f, 300.f);
+    m_pGameInstance->Ready_RT_Debug(TEXT("Target_Shade"), 450.0f, 150.0f, 300.f, 300.f); // 오른쪽 위에서 첫번째.
+    
+    m_pGameInstance->Ready_RT_Debug(TEXT("Target_LightDepth"), 450.f, 450.0f, 300.f, 300.f); // 그림자 전용
+    m_pGameInstance->Ready_RT_Debug(TEXT("Combine_Shade"), 450.0f, 750.0f, 300.f, 300.f);
 
-    //m_pGameInstance->Ready_RT_Debug(TEXT("Target_Distortion"), 750.0f, 150.0f, 300.f, 300.f);
-    //m_pGameInstance->Ready_RT_Debug(TEXT("Combine_Distortion"), 750.0f, 450.0f, 300.f, 300.f);
+    m_pGameInstance->Ready_RT_Debug(TEXT("Target_Distortion"), 750.0f, 150.0f, 300.f, 300.f);
+    m_pGameInstance->Ready_RT_Debug(TEXT("Combine_Distortion"), 750.0f, 450.0f, 300.f, 300.f);
 
     
-    m_pGameInstance->Ready_RT_Debug(TEXT("Target_Distortion"), 150.0f, 150.0f, 300.f, 300.f);
-    m_pGameInstance->Ready_RT_Debug(TEXT("Combine_Distortion"), 150.0f, 450.0f, 300.f, 300.f);
+  /*  m_pGameInstance->Ready_RT_Debug(TEXT("Target_Distortion"), 150.0f, 150.0f, 300.f, 300.f);
+    m_pGameInstance->Ready_RT_Debug(TEXT("Combine_Distortion"), 150.0f, 450.0f, 300.f, 300.f);*/
     
     m_pGameInstance->Ready_RT_Debug(TEXT("Target_BrightPass"), ViewportDesc.Width - 150.0f, 150.0f, 300.f, 300.f);
     m_pGameInstance->Ready_RT_Debug(TEXT("Target_BloomBlurX"), ViewportDesc.Width - 150.0f, 450.0f, 300.f, 300.f);
@@ -761,7 +761,7 @@ HRESULT CRenderer::Render_Debug()
     if (FAILED(m_pDefferedShader->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
         return E_FAIL;
 
-    m_pGameInstance->Render_RT_Debug(m_pDefferedShader, m_pVIBuffer);
+    //m_pGameInstance->Render_RT_Debug(m_pDefferedShader, m_pVIBuffer);
 
     return S_OK;
 }

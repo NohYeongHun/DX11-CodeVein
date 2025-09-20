@@ -125,6 +125,21 @@ BlendState BS_AlphaBlend_Additive // 새로운 가산 혼합 상태
     BlendOp = ADD;
 };
 
+BlendState BS_AdditiveBlend
+{
+    BlendEnable[0] = true;
+    BlendEnable[1] = true;
+    
+    // Color: Source + Destination
+    SrcBlend = ONE;
+    DestBlend = ONE;
+    BlendOp = ADD;
+    
+    // Alpha 처리
+    SrcBlendAlpha = ONE;
+    DestBlendAlpha = ONE;
+    BlendOpAlpha = ADD;
+};
 
 BlendState BS_Blend_Inv
 {

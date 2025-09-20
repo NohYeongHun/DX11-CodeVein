@@ -459,9 +459,24 @@ HRESULT CMainApp::Ready_Pooling()
 		m_pGameInstance->Add_GameObject_ToPools(TEXT("PLAYER_HITPARTICLE"), ENUM_CLASS(CEffectParticle::EffectType), pGameObject);
 	}
 
-	
+#pragma endregion
+
+#pragma region PLAYER SKILL
+	CEffect_PlayerSkill::EFFECT_PLAYERSKILL_DESC PlayerSkillDesc{};
+	PlayerSkillDesc.fSpeedPerSec = 10.f;
+	PlayerSkillDesc.fRotationPerSec = XMConvertToRadians(90.f);
+
+	for (_uint i = 0; i < 100; ++i)
+	{
+		pGameObject = dynamic_cast<CGameObject*>(m_pGameInstance->Clone_Prototype(
+			PROTOTYPE::GAMEOBJECT, ENUM_CLASS(LEVEL::STATIC)
+			, TEXT("Prototype_GameObject_EffectPlayerAuraContainer"), &PlayerSkillDesc
+		));
+		m_pGameInstance->Add_GameObject_ToPools(TEXT("PLAYER_AURA"), ENUM_CLASS(CEffect_PlayerSkill::EffectType), pGameObject);
+	}
 	
 #pragma endregion
+
 
 
 	return S_OK;

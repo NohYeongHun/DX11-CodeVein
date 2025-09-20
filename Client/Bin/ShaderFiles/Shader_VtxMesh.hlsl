@@ -944,6 +944,144 @@ PS_OUT_SHADOW PS_MAIN_SHADOW(PS_IN_SHADOW In)
     return Out;
 }
 
+/* 땅바닥 Blood Aura */
+//PS_OUT_BACKBUFFER PS_BLOOD_CIRCLE_MAIN(PS_BACKBUFFER_IN In)
+//{
+//    PS_OUT_BACKBUFFER Out = (PS_OUT_BACKBUFFER) 0;
+
+//    // ===== 1. UV 회전 (텍스처 스크롤링) =====
+//    float2 centerUV = In.vTexcoord - 0.5f;
+//    float distance = length(centerUV);
+//    float angle = atan2(centerUV.y, centerUV.x);
+    
+//    // 시간에 따라 각도 회전 (텍스처가 회전하는 효과)
+//    float rotationSpeed = 2.0f;
+//    angle += g_fTime * rotationSpeed;
+    
+//    // 회전된 UV 재구성
+//    float2 rotatedUV;
+//    rotatedUV.x = cos(angle) * distance + 0.5f;
+//    rotatedUV.y = sin(angle) * distance + 0.5f;
+
+//    // ===== 2. 텍스처 샘플링 =====
+//    vector vDiffuseColor = g_DiffuseTexture.Sample(DefaultSampler, rotatedUV);
+    
+//    // ===== 3. 색상 처리 =====
+//    // 붉은색 톤 강화
+//    vector finalColor = vDiffuseColor;
+//    finalColor.r = pow(finalColor.r, 0.7f) * 1.2f;
+//    finalColor.g *= 0.2f;
+//    finalColor.b *= 0.1f;
+    
+//    // 회전 패턴 추가 (선택사항)
+//    float pattern = sin(angle * 8.0f - g_fTime * 3.0f) * 0.2f + 0.8f;
+//    finalColor.rgb *= pattern;
+
+//    // ===== 4. 알파 처리 =====
+//    // 기본 알파값 (텍스처의 알파 사용)
+//    float baseAlpha = vDiffuseColor.a;
+    
+//    // Grow 효과 (시작시 페이드 인)
+//    float growAlpha = saturate(g_fGrowTime * 2.0f);
+    
+//    // Dissolve 효과 (종료시 페이드 아웃)
+//    float dissolveAlpha = 1.0f - g_fDissolveTime;
+    
+//    // 최종 알파 = 텍스처 알파 * 성장 * 소멸
+//    float finalAlpha = baseAlpha * growAlpha * dissolveAlpha;
+
+//    // ===== 5. 메쉬 형태 유지 =====
+//    // 도넛 메쉬이므로 별도의 마스킹 없이 그대로 렌더링
+//    // 메쉬가 이미 도넛 형태이므로 추가 clip이나 discard 불필요
+
+//    // ===== 최종 출력 =====
+//    Out.vDiffuse = float4(saturate(finalColor.rgb), saturate(finalAlpha));
+//    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+//    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w, 0.f, 0.f);
+
+//    return Out;
+//}
+
+PS_OUT_BACKBUFFER PS_BLOOD_CIRCLE_MAIN(PS_BACKBUFFER_IN In)
+{
+    PS_OUT_BACKBUFFER Out = (PS_OUT_BACKBUFFER) 0;
+
+    // ===== 1. UV 스크롤링 (회전 대신 이동) =====
+    // 평면 UV에서는 스크롤링이 더 자연스러움
+    float2 scrolledUV = In.vTexcoord;
+    scrolledUV.x += g_fTime * 5.f; // 가로 스크롤
+    scrolledUV = frac(scrolledUV); // 0~1 범위로 래핑
+
+    // ===== 2. 텍스처 샘플링 =====
+    vector vDiffuseColor = g_DiffuseTexture.Sample(DefaultSampler, scrolledUV);
+    vDiffuseColor.r *= 0.8f; // 빨강 유지
+    vDiffuseColor.g *= 0.05f; // 약간의 녹색
+    vDiffuseColor.b *= 0.0f; // 파랑 제거
+
+    // ===== 3. UV 기반 외곽선 (위아래 경계) =====
+    float edgeMask = 0.0f;
+    float edgeThickness = 0.05f; // 외곽선 두께
+    
+    // 위쪽 가장자리 (V값이 1에 가까움)
+    if (In.vTexcoord.y > 1.0f - edgeThickness)
+    {
+        edgeMask = (In.vTexcoord.y - (1.0f - edgeThickness)) / edgeThickness;
+    }
+    
+    // 아래쪽 가장자리 (V값이 0에 가까움)
+    if (In.vTexcoord.y < edgeThickness)
+    {
+        edgeMask = max(edgeMask, 1.0f - (In.vTexcoord.y / edgeThickness));
+    }
+
+    // ===== 4. 색상 처리 =====
+    vector finalColor = vDiffuseColor;
+    
+    // 붉은색 강화
+    finalColor.r = pow(finalColor.r, 0.7f) * 1.2f;
+    finalColor.g *= 0.2f;
+    finalColor.b *= 0.1f;
+    
+    // 외곽선을 검정색으로
+    finalColor.rgb = lerp(finalColor.rgb, float3(0.0f, 0.0f, 0.0f), edgeMask);
+
+    // ===== 5. 패턴 추가 (선택사항) =====
+    // 세로 줄무늬 효과로 회전 느낌 연출
+    float pattern = sin(In.vTexcoord.x * 20.0f - g_fTime * 5.0f) * 0.2f + 0.8f;
+    finalColor.rgb *= pattern;
+
+    // ===== 6. 알파 처리 =====
+    float fadeAlpha = vDiffuseColor.a;
+    fadeAlpha *= saturate(g_fGrowTime * 3.0f);
+    fadeAlpha *= (1.0f - g_fDissolveTime);
+    
+    fadeAlpha -= 0.3f;
+
+    // ===== 출력 =====
+    Out.vDiffuse = float4(saturate(finalColor.rgb), saturate(fadeAlpha));
+    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w, 0.f, 0.f);
+
+    return Out;
+}
+
+
+//PS_OUT_BACKBUFFER PS_BLOOD_CIRCLE_MAIN(PS_BACKBUFFER_IN In)
+//{
+//    PS_OUT_BACKBUFFER Out = (PS_OUT_BACKBUFFER) 0;
+
+//    // ===== 1. 회전하는 UV 생성 =====
+//    vector vSwirlColor = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
+
+//    // ===== 최종 출력 =====
+//    Out.vDiffuse = vSwirlColor;
+//    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+//    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w, 0.f, 0.f);
+
+//    return Out;
+//}
+
+
 technique11 DefaultTechnique
 {
     /* 특정 패스를 이용해서 점정을 그려냈다. */
@@ -1052,6 +1190,19 @@ technique11 DefaultTechnique
         //PixelShader = compile ps_5_0 PS_MAIN();
         PixelShader = compile ps_5_0 PS_MAIN_SHADOW();
     }
+
+    pass BloodAuraPass // 8
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        //PixelShader = compile ps_5_0 PS_SWORDWIND_IMPROVED();
+        PixelShader = compile ps_5_0 PS_BLOOD_CIRCLE_MAIN();
+    }
+
 
 
 }

@@ -51,8 +51,14 @@
 #include "Blood_PillarC.h"
 #include "Effect_Pillar.h"
 #include "Effect_Wind.h"
-#include "SwordWind.h"
 
+
+
+#include "Effect_PlayerSkill.h"
+#include "Effect_FloorAura.h"
+#include "Effect_BodyAura.h"
+
+#include "SwordWind.h"
 #include "SwordTrail.h"
 #pragma endregion
 

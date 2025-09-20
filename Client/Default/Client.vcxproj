@@ -203,7 +203,10 @@
     <ClInclude Include="..\Public\Client_Debug.h" />
     <ClInclude Include="..\Public\Client_Defines.h" />
     <ClInclude Include="..\Public\EffectParticle.h" />
+    <ClInclude Include="..\Public\Effect_BodyAura.h" />
+    <ClInclude Include="..\Public\Effect_FloorAura.h" />
     <ClInclude Include="..\Public\Effect_Pillar.h" />
+    <ClInclude Include="..\Public\Effect_PlayerSkill.h" />
     <ClInclude Include="..\Public\Effect_Wind.h" />
     <ClInclude Include="..\Public\Fade_Out.h" />
     <ClInclude Include="..\Public\Giant_WhiteDevil.h" />
@@ -355,7 +358,10 @@
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ClientPch.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ClientPch.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
     </ClCompile>
+    <ClCompile Include="..\Private\Effect_BodyAura.cpp" />
+    <ClCompile Include="..\Private\Effect_FloorAura.cpp" />
     <ClCompile Include="..\Private\Effect_Pillar.cpp" />
+    <ClCompile Include="..\Private\Effect_PlayerSkill.cpp" />
     <ClCompile Include="..\Private\Effect_Wind.cpp" />
     <ClCompile Include="..\Private\Fade_Out.cpp" />
     <ClCompile Include="..\Private\Giant_WhiteDevil.cpp" />

@@ -81,6 +81,17 @@ void CPlayer_SecondSkillState::Enter(void* pArg)
     Desc.iSlotIdx = 1;
     Desc.fSkillCoolTime = m_pFsm->Get_StateCoolTime(CPlayer::SKILL_2);
     m_pGameInstance->Publish(EventType::SKILL_EXECUTE, &Desc);
+
+
+    // 오라 이펙트
+    CEffect_PlayerSkill::EFFECT_PLAYERSKILL_ACTIVATE_DESC Effect_PlayerSkillDesc{};
+    Effect_PlayerSkillDesc.eCurLevel = m_pPlayer->Get_CurrentLevel();
+    Effect_PlayerSkillDesc.pTargetTransform = m_pPlayer->Get_Transform();
+    Effect_PlayerSkillDesc.fDuration = 10.f; // 지속시간,,
+    Effect_PlayerSkillDesc.vStartPos = { 0.f, 0.f, 0.f }; // { 발 }
+    
+    m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(m_pGameInstance->Get_CurrentLevelID())
+    	, TEXT("PLAYER_AURA"), TEXT("Layer_Effect"), 1, ENUM_CLASS(CEffect_PlayerSkill::EffectType), &Effect_PlayerSkillDesc);
 }
 
 void CPlayer_SecondSkillState::Update(_float fTimeDelta)

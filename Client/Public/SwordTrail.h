@@ -22,8 +22,11 @@ public:
 	virtual void Late_Update(_float fTimeDelta) override;
 	virtual HRESULT Render() override;
 	virtual HRESULT Render_Distortion() override;
+	
 
 	void Update_Trail_Point(_float3 vPointDown, _float3 vPointUp, _fmatrix WeaponMatrix);
+
+	
 
 
 private:
@@ -72,6 +75,9 @@ private:
 	_float			m_fFadePower = 1.0f;           // 페이드 거듭제곱 (자연스럽게)
 	_float			m_fIntensity = 2.0f;           // 전체 강도 (더 높임)
 	_vector			m_vTrailColor = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f); // 원본 색상 유지
+
+	// Distortion On
+	_bool			m_bDistortionOn = false;
 
 	
 

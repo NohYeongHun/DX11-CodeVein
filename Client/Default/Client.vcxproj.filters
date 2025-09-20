@@ -265,6 +265,9 @@
     <Filter Include="02. GameObject\Effect\Mesh\Player\CirculatePurge\SwordWind">
       <UniqueIdentifier>{e55cadba-582d-4f8a-9da6-e312841c0842}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. GameObject\Effect\Mesh\Player\Skill2">
+      <UniqueIdentifier>{0461f832-26ab-494d-9cb6-708d0634bb78}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -711,6 +714,15 @@
     <ClInclude Include="..\Public\SwordWind.h">
       <Filter>02. GameObject\Effect\Mesh\Player\CirculatePurge\SwordWind</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Effect_FloorAura.h">
+      <Filter>02. GameObject\Effect\Mesh\Player\Skill2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Effect_PlayerSkill.h">
+      <Filter>02. GameObject\Effect\Mesh\Player\Skill2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Effect_BodyAura.h">
+      <Filter>02. GameObject\Effect\Mesh\Player\Skill2</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -1127,6 +1139,15 @@
     </ClCompile>
     <ClCompile Include="..\Private\SwordWind.cpp">
       <Filter>02. GameObject\Effect\Mesh\Player\CirculatePurge\SwordWind</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Effect_FloorAura.cpp">
+      <Filter>02. GameObject\Effect\Mesh\Player\Skill2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Effect_PlayerSkill.cpp">
+      <Filter>02. GameObject\Effect\Mesh\Player\Skill2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Effect_BodyAura.cpp">
+      <Filter>02. GameObject\Effect\Mesh\Player\Skill2</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

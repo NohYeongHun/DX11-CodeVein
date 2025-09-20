@@ -1,4 +1,5 @@
-﻿HRESULT CLoader_Static::Loading_Resource(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
+﻿#include "Loader_Static.h"
+HRESULT CLoader_Static::Loading_Resource(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
 {
 	if (FAILED(Add_Prototype_ForShader(pDevice, pContext, pGameInstance)))
 	{
@@ -542,6 +543,12 @@ HRESULT CLoader_Static::Add_Prototype_Effects(ID3D11Device* pDevice, ID3D11Devic
 		CRASH("Failed CLone SwordWind Effects");
 		return E_FAIL;
 	}
+
+	if (FAILED(Add_Prototype_BloodAura_Effects(pDevice, pContext, pGameInstance)))
+	{
+		CRASH("Failed CLone SwordWind Effects");
+		return E_FAIL;
+	}
 		
 
 
@@ -957,6 +964,75 @@ HRESULT CLoader_Static::Add_Prototype_SwordWind_Effects(ID3D11Device* pDevice, I
 		, TEXT("Prototype_GameObject_EffectWind")
 		, CEffect_Wind::Create(pDevice, pContext))))
 		CRASH("Failed Prototype Effects Wind");
+	return S_OK;
+}
+
+HRESULT CLoader_Static::Add_Prototype_BloodAura_Effects(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
+{
+#pragma region TEXTURE
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
+		, TEXT("Prototype_Component_Texture_BloodAuraDiffuse")
+		, CTexture::Create(pDevice, pContext
+			, TEXT("../Bin/Resources/Models/EffectMesh/BloodAura/Diffuse/Diffuse%d.png"), 5))))
+	{
+		CRASH("Failed Load Effect BloodAura Texture");
+		return E_FAIL;
+	}
+
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
+		, TEXT("Prototype_Component_Texture_BloodAuraOther")
+		, CTexture::Create(pDevice, pContext
+			, TEXT("../Bin/Resources/Models/EffectMesh/SwordWind/Other/Other%d.png"), 13))))
+	{
+		CRASH("Failed Load Effect SwordOther Texture");
+		return E_FAIL;
+	}
+
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
+		, TEXT("Prototype_Component_Texture_BloodAuraNoise")
+		, CTexture::Create(pDevice, pContext
+			, TEXT("../Bin/Resources/Models/EffectMesh/BloodAura/Noise/Noise%d.png"), 5))))
+	{
+		CRASH("Failed Load Effect SwordOther Texture");
+		return E_FAIL;
+	}
+
+
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
+		, TEXT("Prototype_Component_Texture_BloodAuraSwirl")
+		, CTexture::Create(pDevice, pContext
+			, TEXT("../Bin/Resources/Models/EffectMesh/BloodAura/Swirl/Swirl%d.png"), 6))))
+	{
+		CRASH("Failed Load Effect SwordOther Texture");
+		return E_FAIL;
+	}
+
+
+#pragma endregion
+
+	_matrix		PreTransformMatrix = XMMatrixIdentity();
+
+	PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XM_PI);
+
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
+		, TEXT("Prototype_Component_Model_Effect_BloodAura")
+		, CLoad_Model::Create(pDevice, pContext, MODELTYPE::NONANIM, PreTransformMatrix, "../../SaveFile/Model/Effect/BloodAura.dat", L""))))
+	{
+		CRASH("Failed Prototype_Component_Model_Effect_BloodAura");
+		return E_FAIL;
+	}
+
+	/* 부품 메시들. */
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
+		, TEXT("Prototype_GameObject_BloodAura")
+		, CEffect_FloorAura::Create(pDevice, pContext))))
+		CRASH("Failed Prototype Blood Aura Effects");
+
+	/* 최종 명령을 내리는 주체.*/
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
+		, TEXT("Prototype_GameObject_EffectPlayerAuraContainer")
+		, CEffect_PlayerSkill::Create(pDevice, pContext))))
+		CRASH("Failed Prototype Effects PlayerSkill");
 	return S_OK;
 }
 

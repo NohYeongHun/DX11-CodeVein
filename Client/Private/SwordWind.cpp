@@ -28,7 +28,6 @@ HRESULT CSwordWind::Initialize_Clone(void* pArg)
 #pragma region 기본 변수들 초기화
 	m_fDisplayTime = pDesc->fDisplayTime;
 	m_iShaderPath = static_cast<_uint>(pDesc->eShaderPath);
-	/*m_pParentMatrix = pDesc->pParentMatrix;*/
 	m_pOwner = pDesc->pOwner;
 	
 #pragma endregion
@@ -427,10 +426,10 @@ HRESULT CSwordWind::Bind_ShaderResources()
 	}
 
 
-	_float fDisolveRatio = m_fDissolveTime / m_fDecreaseDuration;
+	_float fDissolveRatio = m_fDissolveTime / m_fDecreaseDuration;
 
 
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_fDissolveTime", &m_fDissolveThreshold, sizeof(_float))))
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fDissolveTime", &fDissolveRatio, sizeof(_float))))
 	{
 		CRASH("Failed Bind Cam Position");
 		return E_FAIL;

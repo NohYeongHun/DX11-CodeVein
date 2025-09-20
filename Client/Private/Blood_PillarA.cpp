@@ -172,8 +172,6 @@ void CBlood_PillarA::Shape_Control(_float fTimeDelta)
 		break;
 	}
 
-	_float3 vScale = m_pTransformCom->Get_Scale();
-
 	if (!m_bIsGrowing)
 		return;
 
@@ -229,8 +227,6 @@ void CBlood_PillarA::Update_Decrease(_float fTimeDelta)
 	fRatio = fRatio * fRatio;
 
 	// [수정] 선형 보간 공식을 사용하여 반지름을 계산합니다.
-	// 시작값: m_fTargetRadius
-	// 목표값: m_fDecreaseTargetRadius
 	_float fCurrentRadius = m_fTargetRadius + (m_fDecreaseTargetRadius - m_fTargetRadius) * fRatio;
 
 	// Y축 스케일(높이)은 이전 요청대로 m_fTargetHeight 값으로 고정합니다.

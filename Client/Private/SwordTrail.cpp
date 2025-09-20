@@ -307,8 +307,17 @@ HRESULT CSwordTrail::Bind_DistortionShaderResources()
 	}
 
 
-
 #pragma endregion
+
+#pragma region SHADER 변수
+
+	if (FAILED(m_pDistortionShaderCom->Bind_RawValue("g_fTime", &m_fTime, sizeof(_float))))
+	{
+		CRASH("Failed Bind Time");
+		return E_FAIL;
+	}
+#pragma endregion
+
 	return S_OK;
 }
 
