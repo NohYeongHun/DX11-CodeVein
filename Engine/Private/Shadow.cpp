@@ -34,7 +34,7 @@ HRESULT CShadow::Ready_ShadowLight(SHADOW_LIGHT_DESC LightDesc)
 
 void CShadow::Update()
 {
-	_vector vCameraPos = XMLoadFloat4(m_pGameInstance->Get_CamPosition());
+	/*_vector vCameraPos = XMLoadFloat4(m_pGameInstance->Get_CamPosition());
 
 	SHADOW_LIGHT_DESC ShadowLightDesc{};
 	_float4 vEye, vAt;
@@ -47,12 +47,20 @@ void CShadow::Update()
 	ShadowLightDesc.fNear = 0.1f;
 	ShadowLightDesc.fFar = 1000.f;
 
-	m_pGameInstance->Ready_ShadowLight(ShadowLightDesc);
-
+	m_pGameInstance->Ready_ShadowLight(ShadowLightDesc);*/
+	
 
 
 
 }
+#ifdef _DEBUG
+void CShadow::Render()
+{
+	
+}
+#endif // _DEBUG
+
+
 
 
 

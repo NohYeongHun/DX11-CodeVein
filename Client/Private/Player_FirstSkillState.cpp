@@ -77,15 +77,8 @@ HRESULT CPlayer_FirstSkillState::Initialize(_uint iStateNum, void* pArg)
 
 
 
-	//m_fIncreaseDamage = 10.f; // 기본 공격력 증가량 설정
-	m_fIncreaseDamage = 1000.f; // 기본 공격력 증가량 설정
-
-    // 1. 스테미나 감소.
-    STEMINA_CHANGE_DESC SteminaDesc{};
-    SteminaDesc.bIncrease = false;
-    SteminaDesc.fStemina = 35.f;
-    SteminaDesc.fTime = 1.f;
-    m_pGameInstance->Publish(EventType::STEMINA_CHANGE, &SteminaDesc);
+    m_fIncreaseDamage = static_cast<_float>(m_pGameInstance->Rand_UnsignedInt(20.f, 40.f)); // 기본 공격력 증가량 설정
+	//m_fIncreaseDamage = 1000.f; // 기본 공격력 증가량 설정
 
     return S_OK;
 }
@@ -140,6 +133,13 @@ void CPlayer_FirstSkillState::Enter(void* pArg)
 
     m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(m_pGameInstance->Get_CurrentLevelID())
         , TEXT("PLAYER_AURA"), TEXT("Layer_Effect"), 1, ENUM_CLASS(CEffect_PlayerSkill::EffectType), &Effect_PlayerSkillDesc);
+
+
+    STEMINA_CHANGE_DESC SteminaDesc{};
+    SteminaDesc.bIncrease = false;
+    SteminaDesc.fStemina = 40.f;
+    SteminaDesc.fTime = 1.f;
+    m_pGameInstance->Publish(EventType::STEMINA_CHANGE, &SteminaDesc);
 
     //// 2. 검풍 생성 부분 수정
     //CEffect_Wind::EFFECTWIND_ACTIVATE_DESC WindActivate_Desc{};

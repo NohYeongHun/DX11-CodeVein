@@ -59,7 +59,7 @@ public:
 
 private:
 	class CGiant_WhiteDevilTree* m_pTree = { nullptr };
-
+	class CTexture* m_pDissolveTexture = { nullptr };
 #pragma endregion
 
 
@@ -77,6 +77,12 @@ public:
 #pragma endregion
 
 #pragma region 6. 특수한 상태를 제어하기 위한 함수들입니다.
+
+public:
+	virtual void Dead_Action();
+	virtual void Start_Dissolve(_float fDuration = 0.f);
+	virtual void ReverseStart_Dissolve(_float fDuration = 0.f); // Dissolve 역재생
+	virtual void End_Dissolve();
 
 
 public:

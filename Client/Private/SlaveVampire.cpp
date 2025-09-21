@@ -535,7 +535,7 @@ HRESULT CSlaveVampire::Ready_Render_Resources()
 
     if (FAILED(m_pShaderCom->Bind_RawValue("g_fDissolveTime", &fDissolveTime, sizeof(_float))))
     {
-        CRASH("Failed Dissolve Texture");
+        CRASH("Failed Dissolve Time");
         return E_FAIL;
     }
 

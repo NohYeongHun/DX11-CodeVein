@@ -26,7 +26,7 @@ HRESULT CSteminaBar::Initialize_Clone(void* pArg)
     m_iMaxStemina = 200;
     m_iStemina = m_iMaxStemina;
     m_iShaderPath = static_cast<_uint>(POSTEX_SHADERPATH::HPPROGRESSBAR);
-    m_fIncreaseSpeed = 30.f; // 초당 30.f 차게끔?
+    m_fIncreaseSpeed = 80.f; // 초당 30.f 차게끔?
 
     if (FAILED(Ready_Components()))
         return E_FAIL;

@@ -36,6 +36,12 @@ void CPlayer_DodgeState::Enter(void* pArg)
 
 	m_pPlayer->AddBuff(CPlayer::BUFF_INVINCIBLE);
 
+
+	STEMINA_CHANGE_DESC SteminaDesc{};
+	SteminaDesc.bIncrease = false;
+	SteminaDesc.fStemina = 30.f;
+	SteminaDesc.fTime = 1.f;
+	m_pGameInstance->Publish(EventType::STEMINA_CHANGE, &SteminaDesc);
 }
 
 /* State 실행 */
@@ -175,15 +181,6 @@ void CPlayer_DodgeState::Change_State()
 			return;
 		}
 
-	/*	if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::DODGE))
-		{
-			m_iNextAnimIdx = m_pPlayer->Find_AnimationIndex(TEXT("DODGE"));
-			m_iNextState = CPlayer::PLAYER_STATE::DODGE;
-			Dodge.iAnimation_Idx = m_iNextAnimIdx;
-			m_pFsm->Change_State(m_iNextState, &Dodge);
-			return;
-		}*/
-
 		if (m_pPlayer->Is_MovementKeyPressed())
 		{
 			// 락온 상태에 따라 RUN 또는 WALK 전환
@@ -232,18 +229,20 @@ void CPlayer_DodgeState::Change_State()
 			return;
 		}
 
-		if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::GUARD))
-		{
-			// 해당 동작은 쿨타임이 있는경우 무시됨.
-			if (!m_pFsm->Is_CoolTimeEnd(CPlayer::GUARD))
-				return;
 
-			m_iNextAnimIdx = m_pPlayer->Find_AnimationIndex(TEXT("GUARD_START"));
-			m_iNextState = CPlayer::GUARD;
-			StrongAttack.iAnimation_Idx = m_iNextAnimIdx;
-			m_pFsm->Change_State(m_iNextState, &Guard);
-			return;
-		}
+
+		//if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::GUARD))
+		//{
+		//	// 해당 동작은 쿨타임이 있는경우 무시됨.
+		//	if (!m_pFsm->Is_CoolTimeEnd(CPlayer::GUARD))
+		//		return;
+
+		//	m_iNextAnimIdx = m_pPlayer->Find_AnimationIndex(TEXT("GUARD_START"));
+		//	m_iNextState = CPlayer::GUARD;
+		//	StrongAttack.iAnimation_Idx = m_iNextAnimIdx;
+		//	m_pFsm->Change_State(m_iNextState, &Guard);
+		//	return;
+		//}
 	}
 
 

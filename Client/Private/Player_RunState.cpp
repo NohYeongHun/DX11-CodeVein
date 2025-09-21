@@ -218,18 +218,18 @@ void CPlayer_RunState::Change_State(_float fTimeDelta)
 		return;
 	}
 
-	if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::GUARD))
-	{
-		//달리는 도중에 바꾸면 동작이 어색함.
-		if (!m_pFsm->Is_CoolTimeEnd(CPlayer::GUARD))
-			return;
+	//if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::GUARD))
+	//{
+	//	//달리는 도중에 바꾸면 동작이 어색함.
+	//	if (!m_pFsm->Is_CoolTimeEnd(CPlayer::GUARD))
+	//		return;
 
-		m_iNextAnimIdx = m_pPlayer->Find_AnimationIndex(TEXT("GUARD_START"));
-		m_iNextState = CPlayer::PLAYER_STATE::GUARD;
-		Guard.iAnimation_Idx = m_iNextAnimIdx;
-		m_pFsm->Change_State(m_iNextState, &Guard);
-		return;
-	}
+	//	m_iNextAnimIdx = m_pPlayer->Find_AnimationIndex(TEXT("GUARD_START"));
+	//	m_iNextState = CPlayer::PLAYER_STATE::GUARD;
+	//	Guard.iAnimation_Idx = m_iNextAnimIdx;
+	//	m_pFsm->Change_State(m_iNextState, &Guard);
+	//	return;
+	//}
 	
 
 	if (m_pPlayer->Is_MovementKeyPressed()) // 입력키 이용 중이라면.

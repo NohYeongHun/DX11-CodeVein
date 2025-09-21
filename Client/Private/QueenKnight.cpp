@@ -131,7 +131,9 @@ void CQueenKnight::Update(_float fTimeDelta)
 
     if (m_IsEncountered && m_isBgm)
     {
-        m_isBgm = false;
+        m_isBgm = false; 
+        AddBuff(QUEEN_BUFF_DASH_ATTACK_COOLDOWN);
+        AddBuff(QUEEN_BUFF_DOWN_TRIPLE_STRIKE_COOLDOWN);
         m_pGameInstance->PlayBGM(L"BossStage.mp3", 0.4f, true);
     }
     
@@ -918,7 +920,7 @@ void CQueenKnight::Disable_Trail(_uint iPartType)
 #pragma region 0. 기본 함수들 정의 => 콜라이더도 정의
 HRESULT CQueenKnight::Ready_Components(QUEENKNIGHT_DESC* pDesc)
 {
-    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("dd"),
+    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Shader_VtxAnimMesh"),
         TEXT("Com_Shader"), reinterpret_cast<CComponent**>(&m_pShaderCom), nullptr)))
         return E_FAIL;
 
@@ -1072,32 +1074,6 @@ HRESULT CQueenKnight::Ready_Effects(QUEENKNIGHT_DESC* pDesc)
 
     m_vecPillarPositions.reserve(iTotalPillars);
     m_vecIsPillarActivated.resize(iTotalPillars);
-
-    //for (_uint i = 0; i < iNumArms; ++i)
-    //{
-    //    _float3 vDirection = { 0.f, 0.f, 0.f };
-
-    //    switch (i)
-    //    {
-
-    //    case 0: vDirection = { 0.f, 0.f, 1.f };  break; // 위
-    //    case 1: vDirection = { 1.f, 0.f, 0.f };  break; // 오른쪽
-    //    case 2: vDirection = { 0.f, 0.f, -1.f }; break; // 아래
-    //    case 3: vDirection = { -1.f, 0.f, 0.f }; break; // 왼쪽
-    //    }
-
-    //    _float3 vPos = {};
-    //    for (_uint j = 1; j <= iNumPillarsPerArm; ++j)
-    //    {
-    //        _float fDistance = fSpacing * j;
-    //        
-    //        XMStoreFloat3(&vPos, XMLoadFloat3(&vDirection) * fDistance); // 방향 벡터 * 거리 = 최종 위치
-    //        vPos.y += 2.f;
-    //        
-
-    //        m_vecPillarPositions.push_back(vPos);
-    //    }
-    //}
 
     // [수정 코드]
     // 바깥 루프가 j (기둥 순번), 안쪽 루프가 i (팔 방향)가 됩니다.

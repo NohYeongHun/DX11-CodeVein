@@ -196,7 +196,7 @@ void CPlayer_WalkState::Handle_Input(_float fTimeDelta)
 	}
 
 	// 가드 입력 체크
-	if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::GUARD))
+	/*if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::GUARD))
 	{
 		if (m_pFsm->Is_CoolTimeEnd(CPlayer::GUARD))
 		{
@@ -205,7 +205,7 @@ void CPlayer_WalkState::Handle_Input(_float fTimeDelta)
 			m_pFsm->Change_State(CPlayer::PLAYER_STATE::GUARD, &Guard);
 			return;
 		}
-	}
+	}*/
 
 	// LockOn 상태에 따라 다른 애니메이션 재생 (공격 체크 이후에 실행)
 	if (m_pPlayer->Is_LockOn())

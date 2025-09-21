@@ -15,6 +15,9 @@ public:
 	HRESULT Ready_ShadowLight(SHADOW_LIGHT_DESC LightDesc);
 	void Update();
 
+#ifdef _DEBUG
+	void Render();
+#endif
 
 private:
 	_float				m_fViewportWidth{}, m_fViewportHeight{};

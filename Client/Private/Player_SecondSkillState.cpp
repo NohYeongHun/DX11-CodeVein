@@ -82,6 +82,13 @@ void CPlayer_SecondSkillState::Enter(void* pArg)
     Desc.fSkillCoolTime = m_pFsm->Get_StateCoolTime(CPlayer::SKILL_2);
     m_pGameInstance->Publish(EventType::SKILL_EXECUTE, &Desc);
 
+    // 스테미나
+    STEMINA_CHANGE_DESC SteminaDesc{};
+    SteminaDesc.bIncrease = false;
+    SteminaDesc.fStemina = 40.f;
+    SteminaDesc.fTime = 1.f;
+    m_pGameInstance->Publish(EventType::STEMINA_CHANGE, &SteminaDesc);
+
 
     // 오라 이펙트
     CEffect_PlayerSkill::EFFECT_PLAYERSKILL_ACTIVATE_DESC Effect_PlayerSkillDesc{};

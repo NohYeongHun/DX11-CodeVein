@@ -212,7 +212,7 @@ void CPlayer_AttackState::Change_State(_float fTimeDelta)
 			return;
 		}
 
-		if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::GUARD))
+		/*if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::GUARD))
 		{
 			if (!m_pFsm->Is_CoolTimeEnd(CPlayer::GUARD))
 				return;
@@ -222,7 +222,7 @@ void CPlayer_AttackState::Change_State(_float fTimeDelta)
 			Guard.iAnimation_Idx = m_iNextAnimIdx;
 			m_pFsm->Change_State(m_iNextState, &Guard);
 			return;
-		}
+		}*/
 
 		if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::DODGE))
 		{
