@@ -45,8 +45,13 @@ private:
     _float m_fJump_StartRatio = {};
     _float m_fJump_EndRatio = {};
 
+    _bool m_IsWarpSound = { false };
+    _bool m_IsWarpSkillSound = { false };
+
     _float m_fAttack_StartRatio = {};
     _float m_fAttack_EndRatio = {};
+
+    _float m_fSkillStart_Ratio = {};
 
 #pragma endregion
 

@@ -1010,153 +1010,125 @@ PS_OUT_BACKBUFFER PS_BLOOD_CIRCLE_MAIN(PS_BACKBUFFER_IN In)
 }
 
 
-PS_OUT_BACKBUFFER PS_BLOOD_BODYAURA_MAIN(PS_BACKBUFFER_IN In)
-{
-    PS_OUT_BACKBUFFER Out = (PS_OUT_BACKBUFFER) 0;
-
-    // ===== 1. 알파(Alpha) 계산: 오라의 '형태' 결정 =====
-
-    // 1-1. 대각선 방향으로 스크롤되는 UV 생성
-    float2 animatedUV = In.vTexcoord;
-    animatedUV.x += g_fTime * 0.5f; // X축 이동 (회전)
-    animatedUV.y -= g_fTime * 0.8f; // Y축 이동 (상승)
-
-    // 1-2. 스크롤된 UV로 노이즈 텍스처를 샘플링하여 기본 모양 생성
-    float noiseMask = g_NoiseTextures[5].Sample(DefaultSampler, frac(animatedUV)).r;
-    noiseMask = smoothstep(0.4f, 0.6f, noiseMask); // 경계를 선명하게
-
-    // 1-3. 물결 마스크(Wave Mask) 추가하여 사선으로 휘감는 느낌 강화
-    float waveFrequency = 4.0f; // 물결의 갯수
-    float waveSpeed = 3.0f;
-    // UV의 y값(높이)과 시간에 따라 sin 값이 변하도록 하여 물결 생성
-    float wave = sin(In.vTexcoord.y * waveFrequency + g_fTime * waveSpeed);
-    // sin 결과(-1~1)를 0~1 범위로 변환
-    float waveMask = wave * 0.5f + 0.5f;
-    
-    // 1-4. 높이 마스크 생성 (기존 로직 유지)
-    float heightMask = 1.0f;
-    heightMask *= smoothstep(0.0f, 0.2f, In.vTexcoord.y);
-    heightMask *= (1.0f - smoothstep(0.8f, 1.0f, In.vTexcoord.y));
-
-    // 최종 알파 = (기본 노이즈 모양) * (물결 모양) * (높이 마스크)
-    float finalAlpha = noiseMask * waveMask * heightMask;
-    finalAlpha *= (1.0f - g_fDissolveTime); // Dissolve 효과
-
-    clip(finalAlpha - 0.01f);
-
-    // ===== 2. 색상(Color) 계산 =====
-    vector finalColor = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
-
-    // ===== 최종 출력 =====
-    Out.vDiffuse = float4(saturate(finalColor.rgb), saturate(finalAlpha));
-    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
-    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w, 0.f, 0.f);
-
-    return Out;
-}
-
-
 
 //PS_OUT_BACKBUFFER PS_BLOOD_BODYAURA_MAIN(PS_BACKBUFFER_IN In)
 //{
 //    PS_OUT_BACKBUFFER Out = (PS_OUT_BACKBUFFER) 0;
 
-//     --- 1. UV 스크롤링으로 회전 느낌 주기 ---
+//    // ===== 1. 알파(Alpha) 계산: 오라의 '형태' 결정 =====
+
+//    // 1-1. 대각선 방향으로 스크롤되는 UV 생성
 //    float2 animatedUV = In.vTexcoord;
-//    animatedUV.x += g_fTime * 0.5f;
-//    animatedUV.y -= g_fTime * 0.8f;
+//    animatedUV.x += g_fTime * 0.5f; // X축 이동 (회전)
+//    animatedUV.y -= g_fTime * 0.8f; // Y축 이동 (상승)
 
-//     --- 2. Noise 마스크 생성 및 '검은 부분 버리기' ---
-//    float noiseValue = g_NoiseTextures[6].Sample(DefaultSampler, frac(animatedUV)).r;
-//    float noiseMask = smoothstep(0.4f, 0.6f, noiseValue);
+//    // 1-2. 스크롤된 UV로 노이즈 텍스처를 샘플링하여 기본 모양 생성
+//    float noiseMask = g_NoiseTextures[5].Sample(DefaultSampler, frac(animatedUV)).r;
+//    noiseMask = smoothstep(0.4f, 0.6f, noiseMask); // 경계를 선명하게
 
-//     [핵심] clip 함수를 사용하여 noiseMask 값이 매우 낮은 (거의 검은색) 픽셀을 완전히 제거(버림)
-//    clip(noiseMask - 0.01f);
+//    // 1-3. 물결 마스크(Wave Mask) 추가하여 사선으로 휘감는 느낌 강화
+//    float waveFrequency = 4.0f; // 물결의 갯수
+//    float waveSpeed = 3.0f;
+//    // UV의 y값(높이)과 시간에 따라 sin 값이 변하도록 하여 물결 생성
+//    float wave = sin(In.vTexcoord.y * waveFrequency + g_fTime * waveSpeed);
+//    // sin 결과(-1~1)를 0~1 범위로 변환
+//    float waveMask = wave * 0.5f + 0.5f;
     
-//     --- 3. '흰색 부분에 Diffuse 색상 입히기' ---
-//     clip을 통과한 픽셀들만 아래 코드를 실행하게 됩니다.
-//    vector vDiffuseColor = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
-
-//     최종 출력: 색상은 Diffuse, 투명도는 noiseMask 값을 그대로 사용하여 가장자리를 부드럽게 처리
-//    Out.vDiffuse = float4(vDiffuseColor.rgb, 1.f);
-    
-//     나머지 G-Buffer 출력은 기본값으로 설정합니다.
-//    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
-//    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w, 0.f, 0.f);
-
-//    return Out;
-//}
-
-//PS_OUT_BACKBUFFER PS_BLOOD_BODYAURA_MAIN(PS_BACKBUFFER_IN In)
-//{
-//    PS_OUT_BACKBUFFER Out = (PS_OUT_BACKBUFFER) 0;
-
-//    // ===== 1. UV 왜곡(Distortion) 생성 =====
-//    // 왜곡을 만들기 위한 노이즈 텍스처의 UV를 스크롤합니다.
-//    float2 distortionUV = In.vTexcoord * 1.5f; // 왜곡 패턴의 크기 조절
-//    distortionUV.y += g_fTime * 0.4f;
-
-//    // 노이즈 텍스처를 샘플링하여 왜곡 방향과 강도를 얻습니다. (.rg 값을 -1~1 범위로 사용)
-//    float2 distortionVector = (g_NoiseTextures[5].Sample(DefaultSampler, distortionUV).rg * 2.0f - 1.0f);
-//    float distortionStrength = 0.2f; // 왜곡 강도
-
-//    // 원래 UV 좌표에 왜곡 벡터를 더해 최종 UV를 만듭니다.
-//    float2 distortedUV = In.vTexcoord + distortionVector * distortionStrength;
-
-
-//    // ===== 2. 최종 알파(Alpha) 계산: 왜곡된 UV로 '형태' 결정 =====
-    
-//    // 2-1. 왜곡된 UV로 메인 패턴 텍스처를 샘플링합니다.
-//    // (이 텍스처가 핏줄기의 주된 모양을 결정합니다. 다른 노이즈나 핏줄기 텍스처를 사용해도 좋습니다.)
-//    float2 patternUV = distortedUV;
-//    patternUV.y -= g_fTime * 0.5f; // 패턴 자체도 흐르도록 처리
-//    float patternMask = g_NoiseTextures[6].Sample(DefaultSampler, patternUV).r;
-
-//    // 2-2. 대비를 강화하여 핏줄기 형태를 날카롭게 만듭니다.
-//    patternMask = pow(patternMask, 2.5f);
-//    float sharpMask = smoothstep(0.4f, 0.6f, patternMask);
-    
-//    // 2-3. 높이 마스크 생성 (기존 로직 유지)
+//    // 1-4. 높이 마스크 생성 (기존 로직 유지)
 //    float heightMask = 1.0f;
 //    heightMask *= smoothstep(0.0f, 0.2f, In.vTexcoord.y);
 //    heightMask *= (1.0f - smoothstep(0.8f, 1.0f, In.vTexcoord.y));
 
-//    // 최종 알파 계산
-//    float finalAlpha = sharpMask * heightMask;
-//    finalAlpha *= (1.0f - g_fDissolveTime);
-    
+//    // 최종 알파 = (기본 노이즈 모양) * (물결 모양) * (높이 마스크)
+//    float finalAlpha = noiseMask * waveMask * heightMask;
+//    finalAlpha *= (1.0f - g_fDissolveTime); // Dissolve 효과
+
 //    clip(finalAlpha - 0.01f);
 
-//    // ===== 3. 색상(Color) 계산 =====
-//    // Diffuse 텍스처를 샘플링하여 그대로 색상으로 사용
+//    // ===== 2. 색상(Color) 계산 =====
 //    vector finalColor = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
 
 //    // ===== 최종 출력 =====
 //    Out.vDiffuse = float4(saturate(finalColor.rgb), saturate(finalAlpha));
 //    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
 //    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w, 0.f, 0.f);
-    
-//    return Out;
-//}
 
-//PS_OUT_BACKBUFFER PS_BLOOD_BODYAURA_MAIN(PS_BACKBUFFER_IN In)
-//{
-//    PS_OUT_BACKBUFFER Out = (PS_OUT_BACKBUFFER) 0;
-   
-    
-    
-//    // ===== 최종 출력 =====
-//    Out.vDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
-//    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
-//    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w, 0.f, 0.f);
-    
 //    return Out;
 //}
 
 
-
-
-
+PS_OUT_BACKBUFFER PS_BLOOD_BODYAURA_MAIN(PS_BACKBUFFER_IN In)
+{
+    PS_OUT_BACKBUFFER Out = (PS_OUT_BACKBUFFER) 0;
+    
+    // ===== 1. 알파(Alpha) 계산: 오라의 '형태' 결정 =====
+    
+    // 1-1. 대각선 방향으로 스크롤되는 UV 생성 (회전 속도 증가)
+    float2 animatedUV = In.vTexcoord;
+    animatedUV.x += g_fTime * 0.7f; // X축 이동 (회전) - 속도 증가
+    animatedUV.y -= g_fTime * 1.2f; // Y축 이동 (상승) - 속도 증가
+    
+    // 1-2. 다층 노이즈로 더 선명한 디테일 생성
+    float noiseMask1 = g_NoiseTextures[5].Sample(DefaultSampler, frac(animatedUV)).r;
+    float noiseMask2 = g_NoiseTextures[5].Sample(DefaultSampler, frac(animatedUV * 2.0f)).r;
+    
+    // 두 노이즈를 곱해서 더 날카로운 엣지 생성
+    float noiseMask = noiseMask1 * noiseMask2;
+    noiseMask = pow(noiseMask, 0.5f); // 감마 보정으로 중간값 강화
+    noiseMask = smoothstep(0.2f, 0.4f, noiseMask); // 더 타이트한 경계
+    
+    // 1-3. 나선형 물결 마스크 (토네이도의 회전 강조)
+    float waveFrequency = 6.0f; // 물결 갯수 증가
+    float waveSpeed = 4.0f; // 회전 속도 증가
+    float spiralOffset = In.vTexcoord.x * 3.14159f; // X 좌표에 따른 위상 차이
+    
+    // 나선형 패턴 생성
+    float wave = sin(In.vTexcoord.y * waveFrequency + g_fTime * waveSpeed + spiralOffset);
+    // 더 선명한 스트라이프를 위해 pow 사용
+    float waveMask = saturate(pow(abs(wave), 0.3f));
+    
+    // 1-4. 높이 마스크 개선 (토네이도 형태 강화)
+    float heightMask = 1.0f;
+    
+    // 아래쪽은 넓게, 위쪽은 좁게 (토네이도 형태)
+    float widthScale = lerp(1.2f, 0.3f, In.vTexcoord.y);
+    float centerDist = abs(In.vTexcoord.x - 0.5f) * 2.0f;
+    float radialMask = 1.0f - smoothstep(0.0f, widthScale, centerDist);
+    
+    // 상하 페이드
+    heightMask *= smoothstep(0.0f, 0.15f, In.vTexcoord.y);
+    heightMask *= (1.0f - smoothstep(0.85f, 1.0f, In.vTexcoord.y));
+    
+    // 1-5. 엣지 강조를 위한 추가 마스크
+    float edgeEnhance = 1.0f - smoothstep(0.6f, 0.9f, noiseMask);
+    edgeEnhance = saturate(edgeEnhance + 0.3f); // 최소값 보장
+    
+    // 최종 알파 계산 (각 요소의 기여도 조정)
+    float finalAlpha = noiseMask * waveMask * heightMask * radialMask * edgeEnhance;
+    
+    // 알파 값 강화 (더 진하게)
+    finalAlpha = pow(finalAlpha, 0.7f); // 감마 보정으로 전체적으로 밝게
+    finalAlpha = saturate(finalAlpha * 1.5f); // 강도 증폭
+    
+    finalAlpha *= (1.0f - g_fDissolveTime); // Dissolve 효과
+    
+    // 더 선명한 컷오프
+    clip(finalAlpha - 0.05f);
+    
+    // ===== 2. 색상(Color) 계산 =====
+    vector baseColor = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
+    
+    // 엣지 부분 색상 강조 (선택적)
+    float edgeGlow = 1.0f + (1.0f - noiseMask) * 0.5f;
+    vector finalColor = baseColor * edgeGlow;
+    
+    // ===== 최종 출력 =====
+    Out.vDiffuse = float4(saturate(finalColor.rgb), saturate(finalAlpha));
+    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w, 0.f, 0.f);
+    
+    return Out;
+}
 
 
 technique11 DefaultTechnique

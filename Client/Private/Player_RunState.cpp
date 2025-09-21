@@ -8,6 +8,12 @@ HRESULT CPlayer_RunState::Initialize(_uint iStateNum, void* pArg)
 {
 	if (FAILED(CPlayerState::Initialize(iStateNum, pArg)))
 		return E_FAIL;
+
+	m_pModelCom->Get_Current_Ratio();
+
+	m_fFootStepFirst = 18.f / 47.f;
+	m_fFootStepSecond = 38.f / 47.f;
+
 	return S_OK;
 }
 
@@ -29,6 +35,7 @@ void CPlayer_RunState::Enter(void* pArg)
 	m_pModelCom->Set_Animation(m_iCurAnimIdx, m_isLoop);
 
 
+	//m_pGameInstance->PlaySoundEffect(L"FootSound1.wav", 0.3f);
 	
 }
 
@@ -37,11 +44,38 @@ void CPlayer_RunState::Update(_float fTimeDelta)
 {
 	Handle_Input();
 
-	//RockOn_State(fTimeDelta);
-
+	Update_Sound(fTimeDelta);
 	Change_State(fTimeDelta);
 	CPlayerState::Handle_Collider_State();
 }
+
+void CPlayer_RunState::Update_Sound(_float fTimeDelta)
+{
+
+	_float fCurrentRatio = m_pModelCom->Get_Current_Ratio();
+
+	if (!m_bFirstSoundPlayed && fCurrentRatio > m_fFootStepFirst)
+	{
+		m_strFootSoundFile = L"FootSound1.wav";
+		m_pGameInstance->PlaySoundEffect(m_strFootSoundFile, 0.3f);
+		m_bFirstSoundPlayed = true;
+	}
+	else if (!m_bSecondSoundPlayed  && fCurrentRatio > m_fFootStepSecond)
+	{
+		m_strFootSoundFile = L"FootSound1.wav";
+		m_pGameInstance->PlaySoundEffect(m_strFootSoundFile, 0.3f);
+		m_bSecondSoundPlayed = true;
+	}
+
+	// 애니메이션 리셋 시 플래그 초기화
+	if (fCurrentRatio < 0.1f)
+	{
+		m_bFirstSoundPlayed = false;
+		m_bSecondSoundPlayed = false;
+	}
+}
+
+
 
 // 종료될 때 실행할 동작..
 void CPlayer_RunState::Exit()
@@ -59,7 +93,10 @@ void CPlayer_RunState::Exit()
 
 		m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, false);
 	}
+
 		
+	m_bFirstSoundPlayed = false;
+	m_bSecondSoundPlayed = false;
 }
 
 // 상태 초기화

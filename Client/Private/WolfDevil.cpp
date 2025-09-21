@@ -211,7 +211,8 @@ void CWolfDevil::On_Collision_Enter(CGameObject* pOther)
             // 1. 데미지를 입고.
             Take_Damage(pPlayerWeapon->Get_AttackPower(), pPlayerWeapon);
 
-            // 2. 해당 위치에 검흔 Effect 생성?
+            // 2. 사운드 재생.
+            m_pGameInstance->PlaySoundEffect(L"NormalAttack.wav", 0.3f);
 
             // 3. 무적 버프 추가.
             AddBuff(BUFF_INVINCIBLE);

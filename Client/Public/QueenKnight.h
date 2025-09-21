@@ -28,6 +28,14 @@ public:
 		QUEEN_BUFF_DOWN_TRIPLE_STRIKE_COOLDOWN = 1 << 9, // Down Strike 시퀀스 => 쿨타임 존재.
 	};
 
+	enum SOUND_FLAGS : _uint
+	{
+		SOUND_WARP_START = 0,
+		SOUND_WARP_END = 1,
+		SOUND_WARP_ATTACK = 2,
+		SOUND_END
+	};
+
 public:
 	typedef struct tagQueenKnightDesc : public CMonster::MONSTER_DESC
 	{
@@ -85,6 +93,11 @@ public:
 
 private:
 	class CQueenKnightTree* m_pTree = { nullptr };
+
+
+public:
+	virtual void Play_Sound(_uint iSoundFlag);
+	virtual void PlayWeaponSound() override;
 #pragma endregion
 
 #pragma region 3. 몬스터는 자신에게 필요한 수치값들을 초기화해야한다.
@@ -127,6 +140,11 @@ public:
 	virtual void Encounter_Action() override;
 
 	virtual void IncreaseDetection();
+
+
+private:
+	_bool m_IsWeaponSound = { false };
+
 #pragma endregion
 
 #pragma region 7. 보스몹 체력 UI 관리

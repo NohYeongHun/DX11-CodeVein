@@ -48,6 +48,23 @@ public:
 
 	void Change_State();
 
+private:
+	void Update_Sound(_float fTimeDelta);
+
+private:
+	_bool m_IsFirstAttack = {};
+	_bool m_IsSecondAttack = {};
+	_bool m_IsThirdAttack = {};
+	_bool m_IsFourthAttack = {};
+	_bool m_IsFifthAttack = {};
+
+	_float m_fFirstAttackFrame = {};
+	_float m_fSecondAttackFrame = {};
+	_float m_fThirdAttackFrame = {};
+	_float m_fFourthAttackFrame = {};
+	_float m_fFifthAttackFrame = {};
+
+	_wstring m_strSoundFile = {};
 
 public:
 	static CPlayer_FirstSkillState* Create(_uint iStateNum, void* pArg);

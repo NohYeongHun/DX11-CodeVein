@@ -41,6 +41,9 @@ private:
     _float m_fJump_StartRatio = {};
     _float m_fJump_EndRatio = {};
 
+    _bool m_IsWarpSound = { false };
+    _bool m_IsWarpEndSound = { false };
+
     _float m_fAttackReady_StartRatio = {};
     _float m_fAttackReady_EndRatio = {};
 

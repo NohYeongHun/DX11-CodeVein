@@ -36,6 +36,8 @@ public:
 	// State 실행 로직
 	virtual void Update(_float fTimeDelta) override;
 
+	void Update_Sound(_float fTimeDelta);
+
 	// State Exit
 	virtual void Exit() override;
 
@@ -48,7 +50,13 @@ public:
 private:
 	_bool		   m_isLoop = { true };
 	
-	
+	_float m_fFootStepFirst = {};
+	_float m_fFootStepSecond = {};
+	_float m_strSoundFile = {};
+	_wstring m_strFootSoundFile = {};
+
+	_bool m_bFirstSoundPlayed = false;
+	_bool m_bSecondSoundPlayed = false;
 
 public:
 	static CPlayer_RunState* Create(_uint iStateNum, void* pArg);

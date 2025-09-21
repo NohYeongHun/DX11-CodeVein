@@ -1,4 +1,5 @@
-﻿CPlayer_FirstSkillState::CPlayer_FirstSkillState()
+﻿#include "Player_FirstSkillState.h"
+CPlayer_FirstSkillState::CPlayer_FirstSkillState()
 {
 }
 
@@ -6,6 +7,21 @@ HRESULT CPlayer_FirstSkillState::Initialize(_uint iStateNum, void* pArg)
 {
     if (FAILED(CPlayerState::Initialize(iStateNum, pArg)))
         return E_FAIL;
+
+#pragma region Sound Track 관리
+    m_fFirstAttackFrame = 35.f / 233.f;
+    m_fSecondAttackFrame = 55.f / 233.f;
+    m_fThirdAttackFrame = 75.f / 233.f;
+    m_fFourthAttackFrame = 95.f / 233.f;
+    m_fFifthAttackFrame = 119.f / 233.f;
+
+    m_IsFirstAttack  = false;
+    m_IsSecondAttack = false;
+    m_IsThirdAttack  = false;
+    m_IsFourthAttack = false;
+    m_IsFifthAttack  = false;
+#pragma endregion
+
 
 #pragma region 콜라이더 관리.
     // 1. 앞찌르기
@@ -158,6 +174,12 @@ void CPlayer_FirstSkillState::Enter(void* pArg)
 
     //m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(m_pGameInstance->Get_CurrentLevelID())
     //    , TEXT("SWORD_WIND"), TEXT("Layer_Effect"), 1, ENUM_CLASS(CEffect_Wind::EffectType), &WindActivate_Desc);
+
+    m_IsFirstAttack = false;
+    m_IsSecondAttack = false;
+    m_IsThirdAttack = false;
+    m_IsFourthAttack = false;
+    m_IsFifthAttack = false;
 }
 
 void CPlayer_FirstSkillState::Update(_float fTimeDelta)
@@ -166,6 +188,8 @@ void CPlayer_FirstSkillState::Update(_float fTimeDelta)
     //Handle_Input();
     Handle_Unified_Direction_Input(fTimeDelta);
     Change_State();
+
+    Update_Sound(fTimeDelta);
     CPlayerState::Handle_Collider_State();
     CPlayerState::Handle_AnimationSpeed_State();
     CPlayerState::Handle_AnimationTrail_State();
@@ -222,6 +246,46 @@ void CPlayer_FirstSkillState::Change_State()
         }
     }
 
+}
+
+void CPlayer_FirstSkillState::Update_Sound(_float fTimeDelta)
+{
+    _float fCurrentRatio = m_pModelCom->Get_Current_Ratio();
+
+    if (!m_IsFirstAttack && fCurrentRatio > m_fFirstAttackFrame)
+    {
+        m_strSoundFile = L"PlayerAttack.mp3";
+        m_pGameInstance->PlaySoundEffect(m_strSoundFile, 0.3f);
+        m_IsFirstAttack = true;
+    }
+    else if (!m_IsSecondAttack && fCurrentRatio > m_fSecondAttackFrame)
+    {
+        m_strSoundFile = L"PlayerAttack.mp3";
+        m_pGameInstance->PlaySoundEffect(m_strSoundFile, 0.3f);
+        m_IsSecondAttack = true;
+    }
+    else if (!m_IsThirdAttack && fCurrentRatio > m_fThirdAttackFrame)
+    {
+        m_strSoundFile = L"AttackWindSound.wav";
+        m_pGameInstance->PlaySoundEffect(m_strSoundFile, 0.3f);
+
+        /*m_strSoundFile = L"SkillFirst2.wav";
+        m_pGameInstance->PlaySoundEffect(m_strSoundFile, 0.3f);*/
+        m_IsThirdAttack = true;
+    }
+    else if (!m_IsFourthAttack && fCurrentRatio > m_fFourthAttackFrame)
+    {
+        m_strSoundFile = L"AttackWindSound.wav";
+        m_pGameInstance->PlaySoundEffect(m_strSoundFile, 0.3f);
+        m_IsFourthAttack = true;
+    }
+    else if (!m_IsFifthAttack && fCurrentRatio > m_fFifthAttackFrame)
+    {
+        m_strSoundFile = L"AttackWindSound.wav";
+        m_pGameInstance->PlaySoundEffect(m_strSoundFile, 0.3f);
+        m_IsFifthAttack = true;
+    }
+    
 }
 
 CPlayer_FirstSkillState* CPlayer_FirstSkillState::Create(_uint iStateNum, void* pArg)

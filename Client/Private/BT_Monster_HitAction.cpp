@@ -45,6 +45,8 @@ BT_RESULT CBT_Monster_HitAction::EnterHit(_float fTimeDelta)
     // 3. 맞았으면 무적시간 부여하기. => 충돌 시 부여.
     // m_pOwner->AddBuff(CMonster::BUFF_INVINCIBLE);
 
+    m_pOwner->PlayHitSound();
+
     // 4. 다음 단계로 진행
     m_eHitPhase = HIT_PHASE::LOOP;
 

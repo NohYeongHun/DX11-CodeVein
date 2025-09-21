@@ -14,8 +14,8 @@ BT_RESULT CBT_Monster_AttackAction::Perform_Action(_float fTimeDelta)
     {
     case ATTACK_PHASE::NONE:
         return EnterAttack(fTimeDelta);
-    case ATTACK_PHASE::ROTATING:
-        return UpdateRotating(fTimeDelta);
+   /* case ATTACK_PHASE::ROTATING:
+        return UpdateRotating(fTimeDelta);*/
     case ATTACK_PHASE::LOOP:
         return UpdateAttack(fTimeDelta);
     case ATTACK_PHASE::COMPLETED:
@@ -48,6 +48,8 @@ BT_RESULT CBT_Monster_AttackAction::EnterAttack(_float fTimeDelta)
     m_pOwner->Set_RootMotionTranslate(true);
     // 1. 공격 애니메이션 선택
     _uint iNextAnimationIdx = m_pOwner->Find_AnimationIndex(L"ATTACK");
+   
+    m_pOwner->PlayWeaponSound();
 
     // 2. 공격 상태로 변경
     m_pOwner->Change_Animation_Blend(iNextAnimationIdx);
@@ -70,6 +72,8 @@ BT_RESULT CBT_Monster_AttackAction::UpdateRotating(_float fTimeDelta)
         m_pOwner->Set_RootMotionTranslate(true);
         // 1. 공격 애니메이션 선택
         _uint iNextAnimationIdx = m_pOwner->Find_AnimationIndex(L"ATTACK");
+
+        
 
         // 2. 공격 상태로 변경
         m_pOwner->Change_Animation_Blend(iNextAnimationIdx);

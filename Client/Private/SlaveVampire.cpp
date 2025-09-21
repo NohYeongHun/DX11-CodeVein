@@ -213,11 +213,15 @@ void CSlaveVampire::On_Collision_Enter(CGameObject* pOther)
             Take_Damage(pPlayerWeapon->Get_AttackPower(), pPlayerWeapon);
 
             // 2. 해당 위치에 검흔 Effect 생성?
+            m_pGameInstance->PlaySoundEffect(L"NormalAttack.wav", 0.3f);
 
             // 3. 무적 버프 추가.
             AddBuff(BUFF_INVINCIBLE);
 
             AddBuff(BUFF_HIT);
+
+            // 4. 사운드 재생.
+            //m_pGameInstance->PlaySoundEffect(L"WeaponHit.wav", 0.3f);
         }
     }
 
@@ -266,11 +270,22 @@ void CSlaveVampire::Update_AI(_float fTimeDelta)
     else
         m_fCurDissolveTime = 0.f; // 버프가 사라지면서 잔여값이 남아서 Texture Reverse Dissolve가 모두 동작하지 않음.
 
+
     /* 콜라이더 활성화 구간 확인 */
     CMonster::Handle_Collider_State();
 
     if (true == m_pModelCom->Play_Animation(fTimeDelta))
     {
+    }
+
+    if (HasBuff(CMonster::BUFF_DEAD))
+        return;
+
+    _float fCurrentRatio = m_pModelCom->Get_Current_Ratio();
+    if (m_bPlayWeaponSound && fCurrentRatio >= m_fPlayAttackSound)
+    {
+        m_bPlayWeaponSound = false;
+        m_pGameInstance->PlaySoundEffect(L"SlaveVampireAttack.wav", 0.2f);
     }
 
 }
@@ -355,6 +370,9 @@ HRESULT CSlaveVampire::InitializeAction_ToAnimationMap()
 
 
 
+    
+    m_fPlayAttackSound = 68.f / 256.f;
+
 #pragma region COllider 활성화 프레임 관리
     Add_Collider_Frame(m_Action_AnimMap[TEXT("ATTACK")], 70.f / 256.f, 85.f / 256.f, PART_WEAPON);     // Weapon attack
 #pragma endregion
@@ -417,6 +435,15 @@ void CSlaveVampire::Disable_Collider(_uint iType)
     default:
         break;
     }
+}
+void CSlaveVampire::PlayHitSound()
+{
+    //m_pGameInstance->PlaySoundEffect(L"SlaveVampireHit.wav", 0.3f);
+}
+
+void CSlaveVampire::PlayWeaponSound()
+{
+    m_bPlayWeaponSound = true;
 }
 #pragma endregion
 

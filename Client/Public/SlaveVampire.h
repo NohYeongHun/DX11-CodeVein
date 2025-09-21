@@ -91,6 +91,14 @@ public:
 public:
 	virtual void Enable_Collider(_uint iType) override;
 	virtual void Disable_Collider(_uint iType) override;
+
+public:
+	virtual void PlayHitSound() override;
+	virtual void PlayWeaponSound() override;
+
+private:
+	_bool m_bPlayWeaponSound = { false };
+	_float m_fPlayAttackSound = {};
 #pragma endregion
 
 #pragma region 6. 기본적으로 몬스터가 필요한 상태들을 정의합니다.

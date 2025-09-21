@@ -25,6 +25,8 @@ CBT_QueenKnight_DownStrikeAction::CBT_QueenKnight_DownStrikeAction(CQueenKnight*
 
     m_fAttack_StartRatio = 21.f / 136.f;
     m_fAttack_EndRatio = 44.f / 136.f;
+
+    m_IsWarpSound = false;
 }
 
 BT_RESULT CBT_QueenKnight_DownStrikeAction::Perform_Action(_float fTimeDelta)
@@ -46,6 +48,8 @@ BT_RESULT CBT_QueenKnight_DownStrikeAction::Perform_Action(_float fTimeDelta)
     case ATTACK_PHASE::COMPLETED:
     {
         m_pOwner->Set_Visible(true);
+        m_IsWarpSound = false;
+        m_IsWarpEndSound = false;
         return BT_RESULT::SUCCESS;
     }
         
@@ -75,6 +79,8 @@ void CBT_QueenKnight_DownStrikeAction::Reset()
     m_pOwner->Enable_Collider(CQueenKnight::PART_BODY);
     m_pOwner->Disable_Collider(CQueenKnight::PART_WEAPON);
     m_pOwner->Set_Visible(true);
+    m_IsWarpSound = false;
+    m_IsWarpEndSound = false;
 }
 
 BT_RESULT CBT_QueenKnight_DownStrikeAction::Enter_Attack(_float fTimeDelta)
@@ -124,11 +130,19 @@ BT_RESULT CBT_QueenKnight_DownStrikeAction::Update_Ascend(_float fTimeDelta)
         // 디졸브 시작.
         m_bDissolveCheck = true; // 이미 Dissolve가 발생했는지?
         m_pOwner->Start_Dissolve(1.2f);
+        
+        // 사운드 시작.
+       
 
         // 시점과 운동 방향 변경 필요. => 운동 방향은 몬스터 중앙에서 시작해서 위로 퍼져나감.
         m_pOwner->Create_QueenKnightWarp_Effect_Particle({ 0.f, 1.f, 0.f });
     }
 
+    if (!m_IsWarpSound && fCurrentRatio > m_fJump_StartRatio)
+    {
+        m_IsWarpSound = true;
+        m_pOwner->Play_Sound(CQueenKnight::SOUND_WARP_START);
+    }
 
 
     if (vOwnerPos.m128_f32[1] <= m_vAscendTarget.y && fCurrentRatio >= m_fJump_StartRatio)
@@ -160,7 +174,7 @@ BT_RESULT CBT_QueenKnight_DownStrikeAction::Update_Ascend(_float fTimeDelta)
         m_eAttackPhase = ATTACK_PHASE::HANG;
 
         // 3. 상승이 끝난 후 시야에서 사라지기
-        
+       
 
         // 4. 순간이동 페이즈에 진입할때 Player 머리 위로 위치 이동. => 이게 부자연스러운데..
         _float vPosY = vOwnerPos.m128_f32[1];
@@ -188,6 +202,7 @@ BT_RESULT CBT_QueenKnight_DownStrikeAction::Update_Ascend(_float fTimeDelta)
         // 5. 애니메이션 전환.
         _uint iNextAnimationIdx = m_pOwner->Find_AnimationIndex(L"WARP_END");
 
+
         m_pOwner->Change_Animation_Blend(iNextAnimationIdx, false, 0.1f, true, true, true);
 
         m_pOwner->RotateTurn_ToTargetYaw();
@@ -196,18 +211,6 @@ BT_RESULT CBT_QueenKnight_DownStrikeAction::Update_Ascend(_float fTimeDelta)
         //if (m_pOwner->HasBuff(CMonster::BUFF_DISSOLVE))
             
         m_bDissolveCheck = false;
-
-
-
-        // 6. Dissolve 해제.
-        //m_bDissolveCheck = false;
-        //m_pOwner->ReverseStart_Dissolve();
-        //m_pOwner->AddBuff(CMonster::BUFF_REVERSEDISSOLVE);
-        //if (m_pOwner->HasBuff(CMonster::BUFF_DISSOLVE))
-        //    m_pOwner->RemoveBuff(CMonster::BUFF_DISSOLVE);
-        //7. 파티클 생성
-
-        //m_pOwner->Set_Visible(true);
 
     }
     return BT_RESULT::RUNNING;
@@ -222,6 +225,7 @@ BT_RESULT CBT_QueenKnight_DownStrikeAction::Update_Hang(_float fTimeDelta)
     {
         // 2. 목표 하강지점 도착했으므로 렌더링 켜기 (시야에서 나타남)
         m_pOwner->ReverseStart_Dissolve(0.4f);
+        
     }
 
     // 1. 현재 위치
@@ -287,10 +291,22 @@ BT_RESULT CBT_QueenKnight_DownStrikeAction::Update_Descend(_float fTimeDelta)
 {
     _float fCurrentRatio = m_pOwner->Get_CurrentAnimationRatio();
 
+
+    if (!m_IsWarpEndSound && fCurrentRatio >= m_fAttack_StartRatio)
+    {
+        //m_pOwner->Play_Sound(CQueenKnight::SOUND_FLAGS::SOUND_WARP_END);
+        m_pOwner->Play_Sound(CQueenKnight::SOUND_FLAGS::SOUND_WARP_ATTACK);
+        m_IsWarpEndSound = true;
+    }
+
     if (fCurrentRatio >= m_fAttack_EndRatio)
     {
+        
+        
         m_pOwner->Set_Animation_Speed(m_pOwner->Find_AnimationIndex(L"WARP_END"), 2.f);
     }
+
+    
 
     if (m_pOwner->Is_Animation_Finished())
     {

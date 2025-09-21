@@ -17,6 +17,8 @@ public:
         _float fDuration = {};  // 총 객체 수명.
         const _float4x4* pParentMatrix = { nullptr };
 		class CTransform* pTargetTransform = { nullptr };
+
+        _float3 vScaleMultiple = {1.f, 1.f, 1.f};
     }EFFECT_PLAYERSKILL_ACTIVATE_DESC;
 
 private:
@@ -99,6 +101,7 @@ private:
     const _float4x4* m_pParentMatrix = { nullptr };
     class CTransform* m_pTargetTransform = { nullptr };
     _float3 m_vStartPos = {};
+    _float3 m_vScaleMultiple = {};
     
 
 

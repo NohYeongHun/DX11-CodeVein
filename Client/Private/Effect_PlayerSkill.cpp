@@ -55,14 +55,7 @@ void CEffect_PlayerSkill::Late_Update(_float fTimeDelta)
 {
     CContainerObject::Late_Update(fTimeDelta);
 
-    //if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::BLEND, this)))
-    //    return;
-
-    //if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::STATIC_UI, this)))
-    //    return;
-
 #ifdef _DEBUG
-    // Collider Rendering
     
 #endif // _DEBUG
 
@@ -71,7 +64,7 @@ void CEffect_PlayerSkill::Late_Update(_float fTimeDelta)
 HRESULT CEffect_PlayerSkill::Render()
 {
 #ifdef _DEBUG
-    ImGui_Render();
+    //ImGui_Render();
 #endif // DEBUG
 
     return S_OK;
@@ -95,11 +88,12 @@ void CEffect_PlayerSkill::OnActivate(void* pArg)
     m_pParentMatrix = pDesc->pParentMatrix;
     m_fDuration = m_ActivateDesc.fDuration;  // 총 수명
     m_vStartPos = pDesc->vStartPos;
-
+    m_vScaleMultiple = pDesc->vScaleMultiple;
     /* 이거를 PlayerSkill의 Update 때 지정하는것도 괜찮아 보임 
     *  특정 시간에 저거 특정 시간에 저거 등등.
     */
 
+    
 
     /* Effect Trigger 호출. */
     m_EffectTrigger.emplace_back(
@@ -140,10 +134,13 @@ void CEffect_PlayerSkill::Initialize_EffectTrigger(const _wstring& strTag)
     {
         CEffect_FloorAura::EFFECTFLOORAURA_ACTIVATE_DESC FloorAuraDesc{};
         FloorAuraDesc.eCurLevel = m_eCurLevel;
-        FloorAuraDesc.vOffsetPos = { 0.f, 0.f, 0.f };
+        FloorAuraDesc.vOffsetPos = m_vStartPos;
         FloorAuraDesc.vColor = { 0.f, 0.f, 0.f, 1.f };
         FloorAuraDesc.vStartScale = { 0.01f, 1.f, 0.01f };
-        FloorAuraDesc.vEndScale = { 0.7f, 0.7f, 0.7f };
+        _float3 vEndSacle = { 0.7f, 0.7f, 0.7f };
+        XMStoreFloat3(&FloorAuraDesc.vEndScale, XMLoadFloat3(&vEndSacle) * XMLoadFloat3(&m_vScaleMultiple));
+
+
         FloorAuraDesc.fGrowDuration = 0.2f;
         FloorAuraDesc.fStayDuration = 0.4f;
         FloorAuraDesc.fDissolveDuration = 0.4f;
@@ -156,11 +153,12 @@ void CEffect_PlayerSkill::Initialize_EffectTrigger(const _wstring& strTag)
     {
         CEffect_BodyAura::EFFECTFBODYAURA_ACTIVATE_DESC BodyAuraDesc{};
         BodyAuraDesc.eCurLevel = m_eCurLevel;
-        BodyAuraDesc.vOffsetPos = { 0.f, 0.f, 0.f };
+        BodyAuraDesc.vOffsetPos = m_vStartPos;
         BodyAuraDesc.vColor = { 0.f, 0.f, 0.f, 1.f };
-        BodyAuraDesc.vStartScale = { 4.5f, 2.5f, 4.5f };
+        _float3 vStartScale = { 4.5f, 2.5f, 4.5f };
+        XMStoreFloat3(&BodyAuraDesc.vStartScale, XMLoadFloat3(&vStartScale) * XMLoadFloat3(&m_vScaleMultiple));
         //BodyAuraDesc.vStartScale = { 8.f, 6.f, 8.f };
-        BodyAuraDesc.fStayDuration = 0.7f;
+        BodyAuraDesc.fStayDuration = 1.4f;
         BodyAuraDesc.fDissolveDuration = 0.3f;
         BodyAuraDesc.vStartRotation = { 0.f, 0.f, 0.f };
 

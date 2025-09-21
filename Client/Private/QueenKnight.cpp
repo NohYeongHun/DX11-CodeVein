@@ -132,9 +132,11 @@ void CQueenKnight::Update(_float fTimeDelta)
     if (m_IsEncountered && m_isBgm)
     {
         m_isBgm = false; 
+        m_pGameInstance->StopBGM();
+
         AddBuff(QUEEN_BUFF_DASH_ATTACK_COOLDOWN);
         AddBuff(QUEEN_BUFF_DOWN_TRIPLE_STRIKE_COOLDOWN);
-        m_pGameInstance->PlayBGM(L"BossStage.mp3", 0.4f, true);
+        m_pGameInstance->PlayBGM(L"BossStage.mp3", 0.2f, true);
     }
     
 
@@ -230,6 +232,7 @@ void CQueenKnight::On_Collision_Enter(CGameObject* pOther)
             Take_Damage(pPlayerWeapon->Get_AttackPower(), pPlayerWeapon);
 
             // 2. 해당 위치에 검흔 Effect 생성?
+            m_pGameInstance->PlaySoundEffect(L"NormalAttack.wav", 0.3f);
 
             // 3. 무적 버프 추가.
             AddBuff(BUFF_INVINCIBLE);
@@ -313,11 +316,37 @@ void CQueenKnight::Update_AI(_float fTimeDelta)
 
     }
 }
+
+void CQueenKnight::Play_Sound(_uint iSoundFlag)
+{
+    switch (iSoundFlag)
+    {
+    case SOUND_WARP_START:
+        m_pGameInstance->PlaySoundEffect(L"WaprStart.wav", 0.3f);
+        break;
+    case SOUND_WARP_END:
+        m_pGameInstance->PlaySoundEffect(L"WarpEnd.wav", 0.3f);
+        break;
+    case SOUND_WARP_ATTACK:
+        m_pGameInstance->PlaySoundEffect(L"Jump_Attack.wav", 0.3f);
+        break;
+    default:
+        break;
+    }
+}
+
+void CQueenKnight::PlayWeaponSound()
+{
+
+    m_IsWeaponSound = true;
+    m_pGameInstance->PlaySoundEffect(L"Swing0.wav", 0.3f);
+}
 #pragma endregion
 
 
 
 #pragma region 3. 몬스터는 자신에게 필요한 수치값들을 초기화해야 합니다.
+
 HRESULT CQueenKnight::Initialize_Stats()
 {
     m_fMinDetectionDistance = 5.f;
@@ -781,6 +810,22 @@ void CQueenKnight::Start_PillarSkill()
     m_fSkillElapsedTime = 0.f; // 타이머 리셋
     XMStoreFloat3(&m_vSkillCenterPos, m_pTransformCom->Get_State(STATE::POSITION)); // 스킬 중심 위치 저장
     std::fill(m_vecIsPillarActivated.begin(), m_vecIsPillarActivated.end(), false);
+
+
+    // 장판 시작.
+    CEffect_PlayerSkill::EFFECT_PLAYERSKILL_ACTIVATE_DESC Effect_PlayerSkillDesc{};
+    Effect_PlayerSkillDesc.eCurLevel = m_eCurLevel;
+    Effect_PlayerSkillDesc.pTargetTransform = m_pTransformCom;
+    Effect_PlayerSkillDesc.fDuration = 4.f; // 지속시간,,
+    Effect_PlayerSkillDesc.vStartPos = { 0.f, 0.2f, 0.f }; // { 발 }
+    Effect_PlayerSkillDesc.vScaleMultiple = { 1.5f, 1.5f, 1.5f };
+
+    m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(m_pGameInstance->Get_CurrentLevelID())
+        , TEXT("PLAYER_AURA"), TEXT("Layer_Effect"), 1, ENUM_CLASS(CEffect_PlayerSkill::EffectType), &Effect_PlayerSkillDesc);
+
+    
+    Play_Sound(SOUND_WARP_ATTACK);
+    Play_Sound(SOUND_WARP_END);
 }
 
 
@@ -819,10 +864,6 @@ void CQueenKnight::Update_BloodPillar(_float fTimeDelta)
 
             m_vecIsPillarActivated[i] = true;
             iCount++;
-
-            //OutputDebugString(L"[QueenKnight] Pillar Particle : ");
-            //OutPutDebugInt(iCount);
-            //OutPutDebugFloat3(vFinalWorldPos);
         }
     }
 
@@ -882,6 +923,7 @@ void CQueenKnight::End_Dissolve()
 void CQueenKnight::Dead_Action()
 {
     CMonster::Dead_Action();
+    m_pGameInstance->PlaySoundEffect(L"BossEnd.wav", 0.3f);
     Start_Dissolve(3.5f);
 }
 

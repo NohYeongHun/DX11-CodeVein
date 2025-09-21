@@ -209,7 +209,8 @@ void CGiant_WhiteDevil::On_Collision_Enter(CGameObject* pOther)
             // 1. 데미지를 입고.
             Take_Damage(pPlayerWeapon->Get_AttackPower(), pPlayerWeapon);
 
-            // 2. 해당 위치에 검흔 Effect 생성?
+            //2. Sound 시작.
+            m_pGameInstance->PlaySoundEffect(L"NormalAttack.wav", 0.3f);
 
             // 3. 무적 버프 추가.
             AddBuff(BUFF_INVINCIBLE);
@@ -451,6 +452,21 @@ void CGiant_WhiteDevil::Disable_Collider(_uint iType)
     default:
         break;
     }
+}
+void CGiant_WhiteDevil::Play_Sound(_uint iTrack)
+{
+    switch (iTrack)
+    {
+    case GIANT_ATTACK_SOUND:
+    {
+        //m_pGameInstance->PlaySoundEffect(L"SwingHalberd.mp3", 0.3f);
+        m_pGameInstance->PlaySoundEffect(L"BluntAttack.wav", 0.3f);
+    }
+        break;
+    default:
+        break;
+    }
+        
 }
 #pragma endregion
 

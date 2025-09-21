@@ -31,6 +31,7 @@ public:
 
 	// State 실행 로직
 	virtual void Update(_float fTimeDelta) override;
+	void Update_FootstepSound(_float fTimeDelta);
 
 	// State Exit
 	virtual void Exit() override;
@@ -42,7 +43,13 @@ public:
 	void Handle_Input(_float fTimeDelta);
 
 private:
-	
+	_float m_fFootStepFirst = {};
+	_float m_fFootStepSecond = {};
+
+	_bool m_bFirstSoundPlayed = {};
+	_bool m_bSecondSoundPlayed = {};
+	_wstring m_strFootSoundFile = {};
+
 	
 
 public:

@@ -315,6 +315,11 @@ public:
     
 
 public:
+    virtual void PlayHitSound() {};
+    virtual void PlayWeaponSound() {};
+
+
+public:
     /* 콜라이더 제어.*/
     virtual void Enable_Collider(_uint iType) PURE; 
     virtual void Disable_Collider(_uint iType) PURE;

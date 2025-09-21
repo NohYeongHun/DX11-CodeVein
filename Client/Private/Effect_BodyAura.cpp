@@ -150,6 +150,7 @@ void CEffect_BodyAura::OnActivate(void* pArg)
 
 	m_vStartScale = pDesc->vStartScale;
 
+	m_pTransformCom->Set_State(STATE::POSITION, XMLoadFloat3(&pDesc->vOffsetPos));
 
 
 	m_pTransformCom->Set_Scale(m_vStartScale);

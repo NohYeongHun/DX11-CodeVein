@@ -11,6 +11,9 @@ HRESULT CPlayer_WalkState::Initialize(_uint iStateNum, void* pArg)
 		return E_FAIL;
 
 
+	m_fFootStepFirst = 20.f / 47.f;
+	m_fFootStepSecond = 40.f / 47.f;
+
 	return S_OK;
 }
 
@@ -65,7 +68,34 @@ void CPlayer_WalkState::Update(_float fTimeDelta)
 		
 	}		
 
+	Update_FootstepSound(fTimeDelta);
+
 	CPlayerState::Handle_Collider_State();
+}
+
+void CPlayer_WalkState::Update_FootstepSound(_float fTimeDelta)
+{
+	_float fCurrentRatio = m_pModelCom->Get_Current_Ratio();
+
+	if (!m_bFirstSoundPlayed && fCurrentRatio > m_fFootStepFirst)
+	{
+		m_strFootSoundFile = L"FootSound1.wav";
+		m_pGameInstance->PlaySoundEffect(m_strFootSoundFile, 0.3f);
+		m_bFirstSoundPlayed = true;
+	}
+	else if (!m_bSecondSoundPlayed && fCurrentRatio > m_fFootStepSecond)
+	{
+		m_strFootSoundFile = L"FootSound2.wav";
+		m_pGameInstance->PlaySoundEffect(m_strFootSoundFile, 0.3f);
+		m_bSecondSoundPlayed = true;
+	}
+
+	// 애니메이션 리셋 시 플래그 초기화
+	if (fCurrentRatio < 0.1f)
+	{
+		m_bFirstSoundPlayed = false;
+		m_bSecondSoundPlayed = false;
+	}
 }
 
 // 종료될 때 실행할 동작..

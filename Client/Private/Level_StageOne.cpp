@@ -81,6 +81,10 @@ HRESULT CLevel_StageOne::Initialize_Clone()
 	m_pGameInstance->Setting_Threshold(0.9f);
 	m_pGameInstance->Setting_Soft(0.3f);
 
+
+	// 시작 브금.
+	m_pGameInstance->PlayBGM(L"Environment.wav", 0.3f, true);
+
 	return S_OK;
 }
 
@@ -583,4 +587,5 @@ CLevel_StageOne* CLevel_StageOne::Create(ID3D11Device* pDevice, ID3D11DeviceCont
 void CLevel_StageOne::Free()
 {
 	CLevel::Free();
+	m_pGameInstance->StopBGM();
 }

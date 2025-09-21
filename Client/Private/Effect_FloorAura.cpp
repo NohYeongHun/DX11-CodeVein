@@ -148,6 +148,7 @@ void CEffect_FloorAura::OnActivate(void* pArg)
 
 	m_pTargetTransform = pDesc->pTargetTransform;
 
+	m_pTransformCom->Set_State(STATE::POSITION, XMLoadFloat3(&pDesc->vOffsetPos));
 	m_vStartScale = pDesc->vStartScale;
 	m_vEndScale = pDesc->vEndScale;
 

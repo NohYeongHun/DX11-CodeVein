@@ -1,4 +1,5 @@
-﻿
+﻿#include "Player_DodgeState.h"
+
 CPlayer_DodgeState::CPlayer_DodgeState()
 {
 }
@@ -10,6 +11,7 @@ HRESULT CPlayer_DodgeState::Initialize(_uint iStateNum, void* pArg)
 
 	m_isLoop = false;
 
+	m_fSoundTime = 20.f / 108.f;
 	// 버프 시스템을 사용하므로 충돌체 맵은 필요 없음
 
 	return S_OK;
@@ -42,6 +44,8 @@ void CPlayer_DodgeState::Enter(void* pArg)
 	SteminaDesc.fStemina = 30.f;
 	SteminaDesc.fTime = 1.f;
 	m_pGameInstance->Publish(EventType::STEMINA_CHANGE, &SteminaDesc);
+
+	m_bSoundPlayed = false;
 }
 
 /* State 실행 */
@@ -73,7 +77,7 @@ void CPlayer_DodgeState::Update(_float fTimeDelta)
 
 
 
-
+	Update_Sound(fTimeDelta);
 
 	// 무적 버프 관리
 	Handle_Invincible_Buff();
@@ -100,6 +104,8 @@ void CPlayer_DodgeState::Exit()
 
 		m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, true);
 	}
+
+	m_bSoundPlayed = false;
 
 }
 
@@ -128,6 +134,16 @@ void CPlayer_DodgeState::Handle_Invincible_Buff()
 		}
 
 		m_bPrevInvincible = bShouldInvincible;
+	}
+}
+
+void CPlayer_DodgeState::Update_Sound(_float fTimeDelta)
+{
+	_float fCurrentRatio = m_pModelCom->Get_Current_Ratio();
+	if (!m_bSoundPlayed && fCurrentRatio > m_fSoundTime)
+	{
+		m_pGameInstance->PlaySoundEffect(L"Dodge.wav", 0.3f);
+		m_bSoundPlayed = true;
 	}
 }
 

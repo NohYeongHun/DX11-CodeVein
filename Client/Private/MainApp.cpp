@@ -97,6 +97,7 @@ HRESULT CMainApp::Render()
 
 	
 
+#ifdef _DEBUG
 	ImGuiIO& io = ImGui::GetIO();
 
 	// 기존 Player Debug Window
@@ -109,18 +110,10 @@ HRESULT CMainApp::Render()
 
 
 	ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
-	
-	//ImGui::SliderFloat("threshold", &m_fThreshold, 0.f, 1.f);
-	//ImGui::SliderFloat("soft", &m_fSoft, 0.f, 1.f);
-	//
-	//if (ImGui::Button("Apply Value"))
-	//{
-	//	m_pGameInstance->Setting_Threshold(m_fThreshold);
-	//	m_pGameInstance->Setting_Soft(m_fSoft);
-	//}
-	
-
 	ImGui::End();
+#endif // _DEBUG
+
+
 
 	m_pImGui_Manager->Render_End();
 	m_pGameInstance->Render_End();
