@@ -3,29 +3,29 @@
 
 CInput_Device::CInput_Device(void)
 {
-	ZeroMemory(m_byKeyState, sizeof(m_byKeyState));
+	ZeroMemory(m_IsyKeyState, sizeof(m_IsyKeyState));
 }
 
 _bool CInput_Device::Get_KeyPress(_ubyte byKeyID)
 {
-	_bool IsCurrent = m_byKeyState[byKeyID] & 0x80;
-	_bool IsPrev = m_byPrevKeyState[byKeyID] & 0x80;
+	_bool IsCurrent = m_IsyKeyState[byKeyID] & 0x80;
+	_bool IsPrev = m_IsyPrevKeyState[byKeyID] & 0x80;
 
 	return IsCurrent && IsPrev;
 }
 
 _bool CInput_Device::Get_KeyDown(_ubyte byKeyID)
 {
-	_bool IsCurrent = m_byKeyState[byKeyID] & 0x80;
-	_bool IsPrev = m_byPrevKeyState[byKeyID] & 0x80;
+	_bool IsCurrent = m_IsyKeyState[byKeyID] & 0x80;
+	_bool IsPrev = m_IsyPrevKeyState[byKeyID] & 0x80;
 
 	return IsCurrent && !IsPrev;
 }
 
 _bool CInput_Device::Get_KeyUp(_ubyte byKeyID)
 {
-	_bool IsCurrent = m_byKeyState[byKeyID] & 0x80;
-	_bool IsPrev = m_byPrevKeyState[byKeyID] & 0x80;
+	_bool IsCurrent = m_IsyKeyState[byKeyID] & 0x80;
+	_bool IsPrev = m_IsyPrevKeyState[byKeyID] & 0x80;
 
 	return !IsCurrent && IsPrev;
 }
@@ -102,14 +102,14 @@ HRESULT CInput_Device::Initialize(HINSTANCE hInst, HWND hWnd)
 */
 void CInput_Device::Update(void)
 {
-	memcpy(m_byPrevKeyState, m_byKeyState, sizeof(m_byPrevKeyState));
+	memcpy(m_IsyPrevKeyState, m_IsyKeyState, sizeof(m_IsyPrevKeyState));
 	memcpy(&m_tPrevMouseState, &m_tMouseState, sizeof(m_tPrevMouseState));
 
-	// Device State를 m_byKeyState에 받아온다.
-	if (FAILED(m_pKeyBoard->GetDeviceState(256, m_byKeyState)))
+	// Device State를 m_IsyKeyState에 받아온다.
+	if (FAILED(m_pKeyBoard->GetDeviceState(256, m_IsyKeyState)))
 	{
 		m_pKeyBoard->Acquire();
-		ZeroMemory(&m_byKeyState, sizeof(m_byKeyState));
+		ZeroMemory(&m_IsyKeyState, sizeof(m_IsyKeyState));
 	}
 
 	if (FAILED(m_pMouse->GetDeviceState(sizeof(m_tMouseState), &m_tMouseState)))

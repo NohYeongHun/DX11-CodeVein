@@ -62,7 +62,7 @@ private:
     LEVEL m_eCurLevel = { LEVEL::END };
     // LockOn 관련
     CGameObject* m_pTarget = { nullptr };
-    _bool m_bActive = false;
+    _bool m_IsActive = false;
 
     
     // 타이머
@@ -70,7 +70,7 @@ private:
     _float m_fCurrentTime = 0.0f;        // 현재 경과 시간
     // 회전 정보
     _float m_fRotationAngle = 0.0f; // Z축 회전 각도 (라디안)
-    _bool m_bDirectionCalculated = false; // 방향이 계산되었는지 여부
+    _bool m_IsDirectionCalculated = false; // 방향이 계산되었는지 여부
     _vector m_vHitDirection = {};
     _float3 m_vScale = {};
     _uint m_iShaderPath = {};

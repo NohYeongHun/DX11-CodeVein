@@ -20,8 +20,8 @@ private:
     _bool m_IsFirstAttack = { false };
 	_bool m_IsSecondAttack = { false };
 
-    _bool m_bFirstPlaySound = {};
-    _bool m_bSecondPlaySound = {};
+    _bool m_IsFirstPlaySound = {};
+    _bool m_IsSecondPlaySound = {};
     _float m_fFirstAttackSound = {};
     _float m_fSecondAttackSound = {};
 

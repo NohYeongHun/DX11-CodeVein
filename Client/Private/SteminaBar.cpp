@@ -85,18 +85,18 @@ HRESULT CSteminaBar::Render()
 // 한번에 늘리면 안되고 시간에 따라 늘리게?
 //void CSteminaBar::Increase_Stemina(_uint iStemina, _float fTime)
 //{
-//    m_bIncrease = true;
+//    m_IsIncrease = true;
 //}
 //
 //void CSteminaBar::Decrease_Stemina(_uint iStemina, _float fTime)
 //{
 //    // 증가 중인데 감소한다면.
-//    if (m_bIncrease)
+//    if (m_IsIncrease)
 //    {
 //        m_fRightRatio = m_fLeftRatio;
 //        m_iStemina = m_iStemina < iStemina ? 0 : m_iStemina - iStemina;
 //        m_fLeftRatio = static_cast<_float>(m_iStemina) / static_cast<_float>(m_iMaxStemina);
-//        m_bIncrease = false;
+//        m_IsIncrease = false;
 //    }
 //    else
 //    {
@@ -105,7 +105,7 @@ HRESULT CSteminaBar::Render()
 //        m_fLeftRatio = static_cast<_float>(m_iStemina) / static_cast<_float>(m_iMaxStemina);
 //    }
 //    
-//    m_bDecrease = true;
+//    m_IsDecrease = true;
 //
 //}
 
@@ -113,18 +113,18 @@ HRESULT CSteminaBar::Render()
 #pragma region 증감 효과
 void CSteminaBar::Increase_Stemina(_float iStemina, _float fTime)
 {
-    m_bIncrease = true;
+    m_IsIncrease = true;
 }
 
 void CSteminaBar::Decrease_Stemina(_float fStemina, _float fTime)
 {
     // 증가 중인데 감소한다면.
-    if (m_bIncrease)
+    if (m_IsIncrease)
     {
         m_fRightRatio = m_fLeftRatio;
         m_fStemina = m_fStemina < fStemina ? 0 : m_fStemina - fStemina;
         m_fLeftRatio = m_fStemina / m_fMaxStemina;
-        m_bIncrease = false;
+        m_IsIncrease = false;
     }
     else
     {
@@ -133,7 +133,7 @@ void CSteminaBar::Decrease_Stemina(_float fStemina, _float fTime)
         m_fLeftRatio = m_fStemina / m_fMaxStemina;
     }
 
-    m_bDecrease = true;
+    m_IsDecrease = true;
 
 }
 
@@ -178,7 +178,7 @@ HRESULT CSteminaBar::Ready_Render_Resources()
     if (FAILED(m_pShaderCom->Bind_RawValue("g_fRightRatio", static_cast<void*>(&m_fRightRatio), sizeof(m_fRightRatio))))
         return E_FAIL;
 
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_bIncrease", static_cast<void*>(&m_bIncrease), sizeof(m_bIncrease))))
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_bIncrease", static_cast<void*>(&m_IsIncrease), sizeof(m_IsIncrease))))
         return E_FAIL;
 
     if (FAILED(m_pTextureCom->Bind_Shader_Resource(m_pShaderCom, "g_Texture", m_iTextureIndex)))
@@ -221,17 +221,17 @@ HRESULT CSteminaBar::Ready_Events()
 
 //void CSteminaBar::Ratio_Calc(_float fTimeDelta)
 //{
-//    if (m_bDecrease)
+//    if (m_IsDecrease)
 //    {
 //        if (m_fRightRatio <= m_fLeftRatio)
 //        {
-//            m_bDecrease = false;
-//            m_bIncrease = true;
+//            m_IsDecrease = false;
+//            m_IsIncrease = true;
 //        }
 //        else
 //            m_fRightRatio -= fTimeDelta * 0.1f;
 //    }
-//    else if (m_bIncrease)
+//    else if (m_IsIncrease)
 //    {
 //        m_fLeftRatio = static_cast<_float>(m_iStemina) / static_cast<_float>(m_iMaxStemina);
 //        if (m_iStemina < m_iMaxStemina)
@@ -240,23 +240,23 @@ HRESULT CSteminaBar::Ready_Events()
 //            m_fRightRatio = static_cast<_float>(m_iStemina) / static_cast<_float>(m_iMaxStemina);
 //        }
 //        else
-//            m_bIncrease = false;
+//            m_IsIncrease = false;
 //    }
 //}
 
 void CSteminaBar::Ratio_Calc(_float fTimeDelta)
 {
-    if (m_bDecrease)
+    if (m_IsDecrease)
     {
         if (m_fRightRatio <= m_fLeftRatio)
         {
-            m_bDecrease = false;
-            m_bIncrease = true;
+            m_IsDecrease = false;
+            m_IsIncrease = true;
         }
         else
             m_fRightRatio -= fTimeDelta * 0.2f;
     }
-    else if (m_bIncrease)
+    else if (m_IsIncrease)
     {
         m_fLeftRatio = m_fStemina / m_fMaxStemina;
         if (m_fStemina < m_fMaxStemina)
@@ -265,7 +265,7 @@ void CSteminaBar::Ratio_Calc(_float fTimeDelta)
             m_fRightRatio = m_fStemina / m_fMaxStemina;
         }
         else
-            m_bIncrease = false;
+            m_IsIncrease = false;
     }
 }
 

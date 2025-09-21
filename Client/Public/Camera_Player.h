@@ -55,11 +55,11 @@ private:
 	_float m_fRotationSmoothSpeed = 8.0f; // 회전 부드러움 속도
 
 	// Q키 눌렀을때 Pitch 조정.
-	_bool m_bPitchControlMode = false;    // Q키를 누르고 있을 때만 true
+	_bool m_IsPitchControlMode = false;    // Q키를 누르고 있을 때만 true
 	_float m_fDefaultPitch = 0.0f;       // 기본 Pitch 각도 (도 단위)
 
 	// 마우스 커서 제한
-	_bool m_bMouseClipped = false;        // 마우스 클립 상태
+	_bool m_IsMouseClipped = false;        // 마우스 클립 상태
 	RECT m_rcClipRect = {};              // 클립 영역
 
 	// Pitch 제한값들 (자연스러운 카메라 각도 범위)
@@ -70,14 +70,14 @@ private:
 	_float4 m_vCurrentCameraPos = {};   // 현재 카메라 위치
 	_float4 m_vTargetCameraPos = {};    // 목표 카메라 위치
 	_float m_fSmoothSpeed = 200.0f;     // 추적 속도 (높을수록 빠름)
-	_bool m_bFirstUpdate = true;        // 첫 번째 업데이트시 플레이어 위치로 바로 이동.
+	_bool m_IsFirstUpdate = true;        // 첫 번째 업데이트시 플레이어 위치로 바로 이동.
 
 #pragma endregion
 
 #pragma region 1. 락온 상태. <-몬스터를 추적하되 플레이어를 동일선상에 둡니다. => 카메라 => 플레이어 등짝 => 몬스터
 public:
 	void Toggle_LockOn_Mode();
-	_bool Is_LockOn_Mode() const { return m_bLockOnMode; }
+	_bool Is_LockOn_Mode() const { return m_IsLockOnMode; }
 	class CMonster* Get_LockOn_Target() const { return m_pLockOnTarget; }
 
 private:
@@ -102,17 +102,17 @@ private:
 
 
 public:
-	void Set_InventroyMode(_bool bInventoryMode) { m_bInventoryMode = bInventoryMode; }
+	void Set_InventroyMode(_bool bInventoryMode) { m_IsInventoryMode = bInventoryMode; }
 
 private:
 	// 인벤토리 키면 회전 멈추기
-	_bool m_bInventoryMode = { false };
+	_bool m_IsInventoryMode = { false };
 
 private:
 	class CMonster* m_pLockOnTarget = { nullptr };// LockOn 타겟
 	class CLockOnUI* m_pLockOnUI = { nullptr };   // LockOn UI
 	_float4 m_vLockOnOffset = {};				  // 락온 모드 전용 오프셋 (더 멀리)
-	_bool m_bLockOnMode = { false };              // LockOn 모드 활성화 여부
+	_bool m_IsLockOnMode = { false };              // LockOn 모드 활성화 여부
 	_float m_fLockOnSmoothSpeed = 4.0f;           // LockOn 시 카메라 부드러움 (더 빠르게)
 	_float m_fMaxLockOnDistance = 50.0f;          // 최대 락온 가능 거리
 	_float4 m_vLockOnCameraPos = {};              // LockOn 카메라 목표 위치

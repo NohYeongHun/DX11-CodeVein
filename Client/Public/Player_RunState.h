@@ -55,8 +55,8 @@ private:
 	_float m_strSoundFile = {};
 	_wstring m_strFootSoundFile = {};
 
-	_bool m_bFirstSoundPlayed = false;
-	_bool m_bSecondSoundPlayed = false;
+	_bool m_IsFirstSoundPlayed = false;
+	_bool m_IsSecondSoundPlayed = false;
 
 public:
 	static CPlayer_RunState* Create(_uint iStateNum, void* pArg);

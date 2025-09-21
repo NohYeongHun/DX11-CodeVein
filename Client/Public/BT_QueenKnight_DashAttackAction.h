@@ -32,7 +32,11 @@ private:
     _float m_fDashTime = {};
     _bool m_IsSpeedChange = { false };
 
-    
+    _float m_fDodgeSoundFrame = { 61.f / 208.f}; // 동작이 완성됨.
+    _float m_fDashSoundFrame = {};
+    _bool m_IsDodgeSoundPlay = { false };
+    _bool m_IsDashSoundPlay = { false };
+
 
 public:
     explicit CBT_QueenKnight_DashAttackAction(class CQueenKnight* pOwner);

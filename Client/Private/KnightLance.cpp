@@ -45,7 +45,7 @@ HRESULT CKnightLance::Initialize_Clone(void* pArg)
     m_vPointUp = _float3(0.f, 0.5f, 0.f);
     m_vPointDown = _float3(0.f, -3.5f, 0.f);
 
-    m_bTrail = true;
+    m_IsTrail = true;
 
 
     // 기본 false;
@@ -89,7 +89,7 @@ void CKnightLance::Late_Update(_float fTimeDelta)
 
 #endif // _DEBUG
 
-    if (m_bTrail)
+    if (m_IsTrail)
         m_pTrailWeapon_Effect->Late_Update(fTimeDelta);
 }
 
@@ -276,9 +276,9 @@ HRESULT CKnightLance::Bind_ShaderResources()
         return E_FAIL;
 
     _float fDissolveTime = {};
-    if (m_bDissolve)
+    if (m_IsDissolve)
         fDissolveTime = normalize(m_fCurDissolveTime, 0.f, m_fMaxDissolveTime);
-    else if(m_bReverseDissolve)
+    else if(m_IsReverseDissolve)
         fDissolveTime = normalize(m_fCurDissolveTime, 0.f, m_fMaxReverseDissolveTime);
 
     if (FAILED(m_pShaderCom->Bind_RawValue("g_fDissolveTime", &fDissolveTime, sizeof(_float))))

@@ -183,7 +183,7 @@ private:
 	_float m_fLockOnTimer = 0.0f;                        // LockOn 타이머
 	_float m_fLockOnCheckInterval = 0.5f;                // LockOn 유효성 검사 주기
 	_float m_fLockOnRotationSpeed = 3.0f;                // LockOn 시 회전 속도
-	_bool m_bLockOnRotationEnabled = false;              // LockOn 시 자동 회전 여부
+	_bool m_IsLockOnRotationEnabled = false;              // LockOn 시 자동 회전 여부
 private:
 	class m_pLockOn_Target* m_pTarget = { nullptr };
 #pragma endregion

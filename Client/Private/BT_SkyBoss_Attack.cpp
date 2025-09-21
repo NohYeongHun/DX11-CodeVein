@@ -58,7 +58,7 @@ BT_RESULT CBT_SkyBoss_Attack::StartAttack()
     // 3. 다음 단계로 진행
     m_eAttackPhase = ATTACK_PHASE::PREPARING;
     m_fAttackTimer = 0.f;
-    m_bDamageDealt = false;
+    m_IsDamageDealt = false;
 
     return BT_RESULT::RUNNING;
 }
@@ -84,10 +84,10 @@ BT_RESULT CBT_SkyBoss_Attack::UpdateAttacking(_float fTimeDelta)
     m_fAttackTimer += fTimeDelta;
 
     // 데미지 처리 (한 번만 실행)
-    if (!m_bDamageDealt && m_fAttackTimer >= 0.1f)
+    if (!m_IsDamageDealt && m_fAttackTimer >= 0.1f)
     {
         DealDamageToTarget();
-        m_bDamageDealt = true;
+        m_IsDamageDealt = true;
     }
 
     // 공격 지속 시간
@@ -164,10 +164,10 @@ void CBT_SkyBoss_Attack::Reset()
 {
     m_eAttackPhase = ATTACK_PHASE::NONE;
     m_fAttackTimer = 0.f;
-    m_bDamageDealt = false;
+    m_IsDamageDealt = false;
     m_iSelectedAttackAnim = 0;
     
-    // m_bAnimationSet = false; ← 이 줄 제거
+    // m_IsAnimationSet = false; ← 이 줄 제거
 }
 
 CBT_SkyBoss_Attack* CBT_SkyBoss_Attack::Create(CSkyBoss* pOwner)

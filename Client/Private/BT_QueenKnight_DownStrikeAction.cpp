@@ -66,7 +66,7 @@ void CBT_QueenKnight_DownStrikeAction::Reset()
     m_pOwner->Reset_Collider_ActiveInfo();
     m_pOwner->Set_Visible(true);
     m_IsChangeSpeed = false;
-    m_bDissolveCheck = false;
+    m_IsDissolveCheck = false;
 
     m_pOwner->Set_Animation_Speed(m_pOwner->Find_AnimationIndex(L"WARP_END"), 1.2f);
 
@@ -125,10 +125,10 @@ BT_RESULT CBT_QueenKnight_DownStrikeAction::Update_Ascend(_float fTimeDelta)
     _float fCurrentRatio = m_pOwner->Get_CurrentAnimationRatio();
     _bool bParticle = { false };
 
-    if (!m_bDissolveCheck && !m_pOwner->HasBuff(CMonster::BUFF_DISSOLVE) && fCurrentRatio >= m_fDissolve_StartRatio)
+    if (!m_IsDissolveCheck && !m_pOwner->HasBuff(CMonster::BUFF_DISSOLVE) && fCurrentRatio >= m_fDissolve_StartRatio)
     {
         // 디졸브 시작.
-        m_bDissolveCheck = true; // 이미 Dissolve가 발생했는지?
+        m_IsDissolveCheck = true; // 이미 Dissolve가 발생했는지?
         m_pOwner->Start_Dissolve(1.2f);
         
         // 사운드 시작.
@@ -159,7 +159,7 @@ BT_RESULT CBT_QueenKnight_DownStrikeAction::Update_Ascend(_float fTimeDelta)
     }
 
     // Dissolve가 이미 발생했고 Dissolve 상태가 끝났으면?
-    if (m_bDissolveCheck && !m_pOwner->HasBuff(CMonster::BUFF_DISSOLVE))
+    if (m_IsDissolveCheck && !m_pOwner->HasBuff(CMonster::BUFF_DISSOLVE))
     {
         m_pOwner->Set_Visible(false); // 렌더를 끕니다.
 
@@ -210,7 +210,7 @@ BT_RESULT CBT_QueenKnight_DownStrikeAction::Update_Ascend(_float fTimeDelta)
         
         //if (m_pOwner->HasBuff(CMonster::BUFF_DISSOLVE))
             
-        m_bDissolveCheck = false;
+        m_IsDissolveCheck = false;
 
     }
     return BT_RESULT::RUNNING;
@@ -221,7 +221,7 @@ BT_RESULT CBT_QueenKnight_DownStrikeAction::Update_Hang(_float fTimeDelta)
 {
 
     // DISSOLVE가 끝나면 Reverse Dissolv 시작.
-    if (!m_bDissolveCheck && !m_pOwner->HasBuff(CMonster::BUFF_DISSOLVE))
+    if (!m_IsDissolveCheck && !m_pOwner->HasBuff(CMonster::BUFF_DISSOLVE))
     {
         // 2. 목표 하강지점 도착했으므로 렌더링 켜기 (시야에서 나타남)
         m_pOwner->ReverseStart_Dissolve(0.4f);

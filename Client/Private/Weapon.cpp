@@ -88,7 +88,7 @@ void CWeapon::Update_AttackDirection(_float fTimeDelta)
     // 1. 스윙 방향 계산 (무기 팁 위치 기준)
     _vector vCurrentPosition = XMLoadFloat4(reinterpret_cast<const _float4*>(&m_CombinedWorldMatrix.m[3][0]));
 
-    if (!m_bFirstFrame)
+    if (!m_IsFirstFrame)
     {
         // 슬래시 방향 계산 (이전 위치에서 현재 위치로의 벡터를 반전)
         _vector vMovement = XMVectorSubtract(m_vPreviousPosition, vCurrentPosition);
@@ -102,7 +102,7 @@ void CWeapon::Update_AttackDirection(_float fTimeDelta)
     }
     else
     {
-        m_bFirstFrame = false;
+        m_IsFirstFrame = false;
     }
 
     // 다음 프레임을 위해 현재 위치 저장
@@ -193,7 +193,7 @@ void CWeapon::Start_Dissolve(_float fDuration)
         m_fMaxDissolveTime = fDuration;
 
     m_fCurDissolveTime = 0.f;
-    m_bDissolve = true;
+    m_IsDissolve = true;
     m_iShaderPath = static_cast<_uint>(MESH_SHADERPATH::DISSOLVE);
 }
 void CWeapon::ReverseStart_Dissolve(_float fDuration)
@@ -202,7 +202,7 @@ void CWeapon::ReverseStart_Dissolve(_float fDuration)
         m_fMaxReverseDissolveTime = fDuration;
 
     m_fCurDissolveTime = m_fMaxReverseDissolveTime;
-    m_bReverseDissolve = true;
+    m_IsReverseDissolve = true;
     m_iShaderPath = static_cast<_uint>(MESH_SHADERPATH::DISSOLVE);
 
 }
@@ -211,26 +211,26 @@ void CWeapon::End_Dissolve()
 {
     m_fCurDissolveTime = 0.f;
     m_iShaderPath = static_cast<_uint>(ANIMESH_SHADERPATH::DEFAULT);
-    m_bDissolve = false;
-    m_bReverseDissolve = false;
+    m_IsDissolve = false;
+    m_IsReverseDissolve = false;
 }
 
 
 void CWeapon::Update_DissolveFrame(_float fTimeDelta)
 {
-    if (m_bDissolve)
+    if (m_IsDissolve)
     {
         m_fCurDissolveTime += fTimeDelta;
 
         if (m_fCurDissolveTime >= m_fMaxDissolveTime)
-            m_bDissolve = false;
+            m_IsDissolve = false;
     }
 
-    if (m_bReverseDissolve)
+    if (m_IsReverseDissolve)
     {
         m_fCurDissolveTime -= fTimeDelta;
         if (m_fCurDissolveTime <= 0.f)
-            m_bReverseDissolve = false;
+            m_IsReverseDissolve = false;
     }
 }
 

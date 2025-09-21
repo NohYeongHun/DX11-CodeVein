@@ -137,7 +137,7 @@ void CSlash::OnActivate(void* pArg)
     m_pTransformCom->Set_State(STATE::POSITION, pDesc->vHitPosition);
     m_fDisplayTime = pDesc->fDisPlayTime;
     // 2. 설정되었을때 Camera에 따른 방향을 재계산할 필요성이 존재.
-    m_bDirectionCalculated = false;
+    m_IsDirectionCalculated = false;
     m_vScale = pDesc->vScale;
     // 3. 위치 및 회전계산.
     Initialize_Transform();
@@ -157,7 +157,7 @@ void CSlash::OnDeActivate()
 void CSlash::Initialize_Transform()
 {
     // 이미 계산되었다면 다시 계산하지 않음
-    if (m_bDirectionCalculated)
+    if (m_IsDirectionCalculated)
         return;
 
     // 1. 카메라 위치 가져오기
@@ -199,7 +199,7 @@ void CSlash::Initialize_Transform()
     m_pTransformCom->Set_Scale({ fSizeX, fSizeY, m_vScale.z });
 
     // 7. 계산 완료 플래그 설정
-    m_bDirectionCalculated = true;
+    m_IsDirectionCalculated = true;
 }
 
 HRESULT CSlash::Bind_ShaderResources()

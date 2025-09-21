@@ -49,8 +49,8 @@ public:
 
 private:
 	ACTORDIR			   m_eDir = { ACTORDIR::END };
-	_bool m_bPrevInvincible = {};
-	_bool m_bSoundPlayed = false;
+	_bool m_IsPrevInvincible = {};
+	_bool m_IsSoundPlayed = false;
 	_float m_fSoundTime = {};
 
 

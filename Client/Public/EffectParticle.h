@@ -140,7 +140,7 @@ private:
     class CVIBuffer_PointParticleDir_Instance* m_pVIBufferCom = { nullptr };
 
     LEVEL m_eCurLevel = { LEVEL::END };
-    _bool m_bActive = false;
+    _bool m_IsActive = false;
 
     _bool m_isLoop = { false };
     _bool m_isBillBoard = { false };
@@ -154,7 +154,7 @@ private:
     _float m_fRotationAngle = 0.0f;      // Z축 회전 각도 (라디안)
     _uint m_iShaderPath = {}; // Shader Path.
 
-    _bool  m_bDirectionCalculated = false; // 방향이 계산되었는지 여부 => 한번만 계산.
+    _bool  m_IsDirectionCalculated = false; // 방향이 계산되었는지 여부 => 한번만 계산.
 
 
     _uint m_iTextureIndexArray[TEXTURE_END] = {};
@@ -170,7 +170,7 @@ private:
     _float m_fSpawnTimer = 0.0f;          // 파티클 생성 타이머
     _float m_fSpawnInterval = 0.2f;       // 파티클 생성 간격 (초)
     _uint m_iSpawnCount = 3;              // 한번에 생성할 파티클 개수
-    _bool m_bContinuousSpawn = false;     // 연속 생성 여부
+    _bool m_IsContinuousSpawn = false;     // 연속 생성 여부
 
 
     _float m_fEmissiveIntencity = {};

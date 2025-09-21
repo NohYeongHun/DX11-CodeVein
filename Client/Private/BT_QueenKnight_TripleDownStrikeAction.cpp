@@ -61,7 +61,7 @@ void CBT_QueenKnight_TripleDownStrikeAction::Reset()
     m_pOwner->Reset_Collider_ActiveInfo();
     m_pOwner->Set_Visible(true);
     m_IsChangeSpeed = false;
-    m_bDissolveCheck = false;
+    m_IsDissolveCheck = false;
 
     m_pOwner->Set_Animation_Speed(m_pOwner->Find_AnimationIndex(L"WARP_END"), 1.2f);
 
@@ -115,10 +115,10 @@ BT_RESULT CBT_QueenKnight_TripleDownStrikeAction::Update_Ascend(_float fTimeDelt
     _vector vOwnerPos = m_pOwner->Get_Transform()->Get_State(STATE::POSITION);
     _float fCurrentRatio = m_pOwner->Get_CurrentAnimationRatio();
 
-    if (!m_bDissolveCheck && !m_pOwner->HasBuff(CMonster::BUFF_DISSOLVE) && fCurrentRatio >= m_fDissolve_StartRatio)
+    if (!m_IsDissolveCheck && !m_pOwner->HasBuff(CMonster::BUFF_DISSOLVE) && fCurrentRatio >= m_fDissolve_StartRatio)
     {
         // 디졸브 시작.
-        m_bDissolveCheck = true; // 이미 Dissolve가 발생했는지?
+        m_IsDissolveCheck = true; // 이미 Dissolve가 발생했는지?
         m_pOwner->Start_Dissolve(1.f);
         //m_pOwner->AddBuff(CMonster::BUFF_DISSOLVE);
 
@@ -163,11 +163,11 @@ BT_RESULT CBT_QueenKnight_TripleDownStrikeAction::Update_Ascend(_float fTimeDelt
         m_pOwner->Create_QueenKnightWarp_Effect_Particle({ 0.f, -1.f, 0.f });
 
 
-        m_bDissolveCheck = false;
+        m_IsDissolveCheck = false;
     }
 
     // DISSOLVE가 끝나면 Reverse Dissolv 시작.
-    if (!m_bDissolveCheck && !m_pOwner->HasBuff(CMonster::BUFF_DISSOLVE))
+    if (!m_IsDissolveCheck && !m_pOwner->HasBuff(CMonster::BUFF_DISSOLVE))
     {
         // 시야에 켜기.
 

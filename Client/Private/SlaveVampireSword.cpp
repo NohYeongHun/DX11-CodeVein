@@ -245,9 +245,9 @@ HRESULT CSlaveVampireSword::Bind_ShaderResources()
 
 
     _float fDissolveTime = {};
-    if (m_bDissolve)
+    if (m_IsDissolve)
         fDissolveTime = normalize(m_fCurDissolveTime, 0.f, m_fMaxDissolveTime);
-    else if (m_bReverseDissolve)
+    else if (m_IsReverseDissolve)
         fDissolveTime = normalize(m_fCurDissolveTime, 0.f, m_fMaxReverseDissolveTime);
 
     if (FAILED(m_pShaderCom->Bind_RawValue("g_fDissolveTime", &fDissolveTime, sizeof(_float))))

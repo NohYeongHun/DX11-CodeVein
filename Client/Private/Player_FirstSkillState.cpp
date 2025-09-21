@@ -180,6 +180,8 @@ void CPlayer_FirstSkillState::Enter(void* pArg)
     m_IsThirdAttack = false;
     m_IsFourthAttack = false;
     m_IsFifthAttack = false;
+
+    //m_pGameInstance->PlaySoundEffect(L"SpinAttack.wav", 0.2f);
 }
 
 void CPlayer_FirstSkillState::Update(_float fTimeDelta)

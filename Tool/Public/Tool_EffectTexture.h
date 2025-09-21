@@ -56,7 +56,7 @@ private:
     class CVIBuffer_Rect* m_pVIBufferCom = { nullptr };
 
     LEVEL m_eCurLevel = { LEVEL::END };
-    _bool m_bActive = false;
+    _bool m_IsActive = false;
 
     _vector m_vHitDirection = {};
     _float3 m_vScale = {};
@@ -65,7 +65,7 @@ private:
     _float m_fRotationAngle = 0.0f;      // Z축 회전 각도 (라디안)
     _uint m_iShaderPath = {}; // Shader Path.
 
-    _bool  m_bDirectionCalculated = false; // 방향이 계산되었는지 여부 => 한번만 계산.
+    _bool  m_IsDirectionCalculated = false; // 방향이 계산되었는지 여부 => 한번만 계산.
     
     
 

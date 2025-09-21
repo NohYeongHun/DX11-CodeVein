@@ -40,7 +40,7 @@ private:
     _float m_fDissolve_StartRatio = {};
     _float m_fDissolve_EndRatio = {};
 
-    _bool m_bDissolveCheck = { false };
+    _bool m_IsDissolveCheck = { false };
 
     _float m_fJump_StartRatio = {};
     _float m_fJump_EndRatio = {};

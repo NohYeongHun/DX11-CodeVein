@@ -138,7 +138,7 @@ void CEffect_BodyAura::OnActivate(void* pArg)
 	Reset_Timer();
 
 
-	m_bIsGrowing = true;
+	m_IsGrowing = true;
 	m_fStayDuration = pDesc->fStayDuration;
 	m_fDissolveDuration = pDesc->fDissolveDuration;
 

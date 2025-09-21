@@ -35,7 +35,7 @@ void CPlayer_DamageState::Enter(void* pArg)
     }
 
     // 상태 초기화
-    m_bAnimationFinished = false;
+    m_IsAnimationFinished = false;
     m_fCurrentInvincibilityTime = 0.f;
     
     // 무적 버프 추가
@@ -50,7 +50,7 @@ void CPlayer_DamageState::Update(_float fTimeDelta)
     // 애니메이션이 끝났는지 확인
     if (m_pModelCom->Is_Finished())
     {
-        m_bAnimationFinished = true;
+        m_IsAnimationFinished = true;
         Change_State();
     }
 }
@@ -67,13 +67,13 @@ void CPlayer_DamageState::Exit()
 void CPlayer_DamageState::Reset()
 {
     m_eDamageDirection = ACTORDIR::END;
-    m_bAnimationFinished = false;
+    m_IsAnimationFinished = false;
     m_fCurrentInvincibilityTime = 0.f;
 }
 
 void CPlayer_DamageState::Change_State()
 {
-    if (m_bAnimationFinished)
+    if (m_IsAnimationFinished)
     {
         // 피격 애니메이션이 끝나면 IDLE 상태로 전환
         CPlayer_IdleState::IDLE_ENTER_DESC IdleDesc{};

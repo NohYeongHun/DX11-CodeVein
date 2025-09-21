@@ -282,9 +282,9 @@ void CSlaveVampire::Update_AI(_float fTimeDelta)
         return;
 
     _float fCurrentRatio = m_pModelCom->Get_Current_Ratio();
-    if (m_bPlayWeaponSound && fCurrentRatio >= m_fPlayAttackSound)
+    if (m_IsPlayWeaponSound && fCurrentRatio >= m_fPlayAttackSound)
     {
-        m_bPlayWeaponSound = false;
+        m_IsPlayWeaponSound = false;
         m_pGameInstance->PlaySoundEffect(L"SlaveVampireAttack.wav", 0.2f);
     }
 
@@ -443,7 +443,7 @@ void CSlaveVampire::PlayHitSound()
 
 void CSlaveVampire::PlayWeaponSound()
 {
-    m_bPlayWeaponSound = true;
+    m_IsPlayWeaponSound = true;
 }
 #pragma endregion
 

@@ -50,8 +50,8 @@ private:
 	_float  m_fHp = {};
 	_float  m_fMaxHp = {};
 
-	_bool  m_bIncrease = { false };
-	_bool  m_bDecrease = { false };
+	_bool  m_IsIncrease = { false };
+	_bool  m_IsDecrease = { false };
 
 
 	// Noise Time => Texture 흐르는 효과

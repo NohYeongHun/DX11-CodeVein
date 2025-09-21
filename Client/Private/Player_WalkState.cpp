@@ -77,24 +77,24 @@ void CPlayer_WalkState::Update_FootstepSound(_float fTimeDelta)
 {
 	_float fCurrentRatio = m_pModelCom->Get_Current_Ratio();
 
-	if (!m_bFirstSoundPlayed && fCurrentRatio > m_fFootStepFirst)
+	if (!m_IsFirstSoundPlayed && fCurrentRatio > m_fFootStepFirst)
 	{
 		m_strFootSoundFile = L"FootSound1.wav";
 		m_pGameInstance->PlaySoundEffect(m_strFootSoundFile, 0.3f);
-		m_bFirstSoundPlayed = true;
+		m_IsFirstSoundPlayed = true;
 	}
-	else if (!m_bSecondSoundPlayed && fCurrentRatio > m_fFootStepSecond)
+	else if (!m_IsSecondSoundPlayed && fCurrentRatio > m_fFootStepSecond)
 	{
 		m_strFootSoundFile = L"FootSound2.wav";
 		m_pGameInstance->PlaySoundEffect(m_strFootSoundFile, 0.3f);
-		m_bSecondSoundPlayed = true;
+		m_IsSecondSoundPlayed = true;
 	}
 
 	// 애니메이션 리셋 시 플래그 초기화
 	if (fCurrentRatio < 0.1f)
 	{
-		m_bFirstSoundPlayed = false;
-		m_bSecondSoundPlayed = false;
+		m_IsFirstSoundPlayed = false;
+		m_IsSecondSoundPlayed = false;
 	}
 }
 

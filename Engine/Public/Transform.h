@@ -68,7 +68,7 @@ public:
 	void Set_Quaternion(_fvector qRot)
 	{
 		m_QuatRotation = XMQuaternionNormalize(qRot);
-		m_bIsDirty = true; // 월드 행렬
+		m_IsDirty = true; // 월드 행렬
 	}
 
 	_vector Get_Quaternion()
@@ -129,9 +129,9 @@ public:
 	void Set_Position(const _float3& vPos);
 	void Set_Scale(const XMFLOAT3& vScale);
 	void Scale(const XMFLOAT3& vScale);
-	void Set_ScaleX(float fX) { m_vScale.x = fX; m_bIsDirty = true; }
-	void Set_ScaleY(float fY) { m_vScale.y = fY; m_bIsDirty = true; }
-	void Set_ScaleZ(float fZ) { m_vScale.z = fZ; m_bIsDirty = true; }
+	void Set_ScaleX(float fX) { m_vScale.x = fX; m_IsDirty = true; }
+	void Set_ScaleY(float fY) { m_vScale.y = fY; m_IsDirty = true; }
+	void Set_ScaleZ(float fZ) { m_vScale.z = fZ; m_IsDirty = true; }
 	_float3 Get_Scale();
 
 	void Add_Rotation(_float fPitch, _float fYaw, _float fRoll);
@@ -165,7 +165,7 @@ private:
 	_float			m_fRoll = {}; // Z축 회전.
 
 private:
-	_bool m_bIsDirty = { false }; // 갱신을 해주어야하는가? 체크
+	_bool m_IsDirty = { false }; // 갱신을 해주어야하는가? 체크
 
 
 public:

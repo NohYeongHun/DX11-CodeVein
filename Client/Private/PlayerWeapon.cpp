@@ -110,7 +110,7 @@ void CPlayerWeapon::Late_Update(_float fTimeDelta)
 
 
     // Trail이 켜질때만 넣기.
-    if (m_bTrail)
+    if (m_IsTrail)
           m_pTrailWeapon_Effect->Late_Update(fTimeDelta);
 }
 

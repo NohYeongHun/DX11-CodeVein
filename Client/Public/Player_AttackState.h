@@ -76,7 +76,7 @@ private:
 	_float m_fAttackThird = {};
 	_float m_fAttackFourth = {};
 
-	_bool m_bSoundPlayed = false;
+	_bool m_IsSoundPlayed = false;
 
 	_wstring m_strSoundFile = {};
 

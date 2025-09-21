@@ -121,7 +121,7 @@ void CBlood_PillarA::OnActivate(void* pArg)
 	m_ActivateDesc = *pDesc;
 	Reset_Timer();
 	
-	m_bIsGrowing = true;
+	m_IsGrowing = true;
 	m_fGrowDuration = pDesc->fGrowDuration;
 	m_fStayDuration = pDesc->fStayDuration;
 	m_fDecreaseDuration = pDesc->fDecreaseDuration;
@@ -172,7 +172,7 @@ void CBlood_PillarA::Shape_Control(_float fTimeDelta)
 		break;
 	}
 
-	if (!m_bIsGrowing)
+	if (!m_IsGrowing)
 		return;
 
 	

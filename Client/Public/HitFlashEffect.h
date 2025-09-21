@@ -73,7 +73,7 @@ private:
 #pragma endregion
 
     // 회전 정보
-    _bool m_bDirectionCalculated = false; // 방향이 계산되었는지 여부
+    _bool m_IsDirectionCalculated = false; // 방향이 계산되었는지 여부
     _vector m_vHitDirection = {};
     _float3 m_vScale = {};
 

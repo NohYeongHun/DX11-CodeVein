@@ -22,8 +22,8 @@ private:
     DOWN_PHASE m_eAttackPhase = { ATTACK_PHASE::NONE };
     _float m_fAttackTimer = { 0.f };
     _uint m_iSelectedAttackAnim = { 0 };
-    _bool m_bDamageDealt = { false };
-    _bool m_bAnimationSet = false;
+    _bool m_IsDamageDealt = { false };
+    _bool m_IsAnimationSet = false;
 
 public:
     explicit CBT_SkyBoss_IsDownStart(CSkyBoss* pOwner);

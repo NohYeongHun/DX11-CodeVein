@@ -45,7 +45,7 @@ void CPlayer_DodgeState::Enter(void* pArg)
 	SteminaDesc.fTime = 1.f;
 	m_pGameInstance->Publish(EventType::STEMINA_CHANGE, &SteminaDesc);
 
-	m_bSoundPlayed = false;
+	m_IsSoundPlayed = false;
 }
 
 /* State 실행 */
@@ -105,7 +105,7 @@ void CPlayer_DodgeState::Exit()
 		m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, true);
 	}
 
-	m_bSoundPlayed = false;
+	m_IsSoundPlayed = false;
 
 }
 
@@ -120,7 +120,7 @@ void CPlayer_DodgeState::Handle_Invincible_Buff()
 
 	_bool bShouldInvincible = (fCurrentRatio >= fInvincibleStart && fCurrentRatio <= fInvincibleEnd);
 
-	if (bShouldInvincible != m_bPrevInvincible)
+	if (bShouldInvincible != m_IsPrevInvincible)
 	{
 		if (bShouldInvincible)
 		{
@@ -133,17 +133,17 @@ void CPlayer_DodgeState::Handle_Invincible_Buff()
 			m_pPlayer->RemoveBuff(CPlayer::BUFF_INVINCIBLE, true);
 		}
 
-		m_bPrevInvincible = bShouldInvincible;
+		m_IsPrevInvincible = bShouldInvincible;
 	}
 }
 
 void CPlayer_DodgeState::Update_Sound(_float fTimeDelta)
 {
 	_float fCurrentRatio = m_pModelCom->Get_Current_Ratio();
-	if (!m_bSoundPlayed && fCurrentRatio > m_fSoundTime)
+	if (!m_IsSoundPlayed && fCurrentRatio > m_fSoundTime)
 	{
 		m_pGameInstance->PlaySoundEffect(L"Dodge.wav", 0.3f);
-		m_bSoundPlayed = true;
+		m_IsSoundPlayed = true;
 	}
 }
 

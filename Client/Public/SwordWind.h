@@ -122,7 +122,7 @@ public:
 
 private:
     LEVEL m_eCurLevel = { LEVEL::END };
-    _bool m_bActive = false;
+    _bool m_IsActive = false;
 
     // 타이머
     //_float m_fDisplayTime = 1.0f;        // 표시 시간 (초)
@@ -137,7 +137,7 @@ public:
 private:
     ESTATE m_eState = { ESTATE::STATE_END };
     // --- 성장 애니메이션용 변수 ---
-    _bool  m_bIsGrowing = false;   // 애니메이션이 진행 중인지 여부
+    _bool  m_IsGrowing = false;   // 애니메이션이 진행 중인지 여부
     _float m_fCurrentTime = 0.0f;        // 현재 경과 시간
 
     _float m_fGrowTime = {};

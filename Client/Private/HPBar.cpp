@@ -43,24 +43,24 @@ void CHPBar::Priority_Update(_float fTimeDelta)
 {
 
 
-    if (m_bDecrease)
+    if (m_IsDecrease)
     {
         if (m_fRightRatio <= m_fLeftRatio)
         {
             m_fRightRatio = 0;
             m_fLeftRatio = 0;
-            m_bDecrease = false;
+            m_IsDecrease = false;
         }
         else
             m_fRightRatio -= fTimeDelta * 0.2f;
     }
-    if (m_bIncrease)
+    if (m_IsIncrease)
     {
         if (m_fRightRatio <= m_fLeftRatio)
         {
             m_fRightRatio = 0;
             m_fLeftRatio = 0;
-            m_bIncrease = false;
+            m_IsIncrease = false;
         }
         else
             m_fLeftRatio += fTimeDelta * 0.2f;
@@ -125,12 +125,12 @@ HRESULT CHPBar::Render()
 */
 void CHPBar::Increase_Hp(_float fHp, _float fTime)
 {
-    if (m_bDecrease)
+    if (m_IsDecrease)
     {
         m_fLeftRatio = m_fRightRatio;
         m_fHp = m_fHp < fHp ? 0 : m_fHp + fHp;
         m_fRightRatio = static_cast<_float>(m_fHp) / static_cast<_float>(m_fMaxHp);
-        m_bDecrease = false;
+        m_IsDecrease = false;
     }
     else
     {
@@ -139,17 +139,17 @@ void CHPBar::Increase_Hp(_float fHp, _float fTime)
         m_fRightRatio = static_cast<_float>(m_fHp) / static_cast<_float>(m_fMaxHp);
     }
 
-    m_bIncrease = true;
+    m_IsIncrease = true;
 }
 
 void CHPBar::Decrease_Hp(_float fHp, _float fTime)
 {
-    if (m_bIncrease)
+    if (m_IsIncrease)
     {
         m_fRightRatio = m_fLeftRatio;
         m_fHp = m_fHp < fHp ? 0 : m_fHp - fHp;
         m_fLeftRatio = static_cast<_float>(m_fHp) / static_cast<_float>(m_fMaxHp);
-        m_bIncrease = false;
+        m_IsIncrease = false;
     }
     else
     {
@@ -159,7 +159,7 @@ void CHPBar::Decrease_Hp(_float fHp, _float fTime)
     }
 
 
-    m_bDecrease = true;
+    m_IsDecrease = true;
 }
 
 void CHPBar::Render_HP()
@@ -234,7 +234,7 @@ HRESULT CHPBar::Ready_Render_Resources()
     if (FAILED(m_pShaderCom->Bind_RawValue("g_fRightRatio", static_cast<void*>(&m_fRightRatio), sizeof(_float))))
         return E_FAIL;
 
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_bIncrease", static_cast<void*>(&m_bIncrease), sizeof(_bool))))
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_bIncrease", static_cast<void*>(&m_IsIncrease), sizeof(_bool))))
         return E_FAIL;
 
     // Noise Time

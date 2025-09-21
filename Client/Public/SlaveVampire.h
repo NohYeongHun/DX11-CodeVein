@@ -97,7 +97,7 @@ public:
 	virtual void PlayWeaponSound() override;
 
 private:
-	_bool m_bPlayWeaponSound = { false };
+	_bool m_IsPlayWeaponSound = { false };
 	_float m_fPlayAttackSound = {};
 #pragma endregion
 

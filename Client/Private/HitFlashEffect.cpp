@@ -148,7 +148,7 @@ void CHitFlashEffect::OnActivate(void* pArg)
     
 
     // 2. 설정되었을때 Camera에 따른 방향을 재계산할 필요성이 존재.
-    m_bDirectionCalculated = false;
+    m_IsDirectionCalculated = false;
     m_vScale = pDesc->vScale;
 
 
@@ -168,7 +168,7 @@ void CHitFlashEffect::OnDeActivate()
 void CHitFlashEffect::Initialize_Transform()
 {
     // 이미 계산되었다면 다시 계산하지 않음
-    if (m_bDirectionCalculated)
+    if (m_IsDirectionCalculated)
         return;
 
     // 1. 카메라 위치 가져오기
@@ -205,7 +205,7 @@ void CHitFlashEffect::Initialize_Transform()
     m_pTransformCom->Set_Scale({ fSizeX, fSizeY, m_vScale.z });
 
     // 7. 계산 완료 플래그 설정
-    m_bDirectionCalculated = true;
+    m_IsDirectionCalculated = true;
 }
 
 HRESULT CHitFlashEffect::Bind_ShaderResources()

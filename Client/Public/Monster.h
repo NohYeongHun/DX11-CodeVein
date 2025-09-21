@@ -257,7 +257,7 @@ protected:
     MONSTER_STAT m_MonsterStat = {};
     _float m_fMinDetectionDistance = 5.f;
     _float m_fMinRotationDistance = 2.f;
-    _bool m_bIsCurrentlyDetecting = false;  // 현재 탐지 중인지 상태
+    _bool m_IsCurrentlyDetecting = false;  // 현재 탐지 중인지 상태
 #pragma endregion
 
 
@@ -385,11 +385,11 @@ protected:
 #pragma region 8. 렌더링 제어
 public:
     virtual void Set_Visible(_bool bVisible) {};
-    _bool Is_Visible() const { return m_bVisible; }
+    _bool Is_Visible() const { return m_IsVisible; }
 
 
 protected:
-    _bool m_bVisible = { true };  // 기본적으로 보이는 상태
+    _bool m_IsVisible = { true };  // 기본적으로 보이는 상태
 
 public:
     // 몬스터 LockOn 용도 위치 가져오기.

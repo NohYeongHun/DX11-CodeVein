@@ -46,8 +46,8 @@ private:
 	_float m_fFootStepFirst = {};
 	_float m_fFootStepSecond = {};
 
-	_bool m_bFirstSoundPlayed = {};
-	_bool m_bSecondSoundPlayed = {};
+	_bool m_IsFirstSoundPlayed = {};
+	_bool m_IsSecondSoundPlayed = {};
 	_wstring m_strFootSoundFile = {};
 
 	

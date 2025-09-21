@@ -33,6 +33,10 @@ public:
 		SOUND_WARP_START = 0,
 		SOUND_WARP_END = 1,
 		SOUND_WARP_ATTACK = 2,
+		SOUND_ATTACK = 3,
+		SOUND_CHOP = 4,
+		SOUND_DODGE = 5,
+		SOUND_DASH = 6,
 		SOUND_END
 	};
 
@@ -144,6 +148,7 @@ public:
 
 private:
 	_bool m_IsWeaponSound = { false };
+	_float m_fNormalAttackSoundFrame = {};
 
 #pragma endregion
 
@@ -197,7 +202,7 @@ private:
 	vector<bool>    m_vecIsPillarActivated;
 
 	// 스킬 관련 변수
-	_bool   m_bIsSkillActive = false;    // 스킬이 발동 중인지
+	_bool   m_IsSkillActive = false;    // 스킬이 발동 중인지
 	_float m_fSkillElapsedTime = 0.f; // 스킬이 발동된 후 흐른 시간
 	_float3 m_vSkillCenterPos;         // 스킬이 발동된 중심 위치
 	_float m_fRippleSpeed = 15.f;     // 효과 전파 속도

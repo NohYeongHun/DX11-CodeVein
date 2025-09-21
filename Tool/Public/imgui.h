@@ -2809,7 +2809,7 @@ struct ImGuiListClipper
     // Call IncludeItemByIndex() or IncludeItemsByIndex() *BEFORE* first call to Step() if you need a range of items to not be clipped, regardless of their visibility.
     // (Due to alignment / padding of certain items it is possible that an extra item may be included on either end of the display range).
     inline void     IncludeItemByIndex(int item_index)                  { IncludeItemsByIndex(item_index, item_index + 1); }
-    IMGUI_API void  IncludeItemsByIndex(int item_begin, int item_end);  // item_end is exclusive e.g. use (42, 42+1) to make item 42 never clipped.
+    IMGUI_API void  IncludeItemsByIndex(int item_Isegin, int item_end);  // item_end is exclusive e.g. use (42, 42+1) to make item 42 never clipped.
 
     // Seek cursor toward given item. This is automatically called while stepping.
     // - The only reason to call this is: you can use ImGuiListClipper::Begin(INT_MAX) if you don't know item count ahead of time.
@@ -2817,8 +2817,8 @@ struct ImGuiListClipper
     IMGUI_API void  SeekCursorForItem(int item_index);
 
 #ifndef IMGUI_DISABLE_OBSOLETE_FUNCTIONS
-    inline void IncludeRangeByIndices(int item_begin, int item_end)      { IncludeItemsByIndex(item_begin, item_end); } // [renamed in 1.89.9]
-    //inline void ForceDisplayRangeByIndices(int item_begin, int item_end) { IncludeItemsByIndex(item_begin, item_end); } // [renamed in 1.89.6]
+    inline void IncludeRangeByIndices(int item_Isegin, int item_end)      { IncludeItemsByIndex(item_Isegin, item_end); } // [renamed in 1.89.9]
+    //inline void ForceDisplayRangeByIndices(int item_Isegin, int item_end) { IncludeItemsByIndex(item_Isegin, item_end); } // [renamed in 1.89.6]
     //inline ImGuiListClipper(int items_count, float items_height = -1.0f) { memset(this, 0, sizeof(*this)); ItemsCount = -1; Begin(items_count, items_height); } // [removed in 1.79]
 #endif
 };

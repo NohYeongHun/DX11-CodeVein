@@ -33,8 +33,8 @@ void CBT_GiantWhiteDevil_ComboAttackAction::Reset()
     m_pOwner->Reset_Collider_ActiveInfo();
     m_IsFirstAttack = false;
     m_IsSecondAttack = false;
-    m_bFirstPlaySound = false;
-    m_bSecondPlaySound = false;
+    m_IsFirstPlaySound = false;
+    m_IsSecondPlaySound = false;
 }
 
 BT_RESULT CBT_GiantWhiteDevil_ComboAttackAction::EnterAttack(_float fTimeDelta)
@@ -66,9 +66,9 @@ BT_RESULT CBT_GiantWhiteDevil_ComboAttackAction::UpdateFirstAttack(_float fTimeD
     }
 
     // 1. Sound 설정.
-    if (!m_bFirstPlaySound && fCurrentRatio > m_fFirstAttackSound)
+    if (!m_IsFirstPlaySound && fCurrentRatio > m_fFirstAttackSound)
     {
-        m_bFirstPlaySound = true;
+        m_IsFirstPlaySound = true;
         m_pOwner->Play_Sound(CGiant_WhiteDevil::GIANT_ATTACK_SOUND);
     }
 
@@ -96,9 +96,9 @@ BT_RESULT CBT_GiantWhiteDevil_ComboAttackAction::UpdateSecondAttack(_float fTime
     _float fCurrentRatio = m_pOwner->Get_CurrentAnimationRatio();
 
     // 1. Sound 설정.
-    if (!m_bSecondPlaySound && fCurrentRatio > m_fSecondAttackSound)
+    if (!m_IsSecondPlaySound && fCurrentRatio > m_fSecondAttackSound)
     {
-        m_bSecondPlaySound = true;
+        m_IsSecondPlaySound = true;
         m_pOwner->Play_Sound(CGiant_WhiteDevil::GIANT_ATTACK_SOUND);
     }
 

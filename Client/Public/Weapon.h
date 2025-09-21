@@ -44,7 +44,7 @@ protected:
 	// 스윙 방향 계산을 위한 변수들
 	_vector m_vPreviousPosition = XMVectorSet(0.f, 0.f, 0.f, 1.f);  // 이전 프레임 위치
 	_vector m_vSwingDirection = XMVectorSet(1.f, 0.f, 0.f, 0.f);    // 스윙 방향
-	_bool m_bFirstFrame = true;  // 첫 프레임 여부
+	_bool m_IsFirstFrame = true;  // 첫 프레임 여부
 #pragma endregion
 
 
@@ -89,13 +89,13 @@ public:
 #pragma region 2. Rendering 설정
 
 public:
-	void Set_Visible(_bool isVisible) { m_bVisible = isVisible; }
-	_bool Is_Visible() { return m_bVisible; }
+	void Set_Visible(_bool isVisible) { m_IsVisible = isVisible; }
+	_bool Is_Visible() { return m_IsVisible; }
 
 
 
 protected:
-	_bool m_bVisible = { true };
+	_bool m_IsVisible = { true };
 	
 
 
@@ -112,10 +112,10 @@ public:
 #pragma region 4. TRAIL 설정.
 
 public:
-	void Set_Trail(_bool isTrail) { m_bTrail = isTrail;  }
+	void Set_Trail(_bool isTrail) { m_IsTrail = isTrail;  }
 
 protected:
-	_bool m_bTrail = { false };
+	_bool m_IsTrail = { false };
 #pragma endregion
 
 #pragma region 5. DISSOLVE 처리
@@ -127,8 +127,8 @@ public:
 	void End_Dissolve();
 
 protected:
-	_bool m_bDissolve = { false };
-	_bool m_bReverseDissolve = { false };
+	_bool m_IsDissolve = { false };
+	_bool m_IsReverseDissolve = { false };
 	class CTexture* m_pDissolveTexture = { nullptr };
 	_uint m_iShaderPath = {};
 	_float m_fCurDissolveTime = {};

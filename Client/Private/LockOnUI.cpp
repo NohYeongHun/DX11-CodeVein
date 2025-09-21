@@ -75,14 +75,14 @@ HRESULT CLockOnUI::Initialize_Clone(void* pArg)
 
 void CLockOnUI::Priority_Update(_float fTimeDelta)
 {
-    if (!m_bActive || !m_pTarget)
+    if (!m_IsActive || !m_pTarget)
         return;
 
 }
 
 void CLockOnUI::Update(_float fTimeDelta)
 {
-    if (!m_bActive || !m_pTarget)
+    if (!m_IsActive || !m_pTarget)
         return;
 
     m_fAnimationTime += fTimeDelta;
@@ -93,7 +93,7 @@ void CLockOnUI::Update(_float fTimeDelta)
 
 void CLockOnUI::Late_Update(_float fTimeDelta)
 {
-    if (!m_bActive || !m_pTarget)
+    if (!m_IsActive || !m_pTarget)
         return;
 
     // UI 렌더 그룹에 추가
@@ -103,7 +103,7 @@ void CLockOnUI::Late_Update(_float fTimeDelta)
 
 HRESULT CLockOnUI::Render()
 {
-    if (!m_bActive || !m_pTarget)
+    if (!m_IsActive || !m_pTarget)
     {
         // Active, Target도 아닌데 Render되고 있다면 문제가 있음.
         CRASH("Failed Render LockOnUI");
@@ -144,14 +144,14 @@ HRESULT CLockOnUI::Render()
 void CLockOnUI::Set_Target(CMonster* pTarget)
 {
     m_pTarget = pTarget;
-    m_bActive = (pTarget != nullptr);
+    m_IsActive = (pTarget != nullptr);
     m_fAnimationTime = 0.0f; // 애니메이션 초기화
 }
 
 void CLockOnUI::Clear_Target()
 {
     m_pTarget = nullptr;
-    m_bActive = false;
+    m_IsActive = false;
 }
 
 

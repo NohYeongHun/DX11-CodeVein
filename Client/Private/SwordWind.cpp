@@ -185,7 +185,7 @@ void CSwordWind::OnActivate(void* pArg)
 	m_ActivateDesc = *pDesc;
 	Reset_Timer();
 
-	m_bIsGrowing = true;
+	m_IsGrowing = true;
 	m_fGrowDuration = pDesc->fGrowDuration;
 	m_fStayDuration = pDesc->fStayDuration;
 	m_fDecreaseDuration = pDesc->fDecreaseDuration;
@@ -277,7 +277,7 @@ void CSwordWind::Shape_Control(_float fTimeDelta)
 
 	_float3 vScale = m_pTransformCom->Get_Scale();
 
-	if (!m_bIsGrowing)
+	if (!m_IsGrowing)
 		return;
 
 	

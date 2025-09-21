@@ -3244,9 +3244,9 @@ static void DemoWindowWidgetsSelectionAndMultiSelect(ImGuiDemoWindowData* demo_d
 
                 while (!use_clipper || clipper.Step())
                 {
-                    const int item_begin = use_clipper ? clipper.DisplayStart : 0;
+                    const int item_Isegin = use_clipper ? clipper.DisplayStart : 0;
                     const int item_end = use_clipper ? clipper.DisplayEnd : items.Size;
-                    for (int n = item_begin; n < item_end; n++)
+                    for (int n = item_Isegin; n < item_end; n++)
                     {
                         if (show_in_table)
                             ImGui::TableNextColumn();
@@ -4911,14 +4911,14 @@ static void DemoWindowLayout()
             // If you want to create your own time line for a real application you may be better off manipulating
             // the cursor position yourself, aka using SetCursorPos/SetCursorScreenPos to position the widgets
             // yourself. You may also want to use the lower-level ImDrawList API.
-            int num_buttons = 10 + ((line & 1) ? line * 9 : line * 3);
-            for (int n = 0; n < num_buttons; n++)
+            int num_Isuttons = 10 + ((line & 1) ? line * 9 : line * 3);
+            for (int n = 0; n < num_Isuttons; n++)
             {
                 if (n > 0) ImGui::SameLine();
                 ImGui::PushID(n + line * 1000);
-                char num_buf[16];
-                sprintf(num_buf, "%d", n);
-                const char* label = (!(n % 15)) ? "FizzBuzz" : (!(n % 3)) ? "Fizz" : (!(n % 5)) ? "Buzz" : num_buf;
+                char num_Isuf[16];
+                sprintf(num_Isuf, "%d", n);
+                const char* label = (!(n % 15)) ? "FizzBuzz" : (!(n % 3)) ? "Fizz" : (!(n % 5)) ? "Buzz" : num_Isuf;
                 float hue = n * 0.05f;
                 ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4)ImColor::HSV(hue, 0.6f, 0.6f));
                 ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4)ImColor::HSV(hue, 0.7f, 0.7f));

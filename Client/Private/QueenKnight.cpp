@@ -134,7 +134,7 @@ void CQueenKnight::Update(_float fTimeDelta)
         m_isBgm = false; 
         m_pGameInstance->StopBGM();
 
-        AddBuff(QUEEN_BUFF_DASH_ATTACK_COOLDOWN);
+        //AddBuff(QUEEN_BUFF_DASH_ATTACK_COOLDOWN);
         AddBuff(QUEEN_BUFF_DOWN_TRIPLE_STRIKE_COOLDOWN);
         m_pGameInstance->PlayBGM(L"BossStage.mp3", 0.2f, true);
     }
@@ -306,6 +306,8 @@ void CQueenKnight::Update_AI(_float fTimeDelta)
         m_fCurDissolveTime = 0.f; // 버프가 사라지면서 잔여값이 남아서 Texture Reverse Dissolve가 모두 동작하지 않음.
     
 
+    
+
     /* 콜라이더 활성화 구간 확인 */
     CMonster::Handle_Collider_State();
     /* Trail 활성화 구간 확인. */
@@ -314,6 +316,13 @@ void CQueenKnight::Update_AI(_float fTimeDelta)
     if (true == m_pModelCom->Play_Animation(fTimeDelta))
     {
 
+    }
+
+    _float fCurrentRatio = m_pModelCom->Get_Current_Ratio();
+    if (m_IsWeaponSound && fCurrentRatio >= m_fNormalAttackSoundFrame)
+    {
+        m_IsWeaponSound = false;
+        Play_Sound(SOUND_ATTACK);
     }
 }
 
@@ -328,7 +337,19 @@ void CQueenKnight::Play_Sound(_uint iSoundFlag)
         m_pGameInstance->PlaySoundEffect(L"WarpEnd.wav", 0.3f);
         break;
     case SOUND_WARP_ATTACK:
-        m_pGameInstance->PlaySoundEffect(L"Jump_Attack.wav", 0.3f);
+        m_pGameInstance->PlaySoundEffect(L"Jump_Attack.wav", 0.2f);
+        break;
+    case SOUND_ATTACK:
+        m_pGameInstance->PlaySoundEffect(L"Swing1.wav", 0.3f);
+        break;
+    case SOUND_CHOP:
+        m_pGameInstance->PlaySoundEffect(L"Swing0.wav", 0.3f);
+        break;
+    case SOUND_DODGE:
+        m_pGameInstance->PlaySoundEffect(L"Swing4.wav", 0.3f);
+        break;
+    case SOUND_DASH:
+        m_pGameInstance->PlaySoundEffect(L"DashSound.mp3", 0.3f);
         break;
     default:
         break;
@@ -339,7 +360,7 @@ void CQueenKnight::PlayWeaponSound()
 {
 
     m_IsWeaponSound = true;
-    m_pGameInstance->PlaySoundEffect(L"Swing0.wav", 0.3f);
+    
 }
 #pragma endregion
 
@@ -523,8 +544,11 @@ HRESULT CQueenKnight::InitializeAction_ToAnimationMap()
 
 #pragma region COllider 활성화 프레임 관리
     // 100 ~ 136 Frame 활성화
-    Add_Collider_Frame(m_Action_AnimMap[TEXT("DASH_ATTACK_START")], 100.f / 136.f, 136.f / 136.f, PART_WEAPON);     // Dash Attack
+    //Add_Collider_Frame(m_Action_AnimMap[TEXT("DASH_ATTACK_START")], 100.f / 136.f, 136.f / 136.f, PART_WEAPON);     // Dash Attack
+    //Add_Collider_Frame(m_Action_AnimMap[TEXT("DASH_ATTACK_END")], 0.f / 130.f, 100.f / 130.f, PART_WEAPON);     // Dash Attack
+    Add_Collider_Frame(m_Action_AnimMap[TEXT("DASH_ATTACK_START")], 100.f / 246.f, 136.f / 136.f, PART_WEAPON);     // Dash Attack
     Add_Collider_Frame(m_Action_AnimMap[TEXT("DASH_ATTACK_END")], 0.f / 130.f, 100.f / 130.f, PART_WEAPON);     // Dash Attack
+    
 
 
     Add_Collider_Frame(m_Action_AnimMap[TEXT("WARP_END")], 20.f / 137.f, 45.f / 137.f, PART_WEAPON);     // Dash Attack
@@ -532,6 +556,7 @@ HRESULT CQueenKnight::InitializeAction_ToAnimationMap()
     //Add_Collider_Frame(m_Action_AnimMap[TEXT("DOWN_STRIKE")], 60.f / 224.f, 85.f / 224.f, PART_WEAPON);     // Dash Attack
     
     Add_Collider_Frame(m_Action_AnimMap[TEXT("ATTACK")], 54.f / 194.f, 75.f / 194.f, PART_WEAPON);       // Weapon attack
+    m_fNormalAttackSoundFrame = 60.f / 194.f;
 
     Add_Collider_Frame(m_Action_AnimMap[TEXT("PHASE_ATTACK1")], 54.f / 194.f, 75.f / 194.f, PART_WEAPON);// Weapon attack
     Add_Collider_Frame(m_Action_AnimMap[TEXT("PHASE_ATTACK2")], 40.f / 241.f, 60.f / 241.f, PART_WEAPON);// Weapon attack
@@ -731,10 +756,10 @@ HRESULT CQueenKnight::Initailize_UI()
 
 void CQueenKnight::Set_Visible(_bool bVisible)
 {
-    m_bVisible = bVisible;
+    m_IsVisible = bVisible;
 
-    m_pWeapon->Set_Visible(m_bVisible);
-    m_pShield->Set_Visible(m_bVisible);
+    m_pWeapon->Set_Visible(m_IsVisible);
+    m_pShield->Set_Visible(m_IsVisible);
 }
 
 
@@ -806,7 +831,7 @@ void CQueenKnight::Create_QueenKnightWarp_Effect(_float3 vDir)
 // Pillar 시작 시.
 void CQueenKnight::Start_PillarSkill()
 {
-    m_bIsSkillActive = true;
+    m_IsSkillActive = true;
     m_fSkillElapsedTime = 0.f; // 타이머 리셋
     XMStoreFloat3(&m_vSkillCenterPos, m_pTransformCom->Get_State(STATE::POSITION)); // 스킬 중심 위치 저장
     std::fill(m_vecIsPillarActivated.begin(), m_vecIsPillarActivated.end(), false);
@@ -832,7 +857,7 @@ void CQueenKnight::Start_PillarSkill()
 void CQueenKnight::Update_BloodPillar(_float fTimeDelta)
 {
 
-    if (!m_bIsSkillActive)
+    if (!m_IsSkillActive)
         return;
 
     m_fSkillElapsedTime += fTimeDelta;
@@ -869,7 +894,7 @@ void CQueenKnight::Update_BloodPillar(_float fTimeDelta)
 
     if (m_fSkillElapsedTime >= m_fMaxSkillDuration)
     {
-        m_bIsSkillActive = false;
+        m_IsSkillActive = false;
     }
 }
 

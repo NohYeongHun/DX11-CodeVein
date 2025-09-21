@@ -77,9 +77,9 @@ void CPlayer_AttackState::Enter(void* pArg)
 
 
 	// 방향 제어 관련 초기화
-	m_bCanChangeDirection = true;
+	m_IsCanChangeDirection = true;
 	m_fCurrentLockTime = 0.0f;
-	m_bIsDirectionLocked = false;
+	m_IsDirectionLocked = false;
 
 	// 락온 중이면 타겟을 향해 즉시 회전
 	if (m_pPlayer->Is_LockOn() && m_pPlayer->Has_LockOn_Target())
@@ -157,7 +157,7 @@ void CPlayer_AttackState::Exit()
 		m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, false);
 	}
 
-	m_bSoundPlayed = false;
+	m_IsSoundPlayed = false;
 	
 	
 }
@@ -256,40 +256,40 @@ void CPlayer_AttackState::Update_Sound(_float fTimeDelta)
 	_float fCurrentRatio = m_pModelCom->Get_Current_Ratio();
 
 	// Attack 1인경우.
-	if (!m_bSoundPlayed && m_iCurAnimIdx == m_pPlayer->Find_AnimationIndex(TEXT("ATTACK1")))
+	if (!m_IsSoundPlayed && m_iCurAnimIdx == m_pPlayer->Find_AnimationIndex(TEXT("ATTACK1")))
 	{
 		if (fCurrentRatio > m_fAttackFirst)
 		{
 			m_strSoundFile = L"PlayerAttack.mp3";
 			m_pGameInstance->PlaySoundEffect(m_strSoundFile, 0.3f);
-			m_bSoundPlayed = true;
+			m_IsSoundPlayed = true;
 		}
 	}
-	else if (!m_bSoundPlayed && m_iCurAnimIdx == m_pPlayer->Find_AnimationIndex(TEXT("ATTACK2")))
+	else if (!m_IsSoundPlayed && m_iCurAnimIdx == m_pPlayer->Find_AnimationIndex(TEXT("ATTACK2")))
 	{
 		if (fCurrentRatio > m_fAttackSecond)
 		{
 			m_strSoundFile = L"PlayerAttack.mp3";
 			m_pGameInstance->PlaySoundEffect(m_strSoundFile, 0.3f);
-			m_bSoundPlayed = true;
+			m_IsSoundPlayed = true;
 		}
 	}
-	else if (!m_bSoundPlayed && m_iCurAnimIdx == m_pPlayer->Find_AnimationIndex(TEXT("ATTACK3")))
+	else if (!m_IsSoundPlayed && m_iCurAnimIdx == m_pPlayer->Find_AnimationIndex(TEXT("ATTACK3")))
 	{
 		if (fCurrentRatio > m_fAttackThird)
 		{
 			m_strSoundFile = L"PlayerAttack.mp3";
 			m_pGameInstance->PlaySoundEffect(m_strSoundFile, 0.3f);
-			m_bSoundPlayed = true;
+			m_IsSoundPlayed = true;
 		}
 	}
-	else if (!m_bSoundPlayed && m_iCurAnimIdx == m_pPlayer->Find_AnimationIndex(TEXT("ATTACK4")))
+	else if (!m_IsSoundPlayed && m_iCurAnimIdx == m_pPlayer->Find_AnimationIndex(TEXT("ATTACK4")))
 	{
 		if (fCurrentRatio > m_fAttackFourth)
 		{
 			m_strSoundFile = L"PlayerAttack.mp3";
 			m_pGameInstance->PlaySoundEffect(m_strSoundFile, 0.3f);
-			m_bSoundPlayed = true;
+			m_IsSoundPlayed = true;
 		}
 	}
 	
@@ -297,7 +297,7 @@ void CPlayer_AttackState::Update_Sound(_float fTimeDelta)
 	// 애니메이션 리셋 시 플래그 초기화
 	if (fCurrentRatio < 0.1f)
 	{
-		m_bSoundPlayed = false;
+		m_IsSoundPlayed = false;
 	}
 }
 

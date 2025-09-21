@@ -137,10 +137,10 @@ protected:
 
 protected:
 	// 새로운 멤버 변수 추가
-	_bool m_bCanChangeDirection = true;     // 방향 변경 가능 여부
+	_bool m_IsCanChangeDirection = true;     // 방향 변경 가능 여부
 	_float m_fDirectionLockTime = 0.3f;     // 방향 고정 시간 (초)
 	_float m_fCurrentLockTime = 0.0f;       // 현재 경과 시간
-	_bool m_bIsDirectionLocked = false;     // 방향이 고정되었는지 여부
+	_bool m_IsDirectionLocked = false;     // 방향이 고정되었는지 여부
 #pragma endregion
 
 
@@ -158,7 +158,7 @@ protected:
 	uint16_t m_KeyInput = {};
 	_float4 m_vMoveDir = {};
 	_bool m_LockOn = {}; // LockOn
-	_bool m_bFirstFrame = false;
+	_bool m_IsFirstFrame = false;
 	ACTORDIR	  m_eDir = { ACTORDIR::END };
 	_bool  m_isLoop = { true };
 

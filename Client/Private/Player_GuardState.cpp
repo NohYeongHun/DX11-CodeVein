@@ -29,9 +29,9 @@ void CPlayer_GuardState::Enter(void* pArg)
 	m_pModelCom->Set_RootMotionTranslate(false);
 
 	// 방향 제어 관련 초기화
-	m_bCanChangeDirection = true;
+	m_IsCanChangeDirection = true;
 	m_fCurrentLockTime = 0.0f;
-	m_bIsDirectionLocked = false;
+	m_IsDirectionLocked = false;
 }
 
 /* State 실행 */

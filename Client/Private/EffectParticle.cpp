@@ -502,18 +502,18 @@ void CEffectParticle::Set_SpawnSettings(_float fInterval, _uint iCount, _bool bC
 {
     m_fSpawnInterval = fInterval;
     m_iSpawnCount = iCount;
-    m_bContinuousSpawn = bContinuous;
+    m_IsContinuousSpawn = bContinuous;
 }
 
 void CEffectParticle::Start_ContinuousSpawn()
 {
-    m_bContinuousSpawn = true;
+    m_IsContinuousSpawn = true;
     m_fSpawnTimer = 0.0f;
 }
 
 void CEffectParticle::Stop_ContinuousSpawn()
 {
-    m_bContinuousSpawn = false;
+    m_IsContinuousSpawn = false;
     m_fSpawnTimer = 0.0f;
 }
 
@@ -536,7 +536,7 @@ void CEffectParticle::OnActivate(void* pArg)
     Reset_Timer(); // 타이머 초기화
     m_fSpawnTimer = 0.0f; // 스폰 타이머도 초기화
 
-    m_bContinuousSpawn = pDesc->IsSpawn;
+    m_IsContinuousSpawn = pDesc->IsSpawn;
     m_fSpawnInterval = pDesc->fSpawnInterval;
     m_iSpawnCount = pDesc->iSpawnCount;
     m_fChaseTime = pDesc->fChaseTime;

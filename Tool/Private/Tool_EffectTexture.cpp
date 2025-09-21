@@ -122,7 +122,7 @@ HRESULT CTool_EffectTexture::Render()
 void CTool_EffectTexture::Initialize_Transform()
 {
     // 이미 계산되었다면 다시 계산하지 않음
-    if (m_bDirectionCalculated)
+    if (m_IsDirectionCalculated)
         return;
 
     // 1. 카메라 위치 가져오기
@@ -157,7 +157,7 @@ void CTool_EffectTexture::Initialize_Transform()
     m_pTransformCom->Set_Scale({ m_vScale.x, m_vScale.y, m_vScale.z });
 
     // 7. 계산 완료 플래그 설정
-    m_bDirectionCalculated = true;
+    m_IsDirectionCalculated = true;
 }
 
 HRESULT CTool_EffectTexture::Bind_ShaderResources()

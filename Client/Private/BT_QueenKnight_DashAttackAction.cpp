@@ -23,22 +23,18 @@ BT_RESULT CBT_QueenKnight_DashAttackAction::Perform_Action(_float fTimeDelta)
     case ATTACK_PHASE::LAST_ATTACK:
         return Update_LastAttack(fTimeDelta);
     case ATTACK_PHASE::COMPLETED:
+    {
+        m_IsDodgeSoundPlay = false;
+        m_IsDashSoundPlay = false;
         return Complete(fTimeDelta);
+    }
+        
     }
     return BT_RESULT::FAILURE;
 }
 
 void CBT_QueenKnight_DashAttackAction::Reset()
 {
-    /* 콜라이더 원본 크기로 되돌리기. */
-    //if (m_IsColliderChange)
-    //{
-    //    CCollider* pColliderCom = dynamic_cast<CCollider*>(m_pOwner->Get_Component(L"Com_Collider"));
-    //    CBounding_OBB::BOUNDING_OBB_DESC Desc{};
-    //    Desc = *m_OriginDesc;
-    //    pColliderCom->Change_BoundingDesc(&Desc);
-    //    m_IsColliderChange = false;
-    //}
 
     /* 원본 크기로 되돌리기. */
     m_pOwner->WeaponOBB_ChangeExtents(m_pOwner->Get_WeaponOBBExtents());
@@ -53,6 +49,10 @@ void CBT_QueenKnight_DashAttackAction::Reset()
 
     m_pOwner->Enable_Collider(CQueenKnight::PART_BODY);
     m_pOwner->Disable_Collider(CQueenKnight::PART_WEAPON);
+
+    m_IsDodgeSoundPlay = false;
+    m_IsDashSoundPlay = false;
+
 
 }
 
@@ -113,6 +113,12 @@ BT_RESULT CBT_QueenKnight_DashAttackAction::Update_Rotating(_float fTimeDelta)
             // 1. 공격 애니메이션 선택
             _uint iNextAnimationIdx = m_pOwner->Find_AnimationIndex(L"DASH_ATTACK_START");
 
+            if (!m_IsDashSoundPlay)
+            {
+                m_IsDashSoundPlay = true;
+                m_pOwner->Play_Sound(CQueenKnight::SOUND_DASH);
+            }
+
             m_pOwner->Change_Animation_Blend(iNextAnimationIdx, false, 0.2f, true, true, true);
 
             // 2. 콜라이더 상태 초기화
@@ -145,6 +151,14 @@ BT_RESULT CBT_QueenKnight_DashAttackAction::Update_Dodge(_float fTimeDelta)
         m_IsChangeSpeed = true;
     }
 
+    _float fCurrentRatio = m_pOwner->Get_CurrentAnimationRatio();
+    if (!m_IsDodgeSoundPlay && fCurrentRatio > m_fDodgeSoundFrame)
+    {
+        m_IsDodgeSoundPlay = true;
+        m_pOwner->Play_Sound(CQueenKnight::SOUND_DODGE);
+    }
+
+
     if (m_pOwner->Is_Animation_Finished())
     {
         m_eAttackPhase = ATTACK_PHASE::FIRST_ATTACK;
@@ -156,6 +170,11 @@ BT_RESULT CBT_QueenKnight_DashAttackAction::Update_Dodge(_float fTimeDelta)
 
         m_pOwner->Change_Animation_Blend(iNextAnimationIdx, false, 0.2f, true, true, true);
 
+        if (!m_IsDashSoundPlay)
+        {
+            m_IsDashSoundPlay = true;
+            m_pOwner->Play_Sound(CQueenKnight::SOUND_DASH);
+        }
 
         // 2. 콜라이더 상태 초기화
         m_pOwner->Reset_Collider_ActiveInfo();
@@ -207,7 +226,14 @@ BT_RESULT CBT_QueenKnight_DashAttackAction::Update_FirstAttack(_float fTimeDelta
 
         _vector vLook = XMVector3Normalize(m_pOwner->Get_Transform()->Get_State(STATE::LOOK));
         m_pOwner->Move_Direction(vLook, fTimeDelta * 1.7f); // 완료 시점만 속도를 빠르게.
+
+
+       
     }
+
+    //_float fCurrentRatio = m_pOwner->Get_CurrentAnimationRatio();
+    
+
 
     if (m_pOwner->Is_Animation_Finished() && m_fDashTime <= 0.f)
     {

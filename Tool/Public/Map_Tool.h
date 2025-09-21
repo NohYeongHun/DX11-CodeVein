@@ -107,7 +107,7 @@ public:
 
 private:
 	class CNavigationManager* m_pNavigation_Manager = { nullptr };
-	_bool m_bNaviPicking = { false }; // Navigation Picking 여부.
+	_bool m_IsNaviPicking = { false }; // Navigation Picking 여부.
 	_float3 m_fClickPoint = {};
 
 private:
@@ -237,12 +237,12 @@ private:
 	SAVEMODE m_eSaveMode = {};
 
 	_float m_fEditorAlpha = { 1.f};
-	_bool m_bSave = {};
-	_bool m_bLoad = {};
-	_bool m_bShowSimpleMousePos = {};
-	_bool m_bShowPickedObject = {};
+	_bool m_IsSave = {};
+	_bool m_IsLoad = {};
+	_bool m_IsShowSimpleMousePos = {};
+	_bool m_IsShowPickedObject = {};
 
-	_bool m_bShowOnlyNavi = {};
+	_bool m_IsShowOnlyNavi = {};
 
 
 private:

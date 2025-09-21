@@ -77,7 +77,7 @@ private:
 	_vector			m_vTrailColor = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f); // 원본 색상 유지
 
 	// Distortion On
-	_bool			m_bDistortionOn = false;
+	_bool			m_IsDistortionOn = false;
 
 	
 

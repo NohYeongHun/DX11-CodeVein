@@ -3187,13 +3187,13 @@ void ImGuiListClipper::End()
     ItemsCount = -1;
 }
 
-void ImGuiListClipper::IncludeItemsByIndex(int item_begin, int item_end)
+void ImGuiListClipper::IncludeItemsByIndex(int item_Isegin, int item_end)
 {
     ImGuiListClipperData* data = (ImGuiListClipperData*)TempData;
     IM_ASSERT(DisplayStart < 0); // Only allowed after Begin() and if there has not been a specified range yet.
-    IM_ASSERT(item_begin <= item_end);
-    if (item_begin < item_end)
-        data->Ranges.push_back(ImGuiListClipperRange::FromIndices(item_begin, item_end));
+    IM_ASSERT(item_Isegin <= item_end);
+    if (item_Isegin < item_end)
+        data->Ranges.push_back(ImGuiListClipperRange::FromIndices(item_Isegin, item_end));
 }
 
 // This is already called while stepping.
@@ -5742,18 +5742,18 @@ static void ImGui::RenderDimmedBackgrounds()
     ImGuiWindow* modal_window = GetTopMostAndVisiblePopupModal();
     if (g.DimBgRatio <= 0.0f && g.NavWindowingHighlightAlpha <= 0.0f)
         return;
-    const bool dim_bg_for_modal = (modal_window != NULL);
-    const bool dim_bg_for_window_list = (g.NavWindowingTargetAnim != NULL && g.NavWindowingTargetAnim->Active);
-    if (!dim_bg_for_modal && !dim_bg_for_window_list)
+    const bool dim_Isg_for_modal = (modal_window != NULL);
+    const bool dim_Isg_for_window_list = (g.NavWindowingTargetAnim != NULL && g.NavWindowingTargetAnim->Active);
+    if (!dim_Isg_for_modal && !dim_Isg_for_window_list)
         return;
 
-    if (dim_bg_for_modal)
+    if (dim_Isg_for_modal)
     {
         // Draw dimming behind modal or a begin stack child, whichever comes first in draw order.
-        ImGuiWindow* dim_behind_window = FindBottomMostVisibleWindowWithinBeginStack(modal_window);
-        RenderDimmedBackgroundBehindWindow(dim_behind_window, GetColorU32(modal_window->DC.ModalDimBgColor, g.DimBgRatio));
+        ImGuiWindow* dim_Isehind_window = FindBottomMostVisibleWindowWithinBeginStack(modal_window);
+        RenderDimmedBackgroundBehindWindow(dim_Isehind_window, GetColorU32(modal_window->DC.ModalDimBgColor, g.DimBgRatio));
     }
-    else if (dim_bg_for_window_list)
+    else if (dim_Isg_for_window_list)
     {
         // Draw dimming behind CTRL+Tab target window and behind CTRL+Tab UI window
         RenderDimmedBackgroundBehindWindow(g.NavWindowingTargetAnim, GetColorU32(ImGuiCol_NavWindowingDimBg, g.DimBgRatio));

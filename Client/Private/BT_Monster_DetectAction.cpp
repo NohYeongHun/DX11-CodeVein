@@ -28,7 +28,7 @@ BT_RESULT CBT_Monster_DetectAction::Perform_Action(_float fTimeDelta)
 void CBT_Monster_DetectAction::Reset()
 {
     m_eDetectPhase = DETECT_PHASE::NONE;
-    m_bIsStopped = false; // 상태 초기화
+    m_IsStopped = false; // 상태 초기화
 }
 
 BT_RESULT CBT_Monster_DetectAction::EnterDetect(_float fTimeDelta)
