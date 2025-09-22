@@ -319,6 +319,7 @@ public:
     virtual void PlayWeaponSound() {};
 
 
+
 public:
     /* 콜라이더 제어.*/
     virtual void Enable_Collider(_uint iType) PURE; 
@@ -330,6 +331,10 @@ public:
 
     /* 무기 회전*/
     virtual void Weapon_Rotation(_uint iPartType, _float3 vRadians, _bool bInverse = false) {};
+
+    /* Hit Action*/
+    virtual void Hit_Action() {};
+    virtual void Hit_EndAction() {};
 
 // 특수 조건 : 조우 했는가?
 protected:

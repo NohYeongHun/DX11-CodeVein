@@ -32,6 +32,7 @@ BT_RESULT CBT_Monster_HitAction::EnterHit(_float fTimeDelta)
         CRASH("Failed Tree Hit Enter Logic");
     }
 
+    m_pOwner->Hit_Action();
 
     // 0. 즉시 회전 시키기
     m_pOwner->RotateTurn_ToTarget();
@@ -75,6 +76,8 @@ BT_RESULT CBT_Monster_HitAction::EndHit(_float fTimeDleta)
 
         // 3. 현재 상태에 대한 판단 기준 =>  쿨타임은 유지되게 해야합니다..
         m_pOwner->RemoveBuff(CMonster::BUFF_HIT);
+
+        m_pOwner->Hit_EndAction();
     }
 
     return BT_RESULT::SUCCESS;

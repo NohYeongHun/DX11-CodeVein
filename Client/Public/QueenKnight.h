@@ -145,6 +145,9 @@ public:
 
 	virtual void IncreaseDetection();
 
+	virtual void Hit_Action() override;
+	virtual void Hit_EndAction() override;
+
 
 private:
 	_bool m_IsWeaponSound = { false };

@@ -134,7 +134,7 @@ void CQueenKnight::Update(_float fTimeDelta)
         m_isBgm = false; 
         m_pGameInstance->StopBGM();
 
-        //AddBuff(QUEEN_BUFF_DASH_ATTACK_COOLDOWN);
+        AddBuff(QUEEN_BUFF_DASH_ATTACK_COOLDOWN);
         AddBuff(QUEEN_BUFF_DOWN_TRIPLE_STRIKE_COOLDOWN);
         m_pGameInstance->PlayBGM(L"BossStage.mp3", 0.2f, true);
     }
@@ -702,6 +702,18 @@ void CQueenKnight::Encounter_Action()
 void CQueenKnight::IncreaseDetection()
 {
     m_MonsterStat.fDetectionRange *= 2.f;
+}
+
+void CQueenKnight::Hit_Action()
+{
+    Weapon_Rotation(PART_TYPE::PART_SHIELD
+        , { XMConvertToRadians(180.f), XMConvertToRadians(0.f), XMConvertToRadians(-90.f) }, false);
+}
+
+void CQueenKnight::Hit_EndAction()
+{
+    Weapon_Rotation(PART_TYPE::PART_SHIELD
+        , { XMConvertToRadians(180.f), XMConvertToRadians(0.f), XMConvertToRadians(-90.f) }, true);
 }
 
 #pragma endregion
