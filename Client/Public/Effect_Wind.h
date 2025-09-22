@@ -17,7 +17,7 @@ public:
         _float fDuration = {}; // 모든 성장이 일어나는데 걸리는 총 시간.
         _float3 vStartRotation = {}; // 시작 회전.
 		_float3 vRotationAxis = {}; // 회전 축.
-        const _float4x4* pParentMatrix = { nullptr };
+        const _float4x4* pSocketMatrix = { nullptr };
 		class CTransform* pTargetTransform = { nullptr };
     }EFFECTWIND_ACTIVATE_DESC;
 
@@ -85,7 +85,7 @@ private:
 	
 
     vector<SwordWindEvent> m_vecSwordWindEvents;
-    const _float4x4* m_pParentMatrix = { nullptr };
+    const _float4x4* m_pSocketMatrix = { nullptr };
     class CTransform* m_pTargetTransform = { nullptr };
     _float3 m_vStartPos = {};
     

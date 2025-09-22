@@ -138,6 +138,8 @@ public:
 	void Take_Damage(_float fDamage, class CEffect_Pillar* pEffectPillar);
 
 	LEVEL Get_CurrentLevel() { return m_eCurLevel; }
+
+	const _float4x4* Get_BoneMatrix(string BoneName);
 #pragma endregion
 
 

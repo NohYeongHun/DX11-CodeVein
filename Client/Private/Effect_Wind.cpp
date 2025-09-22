@@ -66,7 +66,7 @@ void CEffect_Wind::Late_Update(_float fTimeDelta)
 HRESULT CEffect_Wind::Render()
 {
 #ifdef _DEBUG
-    ImGui_Render();
+    //ImGui_Render();
 #endif // DEBUG
 
     return S_OK;
@@ -88,7 +88,7 @@ void CEffect_Wind::OnActivate(void* pArg)
     m_vStartRotation = pDesc->vStartRotation;
     m_vRotationAxis = pDesc->vRotationAxis;
     m_pTargetTransform = pDesc->pTargetTransform;
-    m_pParentMatrix = pDesc->pParentMatrix;
+    m_pSocketMatrix = pDesc->pSocketMatrix;
     m_vStartPos = pDesc->vStartPos;
     Reset_Timer();
 
@@ -106,13 +106,15 @@ void CEffect_Wind::OnActivate(void* pArg)
     ActivateDesc.vStartRotation = m_vStartRotation;
     ActivateDesc.vRotationAxis = m_vRotationAxis;
     ActivateDesc.pTargetTransform = pDesc->pTargetTransform;
-    ActivateDesc.pParentMatrix = pDesc->pParentMatrix;
+    ActivateDesc.pSocketMatrix = m_pSocketMatrix;
     ActivateDesc.vStartPos = pDesc->vStartPos;
 
     // 타이밍 조정
-    ActivateDesc.fGrowDuration = 0.1f;    // 0.1초 - 매우 빠른 확장
-    ActivateDesc.fStayDuration = 0.05f;   // 0.05초 - 짧은 유지
-    ActivateDesc.fDecreaseDuration = 0.3f; // 0.3초 - 천천히 퍼지며 사라짐
+    ActivateDesc.fGrowDuration = 1.f;    // 0.1초 - 매우 빠른 확장
+    ActivateDesc.fStayDuration = 1.f;   // 0.05초 - 짧은 유지
+    ActivateDesc.fDecreaseDuration = 1.f; // 0.3초 - 천천히 퍼지며 사라짐
+
+   
 
     // 4개의 검풍을 순차적으로 생성
     for (_uint i = 0; i < m_vecSwordWinds.size(); ++i)
@@ -121,14 +123,8 @@ void CEffect_Wind::OnActivate(void* pArg)
 
         // 매우 짧은 간격으로 순차 생성 (거의 동시에)
         ActivateDesc.fCreateTime = i * 0.02f; // 0.02초 간격
-
         // 같은 크기로 시작, 약간씩 다른 층 형성
-        _float fScaleOffset = 1.0f + i * 0.1f; // 1.0, 1.1, 1.2, 1.3
-        _float3 vScale = {
-            1.0f * fScaleOffset,
-            1.0f * fScaleOffset,
-            0.3f  // Z축은 얇게 (원판 형태)
-        };
+        _float3 vScale = { 1.f, 1.f, 1.f };
         XMStoreFloat3(&ActivateDesc.vStartScale, XMLoadFloat3(&vScale));
 
         m_vecSwordWinds[i]->OnActivate(&ActivateDesc);
@@ -196,7 +192,9 @@ HRESULT CEffect_Wind::Ready_PartObjects()
         WindDesc.fDisplayTime = m_fDuration;
 
         // 기본 크기는 OnActivate에서 설정
-        _float3 vScale = { 1.0f, 1.0f, 1.0f };
+        //_float3 vScale = { 1.0f, 1.0f, 1.0f };
+        _float3 vScale = { 100.0f, 100.0f, 100.0f };
+        
         XMStoreFloat3(&WindDesc.vStartScale, XMLoadFloat3(&vScale));
 
         if (FAILED(CContainerObject::Add_PartObject(strUniqueTag,

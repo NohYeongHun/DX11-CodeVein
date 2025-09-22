@@ -8,9 +8,10 @@ public:
 
 public:
     /* 클론시 전달할 정보들 */
-    typedef struct tagBloodPillarADesc : public CPartObject::GAMEOBJECT_DESC
+    typedef struct tagSwordWindDesc : public CPartObject::GAMEOBJECT_DESC
     {
         class CGameObject* pOwner = { nullptr };
+        
         LEVEL eCurLevel = {}; // 현재 레벨
         MESH_SHADERPATH eShaderPath = { MESH_SHADERPATH::NONE };
         _uint iTextureIndexArray[TEXTURE::TEXTURE_END] = {};
@@ -22,7 +23,7 @@ public:
     typedef struct tagPillarAEnterDesc
     {
         LEVEL eCurLevel = { LEVEL::END };
-        const _float4x4* pParentMatrix = { nullptr }; // 장착할 부모 행렬.
+
         _float3 vColor = {}; // 추가할 컬러.
         _float fEmissiveIntensity = {}; // Emissive 강도
         _float3 vStartPos = {}; // 시작 포지션.
@@ -39,7 +40,8 @@ public:
         _float fCreateTime = {}; // 생성 시간.
 		_uint iMeshIndex = {}; // 몇번째 메시인지.
         
-        CTransform* pTargetTransform = { nullptr };
+        const _float4x4* pSocketMatrix = { nullptr };
+        class CTransform* pTargetTransform = { nullptr };
     }SWORDWIND_ACTIVATE_DESC;
 
 private:
@@ -85,6 +87,7 @@ private:
     _uint m_iTextureIndexArray[TEXTURE_END] = {};
     
     class CTransform* m_pTargetTransform = { nullptr };
+    const _float4x4* m_pSocketMatrix = { nullptr };
 
 
     

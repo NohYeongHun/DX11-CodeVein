@@ -1289,6 +1289,11 @@ void CPlayer::Take_Damage(_float fDamage, CEffect_Pillar* pEffectPillar)
     m_pGameInstance->Set_SlowMoment(0.5f, 0.8f);
 }
 
+const _float4x4* CPlayer::Get_BoneMatrix(string BoneName)
+{
+    return m_pModelCom->Get_BoneMatrix(BoneName.c_str());
+}
+
 
 #pragma endregion
 

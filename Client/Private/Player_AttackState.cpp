@@ -109,21 +109,20 @@ void CPlayer_AttackState::Enter(void* pArg)
 	XMStoreFloat3(&vStartPos, m_pPlayer->Get_Transform()->Get_State(STATE::POSITION));
 
 	//// 2. 검풍 생성 부분 수정
-	//CEffect_Wind::EFFECTWIND_ACTIVATE_DESC WindActivate_Desc{};
-	//WindActivate_Desc.eCurLevel = m_pPlayer->Get_CurrentLevel();
-	//WindActivate_Desc.fDuration = 10.f; // 지속시간,,
-	//
-	//WindActivate_Desc.vStartPos = { 0.f, 0.f, 5.f }; // {오른쪽, 위, 앞}
-	//
-	//WindActivate_Desc.vStartRotation = { 0.f, 0.f, 0.f }; // 각도 단위
-	//
-	//_vector vCamLook = m_pGameInstance->Get_MainCamera()->Get_Transform()->Get_State(STATE::LOOK);
-	//XMStoreFloat3(&WindActivate_Desc.vRotationAxis, XMVector3Normalize(vCamLook));
-	//WindActivate_Desc.pParentMatrix = m_pPlayer->Get_Transform()->Get_WorldMatrixPtr();
-	//WindActivate_Desc.pTargetTransform = m_pPlayer->Get_Transform();
-	//
-	//m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(m_pGameInstance->Get_CurrentLevelID())
-	//	, TEXT("SWORD_WIND"), TEXT("Layer_Effect"), 1, ENUM_CLASS(CEffect_Wind::EffectType), &WindActivate_Desc);
+	CEffect_Wind::EFFECTWIND_ACTIVATE_DESC WindActivate_Desc{};
+	WindActivate_Desc.eCurLevel = m_pPlayer->Get_CurrentLevel();
+	WindActivate_Desc.fDuration = 10.f; // 지속시간,,
+	
+	WindActivate_Desc.vStartPos = { 0.f, 0.f, 0.f }; // {오른쪽, 위, 앞}
+	WindActivate_Desc.vStartRotation = { 0.f, 0.f, 0.f }; // 각도 단위
+	
+	_vector vCamLook = m_pGameInstance->Get_MainCamera()->Get_Transform()->Get_State(STATE::LOOK);
+	XMStoreFloat3(&WindActivate_Desc.vRotationAxis, XMVector3Normalize(vCamLook));
+	WindActivate_Desc.pSocketMatrix = m_pPlayer->Get_BoneMatrix("LeftHornEffectSocket");
+	WindActivate_Desc.pTargetTransform = m_pPlayer->Get_Transform();
+	
+	m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(m_pGameInstance->Get_CurrentLevelID())
+		, TEXT("SWORD_WIND"), TEXT("Layer_Effect"), 1, ENUM_CLASS(CEffect_Wind::EffectType), &WindActivate_Desc);
 
 	
 

@@ -904,7 +904,7 @@ HRESULT CLoader_Static::Add_Prototype_SwordWind_Effects(ID3D11Device* pDevice, I
 	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
 		, TEXT("Prototype_Component_Texture_SwordWindDiffuse")
 		, CTexture::Create(pDevice, pContext
-			, TEXT("../Bin/Resources/Models/EffectMesh/SwordWind/Diffuse/Diffuse%d.png"), 6))))
+			, TEXT("../Bin/Resources/Models/EffectMesh/SwordWind/Diffuse/Diffuse%d.png"), 7))))
 	{
 		CRASH("Failed Load Effect SwordDiffuse Texture");
 		return E_FAIL;
@@ -947,7 +947,7 @@ HRESULT CLoader_Static::Add_Prototype_SwordWind_Effects(ID3D11Device* pDevice, I
 
 	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
 		, TEXT("Prototype_Component_Model_Effect_SwordWind")
-		, CLoad_Model::Create(pDevice, pContext, MODELTYPE::NONANIM, PreTransformMatrix, "../../SaveFile/Model/Effect/SwordWind.dat", L""))))
+		, CLoad_Model::Create(pDevice, pContext, MODELTYPE::NONANIM, PreTransformMatrix, "../../SaveFile/Model/Effect/EffectWind.dat", L""))))
 	{
 		CRASH("Failed Prototype_Component_Model_Effect_SwordWind");
 		return E_FAIL;
