@@ -52,6 +52,13 @@ protected:
 
 
 public:
+	virtual void Play_CutScene(class CTransform* pTransform, const _float4x4* pSocketMatrix) {};
+
+protected:
+	_bool m_IsPlayCutScene = { };
+
+
+public:
 	virtual CGameObject* Clone(void* pArg) PURE;
 	virtual void Free();
 };

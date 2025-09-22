@@ -301,6 +301,20 @@ HRESULT CEffectParticle::Bind_ShaderResources()
         return E_FAIL;
     }
 
+    _float fDissolveRatio = m_fCurrentTime / m_fDisplayTime;
+
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fDissolveRatio", &fDissolveRatio, sizeof(_float))))
+    {
+        CRASH("Failed Bind TimeRatio");
+        return E_FAIL;
+    }
+
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fDissolveWeight", &m_fDissolveWeight, sizeof(_float))))
+    {
+        CRASH("Failed Bind TimeRatio");
+        return E_FAIL;
+    }
+
     // 크기 바인딩.
     _float fScaleRatio = 1.0f - (fTimeRatio * 0.7f);
     if (FAILED(m_pShaderCom->Bind_RawValue("g_fScaleRatio", &fScaleRatio, sizeof(_float))))
@@ -540,6 +554,8 @@ void CEffectParticle::OnActivate(void* pArg)
     m_fSpawnInterval = pDesc->fSpawnInterval;
     m_iSpawnCount = pDesc->iSpawnCount;
     m_fChaseTime = pDesc->fChaseTime;
+
+    m_fDissolveWeight = pDesc->fDissolveWeight;
 
     const PARTICLE_INIT_INFO& particleInit = pDesc->particleInitInfo;
 

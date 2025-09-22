@@ -36,6 +36,7 @@ public:
         _float fSpawnInterval = {};
         _uint  iSpawnCount = {};
         
+        _float fDissolveWeight = { 1.f };
         _float fChaseTime = {};
         PARTICLE_TYPE eParticleType;
 
@@ -176,6 +177,8 @@ private:
     _float m_fEmissiveIntencity = {};
     // 파티클 생성.
     _float m_fChaseTime = {};
+
+    _float m_fDissolveWeight = {};
 
 private:
     HRESULT Bind_ShaderResources();

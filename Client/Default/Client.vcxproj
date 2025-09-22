@@ -208,6 +208,7 @@
     <ClInclude Include="..\Public\Effect_Pillar.h" />
     <ClInclude Include="..\Public\Effect_PlayerSkill.h" />
     <ClInclude Include="..\Public\Effect_Wind.h" />
+    <ClInclude Include="..\Public\Encounter_Title.h" />
     <ClInclude Include="..\Public\Fade_Out.h" />
     <ClInclude Include="..\Public\Giant_WhiteDevil.h" />
     <ClInclude Include="..\public\Giant_WhiteDevilDefine.h" />
@@ -363,6 +364,7 @@
     <ClCompile Include="..\Private\Effect_Pillar.cpp" />
     <ClCompile Include="..\Private\Effect_PlayerSkill.cpp" />
     <ClCompile Include="..\Private\Effect_Wind.cpp" />
+    <ClCompile Include="..\Private\Encounter_Title.cpp" />
     <ClCompile Include="..\Private\Fade_Out.cpp" />
     <ClCompile Include="..\Private\Giant_WhiteDevil.cpp" />
     <ClCompile Include="..\Private\Giant_WhiteDevilTree.cpp" />

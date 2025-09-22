@@ -23,7 +23,10 @@ BT_RESULT CBT_Monster_EncounterAction::Perform_Action(_float fTimeDelta)
     case ENCOUNTER_PHASE::LOOP:
         return Update_Encounter(fTimeDelta);
     case ENCOUNTER_PHASE::COMPLETED:
+    {
         return Complete(fTimeDelta);
+    }
+        
     }
     return BT_RESULT::FAILURE;
 }
@@ -44,7 +47,9 @@ BT_RESULT CBT_Monster_EncounterAction::Enter_Encounter(_float fTimeDelta)
 
     m_eEncounterPhase = ENCOUNTER_PHASE::LOOP;
 
-    m_pOwner->Set_BGM(true);
+    m_pOwner->Encounter_Action();
+
+    
 
     // 0. 회전.
     m_pOwner->RotateTurn_ToTargetYaw();
@@ -79,8 +84,8 @@ BT_RESULT CBT_Monster_EncounterAction::Update_Encounter(_float fTimeDelta)
 BT_RESULT CBT_Monster_EncounterAction::Complete(_float fTimeDleta)
 {
     /* Encounter 시 실행할 Action */
-    m_pOwner->Encounter_Action();
-    
+     m_pOwner->Encounter_EndAction(); // 임시 주석처리
+
     return BT_RESULT::SUCCESS;
 }
 

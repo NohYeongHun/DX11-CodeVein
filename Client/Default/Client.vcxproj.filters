@@ -268,6 +268,9 @@
     <Filter Include="02. GameObject\Effect\Mesh\Player\Skill2">
       <UniqueIdentifier>{0461f832-26ab-494d-9cb6-708d0634bb78}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. GameObject\UI\Logo\BossEncounter">
+      <UniqueIdentifier>{d02f5961-d053-47bc-ad56-4c0ea822a462}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -723,6 +726,9 @@
     <ClInclude Include="..\Public\Effect_BodyAura.h">
       <Filter>02. GameObject\Effect\Mesh\Player\Skill2</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Encounter_Title.h">
+      <Filter>02. GameObject\UI\Logo\BossEncounter</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -1148,6 +1154,9 @@
     </ClCompile>
     <ClCompile Include="..\Private\Effect_BodyAura.cpp">
       <Filter>02. GameObject\Effect\Mesh\Player\Skill2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Encounter_Title.cpp">
+      <Filter>02. GameObject\UI\Logo\BossEncounter</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

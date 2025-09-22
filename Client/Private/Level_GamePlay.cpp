@@ -70,8 +70,10 @@ HRESULT CLevel_GamePlay::Initialize_Clone()
 	m_pGameInstance->Setting_Threshold(0.9f);
 	m_pGameInstance->Setting_Soft(0.2f);
 	
+
+
 	// 한번만 실행.
-	//m_pGameInstance->PlayBGM(L"NormalBgm.wav", 0.4f, true);
+	m_pGameInstance->PlayBGM(L"Environment.wav", 0.3f, true);
 
 	return S_OK;
 }
@@ -100,9 +102,9 @@ HRESULT CLevel_GamePlay::Render()
 
 
 	SHADOW_LIGHT_DESC			ShadowLightDesc{};
-	static float vEye[4] = { -150.f, 250.f, 0.f, 1.f };
-	static float vAt[4] = { -150.f, 250.f, 0.f, 1.f };
-	static float fFovy = { 60.f };
+	static float vEye[4] = { -100.f, 100.f, 100.f, 1.f };
+	static float vAt[4] = { -100.f, 60.f, 0.f, 1.f };
+	static float fFovy = { 45.f };
 	static float fNear = { 100.f };
 	static float fFar = { 1000.f };
 
@@ -229,8 +231,8 @@ HRESULT CLevel_GamePlay::Ready_Layer_Player(const _wstring& strLayerTag)
 	CPlayer::PLAYER_DESC Desc{};
 #pragma region 1. 플레이어에게 넣어줘야할 레벨 별 다른 값들.
 	Desc.eCurLevel = m_eCurLevel;
-	//Desc.vPos = { 270.f, 0.f, 0.f };
-	Desc.vPos = { 40.f, 0.f, 0.f }; // 보스방 바로
+	Desc.vPos = { 270.f, 0.f, 0.f };
+	//Desc.vPos = { 40.f, 0.f, 0.f }; // 보스방 바로
 #pragma endregion
 
 #pragma region 2. 게임에서 계속 들고있어야할 플레이어 값들.
@@ -384,13 +386,13 @@ HRESULT CLevel_GamePlay::Ready_Layer_Monster(const _wstring& strLayerTag)
 	TriggerDesc = { { 250.f , 0.f, 0.f }, 50.f , TEXT("Layer_WolfDevil")
 		, TEXT("Layer_Monster") , 2, 0 };
 	
-	//m_pGameInstance->Add_Trigger(ENUM_CLASS(m_eCurLevel), TriggerDesc);
+	m_pGameInstance->Add_Trigger(ENUM_CLASS(m_eCurLevel), TriggerDesc);
 	
 	// 두 번째 트리거: SlaveVampire
 	TriggerDesc = { { 200.f , 0.f, 0.f }, 50.f , TEXT("Layer_SlaveVampire")
 		, TEXT("Layer_Monster") , 2, 0 };
 	
-	//m_pGameInstance->Add_Trigger(ENUM_CLASS(m_eCurLevel), TriggerDesc);
+	m_pGameInstance->Add_Trigger(ENUM_CLASS(m_eCurLevel), TriggerDesc);
 
 	/* 다 같은 Monster 레이어에 추가하기. */
 	if (FAILED(Ready_Layer_QueenKnight(strLayerTag)))
@@ -519,6 +521,8 @@ HRESULT CLevel_GamePlay::Ready_Layer_QueenKnight(const _wstring& strLayerTag)
 		, TEXT("Layer_Monster") , 1, 2 }; // 이전 2개 트리거 완료 후 발동
 
 	m_pGameInstance->Add_Trigger(ENUM_CLASS(m_eCurLevel), TriggerDesc);
+
+		
 
 	return S_OK;
 }

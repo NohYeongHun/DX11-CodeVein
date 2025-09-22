@@ -70,6 +70,8 @@
 #include "Camera_Free.h"
 #include "Camera_Player.h"
 /* =========================================== Title Object ===================================== */
+
+#include "Encounter_Title.h"
 #include "Title_BackGround.h"
 #include "TitleText.h"
 #include "Title.h"

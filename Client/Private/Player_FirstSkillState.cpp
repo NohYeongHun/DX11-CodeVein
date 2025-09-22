@@ -90,11 +90,7 @@ HRESULT CPlayer_FirstSkillState::Initialize(_uint iStateNum, void* pArg)
 
 #pragma endregion
 
-
-
-
     m_fIncreaseDamage = static_cast<_float>(m_pGameInstance->Rand_UnsignedInt(20.f, 40.f)); // 기본 공격력 증가량 설정
-	//m_fIncreaseDamage = 1000.f; // 기본 공격력 증가량 설정
 
     return S_OK;
 }

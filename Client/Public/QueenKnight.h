@@ -142,11 +142,17 @@ public:
 public:
 	virtual void Weapon_Rotation(_uint iPartType, _float3 vRadians, _bool bInverse = false) override;
 	virtual void Encounter_Action() override;
+	virtual void Encounter_EndAction() override;
 
 	virtual void IncreaseDetection();
 
 	virtual void Hit_Action() override;
 	virtual void Hit_EndAction() override;
+
+
+public:
+	virtual void Play_CutScene() override;
+	virtual void End_CutScene() override;
 
 
 private:
@@ -155,7 +161,7 @@ private:
 
 #pragma endregion
 
-#pragma region 7. 보스몹 체력 UI 관리
+#pragma region 7. 보스몹 체력 및 UI 관리
 public:
 	virtual void Take_Damage(_float fDamage, CGameObject* pGameObject) override;
 
@@ -169,7 +175,11 @@ private:
 
 private:
 	class CBossHpBarUI* m_pBossHpBarUI = { nullptr };
-
+	class CEncounter_Title* m_pEncounterTitle = { nullptr };
+	class CEncounter_Title* m_pDeadTitle = { nullptr };
+	_bool m_IsEncounterRender = { false };
+	_bool m_IsDeadRender = { false };
+	_float m_fEncounterTimer = { 0.f };
 public:
 	
 #pragma endregion
@@ -186,7 +196,6 @@ public:
 	void Create_QueenKnightWarp_Effect_Particle_Spawn(_float3 vDir, _uint iSpawnCount);
 	void Create_QueenKnightWarp_Effect_Particle_Explosion(_float3 vDir);
 	void Create_QueenKnightWarp_Effect(_float3 vDir);
-	void Create_QueenKnightTornado_Effect();
 
 	/* Blood Pillar Event 활성화*/
 	void Start_PillarSkill();
@@ -218,6 +227,7 @@ public:
 	virtual void ReverseStart_Dissolve(_float fDuration = 0.f); // Dissolve 역재생
 	virtual void End_Dissolve();
 
+	virtual void Dead_Effect() override;
 	virtual void Dead_Action() override;
 
 

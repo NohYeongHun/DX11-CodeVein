@@ -50,7 +50,7 @@ BT_RESULT CBT_Monster_DeadAction::EnterDead()
 
     // 4. 죽음 이벤트 처리 (점수, 아이템 드롭 등)
     //HandleDeathEvents();
-    
+    m_pOwner->Dead_Effect();
 
     // 5. 다음 단계로 진행
     m_eDeadPhase = DEAD_PHASE::DYING;
@@ -66,8 +66,9 @@ BT_RESULT CBT_Monster_DeadAction::UpdateDying(_float fTimeDelta)
     if (bIsAnimationEnd && bIsBuffPossible)
     {
         m_eDeadPhase = DEAD_PHASE::CORPSE; // 죽었을때 시체 상태로 변경.
+        // BGM 변경
         m_pOwner->Dead_Action();
-
+        
     }
 
 

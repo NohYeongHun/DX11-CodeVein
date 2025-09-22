@@ -69,10 +69,12 @@ void CCamera_Player::Priority_Update(_float fTimeDelta)
 
 void CCamera_Player::Update(_float fTimeDelta)
 {
+
 	CCamera::Update(fTimeDelta);
 
 	// 1. 마우스 클립 업데이트 => 창 크기를 벗어나지 못하게 함.
 	Update_Mouse_Clip();
+
 
 	// 락온 모드에 따라 카메라 업데이트 방식 선택
 	if (m_IsLockOnMode)

@@ -336,6 +336,11 @@ public:
     virtual void Hit_Action() {};
     virtual void Hit_EndAction() {};
 
+
+    /* Cut Scene*/
+    virtual void Play_CutScene() {};
+    virtual void End_CutScene() {};
+
 // 특수 조건 : 조우 했는가?
 protected:
     _bool m_IsEncountered = { false };
@@ -348,6 +353,9 @@ public:
 
     /* Encounter시 실행해야할 작업. */
     virtual void Encounter_Action() {};
+    virtual void Encounter_EndAction() {};
+
+   
 
 
 #pragma endregion
@@ -367,6 +375,7 @@ public:
 
 
 public:
+    virtual void Dead_Effect() {};
     virtual void Dead_Action();
     virtual void Start_Dissolve(_float fDuration = 0.f) {};
     virtual void ReverseStart_Dissolve(_float fDuration = 0.f) {}; // Dissolve 역재생

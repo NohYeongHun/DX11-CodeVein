@@ -253,14 +253,14 @@ HRESULT CMainApp::Ready_Pooling()
 	// MainApp.cpp의 Ready_Pooling 함수 내부에 추가
 
 	CEffectParticle::EFFECT_PARTICLE_DESC burstDesc{};
-	burstDesc.iNumInstance = 30; // 한 번에 터질 최대 파티클 개수
+	burstDesc.iNumInstance = 50; // 한 번에 터질 최대 파티클 개수
 	burstDesc.eParticleType = CEffectParticle::PARTICLE_TYPE_EXPLOSION; // 
 	burstDesc.iShaderPath = ENUM_CLASS(POINTDIRPARTICLE_SHADERPATH::EXPLOSION); // 셰이더의 QueenKnightWarpPass (PS_DIFFUSE_MASK_MAIN) 사용
 
 	// 파티클의 속도, 크기, 수명 범위를 설정합니다.
 	burstDesc.vSpeed = { 1.f, 3.f };   // 10 ~ 15의 무작위 속도
 	burstDesc.vSize = { 0.05f, 0.2f };  // 0.05 ~ 0.1의 무작위 크기
-	burstDesc.vLifeTime = { 0.5f, 1.f }; // 0.5 ~ 1.0초의 무작위 수명
+	burstDesc.vLifeTime = { 5.f, 10.f }; // 0.5 ~ 1.0초의 무작위 수명
 
 	// 사용할 텍스처를 지정합니다.
 	burstDesc.useTextureCheckArray[TEXTURE::TEXTURE_DIFFUSE] = true; // g_DiffuseTexture
@@ -367,12 +367,12 @@ HRESULT CMainApp::Ready_Pooling()
 	ParticleExplosionDesc.iNumInstance = 450;
 	ParticleExplosionDesc.vCenter = { 0.f, 0.f, 0.f };
 	ParticleExplosionDesc.vRange = { 2.f, 2.f, 2.f };
-	ParticleExplosionDesc.vSpeed = { 10.f, 15.f };
+	ParticleExplosionDesc.vSpeed = { 3.f, 7.f };
 	ParticleExplosionDesc.vSize = { 0.1f, 0.11f };
-	ParticleExplosionDesc.vLifeTime = { 3.f, 6.f };
+	ParticleExplosionDesc.vLifeTime = { 3.f, 10.f };
 	ParticleExplosionDesc.isLoop = false;
 	ParticleExplosionDesc.isBillBoard = true;
-	ParticleExplosionDesc.iSpawnCount = 50;
+	//ParticleExplosionDesc.iSpawnCount = 50;
 	ParticleExplosionDesc.useTextureCheckArray[TEXTURE::TEXTURE_DIFFUSE] = true;
 	ParticleExplosionDesc.useTextureIndexArray[TEXTURE::TEXTURE_DIFFUSE] = 1;
 	ParticleExplosionDesc.useTextureCheckArray[TEXTURE::TEXTURE_MASK] = true;
