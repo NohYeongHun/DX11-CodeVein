@@ -49,31 +49,43 @@ HRESULT CSwordWind::Initialize_Clone(void* pArg)
 	return S_OK;
 }
 
-
 void CSwordWind::Update(_float fTimeDelta)
 {
 	if (!m_IsActivate)
 		return;
 
 	CPartObject::Update(fTimeDelta);
-	m_fTime += fTimeDelta; // 시간은 계속 셰이더로 보내야 합니다.
+	m_fTime += fTimeDelta;
+
+	// ⭐ 상태별 업데이트
+	switch (m_eState)
+	{
+	case STATE_STAY:
+		Update_Stay(fTimeDelta);
+		break;
+	case STATE_MOVE:
+		Update_RotateMove(fTimeDelta);
+		break;
+	case STATE_DECREASE:
+		Update_Decrease(fTimeDelta);
+		break;
+	}
 
 	m_pTransformCom->Update_WorldMatrix();
 
-	/* 소켓에 부착.*/
-	/*_float4x4 finalMatrix;
-	XMStoreFloat4x4(&finalMatrix,
-		m_pTransformCom->Get_WorldMatrix() *
-		XMLoadFloat4x4(m_pSocketMatrix) *
-		m_pTargetTransform->Get_WorldMatrix());*/
-
-	// 최종 위치 확인
-	_float3 finalPos = { m_CombinedWorldMatrix._41, m_CombinedWorldMatrix._42, m_CombinedWorldMatrix._43 };
-	OutputDebugString(L"SwordWind Final Position: ");
-	OutPutDebugFloat3(finalPos);
-	/*XMStoreFloat4x4(&m_CombinedWorldMatrix
-		, m_pTransformCom->Get_WorldMatrix() * XMLoadFloat4x4(m_pSocketMatrix) 
-		* m_pTargetTransform->Get_WorldMatrix());*/
+	// ⭐ 소켓이 있을 때만 업데이트, 없으면 고정
+	if (m_pSocketMatrix && m_pTargetTransform)
+	{
+		XMStoreFloat4x4(&m_CombinedWorldMatrix,
+			m_pTransformCom->Get_WorldMatrix() *
+			XMLoadFloat4x4(m_pSocketMatrix) *
+			m_pTargetTransform->Get_WorldMatrix());
+	}
+	else
+	{
+		XMStoreFloat4x4(&m_CombinedWorldMatrix,
+			m_pTransformCom->Get_WorldMatrix());
+	}
 }
 
 
@@ -167,44 +179,36 @@ void CSwordWind::OnActivate(void* pArg)
 	m_ActivateDesc = *pDesc;
 	Reset_Timer();
 
-	m_IsGrowing = true;
-	m_fGrowDuration = pDesc->fGrowDuration;
+	m_fMoveDuration = pDesc->fMoveDuration;
 	m_fStayDuration = pDesc->fStayDuration;
 	m_fDecreaseDuration = pDesc->fDecreaseDuration;
-	m_vRotation = pDesc->vStartRotation;
-	m_fDisplayTime = m_fGrowDuration + m_fStayDuration + m_fDecreaseDuration;
-	m_vRotationAxis = pDesc->vRotationAxis;
-	m_fRotationSpeed = pDesc->fRotationSpeed;
-	m_fDissolveTime = 0.f;
-	m_fDissolveThreshold = 0.f; // 초기화
+	m_fDisplayTime = m_fMoveDuration + m_fStayDuration + m_fDecreaseDuration;
 
-	m_pSocketMatrix = pDesc->pSocketMatrix;
-	m_pTargetTransform = pDesc->pTargetTransform;
-
-	m_fCreateTime = pDesc->fCreateTime; // 순차적 생성 시간
-	m_vStartScale = pDesc->vStartScale;
-
-
-	// Local Pos만 지정.
+	// ⭐ Transform 정보 초기화
 	m_pTransformCom->Set_State(STATE::POSITION, XMLoadFloat3(&pDesc->vStartPos));
 
-	m_pTransformCom->Set_Scale(pDesc->vStartScale);
+	// ⭐ 카메라를 바라보도록 초기 회전 설정
+	_matrix viewMatrix = XMLoadFloat4x4(m_pGameInstance->Get_Transform_Float4x4(D3DTS::VIEW));
+	_matrix viewInverse = XMMatrixInverse(nullptr, viewMatrix);
+	_vector vCamPos = viewInverse.r[3];
+	_vector vToCamera = XMVector3Normalize(vCamPos - XMLoadFloat3(&pDesc->vStartPos));
+	_float fYaw = atan2f(XMVectorGetX(vToCamera), XMVectorGetZ(vToCamera));
+	m_pTransformCom->Add_Rotation(0.f, fYaw, 0.f); // Y축 회전만 적용
 
+	// ⭐ 크기 설정: 작게 시작해서 목표 크기로 커짐
+	_float3 vInitialScale = { 2.0f, 2.0f, 2.0f };
+	m_pTransformCom->Set_Scale(vInitialScale);
+	m_vStartScale = vInitialScale;
+	m_vTargetScale = pDesc->vStartScale;
 
-	XMStoreFloat4x4(&m_CombinedWorldMatrix,
-		m_pTransformCom->Get_WorldMatrix() * // 자신의 로컬 변환
-		XMLoadFloat4x4(m_pSocketMatrix) * // 소켓의 변환
-		m_pTargetTransform->Get_WorldMatrix()); // 캐릭터의 월드 변환
-
-	// 초기 회전은 유지하되, Update에서는 회전시키지 않음
-	m_pTransformCom->Add_Rotation(
-		XMConvertToRadians(pDesc->vStartRotation.x),
-		XMConvertToRadians(pDesc->vStartRotation.y),
-		XMConvertToRadians(pDesc->vStartRotation.z)
-	);
-
-	m_eState = STATE_GROW;
+	// ⭐ 상태 및 시간 초기화
+	m_eState = STATE_STAY;
+	m_fMoveTime = 0.f;
+	m_fCurrentTime = 0.f;
+	m_fDissolveTime = 0.f;
+	m_fDissolveThreshold = 0.f;
 }
+
 
 
 void CSwordWind::OnDeActivate()
@@ -220,105 +224,113 @@ void CSwordWind::Calc_Timer(_float fTimeDelta)
 	
 }
 
-void CSwordWind::Shape_Control(_float fTimeDelta)
-{
-	//RotateTurn_ToAxis(fTimeDelta);
-
-	m_fCurrentTime += fTimeDelta;
-
-	/*switch (m_eState)
-	{
-	case STATE_GROW:
-		Update_Grow(fTimeDelta);
-		break;
-	case STATE_STAY:
-		Update_Stay(fTimeDelta);
-		break;
-	case STATE_DECREASE:
-		Update_Decrease(fTimeDelta);
-		break;
-	}*/
-
-	_float3 vScale = m_pTransformCom->Get_Scale();
-
-	if (!m_IsGrowing)
-		return;
-
-	
-}
-
-// z가 높이임.
-void CSwordWind::Update_Grow(_float fTimeDelta)
-{
-	_float fRatio = m_fCurrentTime / m_fGrowDuration;
-	m_fGrowTime += fTimeDelta;
-
-}
 
 void CSwordWind::Update_Stay(_float fTimeDelta)
 {
-	// 유지 시간 완료 시, 다음 상태로 전환
+	m_fCurrentTime += fTimeDelta;
+
 	if (m_fCurrentTime >= m_fStayDuration)
 	{
-		m_eState = STATE_DECREASE; // '감소' 상태로 변경
-		m_fCurrentTime = 0.f;     // 타이머 리셋!
+		m_eState = STATE_MOVE;
+		m_fCurrentTime = 0.f;
+		return;
 	}
-	// 이 상태에서는 아무것도 하지 않고 그냥 크기를 유지합니다.
+	// ⭐ 제자리에서 계속 회전
+	m_pTransformCom->Turn(XMVectorSet(0.f, 0.f, 1.f, 0.f), fTimeDelta * 5.f);
 }
 
-void CSwordWind::Update_Decrease(_float fTimeDelta)
+void CSwordWind::Update_RotateMove(_float fTimeDelta)
 {
-	
-	// 감소 완료 시, 종료 상태로 전환
-	if (m_fCurrentTime >= m_fDecreaseDuration)
+	m_fMoveTime += fTimeDelta;
+
+	if (m_fMoveTime >= m_fMoveDuration)
 	{
-		m_eState = STATE_END; // '종료' 상태로 변경
-		// Set_Dead() 같은 함수로 객체를 비활성화하거나 풀에 반납
+		m_eState = STATE_DECREASE;
+		m_fCurrentTime = 0.f;
+		m_pTransformCom->Set_Scale(m_vTargetScale); // 최종 크기로 고정
 		return;
 	}
 
-	m_fDissolveTime += fTimeDelta;
-	_float fRatio = m_fCurrentTime / m_fDecreaseDuration;
+	_float fRatio = m_fMoveTime / m_fMoveDuration;
 
-	fRatio = fRatio * fRatio;
+	// ⭐ 카메라 정보 가져오기
+	_matrix viewMatrix = XMLoadFloat4x4(m_pGameInstance->Get_Transform_Float4x4(D3DTS::VIEW));
+	_matrix viewInverse = XMMatrixInverse(nullptr, viewMatrix);
+	_vector vCamPos = viewInverse.r[3];
+	_vector vCamLook = XMVector3Normalize(viewInverse.r[2]);
 
-	
+	// ⭐ 이동: 시작 위치(타격점)에서 카메라 앞으로 이동
+	_vector vStartPos = XMLoadFloat3(&m_ActivateDesc.vStartPos);
+	_float fTargetDistance = 5.0f; // 카메라와 최종 거리
+	_vector vTargetPos = vCamPos + (vCamLook * fTargetDistance);
+	_vector vCurrentPos = XMVectorLerp(vStartPos, vTargetPos, fRatio);
+	m_pTransformCom->Set_State(STATE::POSITION, vCurrentPos);
+
+	// ⭐ 회전: Z축을 기준으로 회전 => 여기가 아니라. 
+	m_pTransformCom->Turn(XMVectorSet(0.f, 0.f, 1.f, 0.f), fTimeDelta * 5.f);
+
+	// ⭐ 크기: 시작 크기에서 목표 크기로 점진적으로 증가
+	_float3 vCurrentScale;
+	_float fScaleRatio = 1.f - powf(1.f - fRatio, 2.f); // Ease Out 효과
+	XMStoreFloat3(&vCurrentScale, XMVectorLerp(XMLoadFloat3(&m_vStartScale), XMLoadFloat3(&m_vTargetScale), fScaleRatio));
+	m_pTransformCom->Set_Scale(vCurrentScale);
 }
 
 
 
 
-/* Combined 곱하기 전에 실행. => Update*/
-void CSwordWind::RotateTurn_ToAxis(_float fTimeDelta)
+void CSwordWind::Update_Decrease(_float fTimeDelta)
 {
-	if (m_pTransformCom)
+	m_fDissolveTime += fTimeDelta;
+
+	if (m_fDissolveTime >= m_fDecreaseDuration)
 	{
-		// X축으로 -50도 기울어진 객체를 고려한 회전축 계산
-		// 원래 Z축 회전이 되려면, 기울어진 만큼 보정해야 함
-
-		// 방법 1: 월드 공간의 Y축으로 회전 (수직축 회전)
-		_vector vAxis = XMVectorSet(0.f, 1.f, 0.f, 0.f);
-
-		// 방법 2: 기울어진 객체의 로컬 Forward 방향으로 회전
-		// X축 -50도 회전을 고려한 보정된 회전축
-		// _float fTiltAngle = XMConvertToRadians(-50.f);
-		// _vector vAxis = XMVectorSet(sinf(fTiltAngle), cosf(fTiltAngle), 0.f, 0.f);
-
-		// 방법 3: 카메라 기준이 아닌 객체 자체의 로컬 Z축으로 회전
-		// _matrix matLocal = m_pTransformCom->Get_WorldMatrix();
-		// _vector vAxis = XMVector3Normalize(matLocal.r[2]);
-
-		_float fRotationSpeed = XMConvertToRadians(120.f);
-		_float fRotationAngle = fRotationSpeed * fTimeDelta;
-
-		m_pTransformCom->Turn(vAxis, fRotationAngle);
+		m_eState = STATE_END;
+		m_IsActivate = false;
+		return;
 	}
+
+	_float fRatio = m_fDissolveTime / m_fDecreaseDuration;
+
+	// ⭐ 크기가 점차 작아지면서 사라짐
+	_float fScaleRatio = 1.f - (fRatio * fRatio);
+	_float3 vNewScale = {
+		m_vTargetScale.x * fScaleRatio,
+		m_vTargetScale.y * fScaleRatio,
+		m_vTargetScale.z * fScaleRatio
+	};
+	m_pTransformCom->Set_Scale(vNewScale);
+
+	// ⭐ 계속 회전
+	m_pTransformCom->Turn(XMVectorSet(0.f, 0.f, 1.f, 0.f), fTimeDelta * 10.f);
+
+	m_fDissolveThreshold = fRatio; // 셰이더용 Dissolve 값
 }
+
+
+
 
 
 HRESULT CSwordWind::Bind_ShaderResources()
 {
 #pragma region 행렬 바인딩
+	// ⭐ 화면을 채우는 효과 강화
+	_float4 vIntenseColor = {
+		1.0f,
+		0.8f + sin(m_fTime * 3.0f) * 0.2f,  // 더 강한 색상 변화
+		0.3f + cos(m_fTime * 2.5f) * 0.2f,
+		0.8f  // 더 높은 알파값
+	};
+
+	_float fFasterScrollSpeed = m_fScrollSpeed * 2.0f;
+
+
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_vFresnelColor", &vIntenseColor, sizeof(_float4))))
+		return E_FAIL;
+
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fScrollSpeed", &fFasterScrollSpeed, sizeof(_float))))
+		return E_FAIL;
+
 	// 쉐이더에 바인딩
 	if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &m_CombinedWorldMatrix)))
 	{
@@ -388,8 +400,8 @@ HRESULT CSwordWind::Bind_ShaderResources()
 		return E_FAIL;
 	}
 
-	_float fGrowRatio = m_fGrowTime / m_fGrowDuration;
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_fGrowTime", &fGrowRatio, sizeof(_float))))
+	_float fMoveRatio = m_fMoveTime / m_fMoveDuration;
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_fMoveTime", &fMoveRatio, sizeof(_float))))
 	{
 		CRASH("Failed Bind g_fGrowTime");
 		return E_FAIL;
@@ -598,7 +610,7 @@ HRESULT CSwordWind::Ready_Components(SWORDWIND_DESC* pDesc)
 
 	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Model_Effect_SwordWind"),
 		TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom), &Desc)))
-		CRASH("Failed BloodPillarA Components");
+		CRASH("Failed SwordWind Components");
 
 	/* 사용할 텍스쳐들 ?*/
 

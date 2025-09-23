@@ -4,7 +4,7 @@ NS_BEGIN(Client)
 class CSwordWind final : public CPartObject
 {
 public:
-    enum ESTATE { STATE_GROW, STATE_STAY, STATE_DECREASE, STATE_END };
+    enum ESTATE { STATE_STAY, STATE_MOVE,  STATE_DECREASE, STATE_END };
 
 public:
     /* 클론시 전달할 정보들 */
@@ -28,7 +28,8 @@ public:
         _float fEmissiveIntensity = {}; // Emissive 강도
         _float3 vStartPos = {}; // 시작 포지션.
         _float3 vStartScale = {}; // 시작 스케일;
-        _float fGrowDuration = {}; // 모든 성장이 일어나는데 걸리는 총 시간.
+
+        _float fMoveDuration = {}; // 모든 성장이 일어나는데 걸리는 총 시간.
         _float fStayDuration = {}; // 유지 시간.
         _float fDecreaseDuration = {}; // 모든 감소가 일어나는데 걸리는 총 시간.
         _float3 vStartRotation = {}; // 시작 회전.
@@ -98,6 +99,7 @@ private:
 private:
     _float m_fRotationSpeed = {};
     _float3 m_vStartScale = {};
+    _float3 m_vTargetScale = {};
 #pragma endregion
 
 
@@ -143,22 +145,22 @@ private:
     _bool  m_IsGrowing = false;   // 애니메이션이 진행 중인지 여부
     _float m_fCurrentTime = 0.0f;        // 현재 경과 시간
 
-    _float m_fGrowTime = {};
+    _float m_fMoveTime = {};
     
-    _float m_fGrowDuration = 0.f;      // 총 성장 시간
-    _float m_fStayDuration = 0.f;      // 총 성장 시간
+    _float m_fStayDuration = 0.f;      // 대기 시간
+    _float m_fMoveDuration = 0.f;      // 이동 시간.
     _float m_fDecreaseDuration = 0.f;
 
     _float3 m_vRotation = {};
     _float3 m_vRotationAxis = {};
 
 private:
-    void Shape_Control(_float fTimeDelta);
-    void Update_Grow(_float fTimeDelta);
+
     void Update_Stay(_float fTimeDelta);
+    void Update_RotateMove(_float fTimeDelta);
+    
     void Update_Decrease(_float fTimeDelta); // x,z만 감소.
     
-    void RotateTurn_ToAxis(_float fTimeDelta);
     
 #pragma endregion
 

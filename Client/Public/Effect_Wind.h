@@ -19,6 +19,7 @@ public:
 		_float3 vRotationAxis = {}; // 회전 축.
         const _float4x4* pSocketMatrix = { nullptr };
 		class CTransform* pTargetTransform = { nullptr };
+        _bool bUseWorldPosition = {};
     }EFFECTWIND_ACTIVATE_DESC;
 
 private:

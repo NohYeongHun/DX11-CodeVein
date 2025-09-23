@@ -85,49 +85,23 @@ void CEffect_Wind::OnActivate(void* pArg)
     m_eCurLevel = pDesc->eCurLevel;
     m_ActivateDesc = *pDesc;
     m_fDuration = m_ActivateDesc.fDuration;
-    m_vStartRotation = pDesc->vStartRotation;
-    m_vRotationAxis = pDesc->vRotationAxis;
-    m_pTargetTransform = pDesc->pTargetTransform;
-    m_pSocketMatrix = pDesc->pSocketMatrix;
     m_vStartPos = pDesc->vStartPos;
     Reset_Timer();
 
-    /* 검풍 4개 순차적으로 생성 */
     CSwordWind::SWORDWIND_ACTIVATE_DESC ActivateDesc{};
     ActivateDesc.eCurLevel = m_eCurLevel;
 
-    // 애니메이션 타이밍 설정
-    // 전체 시간을 4개의 검풍이 나눠 사용
-    _float fTotalDuration = m_fDuration;
-    _float fOverlapTime = 0.3f; // 겹치는 시간
-
-    // 각 검풍의 지속시간
-
-    ActivateDesc.vStartRotation = m_vStartRotation;
-    ActivateDesc.vRotationAxis = m_vRotationAxis;
-    ActivateDesc.pTargetTransform = pDesc->pTargetTransform;
-    ActivateDesc.pSocketMatrix = m_pSocketMatrix;
+    // ⭐ 검풍 효과의 생명주기 및 크기 설정
+    ActivateDesc.fMoveDuration = 0.3f;     // 나타나며 커지는 시간
+    ActivateDesc.fStayDuration = 0.2f;     // 유지 시간
+    ActivateDesc.fDecreaseDuration = 0.4f; // 사라지는 시간
+    ActivateDesc.vStartScale = { 17.0f, 17.0f, 1.0f }; // 최종 목표 크기
     ActivateDesc.vStartPos = pDesc->vStartPos;
 
-    // 타이밍 조정
-    ActivateDesc.fGrowDuration = 1.f;    // 0.1초 - 매우 빠른 확장
-    ActivateDesc.fStayDuration = 1.f;   // 0.05초 - 짧은 유지
-    ActivateDesc.fDecreaseDuration = 1.f; // 0.3초 - 천천히 퍼지며 사라짐
-
-   
-
-    // 4개의 검풍을 순차적으로 생성
-    for (_uint i = 0; i < m_vecSwordWinds.size(); ++i)
+    // ⭐ 단 하나의 검풍만 활성화
+    if (!m_vecSwordWinds.empty())
     {
-        ActivateDesc.fRotationSpeed = 0.0f;
-
-        // 매우 짧은 간격으로 순차 생성 (거의 동시에)
-        ActivateDesc.fCreateTime = i * 0.02f; // 0.02초 간격
-        // 같은 크기로 시작, 약간씩 다른 층 형성
-        _float3 vScale = { 1.f, 1.f, 1.f };
-        XMStoreFloat3(&ActivateDesc.vStartScale, XMLoadFloat3(&vScale));
-
-        m_vecSwordWinds[i]->OnActivate(&ActivateDesc);
+        m_vecSwordWinds[0]->OnActivate(&ActivateDesc);
     }
 
 
@@ -190,10 +164,10 @@ HRESULT CEffect_Wind::Ready_PartObjects()
         _wstring strUniqueTag = strComTag + to_wstring(i);
 
         WindDesc.fDisplayTime = m_fDuration;
-
+        
         // 기본 크기는 OnActivate에서 설정
-        //_float3 vScale = { 1.0f, 1.0f, 1.0f };
-        _float3 vScale = { 100.0f, 100.0f, 100.0f };
+        _float3 vScale = { 1.0f, 1.0f, 1.0f };
+        
         
         XMStoreFloat3(&WindDesc.vStartScale, XMLoadFloat3(&vScale));
 

@@ -30,6 +30,7 @@ vector g_vMtrlSpecular = 1.f;
 // ½Ã°£.
 float g_fDissolveTime;
 float g_fGrowTime;
+float g_fMoveTime;
 
 
 float g_fTime;
