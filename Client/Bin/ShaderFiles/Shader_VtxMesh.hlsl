@@ -663,12 +663,33 @@ PS_OUT_BACKBUFFER PS_SWORDWIND_MAIN(PS_BACKBUFFER_IN In)
 {
     PS_OUT_BACKBUFFER Out = (PS_OUT_BACKBUFFER) 0;
 
+     // 1. Base Color 텍스처 샘플링 (블렌더의 T_FX_GEZWhiteColor01)
     float4 vMtrlDiffuse = g_DiffuseTextures[6].Sample(DefaultSampler, In.vTexcoord);
+    
+    // 2. Alpha에 사용할 노이즈 텍스처 샘플링 (블렌더의 T_FX_UE4TilingNoise03)
     float4 vMtrlNoise = g_NoiseTextures[4].Sample(DefaultSampler, In.vTexcoord);
+    
+     // 3. Color Ramp 구현
+    // 노이즈 텍스처의 R 채널 값을 팩터로 사용합니다. (0.0 ~ 1.0 사이의 값)
+    float noiseFactor = vMtrlNoise.r;
 
-    // ===== 최종 출력 =====
-    //Out.vDiffuse = vMtrlDiffuse;
-    Out.vDiffuse = float4(1.f, 1.f, 1.f, 1.f);
+    // noiseFactor 값을 0.0 ~ 0.009 범위에서 0.0 ~ 1.0 범위로 리매핑합니다.
+    // saturate는 값을 0.0과 1.0 사이로 제한하는 역할을 합니다.
+    // 이는 Color Ramp에서 0.009 위치를 넘어가면 모두 빨간색(1.0)으로 처리하는 것과 동일합니다.
+    float rampT = saturate(noiseFactor / 0.009f);
+    
+      // rampT 값을 이용해 검은색(0)에서 빨간색(1)으로 보간합니다.
+    // Color Ramp의 결과 색상에서 R 채널 값만 필요하므로 float으로 계산합니다.
+    float finalAlpha = lerp(0.f, 1.f, rampT);
+
+    float bloomIntensity = 0.6f; // <<< 이 값을 조절해서 빛의 세기를 제어하세요!
+
+    // 원본 Diffuse 색상에 강도 값을 곱해 최종 색상을 계산합니다.
+    float3 finalColor = vMtrlDiffuse.rgb;
+    
+   // ===== 최종 출력 =====
+    // vMtrlDiffuse의 RGB 색상과 위에서 계산한 finalAlpha 값을 조합합니다.
+    Out.vDiffuse = float4(finalColor, vMtrlNoise.r);
     Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w, 0.f, 0.f);
 
