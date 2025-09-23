@@ -202,17 +202,15 @@ void CPlayer_SecondSkillState::Change_State()
 
 void CPlayer_SecondSkillState::Create_WindEffect(void* pArg)
 {
-    // 2. 검풍 생성 부분 수정
-      // 플레이어 정면 계산
+
     _matrix playerWorld = m_pPlayer->Get_Transform()->Get_WorldMatrix();
     _vector vPlayerPos = playerWorld.r[3];
     _vector vPlayerForward = XMVector3Normalize(playerWorld.r[2]);
-    _vector vPlayerUp = XMVector3Normalize(playerWorld.r[1]);
 
-    // 플레이어 앞 (타격 지점)
-    _float fHitDistance = 6.0f;
+    _float fHitDistance = 3.0f;
     _vector vHitPos = vPlayerPos + (vPlayerForward * fHitDistance);
-    vHitPos += vPlayerUp * 0.7f;
+
+    vHitPos = XMVectorSetY(vHitPos, XMVectorGetY(vPlayerPos) + 1.0f);
 
     CEffect_Wind::EFFECTWIND_ACTIVATE_DESC WindActivate_Desc{};
     WindActivate_Desc.eCurLevel = m_pPlayer->Get_CurrentLevel();
@@ -220,12 +218,11 @@ void CPlayer_SecondSkillState::Create_WindEffect(void* pArg)
 
     _float3 vHitPoint;
     XMStoreFloat3(&vHitPoint, vHitPos);
-    WindActivate_Desc.vStartPos = vHitPoint;  // ⭐ 타격 지점을 시작 위치로 지정
+    WindActivate_Desc.vStartPos = vHitPoint;
     WindActivate_Desc.bUseWorldPosition = true;
-    WindActivate_Desc.fCreateDelay = 0.12f;
-    WindActivate_Desc.iWindCount = 3;
+    WindActivate_Desc.fCreateDelay = 0.05f;
+    WindActivate_Desc.iWindCount = 6;
     WindActivate_Desc.vStartScale = { 5.f, 5.f, 5.f };
-
 
     m_pGameInstance->Move_Effect_ToObjectLayer(
         ENUM_CLASS(m_pGameInstance->Get_CurrentLevelID()),

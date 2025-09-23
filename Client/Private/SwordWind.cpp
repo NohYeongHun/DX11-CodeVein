@@ -243,31 +243,35 @@ void CSwordWind::Update_RotateMove(_float fTimeDelta)
 	{
 		m_eState = STATE_DECREASE;
 		m_fCurrentTime = 0.f;
-		m_pTransformCom->Set_Scale(m_vTargetScale); // 최종 크기로 고정
+		m_pTransformCom->Set_Scale(m_vTargetScale);
 		return;
 	}
 
 	_float fRatio = m_fMoveTime / m_fMoveDuration;
 
-	// ⭐ 카메라 정보 가져오기
 	_matrix viewMatrix = XMLoadFloat4x4(m_pGameInstance->Get_Transform_Float4x4(D3DTS::VIEW));
 	_matrix viewInverse = XMMatrixInverse(nullptr, viewMatrix);
 	_vector vCamPos = viewInverse.r[3];
 	_vector vCamLook = XMVector3Normalize(viewInverse.r[2]);
 
-	// ⭐ 이동: 시작 위치(타격점)에서 카메라 앞으로 이동
 	_vector vStartPos = XMLoadFloat3(&m_ActivateDesc.vStartPos);
-	_float fTargetDistance = 3.0f; // 카메라뒤로
-	_vector vTargetPos = vCamPos + (vCamLook * fTargetDistance) * -1.f;
-	_vector vCurrentPos = XMVectorLerp(vStartPos, vTargetPos, fRatio);
+
+	_float fBehindDistance = 5.0f;
+	_vector vTargetPos = vCamPos - (vCamLook * fBehindDistance);
+
+	_float fStartY = XMVectorGetY(vStartPos);
+	_float fCamY = XMVectorGetY(vCamPos);
+	_float fTargetY = fStartY + (fCamY - fStartY) * 0.3f; // 약간만 높이 변화
+	vTargetPos = XMVectorSetY(vTargetPos, fTargetY);
+
+	_float fEasedRatio = 1.f - powf(1.f - fRatio, 3.f);
+	_vector vCurrentPos = XMVectorLerp(vStartPos, vTargetPos, fEasedRatio);
 	m_pTransformCom->Set_State(STATE::POSITION, vCurrentPos);
 
-	// ⭐ 회전: Z축을 기준으로 회전 => 여기가 아니라. 
 	m_pTransformCom->Turn(XMVectorSet(0.f, 0.f, 1.f, 0.f), fTimeDelta * 5.f);
 
-	// ⭐ 크기: 시작 크기에서 목표 크기로 점진적으로 증가
 	_float3 vCurrentScale;
-	_float fScaleRatio = 1.f - powf(1.f - fRatio, 2.f); // Ease Out 효과
+	_float fScaleRatio = 1.f - powf(1.f - fRatio, 2.f);
 	XMStoreFloat3(&vCurrentScale, XMVectorLerp(XMLoadFloat3(&m_vStartScale), XMLoadFloat3(&m_vTargetScale), fScaleRatio));
 	m_pTransformCom->Set_Scale(vCurrentScale);
 }
