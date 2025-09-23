@@ -47,9 +47,10 @@ public:
 	virtual void Reset() override;
 
 	void Change_State();
+	void Create_WindEffect(void* pArg);
 
 private:
-	void Update_Sound(_float fTimeDelta);
+	void Update_Event(_float fTimeDelta);
 
 private:
 	_bool m_IsFirstAttack = {};

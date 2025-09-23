@@ -158,7 +158,7 @@ void CEffect_PlayerSkill::Initialize_EffectTrigger(const _wstring& strTag)
         _float3 vStartScale = { 4.5f, 2.5f, 4.5f };
         XMStoreFloat3(&BodyAuraDesc.vStartScale, XMLoadFloat3(&vStartScale) * XMLoadFloat3(&m_vScaleMultiple));
         //BodyAuraDesc.vStartScale = { 8.f, 6.f, 8.f };
-        BodyAuraDesc.fStayDuration = 1.4f;
+        BodyAuraDesc.fStayDuration = 0.7f;
         BodyAuraDesc.fDissolveDuration = 0.3f;
         BodyAuraDesc.vStartRotation = { 0.f, 0.f, 0.f };
 

@@ -43,11 +43,24 @@ HRESULT CSwordWind::Initialize_Clone(void* pArg)
 	//m_pTransformCom->Set_Scale(pDesc->vStartScale);
 	//m_pTransformCom->Set_Scale({100.f, 100.f, 100.f});
 	
-	
+	m_IsActivate = false;
 	
 
 	return S_OK;
 }
+
+
+
+void CSwordWind::Priority_Update(_float fTimeDelta)
+{
+	if (!m_IsActivate)
+		return;
+
+	CPartObject::Priority_Update(fTimeDelta);
+
+
+}
+
 
 void CSwordWind::Update(_float fTimeDelta)
 {
@@ -87,18 +100,6 @@ void CSwordWind::Update(_float fTimeDelta)
 			m_pTransformCom->Get_WorldMatrix());
 	}
 }
-
-
-void CSwordWind::Priority_Update(_float fTimeDelta)
-{
-	if (!m_IsActivate)
-		return;
-
-	CPartObject::Priority_Update(fTimeDelta);
-
-
-}
-
 
 void CSwordWind::Late_Update(_float fTimeDelta)
 {
@@ -156,13 +157,7 @@ HRESULT CSwordWind::Render_Distortion()
 
 	for (_uint i = 0; i < iNumMeshes; i++)
 	{
-		// 기본 Texture를 NoiseTexture로 지정.
-		if (FAILED(m_pModelCom->Bind_Materials(m_pDistortionShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE, 0)))
-			return E_FAIL;
-
-
-		//m_pDistortionShaderCom->Begin(static_cast<_uint>(DISTORTION_SHADERPATH::SWORD_WIND));
-		m_pDistortionShaderCom->Begin(static_cast<_uint>(DISTORTION_SHADERPATH::SWORD_WIND));
+		m_pDistortionShaderCom->Begin(static_cast<_uint>(EFFECTMESH_DISTORTIONSHADERPATH::SWORD_WIND));
 		m_pModelCom->Render(i);
 	}
 
@@ -183,6 +178,7 @@ void CSwordWind::OnActivate(void* pArg)
 	m_fStayDuration = pDesc->fStayDuration;
 	m_fDecreaseDuration = pDesc->fDecreaseDuration;
 	m_fDisplayTime = m_fMoveDuration + m_fStayDuration + m_fDecreaseDuration;
+	m_fDuration = m_fMoveDuration + m_fStayDuration + m_fDecreaseDuration;
 
 	// ⭐ Transform 정보 초기화
 	m_pTransformCom->Set_State(STATE::POSITION, XMLoadFloat3(&pDesc->vStartPos));
@@ -236,7 +232,7 @@ void CSwordWind::Update_Stay(_float fTimeDelta)
 		return;
 	}
 	// ⭐ 제자리에서 계속 회전
-	m_pTransformCom->Turn(XMVectorSet(0.f, 0.f, 1.f, 0.f), fTimeDelta * 5.f);
+	//m_pTransformCom->Turn(XMVectorSet(0.f, 0.f, 1.f, 0.f), fTimeDelta * 5.f);
 }
 
 void CSwordWind::Update_RotateMove(_float fTimeDelta)
@@ -261,8 +257,8 @@ void CSwordWind::Update_RotateMove(_float fTimeDelta)
 
 	// ⭐ 이동: 시작 위치(타격점)에서 카메라 앞으로 이동
 	_vector vStartPos = XMLoadFloat3(&m_ActivateDesc.vStartPos);
-	_float fTargetDistance = 5.0f; // 카메라와 최종 거리
-	_vector vTargetPos = vCamPos + (vCamLook * fTargetDistance);
+	_float fTargetDistance = 3.0f; // 카메라뒤로
+	_vector vTargetPos = vCamPos + (vCamLook * fTargetDistance) * -1.f;
 	_vector vCurrentPos = XMVectorLerp(vStartPos, vTargetPos, fRatio);
 	m_pTransformCom->Set_State(STATE::POSITION, vCurrentPos);
 
@@ -292,17 +288,17 @@ void CSwordWind::Update_Decrease(_float fTimeDelta)
 
 	_float fRatio = m_fDissolveTime / m_fDecreaseDuration;
 
-	// ⭐ 크기가 점차 작아지면서 사라짐
-	_float fScaleRatio = 1.f - (fRatio * fRatio);
-	_float3 vNewScale = {
-		m_vTargetScale.x * fScaleRatio,
-		m_vTargetScale.y * fScaleRatio,
-		m_vTargetScale.z * fScaleRatio
-	};
-	m_pTransformCom->Set_Scale(vNewScale);
+	//// ⭐ 크기가 점차 작아지면서 사라짐
+	//_float fScaleRatio = 1.f - (fRatio * fRatio);
+	//_float3 vNewScale = {
+	//	m_vTargetScale.x * fScaleRatio,
+	//	m_vTargetScale.y * fScaleRatio,
+	//	m_vTargetScale.z * fScaleRatio
+	//};
+	//m_pTransformCom->Set_Scale(vNewScale);
 
 	// ⭐ 계속 회전
-	m_pTransformCom->Turn(XMVectorSet(0.f, 0.f, 1.f, 0.f), fTimeDelta * 10.f);
+	//m_pTransformCom->Turn(XMVectorSet(0.f, 0.f, 1.f, 0.f), fTimeDelta * 10.f);
 
 	m_fDissolveThreshold = fRatio; // 셰이더용 Dissolve 값
 }
@@ -332,7 +328,7 @@ HRESULT CSwordWind::Bind_ShaderResources()
 		return E_FAIL;
 
 	// 쉐이더에 바인딩
-	if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", &m_CombinedWorldMatrix)))
+	if (FAILED(m_pShaderCom->Bind_Matrix("g_WorldMatrix", m_pTransformCom->Get_WorldMatrixPtr())))
 	{
 		CRASH("Failed Bind World Matrix");
 		return E_FAIL;
@@ -368,32 +364,13 @@ HRESULT CSwordWind::Bind_ShaderResources()
 	
 #pragma region SHADER변수
 
-	//_float fSmokeDensity = 1.5f; // 연기 밀도
-	//if (FAILED(m_pShaderCom->Bind_RawValue("g_fSmokeDensity", &fSmokeDensity, sizeof(_float))))
-	//	return E_FAIL;
-
-	//_float fSmokeSpeed = 0.5f; // 연기 이동 속도
-	//if (FAILED(m_pShaderCom->Bind_RawValue("g_fSmokeSpeed", &fSmokeSpeed, sizeof(_float))))
-	//	return E_FAIL;
-
-	//// 색상 조정
-	//_float4 vSmokeColor = { 0.8f, 0.85f, 0.9f, 1.0f }; // 연회색
-	//if (FAILED(m_pShaderCom->Bind_RawValue("g_vSmokeColor", &vSmokeColor, sizeof(_float4))))
-	//	return E_FAIL;
-
-	if (FAILED(m_pShaderCom->Bind_RawValue("g_fTime", &m_fTime, sizeof(_float))))
-	{
-		CRASH("Failed Bind Cam Position");
-		return E_FAIL;
-	}
-
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_fDissolveThresold", &m_fDissolveThreshold, sizeof(_float))))
 	{
 		CRASH("Failed Bind Cam Position");
 		return E_FAIL;
 	}
 
-	_float fRatio = m_fTime / m_fDisplayTime;
+	_float fRatio = m_fTime / m_fDuration;
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_fRatio", &fRatio, sizeof(_float))))
 	{
 		CRASH("Failed Bind Cam Position");
@@ -501,70 +478,17 @@ HRESULT CSwordWind::Bind_ShaderResources_Distortion()
 		return E_FAIL;
 	}
 
-
-
-
-#pragma region SHADER변수
+#pragma region SHADER 변수
 
 	//if (FAILED(m_pDistortionShaderCom->Bind_RawValue("g_fTime", &m_fTime, sizeof(_float))))
 	//{
-	//	CRASH("Failed Bind Cam Position");
-	//	return E_FAIL;
-	//}
-
-	//if (FAILED(m_pDistortionShaderCom->Bind_RawValue("g_fDissolveThresold", &m_fDissolveThreshold, sizeof(_float))))
-	//{
-	//	CRASH("Failed Bind Cam Position");
-	//	return E_FAIL;
-	//}
-
-	//_float fRatio = m_fTime / m_fDisplayTime;
-	//if (FAILED(m_pDistortionShaderCom->Bind_RawValue("g_fRatio", &fRatio, sizeof(_float))))
-	//{
-	//	CRASH("Failed Bind Cam Position");
-	//	return E_FAIL;
-	//}
-
-	//_float fGrowRatio = m_fGrowTime / m_fGrowDuration;
-	//if (FAILED(m_pDistortionShaderCom->Bind_RawValue("g_fGrowTime", &fGrowRatio, sizeof(_float))))
-	//{
-	//	CRASH("Failed Bind g_fGrowTime");
+	//	CRASH("Failed Bind Time");
 	//	return E_FAIL;
 	//}
 
 
-	//_float fDisolveRatio = m_fDissolveTime / m_fDecreaseDuration;
-
-
-	//if (FAILED(m_pDistortionShaderCom->Bind_RawValue("g_fDissolveTime", &m_fDissolveThreshold, sizeof(_float))))
-	//{
-	//	CRASH("Failed Bind Cam Position");
-	//	return E_FAIL;
-	//}
-
-	//if (FAILED(m_pDistortionShaderCom->Bind_RawValue("g_fScrollSpeed", &m_fScrollSpeed, sizeof(_float))))
-	//{
-	//	CRASH("Failed Bind Cam Position");
-	//	return E_FAIL;
-	//}
-
-
-	//_float4 vDynamicFresnelColor = {
-	//	1.0f,
-	//	0.2f + sin(m_fTime * 2.0f) * 0.1f,  // 초록 성분 변화
-	//	0.1f + cos(m_fTime * 1.5f) * 0.05f, // 파랑 성분 변화
-	//	1.0f
-	//};
-
-	//if (FAILED(m_pDistortionShaderCom->Bind_RawValue("g_vFresnelColor", &vDynamicFresnelColor, sizeof(_float4))))
-	//	return E_FAIL;
-
-	//if (FAILED(m_pDistortionShaderCom->Bind_RawValue("g_fDissolveThresold", &m_fDissolveThreshold, sizeof(_float))))
-	//{
-	//	CRASH("Failed Bind Cam Position");
-	//	return E_FAIL;
-	//}
 #pragma endregion
+
 
 
 
@@ -646,6 +570,15 @@ HRESULT CSwordWind::Ready_Components(SWORDWIND_DESC* pDesc)
 		return E_FAIL;
 	}
 
+	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC)
+		, TEXT("Prototype_Component_Texture_TrailDistortion")
+		, TEXT("Com_DistortionTexture")
+		, reinterpret_cast<CComponent**>(&m_pDistortionTexture))))
+	{
+		CRASH("Failed Create Glow Texture Trail Distortion");
+		return E_FAIL;
+	}
+
 
 	// 사용할 인덱스 지정.?
 	for (_uint i = 0; i < TEXTURE::TEXTURE_END; ++i)
@@ -688,6 +621,7 @@ void CSwordWind::Free()
 	Safe_Release(m_pShaderCom);
 	Safe_Release(m_pDistortionShaderCom);
 	Safe_Release(m_pModelCom);
+	Safe_Release(m_pDistortionTexture);
 	for (auto& pTextureCom : m_pTextureCom)
 		Safe_Release(pTextureCom);
 

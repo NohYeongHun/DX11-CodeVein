@@ -20,21 +20,19 @@ public:
     }SWORDWIND_DESC;
 
     /* POLL에서 Actviate 상태로 변할때 지정될 값들? */
-    typedef struct tagPillarAEnterDesc
+    typedef struct tagSwordWindActivateDesc
     {
         LEVEL eCurLevel = { LEVEL::END };
 
         _float3 vColor = {}; // 추가할 컬러.
         _float fEmissiveIntensity = {}; // Emissive 강도
-        _float3 vStartPos = {}; // 시작 포지션.
-        _float3 vStartScale = {}; // 시작 스케일;
+        _float3 vStartPos = {};
+        _float3 vMoveDirection = {}; 
+        _float3 vStartScale = {};
 
         _float fMoveDuration = {}; // 모든 성장이 일어나는데 걸리는 총 시간.
         _float fStayDuration = {}; // 유지 시간.
         _float fDecreaseDuration = {}; // 모든 감소가 일어나는데 걸리는 총 시간.
-        _float3 vStartRotation = {}; // 시작 회전.
-        _float3 vRotationAxis = {}; // 회전 축.
-        _float fRotationSpeed = {}; // 회전 속도
 
 
         _float fDissolveThreshold = {}; // 디졸브 임계값;
@@ -85,6 +83,7 @@ private:
 
     class CLoad_Model* m_pModelCom = { nullptr };
     class CTexture* m_pTextureCom[TEXTURE_END] = { nullptr };
+    class CTexture* m_pDistortionTexture = { nullptr };
     _uint m_iTextureIndexArray[TEXTURE_END] = {};
     
     class CTransform* m_pTargetTransform = { nullptr };
@@ -100,6 +99,15 @@ private:
     _float m_fRotationSpeed = {};
     _float3 m_vStartScale = {};
     _float3 m_vTargetScale = {};
+    _float3 m_vMoveDirection = {}; // 이동 방향이자 회전축.
+    _float3 m_vStartPos = {};
+    
+    _vector m_vTargetPos = {};
+
+    // ... 기존 다른 변수들 ...
+    _float m_fRotationAngle = { 0.f };    // ⭐ 2. 현재 회전 각도 변수 추가!
+    _float m_fStartAngle = { 0.f };       // ⭐ 3. 시작 각도를 저장할 변수 추가!
+    _vector m_vPrevPos = {};              // ⭐ 4. 이전 프레임 위치 저장 변수 추가!
 #pragma endregion
 
 
@@ -131,7 +139,8 @@ private:
 
     // 타이머
     //_float m_fDisplayTime = 1.0f;        // 표시 시간 (초)
-    _float m_fDisplayTime = 0.f;        // 테스트용 표시 시간 (초)
+    _float m_fDisplayTime = {};        // 테스트용 표시 시간 (초)
+    _float m_fDuration = {};
     
 
 public:

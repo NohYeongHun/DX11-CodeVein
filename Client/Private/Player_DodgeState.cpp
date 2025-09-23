@@ -140,9 +140,13 @@ void CPlayer_DodgeState::Handle_Invincible_Buff()
 void CPlayer_DodgeState::Update_Sound(_float fTimeDelta)
 {
 	_float fCurrentRatio = m_pModelCom->Get_Current_Ratio();
+	_wstring soundFile = TEXT("Dodge0");
 	if (!m_IsSoundPlayed && fCurrentRatio > m_fSoundTime)
 	{
-		m_pGameInstance->PlaySoundEffect(L"Dodge.wav", 0.3f);
+		_uint iRandValue = m_pGameInstance->Rand_UnsignedInt(1, 3);
+		
+		soundFile += to_wstring(iRandValue) + TEXT(".wav");
+		m_pGameInstance->PlaySoundEffect(soundFile, 0.3f);
 		m_IsSoundPlayed = true;
 	}
 }

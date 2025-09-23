@@ -251,9 +251,10 @@ public:
 
 #pragma endregion
 
-#pragma region 6. 파티클 시전.
+#pragma region 6. 이펙트
 public:
 	void Create_Particle(CParticleSystem::PARTICLE_TYPE eType);
+
 
 #pragma endregion
 

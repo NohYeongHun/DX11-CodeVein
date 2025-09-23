@@ -56,13 +56,18 @@ void CPlayer_RunState::Update_Sound(_float fTimeDelta)
 
 	if (!m_IsFirstSoundPlayed && fCurrentRatio > m_fFootStepFirst)
 	{
-		m_strFootSoundFile = L"FootSound1.wav";
+		//m_strFootSoundFile = L"FootSound.wav";
+		m_strFootSoundFile = L"FootHeel_01.wav";
+		//_uint iRandValue = m_pGameInstance->Rand_UnsignedInt(1, 3);
+		//m_strFootSoundFile += to_wstring(iRandValue);
+
 		m_pGameInstance->PlaySoundEffect(m_strFootSoundFile, 0.3f);
 		m_IsFirstSoundPlayed = true;
 	}
 	else if (!m_IsSecondSoundPlayed  && fCurrentRatio > m_fFootStepSecond)
 	{
-		m_strFootSoundFile = L"FootSound1.wav";
+		m_strFootSoundFile = L"FootHeel_01.wav";
+		//_uint iRandValue = m_pGameInstance->Rand_UnsignedInt(1, 3);
 		m_pGameInstance->PlaySoundEffect(m_strFootSoundFile, 0.3f);
 		m_IsSecondSoundPlayed = true;
 	}

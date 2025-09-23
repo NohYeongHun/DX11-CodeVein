@@ -76,21 +76,33 @@ HRESULT CPlayer_FirstSkillState::Initialize(_uint iStateNum, void* pArg)
     // 앞 찌르기
     Add_AnimationSpeed_Info(m_pPlayer->Find_AnimationIndex(TEXT("CIRCULATE_PURGE"))
         , ANIMATION_SPEED_INFO{1.f / 232.f, 40.f / 232.f, 0, m_pPlayer->Find_AnimationIndex(TEXT("CIRCULATE_PURGE"))
-        , fOriginSpeed, 2.f});
+        , fOriginSpeed, 3.f});
 
     // 회전 공격 
     Add_AnimationSpeed_Info(m_pPlayer->Find_AnimationIndex(TEXT("CIRCULATE_PURGE"))
         , ANIMATION_SPEED_INFO{ 41.f / 232.f, 120.f / 232.f, 0, m_pPlayer->Find_AnimationIndex(TEXT("CIRCULATE_PURGE"))
-        , fOriginSpeed, 1.5f });
+        , fOriginSpeed, 2.f });
 
     // 끝.
     Add_AnimationSpeed_Info(m_pPlayer->Find_AnimationIndex(TEXT("CIRCULATE_PURGE"))
         , ANIMATION_SPEED_INFO{ 121.f / 232.f, 232.f / 232.f, 0, m_pPlayer->Find_AnimationIndex(TEXT("CIRCULATE_PURGE"))
-        , fOriginSpeed, 1.8f });
+        , fOriginSpeed, 2.f });
 
 #pragma endregion
 
     m_fIncreaseDamage = static_cast<_float>(m_pGameInstance->Rand_UnsignedInt(20.f, 40.f)); // 기본 공격력 증가량 설정
+
+
+#pragma region 애니메이션 Effect 제어
+
+    EFFECT_ACTIVE_INFO effectActive = { 35.f / 232.f, 40.f / 232.f
+        , m_pPlayer->Find_AnimationIndex(TEXT("DRAGON_LUNGE"))
+    , [this](void*) {
+            this->Create_WindEffect(nullptr); } };
+
+    Add_AnimationEffect_Info(
+        m_pPlayer->Find_AnimationIndex(TEXT("DRAGON_LUNGE")), effectActive);
+#pragma endregion
 
     return S_OK;
 }
@@ -140,7 +152,7 @@ void CPlayer_FirstSkillState::Enter(void* pArg)
     CEffect_PlayerSkill::EFFECT_PLAYERSKILL_ACTIVATE_DESC Effect_PlayerSkillDesc{};
     Effect_PlayerSkillDesc.eCurLevel = m_pPlayer->Get_CurrentLevel();
     Effect_PlayerSkillDesc.pTargetTransform = m_pPlayer->Get_Transform();
-    Effect_PlayerSkillDesc.fDuration = 10.f; // 지속시간,,
+    Effect_PlayerSkillDesc.fDuration = 3.f; // 지속시간,,
     Effect_PlayerSkillDesc.vStartPos = { 0.f, 0.f, 0.f }; // { 발 }
 
     m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(m_pGameInstance->Get_CurrentLevelID())
@@ -153,23 +165,7 @@ void CPlayer_FirstSkillState::Enter(void* pArg)
     SteminaDesc.fTime = 1.f;
     m_pGameInstance->Publish(EventType::STEMINA_CHANGE, &SteminaDesc);
 
-    //// 2. 검풍 생성 부분 수정
-    //CEffect_Wind::EFFECTWIND_ACTIVATE_DESC WindActivate_Desc{};
-    //WindActivate_Desc.eCurLevel = m_pPlayer->Get_CurrentLevel();
-    //WindActivate_Desc.fDuration = 1.f; // 지속시간,,
-
-    //WindActivate_Desc.vStartPos = { 0.f, 2.f, 5.f }; // {오른쪽, 위, 앞}
-
-    ////WindActivate_Desc.vStartRotation = { 0.f, 270.f, 0.f }; // 각도 단위
-
-    //_vector vCamLook = m_pGameInstance->Get_MainCamera()->Get_Transform()->Get_State(STATE::LOOK);
-    //XMStoreFloat3(&WindActivate_Desc.vRotationAxis, XMVector3Normalize(vCamLook));
-
-    //WindActivate_Desc.pParentMatrix = m_pPlayer->Get_Transform()->Get_WorldMatrixPtr();
-    //WindActivate_Desc.pTargetTransform = m_pPlayer->Get_Transform();
-
-    //m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(m_pGameInstance->Get_CurrentLevelID())
-    //    , TEXT("SWORD_WIND"), TEXT("Layer_Effect"), 1, ENUM_CLASS(CEffect_Wind::EffectType), &WindActivate_Desc);
+ 
 
     m_IsFirstAttack = false;
     m_IsSecondAttack = false;
@@ -177,17 +173,48 @@ void CPlayer_FirstSkillState::Enter(void* pArg)
     m_IsFourthAttack = false;
     m_IsFifthAttack = false;
 
-    //m_pGameInstance->PlaySoundEffect(L"SpinAttack.wav", 0.2f);
+    
+
+
+    // 2. 검풍 생성 부분 수정
+    // 플레이어 정면 계산
+    //_matrix playerWorld = m_pPlayer->Get_Transform()->Get_WorldMatrix();
+    //_vector vPlayerPos = playerWorld.r[3];
+    //_vector vPlayerForward = XMVector3Normalize(playerWorld.r[2]);
+
+    //// 플레이어 앞 (타격 지점)
+    //_float fHitDistance = 3.0f;
+    //_vector vHitPos = vPlayerPos + (vPlayerForward * fHitDistance);
+
+    //CEffect_Wind::EFFECTWIND_ACTIVATE_DESC WindActivate_Desc{};
+    //WindActivate_Desc.eCurLevel = m_pPlayer->Get_CurrentLevel();
+    //WindActivate_Desc.fDuration = 1.5f;
+
+    //_float3 vHitPoint;
+    //XMStoreFloat3(&vHitPoint, vHitPos);
+    //WindActivate_Desc.vStartPos = vHitPoint;  // ⭐ 타격 지점을 시작 위치로 지정
+    //WindActivate_Desc.bUseWorldPosition = true;
+    //WindActivate_Desc.fCreateDelay = 0.1f;
+    //WindActivate_Desc.iWindCount = 5;
+    //WindActivate_Desc.vStartScale = { 4.f, 4.f, 4.f};
+
+
+    //m_pGameInstance->Move_Effect_ToObjectLayer(
+    //    ENUM_CLASS(m_pGameInstance->Get_CurrentLevelID()),
+    //    TEXT("SWORD_WIND"), TEXT("Layer_Effect"), 1,
+    //    ENUM_CLASS(CEffect_Wind::EffectType), &WindActivate_Desc);
+    //m_pGameInstance->PlaySoundEffect(L"CirculatePulse1.ogg", 0.2f);
 }
 
 void CPlayer_FirstSkillState::Update(_float fTimeDelta)
 {
+    _float fCurrentRatio = m_pModelCom->Get_Current_Ratio();
 
-    //Handle_Input();
+   
     Handle_Unified_Direction_Input(fTimeDelta);
     Change_State();
 
-    Update_Sound(fTimeDelta);
+    Update_Event(fTimeDelta);
     CPlayerState::Handle_Collider_State();
     CPlayerState::Handle_AnimationSpeed_State();
     CPlayerState::Handle_AnimationTrail_State();
@@ -246,7 +273,7 @@ void CPlayer_FirstSkillState::Change_State()
 
 }
 
-void CPlayer_FirstSkillState::Update_Sound(_float fTimeDelta)
+void CPlayer_FirstSkillState::Update_Event(_float fTimeDelta)
 {
     _float fCurrentRatio = m_pModelCom->Get_Current_Ratio();
 
@@ -255,6 +282,8 @@ void CPlayer_FirstSkillState::Update_Sound(_float fTimeDelta)
         m_strSoundFile = L"PlayerAttack.mp3";
         m_pGameInstance->PlaySoundEffect(m_strSoundFile, 0.3f);
         m_IsFirstAttack = true;
+
+        Create_WindEffect(nullptr);
     }
     else if (!m_IsSecondAttack && fCurrentRatio > m_fSecondAttackFrame)
     {
@@ -284,6 +313,38 @@ void CPlayer_FirstSkillState::Update_Sound(_float fTimeDelta)
         m_IsFifthAttack = true;
     }
     
+}
+
+void CPlayer_FirstSkillState::Create_WindEffect(void* pArg)
+{
+    // 2. 검풍 생성 부분 수정
+      // 플레이어 정면 계산
+    _matrix playerWorld = m_pPlayer->Get_Transform()->Get_WorldMatrix();
+    _vector vPlayerPos = playerWorld.r[3];
+    _vector vPlayerForward = XMVector3Normalize(playerWorld.r[2]);
+
+    // 플레이어 앞 (타격 지점)
+    _float fHitDistance = 3.0f;
+    _vector vHitPos = vPlayerPos + (vPlayerForward * fHitDistance);
+
+    CEffect_Wind::EFFECTWIND_ACTIVATE_DESC WindActivate_Desc{};
+    WindActivate_Desc.eCurLevel = m_pPlayer->Get_CurrentLevel();
+    WindActivate_Desc.fDuration = 1.5f;
+
+    _float3 vHitPoint;
+    XMStoreFloat3(&vHitPoint, vHitPos);
+    WindActivate_Desc.vStartPos = vHitPoint;  // ⭐ 타격 지점을 시작 위치로 지정
+    WindActivate_Desc.bUseWorldPosition = true;
+    WindActivate_Desc.fCreateDelay = 0.1f;
+    WindActivate_Desc.iWindCount = 3;
+    WindActivate_Desc.vStartScale = { 5.f, 5.f, 5.f };
+
+
+    m_pGameInstance->Move_Effect_ToObjectLayer(
+        ENUM_CLASS(m_pGameInstance->Get_CurrentLevelID()),
+        TEXT("SWORD_WIND"), TEXT("Layer_Effect"), 1,
+        ENUM_CLASS(CEffect_Wind::EffectType), &WindActivate_Desc);
+    m_pGameInstance->PlaySoundEffect(L"CirculatePulse1.ogg", 0.2f);
 }
 
 CPlayer_FirstSkillState* CPlayer_FirstSkillState::Create(_uint iStateNum, void* pArg)

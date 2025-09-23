@@ -682,14 +682,15 @@ PS_OUT_BACKBUFFER PS_SWORDWIND_MAIN(PS_BACKBUFFER_IN In)
     // Color Ramp의 결과 색상에서 R 채널 값만 필요하므로 float으로 계산합니다.
     float finalAlpha = lerp(0.f, 1.f, rampT);
 
-    float bloomIntensity = 0.6f; // <<< 이 값을 조절해서 빛의 세기를 제어하세요!
-
     // 원본 Diffuse 색상에 강도 값을 곱해 최종 색상을 계산합니다.
     float3 finalColor = vMtrlDiffuse.rgb;
     
+    float fAlpha = vMtrlNoise.r * saturate(1.f - g_fRatio * 2.f);
+    
    // ===== 최종 출력 =====
     // vMtrlDiffuse의 RGB 색상과 위에서 계산한 finalAlpha 값을 조합합니다.
-    Out.vDiffuse = float4(finalColor, vMtrlNoise.r);
+    //Out.vDiffuse = float4(finalColor, vMtrlNoise.r);
+    Out.vDiffuse = float4(finalColor, fAlpha);
     Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w, 0.f, 0.f);
 

@@ -856,6 +856,7 @@ void CPlayer::Create_Particle(CParticleSystem::PARTICLE_TYPE eType)
         , TEXT("PARTICLE_SYSTEM"), TEXT("Layer_Effect")
         , 2, ENUM_CLASS(EFFECTTYPE::PARTICLE), &ActivateDesc);
 }
+
 #pragma endregion
 
 
@@ -926,6 +927,7 @@ void CPlayer::On_Collision_Enter(CGameObject* pOther)
 
 
                 Create_HitEffects(vClosestPoint, vAttackDirection);
+                m_pGameInstance->PlaySoundEffect(L"NormalAttack.wav", 0.3f);
 
                 //_float3 vPos = { 0.f, 1.f, 0.f };
                 //CEffect_Pillar::PILLAR_ACTIVATE_DESC EffectPillarDesc{};

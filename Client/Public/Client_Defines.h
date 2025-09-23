@@ -67,6 +67,8 @@ namespace Client
 		SWORD_TRAIL = 0, NONE
 	};
 
+
+
 	enum class POINTDIRPARTICLE_SHADERPATH : _uint
 	{
 		DEFAULT = 0, QUEENKNIGHTWARP = 1, EXPLOSION = 2,QUEENKINGHT_PARTICLE = 3, HITPARTICLE = 4, PLAYERHITPARTICLE = 5,
@@ -74,8 +76,8 @@ namespace Client
 		NONE
 	};
 
-	enum class DISTORTION_SHADERPATH : _uint {
-		DEFAULT = 0, SWORD_WIND = 1, NONE
+	enum class EFFECTMESH_DISTORTIONSHADERPATH : _uint {
+		SWORD_WIND = 0, NONE
 	};
 
 	/* 기본 스탯 구조체 */

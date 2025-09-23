@@ -1,4 +1,5 @@
-﻿CPlayer_SecondSkillState::CPlayer_SecondSkillState()
+﻿#include "Player_SecondSkillState.h"
+CPlayer_SecondSkillState::CPlayer_SecondSkillState()
 {
 }
 
@@ -25,18 +26,20 @@ HRESULT CPlayer_SecondSkillState::Initialize(_uint iStateNum, void* pArg)
     _float fOriginSpeed = m_pModelCom->Get_AnimSpeed(m_pPlayer->Find_AnimationIndex(TEXT("DRAGON_LUNGE")));
     Add_AnimationSpeed_Info(m_pPlayer->Find_AnimationIndex(TEXT("DRAGON_LUNGE"))
         , ANIMATION_SPEED_INFO{ 0.f / 289.f, 70.f / 289.f, 0, m_pPlayer->Find_AnimationIndex(TEXT("DRAGON_LUNGE"))
-        , fOriginSpeed, 1.5f });
+        , fOriginSpeed, 3.f });
 
     Add_AnimationSpeed_Info(m_pPlayer->Find_AnimationIndex(TEXT("DRAGON_LUNGE"))
         , ANIMATION_SPEED_INFO{ 71.f / 289.f, 120.f / 289.f, 0, m_pPlayer->Find_AnimationIndex(TEXT("DRAGON_LUNGE"))
-        , fOriginSpeed, 1.7f });
+        , fOriginSpeed, 2.5f });
 
+    // 애니메이션 끝.
     Add_AnimationSpeed_Info(m_pPlayer->Find_AnimationIndex(TEXT("DRAGON_LUNGE"))
         , ANIMATION_SPEED_INFO{ 121.f / 289.f, 289.f / 289.f, 0, m_pPlayer->Find_AnimationIndex(TEXT("DRAGON_LUNGE"))
-        , fOriginSpeed, 2.f });
-
+        , fOriginSpeed, 3.f });
 
 #pragma endregion
+
+    m_fFirstEventFrame = 43.f / 289.f;
 
     return S_OK;
 }
@@ -99,6 +102,13 @@ void CPlayer_SecondSkillState::Enter(void* pArg)
     
     m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(m_pGameInstance->Get_CurrentLevelID())
     	, TEXT("PLAYER_AURA"), TEXT("Layer_Effect"), 1, ENUM_CLASS(CEffect_PlayerSkill::EffectType), &Effect_PlayerSkillDesc);
+
+    m_IsFirstEvent = false;
+    m_IsSecondEvent = false;
+    m_IsThirdEvent = false;
+    m_IsFourthEvent = false;
+    m_IsFifthEvent = false;
+    
 }
 
 void CPlayer_SecondSkillState::Update(_float fTimeDelta)
@@ -107,6 +117,8 @@ void CPlayer_SecondSkillState::Update(_float fTimeDelta)
     Handle_Input();
     Handle_Unified_Direction_Input(fTimeDelta);
     Change_State();
+
+    Update_Event(fTimeDelta);
     // 콜라이더 맵 관리.
     CPlayerState::Handle_Collider_State();
     // 스피드 관리
@@ -185,6 +197,53 @@ void CPlayer_SecondSkillState::Change_State()
             return;
         }
     }
+
+}
+
+void CPlayer_SecondSkillState::Create_WindEffect(void* pArg)
+{
+    // 2. 검풍 생성 부분 수정
+      // 플레이어 정면 계산
+    _matrix playerWorld = m_pPlayer->Get_Transform()->Get_WorldMatrix();
+    _vector vPlayerPos = playerWorld.r[3];
+    _vector vPlayerForward = XMVector3Normalize(playerWorld.r[2]);
+    _vector vPlayerUp = XMVector3Normalize(playerWorld.r[1]);
+
+    // 플레이어 앞 (타격 지점)
+    _float fHitDistance = 6.0f;
+    _vector vHitPos = vPlayerPos + (vPlayerForward * fHitDistance);
+    vHitPos += vPlayerUp * 0.7f;
+
+    CEffect_Wind::EFFECTWIND_ACTIVATE_DESC WindActivate_Desc{};
+    WindActivate_Desc.eCurLevel = m_pPlayer->Get_CurrentLevel();
+    WindActivate_Desc.fDuration = 1.5f;
+
+    _float3 vHitPoint;
+    XMStoreFloat3(&vHitPoint, vHitPos);
+    WindActivate_Desc.vStartPos = vHitPoint;  // ⭐ 타격 지점을 시작 위치로 지정
+    WindActivate_Desc.bUseWorldPosition = true;
+    WindActivate_Desc.fCreateDelay = 0.12f;
+    WindActivate_Desc.iWindCount = 3;
+    WindActivate_Desc.vStartScale = { 5.f, 5.f, 5.f };
+
+
+    m_pGameInstance->Move_Effect_ToObjectLayer(
+        ENUM_CLASS(m_pGameInstance->Get_CurrentLevelID()),
+        TEXT("SWORD_WIND"), TEXT("Layer_Effect"), 1,
+        ENUM_CLASS(CEffect_Wind::EffectType), &WindActivate_Desc);
+    m_pGameInstance->PlaySoundEffect(L"CirculatePulse1.ogg", 0.2f);
+}
+
+void CPlayer_SecondSkillState::Update_Event(_float fTimeDelta)
+{
+    _float fCurrentRatio = m_pModelCom->Get_Current_Ratio();
+
+    if (!m_IsFirstEvent && fCurrentRatio >= m_fFirstEventFrame)
+    {
+        m_IsFirstEvent = true;
+        Create_WindEffect(nullptr);
+    }
+
 
 }
 

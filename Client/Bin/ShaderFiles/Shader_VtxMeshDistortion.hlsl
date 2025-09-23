@@ -15,7 +15,7 @@ vector g_vCamPosition;
 //vector g_vMtrlAmbient = 1.f;
 //vector g_vMtrlSpecular = 1.f;
 texture2D g_DiffuseTexture;
-texture2D g_DiffuseTextures[6];
+texture2D g_DiffuseTextures[7];
 
 texture2D g_OtherTextures[13];
 
@@ -98,6 +98,7 @@ PS_OUT PS_DISTORTION_MAP_MAIN(VS_OUT In)
     
     vector vMtrlDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
     
+
     if (vMtrlDiffuse.a < 0.3f)
         discard;
     

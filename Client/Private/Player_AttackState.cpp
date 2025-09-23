@@ -108,32 +108,6 @@ void CPlayer_AttackState::Enter(void* pArg)
 	_float3 vStartPos = {};
 	XMStoreFloat3(&vStartPos, m_pPlayer->Get_Transform()->Get_State(STATE::POSITION));
 
-	// 2. 검풍 생성 부분 수정
-	// 플레이어 정면 계산
-	_matrix playerWorld = m_pPlayer->Get_Transform()->Get_WorldMatrix();
-	_vector vPlayerPos = playerWorld.r[3];
-	_vector vPlayerForward = XMVector3Normalize(playerWorld.r[2]);
-
-	// 플레이어 앞 (타격 지점)
-	_float fHitDistance = 3.0f;
-	_vector vHitPos = vPlayerPos + (vPlayerForward * fHitDistance);
-
-	CEffect_Wind::EFFECTWIND_ACTIVATE_DESC WindActivate_Desc{};
-	WindActivate_Desc.eCurLevel = m_pPlayer->Get_CurrentLevel();
-	WindActivate_Desc.fDuration = 1.5f;
-
-	_float3 vHitPoint;
-	XMStoreFloat3(&vHitPoint, vHitPos);
-	WindActivate_Desc.vStartPos = vHitPoint;  // ⭐ 타격 지점을 시작 위치로 지정
-	WindActivate_Desc.bUseWorldPosition = true;
-
-	m_pGameInstance->Move_Effect_ToObjectLayer(
-		ENUM_CLASS(m_pGameInstance->Get_CurrentLevelID()),
-		TEXT("SWORD_WIND"), TEXT("Layer_Effect"), 1,
-		ENUM_CLASS(CEffect_Wind::EffectType), &WindActivate_Desc);
-
-	
-
 }
 
 /* State 실행 */
