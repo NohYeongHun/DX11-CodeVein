@@ -39,6 +39,18 @@ HRESULT CPlayer_SecondSkillState::Initialize(_uint iStateNum, void* pArg)
 
 #pragma endregion
 
+#pragma region 애니메이션 트레일 제어
+
+    Add_AnimationTrail_Info(m_pPlayer->Find_AnimationIndex(TEXT("DRAGON_LUNGE"))
+        , TRAIL_ACTIVE_INFO{ 72.f / 289.f, 120.f / 289.f
+        , m_pPlayer->Find_AnimationIndex(TEXT("DRAGON_LUNGE")), true });
+
+    //Add_AnimationTrail_Info(m_pPlayer->Find_AnimationIndex(TEXT("DRAGON_LUNGE"))
+    //    , TRAIL_ACTIVE_INFO{ 48.f / 289.f, 60.f / 289.f
+    //    , m_pPlayer->Find_AnimationIndex(TEXT("DRAGON_LUNGE")), true });
+#pragma endregion
+
+
     m_fFirstEventFrame = 43.f / 289.f;
     m_fSecondEventFrame = 68.f / 289.f; // 도약 이전.
 
@@ -124,6 +136,8 @@ void CPlayer_SecondSkillState::Update(_float fTimeDelta)
     CPlayerState::Handle_Collider_State();
     // 스피드 관리
     CPlayerState::Handle_AnimationSpeed_State();
+    // 트레일 관리
+    CPlayerState::Handle_AnimationTrail_State();
 }
 
 void CPlayer_SecondSkillState::Exit()
@@ -267,7 +281,7 @@ void CPlayer_SecondSkillState::Create_SecondEvent()
     _float3 vStartPos = { -0.3f, 0.f, 0.f };
     WindCircleActivate_Desc.vStartPos = vStartPos;
     WindCircleActivate_Desc.fDisplayTime = 0.25f;
-    WindCircleActivate_Desc.fCreateDelay = 0.05f; // 얘가 바로뜨고.
+    WindCircleActivate_Desc.fCreateDelay = 0.1f; // 얘가 바로뜨고.
     WindCircleActivate_Desc.iWindCount = 2;
     WindCircleActivate_Desc.vStartScale = { 6.f, 6.f, 6.f };
     WindCircleActivate_Desc.vTargetScale = { 7.f, 7.f, 7.f };

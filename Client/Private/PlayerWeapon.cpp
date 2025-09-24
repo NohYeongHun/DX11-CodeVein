@@ -262,6 +262,7 @@ HRESULT CPlayerWeapon::Ready_Effects()
     Desc.fSpeedPerSec = 5.f;
     Desc.fRotationPerSec = XMConvertToRadians(1.0f);
     Desc.eDiffuseType = TRAIL_DIFFUSE::SWORD;
+    Desc.eShaderPath = EFFECTTRAIL_SHADERPATH::TRAIL_EMISSIVE;
 
 ;    m_pTrailWeapon_Effect = dynamic_cast<CSwordTrail*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT,
         ENUM_CLASS(LEVEL::STATIC)

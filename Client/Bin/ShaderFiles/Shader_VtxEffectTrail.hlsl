@@ -31,14 +31,6 @@ vector g_ColorFront = vector(1.f, 1.f, 1.f, 1.f);
 
 texture2D g_GradientTexture;
 
-//sampler GradientSampler = sampler_state
-//{
-//    texture = g_GradientTexture;
-//    minfilter = linear;
-//    magfilter = linear;
-//    mipfilter = linear;
-//};
-
 
 
 sampler DepthSampler = sampler_state
@@ -181,13 +173,61 @@ PS_OUT PS_STRETCH_TRAIL(PS_IN In)
     Out.vDiffuse = weaponColor;
     
     
-    //Out.vDiffuse = g_BaseTexture.Sample(DefaultSampler, In.vTexcoord);
-    
     if (Out.vDiffuse.a <= 0.01f)
         discard;
-    //Out.vDiffuse.rgb = float3(128.f / 255.f, 128.f / 255.f, 128.f / 255.f);
-    //Out.vDiffuse.rgb = float3(0.f, 0.f, 0.f);
-    //Out.vDiffuse.a = 1.f;
+
+    
+    return Out;
+}
+
+
+
+texture2D g_DiffuseTextures[4];
+texture2D g_MaskTextures[2];
+float g_BloomIntensity = 2.f;
+
+PS_OUT PS_EMISSIVE_TRAIL(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+    
+    float2 scrollUV = In.vTexcoord;
+    scrollUV.x += g_Time * g_ScrollSpeed;
+    
+    float4 weaponColor = g_BaseTexture.Sample(DefaultSampler, scrollUV);
+    float4 vMask = g_MaskTextures[0].Sample(DefaultSampler, scrollUV);
+    
+    float pulse = sin(g_Time * 10.0f) * 0.5f + 0.5f; // 0~1 펄스
+    pulse = pow(pulse, 2.0f); // 더 날카로운 펄스
+    
+    float wave = sin((In.vTexcoord.x * 10.0f) - (g_Time * 5.0f)) * 0.5f + 0.5f;
+    float3 baseColor = weaponColor.rgb * 2.0f;
+    
+    float3 bloomColor = float3(6.0f, 1.2f, 1.2f); // 연한 빨강 (핑크빛 빨강)
+    float3 secondaryBloom = float3(4.0f, 0.8f, 0.8f); // 더 연한 빨강
+        
+    float3 dynamicBloom = lerp(bloomColor, secondaryBloom, pulse);
+    dynamicBloom *= (1.0f + wave * 0.5f);
+    
+    float fMaskBrightness = dot(vMask.rgb, float3(0.299, 0.587, 0.114));
+    if (fMaskBrightness > 0.5f)
+    {
+        baseColor *= 2.0f;
+        dynamicBloom *= 2.0f;
+    }
+    
+    float uvFade = pow(1.0f - In.vTexcoord.x, 1.5f);
+    
+    float3 finalColor = baseColor + (dynamicBloom * uvFade * g_BloomIntensity);
+    
+    float dither = frac(sin(dot(In.vPosition.xy, float2(12.9898, 78.233))) * 43758.5453);
+    finalColor *= (0.95f + dither * 0.1f);
+    
+    float alpha = weaponColor.a * uvFade;
+    
+    if (alpha <= 0.01f)
+        discard;
+    
+    Out.vDiffuse = float4(finalColor, alpha);
     
     return Out;
 }
@@ -197,7 +237,7 @@ PS_OUT PS_STRETCH_TRAIL(PS_IN In)
 
 technique11 DefaultTechnique
 {
-    pass Trail
+    pass Trail // 0
     {
         SetRasterizerState(RS_Default);
         SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 1.f), 0xffffffff);
@@ -208,7 +248,7 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_TRAIL();
     }
 
-    pass MultiTrail
+    pass MultiTrail // 1
     {
         SetRasterizerState(RS_Default);
         SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 1.f), 0xffffffff);
@@ -219,7 +259,7 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_MULTI_TRAIL();
     }
 
-    pass StretchTrail
+    pass StretchTrail // 2
     {
         SetRasterizerState(RS_Default);
         SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 1.f), 0xffffffff);
@@ -229,5 +269,17 @@ technique11 DefaultTechnique
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_STRETCH_TRAIL();
+    }
+
+    pass EmissiveTrail // 3
+    {
+        SetRasterizerState(RS_Default);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 1.f), 0xffffffff);
+        //SetDepthStencilState(DSS_WeightBlend, 0);
+        SetDepthStencilState(DSS_WeightBlend, 0);
+
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_EMISSIVE_TRAIL();
     }
 }

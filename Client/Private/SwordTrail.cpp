@@ -42,7 +42,6 @@ HRESULT CSwordTrail::Initialize_Clone(void* pArg)
     }
         
 	m_eCurLevel = pDesc->eCurLevel;
-    m_iShaderPath = static_cast<_uint>(EFFECTTRAIL_SHADERPATH::STRETCH_TRAIL); // StretchTrail 패스 사용 (Ribbon Trail)
 	m_iBaseTextureIndex = static_cast<_uint>(pDesc->eDiffuseType);
 
 	CPlayer* pPlayer = dynamic_cast<CPlayer*>(pDesc->pTarget);
@@ -52,6 +51,8 @@ HRESULT CSwordTrail::Initialize_Clone(void* pArg)
 	// m_vColorBack = { 12, 76, 255, 255 };
 	m_fAlpha = 1.2f; // 기본 알파값 증가
 
+
+	m_iShaderPath = static_cast<_uint>(pDesc->eShaderPath);
     
     return S_OK;
 } 
@@ -158,7 +159,7 @@ HRESULT CSwordTrail::Ready_Components(SWORDTRAIL_DESC* pDesc)
 	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC)
 		, TEXT("Prototype_Component_Texture_TrailSlash")
 		,TEXT("Com_DetailTexture")
-	, reinterpret_cast<CComponent**>(&m_pDetailTexture))))
+	, reinterpret_cast<CComponent**>(&m_pMaskTexture))))
 	{
 		CRASH("Failed Create Detail Texture Sword Trail");
 		return E_FAIL;
@@ -188,6 +189,15 @@ HRESULT CSwordTrail::Ready_Components(SWORDTRAIL_DESC* pDesc)
 		, TEXT("Prototype_Component_Texture_TrailDistortion")
 		,TEXT("Com_DistortionTexture")
 	, reinterpret_cast<CComponent**>(&m_pDistortionTexture))))
+	{
+		CRASH("Failed Create Glow Texture Trail Distortion");
+		return E_FAIL;
+	}
+
+	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC)
+		, TEXT("Prototype_Component_Texture_TrailDiffuse")
+		, TEXT("Com_Diffuse")
+		, reinterpret_cast<CComponent**>(&m_pDiffuseTexture))))
 	{
 		CRASH("Failed Create Glow Texture Trail Distortion");
 		return E_FAIL;
@@ -257,21 +267,27 @@ HRESULT CSwordTrail::Bind_ShaderResources()
 		CRASH("Failed Bind SP_Weapon Texture as GlowTexture");
 		return E_FAIL;
 	}
-
-	if (FAILED(m_pGraidentTexture->Bind_Shader_Resource(m_pShaderCom, "g_GradientTexture", 2)))
+	
+	if (FAILED(m_pMaskTexture->Bind_Shader_Resources(m_pShaderCom, "g_MaskTextures")))
 	{
-		CRASH("Failed Bind SP_Weapon Texture as GlowTexture");
+		CRASH("Failed Bind SP_Weapon Texture as MaskTexture");
 		return E_FAIL;
 	}
 
 	// Depth Texture 바인딩
 	m_pGameInstance->Bind_RT_ShaderResource(TEXT("Target_Depth"), m_pShaderCom, "g_DepthTexture");
 
-	if (FAILED(m_pBaseTexture->Bind_Shader_Resource(m_pShaderCom, "g_GradientTexture", m_iBaseTextureIndex)))
+	if (FAILED(m_pDiffuseTexture->Bind_Shader_Resources(m_pShaderCom, "g_DiffuseTextures")))
+	{
+		CRASH("Failed Bind SP_Weapon Texture as GlowTexture");
+		return E_FAIL;
+	}
+
+	/*if (FAILED(m_pBaseTexture->Bind_Shader_Resource(m_pShaderCom, "g_GradientTexture", m_iBaseTextureIndex)))
 	{
 		CRASH("Failed Bind SP_Weapon Texture as DepthTexture");
 		return E_FAIL;
-	}
+	}*/
 
 	// Ribbon Trail 파라미터 바인딩
 	if (FAILED(m_pShaderCom->Bind_RawValue("g_Time", &m_fTime, sizeof(_float))))
@@ -386,10 +402,11 @@ void CSwordTrail::Free()
 	Safe_Release(m_pDistortionShaderCom);
 	
 	Safe_Release(m_pBaseTexture);
-	Safe_Release(m_pDetailTexture);
+	Safe_Release(m_pMaskTexture);
 	Safe_Release(m_pGlowTexture);
 	Safe_Release(m_pGraidentTexture);
 	Safe_Release(m_pDistortionTexture);
+	Safe_Release(m_pDiffuseTexture);
 }
 
 #ifdef _DEBUG

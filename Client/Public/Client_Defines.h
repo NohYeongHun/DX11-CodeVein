@@ -60,7 +60,7 @@ namespace Client
 	};
 	enum class EFFECTTRAIL_SHADERPATH : _uint {
 		TRAIL = 0, MULTITRAIL = 1, STRETCH_TRAIL = 2
-		, NONE
+		, TRAIL_EMISSIVE = 3, NONE
 	};
 
 	enum class EFFECTTRAIL_DISTORTIONSHADERPATH : _uint {

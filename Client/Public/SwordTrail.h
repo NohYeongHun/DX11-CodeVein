@@ -9,6 +9,7 @@ public:
 		LEVEL eCurLevel;
 		CGameObject* pTarget = { nullptr };
 		TRAIL_DIFFUSE eDiffuseType = {};
+		EFFECTTRAIL_SHADERPATH eShaderPath = { EFFECTTRAIL_SHADERPATH::STRETCH_TRAIL };
 	}SWORDTRAIL_DESC;
 private:
 	CSwordTrail(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
@@ -51,9 +52,10 @@ private:
 	// 멀티 텍스처 시스템
 	class CTexture* m_pBaseTexture = { nullptr };      // 기본 검 궤적
 	_uint			m_iBaseTextureIndex = {};
-	class CTexture* m_pDetailTexture = { nullptr };    // 슬래시 디테일
+	class CTexture* m_pMaskTexture = { nullptr };    // 슬래시 디테일
 	class CTexture* m_pGlowTexture = { nullptr };      // 발광 효과
 	class CTexture* m_pDistortionTexture = { nullptr };      // 발광 효과
+	class CTexture* m_pDiffuseTexture = { nullptr };      // 발광 효과
 	class CTexture* m_pGraidentTexture = { nullptr };      // Gradient
 	_vector	m_vColorBack = XMVectorSet(1.f, 1.f, 1.f, 1.f);
 	_vector	m_vColorFront = XMVectorSet(1.f, 1.f, 1.f, 1.f);
