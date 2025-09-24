@@ -52,6 +52,8 @@
 #include "Effect_Pillar.h"
 #include "Effect_Wind.h"
 
+#include "Effect_WindCircle.h"
+
 
 
 #include "Effect_PlayerSkill.h"
@@ -59,6 +61,8 @@
 #include "Effect_BodyAura.h"
 
 #include "SwordWind.h"
+#include "SwordWindCircle.h"
+
 #include "SwordTrail.h"
 #pragma endregion
 
@@ -142,6 +146,7 @@
 
 #pragma region Effect
 #include "Slash.h"
+#include "RenketsuSlash.h"
 #include "HitFlashEffect.h"
 #pragma endregion
 

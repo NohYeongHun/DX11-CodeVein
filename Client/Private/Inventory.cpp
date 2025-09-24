@@ -370,7 +370,7 @@ HRESULT CInventory::Ready_Events()
 HRESULT CInventory::Ready_Skills()
 {
     /*INVENTORY_SKILLCHANGE_DESC Desc{};
-    Desc.pText = TEXT("Action_SkillIcon");
+    
     Desc.iSkillPanelIdx = SKILL_PANEL_LEFT;
     Desc.iSlotIdx = 0;
     Desc.iTextureIdx = 0;

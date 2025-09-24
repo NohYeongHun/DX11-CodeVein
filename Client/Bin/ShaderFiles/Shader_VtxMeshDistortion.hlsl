@@ -3,12 +3,12 @@
 matrix g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 vector g_vCamPosition;
 
-/*재질*/
+/*?�질*/
 //texture2D g_DiffuseTexture;
 //texture2D g_NormalTexture;
 
 
-//// 시간.
+//// ?�간.
 //float g_fDissolveTime;
 //float g_fReverseDissolveTime;
 
@@ -41,14 +41,10 @@ struct VS_OUT
     float4 vProjPos : TEXCOORD2;
 };
 
-/* 정점쉐이더 : 정점 위치의 스페이스 변환(로컬 -> 월드 -> 뷰 -> 투영). */ 
-/*          : 정점의 구성을 변경.(in:3개, out:2개 or 5개) */
-/*          : 정점 단위(정점 하나당 VS_MAIN한번호출) */ 
 VS_OUT VS_MAIN(VS_IN In)
 {
     VS_OUT Out = (VS_OUT) 0;
     
-    /* 정점의 로컬위치 * 월드 * 뷰 * 투영 */ 
         
     float4x4 matWV, matWVP;
     
@@ -67,9 +63,6 @@ VS_OUT VS_MAIN(VS_IN In)
 }
 
 
-/* /W을 수행한다. 투영스페이스로 변환 */
-/* 뷰포트로 변환하고.*/
-/* 래스터라이즈 : 픽셀을 만든다. */
 
 struct PS_IN
 {
@@ -85,13 +78,13 @@ struct PS_IN
 
 struct PS_OUT
 {
-    // 렌더 타겟(Target_Distortion)에 노멀 벡터를 기록합니다.
+    // ?�더 ?��?Target_Distortion)???��? 벡터�?기록?�니??
     float4 vNormal : SV_TARGET0;
 };
 
 
 
-// 왜곡 지도 생성용 픽셀 셰이더
+// ?�곡 지???�성???��? ?�이??
 PS_OUT PS_DISTORTION_MAP_MAIN(VS_OUT In)
 {
     PS_OUT Out = (PS_OUT) 0;
@@ -103,15 +96,12 @@ PS_OUT PS_DISTORTION_MAP_MAIN(VS_OUT In)
         discard;
     
    
-    // 텍스처에서 노멀 값을 읽어옵니다. (노멀맵 사용 시)
     vector vNormalDesc = g_OtherTextures[10].Sample(DefaultSampler, In.vTexcoord);
     float3 vNormal = vNormalDesc.xyz * 2.f - 1.f;
     
     float3x3 WorldMatrix = float3x3(In.vTangent.xyz, In.vBinormal.xyz * -1.f, In.vNormal.xyz);
     vNormal = mul(vNormal, WorldMatrix);
     
-    // 노멀 벡터의 범위를 0 ~ 1로 변환하여 출력합니다.
-    // 렌더 타겟에는 음수 값을 저장할 수 없기 때문입니다.
     Out.vNormal = vector(vNormal * 0.5f + 0.5f, 0.f);
 
     return Out;
@@ -120,9 +110,6 @@ PS_OUT PS_DISTORTION_MAP_MAIN(VS_OUT In)
 
 technique11 DefaultTechnique
 {
-    /* 특정 패스를 이용해서 점정을 그려냈다. */
-    /* 하나의 모델을 그려냈다. */ 
-    /* 모델의 상황에 따라 다른 쉐이딩 기법 세트(명암 + 림라이트 + 스펙큘러 + 노멀맵 + ssao )를 먹여주기위해서 */
     pass SwordWindPass // 0 
     {
         SetRasterizerState(RS_Default);

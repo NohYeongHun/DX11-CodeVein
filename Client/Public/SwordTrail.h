@@ -54,6 +54,7 @@ private:
 	class CTexture* m_pDetailTexture = { nullptr };    // 슬래시 디테일
 	class CTexture* m_pGlowTexture = { nullptr };      // 발광 효과
 	class CTexture* m_pDistortionTexture = { nullptr };      // 발광 효과
+	class CTexture* m_pGraidentTexture = { nullptr };      // Gradient
 	_vector	m_vColorBack = XMVectorSet(1.f, 1.f, 1.f, 1.f);
 	_vector	m_vColorFront = XMVectorSet(1.f, 1.f, 1.f, 1.f);
 	_float			m_fAlpha = 1.f;

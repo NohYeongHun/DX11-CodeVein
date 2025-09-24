@@ -2,17 +2,20 @@
 
 matrix g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 
-/* ì´ 6ê°œ ì‚¬ìš© */
 texture2D g_DiffuseTexture;
+texture2D g_DiffuseTextures[2];
 texture2D g_OpacityTexture;
 texture2D g_MaskTexture;
+
+
 texture2D g_OtherTexture[5];
 
-/* ì‚¬ìš©í•  ë³€ìˆ˜ë“¤ */
+
+
 float g_fTime;
 float g_fTimeRatio;
 float g_fBloomIntensity = 2.0f;
-float g_fScale; // ìŠ¤ì¼€ì¼ íŒ©í„°
+float g_fScale; 
 
 struct VS_IN
 {
@@ -74,23 +77,16 @@ PS_OUT PS_HITFLASH_MAIN(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
 
-    // 1. ì›ë³¸ ë¶ˆê½ƒ ëª¨ì–‘ì„ ê°€ì ¸ì˜µë‹ˆë‹¤.
     float sparkShape = g_OpacityTexture.Sample(DefaultSampler, In.vTexcoord).r;
 
-    // ë¶€ë“œëŸ¬ìš´ ë¹›ë¬´ë¦¬ íš¨ê³¼ë¥¼ ìœ„í•´ Radial í…ìŠ¤ì²˜ë¥¼ ë”í•´ì¤ë‹ˆë‹¤.
     float radialGlow = g_OtherTexture[2].Sample(DefaultSampler, In.vTexcoord).r;
     
-    // radialGlow ê´€ë ¨ ë‘ ì¤„ì„ ì‚­ì œí•˜ê³  ì•„ë˜ì™€ ê°™ì´ ìˆ˜ì •í•©ë‹ˆë‹¤.
-    //float finalShape = sparkShape;
     float finalShape = saturate(sparkShape + (radialGlow * 0.1f));
 
-    // 2. ì‹œê°„ì— ë”°ë¼ ë‚˜íƒ€ë‚¬ë‹¤ê°€ ì‚¬ë¼ì§€ëŠ” ì•ŒíŒŒê°’ì„ ê³„ì‚°í•©ë‹ˆë‹¤.
     float fadeAlpha = sin(saturate(g_fTimeRatio) * 3.14159f);
     
-    // 3. ìµœì¢… ì•ŒíŒŒ = (ìµœì¢… ëª¨ì–‘ * ì „ì²´ Fade)
     float finalAlpha = finalShape * fadeAlpha;
 
-    // ìƒ‰ìƒ ì ìš©
     float3 goldColor = float3(2.5f, 1.8f, 0.5f) * g_fBloomIntensity;
     float3 finalColor = goldColor * finalShape;
     
@@ -100,68 +96,27 @@ PS_OUT PS_HITFLASH_MAIN(PS_IN In)
 }
 
 
-//PS_OUT PS_LINESLASH_MAIN(PS_IN In)
-//{
-//    PS_OUT Out = (PS_OUT) 0;
-
-//    // 1. [ìˆ˜ì •] ê¸°ë³¸ UV ì¢Œí‘œë¥¼ ì‚¬ìš©í•©ë‹ˆë‹¤.
-//    // ì¶•ì†Œ íš¨ê³¼ë¥¼ ìœ„í•œ scaledUV ê³„ì‚° ë¡œì§ì„ ëª¨ë‘ ì œê±°í–ˆìŠµë‹ˆë‹¤.
-//    float2 uv = In.vTexcoord;
-
-//    // 2. ê²€ê²©(Slash) í…ìŠ¤ì²˜ë¥¼ ìƒ˜í”Œë§í•©ë‹ˆë‹¤.
-//    // ê²€ê²© í…ìŠ¤ì²˜(g_OtherTexture[1])ê°€ 4ì¤„ì§œë¦¬ SubUV ì‹œíŠ¸ë¼ëŠ” ê°€ì •í•˜ì—,
-//    // ê·¸ ì¤‘ ë‘ ë²ˆì§¸ ì¤„ì„ ì„ íƒí•˜ëŠ” ë¡œì§ì€ ìœ ì§€í–ˆìŠµë‹ˆë‹¤.
-//    uv.y = (uv.y + 1.0f) / 4.0f;
-//    float slashShape = g_OtherTexture[1].Sample(DefaultSampler, uv).r;
-    
-//    // 3. [ìœ ì§€] ì‹œê°„ì— ë”°ë¥¸ ì•ŒíŒŒ(íˆ¬ëª…ë„) ì• ë‹ˆë©”ì´ì…˜ì…ë‹ˆë‹¤.
-//    // íš¨ê³¼ê°€ ë‚˜íƒ€ë‚˜ê³  20%ì˜ ì‹œê°„ì´ ì§€ë‚œ í›„ë¶€í„° ì„œì„œíˆ ì‚¬ë¼ì§‘ë‹ˆë‹¤.
-//    float fadeAlpha = 1.0f;
-//    if (g_fTimeRatio > 0.2f)
-//    {
-//        fadeAlpha = 1.0f - (g_fTimeRatio - 0.2f) / 0.8f;
-//    }
-
-//    // 4. [ìœ ì§€] ìµœì¢… ìƒ‰ìƒì— ë¸”ë£¸ ê°•ë„ë¥¼ ê³±í•˜ê³ , ê³„ì‚°ëœ ì•ŒíŒŒë¥¼ ì ìš©í•©ë‹ˆë‹¤.
-//    float3 goldColor = float3(2.5f, 1.8f, 0.5f);
-//    float3 finalColor = goldColor * slashShape * g_fBloomIntensity;
-//    float finalAlpha = slashShape * fadeAlpha;
-
-//    Out.vColor = float4(finalColor, finalAlpha);
-    
-//    return Out;
 //}
 
 PS_OUT PS_LINESLASH_MAIN(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
 
-    // 1. ê²€ê²©(Slash) í…ìŠ¤ì²˜ë¥¼ ìƒ˜í”Œë§í•©ë‹ˆë‹¤.
     float2 slashUV = In.vTexcoord;
-    slashUV.y = (slashUV.y + 1.0f) / 4.0f; // 4ì¤„ì§œë¦¬ í…ìŠ¤ì²˜ ì¤‘ ë‘ ë²ˆì§¸ ì¤„ ì„ íƒ
+    slashUV.y = (slashUV.y + 1.0f) / 4.0f; 
     float slashShape = g_OtherTexture[1].Sample(DefaultSampler, slashUV).r;
 
-    // [ì¶”ê°€] ê²€ê²©ì˜ ì¤‘ì‹¬ë¶€ë¥¼ ë” ë‚ ì¹´ë¡­ê³  ë°ê²Œ ë§Œë“­ë‹ˆë‹¤.
     slashShape = pow(slashShape, 2.0f);
 
-    // 2. [í•µì‹¬] ì•ŒíŒŒ ì†Œë©¸ì„ ìœ„í•œ ë…¸ì´ì¦ˆ í…ìŠ¤ì²˜ë¥¼ ìƒ˜í”Œë§í•©ë‹ˆë‹¤.
-    // Other0.png ê°™ì€ ìœ ê¸°ì ì¸ ë…¸ì´ì¦ˆ í…ìŠ¤ì²˜ë¥¼ g_OtherTexture[0]ì— í• ë‹¹í–ˆë‹¤ê³  ê°€ì •í•©ë‹ˆë‹¤.
-    // g_fTimeì„ ì´ìš©í•´ ë…¸ì´ì¦ˆê°€ ì›€ì§ì´ê²Œ í•˜ì—¬ ë§¤ë²ˆ ë‹¤ë¥¸ ëª¨ì–‘ìœ¼ë¡œ ì‚¬ë¼ì§€ê²Œ í•©ë‹ˆë‹¤.
     float2 noiseUV = In.vTexcoord * 2.0f + g_fTime * 0.5f;
     float noiseValue = g_OtherTexture[2].Sample(DefaultSampler, noiseUV).r;
 
-    // 3. [í•µì‹¬] clip() í•¨ìˆ˜ë¡œ ì•ŒíŒŒ ì†Œë©¸ íš¨ê³¼ë¥¼ êµ¬í˜„í•©ë‹ˆë‹¤.
-    // g_fTimeRatio (ì‹œê°„ ì§„í–‰ë„, 0.0 -> 1.0)ê°€ ì¦ê°€í•¨ì— ë”°ë¼,
-    // noiseValueê°€ g_fTimeRatioë³´ë‹¤ ì‘ì€ í”½ì…€ë“¤ì„ ê·¸ë ¤ì§€ì§€ ì•Šë„ë¡(discard) ì˜ë¼ëƒ…ë‹ˆë‹¤.
-    // ì´ ë¶€ë¶„ì´ ì˜ìƒì²˜ëŸ¼ "ì¹¨ì‹ë˜ë©° ì‚¬ë¼ì§€ëŠ”" íš¨ê³¼ë¥¼ ë§Œë“­ë‹ˆë‹¤.
     clip(noiseValue - pow(g_fTimeRatio, 2.2f));
 
-    // 4. ìµœì¢… ìƒ‰ìƒ ë° ì•ŒíŒŒë¥¼ ê³„ì‚°í•©ë‹ˆë‹¤.
-    // ì´ì œ ì†Œë©¸ íš¨ê³¼ëŠ” clip()ì´ ë‹´ë‹¹í•˜ë¯€ë¡œ, ì•ŒíŒŒëŠ” ê²€ê²©ì˜ ëª¨ì–‘ ìì²´ë§Œìœ¼ë¡œ ì¶©ë¶„í•©ë‹ˆë‹¤.
     float3 goldColor = float3(2.5f, 1.8f, 0.5f);
     float3 finalColor = goldColor * slashShape * g_fBloomIntensity;
     
-    // ì†Œë©¸ ê²½ê³„ì„ ì„ ë¶€ë“œëŸ½ê²Œ ë§Œë“¤ê¸° ìœ„í•´ ì•½ê°„ì˜ í˜ì´ë“œ íš¨ê³¼ë¥¼ ì¶”ê°€í•  ìˆ˜ ìˆìŠµë‹ˆë‹¤.
+   
     float finalAlpha = slashShape * saturate((noiseValue - g_fTimeRatio) * 5.0f);
 
     Out.vColor = float4(finalColor, finalAlpha);
@@ -169,38 +124,161 @@ PS_OUT PS_LINESLASH_MAIN(PS_IN In)
     return Out;
 }
 
-//PS_OUT PS_LINESLASH_MAIN(PS_IN In)
+
+
+
+texture2D g_OtherTextures[3];
+texture2D g_MaskTextures[2];
+/* ½ÉÇÃ ¹öÀü - ¸íÈ®ÇÑ Å¬¸®ÇÎ */
+//PS_OUT PS_RENKETSU_SLASH_MAIN(PS_IN In)
 //{
 //    PS_OUT Out = (PS_OUT) 0;
-
-//    // 1. ì‹œê°„ì— ë”°ë¼ ì‚¬ë¼ì§€ëŠ” ë“¯í•œ 'ì¶•ì†Œ' íš¨ê³¼ë¥¼ ìœ„í•œ UV ê³„ì‚° (ê¸°ì¡´ê³¼ ë™ì¼)
-//    float2 center = float2(0.5f, 0.5f);
-//    float2 scaledUV = center + (In.vTexcoord - center) / g_fScale;
-//    if (scaledUV.x < 0.0f || scaledUV.x > 1.0f || scaledUV.y < 0.0f || scaledUV.y > 1.0f)
-//        discard;
-
-//    // â–¼â–¼â–¼ [í•µì‹¬ ìˆ˜ì •] ì¼ë ì´ëŠ” íš¨ê³¼ë¥¼ ë§Œë“œëŠ” UV ì™œê³¡ ë¡œì§ ì „ì²´ ì‚­ì œ â–¼â–¼â–¼
     
-//    // 2. ì™œê³¡ë˜ì§€ ì•Šì€ UVë¡œ ê²€ê²©(Slash) í…ìŠ¤ì²˜ ìƒ˜í”Œë§
-//    // ê²€ê²© í…ìŠ¤ì²˜(Other[1])ëŠ” 4ì¤„ì§œë¦¬ SubUVì´ë¯€ë¡œ, ê·¸ ì¤‘ í•œ ì¤„ì„ ì„ íƒí•˜ì—¬ ì‚¬ìš©
-//    float2 slashUV = scaledUV;
-//    slashUV.y = (slashUV.y + 1.0f) / 4.0f; // ë‘ ë²ˆì§¸ ì¤„ ì„ íƒ
-
-//    float slashShape = g_OtherTexture[1].Sample(DefaultSampler, slashUV).r;
+//    float2 uv = In.vTexcoord;
     
-//    // 3. ì‹œê°„ì— ë”°ë¥¸ ì•ŒíŒŒ ì• ë‹ˆë©”ì´ì…˜ (ê¸°ì¡´ê³¼ ë™ì¼)
-//    float fadeAlpha = 1.0f;
-//    if (g_fTimeRatio > 0.2f)
+//    // ¸¶½ºÅ©µé »ùÇÃ¸µ
+//    float4 vGlowMask = g_MaskTextures[0].Sample(DefaultSampler, uv);
+//    float4 vSlashMask = g_MaskTextures[1].Sample(DefaultSampler, uv);
+//    float4 vDiffuse = g_DiffuseTextures[1].Sample(DefaultSampler, uv);
+    
+//    // MaskTextures[0]: Èò ºÎºĞ »ç¿ë, °ËÁ¤ ºÎºĞÀº Å¬¸®ÇÎ
+//    float glow = vGlowMask.r;
+    
+//    // °ËÁ¤ ºÎºĞ ¿ÏÀü Á¦°Å
+//    clip(glow - 0.01f); // clip ÇÔ¼ö·Î ´õ °£´ÜÇÏ°Ô
+    
+//    // MaskTextures[1]: °ËÀº ºÎºĞ »ç¿ë (¹İÀü)
+//    float slash = 1.0f - vSlashMask.r;
+    
+//    // ½Ã°£ ¾Ö´Ï¸ŞÀÌ¼Ç
+//    float t = g_fTimeRatio;
+    
+//    // ½½·¡½Ã Á¡ÁøÀû ³ªÅ¸³²
+//    float slashReveal = smoothstep(0.3f - t, 0.5f - t * 0.5f, slash);
+    
+//    // ±Û·Î¿ì È®»ê
+//    float glowSpread = glow * (1.0f + t * 0.8f);
+//    glowSpread = saturate(glowSpread);
+    
+//    // »ö»ó Àû¿ë
+//    float3 slashColor = vDiffuse.rgb * 2.0f;
+//    float3 glowColor = float3(1.0f, 0.5f, 0.2f);
+    
+//    // ÃÖÁ¾ »ö»ó
+//    float3 finalColor = slashColor * slashReveal;
+//    finalColor += glowColor * glowSpread * 0.7f;
+    
+//    // ¾ËÆÄ (±Û·Î¿ì ¸¶½ºÅ© ¿µ¿ª ³»¿¡¼­¸¸)
+//    float alpha = saturate(slashReveal + glowSpread * 0.4f);
+//    alpha *= (1.0f - smoothstep(0.8f, 1.0f, t));
+//    alpha *= glow; // ±Û·Î¿ì ¸¶½ºÅ© °æ°è Àû¿ë
+    
+//    Out.vColor = float4(finalColor, alpha);
+    
+//    return Out;
+//}
+PS_OUT PS_RENKETSU_SLASH_MAIN(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+    
+    float2 uv = In.vTexcoord;
+    
+    // ¸¶½ºÅ©µé »ùÇÃ¸µ
+    float4 vGlowMask = g_MaskTextures[0].Sample(DefaultSampler, uv); // Èò»ö ±Û·Î¿ì ¸¶½ºÅ©
+    float4 vSlashMask = g_MaskTextures[1].Sample(DefaultSampler, uv); // °ËÀº ½½·¡½Ã ¸¶½ºÅ©
+    
+    // MaskTextures[0]: Èò ºÎºĞ¸¸ ·»´õ¸µ (°ËÁ¤ ºÎºĞ Å¬¸®ÇÎ)
+    float glowArea = vGlowMask.r;
+    clip(glowArea - 0.01f);
+    
+    if (vGlowMask.r < 0.1f && vGlowMask.g < 0.1f && vGlowMask.b < 0.1f)
+        discard;
+    
+    
+    // MaskTextures[1]: °ËÀº ºÎºĞÀÌ ½½·¡½Ã (¹İÀü)
+    float slashCore = 1.0f - vSlashMask.r;
+    
+    // 1. °ËÀº °Ë°İ ºÎºĞ
+    float3 slashColor = float3(0.1f, 0.05f, 0.05f); // °ÅÀÇ °ËÀº»ö
+    
+    // 2. ÁÖº¯ ¿¬ÇÑ »¡°£»ö ¾Æ¿ì¶ó
+    // ½½·¡½Ã¿¡¼­ ¸Ö¾îÁú¼ö·Ï ¿¬ÇÑ »¡°£»öÀ¸·Î º¯È­
+    float auraGradient = 1.0f - slashCore; // ½½·¡½Ã¿¡¼­ ¸Ö¼ö·Ï 1¿¡ °¡±î¿ò
+    float3 auraColor = float3(1.f, 0.01f, 0.01f); // ¿¬ÇÑ »¡°£»ö
+    
+    // ¾Æ¿ì¶ó ¹üÀ§ (½½·¡½Ã ÁÖº¯¿¡¸¸ »ı¼º)
+    float auraRange = smoothstep(0.0f, 0.5f, auraGradient);
+    
+    // 3. »ö»ó ºí·»µù
+    // ½½·¡½Ã Áß½ÉÀº °ËÀº»ö, ÁÖº¯Àº ¿¬ÇÑ »¡°£»ö
+    float3 finalColor = slashColor;  //lerp(slashColor, auraColor, auraRange);
+    
+    // ½½·¡½Ã Áß½ÉºÎ¸¦ ´õ ¾îµÓ°Ô °­Á¶
+    if (slashCore > 0.8f)
+    {
+        finalColor = slashColor * 0.5f; // Áß½ÉºÎ´Â ´õ °Ë°Ô
+    }
+    
+    // 4. ¾ËÆÄ°ª ¼³Á¤
+    // ½½·¡½Ã´Â ºÒÅõ¸í, ¾Æ¿ì¶ó´Â ¹İÅõ¸í
+    float slashAlpha = slashCore; // ½½·¡½Ã ºÎºĞ
+    float auraAlpha = auraRange * 0.4f * (1.0f - slashCore); // ¾Æ¿ì¶ó´Â ¹İÅõ¸í
+    
+    float alpha = saturate(slashAlpha + auraAlpha);
+    alpha *= glowArea; // ±Û·Î¿ì ¸¶½ºÅ© °æ°è Àû¿ë
+    
+    Out.vColor = float4(finalColor, 1.f);
+    
+    return Out;
+} 
+
+/* ·»ÄÉÃ÷ ½½·¡½Ã - Á¡Á¡ ¹ú¾îÁö´Â °Ë°İ È¿°ú */
+/* ·»ÄÉÃ÷ ½½·¡½Ã - ¸¶½ºÅ©ÀÇ Èò»ö ºÎºĞ¿¡¸¸ È¿°ú Àû¿ë */
+/* ´õ °£´ÜÇÏ°í ¸íÈ®ÇÑ ¹öÀü */
+//PS_OUT PS_RENKETSU_SLASH_MAIN(PS_IN In)
+//{
+//    PS_OUT Out = (PS_OUT) 0;
+    
+//    float2 uv = In.vTexcoord;
+    
+//    // ÅØ½ºÃ³ »ùÇÃ¸µ
+//    float4 vMask = g_MaskTexture.Sample(DefaultSampler, uv);
+//    float4 vDiffuse = g_DiffuseTextures[1].Sample(DefaultSampler, uv);
+    
+//    // ¸¶½ºÅ©ÀÇ Èò»ö ºÎºĞ¸¸ »ç¿ë
+//    float maskValue = vMask.r;
+    
+//    // °ËÀº ºÎºĞÀº discard
+//    if (maskValue < 0.01f)
 //    {
-//        fadeAlpha = 1.0f - (g_fTimeRatio - 0.2f) / 0.8f;
+//        discard;
 //    }
-
-//    // 4. ìµœì¢… ìƒ‰ìƒ ë° ë¸”ë£¸ ì ìš© (ê¸°ì¡´ê³¼ ë™ì¼)
-//    float3 goldColor = float3(2.5f, 1.8f, 0.5f);
-//    float3 finalColor = goldColor * slashShape * g_fBloomIntensity;
-//    float finalAlpha = slashShape * fadeAlpha;
-
-//    Out.vColor = float4(finalColor, finalAlpha);
+    
+//    // ½Ã°£¿¡ µû¸¥ È®Àå
+//    float expand = g_fTimeRatio;
+    
+//    // Á¡ÁøÀûÀ¸·Î ³ªÅ¸³ª´Â È¿°ú (threshold animation)
+//    float threshold = 1.0f - expand * 1.2f;
+//    float slash = smoothstep(threshold, threshold + 0.2f, maskValue);
+    
+//    // ³Êºñ È®Àå (¼±ÅÃÀû)
+//    float widthBoost = 1.0f + expand * 0.5f;
+//    slash = saturate(slash * widthBoost);
+    
+//    // ³ëÀÌÁî ÅØ½ºÃ³ÀÇ »ö»óÀ» ¸¶½ºÅ©ÀÇ Èò»ö ºÎºĞ¿¡ Àû¿ë
+//    float3 color = vDiffuse.rgb * 2.0f; // »¡°£»ö ³ëÀÌÁî »ö»ó °­È­
+    
+//    // Áß½ÉºÎ¸¦ ´õ ¹à°Ô
+//    float brightness = pow(maskValue, 0.5f);
+//    color *= (1.0f + brightness);
+    
+//    // ÆäÀÌµå È¿°ú
+//    float fadeOut = 1.0f - smoothstep(0.8f, 1.0f, expand);
+    
+//    // ÃÖÁ¾ ¾ËÆÄ (¸¶½ºÅ© Èò»ö ¿µ¿ª * ¾Ö´Ï¸ŞÀÌ¼Ç * ÆäÀÌµå)
+//    float finalAlpha = maskValue * slash * fadeOut;
+    
+//    Out.vColor = float4(color, finalAlpha);
     
 //    return Out;
 //}
@@ -210,7 +288,7 @@ PS_OUT PS_LINESLASH_MAIN(PS_IN In)
 
 technique11 DefaultTechnique
 {
-    pass DefaultPass
+    pass DefaultPass // 0
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_Default, 0);
@@ -220,24 +298,34 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_MAIN();
     }
 
-    pass HitFlashPass
+    pass HitFlashPass // 1
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_Default, 0);
-        SetBlendState(BS_AlphaBlend_Additive, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_HITFLASH_MAIN();
     }
 
-    pass MonsterLineSlashPass
+    pass MonsterLineSlashPass // 2
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_Default, 0);
-        SetBlendState(BS_AlphaBlend_Additive, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_LINESLASH_MAIN();
+    }
+
+    pass RenketsuLineSlashPass// 3
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_RENKETSU_SLASH_MAIN();
     }
 
 }

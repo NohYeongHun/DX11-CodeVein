@@ -40,6 +40,7 @@ HRESULT CPlayer_SecondSkillState::Initialize(_uint iStateNum, void* pArg)
 #pragma endregion
 
     m_fFirstEventFrame = 43.f / 289.f;
+    m_fSecondEventFrame = 68.f / 289.f; // 도약 이전.
 
     return S_OK;
 }
@@ -203,11 +204,36 @@ void CPlayer_SecondSkillState::Change_State()
 void CPlayer_SecondSkillState::Create_WindEffect(void* pArg)
 {
 
+   
+}
+
+void CPlayer_SecondSkillState::Update_Event(_float fTimeDelta)
+{
+    _float fCurrentRatio = m_pModelCom->Get_Current_Ratio();
+
+    if (!m_IsFirstEvent && fCurrentRatio >= m_fFirstEventFrame)
+    {
+        m_IsFirstEvent = true;
+        Create_FirstEvent();
+       
+    }
+    else if (!m_IsSecondEvent && fCurrentRatio >= m_fSecondEventFrame)
+    {
+        
+        m_IsSecondEvent = true;
+        Create_SecondEvent();
+    }
+
+
+}
+
+void CPlayer_SecondSkillState::Create_FirstEvent()
+{
     _matrix playerWorld = m_pPlayer->Get_Transform()->Get_WorldMatrix();
     _vector vPlayerPos = playerWorld.r[3];
     _vector vPlayerForward = XMVector3Normalize(playerWorld.r[2]);
 
-    _float fHitDistance = 3.0f;
+    _float fHitDistance = 7.0f;
     _vector vHitPos = vPlayerPos + (vPlayerForward * fHitDistance);
 
     vHitPos = XMVectorSetY(vHitPos, XMVectorGetY(vPlayerPos) + 1.0f);
@@ -231,17 +257,42 @@ void CPlayer_SecondSkillState::Create_WindEffect(void* pArg)
     m_pGameInstance->PlaySoundEffect(L"CirculatePulse1.ogg", 0.2f);
 }
 
-void CPlayer_SecondSkillState::Update_Event(_float fTimeDelta)
+void CPlayer_SecondSkillState::Create_SecondEvent()
 {
-    _float fCurrentRatio = m_pModelCom->Get_Current_Ratio();
-
-    if (!m_IsFirstEvent && fCurrentRatio >= m_fFirstEventFrame)
-    {
-        m_IsFirstEvent = true;
-        Create_WindEffect(nullptr);
-    }
+    /* 공기 링.*/
+    CEffect_WindCircle::EFFECTWIND_CIRCLE_ACTIVATE_DESC WindCircleActivate_Desc{};
+    WindCircleActivate_Desc.eCurLevel = m_pPlayer->Get_CurrentLevel();
 
 
+    _float3 vStartPos = { -0.3f, 0.f, 0.f };
+    WindCircleActivate_Desc.vStartPos = vStartPos;
+    WindCircleActivate_Desc.fDisplayTime = 0.25f;
+    WindCircleActivate_Desc.fCreateDelay = 0.05f; // 얘가 바로뜨고.
+    WindCircleActivate_Desc.iWindCount = 2;
+    WindCircleActivate_Desc.vStartScale = { 6.f, 6.f, 6.f };
+    WindCircleActivate_Desc.vTargetScale = { 7.f, 7.f, 7.f };
+    WindCircleActivate_Desc.pWorldMatrix = m_pPlayer->Get_Transform()->Get_WorldMatrixPtr(); // WorldMatrix는 한번만 초기화
+    //WindActivate_Desc.pSocketMatrix = m_pPlayer->Get_BoneMatrix("RightGauntletTrail2"); // 붙일 뼈
+    WindCircleActivate_Desc.pSocketMatrix = m_pPlayer->Get_BoneMatrix("socket_ExpRecoveryFx01"); // 붙일 뼈
+
+    m_pGameInstance->Move_Effect_ToObjectLayer(
+        ENUM_CLASS(m_pGameInstance->Get_CurrentLevelID()),
+        TEXT("SWORD_WINDCIRCLE"), TEXT("Layer_Effect"), 1,
+        ENUM_CLASS(CEffect_WindCircle::EffectType), &WindCircleActivate_Desc);
+
+    CEffectParticle::EFFECTPARTICLE_ENTER_DESC HitParticleDesc{};
+    HitParticleDesc.eParticleType = CEffectParticle::PARTICLE_TYPE_HIT_PARTCILE;
+    HitParticleDesc.vStartPos = m_pPlayer->Get_Transform()->Get_State(STATE::POSITION) + XMVectorSet(0.f, 0.5f, 0.f, 0.f); // 몬스터 현재위치로 생성.
+    HitParticleDesc.particleInitInfo.lifeTime = 0.5f; // lisfeTime
+    HitParticleDesc.particleInitInfo.fRadius = 1.f; // 모일 반경
+    HitParticleDesc.particleInitInfo.fExplositionTime = 0.1f;
+
+    XMStoreFloat3(&HitParticleDesc.particleInitInfo.dir, m_pPlayer->Get_Transform()->Get_LookDirection_NoPitch());
+    HitParticleDesc.pTargetTransform = m_pTransformCom;
+    m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(m_pPlayer->Get_CurrentLevel())
+        , TEXT("HIT_PARTICLE"), TEXT("Layer_Effect"), 1, ENUM_CLASS(CEffectParticle::EffectType), &HitParticleDesc);
+
+    m_pGameInstance->PlaySoundEffect(L"CirculatePulse1.ogg", 0.2f);
 }
 
 CPlayer_SecondSkillState* CPlayer_SecondSkillState::Create(_uint iStateNum, void* pArg)

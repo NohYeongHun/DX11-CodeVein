@@ -75,7 +75,7 @@ void CSwordTrail::Late_Update(_float fTimeDelta)
 {
 	m_pGameInstance->Add_RenderGroup(RENDERGROUP::BLEND, this);
 
-	m_pGameInstance->Add_RenderGroup(RENDERGROUP::DISTORTION, this);
+	//m_pGameInstance->Add_RenderGroup(RENDERGROUP::DISTORTION, this);
 }
 
 HRESULT CSwordTrail::Render()
@@ -164,11 +164,21 @@ HRESULT CSwordTrail::Ready_Components(SWORDTRAIL_DESC* pDesc)
 		return E_FAIL;
 	}
 
+
 	// 발광 효과 텍스처 (Trail_SpWeapon0)
 	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC)
 		, TEXT("Prototype_Component_Texture_TrailGlow")
 		,TEXT("Com_GlowTexture")
 	, reinterpret_cast<CComponent**>(&m_pGlowTexture))))
+	{
+		CRASH("Failed Create Glow Texture Sword Trail");
+		return E_FAIL;
+	}
+
+	if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC)
+		, TEXT("Prototype_Component_Texture_TrailGradient")
+		, TEXT("Com_GradientTexture")
+		, reinterpret_cast<CComponent**>(&m_pGraidentTexture))))
 	{
 		CRASH("Failed Create Glow Texture Sword Trail");
 		return E_FAIL;
@@ -228,6 +238,12 @@ HRESULT CSwordTrail::Bind_ShaderResources()
 		CRASH("Failed Bind Proj Matrix SwordTrail");
 		return E_FAIL;
 	}
+	
+	if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
+	{
+		CRASH("Failed Bind Proj Matrix SwordTrail");
+		return E_FAIL;
+	}
 
 	// SP_Weapon 텍스처를 리본 트레일로 사용
 	if (FAILED(m_pGlowTexture->Bind_Shader_Resource(m_pShaderCom, "g_GlowTexture", 0)))
@@ -239,6 +255,21 @@ HRESULT CSwordTrail::Bind_ShaderResources()
 	if (FAILED(m_pBaseTexture->Bind_Shader_Resource(m_pShaderCom, "g_BaseTexture", m_iBaseTextureIndex)))
 	{
 		CRASH("Failed Bind SP_Weapon Texture as GlowTexture");
+		return E_FAIL;
+	}
+
+	if (FAILED(m_pGraidentTexture->Bind_Shader_Resource(m_pShaderCom, "g_GradientTexture", 2)))
+	{
+		CRASH("Failed Bind SP_Weapon Texture as GlowTexture");
+		return E_FAIL;
+	}
+
+	// Depth Texture 바인딩
+	m_pGameInstance->Bind_RT_ShaderResource(TEXT("Target_Depth"), m_pShaderCom, "g_DepthTexture");
+
+	if (FAILED(m_pBaseTexture->Bind_Shader_Resource(m_pShaderCom, "g_GradientTexture", m_iBaseTextureIndex)))
+	{
+		CRASH("Failed Bind SP_Weapon Texture as DepthTexture");
 		return E_FAIL;
 	}
 
@@ -357,6 +388,7 @@ void CSwordTrail::Free()
 	Safe_Release(m_pBaseTexture);
 	Safe_Release(m_pDetailTexture);
 	Safe_Release(m_pGlowTexture);
+	Safe_Release(m_pGraidentTexture);
 	Safe_Release(m_pDistortionTexture);
 }
 

@@ -245,8 +245,6 @@ HRESULT CRenderer::Add_DebugComponent(CComponent* pComponent)
 
 HRESULT CRenderer::Render_Shadow()
 {
-    ID3D11ShaderResourceView* pNullSRVs[8] = { nullptr, nullptr };
-    m_pContext->PSSetShaderResources(0, 8, pNullSRVs);
 
     if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_Shadow"), m_pShadowDSV)))
         return E_FAIL;
@@ -275,9 +273,7 @@ HRESULT CRenderer::Render_Shadow()
 
 HRESULT CRenderer::Render_Priority()
 {
-    ID3D11ShaderResourceView* pNullSRVs[8] = { nullptr, nullptr };
-    m_pContext->PSSetShaderResources(0, 8, pNullSRVs);
-
+ 
     if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_GameObjects"), nullptr)))
         return E_FAIL;
     
@@ -302,6 +298,7 @@ HRESULT CRenderer::Render_NonBlend()
     /* Diffuse + Normal */
     //if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_GameObjects"))))
     //    return E_FAIL;
+
 
     for (auto& pRenderObject : m_RenderObjects[ENUM_CLASS(RENDERGROUP::NONBLEND)])
     {
@@ -362,8 +359,6 @@ HRESULT CRenderer::Render_Combined()
 { 
     // [추가] Combine Pass에서 입력으로 사용할 모든 G-Buffer와 조명 텍스처들을 미리 해제합니다.
    // 보통 5-6개 이상 사용되므로, 넉넉하게 8개 슬롯을 모두 비웁니다.
-    ID3D11ShaderResourceView* pNullSRVs[8] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
-    m_pContext->PSSetShaderResources(0, 8, pNullSRVs);
 
     // 1. Combine_Shade에 렌더링 시작 => Begin MRT 사용시 RenderTarget을 Clear하므로 Begin_MRT를 조심해서 쓸것.
     m_pGameInstance->Begin_MRT(TEXT("MRT_Combine"), nullptr);
@@ -407,8 +402,6 @@ HRESULT CRenderer::Render_Combined()
 
 HRESULT CRenderer::Render_Blend()
 {
-    ID3D11ShaderResourceView* pNullSRVs[8] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
-    m_pContext->PSSetShaderResources(0, 8, pNullSRVs);
 
     // 1. Combine Texture에 Blend 객체들 덮어 그리기.
     if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_Combine"), nullptr, false)))
@@ -439,8 +432,6 @@ HRESULT CRenderer::Render_Blend()
 /* Distortion 객체들을 새 도화지에 그려놓는다. */
 HRESULT CRenderer::Render_Distortion()
 {
-    ID3D11ShaderResourceView* pNullSRVs[8] = { nullptr, nullptr };
-    m_pContext->PSSetShaderResources(0, 8, pNullSRVs);
 
     if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_Distortion"), nullptr)))
         return E_FAIL;
@@ -551,10 +542,6 @@ HRESULT CRenderer::Render_BloomBlur()
     // 0. 원본 뷰포트 정보 저장
     D3D11_VIEWPORT originalVP = m_ViewPortDesc;
 
-
-    ID3D11ShaderResourceView* pNullSRVs[8] = { nullptr, nullptr };
-    m_pContext->PSSetShaderResources(0, 8, pNullSRVs);
-
     // Target_BrightPass에 밝은 부분만 추출
     if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_BrightPass"), nullptr)))
         return E_FAIL;
@@ -591,7 +578,6 @@ HRESULT CRenderer::Render_BloomBlur()
 
     // --- 2. Horizontal Blur ---
    // [수정] 다음 단계의 입력이 될 'Target_BrightPass'가 바인딩된 슬롯을 미리 해제합니다.
-    m_pContext->PSSetShaderResources(0, 1, &pNullSRVs[0]); // g_DiffuseTexture 슬롯(0번) 해제
 
 
     // 수평 블러 (BrightPass -> BloomBlur1)
@@ -626,7 +612,6 @@ HRESULT CRenderer::Render_BloomBlur()
 
     // --- 3. Vertical Blur ---
     // [수정] 다음 단계의 입력이 될 'Target_BloomBlurX'가 바인딩된 슬롯을 미리 해제합니다.
-    m_pContext->PSSetShaderResources(0, 1, &pNullSRVs[0]); // g_DiffuseTexture 슬롯(0번) 해제
 
     // 수직 블러 (BloomBlur1 -> BloomBlur2)
     m_pGameInstance->Begin_MRT(TEXT("MRT_BloomBlurY"), nullptr);
@@ -651,8 +636,6 @@ HRESULT CRenderer::Render_BloomBlur()
 
 HRESULT CRenderer::Render_BloomCombine()
 {
-    ID3D11ShaderResourceView* pNullSRVs[8] = { nullptr, nullptr };
-    m_pContext->PSSetShaderResources(0, 8, pNullSRVs);
 
     m_pContext->RSSetViewports(1, &m_ViewPortDesc);
 
@@ -684,8 +667,6 @@ HRESULT CRenderer::Render_BloomCombine()
 
 HRESULT CRenderer::Render_UI()
 {
-    ID3D11ShaderResourceView* pNullSRVs[8] = { nullptr, nullptr };
-    m_pContext->PSSetShaderResources(0, 8, pNullSRVs);
 
     for (auto& pRenderObject : m_RenderObjects[ENUM_CLASS(RENDERGROUP::UI)])
     {
@@ -702,8 +683,6 @@ HRESULT CRenderer::Render_UI()
 
 HRESULT CRenderer::Render_StaticUI()
 {
-    ID3D11ShaderResourceView* pNullSRVs[8] = { nullptr, nullptr };
-    m_pContext->PSSetShaderResources(0, 8, pNullSRVs);
 
     for (auto& pRenderObject : m_RenderObjects[ENUM_CLASS(RENDERGROUP::STATIC_UI)])
     {
@@ -721,8 +700,6 @@ HRESULT CRenderer::Render_StaticUI()
 
 HRESULT CRenderer::Render_LastEffect()
 {
-    ID3D11ShaderResourceView* pNullSRVs[8] = { nullptr, nullptr };
-    m_pContext->PSSetShaderResources(0, 8, pNullSRVs);
 
     for (auto& pRenderObject : m_RenderObjects[ENUM_CLASS(RENDERGROUP::LAST_EFFECT)])
     {

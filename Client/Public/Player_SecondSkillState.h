@@ -52,6 +52,10 @@ private:
 	void Update_Event(_float fTimeDelta);
 
 private:
+	void Create_FirstEvent();
+	void Create_SecondEvent();
+
+private:
 	_bool m_IsFirstEvent = {};
 	_bool m_IsSecondEvent = {};
 	_bool m_IsThirdEvent= {};

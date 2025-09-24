@@ -62,6 +62,7 @@ public:
 	virtual void ReverseStart_Dissolve(_float fDuration = 0.f) override; // Dissolve 역재생
 	virtual void End_Dissolve() override;
 	virtual void Dead_Action() override;
+	virtual void Hit_Action() override;
 
 private:
 	class CMonsterTree* m_pTree = { nullptr };

@@ -659,41 +659,96 @@ PS_OUT_BACKBUFFER PS_DEFFERED_BLOODPILLARC_MAIN(PS_BACKBUFFER_IN In)
 
 
 
+//PS_OUT_BACKBUFFER PS_SWORDWIND_MAIN(PS_BACKBUFFER_IN In)
+//{
+//    PS_OUT_BACKBUFFER Out = (PS_OUT_BACKBUFFER) 0;
+
+//     // 1. Base Color 텍스처 샘플링 (블렌더의 T_FX_GEZWhiteColor01)
+//    float4 vMtrlDiffuse = g_DiffuseTextures[6].Sample(DefaultSampler, In.vTexcoord);
+    
+//    // 2. Alpha에 사용할 노이즈 텍스처 샘플링 (블렌더의 T_FX_UE4TilingNoise03)
+//    float4 vMtrlNoise = g_NoiseTextures[4].Sample(DefaultSampler, In.vTexcoord);
+    
+//     // 3. Color Ramp 구현
+//    // 노이즈 텍스처의 R 채널 값을 팩터로 사용합니다. (0.0 ~ 1.0 사이의 값)
+//    float noiseFactor = vMtrlNoise.r;
+
+//    float rampT = saturate(noiseFactor / 1.f);
+    
+//    float finalAlpha = lerp(0.f, 1.f, rampT);
+
+//    // 원본 Diffuse 색상에 강도 값을 곱해 최종 색상을 계산합니다.
+//    float3 finalColor = vMtrlDiffuse.rgb;
+    
+//    float fAlpha = vMtrlNoise.r * saturate(1.f - g_fRatio * 2.f);
+    
+//   // ===== 최종 출력 =====
+//    // vMtrlDiffuse의 RGB 색상과 위에서 계산한 finalAlpha 값을 조합합니다.
+//    //Out.vDiffuse = float4(finalColor, vMtrlNoise.r);
+//    Out.vDiffuse = float4(finalColor, fAlpha);
+//    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+//    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w, 0.f, 0.f);
+
+//    return Out;
+//}
+
 PS_OUT_BACKBUFFER PS_SWORDWIND_MAIN(PS_BACKBUFFER_IN In)
 {
     PS_OUT_BACKBUFFER Out = (PS_OUT_BACKBUFFER) 0;
-
-     // 1. Base Color 텍스처 샘플링 (블렌더의 T_FX_GEZWhiteColor01)
+    
+    // UV 스크롤링 적용
+    float2 scrolledUV = In.vTexcoord;
+    scrolledUV.y += g_fRatio * 0.5f; // Y축 스크롤 (위로)
+    scrolledUV.x += sin(g_fRatio * 3.14159f) * 0.2f; // X축 약간의 사인파 움직임
+    
+    // 1. Base Color 텍스처 샘플링
     float4 vMtrlDiffuse = g_DiffuseTextures[6].Sample(DefaultSampler, In.vTexcoord);
     
-    // 2. Alpha에 사용할 노이즈 텍스처 샘플링 (블렌더의 T_FX_UE4TilingNoise03)
-    float4 vMtrlNoise = g_NoiseTextures[4].Sample(DefaultSampler, In.vTexcoord);
+    // 2. 노이즈 텍스처 샘플링 (스크롤된 UV 사용)
+    float4 vMtrlNoise = g_NoiseTextures[4].Sample(DefaultSampler, scrolledUV);
     
-     // 3. Color Ramp 구현
-    // 노이즈 텍스처의 R 채널 값을 팩터로 사용합니다. (0.0 ~ 1.0 사이의 값)
-    float noiseFactor = vMtrlNoise.r;
-
-    // noiseFactor 값을 0.0 ~ 0.009 범위에서 0.0 ~ 1.0 범위로 리매핑합니다.
-    // saturate는 값을 0.0과 1.0 사이로 제한하는 역할을 합니다.
-    // 이는 Color Ramp에서 0.009 위치를 넘어가면 모두 빨간색(1.0)으로 처리하는 것과 동일합니다.
-    float rampT = saturate(noiseFactor / 0.009f);
+    // 3. 추가 노이즈 레이어 (다른 속도로 스크롤)
+    float2 scrolledUV2 = In.vTexcoord;
+    scrolledUV2.y -= g_fRatio * 0.3f; // 반대 방향
+    float4 vMtrlNoise2 = g_NoiseTextures[4].Sample(DefaultSampler, scrolledUV2);
     
-      // rampT 값을 이용해 검은색(0)에서 빨간색(1)으로 보간합니다.
-    // Color Ramp의 결과 색상에서 R 채널 값만 필요하므로 float으로 계산합니다.
-    float finalAlpha = lerp(0.f, 1.f, rampT);
-
-    // 원본 Diffuse 색상에 강도 값을 곱해 최종 색상을 계산합니다.
+    // 두 노이즈 텍스처 블렌딩
+    float noiseBlend = (vMtrlNoise.r + vMtrlNoise2.r) * 0.5f;
+    
+    // 4. 시간에 따른 알파 감쇠 (자연스러운 페이드 아웃)
+    float timeFade = 1.0f;
+    
+    // 초반 20%는 페이드 인
+    if (g_fRatio < 0.2f)
+    {
+        timeFade = smoothstep(0.0f, 0.2f, g_fRatio);
+    }
+    // 후반 30%에서 페이드 아웃 시작
+    else if (g_fRatio > 0.7f)
+    {
+        timeFade = 1.0f - smoothstep(0.7f, 1.0f, g_fRatio);
+    }
+    
+    // 5. 최종 알파 계산
+    float finalAlpha = noiseBlend * timeFade;
+    
+    // 엣지를 더 선명하게 (선택사항)
+    finalAlpha = saturate(finalAlpha * 1.5f - 0.2f);
+    
+    // 6. 색상 계산
     float3 finalColor = vMtrlDiffuse.rgb;
     
-    float fAlpha = vMtrlNoise.r * saturate(1.f - g_fRatio * 2.f);
+    // 시간에 따른 색상 변화 (선택사항)
+    float3 colorTint = lerp(float3(1.0f, 1.0f, 1.0f),
+                            float3(0.8f, 0.9f, 1.0f),
+                            g_fRatio);
+    finalColor *= colorTint;
     
-   // ===== 최종 출력 =====
-    // vMtrlDiffuse의 RGB 색상과 위에서 계산한 finalAlpha 값을 조합합니다.
-    //Out.vDiffuse = float4(finalColor, vMtrlNoise.r);
-    Out.vDiffuse = float4(finalColor, fAlpha);
+    // 최종 출력
+    Out.vDiffuse = float4(finalColor, finalAlpha);
     Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
     Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w, 0.f, 0.f);
-
+    
     return Out;
 }
 
@@ -858,6 +913,124 @@ PS_OUT_BACKBUFFER PS_BLOOD_BODYAURA_MAIN(PS_BACKBUFFER_IN In)
 }
 
 
+// =============================================================
+// 전역 변수 (Global Variables)
+// =============================================================
+
+float g_fEffectDuration;
+
+// 이 셰이더는 g_OtherTextures[5]에 'Black -> White -> Black' 그라디언트 텍스처를 사용해야 합니다.
+
+
+float GenerateGradientMask(float2 uv)
+{
+    // Y축 기준 그라데이션
+    float gradient = 1.0f - abs(uv.y - 0.5f) * 2.0f;
+    return pow(gradient, 2.0f); // Power로 Falloff 조절
+}
+
+// 원형 검기에 더 적합한 방사형 그라데이션
+float GenerateRadialGradientMask(float2 uv, float innerRadius, float outerRadius)
+{
+    float2 center = float2(0.5f, 0.5f);
+    float dist = distance(uv, center);
+    
+    // 내부 반경과 외부 반경 사이에서 그라데이션
+    float mask = 1.0f - saturate((dist - innerRadius) / (outerRadius - innerRadius));
+    return pow(mask, 1.5f); // 더 날카로운 엣지
+}
+
+// 회전하는 슬래시 형태의 그라데이션
+float GenerateRotatingSlashMask(float2 uv, float time, float bladeCount)
+{
+    float2 center = float2(0.5f, 0.5f);
+    float2 dir = uv - center;
+    float angle = atan2(dir.y, dir.x) + time; // 시간에 따라 회전
+    
+    // 여러 개의 날(blade) 생성
+    float blade = sin(angle * bladeCount) * 0.5f + 0.5f;
+    
+    // 중심에서의 거리에 따른 감쇠
+    float dist = length(dir);
+    float radialFade = 1.0f - saturate(dist * 2.0f);
+    
+    return blade * radialFade;
+}
+
+// 메인 픽셀 셰이더
+PS_OUT_BACKBUFFER PS_SWORDWIND_CIRCLE_MAIN(PS_BACKBUFFER_IN In)
+{
+    PS_OUT_BACKBUFFER Out = (PS_OUT_BACKBUFFER) 0;
+    
+    // 전역 변수
+    float fTimeRatio = g_fRatio;
+    float fTime = g_fTime;
+    float fScrollSpeed = g_fScrollSpeed;
+    
+    // 1. UV 스크롤링 (원형 효과를 위한 회전)
+    float2 vScrolledUV = In.vTexcoord;
+    
+    // 회전 스크롤 (원형 검기에 적합)
+    float2 center = float2(0.5f, 0.5f);
+    float2 offset = vScrolledUV - center;
+    float scrollAngle = fTime * fScrollSpeed;
+    float2 rotatedUV;
+    rotatedUV.x = offset.x * cos(scrollAngle) - offset.y * sin(scrollAngle);
+    rotatedUV.y = offset.x * sin(scrollAngle) + offset.y * cos(scrollAngle);
+    vScrolledUV = rotatedUV + center;
+    
+    // 2. 베이스 텍스처 샘플링
+    float4 vBaseColor = g_DiffuseTextures[6].Sample(DefaultSampler, In.vTexcoord);
+    
+    // 3. 동적 그라데이션 마스크 생성 (텍스처 대신)
+    float fGradientMask = GenerateGradientMask(vScrolledUV);
+    
+    // 추가: 방사형 마스크와 조합 (원형 검기 효과 강화)
+    float fRadialMask = GenerateRadialGradientMask(In.vTexcoord, 0.1f, 0.5f);
+    
+    // 추가: 회전 슬래시 효과 (선택적)
+    float fSlashMask = GenerateRotatingSlashMask(In.vTexcoord, fTime * 2.0f, 4.0f);
+    
+    // 마스크 조합 (필요에 따라 선택)
+    float fCombinedMask = fGradientMask * fRadialMask; // 두 마스크 곱하기
+    // float fCombinedMask = max(fGradientMask, fSlashMask * 0.5f);  // 또는 블렌딩
+    
+    // 4. 시간에 따른 페이드 아웃
+    float fTimeFade = 1.0f - fTimeRatio;
+    
+    // S-커브로 더 부드러운 페이드
+    fTimeFade = smoothstep(0.0f, 1.0f, fTimeFade);
+    
+    // 5. 펄스 효과 (선택적 - 생동감 추가)
+    float fPulse = 1.0f + sin(fTime * 8.0f) * 0.15f * fTimeFade;
+    
+    // 6. 엣지 글로우 효과
+    float fEdgeGlow = pow(1.0f - fRadialMask, 3.0f) * fTimeFade;
+    float3 vGlowColor = float3(0.3f, 0.6f, 1.0f); // 파란빛 글로우
+    
+    // 7. 최종 알파 계산
+    float fFinalAlpha = vBaseColor.a * fCombinedMask * fTimeFade * fPulse;
+    
+    // 알파 최소값 설정 (완전히 안 보이는 것 방지)
+    fFinalAlpha = max(fFinalAlpha, 0.05f * fTimeFade);
+    
+    // 8. 최종 색상 계산
+    float3 vFinalRGB = vBaseColor.rgb;
+    
+    // 엣지 글로우 추가
+    vFinalRGB += vGlowColor * fEdgeGlow * 0.5f;
+    
+    // HDR 부스트 (시작 시 더 밝게)
+    vFinalRGB *= (1.0f + fTimeFade * 0.5f);
+    
+    // 9. 최종 출력
+    Out.vDiffuse = float4(vFinalRGB, fFinalAlpha);
+    Out.vNormal = float4(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+    Out.vDepth = float4(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w, 0.f, 0.f);
+    
+    return Out;
+}
+
 technique11 DefaultTechnique
 {
     /* 특정 패스를 이용해서 점정을 그려냈다. */
@@ -986,6 +1159,18 @@ technique11 DefaultTechnique
         GeometryShader = NULL;
         //PixelShader = compile ps_5_0 PS_SWORDWIND_IMPROVED();
         PixelShader = compile ps_5_0 PS_BLOOD_BODYAURA_MAIN();
+    }
+
+    pass SwordWindCircle // 10
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        //PixelShader = compile ps_5_0 PS_SWORDWIND_IMPROVED();
+        PixelShader = compile ps_5_0 PS_SWORDWIND_CIRCLE_MAIN();
     }
 
 

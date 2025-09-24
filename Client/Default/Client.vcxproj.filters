@@ -271,6 +271,9 @@
     <Filter Include="02. GameObject\UI\Logo\BossEncounter">
       <UniqueIdentifier>{d02f5961-d053-47bc-ad56-4c0ea822a462}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. GameObject\Effect\Mesh\Player\CirculatePurge\Slash">
+      <UniqueIdentifier>{71df7f5a-a6e1-4760-9c2b-9638a105c1ae}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -714,9 +717,6 @@
     <ClInclude Include="..\Public\Effect_Wind.h">
       <Filter>02. GameObject\Effect\Mesh\Player\CirculatePurge</Filter>
     </ClInclude>
-    <ClInclude Include="..\Public\SwordWind.h">
-      <Filter>02. GameObject\Effect\Mesh\Player\CirculatePurge\SwordWind</Filter>
-    </ClInclude>
     <ClInclude Include="..\Public\Effect_FloorAura.h">
       <Filter>02. GameObject\Effect\Mesh\Player\Skill2</Filter>
     </ClInclude>
@@ -728,6 +728,18 @@
     </ClInclude>
     <ClInclude Include="..\Public\Encounter_Title.h">
       <Filter>02. GameObject\UI\Logo\BossEncounter</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\RenketsuSlash.h">
+      <Filter>02. GameObject\Effect\Mesh\Player\CirculatePurge\Slash</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Effect_WindCircle.h">
+      <Filter>02. GameObject\Effect\Mesh\Player\CirculatePurge</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\SwordWindCircle.h">
+      <Filter>02. GameObject\Effect\Mesh\Player\CirculatePurge\SwordWind</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\SwordWind.h">
+      <Filter>02. GameObject\Effect\Mesh\Player\CirculatePurge\SwordWind</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1158,6 +1170,15 @@
     <ClCompile Include="..\Private\Encounter_Title.cpp">
       <Filter>02. GameObject\UI\Logo\BossEncounter</Filter>
     </ClCompile>
+    <ClCompile Include="..\Private\RenketsuSlash.cpp">
+      <Filter>02. GameObject\Effect\Mesh\Player\CirculatePurge\Slash</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Effect_WindCircle.cpp">
+      <Filter>02. GameObject\Effect\Mesh\Player\CirculatePurge</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\SwordWindCircle.cpp">
+      <Filter>02. GameObject\Effect\Mesh\Player\CirculatePurge\SwordWind</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxMesh.hlsl">
@@ -1194,6 +1215,9 @@
       <Filter>96. ShaderFiles</Filter>
     </FxCompile>
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxEffectTrailDistortion.hlsl">
+      <Filter>96. ShaderFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxEffectPosTexDistortion.hlsl">
       <Filter>96. ShaderFiles</Filter>
     </FxCompile>
   </ItemGroup>

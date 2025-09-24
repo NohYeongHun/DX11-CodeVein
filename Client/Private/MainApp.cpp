@@ -177,7 +177,7 @@ HRESULT CMainApp::Ready_Pooling()
 #pragma region MESH 타입.
 	CEffect_Pillar::EFFECT_PILLARDESC EffectPillarDesc{};
 	// 한번에 십자모양 12개씩 사용 예정. => 넉넉하게 넣자.
-	for (_uint i = 0; i < 300; ++i)
+	for (_uint i = 0; i < 500; ++i)
 	{
 		pGameObject = dynamic_cast<CGameObject*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT
 			, ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_EffectPillar"), &EffectPillarDesc));
@@ -194,7 +194,7 @@ HRESULT CMainApp::Ready_Pooling()
 
 	CEffect_Wind::EFFECTWIND_DESC EffectWindDesc{};
 	//한번에 십자모양 12개씩 사용 예정. => 넉넉하게 넣자.
-	for (_uint i = 0; i < 300; ++i)
+	for (_uint i = 0; i < 500; ++i)
 	{
 		pGameObject = dynamic_cast<CGameObject*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT
 			, ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_EffectWind"), &EffectWindDesc));
@@ -204,6 +204,19 @@ HRESULT CMainApp::Ready_Pooling()
 			return E_FAIL;
 		}
 		m_pGameInstance->Add_GameObject_ToPools(TEXT("SWORD_WIND"), ENUM_CLASS(CEffect_Wind::EffectType), pGameObject);
+	}
+
+	CEffect_WindCircle::EFFECTWIND_CIRCLE_DESC EffectWindCircleDesc{};
+	for (_uint i = 0; i < 500; ++i)
+	{
+		pGameObject = dynamic_cast<CGameObject*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT
+			, ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_EffectWindCircle"), &EffectWindCircleDesc));
+		if (nullptr == pGameObject)
+		{
+			CRASH("Failed Create GameObject");
+			return E_FAIL;
+		}
+		m_pGameInstance->Add_GameObject_ToPools(TEXT("SWORD_WINDCIRCLE"), ENUM_CLASS(CEffect_WindCircle::EffectType), pGameObject);
 	}
 
 
@@ -230,6 +243,24 @@ HRESULT CMainApp::Ready_Pooling()
 			return E_FAIL;
 		}
 		m_pGameInstance->Add_GameObject_ToPools(TEXT("SLASH_EFFECT"), ENUM_CLASS(CSlash::EffectType), pGameObject);
+	}
+
+	CRenketsuSlash::SLASHEFFECT_DESC RenketsuslashDesc{};
+	//slashDesc.eShaderPath = POSTEX_SHADERPATH::MONSTER_LINESLASH;
+	RenketsuslashDesc.eShaderPath = EFFECTPOSTEX_SHADERPATH::RENKETSU_LINESLASH;
+
+	// 2. 추가할 개수만큼 추가. 
+	/* 3개 추가. => 풀링 제대로 되는지 테스트. */
+	for (_uint i = 0; i < 100; ++i)
+	{
+		pGameObject = dynamic_cast<CGameObject*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT
+			, ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Renketsu_SlashEffect"), &slashDesc));
+		if (nullptr == pGameObject)
+		{
+			CRASH("Failed Create GameObject");
+			return E_FAIL;
+		}
+		m_pGameInstance->Add_GameObject_ToPools(TEXT("RENKETSU_SLASH_EFFECT"), ENUM_CLASS(CRenketsuSlash::EffectType), pGameObject);
 	}
 
 	CHitFlashEffect::HITFLASH_DESC HitFlashDesc{};

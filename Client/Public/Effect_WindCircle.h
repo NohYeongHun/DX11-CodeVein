@@ -1,0 +1,148 @@
+﻿#pragma once
+
+NS_BEGIN(Client)
+class CEffect_WindCircle final : public CContainerObject
+{
+
+public:
+    /* 클론시 전달할 정보들 */
+    typedef struct tagEffectWindDesc : public CContainerObject::GAMEOBJECT_DESC
+    {
+    }EFFECTWIND_CIRCLE_DESC;
+
+    typedef struct tagPillarActivateDesc
+    {
+        LEVEL eCurLevel = { LEVEL::END };
+        _float3 vStartPos = {}; // 시작 포지션.
+        _float fDisplayTime = {}; // 모든 성장이 일어나는데 걸리는 총 시간.
+        _float3 vStartRotation = {}; // 시작 회전.
+		_float3 vRotationAxis = {}; // 회전 축.
+        _float3 vStartScale = {};
+        _float3 vTargetScale = {};
+        const _float4x4* pSocketMatrix = { nullptr };
+		const _float4x4* pWorldMatrix = { nullptr };
+
+        _uint iWindCount = {};
+        _float fCreateDelay = {};
+    }EFFECTWIND_CIRCLE_ACTIVATE_DESC;
+
+private:
+    struct EFFECTTRIGGER
+    {
+        _float fTriggerTime = { 0.f }; // 몇 초에 발동할 것인가.
+        _bool bIsTriggered = { false };
+        const _wstring strPartObjectTag = { L"" }; // 어떤 PartObject를 활성화 시킬 것인가.
+        _uint iWindIdx = {};
+    };
+
+private:
+    explicit CEffect_WindCircle(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+    explicit CEffect_WindCircle(const CEffect_WindCircle& Prototype);
+    virtual ~CEffect_WindCircle() = default;
+
+#pragma region  기본 함수
+
+public:
+    virtual HRESULT Initialize_Prototype();
+    virtual HRESULT Initialize_Clone(void* pArg);
+    virtual void Priority_Update(_float fTimeDelta);
+    virtual void Update(_float fTimeDelta);
+    virtual void Late_Update(_float fTimeDelta);
+    virtual HRESULT Render();
+
+
+#pragma region 풀링 전용 함수
+public:
+    virtual void OnActivate(void* pArg) override;
+    virtual void OnDeActivate() override;
+
+
+private:
+    void Initialize_EffectTrigger(const _wstring& strTag);
+    void Effect_TriggerCheck(_float fTimeDelta);
+
+private:
+    _uint m_iCurrentWind = {};
+#pragma endregion
+
+
+
+
+#pragma endregion
+
+
+
+#pragma region 사용하는 컴포넌트
+
+#pragma endregion
+
+#pragma region 사용하는 멤버 변수
+public:
+    // 타이머 리셋
+    void Reset_Timer() { m_fCurrentTime = 0.0f; }
+    void Calc_Timer(_float fTimeDelta);
+
+
+private:
+    LEVEL m_eCurLevel = { LEVEL::END };
+    _bool m_IsActive = false;
+
+    _float m_fCurrentTime = {};
+    _float m_fDuration = {};
+    _float m_fDisplayTime = {};
+    EFFECTWIND_CIRCLE_ACTIVATE_DESC m_ActivateDesc = {};
+    _float3 m_vStartRotation = {};
+    _float3 m_vRotationAxis = {};
+    
+
+    // PartObject들
+private:
+    vector<class CSwordWindCircle*> m_vecSwordWinds;
+	
+
+    vector<EFFECTTRIGGER> m_EffectTrigger;
+    const _float4x4* m_pSocketMatrix = { nullptr };
+    const _float4x4* m_pTargetWorldMatrix = { nullptr };
+    _float3 m_vStartPos = {};
+    _float3 m_vStartScale = {};
+    _float3 m_vTargetScale = {};
+    
+    _uint m_iWindCount = {};
+    _float m_fCreateDelay = {};
+
+
+
+public:
+    static const EFFECTTYPE EffectType = EFFECTTYPE::MESH;
+
+#pragma endregion
+
+
+
+#pragma region 기본 준비 함수들
+private:
+    HRESULT Ready_Components(EFFECTWIND_CIRCLE_DESC* pDesc);
+    HRESULT Ready_PartObjects();
+#pragma endregion
+
+
+#pragma region IMGUI
+#ifdef _DEBUG
+private:
+    void ImGui_Render();
+#endif // _DEBUG
+
+
+
+#pragma endregion
+
+
+
+public:
+    static CEffect_WindCircle* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);
+    virtual CGameObject* Clone(void* pArg) override;
+    virtual void Free() override;
+
+};
+NS_END
+

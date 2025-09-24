@@ -49,6 +49,14 @@ public:
 	void Change_State();
 	void Create_WindEffect(void* pArg);
 
+	void Create_FirstEvent();
+	void Create_SecondEvent();
+	void Create_ThirdEvent();
+	void Create_FourthEvent();
+	void Create_FifthEvent();
+	void Create_WindCircleEffect();
+	void Create_RenketsuEffect();
+
 private:
 	void Update_Event(_float fTimeDelta);
 

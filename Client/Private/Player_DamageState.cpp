@@ -40,6 +40,11 @@ void CPlayer_DamageState::Enter(void* pArg)
     
     // 무적 버프 추가
     m_pPlayer->AddBuff(CPlayer::BUFF_HIT);
+
+    _wstring strSoundTag = TEXT("Player_Hit_0");
+    _uint iRandValue = m_pGameInstance->Rand_UnsignedInt(1, 4);
+    strSoundTag += to_wstring(iRandValue) + TEXT(".wav");
+    m_pGameInstance->PlaySoundEffect(strSoundTag, 0.5f);
 }
 
 void CPlayer_DamageState::Update(_float fTimeDelta)

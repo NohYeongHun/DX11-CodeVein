@@ -38,12 +38,14 @@ private:
 	HRESULT Add_Prototype_Effects(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance);
 	HRESULT Add_Prototype_Dissolve_Effects(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance);
 	HRESULT Add_Prototype_Slash_Effects(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance);
+	HRESULT Add_Prototype_Renketsu_Slash_Effects(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance);
 	HRESULT Add_Prototype_HitFlash_Effects(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance);
 	HRESULT Add_Prototype_Particle_Effects(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance);
 	HRESULT Add_Prototype_Trail_Effects(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance);
 	HRESULT Add_Prototype_ParticleSystem(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance);
 	HRESULT Add_Prototype_BloodPillar_Effects(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance);
 	HRESULT Add_Prototype_SwordWind_Effects(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance);
+	HRESULT Add_Prototype_SwordWindCircle_Effects(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance);
 	HRESULT Add_Prototype_BloodAura_Effects(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance);
 
 #pragma endregion

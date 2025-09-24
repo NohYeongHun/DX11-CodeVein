@@ -71,6 +71,8 @@ HRESULT CSkillUI::Initialize_Clone(void* pArg)
     //    return E_FAIL;
 
 
+    
+
 
     return S_OK;
 }
@@ -87,7 +89,7 @@ void CSkillUI::Update(_float fTimeDelta)
     if (!m_IsVisibility)
         return;
 
-    if (m_pGameInstance->Get_KeyUp(DIK_ESCAPE))
+    if (m_pGameInstance->Get_KeyUp(DIK_ESCAPE) || m_pGameInstance->Get_KeyUp(DIK_I))
         Set_Visibility();
 
     CUIObject::Update(fTimeDelta);

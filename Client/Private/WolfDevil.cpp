@@ -304,6 +304,11 @@ void CWolfDevil::Dead_Action()
     CMonster::Dead_Action();
     Start_Dissolve(6.f);
 }
+void CWolfDevil::Hit_Action()
+{
+    CMonster::Hit_Action();
+    m_pGameInstance->PlaySoundEffect(L"Wolf_Hit.wav", 0.3f);
+}
 #pragma endregion
 
 

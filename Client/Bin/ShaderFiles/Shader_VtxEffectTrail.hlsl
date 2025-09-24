@@ -1,6 +1,7 @@
 #include "Engine_Shader_Defines.hlsli"
 
 matrix g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
+vector g_vCamPosition;
 float g_fAlpha = 1.f;
 texture2D g_DiffuseTexture;
 texture2D g_DepthTexture;
@@ -26,6 +27,24 @@ float4 g_TrailColor = float4(0.8f, 0.4f, 1.0f, 1.0f); // 리본 트레일 색상
 
 vector g_ColorBack = vector(1.f, 1.f, 1.f, 1.f);
 vector g_ColorFront = vector(1.f, 1.f, 1.f, 1.f);
+
+
+texture2D g_GradientTexture;
+
+//sampler GradientSampler = sampler_state
+//{
+//    texture = g_GradientTexture;
+//    minfilter = linear;
+//    magfilter = linear;
+//    mipfilter = linear;
+//};
+
+
+
+sampler DepthSampler = sampler_state
+{
+    texture = g_DepthTexture;
+};
 
 struct VS_IN
 {
@@ -172,6 +191,8 @@ PS_OUT PS_STRETCH_TRAIL(PS_IN In)
     
     return Out;
 }
+
+
 
 
 technique11 DefaultTechnique

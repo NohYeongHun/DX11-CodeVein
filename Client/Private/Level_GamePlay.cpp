@@ -202,6 +202,19 @@ HRESULT CLevel_GamePlay::Ready_HUD()
 	// 이벤트 실행이지 구독이아님.
 	m_pGameInstance->Publish<HUDEVENT_DESC>(EventType::HUD_DISPLAY, &Desc);
 
+	//// 기본 스킬 설정 - 첫 번째 스킬 (검풍)
+	//HUD_SKILLCHANGE_DESC SkillDesc{};
+	//SkillDesc.iSkillPanelIdx = CHUD::SKILL_PANEL_TOP;  // 상단 스킬 패널
+	//SkillDesc.iSlotIdx = 0;  // 첫 번째 슬롯
+	//SkillDesc.iTextureIdx = 0;  // 검풍 스킬 텍스처 인덱스
+	//SkillDesc.pSkillIcon = nullptr;  // 기본 아이콘 사용
+	//m_pGameInstance->Publish<HUD_SKILLCHANGE_DESC>(EventType::HUD_SKILL_CHANGE, &SkillDesc);
+
+	//// 기본 스킬 설정 - 두 번째 스킬 (있다면)
+	//SkillDesc.iSlotIdx = 1;  // 두 번째 슬롯
+	//SkillDesc.iTextureIdx = 1;  // 두 번째 스킬 텍스처 인덱스
+	//m_pGameInstance->Publish<HUD_SKILLCHANGE_DESC>(EventType::HUD_SKILL_CHANGE, &SkillDesc);
+
 	return S_OK;
 }
 
@@ -231,8 +244,8 @@ HRESULT CLevel_GamePlay::Ready_Layer_Player(const _wstring& strLayerTag)
 	CPlayer::PLAYER_DESC Desc{};
 #pragma region 1. 플레이어에게 넣어줘야할 레벨 별 다른 값들.
 	Desc.eCurLevel = m_eCurLevel;
-	//Desc.vPos = { 270.f, 0.f, 0.f };
-	Desc.vPos = { 40.f, 0.f, 0.f }; // 보스방 바로
+	Desc.vPos = { 270.f, 0.f, 0.f };
+	//Desc.vPos = { 40.f, 0.f, 0.f }; // 보스방 바로
 #pragma endregion
 
 #pragma region 2. 게임에서 계속 들고있어야할 플레이어 값들.

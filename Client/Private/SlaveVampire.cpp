@@ -220,8 +220,6 @@ void CSlaveVampire::On_Collision_Enter(CGameObject* pOther)
 
             AddBuff(BUFF_HIT);
 
-            // 4. 사운드 재생.
-            //m_pGameInstance->PlaySoundEffect(L"WeaponHit.wav", 0.3f);
         }
     }
 
@@ -323,6 +321,11 @@ void CSlaveVampire::Dead_Action()
 {
     CMonster::Dead_Action();
     Start_Dissolve(6.f);
+}
+void CSlaveVampire::Hit_Action()
+{
+    CMonster::Hit_Action();
+    m_pGameInstance->PlaySoundEffect(L"Wolf_Hit.wav", 0.3f);
 }
 #pragma endregion
 
