@@ -41,6 +41,14 @@ public:
 	virtual void Late_Update(_float fTimeDelta);
 	virtual HRESULT Render();
 
+public:
+	// 쉐이킹 시작 함수
+	virtual void StartShake(_float duration, _float magnitude) {};
+
+protected:
+	_float m_fShakeTime = 0.f; // 쉐이킹 지속시간 (남은 시간)
+	_float m_fShakeDuration = 0.f; // 쉐이킹 지속시간 (남은 시간)
+	_float m_fShakeMagnitude = 0.f; // 쉐이킹 강도
 
 public:
 	void Update_PipeLines();

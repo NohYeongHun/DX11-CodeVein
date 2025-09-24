@@ -920,6 +920,8 @@ void CQueenKnight::Start_PillarSkill()
     XMStoreFloat3(&m_vSkillCenterPos, m_pTransformCom->Get_State(STATE::POSITION)); // 스킬 중심 위치 저장
     std::fill(m_vecIsPillarActivated.begin(), m_vecIsPillarActivated.end(), false);
 
+    // 0. 카메라 쉐이킹
+    m_pGameInstance->Get_MainCamera()->StartShake(0.7f, 0.4f);
 
     // 장판 시작.
     CEffect_PlayerSkill::EFFECT_PLAYERSKILL_ACTIVATE_DESC Effect_PlayerSkillDesc{};

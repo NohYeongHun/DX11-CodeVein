@@ -244,8 +244,8 @@ HRESULT CLevel_GamePlay::Ready_Layer_Player(const _wstring& strLayerTag)
 	CPlayer::PLAYER_DESC Desc{};
 #pragma region 1. 플레이어에게 넣어줘야할 레벨 별 다른 값들.
 	Desc.eCurLevel = m_eCurLevel;
-	//Desc.vPos = { 270.f, 0.f, 0.f };
-	Desc.vPos = { 40.f, 0.f, 0.f }; // 보스방 바로
+	Desc.vPos = { 270.f, 0.f, 0.f };
+	//Desc.vPos = { 40.f, 0.f, 0.f }; // 보스방 바로
 #pragma endregion
 
 #pragma region 2. 게임에서 계속 들고있어야할 플레이어 값들.

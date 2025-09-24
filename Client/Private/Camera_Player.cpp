@@ -1,4 +1,5 @@
-﻿CCamera_Player::CCamera_Player(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿#include "Camera_Player.h"
+CCamera_Player::CCamera_Player(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CCamera(pDevice, pContext)
 {
 }
@@ -76,6 +77,36 @@ void CCamera_Player::Update(_float fTimeDelta)
 	Update_Mouse_Clip();
 
 
+	if (m_fShakeTime > 0.0f)
+	{
+		// 1. 남은 시간 감소
+		m_fShakeTime -= fTimeDelta;
+
+		// 2. 랜덤 오프셋 생성
+		// -1.0f ~ +1.0f 사이의 랜덤 값을 생성합니다.
+		_float fOffsetX = ((float)rand() / RAND_MAX - 0.5f) * 2.0f;
+		_float fOffsetY = ((float)rand() / RAND_MAX - 0.5f) * 2.0f;
+		_float fOffsetZ = ((float)rand() / RAND_MAX - 0.5f) * 2.0f;
+
+		m_vShakeOffset = XMVectorSet(fOffsetX, fOffsetY, fOffsetZ, 0.0f);
+
+		// 3. 오프셋에 강도를 곱하고 정규화 (방향만 사용)
+		m_vShakeOffset = XMVector3Normalize(m_vShakeOffset) * m_fShakeMagnitude;
+
+		
+
+		// 4. (선택) 시간이 지남에 따라 쉐이킹 강도를 서서히 줄여 부드럽게 멈추게 함
+		m_fShakeMagnitude *= (m_fShakeTime /  m_fShakeDuration);
+	}
+	else
+	{
+		m_fShakeTime = 0.0f;
+		m_fShakeDuration = 0.0f;
+		m_fShakeMagnitude = 0.0f;
+		m_vShakeOffset = XMVectorSet(0.f, 0.f, 0.f, 0.f);
+	}
+
+
 	// 락온 모드에 따라 카메라 업데이트 방식 선택
 	if (m_IsLockOnMode)
 	{
@@ -90,6 +121,7 @@ void CCamera_Player::Update(_float fTimeDelta)
 	Update_LockOn_UI(fTimeDelta);
 
 
+	
 
 
 
@@ -172,8 +204,11 @@ void CCamera_Player::Update_Chase_Target(_float fTimeDelta)
 	_vector vSmoothedPos = XMVectorLerp(vCurrentPos, vTargetPos_Camera, fLerpFactor);
 
 	// 10. 현재 위치 업데이트
+	/*XMStoreFloat4(&m_vCurrentCameraPos, vSmoothedPos);
+	m_pTransformCom->Set_State(STATE::POSITION, vSmoothedPos);*/
+	// 10. 현재 위치 업데이트
 	XMStoreFloat4(&m_vCurrentCameraPos, vSmoothedPos);
-	m_pTransformCom->Set_State(STATE::POSITION, vSmoothedPos);
+	m_pTransformCom->Set_State(STATE::POSITION, vSmoothedPos + m_vShakeOffset);
 
 	// 11. 카메라 방향 설정 (Pitch와 Yaw 적용)
 	_vector vForward = XMVector3TransformNormal(XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f), matRotation);
@@ -350,13 +385,20 @@ void CCamera_Player::Update_LockOn_Camera(_float fTimeDelta)
 	_vector vSmoothedPos = XMVectorLerp(vCurrentPos, vTargetPos, fLerpFactor);
 
 	// 5. 카메라 위치 설정
+	//XMStoreFloat4(&m_vCurrentCameraPos, vSmoothedPos);
+	//m_pTransformCom->Set_State(STATE::POSITION, vSmoothedPos);
+
+	// 5. 카메라 위치 설정
 	XMStoreFloat4(&m_vCurrentCameraPos, vSmoothedPos);
-	m_pTransformCom->Set_State(STATE::POSITION, vSmoothedPos);
+	m_pTransformCom->Set_State(STATE::POSITION, vSmoothedPos + m_vShakeOffset);
 
 	// 6. 락온 상태에서는 몬스터를 직접 바라보도록 설정
 	_float3 vTargetPosFloat3;
 	XMStoreFloat3(&vTargetPosFloat3, vTargetPos_Enemy);
 	m_pTransformCom->LookAt(vTargetPosFloat3);
+
+
+	// 4. 최종 카메라 위치에 오프셋 적용
 
 }
 
@@ -544,6 +586,15 @@ void CCamera_Player::Calculate_LockOn_Camera_Position(_float fTimeDelta)
 
 #pragma endregion
 
+
+
+
+void CCamera_Player::StartShake(_float duration, _float magnitude)
+{
+	m_fShakeTime = duration;
+	m_fShakeDuration = duration;
+	m_fShakeMagnitude = magnitude;
+}
 
 void CCamera_Player::Debug_CameraVectors()
 {

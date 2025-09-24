@@ -125,6 +125,16 @@ private:
 
 #pragma endregion
 
+#pragma region 2. 카메라 Shaking
+public:
+	virtual void StartShake(_float duration, _float magnitude) override;
+
+private:
+	_vector m_vShakeOffset = {};
+
+#pragma endregion
+
+
 #pragma region 99. 디버그 용도
 public:
 	void Debug_CameraVectors();

@@ -236,6 +236,8 @@ void CPlayer_SecondSkillState::Update_Event(_float fTimeDelta)
         
         m_IsSecondEvent = true;
         Create_SecondEvent();
+
+        m_pGameInstance->Get_MainCamera()->StartShake(0.4f, 0.1f);
     }
 
 
