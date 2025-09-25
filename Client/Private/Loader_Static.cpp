@@ -562,6 +562,12 @@ HRESULT CLoader_Static::Add_Prototype_Effects(ID3D11Device* pDevice, ID3D11Devic
 		CRASH("Failed CLone SwordWind Effects");
 		return E_FAIL;
 	}
+
+	if (FAILED(Add_Prototype_LungePillar_Effects(pDevice, pContext, pGameInstance)))
+	{
+		CRASH("Failed CLone LungePillar Effects");
+		return E_FAIL;
+	}
 		
 
 
@@ -1146,6 +1152,65 @@ HRESULT CLoader_Static::Add_Prototype_BloodAura_Effects(ID3D11Device* pDevice, I
 		, TEXT("Prototype_GameObject_EffectPlayerAuraContainer")
 		, CEffect_PlayerSkill::Create(pDevice, pContext))))
 		CRASH("Failed Prototype Effects PlayerSkill");
+	return S_OK;
+}
+
+HRESULT CLoader_Static::Add_Prototype_LungePillar_Effects(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
+{
+
+#pragma region TEXTURE
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
+		, TEXT("Prototype_Component_Texture_LungePillarDiffuse")
+		, CTexture::Create(pDevice, pContext
+			, TEXT("../Bin/Resources/Models/EffectMesh/LungePillar/Diffuse/Diffuse%d.png"), 7))))
+	{
+		CRASH("Failed Load Effect LungePillar Texture");
+		return E_FAIL;
+	}
+
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
+		, TEXT("Prototype_Component_Texture_LungePillarNoise")
+		, CTexture::Create(pDevice, pContext
+			, TEXT("../Bin/Resources/Models/EffectMesh/LungePillar/Noise/Noise%d.png"), 5))))
+	{
+		CRASH("Failed Load Effect LungePillar Texture");
+		return E_FAIL;
+	}
+
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
+		, TEXT("Prototype_Component_Texture_LungePillarOther")
+		, CTexture::Create(pDevice, pContext
+			, TEXT("../Bin/Resources/Models/EffectMesh/LungePillar/Other/Other%d.png"), 13))))
+	{
+		CRASH("Failed Load Effect LungePillar Texture");
+		return E_FAIL;
+	}
+
+#pragma endregion
+
+
+	_matrix		PreTransformMatrix = XMMatrixIdentity();
+
+	PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XM_PI);
+
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
+		, TEXT("Prototype_Component_Model_Effect_LungePillar")
+		, CLoad_Model::Create(pDevice, pContext, MODELTYPE::NONANIM, PreTransformMatrix, "../../SaveFile/Model/Effect/LungePillar.dat", L""))))
+		CRASH("Failed Prototype Lunge Pillar Effects");
+
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
+		, TEXT("Prototype_GameObject_LungePillar")
+		, CLunge_Pillar::Create(pDevice, pContext))))
+		CRASH("Failed Prototype Lunge Pillar Effects");
+
+
+	/* 최종 명령을 내리는 주체.*/
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
+		, TEXT("Prototype_GameObject_Effect_LungePillar")
+		, CEffect_LungePillar::Create(pDevice, pContext))))
+		CRASH("Failed Prototype Blood Pillar Effects");
+
+
 	return S_OK;
 }
 

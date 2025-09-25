@@ -133,8 +133,6 @@ PS_OUT PS_LINESLASH_MAIN(PS_IN In)
 PS_OUT PS_LINESLASH_RED_MAIN(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
-
- 
     
     float2 slashUV = In.vTexcoord;
     slashUV.y = (slashUV.y + 1.0f) / 4.0f;

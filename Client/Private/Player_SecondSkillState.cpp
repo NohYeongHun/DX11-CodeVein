@@ -400,6 +400,48 @@ void CPlayer_SecondSkillState::Create_ThirdEvent()
 void CPlayer_SecondSkillState::Create_FourthEvent()
 {
 
+
+    CEffect_LungePillar::LUNGEPILLAR_ACTIVATE_DESC PillarDesc{};
+    PillarDesc.eCurLevel = m_pPlayer->Get_CurrentLevel();
+
+    _matrix playerWorld = m_pPlayer->Get_Transform()->Get_WorldMatrix();
+    _vector vPlayerPos = playerWorld.r[3];
+    _vector vPlayerForward = XMVector3Normalize(playerWorld.r[2]);
+    _vector vPlayerRight = XMVector3Normalize(playerWorld.r[1]);
+    _vector vPlayerUp = XMVector3Normalize(playerWorld.r[0]);
+    _float fHitDistance = 4.0f;
+
+    _vector vHitPos = vPlayerPos + (vPlayerForward * fHitDistance);
+
+    PillarDesc.vStartPos = vHitPos; // 최종 월드 좌표 전달
+    PillarDesc.fGrowDuration = 10.f;
+    PillarDesc.fStayDuration = 0.1f;
+    PillarDesc.fDecreaseDuration = 10.f;
+    PillarDesc.fTargetRadius = 5.f;
+    //
+
+    m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(PillarDesc.eCurLevel)
+        , TEXT("LUNGE_PILLAR"), TEXT("Layer_Effect"), 1, ENUM_CLASS(CEffect_LungePillar::EffectType), &PillarDesc);
+
+
+    //CEffectParticle::EFFECTPARTICLE_ENTER_DESC HitParticleDesc{};
+    //HitParticleDesc.eParticleType = CEffectParticle::PARTICLE_TYPE_HIT_PARTCILE;
+    //HitParticleDesc.vStartPos = vHitPos;
+    //HitParticleDesc.particleInitInfo.lifeTime = 0.5f; // lisfeTime
+    //HitParticleDesc.particleInitInfo.fRadius = 2.f; // 모일 반경
+    //HitParticleDesc.particleInitInfo.fExplositionTime = 0.1f;
+    //
+    //HitParticleDesc.particleInitInfo.dir = { 0.f, 1.f, 0.f };
+    //HitParticleDesc.pTargetTransform = m_pTransformCom;
+    //m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(m_pPlayer->Get_CurrentLevel())
+    //    , TEXT("HIT_PARTICLE"), TEXT("Layer_Effect"), 3, ENUM_CLASS(CEffectParticle::EffectType), &HitParticleDesc);
+    //
+    //
+    //vHitPos = XMVectorSetY(vHitPos, XMVectorGetY(vHitPos) + 0.5f);
+    //HitParticleDesc.vStartPos = vHitPos;
+    //m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(m_pPlayer->Get_CurrentLevel())
+    //    , TEXT("HIT_PARTICLE"), TEXT("Layer_Effect"), 3, ENUM_CLASS(CEffectParticle::EffectType), &HitParticleDesc);
+
 }
 
 CPlayer_SecondSkillState* CPlayer_SecondSkillState::Create(_uint iStateNum, void* pArg)

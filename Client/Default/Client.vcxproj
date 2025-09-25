@@ -205,6 +205,7 @@
     <ClInclude Include="..\Public\EffectParticle.h" />
     <ClInclude Include="..\Public\Effect_BodyAura.h" />
     <ClInclude Include="..\Public\Effect_FloorAura.h" />
+    <ClInclude Include="..\Public\Effect_LungePillar.h" />
     <ClInclude Include="..\Public\Effect_Pillar.h" />
     <ClInclude Include="..\Public\Effect_PlayerSkill.h" />
     <ClInclude Include="..\Public\Effect_Wind.h" />
@@ -253,6 +254,7 @@
     <ClInclude Include="..\Public\Loading_Panel.h" />
     <ClInclude Include="..\Public\Loading_Slot.h" />
     <ClInclude Include="..\Public\LockOnUI.h" />
+    <ClInclude Include="..\Public\Lunge_Pillar.h" />
     <ClInclude Include="..\Public\Map.h" />
     <ClInclude Include="..\Public\Monster.h" />
     <ClInclude Include="..\Public\MonsterHpBarUI.h" />
@@ -364,6 +366,7 @@
     </ClCompile>
     <ClCompile Include="..\Private\Effect_BodyAura.cpp" />
     <ClCompile Include="..\Private\Effect_FloorAura.cpp" />
+    <ClCompile Include="..\Private\Effect_LungePillar.cpp" />
     <ClCompile Include="..\Private\Effect_Pillar.cpp" />
     <ClCompile Include="..\Private\Effect_PlayerSkill.cpp" />
     <ClCompile Include="..\Private\Effect_Wind.cpp" />
@@ -409,6 +412,7 @@
     <ClCompile Include="..\Private\Loading_Panel.cpp" />
     <ClCompile Include="..\Private\Loading_Slot.cpp" />
     <ClCompile Include="..\Private\LockOnUI.cpp" />
+    <ClCompile Include="..\Private\Lunge_Pillar.cpp" />
     <ClCompile Include="..\Private\Map.cpp" />
     <ClCompile Include="..\Private\Monster.cpp" />
     <ClCompile Include="..\Private\MonsterHpBarUi.cpp" />

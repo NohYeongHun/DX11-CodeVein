@@ -655,43 +655,6 @@ PS_OUT_BACKBUFFER PS_DEFFERED_BLOODPILLARC_MAIN(PS_BACKBUFFER_IN In)
 }
 
 
-
-
-
-
-//PS_OUT_BACKBUFFER PS_SWORDWIND_MAIN(PS_BACKBUFFER_IN In)
-//{
-//    PS_OUT_BACKBUFFER Out = (PS_OUT_BACKBUFFER) 0;
-
-//     // 1. Base Color 텍스처 샘플링 (블렌더의 T_FX_GEZWhiteColor01)
-//    float4 vMtrlDiffuse = g_DiffuseTextures[6].Sample(DefaultSampler, In.vTexcoord);
-    
-//    // 2. Alpha에 사용할 노이즈 텍스처 샘플링 (블렌더의 T_FX_UE4TilingNoise03)
-//    float4 vMtrlNoise = g_NoiseTextures[4].Sample(DefaultSampler, In.vTexcoord);
-    
-//     // 3. Color Ramp 구현
-//    // 노이즈 텍스처의 R 채널 값을 팩터로 사용합니다. (0.0 ~ 1.0 사이의 값)
-//    float noiseFactor = vMtrlNoise.r;
-
-//    float rampT = saturate(noiseFactor / 1.f);
-    
-//    float finalAlpha = lerp(0.f, 1.f, rampT);
-
-//    // 원본 Diffuse 색상에 강도 값을 곱해 최종 색상을 계산합니다.
-//    float3 finalColor = vMtrlDiffuse.rgb;
-    
-//    float fAlpha = vMtrlNoise.r * saturate(1.f - g_fRatio * 2.f);
-    
-//   // ===== 최종 출력 =====
-//    // vMtrlDiffuse의 RGB 색상과 위에서 계산한 finalAlpha 값을 조합합니다.
-//    //Out.vDiffuse = float4(finalColor, vMtrlNoise.r);
-//    Out.vDiffuse = float4(finalColor, fAlpha);
-//    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
-//    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w, 0.f, 0.f);
-
-//    return Out;
-//}
-
 PS_OUT_BACKBUFFER PS_SWORDWIND_MAIN(PS_BACKBUFFER_IN In)
 {
     PS_OUT_BACKBUFFER Out = (PS_OUT_BACKBUFFER) 0;
@@ -1031,6 +994,69 @@ PS_OUT_BACKBUFFER PS_SWORDWIND_CIRCLE_MAIN(PS_BACKBUFFER_IN In)
     return Out;
 }
 
+float g_fBloomIntensity = 2.f;
+float g_fEmissiveIntensity = 2.f;
+PS_OUT_BACKBUFFER PS_LUNGE_PILLAR_MAIN(PS_BACKBUFFER_IN In)
+{
+    PS_OUT_BACKBUFFER Out = (PS_OUT_BACKBUFFER) 0;
+
+    // 1. 기본 색상.
+    vector vSourDiffuse = g_DiffuseTextures[5].Sample(DefaultSampler, In.vTexcoord);
+    vector vDestDiffuse = float4(0, 0, 0, 1);
+    vector vMask = float4(0, 0, 0, 0);
+    
+    
+    // 2. 마스킹
+    //vMask = g_DiffuseTextures[6].Sample(DefaultSampler, In.vTexcoord);
+    //vDestDiffuse = g_DiffuseTextures[6].Sample(DefaultSampler, In.vTexcoord);
+    
+    //vMask = g_NoiseTextures[4].Sample(DefaultSampler, In.vTexcoord);
+    //vDestDiffuse = g_NoiseTextures[4].Sample(DefaultSampler, In.vTexcoord);
+
+    
+    // // 3. 색상 버리기.
+    //if (vDestDiffuse.r < 0.1f && vDestDiffuse.g < 0.1f && vDestDiffuse.b < 0.1f)
+    //    discard;
+    
+    // // 4. Mask 범위 구하기.
+    //vector vMtrlDiffuse = vDestDiffuse * (1.f - vMask) + vSourDiffuse * (vMask);
+    
+    // // 5. Emissive 추가 발광효과.
+    //float fMaskBrightness = dot(vMask.rgb, float3(0.299, 0.587, 0.114));
+    //if (fMaskBrightness > 0.5f)
+    //{
+    //    vector vEmissive = vMask * g_fEmissiveIntensity * 2.0f;
+    //    vMtrlDiffuse.rgb += vEmissive.rgb;
+    //}
+    
+    //// 6. Bloom Color 계산
+    //float lifeRatio = g_fRatio;
+    //float lifeCurve = sin(lifeRatio * 3.14159f);
+
+    //vector bloomColor = float4(float3(4.0f, 0.5f, 0.2f) * g_fBloomIntensity, 1.0f);
+    
+    
+    //  // 7. 밝기 
+    //if (fMaskBrightness > 0.1f) // 임계값은 0.1 ~ 0.5 사이에서 조정
+    //{
+    //    // vMtrlDiffuse.rgb에 bloomColor.rgb를 더합니다.
+    //    // lifeCurve를 곱해줘서 파티클 수명에 따라 자연스럽게 빛나도록 합니다.
+    //    //vMtrlDiffuse.rgb += bloomColor.rgb * vMask.rgb * lifeCurve;
+    //    vMtrlDiffuse.rgb += bloomColor.rgb * vMask.rgb;
+    //}
+    
+    //float fadeAlpha = saturate(1.0f - lifeRatio); // 기존 코드
+    //vMtrlDiffuse.a = fadeAlpha; // 기존 코드
+    
+    Out.vDiffuse = float4(1.f, 1.f, 1.f, 1.f);
+    
+    Out.vNormal = float4(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+    Out.vDepth = float4(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w, 0.f, 0.f);
+
+    return Out;
+}
+
+
 technique11 DefaultTechnique
 {
     /* 특정 패스를 이용해서 점정을 그려냈다. */
@@ -1161,7 +1187,7 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_BLOOD_BODYAURA_MAIN();
     }
 
-    pass SwordWindCircle // 10
+    pass SwordWindCirclePass // 10
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_Default, 0);
@@ -1171,6 +1197,19 @@ technique11 DefaultTechnique
         GeometryShader = NULL;
         //PixelShader = compile ps_5_0 PS_SWORDWIND_IMPROVED();
         PixelShader = compile ps_5_0 PS_SWORDWIND_CIRCLE_MAIN();
+    }
+
+    pass LungePillarPass // 11
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_Default, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        // 일단 테스트용도.
+        //PixelShader = compile ps_5_0 PS_DEFFERED_BLOODPILLARA_MAIN();
+        PixelShader = compile ps_5_0 PS_LUNGE_PILLAR_MAIN();
     }
 
 

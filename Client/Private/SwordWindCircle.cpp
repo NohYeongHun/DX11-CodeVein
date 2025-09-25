@@ -112,7 +112,7 @@ void CSwordWindCircle::Late_Update(_float fTimeDelta)
 HRESULT CSwordWindCircle::Render()
 {
 #ifdef _DEBUG
-	ImGui_Render();
+	//ImGui_Render();
 #endif // _DEBUG
 
 

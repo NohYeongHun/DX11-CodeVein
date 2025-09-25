@@ -274,6 +274,9 @@
     <Filter Include="02. GameObject\Effect\Mesh\Player\CirculatePurge\Slash">
       <UniqueIdentifier>{71df7f5a-a6e1-4760-9c2b-9638a105c1ae}</UniqueIdentifier>
     </Filter>
+    <Filter Include="02. GameObject\Effect\Mesh\Player\Skill2\DragonLunge">
+      <UniqueIdentifier>{b24996db-0df6-4603-ac44-cd3379c7360a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Client.h">
@@ -741,6 +744,12 @@
     <ClInclude Include="..\Public\SwordWind.h">
       <Filter>02. GameObject\Effect\Mesh\Player\CirculatePurge\SwordWind</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Effect_LungePillar.h">
+      <Filter>02. GameObject\Effect\Mesh\Player\Skill2\DragonLunge</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Public\Lunge_Pillar.h">
+      <Filter>02. GameObject\Effect\Mesh\Player\Skill2\DragonLunge</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">
@@ -1178,6 +1187,12 @@
     </ClCompile>
     <ClCompile Include="..\Private\SwordWindCircle.cpp">
       <Filter>02. GameObject\Effect\Mesh\Player\CirculatePurge\SwordWind</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Effect_LungePillar.cpp">
+      <Filter>02. GameObject\Effect\Mesh\Player\Skill2\DragonLunge</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Private\Lunge_Pillar.cpp">
+      <Filter>02. GameObject\Effect\Mesh\Player\Skill2\DragonLunge</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
