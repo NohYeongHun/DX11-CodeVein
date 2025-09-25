@@ -282,6 +282,9 @@ void CSlaveVampire::Update_AI(_float fTimeDelta)
     _float fCurrentRatio = m_pModelCom->Get_Current_Ratio();
     if (m_IsPlayWeaponSound && fCurrentRatio >= m_fPlayAttackSound)
     {
+        if (HasBuff(CMonster::BUFF_DEAD))
+            return;
+
         m_IsPlayWeaponSound = false;
         m_pGameInstance->PlaySoundEffect(L"SlaveVampireAttack.wav", 0.2f);
     }
