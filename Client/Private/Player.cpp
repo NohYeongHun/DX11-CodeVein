@@ -807,6 +807,12 @@ void CPlayer::Tick_BuffTimers(_float fTimeDelta)
 
 }
 
+/* 스킬 상태일 때 카메라 회전을 막습니다.*/
+void CPlayer::Set_SkillMode(_bool bSkillMode)
+{
+    m_pPlayerCamera->Set_SkillMode(bSkillMode);
+}
+
 
 HRESULT CPlayer::Initialize_BuffDurations()
 {

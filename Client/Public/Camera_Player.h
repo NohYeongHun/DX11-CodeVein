@@ -103,10 +103,12 @@ private:
 
 public:
 	void Set_InventroyMode(_bool bInventoryMode) { m_IsInventoryMode = bInventoryMode; }
-
+	void Set_SkillMode(_bool bSkillMode) { m_IsSkillMode = bSkillMode; }
 private:
 	// 인벤토리 키면 회전 멈추기
 	_bool m_IsInventoryMode = { false };
+	// 스킬 상태면 회전 멈추기
+	_bool m_IsSkillMode = { false };
 
 private:
 	class CMonster* m_pLockOnTarget = { nullptr };// LockOn 타겟

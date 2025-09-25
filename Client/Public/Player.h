@@ -224,6 +224,9 @@ public:
 public:
 	void Tick_BuffTimers(_float fTimeDelta);
 
+public:
+	void Set_SkillMode(_bool bSkillMode);
+
 
 private:
 	HRESULT Initialize_BuffDurations();

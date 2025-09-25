@@ -176,6 +176,9 @@ void CPlayer_FirstSkillState::Enter(void* pArg)
     m_IsThirdAttack = false;
     m_IsFourthAttack = false;
     m_IsFifthAttack = false;
+
+    /* 스킬에 진입하면 카메라 마우스 이동을 막습니다. */
+    m_pPlayer->Set_SkillMode(true);
 }
 
 void CPlayer_FirstSkillState::Update(_float fTimeDelta)
@@ -210,6 +213,9 @@ void CPlayer_FirstSkillState::Exit()
     {
         m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, false);
     }
+
+    // 다시 회전 가능하게
+    m_pPlayer->Set_SkillMode(false);
 }
 
 void CPlayer_FirstSkillState::Reset()
@@ -386,8 +392,10 @@ void CPlayer_FirstSkillState::Create_SecondEvent()
     SlashDesc.vTargetScale = { 8.f, 0.4f, 1.f };
     SlashDesc.fCreateDelay = m_pGameInstance->Get_TimeDelta() * 30.f;
     SlashDesc.fDisPlayTime = 0.2f;
+    SlashDesc.bIsScaleChange = true;
+    SlashDesc.eShaderPath = EFFECTPOSTEX_SHADERPATH::RENKETSU_LINESLASH;
     m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(SlashDesc.eCurLevel)
-        , TEXT("SLASH_EFFECT"), TEXT("Layer_Effect"), 2, ENUM_CLASS(CSlash::EffectType), &SlashDesc);
+        , TEXT("SLASH_EFFECT"), TEXT("Layer_Effect"), 1, ENUM_CLASS(CSlash::EffectType), &SlashDesc);
 }
 
 void CPlayer_FirstSkillState::Create_ThirdEvent()
@@ -439,6 +447,7 @@ void CPlayer_FirstSkillState::Create_ThirdEvent()
     SlashDesc.vTargetScale = { 8.f, 0.4f, 1.f };
     SlashDesc.fCreateDelay = 0.0f;
     SlashDesc.fDisPlayTime = 0.5f;
+    SlashDesc.eShaderPath = EFFECTPOSTEX_SHADERPATH::RENKETSU_LINESLASH;
     m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(SlashDesc.eCurLevel)
         , TEXT("SLASH_EFFECT"), TEXT("Layer_Effect"), 2, ENUM_CLASS(CSlash::EffectType), &SlashDesc);
 }
@@ -458,7 +467,6 @@ void CPlayer_FirstSkillState::Create_FourthEvent()
     WindCircleActivate_Desc.vStartScale = { 6.f, 6.f, 6.f };
     WindCircleActivate_Desc.vTargetScale = { 7.f, 7.f, 7.f };
     WindCircleActivate_Desc.pWorldMatrix = m_pPlayer->Get_Transform()->Get_WorldMatrixPtr(); // WorldMatrix는 한번만 초기화
-    //WindActivate_Desc.pSocketMatrix = m_pPlayer->Get_BoneMatrix("RightGauntletTrail2"); // 붙일 뼈
     WindCircleActivate_Desc.pSocketMatrix = m_pPlayer->Get_BoneMatrix("socket_ExpRecoveryFx01"); // 붙일 뼈
 
     m_pGameInstance->Move_Effect_ToObjectLayer(
@@ -492,6 +500,7 @@ void CPlayer_FirstSkillState::Create_FourthEvent()
     SlashDesc.fCreateDelay = 0.f;
     SlashDesc.fDisPlayTime = 0.5f;
     SlashDesc.bIsScaleChange = true;
+    SlashDesc.eShaderPath = EFFECTPOSTEX_SHADERPATH::RENKETSU_LINESLASH;
     m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(SlashDesc.eCurLevel)
         , TEXT("SLASH_EFFECT"), TEXT("Layer_Effect"), 2, ENUM_CLASS(CSlash::EffectType), &SlashDesc);
 }
@@ -543,6 +552,7 @@ void CPlayer_FirstSkillState::Create_FifthEvent()
     SlashDesc.vTargetScale = { 8.f, 0.4f, 1.f };
     SlashDesc.fCreateDelay = 0.2f;
     SlashDesc.fDisPlayTime = 0.5f;
+    SlashDesc.eShaderPath = EFFECTPOSTEX_SHADERPATH::RENKETSU_LINESLASH;
     m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(SlashDesc.eCurLevel)
         , TEXT("SLASH_EFFECT"), TEXT("Layer_Effect"), 2, ENUM_CLASS(CSlash::EffectType), &SlashDesc);
 

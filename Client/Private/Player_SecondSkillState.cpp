@@ -123,6 +123,9 @@ void CPlayer_SecondSkillState::Enter(void* pArg)
     m_IsThirdEvent = false;
     m_IsFourthEvent = false;
     m_IsFifthEvent = false;
+
+    // 카메라 회전 막기.
+    m_pPlayer->Set_SkillMode(true);
     
 }
 
@@ -157,6 +160,9 @@ void CPlayer_SecondSkillState::Exit()
     }
 
     m_pPlayer->Decrease_Damage(m_fIncreaseDamage);
+
+    // 다시 회전 가능하게
+    m_pPlayer->Set_SkillMode(false);
 }
 
 void CPlayer_SecondSkillState::Reset()
@@ -337,9 +343,10 @@ void CPlayer_SecondSkillState::Create_SecondEvent()
     SlashDesc.vHitPosition = vHitPos;
     SlashDesc.vHitDirection = vPlayerRight;
     SlashDesc.vScale = { 4.f, 1.f, 1.f };
-    SlashDesc.vTargetScale = { 8.f, 0.4f, 1.f };
+    SlashDesc.vTargetScale = { 6.f, 0.4f, 1.f };
     SlashDesc.fCreateDelay = 0.f;
     SlashDesc.fDisPlayTime = 0.5f;
+    SlashDesc.bIsScaleChange = true;
     SlashDesc.eShaderPath = EFFECTPOSTEX_SHADERPATH::RENKETSU_LINESLASH;
     m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(SlashDesc.eCurLevel)
         , TEXT("SLASH_EFFECT"), TEXT("Layer_Effect"), 1, ENUM_CLASS(CSlash::EffectType), &SlashDesc);
@@ -380,9 +387,10 @@ void CPlayer_SecondSkillState::Create_ThirdEvent()
     SlashDesc.vHitPosition = vHitPos;
     SlashDesc.vHitDirection = vPlayerRight;
     SlashDesc.vScale = { 4.f, 1.f, 1.f };
-    SlashDesc.vTargetScale = { 8.f, 0.4f, 1.f };
+    SlashDesc.vTargetScale = { 6.f, 0.4f, 1.f };
     SlashDesc.fCreateDelay = 0.1f;
     SlashDesc.fDisPlayTime = 0.5f;
+    SlashDesc.bIsScaleChange = true;
     SlashDesc.eShaderPath = EFFECTPOSTEX_SHADERPATH::RENKETSU_LINESLASH;
     m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(SlashDesc.eCurLevel)
         , TEXT("SLASH_EFFECT"), TEXT("Layer_Effect"), 1, ENUM_CLASS(CSlash::EffectType), &SlashDesc);
