@@ -327,7 +327,7 @@ void CPlayer_SecondSkillState::Create_SecondEvent()
     _vector vPlayerForward = XMVector3Normalize(playerWorld.r[2]);
     _vector vPlayerRight = XMVector3Normalize(playerWorld.r[1]);
     _vector vPlayerUp = XMVector3Normalize(playerWorld.r[0]);
-    _float fHitDistance = 3.0f;
+    _float fHitDistance = 1.0f;
 
     _vector vHitPos = vPlayerPos + (vPlayerForward * fHitDistance);
     vHitPos += XMVectorSet(0.f, 1.f, 0.f, 0.f) * 1.7f;
@@ -340,6 +340,7 @@ void CPlayer_SecondSkillState::Create_SecondEvent()
     SlashDesc.vTargetScale = { 8.f, 0.4f, 1.f };
     SlashDesc.fCreateDelay = 0.f;
     SlashDesc.fDisPlayTime = 0.5f;
+    SlashDesc.eShaderPath = EFFECTPOSTEX_SHADERPATH::RENKETSU_LINESLASH;
     m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(SlashDesc.eCurLevel)
         , TEXT("SLASH_EFFECT"), TEXT("Layer_Effect"), 1, ENUM_CLASS(CSlash::EffectType), &SlashDesc);
 
@@ -369,7 +370,7 @@ void CPlayer_SecondSkillState::Create_ThirdEvent()
     _vector vPlayerForward = XMVector3Normalize(playerWorld.r[2]);
     _vector vPlayerRight = XMVector3Normalize(playerWorld.r[1]);
     _vector vPlayerUp = XMVector3Normalize(playerWorld.r[0]);
-    _float fHitDistance = 3.0f;
+    _float fHitDistance = 1.0f;
 
     _vector vHitPos = vPlayerPos + (vPlayerForward * fHitDistance);
     vHitPos += XMVectorSet(0.f, 1.f, 0.f, 0.f) * 1.2f;
@@ -382,6 +383,7 @@ void CPlayer_SecondSkillState::Create_ThirdEvent()
     SlashDesc.vTargetScale = { 8.f, 0.4f, 1.f };
     SlashDesc.fCreateDelay = 0.1f;
     SlashDesc.fDisPlayTime = 0.5f;
+    SlashDesc.eShaderPath = EFFECTPOSTEX_SHADERPATH::RENKETSU_LINESLASH;
     m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(SlashDesc.eCurLevel)
         , TEXT("SLASH_EFFECT"), TEXT("Layer_Effect"), 1, ENUM_CLASS(CSlash::EffectType), &SlashDesc);
 }

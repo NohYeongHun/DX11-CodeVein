@@ -182,10 +182,10 @@ HRESULT CLevel_GamePlay::Ready_Lights()
 
 	SHADOW_LIGHT_DESC			ShadowLightDesc{};
 	ShadowLightDesc.vEye = _float4(100.f, 60.f, 130.f, 1.f);
-	ShadowLightDesc.vAt = _float4(100.f, 45.f, 0.f, 1.f);
+	ShadowLightDesc.vAt = _float4(100.f, 55.f, 0.f, 1.f);
 	ShadowLightDesc.fFovy = XMConvertToRadians(45.f);
 	ShadowLightDesc.fNear = 10.f;
-	ShadowLightDesc.fFar = 4500.f;
+	ShadowLightDesc.fFar = 450.f;
 
 
 	if (FAILED(m_pGameInstance->Ready_ShadowLight(ShadowLightDesc)))

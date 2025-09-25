@@ -24,6 +24,7 @@ public:
         _float3 vTargetScale = {};
         _float fCreateDelay = { 0.f };
         _bool  bIsScaleChange = { false };
+        EFFECTPOSTEX_SHADERPATH eShaderPath = { EFFECTPOSTEX_SHADERPATH::MONSTER_LINESLASH };
     }SLASHACTIVATE_DESC;
 
 private:

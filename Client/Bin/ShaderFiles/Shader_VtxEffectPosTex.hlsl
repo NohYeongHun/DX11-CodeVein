@@ -98,15 +98,14 @@ PS_OUT PS_HITFLASH_MAIN(PS_IN In)
 }
 
 
-//}
-
 PS_OUT PS_LINESLASH_MAIN(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
 
     float2 slashUV = In.vTexcoord;
     slashUV.y = (slashUV.y + 1.0f) / 4.0f; 
-    float slashShape = g_OtherTexture[1].Sample(DefaultSampler, slashUV).r;
+    float4 vMaskTexture = g_OtherTexture[1].Sample(DefaultSampler, slashUV);
+    float slashShape = vMaskTexture.r;
 
     slashShape = pow(slashShape, 2.0f);
 
@@ -116,6 +115,7 @@ PS_OUT PS_LINESLASH_MAIN(PS_IN In)
     clip(noiseValue - pow(g_fTimeRatio, 2.2f));
 
     float3 goldColor = float3(2.5f, 1.8f, 0.5f);
+    
     float3 finalColor = goldColor * slashShape * g_fBloomIntensity;
     
    
@@ -130,6 +130,54 @@ PS_OUT PS_LINESLASH_MAIN(PS_IN In)
 }
 
 
+PS_OUT PS_LINESLASH_RED_MAIN(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+ 
+    
+    float2 slashUV = In.vTexcoord;
+    slashUV.y = (slashUV.y + 1.0f) / 4.0f;
+    
+    float4 vMtrlDiffuse = g_DiffuseTexture.Sample(DefaultSampler, slashUV);
+    float4 vMask = g_OtherTexture[1].Sample(DefaultSampler, slashUV);
+    float slashShape = g_OtherTexture[1].Sample(DefaultSampler, slashUV).r;
+
+    slashShape = pow(slashShape, 2.0f);
+
+    float2 noiseUV = In.vTexcoord * 2.0f + g_fTime * 0.5f;
+    float noiseValue = g_OtherTexture[2].Sample(DefaultSampler, noiseUV).r;
+
+    clip(noiseValue - pow(g_fTimeRatio, 2.2f));
+    
+    vector bloomColor = float4(float3(4.0f, 0.5f, 0.5f) * g_fBloomIntensity, 1.0f);
+    
+    // 3. 마스크가 밝은 부분에 블룸 색상을 더해줍니다.
+    
+    float fMaskBrightness = dot(vMask.rgb, float3(0.299, 0.587, 0.114));
+    //    fMaskBrightness 값은 이미 위에서 계산되었습니다.
+    
+    float lifeRatio = g_fTimeRatio;
+    float lifeCurve = sin(lifeRatio * 3.14159f);
+    if (fMaskBrightness > 0.1f) // 임계값은 0.1 ~ 0.5 사이에서 조정
+    {
+        // vMtrlDiffuse.rgb에 bloomColor.rgb를 더합니다.
+        // lifeCurve를 곱해줘서 파티클 수명에 따라 자연스럽게 빛나도록 합니다.
+        vMtrlDiffuse.rgb += bloomColor.rgb * vMask.rgb * lifeCurve;
+    }
+    
+    float3 finalColor = vMtrlDiffuse.rgb;
+    
+   
+    float finalAlpha = slashShape * saturate((noiseValue - g_fTimeRatio) * 5.0f);
+
+    if (finalAlpha < 0.01f)
+        discard;
+    
+    Out.vColor = float4(finalColor, finalAlpha);
+    
+    return Out;
+}
 
 
 texture2D g_OtherTextures[3];
@@ -234,7 +282,7 @@ technique11 DefaultTechnique
         SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
-        PixelShader = compile ps_5_0 PS_RENKETSU_SLASH_MAIN();
+        PixelShader = compile ps_5_0 PS_LINESLASH_RED_MAIN();
     }
 
 }

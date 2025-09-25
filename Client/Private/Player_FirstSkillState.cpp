@@ -12,7 +12,7 @@ HRESULT CPlayer_FirstSkillState::Initialize(_uint iStateNum, void* pArg)
     m_fFirstAttackFrame = 31.f / 233.f;
 
     /* 링은 52.f 검격은 그보다 조금더 늦게. */
-    m_fSecondAttackFrame = 52.f / 233.f;
+    m_fSecondAttackFrame = 49.f / 233.f;
     /* 링은 70.f 검격은 그보다늦게 그리고 아래에서 위로 검격 .*/
     m_fThirdAttackFrame = 70.f / 233.f;
     /* 링은 90.f 검격은 그보다 늦게. 95.f */
@@ -385,7 +385,7 @@ void CPlayer_FirstSkillState::Create_SecondEvent()
     SlashDesc.vScale = { 4.f, 1.f, 1.f };
     SlashDesc.vTargetScale = { 8.f, 0.4f, 1.f };
     SlashDesc.fCreateDelay = m_pGameInstance->Get_TimeDelta() * 30.f;
-    SlashDesc.fDisPlayTime = 0.5f;
+    SlashDesc.fDisPlayTime = 0.2f;
     m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(SlashDesc.eCurLevel)
         , TEXT("SLASH_EFFECT"), TEXT("Layer_Effect"), 2, ENUM_CLASS(CSlash::EffectType), &SlashDesc);
 }
@@ -422,8 +422,8 @@ void CPlayer_FirstSkillState::Create_ThirdEvent()
     _vector vPlayerForward = XMVector3Normalize(playerWorld.r[2]);
     _vector vPlayerRight = XMVector3Normalize(playerWorld.r[1]);
     _vector vPlayerUp = XMVector3Normalize(playerWorld.r[0]);
-    //_float fHitDistance = 3.0f;
-    _float fHitDistance = 1.0f;
+    _float fHitDistance = 3.0f;
+    //_float fHitDistance = 1.0f;
 
     // 대각선 방향 계산 (45도)
     _vector vDiagonalDirection = XMVector3Normalize(vPlayerRight + vPlayerUp);
@@ -487,10 +487,11 @@ void CPlayer_FirstSkillState::Create_FourthEvent()
     SlashDesc.eCurLevel = m_pPlayer->Get_CurrentLevel();
     SlashDesc.vHitPosition = vHitPos;
     SlashDesc.vHitDirection = vDiagonalDirection;
-    SlashDesc.vScale = { 4.f, 1.f, 1.f };
-    SlashDesc.vTargetScale = { 8.f, 0.4f, 1.f };
+    SlashDesc.vScale = { 3.f, 1.5f, 1.f };
+    SlashDesc.vTargetScale = { 5.f, 1.f, 1.f };
     SlashDesc.fCreateDelay = 0.f;
     SlashDesc.fDisPlayTime = 0.5f;
+    SlashDesc.bIsScaleChange = true;
     m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(SlashDesc.eCurLevel)
         , TEXT("SLASH_EFFECT"), TEXT("Layer_Effect"), 2, ENUM_CLASS(CSlash::EffectType), &SlashDesc);
 }
@@ -525,8 +526,8 @@ void CPlayer_FirstSkillState::Create_FifthEvent()
     _vector vPlayerForward = XMVector3Normalize(playerWorld.r[2]);
     _vector vPlayerRight = XMVector3Normalize(playerWorld.r[1]);
     _vector vPlayerUp = XMVector3Normalize(playerWorld.r[0]);
-    //_float fHitDistance = 3.0f;
-    _float fHitDistance = 1.0f;
+    _float fHitDistance = 3.0f;
+    //_float fHitDistance = 1.0f;
 
 
     _vector vDiagonalDirection = XMVector3Normalize(-vPlayerRight + vPlayerUp);

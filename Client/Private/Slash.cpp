@@ -169,6 +169,8 @@ void CSlash::OnActivate(void* pArg)
 
     m_fCreateDelay = pDesc->fCreateDelay;
 
+    m_iShaderPath = static_cast<_uint>(pDesc->eShaderPath);
+
     m_IsActivate = true;
 }
 
@@ -248,7 +250,7 @@ HRESULT CSlash::Bind_ShaderResources()
     }
 
 #pragma region TEXTURE
-    if (FAILED(m_pTextureCom[DIFFUSE]->Bind_Shader_Resource(m_pShaderCom, "g_DiffuseTexture", 0)))
+    if (FAILED(m_pTextureCom[DIFFUSE]->Bind_Shader_Resource(m_pShaderCom, "g_DiffuseTexture", 1)))
     {
         CRASH("Failed Bind Texture LockOnUI");
         return E_FAIL;
