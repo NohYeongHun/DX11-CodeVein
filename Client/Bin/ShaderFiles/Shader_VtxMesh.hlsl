@@ -1007,48 +1007,45 @@ PS_OUT_BACKBUFFER PS_LUNGE_PILLAR_MAIN(PS_BACKBUFFER_IN In)
     
     
     // 2. 마스킹
-    //vMask = g_DiffuseTextures[6].Sample(DefaultSampler, In.vTexcoord);
-    //vDestDiffuse = g_DiffuseTextures[6].Sample(DefaultSampler, In.vTexcoord);
+    vMask = g_DiffuseTextures[6].Sample(DefaultSampler, In.vTexcoord);
+    vDestDiffuse = g_DiffuseTextures[6].Sample(DefaultSampler, In.vTexcoord);
+   
     
-    //vMask = g_NoiseTextures[4].Sample(DefaultSampler, In.vTexcoord);
-    //vDestDiffuse = g_NoiseTextures[4].Sample(DefaultSampler, In.vTexcoord);
+     // 3. 색상 버리기.
+    if (vDestDiffuse.r < 0.1f && vDestDiffuse.g < 0.1f && vDestDiffuse.b < 0.1f)
+        discard;
+    
+     // 4. Mask 범위 구하기.
+    vector vMtrlDiffuse = vDestDiffuse * (1.f - vMask) + vSourDiffuse * (vMask);
+    
+     // 5. Emissive 추가 발광효과.
+    float fMaskBrightness = dot(vMask.rgb, float3(0.299, 0.587, 0.114));
+    if (fMaskBrightness > 0.5f)
+    {
+        vector vEmissive = vMask * g_fEmissiveIntensity * 2.0f;
+        vMtrlDiffuse.rgb += vEmissive.rgb;
+    }
+    
+    // 6. Bloom Color 계산
+    float lifeRatio = g_fRatio;
+    float lifeCurve = sin(lifeRatio * 3.14159f);
 
-    
-    // // 3. 색상 버리기.
-    //if (vDestDiffuse.r < 0.1f && vDestDiffuse.g < 0.1f && vDestDiffuse.b < 0.1f)
-    //    discard;
-    
-    // // 4. Mask 범위 구하기.
-    //vector vMtrlDiffuse = vDestDiffuse * (1.f - vMask) + vSourDiffuse * (vMask);
-    
-    // // 5. Emissive 추가 발광효과.
-    //float fMaskBrightness = dot(vMask.rgb, float3(0.299, 0.587, 0.114));
-    //if (fMaskBrightness > 0.5f)
-    //{
-    //    vector vEmissive = vMask * g_fEmissiveIntensity * 2.0f;
-    //    vMtrlDiffuse.rgb += vEmissive.rgb;
-    //}
-    
-    //// 6. Bloom Color 계산
-    //float lifeRatio = g_fRatio;
-    //float lifeCurve = sin(lifeRatio * 3.14159f);
-
-    //vector bloomColor = float4(float3(4.0f, 0.5f, 0.2f) * g_fBloomIntensity, 1.0f);
+    vector bloomColor = float4(float3(8.0f, 0.01f, 0.01f) * g_fBloomIntensity, 1.0f);
     
     
-    //  // 7. 밝기 
-    //if (fMaskBrightness > 0.1f) // 임계값은 0.1 ~ 0.5 사이에서 조정
-    //{
-    //    // vMtrlDiffuse.rgb에 bloomColor.rgb를 더합니다.
-    //    // lifeCurve를 곱해줘서 파티클 수명에 따라 자연스럽게 빛나도록 합니다.
-    //    //vMtrlDiffuse.rgb += bloomColor.rgb * vMask.rgb * lifeCurve;
-    //    vMtrlDiffuse.rgb += bloomColor.rgb * vMask.rgb;
-    //}
+      // 7. 밝기 
+    if (fMaskBrightness > 0.1f) // 임계값은 0.1 ~ 0.5 사이에서 조정
+    {
+        // vMtrlDiffuse.rgb에 bloomColor.rgb를 더합니다.
+        // lifeCurve를 곱해줘서 파티클 수명에 따라 자연스럽게 빛나도록 합니다.
+        //vMtrlDiffuse.rgb += bloomColor.rgb * vMask.rgb * lifeCurve;
+        vMtrlDiffuse.rgb += bloomColor.rgb * vMask.rgb;
+    }
     
-    //float fadeAlpha = saturate(1.0f - lifeRatio); // 기존 코드
-    //vMtrlDiffuse.a = fadeAlpha; // 기존 코드
+    float fadeAlpha = saturate(0.7f - lifeRatio * lifeRatio); // 기존 코드
+    vMtrlDiffuse.a = fadeAlpha; // 기존 코드
     
-    Out.vDiffuse = float4(1.f, 1.f, 1.f, 1.f);
+    Out.vDiffuse = vMtrlDiffuse;
     
     Out.vNormal = float4(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
     Out.vDepth = float4(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w, 0.f, 0.f);

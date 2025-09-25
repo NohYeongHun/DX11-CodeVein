@@ -191,25 +191,24 @@ HRESULT CMainApp::Ready_Pooling()
 
 	pGameObject = nullptr;
 
-	CEffect_LungePillar::EFFECT_LUNGEPILLARDESC EffectLunge_PillarDesc{};
-	// 한번에 1개씩 사용 예정. => 넉넉하게 넣자.
-	for (_uint i = 0; i < 300; ++i)
-	{
-		pGameObject = dynamic_cast<CGameObject*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT
-			, ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Effect_LungePillar"), &EffectLunge_PillarDesc));
-		if (nullptr == pGameObject)
-		{
-			CRASH("Failed Create GameObject");
-			return E_FAIL;
-		}
-		m_pGameInstance->Add_GameObject_ToPools(TEXT("LUNGE_PILLAR"), ENUM_CLASS(CEffect_LungePillar::EffectType), pGameObject);
-	}
+	//CEffect_LungePillar::EFFECT_LUNGEPILLARDESC EffectLunge_PillarDesc{};
+	//// 한번에 1개씩 사용 예정. => 넉넉하게 넣자.
+	//for (_uint i = 0; i < 300; ++i)
+	//{
+	//	pGameObject = dynamic_cast<CGameObject*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT
+	//		, ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Effect_LungePillar"), &EffectLunge_PillarDesc));
+	//	if (nullptr == pGameObject)
+	//	{
+	//		CRASH("Failed Create GameObject");
+	//		return E_FAIL;
+	//	}
+	//	m_pGameInstance->Add_GameObject_ToPools(TEXT("LUNGE_PILLAR"), ENUM_CLASS(CEffect_LungePillar::EffectType), pGameObject);
+	//}
 
-	pGameObject = nullptr;
+	//pGameObject = nullptr;
 
 
 	CEffect_Wind::EFFECTWIND_DESC EffectWindDesc{};
-	//한번에 십자모양 12개씩 사용 예정. => 넉넉하게 넣자.
 	for (_uint i = 0; i < 500; ++i)
 	{
 		pGameObject = dynamic_cast<CGameObject*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT

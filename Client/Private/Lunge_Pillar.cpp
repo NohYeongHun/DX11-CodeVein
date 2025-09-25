@@ -56,6 +56,7 @@ void CLunge_Pillar::Update(_float fTimeDelta)
 	/* 전체 회전시키기? */
 	Shape_Control(fTimeDelta);
 	
+	/* 실제 위치는 부모가 가지고 있음. */
 	XMStoreFloat4x4(&m_CombinedWorldMatrix,
 		m_pTransformCom->Get_WorldMatrix() *
 		XMLoadFloat4x4(m_pParentMatrix));

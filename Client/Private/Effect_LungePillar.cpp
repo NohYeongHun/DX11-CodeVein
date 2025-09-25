@@ -104,8 +104,8 @@ void CEffect_LungePillar::OnActivate(void* pArg)
     CLunge_Pillar::LUNGEPILLAR_ACTIVATE_DESC PillarDesc{};
     PillarDesc.vStartPos = { 0.f, 0.f, 0.f }; // 최종 위치는 어차피 곱해진다. => 서서히 조절.
     PillarDesc.fTargetRadius = m_fTargetRadius;
-    PillarDesc.fDecreaseTargetRadius = 0.1f; // 감소
-    PillarDesc.fTargetHeight = 4.f;
+    PillarDesc.fDecreaseTargetRadius = 0.5f; // 감소
+    PillarDesc.fTargetHeight = 5.f;
     PillarDesc.fGrowDuration = m_fGrowDuration;
     PillarDesc.fStayDuration = m_fStayDuration;
     PillarDesc.fDecreaseDuration = m_fDecreaseDuration;

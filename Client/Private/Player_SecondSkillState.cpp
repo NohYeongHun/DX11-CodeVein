@@ -414,16 +414,19 @@ void CPlayer_SecondSkillState::Create_FourthEvent()
     _vector vHitPos = vPlayerPos + (vPlayerForward * fHitDistance);
 
     PillarDesc.vStartPos = vHitPos; // 최종 월드 좌표 전달
-    PillarDesc.fGrowDuration = 10.f;
+    PillarDesc.fGrowDuration = 0.0f;
     PillarDesc.fStayDuration = 0.1f;
-    PillarDesc.fDecreaseDuration = 10.f;
-    PillarDesc.fTargetRadius = 5.f;
+    PillarDesc.fDecreaseDuration = 0.3f;
+    PillarDesc.fTargetRadius = 4.f;
     //
 
-    m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(PillarDesc.eCurLevel)
-        , TEXT("LUNGE_PILLAR"), TEXT("Layer_Effect"), 1, ENUM_CLASS(CEffect_LungePillar::EffectType), &PillarDesc);
+    //m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(PillarDesc.eCurLevel)
+    //    , TEXT("LUNGE_PILLAR"), TEXT("Layer_Effect"), 1, ENUM_CLASS(CEffect_LungePillar::EffectType), &PillarDesc);
 
 
+    m_pGameInstance->Get_MainCamera()->StartShake(0.4f, 1.f);
+
+    // 위로 용암처럼 솟아오르게?
     //CEffectParticle::EFFECTPARTICLE_ENTER_DESC HitParticleDesc{};
     //HitParticleDesc.eParticleType = CEffectParticle::PARTICLE_TYPE_HIT_PARTCILE;
     //HitParticleDesc.vStartPos = vHitPos;

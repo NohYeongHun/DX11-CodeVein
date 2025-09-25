@@ -916,7 +916,7 @@ void CQueenKnight::Start_PillarSkill()
     std::fill(m_vecIsPillarActivated.begin(), m_vecIsPillarActivated.end(), false);
 
     // 0. 카메라 쉐이킹
-    m_pGameInstance->Get_MainCamera()->StartShake(1.7f, 0.8f);
+    m_pGameInstance->Get_MainCamera()->StartShake(1.5f, 1.5f);
 
     // 장판 시작.
     CEffect_PlayerSkill::EFFECT_PLAYERSKILL_ACTIVATE_DESC Effect_PlayerSkillDesc{};
