@@ -67,7 +67,7 @@ HRESULT CMainApp::Initialize()
 	if (FAILED(Start_Level(LEVEL::GAMEPLAY)))
 		return E_FAIL;
 
-	// 원본
+	//// 원본
 	//if (FAILED(Start_Level(LEVEL::LOGO)))
 	//	return E_FAIL;
 

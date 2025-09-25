@@ -74,6 +74,7 @@ DepthStencilState DSS_NonWrite
 {
     DepthEnable = true;
     DepthWriteMask = zero;
+    DepthFunc = LESS;
 };
 
 
@@ -113,6 +114,7 @@ BlendState BS_AlphaBlend
     DestBlend = INV_SRC_ALPHA;
     BlendOp = Add;    
 };
+
 
 BlendState BS_AlphaBlend_Additive // 새로운 가산 혼합 상태
 {

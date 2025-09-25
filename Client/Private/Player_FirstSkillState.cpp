@@ -334,7 +334,8 @@ void CPlayer_FirstSkillState::Create_FirstEvent()
         ENUM_CLASS(m_pGameInstance->Get_CurrentLevelID()),
         TEXT("SWORD_WIND"), TEXT("Layer_Effect"), 1,
         ENUM_CLASS(CEffect_Wind::EffectType), &WindActivate_Desc);
-    m_pGameInstance->PlaySoundEffect(L"CirculatePulse1.ogg", 0.2f);
+    m_pGameInstance->PlaySoundEffect(L"CirculatePulse1.ogg", 0.1f);
+    /*m_pGameInstance->PlaySoundEffect(L"CirculatePulse2.ogg", 0.15f);*/
 
    
 }
@@ -361,7 +362,8 @@ void CPlayer_FirstSkillState::Create_SecondEvent()
         ENUM_CLASS(m_pGameInstance->Get_CurrentLevelID()),
         TEXT("SWORD_WINDCIRCLE"), TEXT("Layer_Effect"), 1,
         ENUM_CLASS(CEffect_WindCircle::EffectType), &WindCircleActivate_Desc);
-    m_pGameInstance->PlaySoundEffect(L"CirculatePulse1.ogg", 0.2f);
+    m_pGameInstance->PlaySoundEffect(L"CirculatePulse1.ogg", 0.1f);
+    m_pGameInstance->PlaySoundEffect(L"CirculatePulse2.ogg", 0.15f);
 
     /* 검격 */
     _matrix playerWorld = m_pPlayer->Get_Transform()->Get_WorldMatrix();
@@ -369,7 +371,9 @@ void CPlayer_FirstSkillState::Create_SecondEvent()
     _vector vPlayerForward = XMVector3Normalize(playerWorld.r[2]);
     _vector vPlayerRight = XMVector3Normalize(playerWorld.r[1]);
     _vector vPlayerUp = XMVector3Normalize(playerWorld.r[0]);
-    _float fHitDistance = 3.0f;
+    //_float fHitDistance = 3.f;
+    _float fHitDistance = 1.f;
+    
 
     _vector vHitPos = vPlayerPos + (vPlayerForward * fHitDistance);
     vHitPos += XMVectorSet(0.f, 1.f, 0.f, 0.f) * 1.7f;
@@ -396,18 +400,20 @@ void CPlayer_FirstSkillState::Create_ThirdEvent()
     WindActivate_Desc.vStartPos = vStartPos;
     WindActivate_Desc.fDisplayTime = 0.5f;
     WindActivate_Desc.fCreateDelay = 0.1f;
-    WindActivate_Desc.iWindCount = 1;
+    WindActivate_Desc.iWindCount = 2;
     WindActivate_Desc.vStartScale = { 5.f, 5.f, 5.f };
     WindActivate_Desc.vTargetScale = { 6.f, 6.f, 6.f };
     WindActivate_Desc.pWorldMatrix = m_pPlayer->Get_Transform()->Get_WorldMatrixPtr(); // WorldMatrix는 한번만 초기화
     //WindActivate_Desc.pSocketMatrix = m_pPlayer->Get_BoneMatrix("RightGauntletTrail2"); // 붙일 뼈
     WindActivate_Desc.pSocketMatrix = m_pPlayer->Get_BoneMatrix("socket_ExpRecoveryFx01"); // 붙일 뼈
+    //WindActivate_Desc.pSocketMatrix = m_pPlayer->Get_BoneMatrix("LeftFootEffectSocket"); // 붙일 뼈
 
     m_pGameInstance->Move_Effect_ToObjectLayer(
         ENUM_CLASS(m_pGameInstance->Get_CurrentLevelID()),
         TEXT("SWORD_WINDCIRCLE"), TEXT("Layer_Effect"), 1,
         ENUM_CLASS(CEffect_Wind::EffectType), &WindActivate_Desc);
-    m_pGameInstance->PlaySoundEffect(L"CirculatePulse1.ogg", 0.2f);
+    m_pGameInstance->PlaySoundEffect(L"CirculatePulse1.ogg", 0.1f);
+    m_pGameInstance->PlaySoundEffect(L"CirculatePulse2.ogg", 0.15f);
 
 
     /* 검격 대각선 방향으로? */
@@ -416,7 +422,8 @@ void CPlayer_FirstSkillState::Create_ThirdEvent()
     _vector vPlayerForward = XMVector3Normalize(playerWorld.r[2]);
     _vector vPlayerRight = XMVector3Normalize(playerWorld.r[1]);
     _vector vPlayerUp = XMVector3Normalize(playerWorld.r[0]);
-    _float fHitDistance = 3.0f;
+    //_float fHitDistance = 3.0f;
+    _float fHitDistance = 1.0f;
 
     // 대각선 방향 계산 (45도)
     _vector vDiagonalDirection = XMVector3Normalize(vPlayerRight + vPlayerUp);
@@ -458,7 +465,8 @@ void CPlayer_FirstSkillState::Create_FourthEvent()
         ENUM_CLASS(m_pGameInstance->Get_CurrentLevelID()),
         TEXT("SWORD_WINDCIRCLE"), TEXT("Layer_Effect"), 1,
         ENUM_CLASS(CEffect_WindCircle::EffectType), &WindCircleActivate_Desc);
-    m_pGameInstance->PlaySoundEffect(L"CirculatePulse1.ogg", 0.2f);
+    m_pGameInstance->PlaySoundEffect(L"CirculatePulse1.ogg", 0.1f);
+    m_pGameInstance->PlaySoundEffect(L"CirculatePulse2.ogg", 0.15f);
 
     /* 검격 */
     _matrix playerWorld = m_pPlayer->Get_Transform()->Get_WorldMatrix();
@@ -466,7 +474,8 @@ void CPlayer_FirstSkillState::Create_FourthEvent()
     _vector vPlayerForward = XMVector3Normalize(playerWorld.r[2]);
     _vector vPlayerRight = XMVector3Normalize(playerWorld.r[1]);
     _vector vPlayerUp = XMVector3Normalize(playerWorld.r[0]);
-    _float fHitDistance = 3.0f;
+    //_float fHitDistance = 3.0f;
+    _float fHitDistance = 1.0f;
 
 
     _vector vDiagonalDirection = XMVector3Normalize(-vPlayerRight + vPlayerUp);
@@ -508,7 +517,7 @@ void CPlayer_FirstSkillState::Create_FifthEvent()
         ENUM_CLASS(m_pGameInstance->Get_CurrentLevelID()),
         TEXT("SWORD_WINDCIRCLE"), TEXT("Layer_Effect"), 1,
         ENUM_CLASS(CEffect_WindCircle::EffectType), &WindCircleActivate_Desc);
-    m_pGameInstance->PlaySoundEffect(L"CirculatePulse1.ogg", 0.2f);
+   /* m_pGameInstance->PlaySoundEffect(L"CirculatePulse1.ogg", 0.2f);*/
 
     /* 검격 */
     _matrix playerWorld = m_pPlayer->Get_Transform()->Get_WorldMatrix();
@@ -516,7 +525,8 @@ void CPlayer_FirstSkillState::Create_FifthEvent()
     _vector vPlayerForward = XMVector3Normalize(playerWorld.r[2]);
     _vector vPlayerRight = XMVector3Normalize(playerWorld.r[1]);
     _vector vPlayerUp = XMVector3Normalize(playerWorld.r[0]);
-    _float fHitDistance = 3.0f;
+    //_float fHitDistance = 3.0f;
+    _float fHitDistance = 1.0f;
 
 
     _vector vDiagonalDirection = XMVector3Normalize(-vPlayerRight + vPlayerUp);
@@ -534,6 +544,10 @@ void CPlayer_FirstSkillState::Create_FifthEvent()
     SlashDesc.fDisPlayTime = 0.5f;
     m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(SlashDesc.eCurLevel)
         , TEXT("SLASH_EFFECT"), TEXT("Layer_Effect"), 2, ENUM_CLASS(CSlash::EffectType), &SlashDesc);
+
+    m_pGameInstance->PlaySoundEffect(L"CirculatePulse1.ogg", 0.1f);
+    m_pGameInstance->PlaySoundEffect(L"CirculatePulse2.ogg", 0.15f);
+
 }
 
 void CPlayer_FirstSkillState::Create_WindCircleEffect()

@@ -101,11 +101,12 @@ HRESULT CLevel_GamePlay::Render()
 	ImGui::Begin(strDebug.c_str(), nullptr, ImGuiWindowFlags_NoCollapse);
 
 
+
 	SHADOW_LIGHT_DESC			ShadowLightDesc{};
-	static float vEye[4] = { -100.f, 100.f, 100.f, 1.f };
-	static float vAt[4] = { -100.f, 60.f, 0.f, 1.f };
+	static float vEye[4] = { 115.f, 40.f, 200.f, 1.f };
+	static float vAt[4] = { 115.f, 1.f, 0.f, 1.f };
 	static float fFovy = { 45.f };
-	static float fNear = { 100.f };
+	static float fNear = { 10.f };
 	static float fFar = { 1000.f };
 
 	ImGui::InputFloat4("Eye", vEye);
@@ -180,11 +181,11 @@ HRESULT CLevel_GamePlay::Ready_Lights()
 		return E_FAIL;
 
 	SHADOW_LIGHT_DESC			ShadowLightDesc{};
-	ShadowLightDesc.vEye = _float4(115.f, 40.f, 200.f, 1.f);
-	ShadowLightDesc.vAt = _float4(115.f, 1.f, 0.f, 1.f);
+	ShadowLightDesc.vEye = _float4(100.f, 60.f, 130.f, 1.f);
+	ShadowLightDesc.vAt = _float4(100.f, 45.f, 0.f, 1.f);
 	ShadowLightDesc.fFovy = XMConvertToRadians(45.f);
 	ShadowLightDesc.fNear = 10.f;
-	ShadowLightDesc.fFar = 450.f;
+	ShadowLightDesc.fFar = 4500.f;
 
 
 	if (FAILED(m_pGameInstance->Ready_ShadowLight(ShadowLightDesc)))
@@ -393,19 +394,20 @@ HRESULT CLevel_GamePlay::Ready_Layer_Monster(const _wstring& strLayerTag)
 	* 트리거 등록
 	*/
 	// 2. 트리거 등록. => 생성과 트리거 등록은 구별.
-	TRIGGER_MONSTER_DESC TriggerDesc{};
+	TRIGGER_MONSTER_DESC FirstTriggerDesc{};
 	
 	// 첫 번째 트리거: WolfDevil
-	TriggerDesc = { { 250.f , 0.f, 0.f }, 50.f , TEXT("Layer_WolfDevil")
+	FirstTriggerDesc = { { 250.f , 0.f, 0.f }, 50.f , TEXT("Layer_WolfDevil")
 		, TEXT("Layer_Monster") , 2, 0 };
 	
-	m_pGameInstance->Add_Trigger(ENUM_CLASS(m_eCurLevel), TriggerDesc);
+	m_pGameInstance->Add_Trigger(ENUM_CLASS(m_eCurLevel), FirstTriggerDesc);
 	
 	// 두 번째 트리거: SlaveVampire
-	TriggerDesc = { { 200.f , 0.f, 0.f }, 50.f , TEXT("Layer_SlaveVampire")
+	TRIGGER_MONSTER_DESC SecondTriggerDesc{};
+	SecondTriggerDesc = { { 200.f , 0.f, 0.f }, 50.f , TEXT("Layer_SlaveVampire")
 		, TEXT("Layer_Monster") , 2, 0 };
 	
-	m_pGameInstance->Add_Trigger(ENUM_CLASS(m_eCurLevel), TriggerDesc);
+	m_pGameInstance->Add_Trigger(ENUM_CLASS(m_eCurLevel), SecondTriggerDesc);
 
 	/* 다 같은 Monster 레이어에 추가하기. */
 	if (FAILED(Ready_Layer_QueenKnight(strLayerTag)))

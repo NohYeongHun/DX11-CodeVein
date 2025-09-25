@@ -45,6 +45,9 @@ void CPlayer_DamageState::Enter(void* pArg)
     _uint iRandValue = m_pGameInstance->Rand_UnsignedInt(1, 4);
     strSoundTag += to_wstring(iRandValue) + TEXT(".wav");
     m_pGameInstance->PlaySoundEffect(strSoundTag, 0.5f);
+
+    // 카메라 쉐이킹
+    m_pGameInstance->Get_MainCamera()->StartShake(0.3f, 0.1f);
 }
 
 void CPlayer_DamageState::Update(_float fTimeDelta)

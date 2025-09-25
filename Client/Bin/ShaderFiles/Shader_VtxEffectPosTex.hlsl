@@ -90,6 +90,8 @@ PS_OUT PS_HITFLASH_MAIN(PS_IN In)
     float3 goldColor = float3(2.5f, 1.8f, 0.5f) * g_fBloomIntensity;
     float3 finalColor = goldColor * finalShape;
     
+    
+    
     Out.vColor = float4(finalColor, finalAlpha);
     
     return Out;
@@ -119,6 +121,9 @@ PS_OUT PS_LINESLASH_MAIN(PS_IN In)
    
     float finalAlpha = slashShape * saturate((noiseValue - g_fTimeRatio) * 5.0f);
 
+    if (finalAlpha < 0.01f)
+        discard;
+    
     Out.vColor = float4(finalColor, finalAlpha);
     
     return Out;
@@ -129,54 +134,7 @@ PS_OUT PS_LINESLASH_MAIN(PS_IN In)
 
 texture2D g_OtherTextures[3];
 texture2D g_MaskTextures[2];
-/* 심플 버전 - 명확한 클리핑 */
-//PS_OUT PS_RENKETSU_SLASH_MAIN(PS_IN In)
-//{
-//    PS_OUT Out = (PS_OUT) 0;
-    
-//    float2 uv = In.vTexcoord;
-    
-//    // 마스크들 샘플링
-//    float4 vGlowMask = g_MaskTextures[0].Sample(DefaultSampler, uv);
-//    float4 vSlashMask = g_MaskTextures[1].Sample(DefaultSampler, uv);
-//    float4 vDiffuse = g_DiffuseTextures[1].Sample(DefaultSampler, uv);
-    
-//    // MaskTextures[0]: 흰 부분 사용, 검정 부분은 클리핑
-//    float glow = vGlowMask.r;
-    
-//    // 검정 부분 완전 제거
-//    clip(glow - 0.01f); // clip 함수로 더 간단하게
-    
-//    // MaskTextures[1]: 검은 부분 사용 (반전)
-//    float slash = 1.0f - vSlashMask.r;
-    
-//    // 시간 애니메이션
-//    float t = g_fTimeRatio;
-    
-//    // 슬래시 점진적 나타남
-//    float slashReveal = smoothstep(0.3f - t, 0.5f - t * 0.5f, slash);
-    
-//    // 글로우 확산
-//    float glowSpread = glow * (1.0f + t * 0.8f);
-//    glowSpread = saturate(glowSpread);
-    
-//    // 색상 적용
-//    float3 slashColor = vDiffuse.rgb * 2.0f;
-//    float3 glowColor = float3(1.0f, 0.5f, 0.2f);
-    
-//    // 최종 색상
-//    float3 finalColor = slashColor * slashReveal;
-//    finalColor += glowColor * glowSpread * 0.7f;
-    
-//    // 알파 (글로우 마스크 영역 내에서만)
-//    float alpha = saturate(slashReveal + glowSpread * 0.4f);
-//    alpha *= (1.0f - smoothstep(0.8f, 1.0f, t));
-//    alpha *= glow; // 글로우 마스크 경계 적용
-    
-//    Out.vColor = float4(finalColor, alpha);
-    
-//    return Out;
-//}
+
 PS_OUT PS_RENKETSU_SLASH_MAIN(PS_IN In)
 {
     PS_OUT Out = (PS_OUT) 0;
@@ -235,55 +193,6 @@ PS_OUT PS_RENKETSU_SLASH_MAIN(PS_IN In)
 /* 렌케츠 슬래시 - 점점 벌어지는 검격 효과 */
 /* 렌케츠 슬래시 - 마스크의 흰색 부분에만 효과 적용 */
 /* 더 간단하고 명확한 버전 */
-//PS_OUT PS_RENKETSU_SLASH_MAIN(PS_IN In)
-//{
-//    PS_OUT Out = (PS_OUT) 0;
-    
-//    float2 uv = In.vTexcoord;
-    
-//    // 텍스처 샘플링
-//    float4 vMask = g_MaskTexture.Sample(DefaultSampler, uv);
-//    float4 vDiffuse = g_DiffuseTextures[1].Sample(DefaultSampler, uv);
-    
-//    // 마스크의 흰색 부분만 사용
-//    float maskValue = vMask.r;
-    
-//    // 검은 부분은 discard
-//    if (maskValue < 0.01f)
-//    {
-//        discard;
-//    }
-    
-//    // 시간에 따른 확장
-//    float expand = g_fTimeRatio;
-    
-//    // 점진적으로 나타나는 효과 (threshold animation)
-//    float threshold = 1.0f - expand * 1.2f;
-//    float slash = smoothstep(threshold, threshold + 0.2f, maskValue);
-    
-//    // 너비 확장 (선택적)
-//    float widthBoost = 1.0f + expand * 0.5f;
-//    slash = saturate(slash * widthBoost);
-    
-//    // 노이즈 텍스처의 색상을 마스크의 흰색 부분에 적용
-//    float3 color = vDiffuse.rgb * 2.0f; // 빨간색 노이즈 색상 강화
-    
-//    // 중심부를 더 밝게
-//    float brightness = pow(maskValue, 0.5f);
-//    color *= (1.0f + brightness);
-    
-//    // 페이드 효과
-//    float fadeOut = 1.0f - smoothstep(0.8f, 1.0f, expand);
-    
-//    // 최종 알파 (마스크 흰색 영역 * 애니메이션 * 페이드)
-//    float finalAlpha = maskValue * slash * fadeOut;
-    
-//    Out.vColor = float4(color, finalAlpha);
-    
-//    return Out;
-//}
-
-
 
 
 technique11 DefaultTechnique
@@ -301,7 +210,7 @@ technique11 DefaultTechnique
     pass HitFlashPass // 1
     {
         SetRasterizerState(RS_Default);
-        SetDepthStencilState(DSS_Default, 0);
+        SetDepthStencilState(DSS_NonWrite, 0);
         SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
@@ -311,7 +220,7 @@ technique11 DefaultTechnique
     pass MonsterLineSlashPass // 2
     {
         SetRasterizerState(RS_Default);
-        SetDepthStencilState(DSS_Default, 0);
+        SetDepthStencilState(DSS_NonWrite, 0);
         SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;

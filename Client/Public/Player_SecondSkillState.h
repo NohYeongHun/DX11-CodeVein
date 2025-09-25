@@ -54,6 +54,8 @@ private:
 private:
 	void Create_FirstEvent();
 	void Create_SecondEvent();
+	void Create_ThirdEvent();
+	void Create_FourthEvent();
 
 private:
 	_bool m_IsFirstEvent = {};

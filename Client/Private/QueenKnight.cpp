@@ -151,6 +151,7 @@ void CQueenKnight::Update(_float fTimeDelta)
         // 2. Encounter UI 렌더링
         m_IsEncounterRender = true;
 
+        // 3. 조우시 쿨타임 부여.
         AddBuff(QUEEN_BUFF_DASH_ATTACK_COOLDOWN);
         AddBuff(QUEEN_BUFF_DOWN_TRIPLE_STRIKE_COOLDOWN);
         m_pGameInstance->PlayBGM(L"BossStage.mp3", 0.1f, true);
@@ -178,7 +179,6 @@ void CQueenKnight::Late_Update(_float fTimeDelta)
 
     if (m_IsEncounterRender)
         m_pEncounterTitle->Late_Update(fTimeDelta);
-
 
     if (m_IsDeadRender)
         m_pDeadTitle->Late_Update(fTimeDelta);
@@ -766,11 +766,6 @@ void CQueenKnight::Play_CutScene()
     Desc.isVisibility = false;
     m_pGameInstance->Publish<HUDEVENT_DESC>(EventType::HUD_DISPLAY, &Desc);
 
-   
-
-    // 3. 카메라 연출. => 어떤걸 바라보게?
-    m_pGameInstance->Get_MainCamera();
-
 }
 
 void CQueenKnight::End_CutScene()
@@ -921,7 +916,7 @@ void CQueenKnight::Start_PillarSkill()
     std::fill(m_vecIsPillarActivated.begin(), m_vecIsPillarActivated.end(), false);
 
     // 0. 카메라 쉐이킹
-    m_pGameInstance->Get_MainCamera()->StartShake(0.7f, 0.4f);
+    m_pGameInstance->Get_MainCamera()->StartShake(1.7f, 0.8f);
 
     // 장판 시작.
     CEffect_PlayerSkill::EFFECT_PLAYERSKILL_ACTIVATE_DESC Effect_PlayerSkillDesc{};
