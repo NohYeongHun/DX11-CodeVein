@@ -68,6 +68,19 @@ private:
 
 
 private:
+	void Update_Sound(_float fTimeDelta);
+
+private:
+	_float m_fAttackFirst = {};
+	_float m_fAttackSecond = {};
+	_float m_fAttackThird = {};
+	_float m_fAttackFourth = {};
+
+	_bool m_IsSoundPlayed = false;
+
+	_wstring m_strSoundFile = {};
+
+
 	// ⭐ AttackState만의 특화된 함수들 (부모 클래스 함수들 활용)
 	//void Handle_Unified_Direction_Input(_float fTimeDelta);
 	//void Rotate_Player_To_Direction(_vector vTargetDirection, _float fTimeDelta);

@@ -125,8 +125,8 @@ public:
 	_bool Play_Animation(_float fTimeDelta);
 	void Set_BlendInfo(uint32_t iNextAnimIndex, _float fBlendTime, _bool bScale, _bool bRotation, _bool bTranslation);
 
-	void Set_RootMotionRotation(_bool bRootRotation = false) { m_bRootMotionRotate = bRootRotation; }
-	void Set_RootMotionTranslate(_bool bRootTranslate = true) { m_bRootMotionTranslate = bRootTranslate; }
+	void Set_RootMotionRotation(_bool bRootRotation = false) { m_IsRootMotionRotate = bRootRotation; }
+	void Set_RootMotionTranslate(_bool bRootTranslate = true) { m_IsRootMotionTranslate = bRootTranslate; }
 
 public:
 	void Animation_Reset();
@@ -183,18 +183,18 @@ private:
 	_uint m_iRoot_BoneIndex = { };
 	_bool m_isTrackEnd = { }; // 애니메이션 한 프레임이 종료된 상태를 저장합니다.
 
-	_bool m_bEnableRootMotion = true;           // 루트 모션 활성화 여부
+	_bool m_IsEnableRootMotion = true;           // 루트 모션 활성화 여부
 	//_float m_fRootMotionScale = 1.0f;           // 루트 모션 스케일
-	_bool m_bEnableRootRotation = true;         // 루트 회전 활성화 여부
+	_bool m_IsEnableRootRotation = true;         // 루트 회전 활성화 여부
 
 	_matrix m_oldMatrix = {};
 	_float4 m_vOldPos = {};
 	_float4 m_vSameOldPos = {};
 	
 
-	_bool m_bRootMotionRotate = { true };
-	_bool m_bRootMotionTranslate = { true };
-	_bool m_bAnimationJustChanged = { false };
+	_bool m_IsRootMotionRotate = { true };
+	_bool m_IsRootMotionTranslate = { true };
+	_bool m_IsAnimationJustChanged = { false };
 
 private:
 	string m_ModelDir = {};

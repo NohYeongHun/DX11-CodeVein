@@ -81,6 +81,10 @@ HRESULT CLevel_StageOne::Initialize_Clone()
 	m_pGameInstance->Setting_Threshold(0.9f);
 	m_pGameInstance->Setting_Soft(0.3f);
 
+
+	// 시작 브금.
+	m_pGameInstance->PlayBGM(L"Environment.wav", 0.3f, true);
+
 	return S_OK;
 }
 
@@ -353,8 +357,10 @@ HRESULT CLevel_StageOne::Ready_Layer_Monster(const _wstring& strLayerTag)
 	TriggerDesc = { { 0.f ,0.f, 0.f }, 250.f , TEXT("Layer_SlaveVampire")
 		, TEXT("Layer_Monster") , 4, 0 };
 
-	/*TriggerDesc = { { 250.f , 0.f, 0.f }, 200.f , TEXT("Layer_WolfDevil")
-		, TEXT("Layer_Monster") , 2, 0 };*/
+	m_pGameInstance->Add_Trigger(ENUM_CLASS(m_eCurLevel), TriggerDesc);
+
+	TriggerDesc = { { 124.f , 21.f, -28.f }, 200.f , TEXT("Layer_WolfDevil")
+		, TEXT("Layer_Monster") , 3, 0 };
 
 	m_pGameInstance->Add_Trigger(ENUM_CLASS(m_eCurLevel), TriggerDesc);
 
@@ -389,11 +395,14 @@ HRESULT CLevel_StageOne::Ready_Layer_WolfDevil(const _wstring& strLayerTag)
 		return E_FAIL;
 	}
 
-	for (_uint i = 0; i < 4; ++i)
+	_float3 monsterPositionArray[3] = {
+		{ 155.f, 21.f, -20.f }, { 154.f, 21.f, -37.f },
+		{ 163.f, 21.f, -28.f }
+	};
+
+	for (_uint i = 0; i < 3; ++i)
 	{
-		Desc.vPos = { 250.f, 0.f, 3.f };
-		Desc.vPos.x += (i / 2) * -10.f;
-		Desc.vPos.z *= i % 2 == 0 ? -1.f : 1.f;
+		Desc.vPos = monsterPositionArray[i];
 		if (FAILED(m_pGameInstance->Add_GameObject_ToTrigger(ENUM_CLASS(m_eCurLevel)
 			, TEXT("Layer_WolfDevil"), ENUM_CLASS(m_eCurLevel)
 			, TEXT("Prototype_GameObject_WolfDevil"), &Desc)))
@@ -583,4 +592,5 @@ CLevel_StageOne* CLevel_StageOne::Create(ID3D11Device* pDevice, ID3D11DeviceCont
 void CLevel_StageOne::Free()
 {
 	CLevel::Free();
+	m_pGameInstance->StopBGM();
 }

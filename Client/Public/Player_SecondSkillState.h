@@ -46,6 +46,30 @@ public:
 
 	void Change_State();
 
+	void Create_WindEffect(void* pArg);
+
+private:
+	void Update_Event(_float fTimeDelta);
+
+private:
+	void Create_FirstEvent();
+	void Create_SecondEvent();
+	void Create_ThirdEvent();
+	void Create_FourthEvent();
+
+private:
+	_bool m_IsFirstEvent = {};
+	_bool m_IsSecondEvent = {};
+	_bool m_IsThirdEvent= {};
+	_bool m_IsFourthEvent = {};
+	_bool m_IsFifthEvent= {};
+
+	_float m_fFirstEventFrame = {};
+	_float m_fSecondEventFrame = {};
+	_float m_fThirdEventFrame = {};
+	_float m_fFourthEventFrame = {};
+	_float m_fFifthEventFrame = {};
+
 
 public:
 	static CPlayer_SecondSkillState* Create(_uint iStateNum, void* pArg);

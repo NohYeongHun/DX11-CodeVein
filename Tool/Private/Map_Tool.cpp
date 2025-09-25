@@ -128,7 +128,7 @@ void CMap_Tool::Render()
                 {
                     // Picking 그룹
                     m_pPicking_Manager->Load_PickingGroup(ENUM_CLASS(m_eCurLevel), TEXT("Layer_Map_Parts"));
-                    ImGui::Checkbox("Picking Navigation", &m_bNaviPicking);
+                    ImGui::Checkbox("Picking Navigation", &m_IsNaviPicking);
 
                     Render_NavigationChild();
                     //Show_CurrentModelList();

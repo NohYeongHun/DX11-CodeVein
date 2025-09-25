@@ -1072,8 +1072,10 @@ void CMonster::Show_Slash_UI_At_Position(_fvector vHitPosition, _fvector vAttack
     HRESULT hr = {};
     // 1. 풀에서 꺼내씁니다
     CSlash::SLASHACTIVATE_DESC SlashDesc{};
+
+    _vector vSlash = vHitPosition + XMVectorSet(0.f, 0.f, 0.01f, 0.f);
     SlashDesc.eCurLevel = m_eCurLevel;
-    SlashDesc.vHitPosition = vHitPosition;
+    SlashDesc.vHitPosition = vSlash;
     SlashDesc.vHitDirection = vAttackDirection;
     SlashDesc.fDisPlayTime = 0.3f;
     SlashDesc.vScale = { 3.f, 0.5f, 1.f };
@@ -1081,9 +1083,10 @@ void CMonster::Show_Slash_UI_At_Position(_fvector vHitPosition, _fvector vAttack
         , TEXT("SLASH_EFFECT"), TEXT("Layer_Effect"), 1, ENUM_CLASS(CSlash::EffectType), &SlashDesc);
 
 
+    _vector vHitFlash = vHitPosition + XMVectorSet(0.f, 0.f, 0.02f, 0.f);
     CHitFlashEffect::HITFLASHACTIVATE_DESC HitFlashDesc{};
     HitFlashDesc.eCurLevel = m_eCurLevel;
-    HitFlashDesc.vHitPosition = vHitPosition;
+    HitFlashDesc.vHitPosition = vHitFlash;
     HitFlashDesc.vHitDirection = vAttackDirection;
     HitFlashDesc.fDisPlayTime = 0.1f;
     HitFlashDesc.vScale = { 1.f, 1.f, 1.f };

@@ -71,6 +71,7 @@ public:
 	virtual void Late_Update(_float fTimeDelta);
 	virtual void Finalize_LateUpdate(_float fTimeDelta) {}; // Update의 마지막 부근에 사용되는 함수
 	virtual HRESULT Render();
+	virtual HRESULT Render_Distortion() { return S_OK; }
 	virtual HRESULT Render_Shadow() { return S_OK; }
 
 

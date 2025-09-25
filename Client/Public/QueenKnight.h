@@ -28,6 +28,18 @@ public:
 		QUEEN_BUFF_DOWN_TRIPLE_STRIKE_COOLDOWN = 1 << 9, // Down Strike 시퀀스 => 쿨타임 존재.
 	};
 
+	enum SOUND_FLAGS : _uint
+	{
+		SOUND_WARP_START = 0,
+		SOUND_WARP_END = 1,
+		SOUND_WARP_ATTACK = 2,
+		SOUND_ATTACK = 3,
+		SOUND_CHOP = 4,
+		SOUND_DODGE = 5,
+		SOUND_DASH = 6,
+		SOUND_END
+	};
+
 public:
 	typedef struct tagQueenKnightDesc : public CMonster::MONSTER_DESC
 	{
@@ -85,6 +97,11 @@ public:
 
 private:
 	class CQueenKnightTree* m_pTree = { nullptr };
+
+
+public:
+	virtual void Play_Sound(_uint iSoundFlag);
+	virtual void PlayWeaponSound() override;
 #pragma endregion
 
 #pragma region 3. 몬스터는 자신에게 필요한 수치값들을 초기화해야한다.
@@ -125,11 +142,26 @@ public:
 public:
 	virtual void Weapon_Rotation(_uint iPartType, _float3 vRadians, _bool bInverse = false) override;
 	virtual void Encounter_Action() override;
+	virtual void Encounter_EndAction() override;
 
 	virtual void IncreaseDetection();
+
+	virtual void Hit_Action() override;
+	virtual void Hit_EndAction() override;
+
+
+public:
+	virtual void Play_CutScene() override;
+	virtual void End_CutScene() override;
+
+
+private:
+	_bool m_IsWeaponSound = { false };
+	_float m_fNormalAttackSoundFrame = {};
+
 #pragma endregion
 
-#pragma region 7. 보스몹 체력 UI 관리
+#pragma region 7. 보스몹 체력 및 UI 관리
 public:
 	virtual void Take_Damage(_float fDamage, CGameObject* pGameObject) override;
 
@@ -143,7 +175,11 @@ private:
 
 private:
 	class CBossHpBarUI* m_pBossHpBarUI = { nullptr };
-
+	class CEncounter_Title* m_pEncounterTitle = { nullptr };
+	class CEncounter_Title* m_pDeadTitle = { nullptr };
+	_bool m_IsEncounterRender = { false };
+	_bool m_IsDeadRender = { false };
+	_float m_fEncounterTimer = { 0.f };
 public:
 	
 #pragma endregion
@@ -160,7 +196,6 @@ public:
 	void Create_QueenKnightWarp_Effect_Particle_Spawn(_float3 vDir, _uint iSpawnCount);
 	void Create_QueenKnightWarp_Effect_Particle_Explosion(_float3 vDir);
 	void Create_QueenKnightWarp_Effect(_float3 vDir);
-	void Create_QueenKnightTornado_Effect();
 
 	/* Blood Pillar Event 활성화*/
 	void Start_PillarSkill();
@@ -179,7 +214,7 @@ private:
 	vector<bool>    m_vecIsPillarActivated;
 
 	// 스킬 관련 변수
-	_bool   m_bIsSkillActive = false;    // 스킬이 발동 중인지
+	_bool   m_IsSkillActive = false;    // 스킬이 발동 중인지
 	_float m_fSkillElapsedTime = 0.f; // 스킬이 발동된 후 흐른 시간
 	_float3 m_vSkillCenterPos;         // 스킬이 발동된 중심 위치
 	_float m_fRippleSpeed = 15.f;     // 효과 전파 속도
@@ -188,9 +223,12 @@ private:
 	_float m_fMaxSkillDuration = { 2.2f }; // [추가] 가장 먼 거리를 계산하기 위한 로직
 
 public:
-	void Start_Dissolve(_float fDuration = 0.f); // Dissolve 재생.
-	void ReverseStart_Dissolve(_float fDuration = 0.f); // Dissolve 역재생
-	void End_Dissolve();
+	virtual void Start_Dissolve(_float fDuration = 0.f); // Dissolve 재생.
+	virtual void ReverseStart_Dissolve(_float fDuration = 0.f); // Dissolve 역재생
+	virtual void End_Dissolve();
+
+	virtual void Dead_Effect() override;
+	virtual void Dead_Action() override;
 
 
 public:
@@ -199,17 +237,7 @@ public:
 
 private:
 	_uint m_iShaderPath = {};
-	_float m_fDissolveTime = {};
-
-	_float m_fMaxDissolveTime = {};
-	_float m_fCurDissolveTime = {};
-
-	_float m_fReverseDissolveTime = {};
-	_float m_fEndReverseDissolveTime = {};
-
-	_bool m_IsDissolve = { false };
-	_bool m_IsReverseDissolve = { false };
-
+	
 
 private:
 	class CTexture* m_pDissolveTexture = { nullptr };

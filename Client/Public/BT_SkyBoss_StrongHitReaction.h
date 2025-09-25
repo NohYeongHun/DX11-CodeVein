@@ -16,7 +16,7 @@ private:
     _uint m_iAnimationIndex = {};
     _float m_fReactionTime = 0.f;
     const _float m_fMaxReactionTime = 1.2f;  // 강한 피격은 더 오래 경직
-    _bool m_bAnimationStarted = false;
+    _bool m_IsAnimationStarted = false;
     
 
 public:

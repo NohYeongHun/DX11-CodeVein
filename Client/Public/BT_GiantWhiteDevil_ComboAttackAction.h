@@ -20,6 +20,11 @@ private:
     _bool m_IsFirstAttack = { false };
 	_bool m_IsSecondAttack = { false };
 
+    _bool m_IsFirstPlaySound = {};
+    _bool m_IsSecondPlaySound = {};
+    _float m_fFirstAttackSound = {};
+    _float m_fSecondAttackSound = {};
+
 public:
     explicit CBT_GiantWhiteDevil_ComboAttackAction(class CGiant_WhiteDevil* pOwner);
     virtual ~CBT_GiantWhiteDevil_ComboAttackAction() = default;

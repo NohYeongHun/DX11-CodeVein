@@ -6,7 +6,7 @@ class CEffect_Wind final : public CContainerObject
 
 public:
     /* 클론시 전달할 정보들 */
-    typedef struct tagEffectPillarDesc : public CContainerObject::GAMEOBJECT_DESC
+    typedef struct tagEffectWindDesc : public CContainerObject::GAMEOBJECT_DESC
     {
     }EFFECTWIND_DESC;
 
@@ -17,15 +17,22 @@ public:
         _float fDuration = {}; // 모든 성장이 일어나는데 걸리는 총 시간.
         _float3 vStartRotation = {}; // 시작 회전.
 		_float3 vRotationAxis = {}; // 회전 축.
-        const _float4x4* pParentMatrix = { nullptr };
+        _float3 vStartScale = {};
+        const _float4x4* pSocketMatrix = { nullptr };
 		class CTransform* pTargetTransform = { nullptr };
+        _bool bUseWorldPosition = {};
+
+        _uint iWindCount = {};
+        _float fCreateDelay = {};
     }EFFECTWIND_ACTIVATE_DESC;
 
 private:
-    struct SwordWindEvent
+    struct EFFECTTRIGGER
     {
-        _bool bIsActive = { false };
-        _float fWindEventTime = {};
+        _float fTriggerTime = { 0.f }; // 몇 초에 발동할 것인가.
+        _bool bIsTriggered = { false };
+        const _wstring strPartObjectTag = { L"" }; // 어떤 PartObject를 활성화 시킬 것인가.
+        _uint iWindIdx = {};
     };
 
 private:
@@ -48,6 +55,14 @@ public:
 public:
     virtual void OnActivate(void* pArg) override;
     virtual void OnDeActivate() override;
+
+
+private:
+    void Initialize_EffectTrigger(const _wstring& strTag);
+    void Effect_TriggerCheck(_float fTimeDelta);
+
+private:
+    _uint m_iCurrentWind = {};
 #pragma endregion
 
 
@@ -70,7 +85,7 @@ public:
 
 private:
     LEVEL m_eCurLevel = { LEVEL::END };
-    _bool m_bActive = false;
+    _bool m_IsActive = false;
 
     _float m_fCurrentTime = {};
     _float m_fDuration = {};
@@ -84,11 +99,14 @@ private:
     vector<class CSwordWind*> m_vecSwordWinds;
 	
 
-    vector<SwordWindEvent> m_vecSwordWindEvents;
-    const _float4x4* m_pParentMatrix = { nullptr };
+    vector<EFFECTTRIGGER> m_EffectTrigger;
+    const _float4x4* m_pSocketMatrix = { nullptr };
     class CTransform* m_pTargetTransform = { nullptr };
     _float3 m_vStartPos = {};
+    _float3 m_vStartScale = {};
     
+    _uint m_iWindCount = {};
+    _float m_fCreateDelay = {};
 
 
 

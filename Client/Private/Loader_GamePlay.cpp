@@ -208,6 +208,28 @@ HRESULT CLoader_GamePlay::Add_Prototype_QueenKnight(ID3D11Device* pDevice, ID3D1
 
 
 
+	/* 일단 띄워볼까? */
+	/*if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level)
+		, TEXT("Prototype_Component_Texture_Title_Text")
+		, CTexture::Create(pDevice, pContext, TEXT("../Bin/Resources/Textures/Title/Text/Text%d.png"), 5))))
+		return E_FAIL;*/
+
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level)
+		, TEXT("Prototype_Component_Texture_Encounter_Text")
+		, CTexture::Create(pDevice, pContext, TEXT("../Bin/Resources/Textures/Monster/QueenKnight/Encounter%d.png"), 2))))
+		return E_FAIL;
+
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level)
+		, TEXT("Prototype_Component_Texture_Dead_Text")
+		, CTexture::Create(pDevice, pContext, TEXT("../Bin/Resources/Textures/Monster/QueenKnight/Dead%d.png"), 2))))
+		return E_FAIL;
+
+
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCur_Level), TEXT("Prototype_GameObject_QueenKnightTitle"),
+		CEncounter_Title::Create(pDevice, pContext))))
+		return E_FAIL;
+
+
 	return S_OK;
 }
 

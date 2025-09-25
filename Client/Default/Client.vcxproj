@@ -203,8 +203,13 @@
     <ClInclude Include="..\Public\Client_Debug.h" />
     <ClInclude Include="..\Public\Client_Defines.h" />
     <ClInclude Include="..\Public\EffectParticle.h" />
+    <ClInclude Include="..\Public\Effect_BodyAura.h" />
+    <ClInclude Include="..\Public\Effect_FloorAura.h" />
     <ClInclude Include="..\Public\Effect_Pillar.h" />
+    <ClInclude Include="..\Public\Effect_PlayerSkill.h" />
     <ClInclude Include="..\Public\Effect_Wind.h" />
+    <ClInclude Include="..\Public\Effect_WindCircle.h" />
+    <ClInclude Include="..\Public\Encounter_Title.h" />
     <ClInclude Include="..\Public\Fade_Out.h" />
     <ClInclude Include="..\Public\Giant_WhiteDevil.h" />
     <ClInclude Include="..\public\Giant_WhiteDevilDefine.h" />
@@ -271,6 +276,7 @@
     <ClInclude Include="..\Public\QueenKnight.h" />
     <ClInclude Include="..\Public\QueenKnightDefine.h" />
     <ClInclude Include="..\Public\QueenKnightTree.h" />
+    <ClInclude Include="..\Public\RenketsuSlash.h" />
     <ClInclude Include="..\Public\Sky.h" />
     <ClInclude Include="..\Public\SkyBoss.h" />
     <ClInclude Include="..\Public\SkyBossDefine.h" />
@@ -288,6 +294,7 @@
     <ClInclude Include="..\Public\SteminaBar.h" />
     <ClInclude Include="..\Public\SwordTrail.h" />
     <ClInclude Include="..\Public\SwordWind.h" />
+    <ClInclude Include="..\Public\SwordWindCircle.h" />
     <ClInclude Include="..\Public\Title_BackGround.h" />
     <ClInclude Include="..\Public\MainApp.h" />
     <ClInclude Include="..\Public\Skill_Icon.h" />
@@ -355,8 +362,13 @@
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ClientPch.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ClientPch.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
     </ClCompile>
+    <ClCompile Include="..\Private\Effect_BodyAura.cpp" />
+    <ClCompile Include="..\Private\Effect_FloorAura.cpp" />
     <ClCompile Include="..\Private\Effect_Pillar.cpp" />
+    <ClCompile Include="..\Private\Effect_PlayerSkill.cpp" />
     <ClCompile Include="..\Private\Effect_Wind.cpp" />
+    <ClCompile Include="..\Private\Effect_WindCircle.cpp" />
+    <ClCompile Include="..\Private\Encounter_Title.cpp" />
     <ClCompile Include="..\Private\Fade_Out.cpp" />
     <ClCompile Include="..\Private\Giant_WhiteDevil.cpp" />
     <ClCompile Include="..\Private\Giant_WhiteDevilTree.cpp" />
@@ -417,6 +429,7 @@
     <ClCompile Include="..\Private\ClientPrototypeName.cpp" />
     <ClCompile Include="..\Private\QueenKnight.cpp" />
     <ClCompile Include="..\Private\QueenKnightTree.cpp" />
+    <ClCompile Include="..\Private\RenketsuSlash.cpp" />
     <ClCompile Include="..\Private\Sky.cpp" />
     <ClCompile Include="..\Private\SkyBoss.cpp" />
     <ClCompile Include="..\Private\SkyBossTree.cpp" />
@@ -432,6 +445,7 @@
     <ClCompile Include="..\Private\SteminaBar.cpp" />
     <ClCompile Include="..\Private\SwordTrail.cpp" />
     <ClCompile Include="..\Private\SwordWind.cpp" />
+    <ClCompile Include="..\Private\SwordWindCircle.cpp" />
     <ClCompile Include="..\Private\Title_BackGround.cpp" />
     <ClCompile Include="..\Private\MainApp.cpp" />
     <ClCompile Include="..\Private\Skill_Icon.cpp" />
@@ -460,11 +474,14 @@
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxAnimMesh.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxCube.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxEffectPosTex.hlsl" />
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxEffectPosTexDistortion.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxEffectTrail.hlsl" />
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxEffectTrailDistortion.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxInstance_Particle.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxInstance_PointDirParticle.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxInstance_PointParticle.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxMesh.hlsl" />
+    <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxMeshDistortion.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxNorTex.hlsl" />
     <FxCompile Include="..\Bin\ShaderFiles\Shader_VtxPosTex.hlsl" />
   </ItemGroup>

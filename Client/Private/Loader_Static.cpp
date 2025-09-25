@@ -1,4 +1,5 @@
-﻿HRESULT CLoader_Static::Loading_Resource(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
+﻿#include "Loader_Static.h"
+HRESULT CLoader_Static::Loading_Resource(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
 {
 	if (FAILED(Add_Prototype_ForShader(pDevice, pContext, pGameInstance)))
 	{
@@ -124,6 +125,15 @@ HRESULT CLoader_Static::Add_Prototype_ForShader(ID3D11Device* pDevice, ID3D11Dev
 		CRASH("Failed Create Shader Cube");
 		return E_FAIL;
 	}
+
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel), TEXT("Prototype_Component_Shader_VtxMeshDistortion"),
+		CShader::Create(pDevice, pContext, TEXT("../Bin/ShaderFiles/Shader_VtxMeshDistortion.hlsl"), VTXANIMMESH::Elements, VTXANIMMESH::iNumElements))))
+	{
+		CRASH("Failed Create Shader Cube");
+		return E_FAIL;
+	}
+
+	
 
 
 	
@@ -503,6 +513,13 @@ HRESULT CLoader_Static::Add_Prototype_Effects(ID3D11Device* pDevice, ID3D11Devic
 		CRASH("Failed Clone Effects");
 		return E_FAIL;
 	}
+
+	if (FAILED(Add_Prototype_Renketsu_Slash_Effects(pDevice, pContext, pGameInstance)))
+	{
+		CRASH("Failed Clone Effects");
+		return E_FAIL;
+	}
+
 	
 	if (FAILED(Add_Prototype_HitFlash_Effects(pDevice, pContext, pGameInstance)))
 	{
@@ -533,6 +550,18 @@ HRESULT CLoader_Static::Add_Prototype_Effects(ID3D11Device* pDevice, ID3D11Devic
 		CRASH("Failed CLone SwordWind Effects");
 		return E_FAIL;
 	}
+
+	if (FAILED(Add_Prototype_SwordWindCircle_Effects(pDevice, pContext, pGameInstance)))
+	{
+		CRASH("Failed CLone SwordWind Effects");
+		return E_FAIL;
+	}
+
+	if (FAILED(Add_Prototype_BloodAura_Effects(pDevice, pContext, pGameInstance)))
+	{
+		CRASH("Failed CLone SwordWind Effects");
+		return E_FAIL;
+	}
 		
 
 
@@ -559,7 +588,7 @@ HRESULT CLoader_Static::Add_Prototype_Slash_Effects(ID3D11Device* pDevice, ID3D1
 	// Diffuse
 	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
 		, TEXT("Prototype_Component_Texture_SlashEffectDiffuse")
-		, CTexture::Create(pDevice, pContext, TEXT("../Bin/Resources/Textures/Effects/Texture/Slash/Diffuse%d.png"), 1))))
+		, CTexture::Create(pDevice, pContext, TEXT("../Bin/Resources/Textures/Effects/Texture/Slash/Diffuse%d.png"), 2))))
 	{
 		CRASH("Failed Load SlashEffect Texture");
 		return E_FAIL;
@@ -573,27 +602,67 @@ HRESULT CLoader_Static::Add_Prototype_Slash_Effects(ID3D11Device* pDevice, ID3D1
 		return E_FAIL;
 	}
 
-	/*if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
-		, TEXT("Prototype_Component_Texture_SlashEffectMask")
-		, CTexture::Create(pDevice, pContext, TEXT("../Bin/Resources/Textures/Effects/Texture/Slash/Slash%d.png"), 1))))
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_SlashEffect"),
+		CSlash::Create(pDevice, pContext))))
+	{
+		CRASH("Failed Load Slash GameObject ");
+		return E_FAIL;
+	}
+#pragma endregion
+	return S_OK;
+}
+
+HRESULT CLoader_Static::Add_Prototype_Renketsu_Slash_Effects(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
+{
+#pragma region RENKETSU Slash Effect
+
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel), TEXT("Prototype_Component_Shader_VtxEffectPosTexDistortion"),
+		CShader::Create(pDevice, pContext, TEXT("../Bin/ShaderFiles/Shader_VtxEffectPosTexDistortion.hlsl"), VTXPOSTEX::Elements, VTXPOSTEX::iNumElements))))
+	{
+		CRASH("Failed Load Point Effect Shader");
+		return E_FAIL;
+	}
+	// Distortion
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
+		, TEXT("Prototype_Component_Texture_SlashDistortion")
+		, CTexture::Create(pDevice, pContext, TEXT("../Bin/Resources/Textures/Effects/Texture/RenketsuSlash/Distortion%d.png"), 1))))
 	{
 		CRASH("Failed Load SlashEffect Texture");
 		return E_FAIL;
 	}
 
+	// Diffuse
 	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
-		, TEXT("Prototype_Component_Texture_SlashEffectDiffuse")
-		, CTexture::Create(pDevice, pContext, TEXT("../Bin/Resources/Textures/Effects/Texture/Slash/SlashDiffuse%d.png"), 1))))
+		, TEXT("Prototype_Component_Texture_RenketsuDiffuse")
+		, CTexture::Create(pDevice, pContext, TEXT("../Bin/Resources/Textures/Effects/Texture/RenketsuSlash/Diffuse%d.png"), 2))))
 	{
 		CRASH("Failed Load SlashEffect Texture");
 		return E_FAIL;
-	}*/
+	}
 
-
-	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_SlashEffect"),
-		CSlash::Create(pDevice, pContext))))
+	// Mask
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
+		, TEXT("Prototype_Component_Texture_RenketsuMask")
+		, CTexture::Create(pDevice, pContext, TEXT("../Bin/Resources/Textures/Effects/Texture/RenketsuSlash/Mask%d.png"), 2))))
 	{
-		CRASH("Failed Load Slash GameObject ");
+		CRASH("Failed Load SlashEffect Texture");
+		return E_FAIL;
+	}
+
+	// Other
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
+		, TEXT("Prototype_Component_Texture_RenketsuOther")
+		, CTexture::Create(pDevice, pContext, TEXT("../Bin/Resources/Textures/Effects/Texture/RenketsuSlash/Other%d.png"), 3))))
+	{
+		CRASH("Failed Load SlashEffect Texture");
+		return E_FAIL;
+	}
+
+
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel), TEXT("Prototype_GameObject_Renketsu_SlashEffect"),
+		CRenketsuSlash::Create(pDevice, pContext))))
+	{
+		CRASH("Failed Load RenketsuSlash GameObject ");
 		return E_FAIL;
 	}
 #pragma endregion
@@ -689,6 +758,13 @@ HRESULT CLoader_Static::Add_Prototype_Trail_Effects(ID3D11Device* pDevice, ID3D1
 		return E_FAIL;
 	}
 
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel), TEXT("Prototype_Component_Shader_VtxSwordTrailDistortion"),
+		CShader::Create(pDevice, pContext, TEXT("../Bin/ShaderFiles/Shader_VtxEffectTrailDistortion.hlsl"), VTXPOSTEX::Elements, VTXPOSTEX::iNumElements))))
+	{
+		CRASH("Failed Load Point Effect Shader");
+		return E_FAIL;
+	}
+
 	/*For.Prototype_Component_VIBuffer_Swordtrail*/
 	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel), TEXT("Prototype_Component_VIBuffer_SwordTrail"),
 		CVIBuffer_SwordTrail::Create(pDevice, pContext))))
@@ -724,6 +800,36 @@ HRESULT CLoader_Static::Add_Prototype_Trail_Effects(ID3D11Device* pDevice, ID3D1
 			, TEXT("../Bin/Resources/Textures/Effects/Texture/Trail/Trail_SpWeapon%d.png"), 1))))
 	{
 		CRASH("Failed Load Effect TrailGlow Texture");
+		return E_FAIL;
+	}
+
+
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
+		, TEXT("Prototype_Component_Texture_TrailDiffuse")
+		, CTexture::Create(pDevice, pContext
+			, TEXT("../Bin/Resources/Textures/Effects/Texture/Trail/TraillSword%d.png"), 4))))
+	{
+		CRASH("Failed Load Effect TrailGlow Texture");
+		return E_FAIL;
+	}
+
+	// 왜곡 효과 텍스처 등록  
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
+		, TEXT("Prototype_Component_Texture_TrailDistortion")
+		, CTexture::Create(pDevice, pContext
+			, TEXT("../Bin/Resources/Textures/Effects/Texture/Trail/Distortion%d.png"), 1))))
+	{
+		CRASH("Failed Load Effect TrailDistortion Texture");
+		return E_FAIL;
+	}
+
+
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
+		, TEXT("Prototype_Component_Texture_TrailGradient")
+		, CTexture::Create(pDevice, pContext
+			, TEXT("../Bin/Resources/Textures/Effects/Texture/Trail/Gradient%d.png"), 7))))
+	{
+		CRASH("Failed Load Effect SwordTrail Texture");
 		return E_FAIL;
 	}
 
@@ -871,7 +977,7 @@ HRESULT CLoader_Static::Add_Prototype_SwordWind_Effects(ID3D11Device* pDevice, I
 	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
 		, TEXT("Prototype_Component_Texture_SwordWindDiffuse")
 		, CTexture::Create(pDevice, pContext
-			, TEXT("../Bin/Resources/Models/EffectMesh/SwordWind/Diffuse/Diffuse%d.png"), 6))))
+			, TEXT("../Bin/Resources/Models/EffectMesh/SwordWind/Diffuse/Diffuse%d.png"), 7))))
 	{
 		CRASH("Failed Load Effect SwordDiffuse Texture");
 		return E_FAIL;
@@ -931,6 +1037,115 @@ HRESULT CLoader_Static::Add_Prototype_SwordWind_Effects(ID3D11Device* pDevice, I
 		, TEXT("Prototype_GameObject_EffectWind")
 		, CEffect_Wind::Create(pDevice, pContext))))
 		CRASH("Failed Prototype Effects Wind");
+
+	
+	return S_OK;
+}
+
+HRESULT CLoader_Static::Add_Prototype_SwordWindCircle_Effects(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
+{
+
+	_matrix		PreTransformMatrix = XMMatrixIdentity();
+
+	PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XM_PI);
+
+	/* 부품 메시들. */
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
+		, TEXT("Prototype_GameObject_SwordWindCircle")
+		, CSwordWindCircle::Create(pDevice, pContext))))
+		CRASH("Failed Prototype Sword Wind Effects");
+
+	/* 최종 명령을 내리는 주체.*/
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
+		, TEXT("Prototype_GameObject_EffectWindCircle")
+		, CEffect_WindCircle::Create(pDevice, pContext))))
+		CRASH("Failed Prototype Effects WindCircle");
+
+	return S_OK;
+}
+
+HRESULT CLoader_Static::Add_Prototype_BloodAura_Effects(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance)
+{
+#pragma region TEXTURE
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
+		, TEXT("Prototype_Component_Texture_BloodAuraDiffuse")
+		, CTexture::Create(pDevice, pContext
+			, TEXT("../Bin/Resources/Models/EffectMesh/BloodAura/Diffuse/Diffuse%d.png"), 5))))
+	{
+		CRASH("Failed Load Effect BloodAura Texture");
+		return E_FAIL;
+	}
+
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
+		, TEXT("Prototype_Component_Texture_BloodAuraOther")
+		, CTexture::Create(pDevice, pContext
+			, TEXT("../Bin/Resources/Models/EffectMesh/BloodAura/Other/Other%d.png"), 13))))
+	{
+		CRASH("Failed Load Effect SwordOther Texture");
+		return E_FAIL;
+	}
+
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
+		, TEXT("Prototype_Component_Texture_BloodAuraNoise")
+		, CTexture::Create(pDevice, pContext
+			, TEXT("../Bin/Resources/Models/EffectMesh/BloodAura/Noise/Noise%d.png"), 8))))
+	{
+		CRASH("Failed Load Effect SwordOther Texture");
+		return E_FAIL;
+	}
+
+
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
+		, TEXT("Prototype_Component_Texture_BloodAuraSwirl")
+		, CTexture::Create(pDevice, pContext
+			, TEXT("../Bin/Resources/Models/EffectMesh/BloodAura/Swirl/Swirl%d.png"), 6))))
+	{
+		CRASH("Failed Load Effect SwordOther Texture");
+		return E_FAIL;
+	}
+
+
+#pragma endregion
+
+	_matrix		PreTransformMatrix = XMMatrixIdentity();
+
+	PreTransformMatrix = XMMatrixScaling(0.01f, 0.01f, 0.01f) * XMMatrixRotationY(XM_PI);
+
+	/* 바닥 객체. */
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
+		, TEXT("Prototype_Component_Model_Effect_BloodFloorAura")
+		, CLoad_Model::Create(pDevice, pContext, MODELTYPE::NONANIM, PreTransformMatrix, "../../SaveFile/Model/Effect/BloodFloorAura.dat", L""))))
+	{
+		CRASH("Failed Prototype_Component_Model_Effect_BloodFloorAura");
+		return E_FAIL;
+	}
+
+
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
+		, TEXT("Prototype_GameObject_BloodFloorAura")
+		, CEffect_FloorAura::Create(pDevice, pContext))))
+		CRASH("Failed Prototype Blood Aura Effects");
+
+	/* Body 객체. */
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
+		, TEXT("Prototype_Component_Model_Effect_BloodBodyAura")
+		, CLoad_Model::Create(pDevice, pContext, MODELTYPE::NONANIM, PreTransformMatrix, "../../SaveFile/Model/Effect/BloodBodyAura.dat", L""))))
+	{
+		CRASH("Failed Prototype_Component_Model_Effect_BloodBodyAura");
+		return E_FAIL;
+	}
+
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
+		, TEXT("Prototype_GameObject_BloodBodyAura")
+		, CEffect_BodyAura::Create(pDevice, pContext))))
+		CRASH("Failed Prototype Blood Body Aura Effects");
+
+
+	/* 최종 명령을 내리는 주체.*/
+	if (FAILED(pGameInstance->Add_Prototype(ENUM_CLASS(m_eCurLevel)
+		, TEXT("Prototype_GameObject_EffectPlayerAuraContainer")
+		, CEffect_PlayerSkill::Create(pDevice, pContext))))
+		CRASH("Failed Prototype Effects PlayerSkill");
 	return S_OK;
 }
 

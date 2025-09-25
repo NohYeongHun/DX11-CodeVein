@@ -400,12 +400,12 @@ void CPlayerState::Handle_Unified_Direction_Input(_float fTimeDelta)
     // 방향 고정 시간 체크
     if (m_fCurrentLockTime >= m_fDirectionLockTime)
     {
-        m_bIsDirectionLocked = true;
-        m_bCanChangeDirection = false;
+        m_IsDirectionLocked = true;
+        m_IsCanChangeDirection = false;
     }
 
     // 방향이 고정되기 전에만 방향 처리
-    if (!m_bIsDirectionLocked)
+    if (!m_IsDirectionLocked)
     {
         // ⭐ 부모 클래스의 통합된 방향 계산 함수 사용
         _vector vFinalDirection = Calculate_Unified_Attack_Direction();

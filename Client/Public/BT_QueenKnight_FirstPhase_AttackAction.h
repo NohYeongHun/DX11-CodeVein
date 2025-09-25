@@ -25,6 +25,11 @@ private:
     _bool m_IsSecondAttack = { false };
     _bool m_IsLastAttack = { false };
 
+    _bool m_IsFirstSoundPlay = { false };
+    _bool m_IsSecondSoundPlay = { false };
+    _float m_fFirstAttackSoundFrame = {};
+    _float m_fSecondAttackSoundFrame = {};
+
 public:
     explicit CBT_QueenKnight_FirstPhase_AttackAction(class CQueenKnight* pOwner);
     virtual ~CBT_QueenKnight_FirstPhase_AttackAction() = default;

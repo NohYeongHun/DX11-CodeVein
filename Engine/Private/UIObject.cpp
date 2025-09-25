@@ -169,11 +169,6 @@ HRESULT CUIObject::Begin()
 
 	XMStoreFloat4x4(&m_RenderMatrix, matWorld);
 
-	// 블렌딩 끄기
-	///* Alpha Blend On, DepthStencil Off*/
-	//m_pGameInstance->Apply_BlendeState();
-	//m_pGameInstance->Apply_DepthStencilOff();
-
 
 	return S_OK;
 }

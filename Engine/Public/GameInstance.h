@@ -223,6 +223,17 @@ public:
 	HRESULT Ready_ShadowLight(SHADOW_LIGHT_DESC LightDesc);
 #pragma endregion
 
+#pragma region SOUND_MANAGER
+
+public:
+	void PlaySoundEffect(wstring pSoundKey, _float fVolume);
+	void PlayBGM(wstring pSoundKey, _float fVolume, _bool bloop);
+	void StopBGM();
+	void StopSound();
+	void StopAll();
+	void SetChannelVolume(_float fVolume);
+#pragma endregion
+
 
 
 //
@@ -253,6 +264,7 @@ private:
 	class CTarget_Manager*		m_pTarget_Manager = { nullptr };
 	class CShadow* m_pShadow = { nullptr };
 	class CFrustum* m_pFrustum = { nullptr };
+	class CSoundManager* m_pSound_Manager = { nullptr };
 	
 	
 	_float m_fTimeDelta = {};

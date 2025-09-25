@@ -18,6 +18,11 @@ public:
 		GIANT_BUFF_COMBO_ATTACK = 1 << 1,
 	};
 
+	enum SOUND_FLAGS : _uint
+	{
+		GIANT_ATTACK_SOUND = 0,
+		GIANT_ATTACK_END
+	};
 public:
 	typedef struct tagGiantWhiteDevil : public CMonster::MONSTER_DESC
 	{
@@ -59,7 +64,7 @@ public:
 
 private:
 	class CGiant_WhiteDevilTree* m_pTree = { nullptr };
-
+	class CTexture* m_pDissolveTexture = { nullptr };
 #pragma endregion
 
 
@@ -78,11 +83,20 @@ public:
 
 #pragma region 6. 특수한 상태를 제어하기 위한 함수들입니다.
 
+public:
+	virtual void Dead_Action();
+	virtual void Start_Dissolve(_float fDuration = 0.f);
+	virtual void ReverseStart_Dissolve(_float fDuration = 0.f); // Dissolve 역재생
+	virtual void End_Dissolve();
+
 
 public:
 	/* 어떤 파츠의 Colider를 제어할 것인지? */
 	virtual void Enable_Collider(_uint iType) override;
 	virtual void Disable_Collider(_uint iType) override;
+
+public:
+	void Play_Sound(_uint iTrack);
 #pragma endregion
 
 #pragma region 7. 보스몹 체력 UI 관리

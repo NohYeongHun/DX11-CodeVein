@@ -3,6 +3,9 @@ CBT_GiantWhiteDevil_ComboAttackAction::CBT_GiantWhiteDevil_ComboAttackAction(CGi
     : m_pOwner(pOwner)
 {
     m_strTag = L"CBT_GiantWhiteDevil_ComboAttackAction";
+
+    m_fFirstAttackSound = 50.f / 221.f;
+    m_fSecondAttackSound = 45.f / 246.f;
 }
 
 BT_RESULT CBT_GiantWhiteDevil_ComboAttackAction::Perform_Action(_float fTimeDelta)
@@ -30,6 +33,8 @@ void CBT_GiantWhiteDevil_ComboAttackAction::Reset()
     m_pOwner->Reset_Collider_ActiveInfo();
     m_IsFirstAttack = false;
     m_IsSecondAttack = false;
+    m_IsFirstPlaySound = false;
+    m_IsSecondPlaySound = false;
 }
 
 BT_RESULT CBT_GiantWhiteDevil_ComboAttackAction::EnterAttack(_float fTimeDelta)
@@ -51,6 +56,8 @@ BT_RESULT CBT_GiantWhiteDevil_ComboAttackAction::EnterAttack(_float fTimeDelta)
 
 BT_RESULT CBT_GiantWhiteDevil_ComboAttackAction::UpdateFirstAttack(_float fTimeDelta)
 {
+    _float fCurrentRatio = m_pOwner->Get_CurrentAnimationRatio();
+   
     // 0. 바로 바뀐다.
     if (!m_IsFirstAttack)
     {
@@ -58,7 +65,14 @@ BT_RESULT CBT_GiantWhiteDevil_ComboAttackAction::UpdateFirstAttack(_float fTimeD
         m_IsFirstAttack = true;
     }
 
-    if (m_pOwner->Get_CurrentAnimationRatio() > 0.5f)
+    // 1. Sound 설정.
+    if (!m_IsFirstPlaySound && fCurrentRatio > m_fFirstAttackSound)
+    {
+        m_IsFirstPlaySound = true;
+        m_pOwner->Play_Sound(CGiant_WhiteDevil::GIANT_ATTACK_SOUND);
+    }
+
+    if (fCurrentRatio > 0.5f)
     {
         // 1. 공격 애니메이션 선택
         _uint iNextAnimationIdx = m_pOwner->Find_AnimationIndex(L"COMBO_ATTACK2");
@@ -78,11 +92,15 @@ BT_RESULT CBT_GiantWhiteDevil_ComboAttackAction::UpdateFirstAttack(_float fTimeD
 
 BT_RESULT CBT_GiantWhiteDevil_ComboAttackAction::UpdateSecondAttack(_float fTimeDelta)
 {
-   /* if (!m_IsSecondAttack)
+
+    _float fCurrentRatio = m_pOwner->Get_CurrentAnimationRatio();
+
+    // 1. Sound 설정.
+    if (!m_IsSecondPlaySound && fCurrentRatio > m_fSecondAttackSound)
     {
-        m_pOwner->RotateTurn_ToTargetYaw();
-        m_IsSecondAttack = true;
-    }*/
+        m_IsSecondPlaySound = true;
+        m_pOwner->Play_Sound(CGiant_WhiteDevil::GIANT_ATTACK_SOUND);
+    }
 
     if (m_pOwner->Is_Animation_Finished())
     {

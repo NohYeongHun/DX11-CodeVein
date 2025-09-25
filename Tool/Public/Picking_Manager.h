@@ -31,7 +31,7 @@ private:
 	class CGameObject*  m_pPickedObj = nullptr;
 	list<CGameObject*>  m_LoadObjects;
 	list<CGameObject*>	m_GameObjects;
-	_bool				m_bMouseInUI = false;
+	_bool				m_IsMouseInUI = false;
 	_float3				m_vPickingPos = _float3(0.f, 0.f, 0.f);
 
 private:

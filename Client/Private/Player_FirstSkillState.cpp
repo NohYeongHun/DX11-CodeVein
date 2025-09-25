@@ -1,4 +1,5 @@
-﻿CPlayer_FirstSkillState::CPlayer_FirstSkillState()
+﻿#include "Player_FirstSkillState.h"
+CPlayer_FirstSkillState::CPlayer_FirstSkillState()
 {
 }
 
@@ -6,6 +7,25 @@ HRESULT CPlayer_FirstSkillState::Initialize(_uint iStateNum, void* pArg)
 {
     if (FAILED(CPlayerState::Initialize(iStateNum, pArg)))
         return E_FAIL;
+
+#pragma region Sound Track 관리
+    m_fFirstAttackFrame = 31.f / 233.f;
+
+    /* 링은 52.f 검격은 그보다 조금더 늦게. */
+    m_fSecondAttackFrame = 49.f / 233.f;
+    /* 링은 70.f 검격은 그보다늦게 그리고 아래에서 위로 검격 .*/
+    m_fThirdAttackFrame = 70.f / 233.f;
+    /* 링은 90.f 검격은 그보다 늦게. 95.f */
+    m_fFourthAttackFrame = 90.f / 233.f;
+    m_fFifthAttackFrame = 113.f / 233.f;
+
+    m_IsFirstAttack  = false;
+    m_IsSecondAttack = false;
+    m_IsThirdAttack  = false;
+    m_IsFourthAttack = false;
+    m_IsFifthAttack  = false;
+#pragma endregion
+
 
 #pragma region 콜라이더 관리.
     // 1. 앞찌르기
@@ -60,7 +80,7 @@ HRESULT CPlayer_FirstSkillState::Initialize(_uint iStateNum, void* pArg)
     // 앞 찌르기
     Add_AnimationSpeed_Info(m_pPlayer->Find_AnimationIndex(TEXT("CIRCULATE_PURGE"))
         , ANIMATION_SPEED_INFO{1.f / 232.f, 40.f / 232.f, 0, m_pPlayer->Find_AnimationIndex(TEXT("CIRCULATE_PURGE"))
-        , fOriginSpeed, 2.f});
+        , fOriginSpeed, 3.f});
 
     // 회전 공격 
     Add_AnimationSpeed_Info(m_pPlayer->Find_AnimationIndex(TEXT("CIRCULATE_PURGE"))
@@ -70,21 +90,23 @@ HRESULT CPlayer_FirstSkillState::Initialize(_uint iStateNum, void* pArg)
     // 끝.
     Add_AnimationSpeed_Info(m_pPlayer->Find_AnimationIndex(TEXT("CIRCULATE_PURGE"))
         , ANIMATION_SPEED_INFO{ 121.f / 232.f, 232.f / 232.f, 0, m_pPlayer->Find_AnimationIndex(TEXT("CIRCULATE_PURGE"))
-        , fOriginSpeed, 1.8f });
+        , fOriginSpeed, 2.f });
 
 #pragma endregion
 
+    m_fIncreaseDamage = static_cast<_float>(m_pGameInstance->Rand_UnsignedInt(20.f, 40.f)); // 기본 공격력 증가량 설정
 
 
+#pragma region 애니메이션 Effect 제어
 
-	m_fIncreaseDamage = 10.f; // 기본 공격력 증가량 설정
+    EFFECT_ACTIVE_INFO effectActive = { 35.f / 232.f, 40.f / 232.f
+        , m_pPlayer->Find_AnimationIndex(TEXT("DRAGON_LUNGE"))
+    , [this](void*) {
+            this->Create_WindEffect(nullptr); } };
 
-    // 1. 스테미나 감소.
-    STEMINA_CHANGE_DESC SteminaDesc{};
-    SteminaDesc.bIncrease = false;
-    SteminaDesc.fStemina = 35.f;
-    SteminaDesc.fTime = 1.f;
-    m_pGameInstance->Publish(EventType::STEMINA_CHANGE, &SteminaDesc);
+    Add_AnimationEffect_Info(
+        m_pPlayer->Find_AnimationIndex(TEXT("DRAGON_LUNGE")), effectActive);
+#pragma endregion
 
     return S_OK;
 }
@@ -131,34 +153,43 @@ void CPlayer_FirstSkillState::Enter(void* pArg)
     m_pPlayer->Increase_Damage(m_fIncreaseDamage);
 
 
-    //// 2. 검풍 생성 부분 수정
-    //CEffect_Wind::EFFECTWIND_ACTIVATE_DESC WindActivate_Desc{};
-    //WindActivate_Desc.eCurLevel = m_pPlayer->Get_CurrentLevel();
-    //WindActivate_Desc.fDuration = 1.f; // 지속시간,,
+    CEffect_PlayerSkill::EFFECT_PLAYERSKILL_ACTIVATE_DESC Effect_PlayerSkillDesc{};
+    Effect_PlayerSkillDesc.eCurLevel = m_pPlayer->Get_CurrentLevel();
+    Effect_PlayerSkillDesc.pTargetTransform = m_pPlayer->Get_Transform();
+    Effect_PlayerSkillDesc.fDuration = 3.f; // 지속시간,,
+    Effect_PlayerSkillDesc.vStartPos = { 0.f, 0.f, 0.f }; // { 발 }
 
-    //// ✅ 플레이어 기준 상대 위치 (Local Offset)
-    //WindActivate_Desc.vStartPos = { 0.f, 2.f, 5.f }; // {오른쪽, 위, 앞}
+    m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(m_pGameInstance->Get_CurrentLevelID())
+        , TEXT("PLAYER_AURA"), TEXT("Layer_Effect"), 1, ENUM_CLASS(CEffect_PlayerSkill::EffectType), &Effect_PlayerSkillDesc);
 
-    ////WindActivate_Desc.vStartRotation = { 0.f, 270.f, 0.f }; // 각도 단위
 
-    //// ✅ 카메라의 Look 방향을 회전축으로 설정 (소용돌이 회전)
-    //_vector vCamLook = m_pGameInstance->Get_MainCamera()->Get_Transform()->Get_State(STATE::LOOK);
-    //XMStoreFloat3(&WindActivate_Desc.vRotationAxis, XMVector3Normalize(vCamLook));
+    STEMINA_CHANGE_DESC SteminaDesc{};
+    SteminaDesc.bIncrease = false;
+    SteminaDesc.fStemina = 40.f;
+    SteminaDesc.fTime = 1.f;
+    m_pGameInstance->Publish(EventType::STEMINA_CHANGE, &SteminaDesc);
 
-    //// ✅ 부모-자식 관계 설정 (플레이어를 따라다니게)
-    //WindActivate_Desc.pParentMatrix = m_pPlayer->Get_Transform()->Get_WorldMatrixPtr();
-    //WindActivate_Desc.pTargetTransform = m_pPlayer->Get_Transform();
+ 
 
-    //m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(m_pGameInstance->Get_CurrentLevelID())
-    //    , TEXT("SWORD_WIND"), TEXT("Layer_Effect"), 1, ENUM_CLASS(CEffect_Wind::EffectType), &WindActivate_Desc);
+    m_IsFirstAttack = false;
+    m_IsSecondAttack = false;
+    m_IsThirdAttack = false;
+    m_IsFourthAttack = false;
+    m_IsFifthAttack = false;
+
+    /* 스킬에 진입하면 카메라 마우스 이동을 막습니다. */
+    m_pPlayer->Set_SkillMode(true);
 }
 
 void CPlayer_FirstSkillState::Update(_float fTimeDelta)
 {
+    _float fCurrentRatio = m_pModelCom->Get_Current_Ratio();
 
-    //Handle_Input();
+   
     Handle_Unified_Direction_Input(fTimeDelta);
     Change_State();
+
+    Update_Event(fTimeDelta);
     CPlayerState::Handle_Collider_State();
     CPlayerState::Handle_AnimationSpeed_State();
     CPlayerState::Handle_AnimationTrail_State();
@@ -182,6 +213,9 @@ void CPlayer_FirstSkillState::Exit()
     {
         m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, false);
     }
+
+    // 다시 회전 가능하게
+    m_pPlayer->Set_SkillMode(false);
 }
 
 void CPlayer_FirstSkillState::Reset()
@@ -215,6 +249,325 @@ void CPlayer_FirstSkillState::Change_State()
         }
     }
 
+}
+
+void CPlayer_FirstSkillState::Update_Event(_float fTimeDelta)
+{
+    _float fCurrentRatio = m_pModelCom->Get_Current_Ratio();
+
+    if (!m_IsFirstAttack && fCurrentRatio > m_fFirstAttackFrame)
+    {
+        m_strSoundFile = L"PlayerAttack.mp3";
+        m_pGameInstance->PlaySoundEffect(m_strSoundFile, 0.3f);
+        m_IsFirstAttack = true;
+
+        Create_FirstEvent();
+    }
+    else if (!m_IsSecondAttack && fCurrentRatio > m_fSecondAttackFrame)
+    {
+        m_strSoundFile = L"PlayerAttack.mp3";
+        m_pGameInstance->PlaySoundEffect(m_strSoundFile, 0.3f);
+
+        // 여기서 메시 이펙트도 있어야한다.. 아님 어색해.
+        Create_SecondEvent();
+
+        m_IsSecondAttack = true;
+    }
+    else if (!m_IsThirdAttack && fCurrentRatio > m_fThirdAttackFrame)
+    {
+        m_strSoundFile = L"AttackWindSound.wav";
+        m_pGameInstance->PlaySoundEffect(m_strSoundFile, 0.3f);
+        Create_ThirdEvent();
+        m_IsThirdAttack = true;
+    }
+    else if (!m_IsFourthAttack && fCurrentRatio > m_fFourthAttackFrame)
+    {
+        m_strSoundFile = L"AttackWindSound.wav";
+        m_pGameInstance->PlaySoundEffect(m_strSoundFile, 0.3f);
+
+        Create_FourthEvent();
+
+        m_IsFourthAttack = true;
+    }
+    else if (!m_IsFifthAttack && fCurrentRatio > m_fFifthAttackFrame)
+    {
+        m_strSoundFile = L"AttackWindSound.wav";
+        m_pGameInstance->PlaySoundEffect(m_strSoundFile, 0.3f);
+
+        Create_FifthEvent();
+
+
+        m_IsFifthAttack = true;
+    }
+    
+}
+
+void CPlayer_FirstSkillState::Create_WindEffect(void* pArg)
+{
+
+
+
+
+   
+}
+
+void CPlayer_FirstSkillState::Create_FirstEvent()
+{
+
+
+    _matrix playerWorld = m_pPlayer->Get_Transform()->Get_WorldMatrix();
+    _vector vPlayerPos = playerWorld.r[3];
+    _vector vPlayerForward = XMVector3Normalize(playerWorld.r[2]);
+
+    _float fHitDistance = 7.0f;
+    _vector vHitPos = vPlayerPos + (vPlayerForward * fHitDistance);
+
+    vHitPos = XMVectorSetY(vHitPos, XMVectorGetY(vPlayerPos) + 1.0f);
+
+    CEffect_Wind::EFFECTWIND_ACTIVATE_DESC WindActivate_Desc{};
+    WindActivate_Desc.eCurLevel = m_pPlayer->Get_CurrentLevel();
+    WindActivate_Desc.fDuration = 1.5f;
+
+    _float3 vHitPoint;
+    XMStoreFloat3(&vHitPoint, vHitPos);
+    WindActivate_Desc.vStartPos = vHitPoint;
+    WindActivate_Desc.bUseWorldPosition = true;
+    WindActivate_Desc.fCreateDelay = 0.05f;
+    WindActivate_Desc.iWindCount = 6;
+    WindActivate_Desc.vStartScale = { 5.f, 5.f, 5.f };
+
+    m_pGameInstance->Move_Effect_ToObjectLayer(
+        ENUM_CLASS(m_pGameInstance->Get_CurrentLevelID()),
+        TEXT("SWORD_WIND"), TEXT("Layer_Effect"), 1,
+        ENUM_CLASS(CEffect_Wind::EffectType), &WindActivate_Desc);
+    m_pGameInstance->PlaySoundEffect(L"CirculatePulse1.ogg", 0.1f);
+    /*m_pGameInstance->PlaySoundEffect(L"CirculatePulse2.ogg", 0.15f);*/
+
+   
+}
+
+void CPlayer_FirstSkillState::Create_SecondEvent()
+{
+    /* 공기 링.*/
+    CEffect_WindCircle::EFFECTWIND_CIRCLE_ACTIVATE_DESC WindCircleActivate_Desc{};
+    WindCircleActivate_Desc.eCurLevel = m_pPlayer->Get_CurrentLevel();
+
+
+    _float3 vStartPos = { -0.3f, 0.f, 0.f };
+    WindCircleActivate_Desc.vStartPos = vStartPos;
+    WindCircleActivate_Desc.fDisplayTime = 0.5f;
+    WindCircleActivate_Desc.fCreateDelay = 0.f; // 얘가 바로뜨고.
+    WindCircleActivate_Desc.iWindCount = 2;
+    WindCircleActivate_Desc.vStartScale = { 6.f, 6.f, 6.f };
+    WindCircleActivate_Desc.vTargetScale = { 7.f, 7.f, 7.f };
+    WindCircleActivate_Desc.pWorldMatrix = m_pPlayer->Get_Transform()->Get_WorldMatrixPtr(); // WorldMatrix는 한번만 초기화
+    //WindActivate_Desc.pSocketMatrix = m_pPlayer->Get_BoneMatrix("RightGauntletTrail2"); // 붙일 뼈
+    WindCircleActivate_Desc.pSocketMatrix = m_pPlayer->Get_BoneMatrix("socket_ExpRecoveryFx01"); // 붙일 뼈
+
+    m_pGameInstance->Move_Effect_ToObjectLayer(
+        ENUM_CLASS(m_pGameInstance->Get_CurrentLevelID()),
+        TEXT("SWORD_WINDCIRCLE"), TEXT("Layer_Effect"), 1,
+        ENUM_CLASS(CEffect_WindCircle::EffectType), &WindCircleActivate_Desc);
+    m_pGameInstance->PlaySoundEffect(L"CirculatePulse1.ogg", 0.1f);
+    m_pGameInstance->PlaySoundEffect(L"CirculatePulse2.ogg", 0.15f);
+
+    /* 검격 */
+    _matrix playerWorld = m_pPlayer->Get_Transform()->Get_WorldMatrix();
+    _vector vPlayerPos = playerWorld.r[3];
+    _vector vPlayerForward = XMVector3Normalize(playerWorld.r[2]);
+    _vector vPlayerRight = XMVector3Normalize(playerWorld.r[1]);
+    _vector vPlayerUp = XMVector3Normalize(playerWorld.r[0]);
+    //_float fHitDistance = 3.f;
+    _float fHitDistance = 1.f;
+    
+
+    _vector vHitPos = vPlayerPos + (vPlayerForward * fHitDistance);
+    vHitPos += XMVectorSet(0.f, 1.f, 0.f, 0.f) * 1.7f;
+
+    CSlash::SLASHACTIVATE_DESC SlashDesc{};
+    SlashDesc.eCurLevel = m_pPlayer->Get_CurrentLevel();
+    SlashDesc.vHitPosition = vHitPos;
+    SlashDesc.vHitDirection = vPlayerUp;
+    SlashDesc.vScale = { 4.f, 1.f, 1.f };
+    SlashDesc.vTargetScale = { 8.f, 0.4f, 1.f };
+    SlashDesc.fCreateDelay = m_pGameInstance->Get_TimeDelta() * 30.f;
+    SlashDesc.fDisPlayTime = 0.2f;
+    SlashDesc.bIsScaleChange = true;
+    SlashDesc.eShaderPath = EFFECTPOSTEX_SHADERPATH::RENKETSU_LINESLASH;
+    m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(SlashDesc.eCurLevel)
+        , TEXT("SLASH_EFFECT"), TEXT("Layer_Effect"), 1, ENUM_CLASS(CSlash::EffectType), &SlashDesc);
+}
+
+void CPlayer_FirstSkillState::Create_ThirdEvent()
+{
+    CEffect_WindCircle::EFFECTWIND_CIRCLE_ACTIVATE_DESC WindActivate_Desc{};
+    WindActivate_Desc.eCurLevel = m_pPlayer->Get_CurrentLevel();
+
+
+    _float3 vStartPos = { 0.f, 0.f, 0.f };
+    WindActivate_Desc.vStartPos = vStartPos;
+    WindActivate_Desc.fDisplayTime = 0.5f;
+    WindActivate_Desc.fCreateDelay = 0.1f;
+    WindActivate_Desc.iWindCount = 2;
+    WindActivate_Desc.vStartScale = { 5.f, 5.f, 5.f };
+    WindActivate_Desc.vTargetScale = { 6.f, 6.f, 6.f };
+    WindActivate_Desc.pWorldMatrix = m_pPlayer->Get_Transform()->Get_WorldMatrixPtr(); // WorldMatrix는 한번만 초기화
+    //WindActivate_Desc.pSocketMatrix = m_pPlayer->Get_BoneMatrix("RightGauntletTrail2"); // 붙일 뼈
+    WindActivate_Desc.pSocketMatrix = m_pPlayer->Get_BoneMatrix("socket_ExpRecoveryFx01"); // 붙일 뼈
+    //WindActivate_Desc.pSocketMatrix = m_pPlayer->Get_BoneMatrix("LeftFootEffectSocket"); // 붙일 뼈
+
+    m_pGameInstance->Move_Effect_ToObjectLayer(
+        ENUM_CLASS(m_pGameInstance->Get_CurrentLevelID()),
+        TEXT("SWORD_WINDCIRCLE"), TEXT("Layer_Effect"), 1,
+        ENUM_CLASS(CEffect_Wind::EffectType), &WindActivate_Desc);
+    m_pGameInstance->PlaySoundEffect(L"CirculatePulse1.ogg", 0.1f);
+    m_pGameInstance->PlaySoundEffect(L"CirculatePulse2.ogg", 0.15f);
+
+
+    /* 검격 대각선 방향으로? */
+    _matrix playerWorld = m_pPlayer->Get_Transform()->Get_WorldMatrix();
+    _vector vPlayerPos = playerWorld.r[3];
+    _vector vPlayerForward = XMVector3Normalize(playerWorld.r[2]);
+    _vector vPlayerRight = XMVector3Normalize(playerWorld.r[1]);
+    _vector vPlayerUp = XMVector3Normalize(playerWorld.r[0]);
+    _float fHitDistance = 3.0f;
+    //_float fHitDistance = 1.0f;
+
+    // 대각선 방향 계산 (45도)
+    _vector vDiagonalDirection = XMVector3Normalize(vPlayerRight + vPlayerUp);
+
+    _vector vHitPos = vPlayerPos + (vPlayerForward * fHitDistance);
+    vHitPos += XMVectorSet(0.f, 1.f, 0.f, 0.f) * 1.7f;
+
+    CSlash::SLASHACTIVATE_DESC SlashDesc{};
+    SlashDesc.eCurLevel = m_pPlayer->Get_CurrentLevel();
+    SlashDesc.vHitPosition = vHitPos;
+    SlashDesc.vHitDirection = vDiagonalDirection * -1.f;
+    SlashDesc.vScale = { 4.f, 1.f, 1.f };
+    SlashDesc.vTargetScale = { 8.f, 0.4f, 1.f };
+    SlashDesc.fCreateDelay = 0.0f;
+    SlashDesc.fDisPlayTime = 0.5f;
+    SlashDesc.eShaderPath = EFFECTPOSTEX_SHADERPATH::RENKETSU_LINESLASH;
+    m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(SlashDesc.eCurLevel)
+        , TEXT("SLASH_EFFECT"), TEXT("Layer_Effect"), 2, ENUM_CLASS(CSlash::EffectType), &SlashDesc);
+}
+
+void CPlayer_FirstSkillState::Create_FourthEvent()
+{
+    /* 공기 링.*/
+    CEffect_WindCircle::EFFECTWIND_CIRCLE_ACTIVATE_DESC WindCircleActivate_Desc{};
+    WindCircleActivate_Desc.eCurLevel = m_pPlayer->Get_CurrentLevel();
+
+
+    _float3 vStartPos = { -0.3f, 0.f, 0.f };
+    WindCircleActivate_Desc.vStartPos = vStartPos;
+    WindCircleActivate_Desc.fDisplayTime = 0.25f;
+    WindCircleActivate_Desc.fCreateDelay = 0.f; // 얘가 바로뜨고.
+    WindCircleActivate_Desc.iWindCount = 2;
+    WindCircleActivate_Desc.vStartScale = { 6.f, 6.f, 6.f };
+    WindCircleActivate_Desc.vTargetScale = { 7.f, 7.f, 7.f };
+    WindCircleActivate_Desc.pWorldMatrix = m_pPlayer->Get_Transform()->Get_WorldMatrixPtr(); // WorldMatrix는 한번만 초기화
+    WindCircleActivate_Desc.pSocketMatrix = m_pPlayer->Get_BoneMatrix("socket_ExpRecoveryFx01"); // 붙일 뼈
+
+    m_pGameInstance->Move_Effect_ToObjectLayer(
+        ENUM_CLASS(m_pGameInstance->Get_CurrentLevelID()),
+        TEXT("SWORD_WINDCIRCLE"), TEXT("Layer_Effect"), 1,
+        ENUM_CLASS(CEffect_WindCircle::EffectType), &WindCircleActivate_Desc);
+    m_pGameInstance->PlaySoundEffect(L"CirculatePulse1.ogg", 0.1f);
+    m_pGameInstance->PlaySoundEffect(L"CirculatePulse2.ogg", 0.15f);
+
+    /* 검격 */
+    _matrix playerWorld = m_pPlayer->Get_Transform()->Get_WorldMatrix();
+    _vector vPlayerPos = playerWorld.r[3];
+    _vector vPlayerForward = XMVector3Normalize(playerWorld.r[2]);
+    _vector vPlayerRight = XMVector3Normalize(playerWorld.r[1]);
+    _vector vPlayerUp = XMVector3Normalize(playerWorld.r[0]);
+    //_float fHitDistance = 3.0f;
+    _float fHitDistance = 1.0f;
+
+
+    _vector vDiagonalDirection = XMVector3Normalize(-vPlayerRight + vPlayerUp);
+
+    _vector vHitPos = vPlayerPos + (vPlayerForward * fHitDistance);
+    vHitPos += XMVectorSet(0.f, 1.f, 0.f, 0.f) * 1.7f;
+
+    CSlash::SLASHACTIVATE_DESC SlashDesc{};
+    SlashDesc.eCurLevel = m_pPlayer->Get_CurrentLevel();
+    SlashDesc.vHitPosition = vHitPos;
+    SlashDesc.vHitDirection = vDiagonalDirection;
+    SlashDesc.vScale = { 3.f, 1.5f, 1.f };
+    SlashDesc.vTargetScale = { 5.f, 1.f, 1.f };
+    SlashDesc.fCreateDelay = 0.f;
+    SlashDesc.fDisPlayTime = 0.5f;
+    SlashDesc.bIsScaleChange = true;
+    SlashDesc.eShaderPath = EFFECTPOSTEX_SHADERPATH::RENKETSU_LINESLASH;
+    m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(SlashDesc.eCurLevel)
+        , TEXT("SLASH_EFFECT"), TEXT("Layer_Effect"), 2, ENUM_CLASS(CSlash::EffectType), &SlashDesc);
+}
+
+void CPlayer_FirstSkillState::Create_FifthEvent()
+{
+    /* 공기 링.*/
+    CEffect_WindCircle::EFFECTWIND_CIRCLE_ACTIVATE_DESC WindCircleActivate_Desc{};
+    WindCircleActivate_Desc.eCurLevel = m_pPlayer->Get_CurrentLevel();
+
+
+    _float3 vStartPos = { -0.3f, 0.f, 0.f };
+    WindCircleActivate_Desc.vStartPos = vStartPos;
+    WindCircleActivate_Desc.fDisplayTime = 0.25f;
+    WindCircleActivate_Desc.fCreateDelay = 0.f; // 얘가 바로뜨고.
+    WindCircleActivate_Desc.iWindCount = 2;
+    WindCircleActivate_Desc.vStartScale = { 6.f, 6.f, 6.f };
+    WindCircleActivate_Desc.vTargetScale = { 7.f, 7.f, 7.f };
+    WindCircleActivate_Desc.pWorldMatrix = m_pPlayer->Get_Transform()->Get_WorldMatrixPtr(); // WorldMatrix는 한번만 초기화
+    //WindActivate_Desc.pSocketMatrix = m_pPlayer->Get_BoneMatrix("RightGauntletTrail2"); // 붙일 뼈
+    WindCircleActivate_Desc.pSocketMatrix = m_pPlayer->Get_BoneMatrix("socket_ExpRecoveryFx01"); // 붙일 뼈
+
+    m_pGameInstance->Move_Effect_ToObjectLayer(
+        ENUM_CLASS(m_pGameInstance->Get_CurrentLevelID()),
+        TEXT("SWORD_WINDCIRCLE"), TEXT("Layer_Effect"), 1,
+        ENUM_CLASS(CEffect_WindCircle::EffectType), &WindCircleActivate_Desc);
+   /* m_pGameInstance->PlaySoundEffect(L"CirculatePulse1.ogg", 0.2f);*/
+
+    /* 검격 */
+    _matrix playerWorld = m_pPlayer->Get_Transform()->Get_WorldMatrix();
+    _vector vPlayerPos = playerWorld.r[3];
+    _vector vPlayerForward = XMVector3Normalize(playerWorld.r[2]);
+    _vector vPlayerRight = XMVector3Normalize(playerWorld.r[1]);
+    _vector vPlayerUp = XMVector3Normalize(playerWorld.r[0]);
+    _float fHitDistance = 3.0f;
+    //_float fHitDistance = 1.0f;
+
+
+    _vector vDiagonalDirection = XMVector3Normalize(-vPlayerRight + vPlayerUp);
+
+    _vector vHitPos = vPlayerPos + (vPlayerForward * fHitDistance);
+    vHitPos += XMVectorSet(0.f, 1.f, 0.f, 0.f) * 1.7f;
+
+    CSlash::SLASHACTIVATE_DESC SlashDesc{};
+    SlashDesc.eCurLevel = m_pPlayer->Get_CurrentLevel();
+    SlashDesc.vHitPosition = vHitPos;
+    SlashDesc.vHitDirection = vDiagonalDirection;
+    SlashDesc.vScale = { 4.f, 1.f, 1.f };
+    SlashDesc.vTargetScale = { 8.f, 0.4f, 1.f };
+    SlashDesc.fCreateDelay = 0.2f;
+    SlashDesc.fDisPlayTime = 0.5f;
+    SlashDesc.eShaderPath = EFFECTPOSTEX_SHADERPATH::RENKETSU_LINESLASH;
+    m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(SlashDesc.eCurLevel)
+        , TEXT("SLASH_EFFECT"), TEXT("Layer_Effect"), 2, ENUM_CLASS(CSlash::EffectType), &SlashDesc);
+
+    m_pGameInstance->PlaySoundEffect(L"CirculatePulse1.ogg", 0.1f);
+    m_pGameInstance->PlaySoundEffect(L"CirculatePulse2.ogg", 0.15f);
+
+}
+
+void CPlayer_FirstSkillState::Create_WindCircleEffect()
+{
+  
+}
+
+void CPlayer_FirstSkillState::Create_RenketsuEffect()
+{
 }
 
 CPlayer_FirstSkillState* CPlayer_FirstSkillState::Create(_uint iStateNum, void* pArg)

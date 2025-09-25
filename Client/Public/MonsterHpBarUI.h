@@ -34,8 +34,8 @@ public:
     // LockOn 대상 설정/해제
 
     // UI 활성화/비활성화
-    void Set_Active(_bool bActive) { m_bActive = bActive; }
-    _bool Is_Active() const { return m_bActive; }
+    void Set_Active(_bool bActive) { m_IsActive = bActive; }
+    _bool Is_Active() const { return m_IsActive; }
 
 #pragma region 위치 구하기.
 
@@ -57,8 +57,8 @@ private:
     _float m_fHp = {};
     _float m_fMaxHp = {};
 
-    _bool m_bIncrease = {false };
-    _bool m_bDecrease = {false };
+    _bool m_IsIncrease = {false };
+    _bool m_IsDecrease = {false };
 #pragma endregion
 
 
@@ -71,7 +71,7 @@ private:
 
     LEVEL m_eCurLevel = { LEVEL::END };
     _uint m_iShaderPath = {};
-    _bool m_bActive = false;
+    _bool m_IsActive = false;
 
     // 애니메이션
     _float m_fAnimationTime = 0.0f;

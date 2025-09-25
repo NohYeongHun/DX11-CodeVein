@@ -10,12 +10,12 @@
 BT_RESULT CBT_SkyBoss_StrongHitReaction::Perform_Action(_float fTimeDelta)
 {
     // 첫 실행시 강한 피격 애니메이션 시작
-    if (!m_bAnimationStarted)
+    if (!m_IsAnimationStarted)
     {
         //m_pOwner->Change_State(MONSTER_HURT); // Monster 상태를 피격으로 변경
         //m_pOwner->Change_Animation(m_iAnimationIndex, false); // 강한 피격 애니메이션 재생
         ////m_pOwner->Add_Knockback_Force(15.f);  // 넉백 효과
-        //m_bAnimationStarted = true;
+        //m_IsAnimationStarted = true;
 
         // 강한 피격 이펙트 재생
         //m_pOwner->Play_Hit_Effect(true); // true = 강한 피격
@@ -39,7 +39,7 @@ BT_RESULT CBT_SkyBoss_StrongHitReaction::Perform_Action(_float fTimeDelta)
 void CBT_SkyBoss_StrongHitReaction::Reset()
 {
     m_fReactionTime = 0.f;
-    m_bAnimationStarted = false;
+    m_IsAnimationStarted = false;
 }
 
 CBT_SkyBoss_StrongHitReaction* CBT_SkyBoss_StrongHitReaction::Create(CSkyBoss* pOwner, _uint iAnimationIndex)

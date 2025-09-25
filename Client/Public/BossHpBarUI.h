@@ -49,8 +49,8 @@ public:
 
 
 private:
-	_bool m_bDecrease = { false };
-	_bool m_bIncrease = { false };
+	_bool m_IsDecrease = { false };
+	_bool m_IsIncrease = { false };
 
 	_float m_fRightRatio = {};
 	_float m_fLeftRatio = {};

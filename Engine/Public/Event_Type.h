@@ -22,6 +22,7 @@ enum class EventType : _uint
 	/* Map Tool */
 	SELECTED_MODEL = 17,
 	OPEN_DEBUG = 18,
+	QUEENKNIGHT_ENCOUNTER = 19,
 	EVENT_END
 };
 

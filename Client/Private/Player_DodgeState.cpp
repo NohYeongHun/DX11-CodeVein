@@ -1,4 +1,5 @@
-﻿
+﻿#include "Player_DodgeState.h"
+
 CPlayer_DodgeState::CPlayer_DodgeState()
 {
 }
@@ -10,6 +11,7 @@ HRESULT CPlayer_DodgeState::Initialize(_uint iStateNum, void* pArg)
 
 	m_isLoop = false;
 
+	m_fSoundTime = 20.f / 108.f;
 	// 버프 시스템을 사용하므로 충돌체 맵은 필요 없음
 
 	return S_OK;
@@ -36,6 +38,14 @@ void CPlayer_DodgeState::Enter(void* pArg)
 
 	m_pPlayer->AddBuff(CPlayer::BUFF_INVINCIBLE);
 
+
+	STEMINA_CHANGE_DESC SteminaDesc{};
+	SteminaDesc.bIncrease = false;
+	SteminaDesc.fStemina = 30.f;
+	SteminaDesc.fTime = 1.f;
+	m_pGameInstance->Publish(EventType::STEMINA_CHANGE, &SteminaDesc);
+
+	m_IsSoundPlayed = false;
 }
 
 /* State 실행 */
@@ -67,7 +77,7 @@ void CPlayer_DodgeState::Update(_float fTimeDelta)
 
 
 
-
+	Update_Sound(fTimeDelta);
 
 	// 무적 버프 관리
 	Handle_Invincible_Buff();
@@ -95,6 +105,8 @@ void CPlayer_DodgeState::Exit()
 		m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, true);
 	}
 
+	m_IsSoundPlayed = false;
+
 }
 
 void CPlayer_DodgeState::Handle_Invincible_Buff()
@@ -108,7 +120,7 @@ void CPlayer_DodgeState::Handle_Invincible_Buff()
 
 	_bool bShouldInvincible = (fCurrentRatio >= fInvincibleStart && fCurrentRatio <= fInvincibleEnd);
 
-	if (bShouldInvincible != m_bPrevInvincible)
+	if (bShouldInvincible != m_IsPrevInvincible)
 	{
 		if (bShouldInvincible)
 		{
@@ -121,7 +133,21 @@ void CPlayer_DodgeState::Handle_Invincible_Buff()
 			m_pPlayer->RemoveBuff(CPlayer::BUFF_INVINCIBLE, true);
 		}
 
-		m_bPrevInvincible = bShouldInvincible;
+		m_IsPrevInvincible = bShouldInvincible;
+	}
+}
+
+void CPlayer_DodgeState::Update_Sound(_float fTimeDelta)
+{
+	_float fCurrentRatio = m_pModelCom->Get_Current_Ratio();
+	_wstring soundFile = TEXT("Dodge0");
+	if (!m_IsSoundPlayed && fCurrentRatio > m_fSoundTime)
+	{
+		_uint iRandValue = m_pGameInstance->Rand_UnsignedInt(1, 3);
+		
+		soundFile += to_wstring(iRandValue) + TEXT(".wav");
+		m_pGameInstance->PlaySoundEffect(soundFile, 0.3f);
+		m_IsSoundPlayed = true;
 	}
 }
 
@@ -175,15 +201,6 @@ void CPlayer_DodgeState::Change_State()
 			return;
 		}
 
-	/*	if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::DODGE))
-		{
-			m_iNextAnimIdx = m_pPlayer->Find_AnimationIndex(TEXT("DODGE"));
-			m_iNextState = CPlayer::PLAYER_STATE::DODGE;
-			Dodge.iAnimation_Idx = m_iNextAnimIdx;
-			m_pFsm->Change_State(m_iNextState, &Dodge);
-			return;
-		}*/
-
 		if (m_pPlayer->Is_MovementKeyPressed())
 		{
 			// 락온 상태에 따라 RUN 또는 WALK 전환
@@ -232,18 +249,20 @@ void CPlayer_DodgeState::Change_State()
 			return;
 		}
 
-		if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::GUARD))
-		{
-			// 해당 동작은 쿨타임이 있는경우 무시됨.
-			if (!m_pFsm->Is_CoolTimeEnd(CPlayer::GUARD))
-				return;
 
-			m_iNextAnimIdx = m_pPlayer->Find_AnimationIndex(TEXT("GUARD_START"));
-			m_iNextState = CPlayer::GUARD;
-			StrongAttack.iAnimation_Idx = m_iNextAnimIdx;
-			m_pFsm->Change_State(m_iNextState, &Guard);
-			return;
-		}
+
+		//if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::GUARD))
+		//{
+		//	// 해당 동작은 쿨타임이 있는경우 무시됨.
+		//	if (!m_pFsm->Is_CoolTimeEnd(CPlayer::GUARD))
+		//		return;
+
+		//	m_iNextAnimIdx = m_pPlayer->Find_AnimationIndex(TEXT("GUARD_START"));
+		//	m_iNextState = CPlayer::GUARD;
+		//	StrongAttack.iAnimation_Idx = m_iNextAnimIdx;
+		//	m_pFsm->Change_State(m_iNextState, &Guard);
+		//	return;
+		//}
 	}
 
 

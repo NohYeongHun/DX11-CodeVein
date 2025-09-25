@@ -97,6 +97,11 @@ HRESULT CGameInstance::Initialize_Engine(const ENGINE_DESC& EngineDesc, ID3D11De
 	if (nullptr == m_pShadow)
 		return E_FAIL;
 
+	/* Sound Manager 생성*/
+	m_pSound_Manager = CSoundManager::Create();
+	if (nullptr == m_pSound_Manager)
+		return E_FAIL;
+
 	return S_OK;
 }
 
@@ -108,7 +113,8 @@ void CGameInstance::Update_Engine(_float fTimeDelta)
 	if (FAILED(Task()))
 		return;
 
-	
+	// 0. Sound Manager Update
+	m_pSound_Manager->Update(fTimeDelta);
 
 	// 0. Trigger Manager => Object Manager Layer에 조건이 부합하면 추가.
 	m_pTrigger_Manager->Update(fTimeDelta); 
@@ -766,6 +772,35 @@ HRESULT CGameInstance::Ready_ShadowLight(SHADOW_LIGHT_DESC LightDesc)
 }
 #pragma endregion
 
+#pragma region SOUND_MANAGER
+void CGameInstance::PlaySoundEffect(wstring pSoundKey, _float fVolume)
+{
+	m_pSound_Manager->PlaySoundEffect(pSoundKey, fVolume);
+}
+void CGameInstance::PlayBGM(wstring pSoundKey, _float fVolume, _bool bloop)
+{
+	m_pSound_Manager->PlayBGM(pSoundKey, fVolume, bloop);
+}
+void CGameInstance::StopBGM()
+{
+	m_pSound_Manager->StopBGM();
+}
+void CGameInstance::StopSound()
+{
+	m_pSound_Manager->StopSound();
+}
+void CGameInstance::StopAll()
+{
+	m_pSound_Manager->StopAll();
+}
+void CGameInstance::SetChannelVolume(_float fVolume)
+{
+	m_pSound_Manager->SetChannelVolume(fVolume);
+}
+
+#pragma endregion
+
+
 
 void CGameInstance::Release_Engine()
 {
@@ -790,6 +825,7 @@ void CGameInstance::Release_Engine()
 	Safe_Release(m_pCamera_Manager);
 	Safe_Release(m_pEffect_Manager);
 	Safe_Release(m_pShadow);
+	Safe_Release(m_pSound_Manager);
 
 
 	Safe_Release(m_pInput_Device);

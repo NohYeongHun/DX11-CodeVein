@@ -115,8 +115,15 @@ void CQueenKnight::Priority_Update(_float fTimeDelta)
     if (m_IsEncountered)
         m_pBossHpBarUI->Priority_Update(fTimeDelta);
 
+    if (m_IsEncounterRender)
+        m_pEncounterTitle->Priority_Update(fTimeDelta);
+
+    if (m_IsDeadRender)
+        m_pDeadTitle->Priority_Update(fTimeDelta);
+
+
     CMonster::Priority_Update(fTimeDelta);
-        
+
 }
 
 void CQueenKnight::Update(_float fTimeDelta)
@@ -124,10 +131,32 @@ void CQueenKnight::Update(_float fTimeDelta)
     if (m_IsEncountered)
         m_pBossHpBarUI->Update(fTimeDelta);
 
+    if (m_IsEncounterRender)
+        m_pEncounterTitle->Update(fTimeDelta);
+
+
+    if (m_IsDeadRender)
+        m_pDeadTitle->Update(fTimeDelta);
+
     CMonster::Update(fTimeDelta);
 
 
     Update_AI(fTimeDelta);
+
+    if (m_IsEncountered && m_isBgm)
+    {
+        m_isBgm = false; 
+        m_pGameInstance->StopBGM();
+
+        // 2. Encounter UI 렌더링
+        m_IsEncounterRender = true;
+
+        // 3. 조우시 쿨타임 부여.
+        AddBuff(QUEEN_BUFF_DASH_ATTACK_COOLDOWN);
+        AddBuff(QUEEN_BUFF_DOWN_TRIPLE_STRIKE_COOLDOWN);
+        m_pGameInstance->PlayBGM(L"BossStage.mp3", 0.1f, true);
+    }
+    
 
     // 스킬 체크
     Update_BloodPillar(fTimeDelta);
@@ -148,6 +177,11 @@ void CQueenKnight::Late_Update(_float fTimeDelta)
     if (m_IsEncountered)
         m_pBossHpBarUI->Late_Update(fTimeDelta);
 
+    if (m_IsEncounterRender)
+        m_pEncounterTitle->Late_Update(fTimeDelta);
+
+    if (m_IsDeadRender)
+        m_pDeadTitle->Late_Update(fTimeDelta);
 
     if (!HasBuff(CMonster::BUFF_NAVIGATION_OFF))
     {
@@ -221,6 +255,7 @@ void CQueenKnight::On_Collision_Enter(CGameObject* pOther)
             Take_Damage(pPlayerWeapon->Get_AttackPower(), pPlayerWeapon);
 
             // 2. 해당 위치에 검흔 Effect 생성?
+            m_pGameInstance->PlaySoundEffect(L"NormalAttack.wav", 0.3f);
 
             // 3. 무적 버프 추가.
             AddBuff(BUFF_INVINCIBLE);
@@ -294,6 +329,8 @@ void CQueenKnight::Update_AI(_float fTimeDelta)
         m_fCurDissolveTime = 0.f; // 버프가 사라지면서 잔여값이 남아서 Texture Reverse Dissolve가 모두 동작하지 않음.
     
 
+    
+
     /* 콜라이더 활성화 구간 확인 */
     CMonster::Handle_Collider_State();
     /* Trail 활성화 구간 확인. */
@@ -303,12 +340,57 @@ void CQueenKnight::Update_AI(_float fTimeDelta)
     {
 
     }
+
+    _float fCurrentRatio = m_pModelCom->Get_Current_Ratio();
+    if (m_IsWeaponSound && fCurrentRatio >= m_fNormalAttackSoundFrame)
+    {
+        m_IsWeaponSound = false;
+        Play_Sound(SOUND_ATTACK);
+    }
+}
+
+void CQueenKnight::Play_Sound(_uint iSoundFlag)
+{
+    switch (iSoundFlag)
+    {
+    case SOUND_WARP_START:
+        m_pGameInstance->PlaySoundEffect(L"WaprStart.wav", 0.3f);
+        break;
+    case SOUND_WARP_END:
+        m_pGameInstance->PlaySoundEffect(L"WarpEnd.wav", 0.3f);
+        break;
+    case SOUND_WARP_ATTACK:
+        m_pGameInstance->PlaySoundEffect(L"Jump_Attack.wav", 0.2f);
+        break;
+    case SOUND_ATTACK:
+        m_pGameInstance->PlaySoundEffect(L"Swing1.wav", 0.3f);
+        break;
+    case SOUND_CHOP:
+        m_pGameInstance->PlaySoundEffect(L"Swing0.wav", 0.3f);
+        break;
+    case SOUND_DODGE:
+        m_pGameInstance->PlaySoundEffect(L"Swing4.wav", 0.3f);
+        break;
+    case SOUND_DASH:
+        m_pGameInstance->PlaySoundEffect(L"DashSound.mp3", 0.3f);
+        break;
+    default:
+        break;
+    }
+}
+
+void CQueenKnight::PlayWeaponSound()
+{
+
+    m_IsWeaponSound = true;
+    
 }
 #pragma endregion
 
 
 
 #pragma region 3. 몬스터는 자신에게 필요한 수치값들을 초기화해야 합니다.
+
 HRESULT CQueenKnight::Initialize_Stats()
 {
     m_fMinDetectionDistance = 5.f;
@@ -377,7 +459,6 @@ HRESULT CQueenKnight::InitializeAction_ToAnimationMap()
     m_pModelCom->Set_RootMotionTranslate(true);
 
     m_Action_AnimMap.emplace(L"IDLE", AS_TStdKnight_TLanceGCS_Idle_N_Loop);
-    //m_Action_AnimMap.emplace(L"IDLE", AS_TStdKnight_TLSword_Idle_N_Loop);
     m_Action_AnimMap.emplace(L"IDLE_L180", AS_TStdKnight_TShieldSword_Guard_IdleTurn_L180);
     m_Action_AnimMap.emplace(L"IDLE_L90", AS_TStdKnight_TShieldSword_Guard_IdleTurn_L90);
     m_Action_AnimMap.emplace(L"IDLE_R180", AS_TStdKnight_TShieldSword_Guard_IdleTurn_R180);
@@ -467,7 +548,6 @@ HRESULT CQueenKnight::InitializeAction_ToAnimationMap()
     /* Phase Attack 1 ~ 3 */
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"PHASE_ATTACK1"], 2.f);
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"PHASE_ATTACK2"], 2.5f);
-    //m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"PHASE_ATTACK3"], 2.5f);
 
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"DODGE_B"], 1.5f);
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"DASH_ATTACK_START"], 2.5f);
@@ -477,7 +557,9 @@ HRESULT CQueenKnight::InitializeAction_ToAnimationMap()
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"IDLE_R180"], 10.f);
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"IDLE_R90"], 10.f);
     m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"IDLE"], 10.f);
-    //m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"ATTACK"], 1.5f);
+
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"ENCOUNTER"], 0.7f);
+    m_pModelCom->Set_AnimSpeed(m_Action_AnimMap[L"DEATH"], 1.2f);
 #pragma endregion
 
 
@@ -485,8 +567,11 @@ HRESULT CQueenKnight::InitializeAction_ToAnimationMap()
 
 #pragma region COllider 활성화 프레임 관리
     // 100 ~ 136 Frame 활성화
-    Add_Collider_Frame(m_Action_AnimMap[TEXT("DASH_ATTACK_START")], 100.f / 136.f, 136.f / 136.f, PART_WEAPON);     // Dash Attack
+    //Add_Collider_Frame(m_Action_AnimMap[TEXT("DASH_ATTACK_START")], 100.f / 136.f, 136.f / 136.f, PART_WEAPON);     // Dash Attack
+    //Add_Collider_Frame(m_Action_AnimMap[TEXT("DASH_ATTACK_END")], 0.f / 130.f, 100.f / 130.f, PART_WEAPON);     // Dash Attack
+    Add_Collider_Frame(m_Action_AnimMap[TEXT("DASH_ATTACK_START")], 100.f / 246.f, 136.f / 136.f, PART_WEAPON);     // Dash Attack
     Add_Collider_Frame(m_Action_AnimMap[TEXT("DASH_ATTACK_END")], 0.f / 130.f, 100.f / 130.f, PART_WEAPON);     // Dash Attack
+    
 
 
     Add_Collider_Frame(m_Action_AnimMap[TEXT("WARP_END")], 20.f / 137.f, 45.f / 137.f, PART_WEAPON);     // Dash Attack
@@ -494,6 +579,7 @@ HRESULT CQueenKnight::InitializeAction_ToAnimationMap()
     //Add_Collider_Frame(m_Action_AnimMap[TEXT("DOWN_STRIKE")], 60.f / 224.f, 85.f / 224.f, PART_WEAPON);     // Dash Attack
     
     Add_Collider_Frame(m_Action_AnimMap[TEXT("ATTACK")], 54.f / 194.f, 75.f / 194.f, PART_WEAPON);       // Weapon attack
+    m_fNormalAttackSoundFrame = 60.f / 194.f;
 
     Add_Collider_Frame(m_Action_AnimMap[TEXT("PHASE_ATTACK1")], 54.f / 194.f, 75.f / 194.f, PART_WEAPON);// Weapon attack
     Add_Collider_Frame(m_Action_AnimMap[TEXT("PHASE_ATTACK2")], 40.f / 241.f, 60.f / 241.f, PART_WEAPON);// Weapon attack
@@ -509,7 +595,7 @@ HRESULT CQueenKnight::InitializeAction_ToAnimationMap()
 
     Add_Trail_Frame(m_Action_AnimMap[TEXT("ATTACK")], 30.f / 195.f, 70.f / 195.f, PART_WEAPON);       // Weapon attack
 
-    Add_Trail_Frame(m_Action_AnimMap[TEXT("ENCOUNTER")], 80.f / 180.f, 130.f / 180.f, PART_WEAPON);// Weapon attack
+    Add_Trail_Frame(m_Action_AnimMap[TEXT("ENCOUNTER")], 70.f / 180.f, 130.f / 180.f, PART_WEAPON);// Weapon attack
 #pragma endregion
 
 
@@ -632,13 +718,68 @@ void CQueenKnight::Weapon_Rotation(_uint iPartType, _float3 vRadians, _bool bInv
 
 void CQueenKnight::Encounter_Action()
 {
+    // 1. 컷씬 실행 이벤트로?
+    Play_CutScene();
+
+}
+
+void CQueenKnight::Encounter_EndAction()
+{
+    // 3. 컷씬 종료 시 기존 설정 복구.
+    End_CutScene();
+
     Weapon_Rotation(PART_TYPE::PART_SHIELD
-        , { XMConvertToRadians(180.f), XMConvertToRadians(0.f), XMConvertToRadians(-90.f)}, true);
+        , { XMConvertToRadians(180.f), XMConvertToRadians(0.f), XMConvertToRadians(-90.f) }, true);
 }
 
 void CQueenKnight::IncreaseDetection()
 {
     m_MonsterStat.fDetectionRange *= 2.f;
+}
+
+void CQueenKnight::Hit_Action()
+{
+    
+
+    Weapon_Rotation(PART_TYPE::PART_SHIELD
+        , { XMConvertToRadians(180.f), XMConvertToRadians(0.f), XMConvertToRadians(-90.f) }, false);
+}
+
+void CQueenKnight::Hit_EndAction()
+{
+    
+    Weapon_Rotation(PART_TYPE::PART_SHIELD
+        , { XMConvertToRadians(180.f), XMConvertToRadians(0.f), XMConvertToRadians(-90.f) }, true);
+}
+
+void CQueenKnight::Play_CutScene()
+{
+
+    // 0. 속도 제어. 컷씬 끝날떄까지 대강.
+    m_pGameInstance->Set_SlowMoment(2.f, 0.7f);
+
+    // 1. BGM 실행
+    Set_BGM(true);
+
+    // 2. UI 렌더링 안되게?
+    HUDEVENT_DESC Desc{};
+    Desc.isVisibility = false;
+    m_pGameInstance->Publish<HUDEVENT_DESC>(EventType::HUD_DISPLAY, &Desc);
+
+}
+
+void CQueenKnight::End_CutScene()
+{
+    // 1. UI 렌더링 되게?
+    HUDEVENT_DESC Desc{};
+    Desc.isVisibility = true;
+    m_pGameInstance->Publish<HUDEVENT_DESC>(EventType::HUD_DISPLAY, &Desc);
+
+    // 2. 타이틀 표시 시간을 늘리기 위해 즉시 FadeOut하지 않음
+    m_pEncounterTitle->Start_FadeOut(); // 제거
+    
+    // Last Encounter Animation에서 무기 회전 위치가 이상하므로 바로잡아줍니다.
+
 }
 
 #pragma endregion
@@ -693,10 +834,10 @@ HRESULT CQueenKnight::Initailize_UI()
 
 void CQueenKnight::Set_Visible(_bool bVisible)
 {
-    m_bVisible = bVisible;
+    m_IsVisible = bVisible;
 
-    m_pWeapon->Set_Visible(m_bVisible);
-    m_pShield->Set_Visible(m_bVisible);
+    m_pWeapon->Set_Visible(m_IsVisible);
+    m_pShield->Set_Visible(m_IsVisible);
 }
 
 
@@ -711,6 +852,7 @@ void CQueenKnight::Create_QueenKnightWarp_Effect_Particle(_float3 vDir)
     Desc.vStartPos = m_pTransformCom->Get_State(STATE::POSITION); // 몬스터 현재위치로 생성.
     Desc.particleInitInfo.lifeTime = 5.f;
     Desc.particleInitInfo.dir = vDir;
+    Desc.fDissolveWeight = 3.f;
     Desc.pTargetTransform = m_pTransformCom;
     Desc.fChaseTime = m_pGameInstance->Get_TimeDelta() * 30.f;
     m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(m_eCurLevel)
@@ -768,17 +910,35 @@ void CQueenKnight::Create_QueenKnightWarp_Effect(_float3 vDir)
 // Pillar 시작 시.
 void CQueenKnight::Start_PillarSkill()
 {
-    m_bIsSkillActive = true;
+    m_IsSkillActive = true;
     m_fSkillElapsedTime = 0.f; // 타이머 리셋
     XMStoreFloat3(&m_vSkillCenterPos, m_pTransformCom->Get_State(STATE::POSITION)); // 스킬 중심 위치 저장
     std::fill(m_vecIsPillarActivated.begin(), m_vecIsPillarActivated.end(), false);
+
+    // 0. 카메라 쉐이킹
+    m_pGameInstance->Get_MainCamera()->StartShake(1.7f, 0.8f);
+
+    // 장판 시작.
+    CEffect_PlayerSkill::EFFECT_PLAYERSKILL_ACTIVATE_DESC Effect_PlayerSkillDesc{};
+    Effect_PlayerSkillDesc.eCurLevel = m_eCurLevel;
+    Effect_PlayerSkillDesc.pTargetTransform = m_pTransformCom;
+    Effect_PlayerSkillDesc.fDuration = 4.f; // 지속시간,,
+    Effect_PlayerSkillDesc.vStartPos = { 0.f, 0.2f, 0.f }; // { 발 }
+    Effect_PlayerSkillDesc.vScaleMultiple = { 1.5f, 1.5f, 1.5f };
+
+    m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(m_pGameInstance->Get_CurrentLevelID())
+        , TEXT("PLAYER_AURA"), TEXT("Layer_Effect"), 1, ENUM_CLASS(CEffect_PlayerSkill::EffectType), &Effect_PlayerSkillDesc);
+
+    
+    Play_Sound(SOUND_WARP_ATTACK);
+    Play_Sound(SOUND_WARP_END);
 }
 
 
 void CQueenKnight::Update_BloodPillar(_float fTimeDelta)
 {
 
-    if (!m_bIsSkillActive)
+    if (!m_IsSkillActive)
         return;
 
     m_fSkillElapsedTime += fTimeDelta;
@@ -798,12 +958,9 @@ void CQueenKnight::Update_BloodPillar(_float fTimeDelta)
             CEffect_Pillar::PILLAR_ACTIVATE_DESC EffectPillarDesc{};
             EffectPillarDesc.eCurLevel = m_eCurLevel;
 
-            // ★★★ 중요: QueenKnight의 월드 위치 + 상대 오프셋 = 최종 월드 좌표 ★★★
-            //_vector vQueenPos = m_pTransformCom->Get_State(STATE::POSITION);
             _vector vQueenPos = XMLoadFloat3(&m_vSkillCenterPos);
             _vector vOffsetPos = XMLoadFloat3(&m_vecPillarPositions[i]);
             _vector vFinalWorldPos = XMVectorSetY(vQueenPos, XMVectorGetY(vQueenPos) -2.f) + vOffsetPos;
-            //vFinalWorldPos = XMVectorSetY(vFinalWorldPos, XMVectorGetY(vQueenPos));
             EffectPillarDesc.vStartPos = vFinalWorldPos; // 최종 월드 좌표 전달
             EffectPillarDesc.fDuration = m_fMaxSkillDuration;
             EffectPillarDesc.fAttackPower = static_cast<_float>(m_pGameInstance->Rand_UnsignedInt(150, 200));
@@ -813,16 +970,12 @@ void CQueenKnight::Update_BloodPillar(_float fTimeDelta)
 
             m_vecIsPillarActivated[i] = true;
             iCount++;
-
-            //OutputDebugString(L"[QueenKnight] Pillar Particle : ");
-            //OutPutDebugInt(iCount);
-            //OutPutDebugFloat3(vFinalWorldPos);
         }
     }
 
     if (m_fSkillElapsedTime >= m_fMaxSkillDuration)
     {
-        m_bIsSkillActive = false;
+        m_IsSkillActive = false;
     }
 }
 
@@ -871,6 +1024,46 @@ void CQueenKnight::End_Dissolve()
     m_iShaderPath = static_cast<_uint>(ANIMESH_SHADERPATH::DEFAULT);
     m_pWeapon->End_Dissolve();
     m_pShield->End_Dissolve();
+}
+
+void CQueenKnight::Dead_Effect()
+{
+    CEffectParticle::EFFECTPARTICLE_ENTER_DESC Desc{};
+    Desc.eParticleType = CEffectParticle::PARTICLE_TYPE::PARTICLE_TYPE_QUEEN_WARP;
+    Desc.vStartPos = m_pTransformCom->Get_State(STATE::POSITION) + XMVectorSet(0.f, 2.f, 0.f, 0.f); // 몬스터 현재위치로 생성.
+    Desc.particleInitInfo.lifeTime = 10.f;
+    Desc.particleInitInfo.fExplositionTime = 3.5f;
+    Desc.particleInitInfo.fRadius = 4.f;
+    Desc.fDissolveWeight = 4.f;
+    Desc.pTargetTransform = m_pTransformCom;
+    
+    m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(m_eCurLevel)
+        , TEXT("QUEENKNIGHT_EXPLOSION"), TEXT("Layer_Effect"), 1, ENUM_CLASS(EFFECTTYPE::PARTICLE), &Desc);
+
+    m_pGameInstance->StopBGM();
+    m_pGameInstance->PlayBGM(L"Environment.wav", 0.3f, true);
+    
+    // Death UI 출력.
+    m_IsDeadRender = true;
+}
+
+void CQueenKnight::Dead_Action()
+{
+    CMonster::Dead_Action();
+    
+    m_pGameInstance->PlaySoundEffect(L"BossEnd.wav", 0.3f);
+
+    
+    Start_Dissolve(2.f);
+    m_pGameInstance->StopBGM();
+    m_pGameInstance->PlayBGM(L"Environment.wav", 0.3f, true);
+
+    m_pDeadTitle->Start_FadeOut();
+
+
+    // UI 띄우기.
+
+    
 }
 
 void CQueenKnight::Enable_Trail(_uint iPartType)
@@ -929,6 +1122,41 @@ HRESULT CQueenKnight::Ready_Components(QUEENKNIGHT_DESC* pDesc)
         return E_FAIL;
     }
     m_fEndReverseDissolveTime = 2.f;
+
+    // Encounter 
+    CEncounter_Title::ENCOUNTER_TITLE_DESC EncounterTextDesc{};
+
+    EncounterTextDesc.fX = g_iWinSizeX >> 1;  // 화면 중앙 X (1920 / 2 = 960)
+    EncounterTextDesc.fY = (g_iWinSizeY >> 1) - 100.f;  // 화면 중앙 Y (1080 / 2 = 540) - 200.f
+    EncounterTextDesc.fSizeX = 1024;
+    EncounterTextDesc.fSizeY = 256;
+    EncounterTextDesc.fFadeTime = 3.f;
+    EncounterTextDesc.strTextureTag = TEXT("Prototype_Component_Texture_Encounter_Text");
+    
+    EncounterTextDesc.eShaderPath = POSTEX_SHADERPATH::QUEENKNIGHT_ENCOUNTER;
+    m_pEncounterTitle = dynamic_cast<CEncounter_Title*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT,
+        ENUM_CLASS(m_eCurLevel),
+        TEXT("Prototype_GameObject_QueenKnightTitle"), &EncounterTextDesc));
+    ASSERT_CRASH(m_pEncounterTitle);
+
+
+    /* Death */
+
+    CEncounter_Title::ENCOUNTER_TITLE_DESC DeathTextDesc{};
+
+    DeathTextDesc.fX = g_iWinSizeX >> 1;  
+    DeathTextDesc.fY = (g_iWinSizeY >> 1) - 100.f;
+    DeathTextDesc.fSizeX = 1138.f;
+    DeathTextDesc.fSizeY = 138.f;
+    DeathTextDesc.fFadeTime = 1.5f;
+    DeathTextDesc.strTextureTag = TEXT("Prototype_Component_Texture_Dead_Text");
+
+    DeathTextDesc.eShaderPath = POSTEX_SHADERPATH::QUEENKNIGHT_ENCOUNTER;
+    m_pDeadTitle = dynamic_cast<CEncounter_Title*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT,
+        ENUM_CLASS(m_eCurLevel),
+        TEXT("Prototype_GameObject_QueenKnightTitle"), &DeathTextDesc));
+    ASSERT_CRASH(m_pEncounterTitle);
+
 
 
     return S_OK;
@@ -1063,32 +1291,6 @@ HRESULT CQueenKnight::Ready_Effects(QUEENKNIGHT_DESC* pDesc)
     m_vecPillarPositions.reserve(iTotalPillars);
     m_vecIsPillarActivated.resize(iTotalPillars);
 
-    //for (_uint i = 0; i < iNumArms; ++i)
-    //{
-    //    _float3 vDirection = { 0.f, 0.f, 0.f };
-
-    //    switch (i)
-    //    {
-
-    //    case 0: vDirection = { 0.f, 0.f, 1.f };  break; // 위
-    //    case 1: vDirection = { 1.f, 0.f, 0.f };  break; // 오른쪽
-    //    case 2: vDirection = { 0.f, 0.f, -1.f }; break; // 아래
-    //    case 3: vDirection = { -1.f, 0.f, 0.f }; break; // 왼쪽
-    //    }
-
-    //    _float3 vPos = {};
-    //    for (_uint j = 1; j <= iNumPillarsPerArm; ++j)
-    //    {
-    //        _float fDistance = fSpacing * j;
-    //        
-    //        XMStoreFloat3(&vPos, XMLoadFloat3(&vDirection) * fDistance); // 방향 벡터 * 거리 = 최종 위치
-    //        vPos.y += 2.f;
-    //        
-
-    //        m_vecPillarPositions.push_back(vPos);
-    //    }
-    //}
-
     // [수정 코드]
     // 바깥 루프가 j (기둥 순번), 안쪽 루프가 i (팔 방향)가 됩니다.
     for (_uint j = 1; j <= iNumPillarsPerArm; ++j)
@@ -1155,13 +1357,7 @@ HRESULT CQueenKnight::Bind_Shader_Resource()
         CRASH("Failed Dissolve Texture");
         return E_FAIL;
     }
-
-
-    //if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
-    //{
-    //    CRASH("Failed Bind CamPosition");
-    //    return E_FAIL;
-    //}
+ 
         
     return S_OK;
 }
@@ -1205,10 +1401,15 @@ void CQueenKnight::Free()
 {
     CMonster::Free();
     Safe_Release(m_pBossHpBarUI);
+    Safe_Release(m_pEncounterTitle);
+    Safe_Release(m_pDeadTitle);
     Safe_Release(m_pWeapon);
     Safe_Release(m_pShield);
     Safe_Release(m_pTree);
     Safe_Release(m_pDissolveTexture);
+    
+
+    m_pGameInstance->StopBGM();
 }
 
 

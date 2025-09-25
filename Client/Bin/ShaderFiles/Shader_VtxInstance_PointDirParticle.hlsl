@@ -21,6 +21,8 @@ float g_fBloomIntensity = 2.f;
 
 /* 사용할 변수 목록 시간, 크기 => 비율*/
 float g_fTimeRatio;
+float g_fDissolveRatio;
+float g_fDissolveWeight;
 float g_fScaleRatio;
 float g_fEmissiveIntensity;
 
@@ -367,9 +369,10 @@ PS_OUT PS_DIFFUSE_QUEENKNIGHTWARP_MAIN(PS_IN In)
     
     Out.vColor = vMtrlDiffuse;
 
+    float dissolveRatio = pow(saturate(g_fTimeRatio), g_fDissolveWeight);
     
     vector vMtrlDissolve = g_NoiseTextures[0].Sample(DefaultSampler, In.vTexcoord);
-    clip(vMtrlDissolve.r - g_fTimeRatio); // r 0 ~ 1.f => g_fTimeRatio를 최소시간, 최대시간이 있잖아요 이걸 0 ~ 1.f로 정규화해서
+    clip(vMtrlDissolve.r - dissolveRatio); // r 0 ~ 1.f => g_fTimeRatio를 최소시간, 최대시간이 있잖아요 이걸 0 ~ 1.f로 정규화해서
 
     
     return Out;

@@ -45,10 +45,14 @@ public:
 	void Change_State();
 	void Handle_Invincible_Buff(); // 무적 버프 처리
 
+	void Update_Sound(_float fTimeDelta);
+
 private:
 	ACTORDIR			   m_eDir = { ACTORDIR::END };
-	_bool m_bPrevInvincible = {};
-	
+	_bool m_IsPrevInvincible = {};
+	_bool m_IsSoundPlayed = false;
+	_float m_fSoundTime = {};
+
 
 public:
 	static CPlayer_DodgeState* Create(_uint iStateNum, void* pArg);

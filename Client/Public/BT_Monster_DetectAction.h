@@ -18,7 +18,7 @@ private:
     class CMonster* m_pOwner = { nullptr };
     DETECT_PHASE m_eDetectPhase = { DETECT_PHASE::NONE };
     _bool m_IsRootMotion = { false };
-    _bool m_bIsStopped = { false };  // 추적 중단 상태
+    _bool m_IsStopped = { false };  // 추적 중단 상태
     _float m_fMinDetectDuration = { 2.0f }; // 최소 탐지 유지 시간
     _float m_fDetectTimer = { 0.0f }; // 탐지 경과 시간
 

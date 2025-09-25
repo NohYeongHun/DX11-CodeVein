@@ -11,6 +11,9 @@ HRESULT CPlayer_WalkState::Initialize(_uint iStateNum, void* pArg)
 		return E_FAIL;
 
 
+	m_fFootStepFirst = 20.f / 47.f;
+	m_fFootStepSecond = 40.f / 47.f;
+
 	return S_OK;
 }
 
@@ -65,7 +68,34 @@ void CPlayer_WalkState::Update(_float fTimeDelta)
 		
 	}		
 
+	Update_FootstepSound(fTimeDelta);
+
 	CPlayerState::Handle_Collider_State();
+}
+
+void CPlayer_WalkState::Update_FootstepSound(_float fTimeDelta)
+{
+	_float fCurrentRatio = m_pModelCom->Get_Current_Ratio();
+
+	if (!m_IsFirstSoundPlayed && fCurrentRatio > m_fFootStepFirst)
+	{
+		m_strFootSoundFile = L"FootSound1.wav";
+		m_pGameInstance->PlaySoundEffect(m_strFootSoundFile, 0.3f);
+		m_IsFirstSoundPlayed = true;
+	}
+	else if (!m_IsSecondSoundPlayed && fCurrentRatio > m_fFootStepSecond)
+	{
+		m_strFootSoundFile = L"FootSound2.wav";
+		m_pGameInstance->PlaySoundEffect(m_strFootSoundFile, 0.3f);
+		m_IsSecondSoundPlayed = true;
+	}
+
+	// 애니메이션 리셋 시 플래그 초기화
+	if (fCurrentRatio < 0.1f)
+	{
+		m_IsFirstSoundPlayed = false;
+		m_IsSecondSoundPlayed = false;
+	}
 }
 
 // 종료될 때 실행할 동작..
@@ -196,7 +226,7 @@ void CPlayer_WalkState::Handle_Input(_float fTimeDelta)
 	}
 
 	// 가드 입력 체크
-	if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::GUARD))
+	/*if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::GUARD))
 	{
 		if (m_pFsm->Is_CoolTimeEnd(CPlayer::GUARD))
 		{
@@ -205,7 +235,7 @@ void CPlayer_WalkState::Handle_Input(_float fTimeDelta)
 			m_pFsm->Change_State(CPlayer::PLAYER_STATE::GUARD, &Guard);
 			return;
 		}
-	}
+	}*/
 
 	// LockOn 상태에 따라 다른 애니메이션 재생 (공격 체크 이후에 실행)
 	if (m_pPlayer->Is_LockOn())

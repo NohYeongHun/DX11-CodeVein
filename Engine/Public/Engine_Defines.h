@@ -27,6 +27,18 @@
 
 using namespace DirectX;
 
+#pragma region FMOD
+#include "FMod/fmod.h"
+#include "FMod/fmod.hpp"
+#include "FMod/fmod_codec.h"
+#include "FMod/fmod_common.h"
+#include "FMod/fmod_dsp.h"
+#include "FMod/fmod_dsp_effects.h"
+#include "FMod/fmod_errors.h"
+#include "FMod/fmod_output.h"
+#pragma endregion
+
+
 
 
 #include <memory>
@@ -59,11 +71,11 @@ namespace Engine
 	// 한 메시에서 최대로 사용가능한 Bone의 개수.
     static const unsigned int g_iMaxNumBones = 512;
 
-    //const unsigned int g_iMaxWidth = 16384;
-    //const unsigned int g_iMaxHeight = 9216;	
+    const unsigned int g_iMaxWidth = 16384;
+    const unsigned int g_iMaxHeight = 9216;	
 
-    const unsigned int g_iMaxWidth = 8192;
-    const unsigned int g_iMaxHeight = 4608;
+    //const unsigned int g_iMaxWidth = 8192;
+    //const unsigned int g_iMaxHeight = 4608;
 }
 
 

@@ -1,4 +1,5 @@
-﻿CCamera_Player::CCamera_Player(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿#include "Camera_Player.h"
+CCamera_Player::CCamera_Player(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CCamera(pDevice, pContext)
 {
 }
@@ -69,13 +70,45 @@ void CCamera_Player::Priority_Update(_float fTimeDelta)
 
 void CCamera_Player::Update(_float fTimeDelta)
 {
+
 	CCamera::Update(fTimeDelta);
 
 	// 1. 마우스 클립 업데이트 => 창 크기를 벗어나지 못하게 함.
 	Update_Mouse_Clip();
 
+
+	if (m_fShakeTime > 0.0f)
+	{
+		// 1. 남은 시간 감소
+		m_fShakeTime -= fTimeDelta;
+
+		// 2. 랜덤 오프셋 생성
+		// -1.0f ~ +1.0f 사이의 랜덤 값을 생성합니다.
+		_float fOffsetX = ((float)rand() / RAND_MAX - 0.5f) * 2.0f;
+		_float fOffsetY = ((float)rand() / RAND_MAX - 0.5f) * 2.0f;
+		_float fOffsetZ = ((float)rand() / RAND_MAX - 0.5f) * 2.0f;
+
+		m_vShakeOffset = XMVectorSet(fOffsetX, fOffsetY, fOffsetZ, 0.0f);
+
+		// 3. 오프셋에 강도를 곱하고 정규화 (방향만 사용)
+		m_vShakeOffset = XMVector3Normalize(m_vShakeOffset) * m_fShakeMagnitude;
+
+		
+
+		// 4. (선택) 시간이 지남에 따라 쉐이킹 강도를 서서히 줄여 부드럽게 멈추게 함
+		m_fShakeMagnitude *= (m_fShakeTime /  m_fShakeDuration);
+	}
+	else
+	{
+		m_fShakeTime = 0.0f;
+		m_fShakeDuration = 0.0f;
+		m_fShakeMagnitude = 0.0f;
+		m_vShakeOffset = XMVectorSet(0.f, 0.f, 0.f, 0.f);
+	}
+
+
 	// 락온 모드에 따라 카메라 업데이트 방식 선택
-	if (m_bLockOnMode)
+	if (m_IsLockOnMode)
 	{
 		Update_LockOn_Camera(fTimeDelta);
 	}
@@ -88,6 +121,7 @@ void CCamera_Player::Update(_float fTimeDelta)
 	Update_LockOn_UI(fTimeDelta);
 
 
+	
 
 
 
@@ -155,10 +189,10 @@ void CCamera_Player::Update_Chase_Target(_float fTimeDelta)
 	XMStoreFloat4(&m_vTargetCameraPos, vTargetCameraPos);
 
 	// 7. 첫 번째 업데이트인 경우 즉시 목표 위치로 이동
-	if (m_bFirstUpdate)
+	if (m_IsFirstUpdate)
 	{
 		m_vCurrentCameraPos = m_vTargetCameraPos;
-		m_bFirstUpdate = false;
+		m_IsFirstUpdate = false;
 	}
 
 	// 8. 부드러운 보간을 사용하여 카메라 위치 업데이트
@@ -170,8 +204,11 @@ void CCamera_Player::Update_Chase_Target(_float fTimeDelta)
 	_vector vSmoothedPos = XMVectorLerp(vCurrentPos, vTargetPos_Camera, fLerpFactor);
 
 	// 10. 현재 위치 업데이트
+	/*XMStoreFloat4(&m_vCurrentCameraPos, vSmoothedPos);
+	m_pTransformCom->Set_State(STATE::POSITION, vSmoothedPos);*/
+	// 10. 현재 위치 업데이트
 	XMStoreFloat4(&m_vCurrentCameraPos, vSmoothedPos);
-	m_pTransformCom->Set_State(STATE::POSITION, vSmoothedPos);
+	m_pTransformCom->Set_State(STATE::POSITION, vSmoothedPos + m_vShakeOffset);
 
 	// 11. 카메라 방향 설정 (Pitch와 Yaw 적용)
 	_vector vForward = XMVector3TransformNormal(XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f), matRotation);
@@ -191,15 +228,15 @@ void CCamera_Player::Handle_Mouse_Input(_float fTimeDelta, _float fSensitivityMu
 	GetClientRect(g_hWnd, &rcClient);
 
 	// Q키 상태 확인 (Pitch 조작 모드)
-	m_bPitchControlMode = m_pGameInstance->Get_KeyPress(DIK_Q);
+	m_IsPitchControlMode = m_pGameInstance->Get_KeyPress(DIK_Q);
 
 	// Q키를 누르지 않았을 때는 기본 Pitch로 복귀
-	if (!m_bPitchControlMode)
+	if (!m_IsPitchControlMode)
 	{
 		m_fTargetPitch = XMConvertToRadians(m_fDefaultPitch);
 	}
 	
-	if (m_bInventoryMode)
+	if (m_IsInventoryMode || m_IsSkillMode)
 		return;
 
 	if (PtInRect(&rcClient, ptMouse))
@@ -209,7 +246,7 @@ void CCamera_Player::Handle_Mouse_Input(_float fTimeDelta, _float fSensitivityMu
 		{
 			_float fAngleX = (_float)MouseMoveX * m_fMouseSensor * fSensitivityMultiplier * fTimeDelta;
 
-			if (m_bLockOnMode)
+			if (m_IsLockOnMode)
 				m_fLockOnYaw += fAngleX;
 			else
 				m_fTargetYaw += fAngleX; // 목표 각도만 수정
@@ -221,7 +258,7 @@ void CCamera_Player::Handle_Mouse_Input(_float fTimeDelta, _float fSensitivityMu
 			_float fAngleY = (_float)MouseMoveY * m_fMouseSensor * fSensitivityMultiplier * fTimeDelta;
 
 			// 락온 모드가 아니고 Q키를 누르고 있을 때만 Pitch 적용
-			if (!m_bLockOnMode && m_bPitchControlMode)
+			if (!m_IsLockOnMode && m_IsPitchControlMode)
 			{
 				m_fTargetPitch -= fAngleY; // 목표 각도만 수정
 
@@ -238,7 +275,7 @@ void CCamera_Player::Handle_Mouse_Input(_float fTimeDelta, _float fSensitivityMu
 /* 해당 카메라 생성 시 Mouse Clipped를 킵니다 */
 void CCamera_Player::Enable_Mouse_Clip()
 {
-	if (!m_bMouseClipped)
+	if (!m_IsMouseClipped)
 	{
 		// 현재 클라이언트 영역을 화면 좌표로 변환
 		GetClientRect(g_hWnd, &m_rcClipRect);
@@ -247,25 +284,25 @@ void CCamera_Player::Enable_Mouse_Clip()
 
 		// 마우스 커서를 해당 영역으로 제한
 		ClipCursor(&m_rcClipRect);
-		m_bMouseClipped = true;
+		m_IsMouseClipped = true;
 	}
 }
 
 /* 해당 카메라 삭제 시 Mouse Clipped를 끕니다. */
 void CCamera_Player::Disable_Mouse_Clip()
 {
-	if (m_bMouseClipped)
+	if (m_IsMouseClipped)
 	{
 		// 마우스 커서 제한 해제
 		ClipCursor(nullptr);
-		m_bMouseClipped = false;
+		m_IsMouseClipped = false;
 	}
 }
 
 void CCamera_Player::Update_Mouse_Clip()
 {
 	// 창 크기가 변경되었을 수 있으므로 클립 영역 업데이트
-	if (m_bMouseClipped)
+	if (m_IsMouseClipped)
 	{
 		RECT rcNewClip;
 		GetClientRect(g_hWnd, &rcNewClip);
@@ -286,7 +323,7 @@ void CCamera_Player::Update_Mouse_Clip()
 #pragma region 1. Lock ON 상태.
 void CCamera_Player::Toggle_LockOn_Mode()
 {
-	if (m_bLockOnMode)
+	if (m_IsLockOnMode)
 	{
 		// 락온 해제
 		Disable_LockOn_Mode();
@@ -348,13 +385,20 @@ void CCamera_Player::Update_LockOn_Camera(_float fTimeDelta)
 	_vector vSmoothedPos = XMVectorLerp(vCurrentPos, vTargetPos, fLerpFactor);
 
 	// 5. 카메라 위치 설정
+	//XMStoreFloat4(&m_vCurrentCameraPos, vSmoothedPos);
+	//m_pTransformCom->Set_State(STATE::POSITION, vSmoothedPos);
+
+	// 5. 카메라 위치 설정
 	XMStoreFloat4(&m_vCurrentCameraPos, vSmoothedPos);
-	m_pTransformCom->Set_State(STATE::POSITION, vSmoothedPos);
+	m_pTransformCom->Set_State(STATE::POSITION, vSmoothedPos + m_vShakeOffset);
 
 	// 6. 락온 상태에서는 몬스터를 직접 바라보도록 설정
 	_float3 vTargetPosFloat3;
 	XMStoreFloat3(&vTargetPosFloat3, vTargetPos_Enemy);
 	m_pTransformCom->LookAt(vTargetPosFloat3);
+
+
+	// 4. 최종 카메라 위치에 오프셋 적용
 
 }
 
@@ -366,7 +410,7 @@ void CCamera_Player::Clear_LockOn_Target()
 
 void CCamera_Player::Enable_LockOn_Mode()
 {
-	m_bLockOnMode = true;
+	m_IsLockOnMode = true;
 
 	// LockOn 모드 시작 시 마우스 회전값 초기화 (자연스러운 전환을 위해)
 	m_fLockOnYaw = 0.0f;
@@ -389,7 +433,7 @@ void CCamera_Player::Enable_LockOn_Mode()
 
 void CCamera_Player::Disable_LockOn_Mode()
 {
-	m_bLockOnMode = false;
+	m_IsLockOnMode = false;
 
 	// 1. 현재 카메라의 Look 방향을 가져와서 Yaw/Pitch로 변환
 	_vector vCurrentLook = m_pTransformCom->Get_State(STATE::LOOK);
@@ -543,6 +587,15 @@ void CCamera_Player::Calculate_LockOn_Camera_Position(_float fTimeDelta)
 #pragma endregion
 
 
+
+
+void CCamera_Player::StartShake(_float duration, _float magnitude)
+{
+	m_fShakeTime = duration;
+	m_fShakeDuration = duration;
+	m_fShakeMagnitude = magnitude;
+}
+
 void CCamera_Player::Debug_CameraVectors()
 {
 	CCamera* pCamera = m_pGameInstance->Get_MainCamera();
@@ -586,7 +639,7 @@ void CCamera_Player::ImGui_Render()
 	_float3 vPos = {};
 	XMStoreFloat3(&vPos, m_pTransformCom->Get_State(STATE::POSITION));
 
-	if (m_bLockOnMode)
+	if (m_IsLockOnMode)
 	{
 		ImGui::Text("Lock On Camera Pos : (%.2f, %.2f, %.2f)", vPos.x, vPos.y, vPos.z);
 	}

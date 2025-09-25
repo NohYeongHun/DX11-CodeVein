@@ -21,6 +21,10 @@ public:
         _vector vHitPosition = {};
         _float  fDisPlayTime = {};
         _float3 vScale = { 1.5f, 0.2f, 1.f };
+        _float3 vTargetScale = {};
+        _float fCreateDelay = { 0.f };
+        _bool  bIsScaleChange = { false };
+        EFFECTPOSTEX_SHADERPATH eShaderPath = { EFFECTPOSTEX_SHADERPATH::MONSTER_LINESLASH };
     }SLASHACTIVATE_DESC;
 
 private:
@@ -62,17 +66,21 @@ private:
     LEVEL m_eCurLevel = { LEVEL::END };
     // LockOn 관련
     CGameObject* m_pTarget = { nullptr };
-    _bool m_bActive = false;
+    _bool m_IsActive = false;
 
+    _bool m_IsScaleChange = { false };
     
     // 타이머
     _float m_fDisplayTime = 1.0f;        // 표시 시간 (초)
     _float m_fCurrentTime = 0.0f;        // 현재 경과 시간
+    _float m_fCreateDelay = {}; // 생성 대기시간.
     // 회전 정보
     _float m_fRotationAngle = 0.0f; // Z축 회전 각도 (라디안)
-    _bool m_bDirectionCalculated = false; // 방향이 계산되었는지 여부
+    _bool m_IsDirectionCalculated = false; // 방향이 계산되었는지 여부
     _vector m_vHitDirection = {};
     _float3 m_vScale = {};
+
+    _float3 m_vTargetScale = {};
     _uint m_iShaderPath = {};
 
     _float m_fBloomIntensity = 5.f;

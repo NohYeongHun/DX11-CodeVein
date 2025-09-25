@@ -13,7 +13,7 @@ void CTransform::Set_State(STATE eState, _fvector vState)
 	{
 	case STATE::POSITION:
 		XMStoreFloat3(&m_vPosition, vState);
-		m_bIsDirty = true;
+		m_IsDirty = true;
 		break;
 
 	case STATE::RIGHT:
@@ -34,17 +34,17 @@ void CTransform::Set_State(STATE eState, _fvector vState)
 		};
 
 		m_QuatRotation = XMQuaternionRotationMatrix(matRot);
-		m_bIsDirty = true; // ✅ 수정: 월드 행렬 갱신 필요
+		m_IsDirty = true;
 	}
 	break;
 	default:
 		break;
 	}
 
-	// ✅ 수정: POSITION의 경우만 m_bIsDirty를 false로 하지 않음
+	// ✅ 수정: POSITION의 경우만 m_IsDirty를 false로 하지 않음
 	if (eState != STATE::POSITION)
 	{
-		m_bIsDirty = true; // 회전이나 다른 상태 변경 시 갱신 필요
+		m_IsDirty = true; // 회전이나 다른 상태 변경 시 갱신 필요
 	}
 }
 
@@ -92,7 +92,7 @@ void CTransform::Move_Direction(_vector vDir, _float fTimeDelta)
 	m_vPosition.y += XMVectorGetY(vMovement);
 	m_vPosition.z += XMVectorGetZ(vMovement);
 
-	m_bIsDirty = true;
+	m_IsDirty = true;
 }
 
 void CTransform::Move_Direction(_vector vDir, _float fTimeDelta, CNavigation* pNavigation)
@@ -109,7 +109,7 @@ void CTransform::Move_Direction(_vector vDir, _float fTimeDelta, CNavigation* pN
 	if (nullptr == pNavigation)
 	{
 		Set_State(STATE::POSITION, XMLoadFloat4(&vPosition));
-		m_bIsDirty = true;
+		m_IsDirty = true;
 	}
 	else
 	{
@@ -118,7 +118,7 @@ void CTransform::Move_Direction(_vector vDir, _float fTimeDelta, CNavigation* pN
 		{
 			// 정상 이동
 			Set_State(STATE::POSITION, XMLoadFloat4(&vPosition));
-			m_bIsDirty = true;
+			m_IsDirty = true;
 		}
 		else
 		{
@@ -134,7 +134,7 @@ void CTransform::Move_Direction(_vector vDir, _float fTimeDelta, CNavigation* pN
 			if (true == pNavigation->isMove(vSlidePosition))
 			{
 				Set_State(STATE::POSITION, vSlidePosition);
-				m_bIsDirty = true;
+				m_IsDirty = true;
 			}
 			// 슬라이딩도 안 되면 이동하지 않음
 		}
@@ -148,7 +148,7 @@ void CTransform::Translate(_fvector vTranslate)
 	vPos += vTranslate;
 	vPos = XMVectorSetW(vPos, 1.f);
 	Set_State(STATE::POSITION, vPos);
-	m_bIsDirty = true;
+	m_IsDirty = true;
 }
 
 /* Navigation 버전 */
@@ -164,7 +164,7 @@ void CTransform::Translate(_fvector vTranslate, CNavigation* pNavigation)
 	if (nullptr == pNavigation)
 	{
 		Set_State(STATE::POSITION, XMLoadFloat4(&vPosition));
-		m_bIsDirty = true;
+		m_IsDirty = true;
 	}
 	else
 	{
@@ -173,7 +173,7 @@ void CTransform::Translate(_fvector vTranslate, CNavigation* pNavigation)
 		{
 			// 정상 이동
 			Set_State(STATE::POSITION, XMLoadFloat4(&vPosition));
-			m_bIsDirty = true;
+			m_IsDirty = true;
 		}
 		else
 		{
@@ -189,7 +189,7 @@ void CTransform::Translate(_fvector vTranslate, CNavigation* pNavigation)
 			if (true == pNavigation->isMove(vSlidePosition))
 			{
 				Set_State(STATE::POSITION, vSlidePosition);
-				m_bIsDirty = true;
+				m_IsDirty = true;
 			}
 			// 슬라이딩도 안 되면 이동하지 않음
 		}
@@ -229,7 +229,7 @@ HRESULT CTransform::Bind_Shader_Resource(CShader* pShader, const _char* pConstan
 // 매프레임 업데이트
 void CTransform::Update_WorldMatrix()
 {
-	if (!m_bIsDirty)
+	if (!m_IsDirty)
 		return;
 
 	_matrix matScale = XMMatrixScaling(m_vScale.x, m_vScale.y, m_vScale.z);
@@ -240,7 +240,7 @@ void CTransform::Update_WorldMatrix()
 	XMStoreFloat4x4(&m_WorldMatrix, world);
 
 	// ✅ 수정: 갱신 완료 후 플래그 해제
-	m_bIsDirty = false;
+	m_IsDirty = false;
 }
 
 void CTransform::Go_Straight(_float fTimeDelta)
@@ -251,7 +251,7 @@ void CTransform::Go_Straight(_float fTimeDelta)
 	m_vPosition.x += XMVectorGetX(vLook);
 	m_vPosition.y += XMVectorGetY(vLook);
 	m_vPosition.z += XMVectorGetZ(vLook);
-	m_bIsDirty = true;
+	m_IsDirty = true;
 }
 
 void CTransform::Go_Straight(_float fTimeDelta, CNavigation* pNavigation)
@@ -266,7 +266,7 @@ void CTransform::Go_Straight(_float fTimeDelta, CNavigation* pNavigation)
 		true == pNavigation->isMove(vPosition))
 	{
 		Set_State(STATE::POSITION, vPosition);
-		m_bIsDirty = true;
+		m_IsDirty = true;
 	}
 
 
@@ -284,7 +284,7 @@ void CTransform::Go_Backward(_float fTimeDelta)
 	m_vPosition.x += XMVectorGetX(vLook);
 	m_vPosition.y += XMVectorGetY(vLook);
 	m_vPosition.z += XMVectorGetZ(vLook);
-	m_bIsDirty = true;
+	m_IsDirty = true;
 }
 
 void CTransform::Go_Left(_float fTimeDelta)
@@ -295,7 +295,7 @@ void CTransform::Go_Left(_float fTimeDelta)
 	m_vPosition.x += XMVectorGetX(vRight);
 	m_vPosition.y += XMVectorGetY(vRight);
 	m_vPosition.z += XMVectorGetZ(vRight);
-	m_bIsDirty = true;
+	m_IsDirty = true;
 }
 
 void CTransform::Go_Right(_float fTimeDelta)
@@ -306,7 +306,7 @@ void CTransform::Go_Right(_float fTimeDelta)
 	m_vPosition.x += XMVectorGetX(vRight);
 	m_vPosition.y += XMVectorGetY(vRight);
 	m_vPosition.z += XMVectorGetZ(vRight);
-	m_bIsDirty = true;
+	m_IsDirty = true;
 }
 
 _float3 CTransform::Get_EulerAngles() const
@@ -347,7 +347,7 @@ void CTransform::LookAt(const _float3& vTargetPos, const _float3& vUp)
 	m_QuatRotation = XMQuaternionRotationMatrix(matRot);
 
 	// Transform 상태 변경됨 → 월드행렬 재계산 필요
-	m_bIsDirty = true;
+	m_IsDirty = true;
 }
 
 
@@ -359,26 +359,26 @@ void CTransform::Set_ParentMatrix(const _float4x4* pParentWorldMatrix)
 void CTransform::Set_Position(const _float3& vPos)
 {
 	m_vPosition = vPos;
-	m_bIsDirty = true;
+	m_IsDirty = true;
 }
 
 void CTransform::Set_Scale(const XMFLOAT3& vScale)
 {
 	m_vScale = vScale;
-	m_bIsDirty = true;
+	m_IsDirty = true;
 }
 
 void CTransform::Scale(const XMFLOAT3& vScale)
 {
 	m_vScale = vScale;
-	m_bIsDirty = true;
+	m_IsDirty = true;
 }
 
 void CTransform::Turn(_fvector vAxis, _float fAngle)
 {
 	_vector qRot = XMQuaternionRotationAxis(vAxis, fAngle); // 회전 쿼터니언 생성
 	m_QuatRotation = XMQuaternionNormalize(XMQuaternionMultiply(qRot, m_QuatRotation)); // 누적
-	m_bIsDirty = true;
+	m_IsDirty = true;
 }
 
 _float3 CTransform::Get_Scale()
@@ -394,7 +394,7 @@ void CTransform::Add_Rotation(_float fPitch, _float fYaw, _float fRoll)
 
 	// 2. 기존 쿼터니언과 곱해 누적 (순서 주의: 새 회전을 뒤에 곱한다)
 	m_QuatRotation = XMQuaternionNormalize(XMQuaternionMultiply(m_QuatRotation, deltaQuat));
-	m_bIsDirty = true;
+	m_IsDirty = true;
 }
 
 void CTransform::Add_Inverse_Rotation(_float fPitch, _float fYaw, _float fRoll)
@@ -404,7 +404,7 @@ void CTransform::Add_Inverse_Rotation(_float fPitch, _float fYaw, _float fRoll)
 	deltaQuat = XMQuaternionInverse(deltaQuat);
 	// 2. 기존 쿼터니언과 곱해 누적 (순서 주의: 새 회전을 뒤에 곱한다)
 	m_QuatRotation = XMQuaternionNormalize(XMQuaternionMultiply(m_QuatRotation, deltaQuat));
-	m_bIsDirty = true;
+	m_IsDirty = true;
 }
 
 CTransform* CTransform::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)

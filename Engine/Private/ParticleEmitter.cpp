@@ -39,8 +39,8 @@ void CParticleEmitter::Reset(const CParticleSystem::PARTICLESYSTEM_CLONE_DESC* p
 	// BURST 타입일 경우, 아직 터지지 않았다는 상태로 리셋
 	if (m_tDesc.eEmissionType == EMITTER_BURST)
 	{
-		// (이를 위해 멤버 변수에 _bool m_bHasBursted = { false }; 추가 필요)
-		m_bHasBursted = false;
+		// (이를 위해 멤버 변수에 _bool m_IsHasBursted = { false }; 추가 필요)
+		m_IsHasBursted = false;
 	}
 	
 }
@@ -72,14 +72,14 @@ void CParticleEmitter::Emit(_float fTimeDelta, vector<PARTICLE_DATA>& out_Partic
 	case EMITTER_BURST:
 	{
 		 //아직 BURST가 일어나지 않았다면 한번에 모두 생성
-		 //(멤버 변수에 _bool m_bHasBursted 추가 필요)
-		 if (!m_bHasBursted)
+		 //(멤버 변수에 _bool m_IsHasBursted 추가 필요)
+		 if (!m_IsHasBursted)
 		 {
 		     for (_uint i = 0; i < m_tDesc.iBurstCount; ++i)
 		     {
 		         Create_Particle_By_Type(out_Particles);
 		     }
-		     m_bHasBursted = true; // 터졌다고 표시
+		     m_IsHasBursted = true; // 터졌다고 표시
 		 }
 	}
 

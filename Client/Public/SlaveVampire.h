@@ -57,8 +57,16 @@ private:
 public:
 	virtual void Update_AI(_float fTimeDelta) override;
 
+	virtual void Start_Dissolve(_float fDuration = 0.f) override; // Dissolve 재생.
+	virtual void ReverseStart_Dissolve(_float fDuration = 0.f) override; // Dissolve 역재생
+	virtual void End_Dissolve() override;
+	virtual void Dead_Action() override;
+	virtual void Hit_Action() override;
+
 private:
 	class CMonsterTree* m_pTree = { nullptr };
+
+	class CTexture* m_pDissolveTexture = { nullptr };
 
 #pragma endregion
 
@@ -84,6 +92,14 @@ public:
 public:
 	virtual void Enable_Collider(_uint iType) override;
 	virtual void Disable_Collider(_uint iType) override;
+
+public:
+	virtual void PlayHitSound() override;
+	virtual void PlayWeaponSound() override;
+
+private:
+	_bool m_IsPlayWeaponSound = { false };
+	_float m_fPlayAttackSound = {};
 #pragma endregion
 
 #pragma region 6. 기본적으로 몬스터가 필요한 상태들을 정의합니다.

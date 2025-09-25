@@ -1,4 +1,5 @@
-﻿CPlayer_AttackState::CPlayer_AttackState()
+﻿#include "Player_AttackState.h"
+CPlayer_AttackState::CPlayer_AttackState()
 {
 }
 
@@ -43,6 +44,13 @@ HRESULT CPlayer_AttackState::Initialize(_uint iStateNum, void* pArg)
 #pragma endregion
 
 	
+#pragma region SOUND TRACK 설정.
+	m_fAttackFirst = 20.f / 133.f;
+	m_fAttackSecond = 20.f / 141.f;
+	m_fAttackThird = 20.f / 158.f;
+	m_fAttackFourth = 20.f / 148.f;
+#pragma endregion
+
 
 	return S_OK;
 }
@@ -69,9 +77,9 @@ void CPlayer_AttackState::Enter(void* pArg)
 
 
 	// 방향 제어 관련 초기화
-	m_bCanChangeDirection = true;
+	m_IsCanChangeDirection = true;
 	m_fCurrentLockTime = 0.0f;
-	m_bIsDirectionLocked = false;
+	m_IsDirectionLocked = false;
 
 	// 락온 중이면 타겟을 향해 즉시 회전
 	if (m_pPlayer->Is_LockOn() && m_pPlayer->Has_LockOn_Target())
@@ -100,29 +108,6 @@ void CPlayer_AttackState::Enter(void* pArg)
 	_float3 vStartPos = {};
 	XMStoreFloat3(&vStartPos, m_pPlayer->Get_Transform()->Get_State(STATE::POSITION));
 
-	// 2. 검풍 생성 부분 수정
-	CEffect_Wind::EFFECTWIND_ACTIVATE_DESC WindActivate_Desc{};
-	WindActivate_Desc.eCurLevel = m_pPlayer->Get_CurrentLevel();
-	WindActivate_Desc.fDuration = 10.f; // 지속시간,,
-
-	// ✅ 플레이어 기준 상대 위치 (Local Offset)
-	WindActivate_Desc.vStartPos = { 0.f, 0.f, 5.f }; // {오른쪽, 위, 앞}
-
-	WindActivate_Desc.vStartRotation = { 0.f, 0.f, 0.f }; // 각도 단위
-
-	// ✅ 카메라의 Look 방향을 회전축으로 설정 (소용돌이 회전)
-	_vector vCamLook = m_pGameInstance->Get_MainCamera()->Get_Transform()->Get_State(STATE::LOOK);
-	XMStoreFloat3(&WindActivate_Desc.vRotationAxis, XMVector3Normalize(vCamLook));
-
-	// ✅ 부모-자식 관계 설정 (플레이어를 따라다니게)
-	WindActivate_Desc.pParentMatrix = m_pPlayer->Get_Transform()->Get_WorldMatrixPtr();
-	WindActivate_Desc.pTargetTransform = m_pPlayer->Get_Transform();
-
-	m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(m_pGameInstance->Get_CurrentLevelID())
-		, TEXT("SWORD_WIND"), TEXT("Layer_Effect"), 1, ENUM_CLASS(CEffect_Wind::EffectType), &WindActivate_Desc);
-
-	
-
 }
 
 /* State 실행 */
@@ -132,6 +117,8 @@ void CPlayer_AttackState::Update(_float fTimeDelta)
 	Handle_Unified_Direction_Input(fTimeDelta);
 	Change_State(fTimeDelta);
 
+
+	Update_Sound(fTimeDelta);
 	CPlayerState::Handle_Collider_State();
 	CPlayerState::Handle_AnimationTrail_State();
 	
@@ -150,6 +137,9 @@ void CPlayer_AttackState::Exit()
 	{
 		m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, false);
 	}
+
+	m_IsSoundPlayed = false;
+	
 	
 }
 
@@ -216,18 +206,6 @@ void CPlayer_AttackState::Change_State(_float fTimeDelta)
 			return;
 		}
 
-		if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::GUARD))
-		{
-			if (!m_pFsm->Is_CoolTimeEnd(CPlayer::GUARD))
-				return;
-
-			m_iNextAnimIdx = m_pPlayer->Find_AnimationIndex(TEXT("GUARD_START"));
-			m_iNextState = CPlayer::GUARD;
-			Guard.iAnimation_Idx = m_iNextAnimIdx;
-			m_pFsm->Change_State(m_iNextState, &Guard);
-			return;
-		}
-
 		if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::DODGE))
 		{
 			m_iNextAnimIdx = m_pPlayer->Find_AnimationIndex(TEXT("DODGE"));
@@ -252,6 +230,56 @@ _vector CPlayer_AttackState::Calculate_Input_Direction_From_Camera()
 {
 	ACTORDIR eInputDir = m_pPlayer->Calculate_Direction();
 	return m_pPlayer->Calculate_Move_Direction(eInputDir);
+}
+
+void CPlayer_AttackState::Update_Sound(_float fTimeDelta)
+{
+	_float fCurrentRatio = m_pModelCom->Get_Current_Ratio();
+
+	// Attack 1인경우.
+	if (!m_IsSoundPlayed && m_iCurAnimIdx == m_pPlayer->Find_AnimationIndex(TEXT("ATTACK1")))
+	{
+		if (fCurrentRatio > m_fAttackFirst)
+		{
+			m_strSoundFile = L"PlayerAttack.mp3";
+			m_pGameInstance->PlaySoundEffect(m_strSoundFile, 0.3f);
+			m_IsSoundPlayed = true;
+		}
+	}
+	else if (!m_IsSoundPlayed && m_iCurAnimIdx == m_pPlayer->Find_AnimationIndex(TEXT("ATTACK2")))
+	{
+		if (fCurrentRatio > m_fAttackSecond)
+		{
+			m_strSoundFile = L"PlayerAttack.mp3";
+			m_pGameInstance->PlaySoundEffect(m_strSoundFile, 0.3f);
+			m_IsSoundPlayed = true;
+		}
+	}
+	else if (!m_IsSoundPlayed && m_iCurAnimIdx == m_pPlayer->Find_AnimationIndex(TEXT("ATTACK3")))
+	{
+		if (fCurrentRatio > m_fAttackThird)
+		{
+			m_strSoundFile = L"PlayerAttack.mp3";
+			m_pGameInstance->PlaySoundEffect(m_strSoundFile, 0.3f);
+			m_IsSoundPlayed = true;
+		}
+	}
+	else if (!m_IsSoundPlayed && m_iCurAnimIdx == m_pPlayer->Find_AnimationIndex(TEXT("ATTACK4")))
+	{
+		if (fCurrentRatio > m_fAttackFourth)
+		{
+			m_strSoundFile = L"PlayerAttack.mp3";
+			m_pGameInstance->PlaySoundEffect(m_strSoundFile, 0.3f);
+			m_IsSoundPlayed = true;
+		}
+	}
+	
+
+	// 애니메이션 리셋 시 플래그 초기화
+	if (fCurrentRatio < 0.1f)
+	{
+		m_IsSoundPlayed = false;
+	}
 }
 
 

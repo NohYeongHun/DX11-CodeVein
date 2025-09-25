@@ -50,11 +50,12 @@ public:
 		_float fStartRatio; // 1. 시작 비율
 		_float fEndRatio;	// 2. 끝 비율
 		_uint iAnimationIndex = 0; // 3. 지정할 애니메이션 인덱스
+		std::function<void(void*)> events = nullptr; // 7. 특정 이벤트
+		void* pDesc = nullptr; // 7. 특정 이벤트
 		_bool bTriggerVisible = false; // 4. 해당 이벤트가 Off용인지 On 용도인지. => 기본 Off
 		_bool bHasTriggeredStart = false; // 5. 시작 지점에서 Enable/Disable 호출했는지
 		_bool bIsCurrentlyActive = false; // 6. 현재 해당 구간에 있는지
-		void* pDesc = nullptr;
-		std::function<void(void*)> events = nullptr; // 7. 특정 이벤트
+		
 
 	}EFFECT_ACTIVE_INFO;
 
@@ -137,10 +138,10 @@ protected:
 
 protected:
 	// 새로운 멤버 변수 추가
-	_bool m_bCanChangeDirection = true;     // 방향 변경 가능 여부
+	_bool m_IsCanChangeDirection = true;     // 방향 변경 가능 여부
 	_float m_fDirectionLockTime = 0.3f;     // 방향 고정 시간 (초)
 	_float m_fCurrentLockTime = 0.0f;       // 현재 경과 시간
-	_bool m_bIsDirectionLocked = false;     // 방향이 고정되었는지 여부
+	_bool m_IsDirectionLocked = false;     // 방향이 고정되었는지 여부
 #pragma endregion
 
 
@@ -158,7 +159,7 @@ protected:
 	uint16_t m_KeyInput = {};
 	_float4 m_vMoveDir = {};
 	_bool m_LockOn = {}; // LockOn
-	_bool m_bFirstFrame = false;
+	_bool m_IsFirstFrame = false;
 	ACTORDIR	  m_eDir = { ACTORDIR::END };
 	_bool  m_isLoop = { true };
 

@@ -1,4 +1,5 @@
-﻿CGiant_WhiteDevil::CGiant_WhiteDevil(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿#include "Giant_WhiteDevil.h"
+CGiant_WhiteDevil::CGiant_WhiteDevil(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CMonster{ pDevice, pContext }
 {
 }
@@ -119,6 +120,13 @@ void CGiant_WhiteDevil::Update(_float fTimeDelta)
 
     Update_AI(fTimeDelta);
 
+    if (HasBuff(CMonster::BUFF_DISSOLVE))
+        m_fCurDissolveTime = m_fMaxDissolveTime - Get_BuffTime(BUFF_DISSOLVE); // 점차 보내는 값이 증가.
+    else if (HasBuff(CMonster::BUFF_REVERSEDISSOLVE))
+        m_fCurDissolveTime = Get_BuffTime(BUFF_REVERSEDISSOLVE); // 점차 값이 감소.
+    else
+        m_fCurDissolveTime = 0.f; // 버프가 사라지면서 잔여값이 남아서 Texture Reverse Dissolve가 모두 동작하지 않음.
+
     // 하위 객체들 움직임 제어는 Tree 제어 이후에
     CMonster::Update(fTimeDelta);
 
@@ -201,7 +209,8 @@ void CGiant_WhiteDevil::On_Collision_Enter(CGameObject* pOther)
             // 1. 데미지를 입고.
             Take_Damage(pPlayerWeapon->Get_AttackPower(), pPlayerWeapon);
 
-            // 2. 해당 위치에 검흔 Effect 생성?
+            //2. Sound 시작.
+            m_pGameInstance->PlaySoundEffect(L"NormalAttack.wav", 0.3f);
 
             // 3. 무적 버프 추가.
             AddBuff(BUFF_INVINCIBLE);
@@ -362,13 +371,58 @@ HRESULT CGiant_WhiteDevil::Initialize_BuffDurations()
 
     m_BuffDefault_Durations[GIANT_BUFF_COMBO_ATTACK] = 3.f; 
 
+    // Dissovle 타임.
+    m_BuffDefault_Durations[BUFF_DISSOLVE] = 1.f;
+    m_BuffDefault_Durations[BUFF_REVERSEDISSOLVE] = 0.5f;
+    // 무기의 Dissolve 타임도 지정.
+    m_pWeapon->Set_DissolveTime(1.f);
+    m_pWeapon->Set_ReverseDissolveTime(0.3f);
+
 
     return S_OK;
 }
+
 #pragma endregion
 
 
 #pragma region 6. 특수한 상태를 제어하기 위한 함수입니다.
+
+void CGiant_WhiteDevil::Start_Dissolve(_float fDuration)
+{
+    if (fDuration == 0.f)
+        AddBuff(BUFF_DISSOLVE);
+
+    AddBuff(BUFF_DISSOLVE, fDuration);
+    m_fMaxDissolveTime = Get_BuffTime(BUFF_DISSOLVE);
+    m_fCurDissolveTime = 0.f;
+
+    m_iShaderPath = static_cast<_uint>(ANIMESH_SHADERPATH::DISSOLVE);
+    m_pWeapon->Start_Dissolve(fDuration);
+}
+void CGiant_WhiteDevil::ReverseStart_Dissolve(_float fDuration)
+{
+    if (fDuration == 0.f)
+        AddBuff(BUFF_REVERSEDISSOLVE);
+
+    AddBuff(BUFF_REVERSEDISSOLVE, fDuration);
+    m_fMaxDissolveTime = Get_DefaultBuffTime(BUFF_DISSOLVE);
+    m_iShaderPath = static_cast<_uint>(ANIMESH_SHADERPATH::DISSOLVE);
+    m_pWeapon->ReverseStart_Dissolve(fDuration);
+}
+void CGiant_WhiteDevil::End_Dissolve()
+{
+    RemoveBuff(BUFF_DISSOLVE);
+    RemoveBuff(BUFF_REVERSEDISSOLVE);  // 이 라인 추가 필요
+    m_iShaderPath = static_cast<_uint>(ANIMESH_SHADERPATH::DEFAULT);
+    m_pWeapon->End_Dissolve();
+}
+void CGiant_WhiteDevil::Dead_Action()
+{
+    CMonster::Dead_Action();
+    Start_Dissolve(3.5f);
+}
+
+
 void CGiant_WhiteDevil::Enable_Collider(_uint iType)
 {
     /* PART_WEAPON이면 WEAPON Colider Enable */
@@ -398,6 +452,21 @@ void CGiant_WhiteDevil::Disable_Collider(_uint iType)
     default:
         break;
     }
+}
+void CGiant_WhiteDevil::Play_Sound(_uint iTrack)
+{
+    switch (iTrack)
+    {
+    case GIANT_ATTACK_SOUND:
+    {
+        //m_pGameInstance->PlaySoundEffect(L"SwingHalberd.mp3", 0.3f);
+        m_pGameInstance->PlaySoundEffect(L"BluntAttack.wav", 0.3f);
+    }
+        break;
+    default:
+        break;
+    }
+        
 }
 #pragma endregion
 
@@ -477,6 +546,14 @@ HRESULT CGiant_WhiteDevil::Ready_Components(GIANTWHITEDEVIL_DESC* pDesc)
         CRASH("Failed Add Component Model");
         return E_FAIL;
     }
+
+    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Dissolve"),
+        TEXT("Com_Dissolve"), reinterpret_cast<CComponent**>(&m_pDissolveTexture), nullptr)))
+    {
+        CRASH("Failed Load DissolveTexture");
+        return E_FAIL;
+    }
+    m_fEndReverseDissolveTime = 2.f;
 
     return S_OK;
 }
@@ -582,6 +659,19 @@ HRESULT CGiant_WhiteDevil::Ready_Render_Resources()
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_Transform_Float4x4(D3DTS::PROJ))))
         return E_FAIL;
 
+    if (FAILED(m_pDissolveTexture->Bind_Shader_Resource(m_pShaderCom, "g_DissolveTexture", 2)))
+    {
+        CRASH("Failed Dissolve Texture");
+        return E_FAIL;
+    }
+
+    _float fDissolveTime = normalize(m_fCurDissolveTime, 0.f, m_fMaxDissolveTime);
+
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fDissolveTime", &fDissolveTime, sizeof(_float))))
+    {
+        CRASH("Failed Dissolve Texture");
+        return E_FAIL;
+    }
 
 
     return S_OK;
@@ -626,6 +716,7 @@ void CGiant_WhiteDevil::Free()
 {
     CMonster::Free();
     Safe_Release(m_pBossHpBarUI);
+    Safe_Release(m_pDissolveTexture);
     Safe_Release(m_pWeapon);
     Safe_Release(m_pTree);
 }

@@ -16,7 +16,7 @@ private:
 public:
 	_byte	Get_DIKeyState(_ubyte byKeyID)
 	{
-		return m_byKeyState[byKeyID];
+		return m_IsyKeyState[byKeyID];
 	}
 
 	_byte	Get_DIMouseState(MOUSEKEYSTATE eMouse)
@@ -67,8 +67,8 @@ private:
 	
 private:
 	// 키부터.
-	_byte					m_byPrevKeyState[256] = {};
-	_byte					m_byKeyState[256] = {};	
+	_byte					m_IsyPrevKeyState[256] = {};
+	_byte					m_IsyKeyState[256] = {};	
 
 
 	DIMOUSESTATE			m_tPrevMouseState = {};

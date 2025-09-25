@@ -8,6 +8,12 @@ HRESULT CPlayer_RunState::Initialize(_uint iStateNum, void* pArg)
 {
 	if (FAILED(CPlayerState::Initialize(iStateNum, pArg)))
 		return E_FAIL;
+
+	m_pModelCom->Get_Current_Ratio();
+
+	m_fFootStepFirst = 18.f / 47.f;
+	m_fFootStepSecond = 38.f / 47.f;
+
 	return S_OK;
 }
 
@@ -29,6 +35,7 @@ void CPlayer_RunState::Enter(void* pArg)
 	m_pModelCom->Set_Animation(m_iCurAnimIdx, m_isLoop);
 
 
+	//m_pGameInstance->PlaySoundEffect(L"FootSound1.wav", 0.3f);
 	
 }
 
@@ -37,11 +44,43 @@ void CPlayer_RunState::Update(_float fTimeDelta)
 {
 	Handle_Input();
 
-	//RockOn_State(fTimeDelta);
-
+	Update_Sound(fTimeDelta);
 	Change_State(fTimeDelta);
 	CPlayerState::Handle_Collider_State();
 }
+
+void CPlayer_RunState::Update_Sound(_float fTimeDelta)
+{
+
+	_float fCurrentRatio = m_pModelCom->Get_Current_Ratio();
+
+	if (!m_IsFirstSoundPlayed && fCurrentRatio > m_fFootStepFirst)
+	{
+		//m_strFootSoundFile = L"FootSound.wav";
+		m_strFootSoundFile = L"FootHeel_01.wav";
+		//_uint iRandValue = m_pGameInstance->Rand_UnsignedInt(1, 3);
+		//m_strFootSoundFile += to_wstring(iRandValue);
+
+		m_pGameInstance->PlaySoundEffect(m_strFootSoundFile, 0.3f);
+		m_IsFirstSoundPlayed = true;
+	}
+	else if (!m_IsSecondSoundPlayed  && fCurrentRatio > m_fFootStepSecond)
+	{
+		m_strFootSoundFile = L"FootHeel_01.wav";
+		//_uint iRandValue = m_pGameInstance->Rand_UnsignedInt(1, 3);
+		m_pGameInstance->PlaySoundEffect(m_strFootSoundFile, 0.3f);
+		m_IsSecondSoundPlayed = true;
+	}
+
+	// 애니메이션 리셋 시 플래그 초기화
+	if (fCurrentRatio < 0.1f)
+	{
+		m_IsFirstSoundPlayed = false;
+		m_IsSecondSoundPlayed = false;
+	}
+}
+
+
 
 // 종료될 때 실행할 동작..
 void CPlayer_RunState::Exit()
@@ -59,7 +98,10 @@ void CPlayer_RunState::Exit()
 
 		m_pModelCom->Set_BlendInfo(m_iNextAnimIdx, 0.2f, true, true, false);
 	}
+
 		
+	m_IsFirstSoundPlayed = false;
+	m_IsSecondSoundPlayed = false;
 }
 
 // 상태 초기화
@@ -218,18 +260,18 @@ void CPlayer_RunState::Change_State(_float fTimeDelta)
 		return;
 	}
 
-	if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::GUARD))
-	{
-		//달리는 도중에 바꾸면 동작이 어색함.
-		if (!m_pFsm->Is_CoolTimeEnd(CPlayer::GUARD))
-			return;
+	//if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::GUARD))
+	//{
+	//	//달리는 도중에 바꾸면 동작이 어색함.
+	//	if (!m_pFsm->Is_CoolTimeEnd(CPlayer::GUARD))
+	//		return;
 
-		m_iNextAnimIdx = m_pPlayer->Find_AnimationIndex(TEXT("GUARD_START"));
-		m_iNextState = CPlayer::PLAYER_STATE::GUARD;
-		Guard.iAnimation_Idx = m_iNextAnimIdx;
-		m_pFsm->Change_State(m_iNextState, &Guard);
-		return;
-	}
+	//	m_iNextAnimIdx = m_pPlayer->Find_AnimationIndex(TEXT("GUARD_START"));
+	//	m_iNextState = CPlayer::PLAYER_STATE::GUARD;
+	//	Guard.iAnimation_Idx = m_iNextAnimIdx;
+	//	m_pFsm->Change_State(m_iNextState, &Guard);
+	//	return;
+	//}
 	
 
 	if (m_pPlayer->Is_MovementKeyPressed()) // 입력키 이용 중이라면.

@@ -71,16 +71,73 @@ HRESULT CLevel_GamePlay::Initialize_Clone()
 	m_pGameInstance->Setting_Soft(0.2f);
 	
 
+
+	// 한번만 실행.
+	m_pGameInstance->PlayBGM(L"Environment.wav", 0.3f, true);
+
 	return S_OK;
 }
 
 void CLevel_GamePlay::Update(_float fTimeDelta)
 {
+	// 새로운 BGM을 재생하면 이전 BGM은 자동으로 멈추고 새로운 곡으로 교체됩니다.
 	
 }
 
 HRESULT CLevel_GamePlay::Render()
 {
+	return S_OK;
+#ifdef _DEBUG
+	ImGuiIO& io = ImGui::GetIO();
+
+	// 기존 Player Debug Window
+
+	ImVec2 windowSize = ImVec2(600.f, 600.f);
+	ImVec2 windowPos = ImVec2(300.f, 0.f);
+	ImGui::SetNextWindowPos(windowPos, ImGuiCond_Once);
+	ImGui::SetNextWindowSize(windowSize, ImGuiCond_Once);
+
+	string strDebug = "Shadow Debug";
+	ImGui::Begin(strDebug.c_str(), nullptr, ImGuiWindowFlags_NoCollapse);
+
+
+
+	SHADOW_LIGHT_DESC			ShadowLightDesc{};
+	static float vEye[4] = { 115.f, 40.f, 200.f, 1.f };
+	static float vAt[4] = { 115.f, 1.f, 0.f, 1.f };
+	static float fFovy = { 45.f };
+	static float fNear = { 10.f };
+	static float fFar = { 1000.f };
+
+	ImGui::InputFloat4("Eye", vEye);
+	ImGui::InputFloat4("At", vAt);
+	ImGui::InputFloat("Fovy", &fFovy);
+	ImGui::InputFloat("Near", &fNear);
+	ImGui::InputFloat("Far", &fFar);
+
+
+	
+
+
+
+	if (ImGui::Button("Shadow Apply"))
+	{
+
+		memcpy(&ShadowLightDesc.vEye, vEye, sizeof(_float4));
+		memcpy(&ShadowLightDesc.vAt, vAt, sizeof(_float4));
+		memcpy(&ShadowLightDesc.fFovy, &fFovy, sizeof(_float));
+		memcpy(&ShadowLightDesc.fNear, &fNear, sizeof(_float));
+		memcpy(&ShadowLightDesc.fFar, &fFar, sizeof(_float));
+		ShadowLightDesc.fFovy = XMConvertToRadians(ShadowLightDesc.fFovy);
+
+		m_pGameInstance->Ready_ShadowLight(ShadowLightDesc);
+	}
+
+	ImGui::End();
+
+#endif // _DEBUG
+
+
 	return S_OK;
 }
 
@@ -115,7 +172,7 @@ HRESULT CLevel_GamePlay::Ready_Lights()
 	LIGHT_DESC			LightDesc{};
 
 	LightDesc.eType = LIGHT_DESC::TYPE::DIRECTIONAL;
-	LightDesc.vDirection = _float4(1.f, -1.f, 1.f, 0.f);
+	LightDesc.vDirection = _float4(1.f, -0.8f, 0.f, 0.f);
 	LightDesc.vDiffuse = _float4(1.f, 1.f, 1.f, 1.f);
 	LightDesc.vAmbient = _float4(0.4f, 0.4f, 0.4f, 1.f);
 	LightDesc.vSpecular = _float4(1.f, 1.f, 1.f, 1.f);
@@ -124,11 +181,11 @@ HRESULT CLevel_GamePlay::Ready_Lights()
 		return E_FAIL;
 
 	SHADOW_LIGHT_DESC			ShadowLightDesc{};
-	ShadowLightDesc.vEye = _float4(0.f, 100.f, -100.f, 1.f);
-	ShadowLightDesc.vAt = _float4(0.f, 0.f, 1.f, 1.f); // 오른쪽 보게?
-	ShadowLightDesc.fFovy = XMConvertToRadians(60.f);
-	ShadowLightDesc.fNear = 0.1f;
-	ShadowLightDesc.fFar = 1000.f;
+	ShadowLightDesc.vEye = _float4(100.f, 60.f, 130.f, 1.f);
+	ShadowLightDesc.vAt = _float4(100.f, 55.f, 0.f, 1.f);
+	ShadowLightDesc.fFovy = XMConvertToRadians(45.f);
+	ShadowLightDesc.fNear = 10.f;
+	ShadowLightDesc.fFar = 450.f;
 
 
 	if (FAILED(m_pGameInstance->Ready_ShadowLight(ShadowLightDesc)))
@@ -145,6 +202,19 @@ HRESULT CLevel_GamePlay::Ready_HUD()
 
 	// 이벤트 실행이지 구독이아님.
 	m_pGameInstance->Publish<HUDEVENT_DESC>(EventType::HUD_DISPLAY, &Desc);
+
+	//// 기본 스킬 설정 - 첫 번째 스킬 (검풍)
+	//HUD_SKILLCHANGE_DESC SkillDesc{};
+	//SkillDesc.iSkillPanelIdx = CHUD::SKILL_PANEL_TOP;  // 상단 스킬 패널
+	//SkillDesc.iSlotIdx = 0;  // 첫 번째 슬롯
+	//SkillDesc.iTextureIdx = 0;  // 검풍 스킬 텍스처 인덱스
+	//SkillDesc.pSkillIcon = nullptr;  // 기본 아이콘 사용
+	//m_pGameInstance->Publish<HUD_SKILLCHANGE_DESC>(EventType::HUD_SKILL_CHANGE, &SkillDesc);
+
+	//// 기본 스킬 설정 - 두 번째 스킬 (있다면)
+	//SkillDesc.iSlotIdx = 1;  // 두 번째 슬롯
+	//SkillDesc.iTextureIdx = 1;  // 두 번째 스킬 텍스처 인덱스
+	//m_pGameInstance->Publish<HUD_SKILLCHANGE_DESC>(EventType::HUD_SKILL_CHANGE, &SkillDesc);
 
 	return S_OK;
 }
@@ -175,8 +245,8 @@ HRESULT CLevel_GamePlay::Ready_Layer_Player(const _wstring& strLayerTag)
 	CPlayer::PLAYER_DESC Desc{};
 #pragma region 1. 플레이어에게 넣어줘야할 레벨 별 다른 값들.
 	Desc.eCurLevel = m_eCurLevel;
-	//Desc.vPos = { 270.f, 0.f, 0.f };
-	Desc.vPos = { 40.f, 0.f, 0.f };
+	Desc.vPos = { 270.f, 0.f, 0.f };
+	//Desc.vPos = { 40.f, 0.f, 0.f }; // 보스방 바로
 #pragma endregion
 
 #pragma region 2. 게임에서 계속 들고있어야할 플레이어 값들.
@@ -324,19 +394,20 @@ HRESULT CLevel_GamePlay::Ready_Layer_Monster(const _wstring& strLayerTag)
 	* 트리거 등록
 	*/
 	// 2. 트리거 등록. => 생성과 트리거 등록은 구별.
-	TRIGGER_MONSTER_DESC TriggerDesc{};
+	TRIGGER_MONSTER_DESC FirstTriggerDesc{};
 	
 	// 첫 번째 트리거: WolfDevil
-	TriggerDesc = { { 250.f , 0.f, 0.f }, 50.f , TEXT("Layer_WolfDevil")
+	FirstTriggerDesc = { { 250.f , 0.f, 0.f }, 50.f , TEXT("Layer_WolfDevil")
 		, TEXT("Layer_Monster") , 2, 0 };
 	
-	//m_pGameInstance->Add_Trigger(ENUM_CLASS(m_eCurLevel), TriggerDesc);
+	m_pGameInstance->Add_Trigger(ENUM_CLASS(m_eCurLevel), FirstTriggerDesc);
 	
 	// 두 번째 트리거: SlaveVampire
-	TriggerDesc = { { 200.f , 0.f, 0.f }, 50.f , TEXT("Layer_SlaveVampire")
+	TRIGGER_MONSTER_DESC SecondTriggerDesc{};
+	SecondTriggerDesc = { { 200.f , 0.f, 0.f }, 50.f , TEXT("Layer_SlaveVampire")
 		, TEXT("Layer_Monster") , 2, 0 };
 	
-	//m_pGameInstance->Add_Trigger(ENUM_CLASS(m_eCurLevel), TriggerDesc);
+	m_pGameInstance->Add_Trigger(ENUM_CLASS(m_eCurLevel), SecondTriggerDesc);
 
 	/* 다 같은 Monster 레이어에 추가하기. */
 	if (FAILED(Ready_Layer_QueenKnight(strLayerTag)))
@@ -409,9 +480,9 @@ HRESULT CLevel_GamePlay::Ready_Layer_SlaveVampire(const _wstring& strLayerTag)
 		return E_FAIL;
 	}
 
-	for (_uint i = 0; i < 2; ++i)
+	for (_uint i = 0; i < 4; ++i)
 	{
-		Desc.vPos = { 200.f, 0.f, 3.f };
+		Desc.vPos = { 100.f, 0.f, 3.f };
 		Desc.vPos.x += (i) * -20.f;
 		Desc.vPos.z *= i % 2 == 0 ? -1.f : 1.f;
 		if (FAILED(m_pGameInstance->Add_GameObject_ToTrigger(ENUM_CLASS(m_eCurLevel)
@@ -465,6 +536,8 @@ HRESULT CLevel_GamePlay::Ready_Layer_QueenKnight(const _wstring& strLayerTag)
 		, TEXT("Layer_Monster") , 1, 2 }; // 이전 2개 트리거 완료 후 발동
 
 	m_pGameInstance->Add_Trigger(ENUM_CLASS(m_eCurLevel), TriggerDesc);
+
+		
 
 	return S_OK;
 }
@@ -549,4 +622,7 @@ CLevel_GamePlay* CLevel_GamePlay::Create(ID3D11Device* pDevice, ID3D11DeviceCont
 void CLevel_GamePlay::Free()
 {
 	CLevel::Free();
+
+	// 배경음 끄기.
+	m_pGameInstance->StopBGM();
 }

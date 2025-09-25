@@ -180,18 +180,18 @@ void CPlayer_IdleState::Change_State()
 		return;
 	}
 
-	if (m_pPlayer->Is_KeyUp(PLAYER_KEY::GUARD))
-	{
-		if (!m_pFsm->Is_CoolTimeEnd(CPlayer::GUARD))
-			return;
+	//if (m_pPlayer->Is_KeyUp(PLAYER_KEY::GUARD))
+	//{
+	//	if (!m_pFsm->Is_CoolTimeEnd(CPlayer::GUARD))
+	//		return;
 
-		m_iNextState = CPlayer::PLAYER_STATE::GUARD;
-		m_iNextAnimIdx = m_pPlayer->Find_AnimationIndex(TEXT("GUARD_START"));
-		Guard.iAnimation_Idx = m_iNextAnimIdx;
-		m_pFsm->Change_State(m_iNextState, &Guard);
-		return;
+	//	m_iNextState = CPlayer::PLAYER_STATE::GUARD;
+	//	m_iNextAnimIdx = m_pPlayer->Find_AnimationIndex(TEXT("GUARD_START"));
+	//	Guard.iAnimation_Idx = m_iNextAnimIdx;
+	//	m_pFsm->Change_State(m_iNextState, &Guard);
+	//	return;
 
-	}
+	//}
 
 	if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::ATTACK))
 	{

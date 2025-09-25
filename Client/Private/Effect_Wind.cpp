@@ -1,4 +1,5 @@
-﻿#pragma region 기본 함수들
+﻿#include "Effect_Wind.h"
+#pragma region 기본 함수들
 CEffect_Wind::CEffect_Wind(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CContainerObject{ pDevice, pContext }
 {
@@ -44,6 +45,9 @@ void CEffect_Wind::Update(_float fTimeDelta)
 
     // 생명 주기 관리
     Calc_Timer(fTimeDelta);
+
+    Effect_TriggerCheck(fTimeDelta);
+    
 }
 
 void CEffect_Wind::Late_Update(_float fTimeDelta)
@@ -66,7 +70,7 @@ void CEffect_Wind::Late_Update(_float fTimeDelta)
 HRESULT CEffect_Wind::Render()
 {
 #ifdef _DEBUG
-    ImGui_Render();
+    //ImGui_Render();
 #endif // DEBUG
 
     return S_OK;
@@ -85,47 +89,28 @@ void CEffect_Wind::OnActivate(void* pArg)
     m_eCurLevel = pDesc->eCurLevel;
     m_ActivateDesc = *pDesc;
     m_fDuration = m_ActivateDesc.fDuration;
-    m_vStartRotation = pDesc->vStartRotation;
-    m_vRotationAxis = pDesc->vRotationAxis;
-    m_pTargetTransform = pDesc->pTargetTransform;
-    m_pParentMatrix = pDesc->pParentMatrix;
     m_vStartPos = pDesc->vStartPos;
+    m_vStartScale = pDesc->vStartScale;
     Reset_Timer();
 
-    // 흠..
-
-    /* 하위 객체들 Activate 실행 */
-    // ... PillarA, B, C 활성화 코드 ...
-    CSwordWind::SWORDWIND_ACTIVATE_DESC ActivateDesc{};
-    ActivateDesc.eCurLevel = m_eCurLevel;
-    ActivateDesc.fGrowDuration = m_fDuration * 0.4f;
-    ActivateDesc.fStayDuration = m_fDuration * 0.2f;
-    ActivateDesc.fDecreaseDuration = m_fDuration * 0.4f;
-    ActivateDesc.vStartRotation = m_vStartRotation;
-    ActivateDesc.vRotationAxis = m_vRotationAxis;
-    ActivateDesc.pTargetTransform = pDesc->pTargetTransform;
-    ActivateDesc.pParentMatrix = pDesc->pParentMatrix;
-    ActivateDesc.vStartPos = pDesc->vStartPos;
     
-
-
-
-    for (_uint i = 0; i < m_vecSwordWinds.size(); ++i)
+    m_iWindCount = pDesc->iWindCount;
+    m_fCreateDelay = pDesc->fCreateDelay;
+   
+    
+    // ⭐ 단 하나의 검풍만 활성화
+ /*   if (!m_vecSwordWinds.empty())
     {
-        ActivateDesc.fRotationSpeed = 0.0f;
-        ActivateDesc.fCreateTime = 0.02f * i; // 더 짧은 간격
+        m_vecSwordWinds[0]->OnActivate(&ActivateDesc);
+    }*/
 
-        // 각도를 줄여서 더 집중된 효과wwww
-        _float fAngleOffset = (i - 1.5f) * 5.0f; // -7.5, -2.5, 2.5, 7.5도
-        ActivateDesc.vStartRotation.y += fAngleOffset;
-
-        // 크기를 크게 해서 더 진한 효과
-        _float3 vScale = { 1.0f, 1.0f, 1.0f }; // 기본 크기 증가
-        XMStoreFloat3(&ActivateDesc.vStartScale, XMLoadFloat3(&vScale));
-
-        m_vecSwordWinds[i]->OnActivate(&ActivateDesc);
+    _wstring strComTag = {};
+    for (_uint i = 0; i < m_iWindCount; ++i)
+    {
+        strComTag = TEXT("Com_SwordWind") + to_wstring(i);
+        m_EffectTrigger.emplace_back(EFFECTTRIGGER{ m_fCreateDelay * i, false, strComTag });
     }
-
+    
 
 
 }
@@ -135,6 +120,42 @@ void CEffect_Wind::OnActivate(void* pArg)
 void CEffect_Wind::OnDeActivate()
 {
     m_IsDestroy = true;
+}
+
+void CEffect_Wind::Initialize_EffectTrigger(const _wstring& strTag)
+{
+    CSwordWind::SWORDWIND_ACTIVATE_DESC ActivateDesc{};
+    ActivateDesc.eCurLevel = m_eCurLevel;
+
+    // ⭐ 검풍 효과의 생명주기 및 크기 설정
+    ActivateDesc.fStayDuration = 0.0f;     // 유지 시간
+    ActivateDesc.fMoveDuration = 0.7f;     // 나타나며 커지는 시간
+    ActivateDesc.fDecreaseDuration = 0.2f; // 사라지는 시간
+    ActivateDesc.vStartPos = m_vStartPos;
+    //ActivateDesc.vStartScale = { 5.0f, 5.0f, 5.0f }; // 초반 크기
+    ActivateDesc.vStartScale = m_vStartScale;
+    
+
+    if (m_iCurrentWind < m_vecSwordWinds.size())
+    {
+        m_vecSwordWinds[m_iCurrentWind]->OnActivate(&ActivateDesc);
+        m_iCurrentWind++;
+    }
+
+}
+
+void CEffect_Wind::Effect_TriggerCheck(_float fTimeDelta)
+{
+    for (auto& Trigger : m_EffectTrigger)
+    {
+        if (Trigger.fTriggerTime <= m_fCurrentTime && Trigger.bIsTriggered == false)
+        {
+            // 트리거 발동
+            Trigger.bIsTriggered = true;
+            // 트리거에 필요한 정보를 채워서 OnActivate 호출
+            Initialize_EffectTrigger(Trigger.strPartObjectTag);
+        }
+    }
 }
 
 void CEffect_Wind::Calc_Timer(_float fTimeDelta)
@@ -171,20 +192,32 @@ HRESULT CEffect_Wind::Ready_PartObjects()
     WindDesc.pOwner = this;
     WindDesc.eCurLevel = m_eCurLevel;
     WindDesc.eShaderPath = MESH_SHADERPATH::SWORD_WIND;
-    WindDesc.iTextureIndexArray[TEXTURE::TEXTURE_DIFFUSE] = 0; // 사용할 인덱스.
 
-    _float3 vScale = { 1.5f, 1.5f, 1.5f }; // 기본 크기.
+    // 텍스처 인덱스 설정
+    WindDesc.iTextureIndexArray[TEXTURE::TEXTURE_DIFFUSE] = 0;
+    WindDesc.iTextureIndexArray[TEXTURE::TEXTURE_OTHER] = 0;
+    WindDesc.iTextureIndexArray[TEXTURE::TEXTURE_NOISE] = 0;
+    WindDesc.iTextureIndexArray[TEXTURE::TEXTURE_SWIRL] = 0;
+
     _wstring strComTag = TEXT("Com_SwordWind");
-    m_vecSwordWinds.resize(4);
+    m_vecSwordWinds.resize(20); // 여러개의.. 검풍 최대 20개?
+
     for (_uint i = 0; i < m_vecSwordWinds.size(); ++i)
     {
-        // Com Tag 다르게 설정. 
-        strComTag += to_wstring(i);
+        // Com Tag 다르게 설정
+        _wstring strUniqueTag = strComTag + to_wstring(i);
+
         WindDesc.fDisplayTime = m_fDuration;
-        XMStoreFloat3(&WindDesc.vStartScale, XMLoadFloat3(&vScale) * (1.f + i * 0.5f)); // 1.f, 1.15f, 1.3f, 1.45f
-        if (FAILED(CContainerObject::Add_PartObject(strComTag,
-            ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_SwordWind")
-            , reinterpret_cast<CPartObject**>(&m_vecSwordWinds[i]), &WindDesc)))
+        
+        // 기본 크기는 OnActivate에서 설정
+        _float3 vScale = { 1.0f, 1.0f, 1.0f };
+        
+        
+        XMStoreFloat3(&WindDesc.vStartScale, XMLoadFloat3(&vScale));
+
+        if (FAILED(CContainerObject::Add_PartObject(strUniqueTag,
+            ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_SwordWind"),
+            reinterpret_cast<CPartObject**>(&m_vecSwordWinds[i]), &WindDesc)))
         {
             CRASH("Failed Create SwordWind");
             return E_FAIL;
@@ -254,9 +287,5 @@ void CEffect_Wind::Free()
     CContainerObject::Free();
 	for (auto& pSwordWind : m_vecSwordWinds)
 		Safe_Release(pSwordWind);
-
-    //Safe_Release(m_pBloodPillarA);
-    //Safe_Release(m_pBloodPillarB);
-    //Safe_Release(m_pBloodPillarC);
     
 }

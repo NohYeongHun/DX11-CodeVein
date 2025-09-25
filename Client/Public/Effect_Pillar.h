@@ -71,12 +71,12 @@ public:
 
 private:
     LEVEL m_eCurLevel = { LEVEL::END };
-    _bool m_bActive = false;
+    _bool m_IsActive = false;
 
     _float m_fCurrentTime = {};
     _float m_fDuration = {};
     _float m_fAttackPower = {};
-    _float m_fTargetRadius = { 4.f };
+    _float m_fTargetRadius = { 6.f };
     PILLAR_ACTIVATE_DESC m_ActivateDesc = {};
 
 

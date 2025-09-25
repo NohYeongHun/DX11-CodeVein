@@ -7089,14 +7089,14 @@ bool ImGui::CollapsingHeader(const char* label, bool* p_visible, ImGuiTreeNodeFl
         // FIXME: We can evolve this into user accessible helpers to add extra buttons on title bars, headers, etc.
         // FIXME: CloseButton can overlap into text, need find a way to clip the text somehow.
         ImGuiContext& g = *GImGui;
-        ImGuiLastItemData last_item_backup = g.LastItemData;
+        ImGuiLastItemData last_item_Isackup = g.LastItemData;
         float button_size = g.FontSize;
         float button_x = ImMax(g.LastItemData.Rect.Min.x, g.LastItemData.Rect.Max.x - g.Style.FramePadding.x - button_size);
         float button_y = g.LastItemData.Rect.Min.y + g.Style.FramePadding.y;
         ImGuiID close_button_id = GetIDWithSeed("#CLOSE", NULL, id);
         if (CloseButton(close_button_id, ImVec2(button_x, button_y)))
             *p_visible = false;
-        g.LastItemData = last_item_backup;
+        g.LastItemData = last_item_Isackup;
     }
 
     return is_open;
@@ -10562,10 +10562,10 @@ void ImGui::TabItemLabelAndCloseButton(ImDrawList* draw_list, const ImRect& bb, 
     }
     else if (close_button_visible)
     {
-        ImGuiLastItemData last_item_backup = g.LastItemData;
+        ImGuiLastItemData last_item_Isackup = g.LastItemData;
         if (CloseButton(close_button_id, button_pos))
             close_button_pressed = true;
-        g.LastItemData = last_item_backup;
+        g.LastItemData = last_item_Isackup;
 
         // Close with middle mouse button
         if (is_hovered && !(flags & ImGuiTabItemFlags_NoCloseWithMiddleMouseButton) && IsMouseClicked(2))

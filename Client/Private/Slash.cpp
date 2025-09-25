@@ -45,6 +45,9 @@ HRESULT CSlash::Initialize_Clone(void* pArg)
 
 void CSlash::Priority_Update(_float fTimeDelta)
 {   
+    if (m_IsActivate && m_fCreateDelay > 0.f)
+        return;
+
     if (!m_IsActivate)
         return;
 
@@ -53,6 +56,12 @@ void CSlash::Priority_Update(_float fTimeDelta)
 
 void CSlash::Update(_float fTimeDelta)
 {
+    if (m_IsActivate && m_fCreateDelay > 0.f)
+    {
+        m_fCreateDelay -= fTimeDelta;
+        return;
+    }
+        
 
     if (!m_IsActivate)
         return;
@@ -61,7 +70,17 @@ void CSlash::Update(_float fTimeDelta)
 
     // 타이머 업데이트
     m_fCurrentTime += fTimeDelta;
+
     
+    if (m_IsScaleChange)
+    {
+        _float fRatio = m_fCurrentTime / m_fDisplayTime;
+        _float3 vScale = {};
+        XMStoreFloat3(&vScale, XMVectorLerp(XMLoadFloat3(&m_vScale), XMLoadFloat3(&m_vTargetScale), fRatio));
+        // Scale 보간.
+        m_pTransformCom->Set_Scale(vScale);
+    }
+
     // 시간이 지나면 비활성화
     if (m_fCurrentTime >= m_fDisplayTime)
     {
@@ -76,6 +95,9 @@ void CSlash::Update(_float fTimeDelta)
 
 void CSlash::Late_Update(_float fTimeDelta)
 {
+    if (m_IsActivate && m_fCreateDelay > 0.f)
+        return;
+
     if (!m_IsActivate)
         return;
 
@@ -137,10 +159,17 @@ void CSlash::OnActivate(void* pArg)
     m_pTransformCom->Set_State(STATE::POSITION, pDesc->vHitPosition);
     m_fDisplayTime = pDesc->fDisPlayTime;
     // 2. 설정되었을때 Camera에 따른 방향을 재계산할 필요성이 존재.
-    m_bDirectionCalculated = false;
+    m_IsDirectionCalculated = false;
     m_vScale = pDesc->vScale;
+
+    m_vTargetScale = pDesc->vTargetScale;
+    m_IsScaleChange = pDesc->bIsScaleChange;
     // 3. 위치 및 회전계산.
     Initialize_Transform();
+
+    m_fCreateDelay = pDesc->fCreateDelay;
+
+    m_iShaderPath = static_cast<_uint>(pDesc->eShaderPath);
 
     m_IsActivate = true;
 }
@@ -157,7 +186,7 @@ void CSlash::OnDeActivate()
 void CSlash::Initialize_Transform()
 {
     // 이미 계산되었다면 다시 계산하지 않음
-    if (m_bDirectionCalculated)
+    if (m_IsDirectionCalculated)
         return;
 
     // 1. 카메라 위치 가져오기
@@ -189,17 +218,12 @@ void CSlash::Initialize_Transform()
     m_pTransformCom->Set_State(STATE::LOOK, vLook);
 
     // 6. 크기 설정.
-    //_float fSizeX = m_vScale.x + static_cast<float>(rand()) / RAND_MAX * 1.5f; // 1.5f ~ 3.f
-    //_float fSizeY = m_vScale.y + static_cast<float>(rand()) / RAND_MAX * 0.2f; // 0.2f ~ 0.3f
-
-    //_float fSizeX = m_pGameInstance->Rand(1.5f, 3.f); // 1.5f ~ 3.f
-    //_float fSizeY = 0.15f;
     _float fSizeX = m_vScale.x;
     _float fSizeY = m_vScale.y;
     m_pTransformCom->Set_Scale({ fSizeX, fSizeY, m_vScale.z });
 
     // 7. 계산 완료 플래그 설정
-    m_bDirectionCalculated = true;
+    m_IsDirectionCalculated = true;
 }
 
 HRESULT CSlash::Bind_ShaderResources()
@@ -226,7 +250,7 @@ HRESULT CSlash::Bind_ShaderResources()
     }
 
 #pragma region TEXTURE
-    if (FAILED(m_pTextureCom[DIFFUSE]->Bind_Shader_Resource(m_pShaderCom, "g_DiffuseTexture", 0)))
+    if (FAILED(m_pTextureCom[DIFFUSE]->Bind_Shader_Resource(m_pShaderCom, "g_DiffuseTexture", 1)))
     {
         CRASH("Failed Bind Texture LockOnUI");
         return E_FAIL;
@@ -239,20 +263,6 @@ HRESULT CSlash::Bind_ShaderResources()
         return E_FAIL;
     }
 #pragma endregion
-
-   /* if (FAILED(m_pTextureCom[TEXTURE_MASK]->Bind_Shader_Resource(m_pShaderCom, "g_MaskTexture", 0)))
-    {
-        CRASH("Failed Bind Texture LockOnUI");
-        return E_FAIL;
-    }
-
-
-    if (FAILED(m_pTextureCom[TEXTURE_DIFFUSE]->Bind_Shader_Resource(m_pShaderCom, "g_DiffuseTexture", 0)))
-    {
-        CRASH("Failed Bind Texture LockOnUI");
-        return E_FAIL;
-    }*/
-
     // 시간 진행도 계산 (0.0 ~ 1.0)
     _float fTimeRatio = m_fCurrentTime / m_fDisplayTime;
     
@@ -328,24 +338,6 @@ HRESULT CSlash::Ready_Components()
     }
 #pragma endregion
 
-
-
-
-
-
-    //if (FAILED(Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_SlashEffectMask"),
-    //    TEXT("Com_Texture"), reinterpret_cast<CComponent**>(&m_pTextureCom[TEXTURE_MASK]))))
-    //{
-    //    CRASH("Failed Load Texture");
-    //    return E_FAIL;
-    //}
-
-    //if (FAILED(Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_SlashEffectDiffuse"),
-    //    TEXT("Com_DiffuseTexture"), reinterpret_cast<CComponent**>(&m_pTextureCom[TEXTURE_DIFFUSE]))))
-    //{
-    //    CRASH("Failed Load Texture");
-    //    return E_FAIL;
-    //}
 
     return S_OK;
 }

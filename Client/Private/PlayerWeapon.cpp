@@ -110,7 +110,7 @@ void CPlayerWeapon::Late_Update(_float fTimeDelta)
 
 
     // Trail이 켜질때만 넣기.
-    if (m_bTrail)
+    if (m_IsTrail)
           m_pTrailWeapon_Effect->Late_Update(fTimeDelta);
 }
 
@@ -151,6 +151,8 @@ void CPlayerWeapon::On_Collision_Enter(CGameObject* pOther)
 {
     CWeapon::On_Collision_Enter(pOther);
         
+    
+
     //OutputDebugWstring(pOther->Get_ObjectTag() + TEXT("충돌"));
     //CWeapon::Deactivate_Collider();
 }
@@ -260,6 +262,7 @@ HRESULT CPlayerWeapon::Ready_Effects()
     Desc.fSpeedPerSec = 5.f;
     Desc.fRotationPerSec = XMConvertToRadians(1.0f);
     Desc.eDiffuseType = TRAIL_DIFFUSE::SWORD;
+    Desc.eShaderPath = EFFECTTRAIL_SHADERPATH::TRAIL_EMISSIVE;
 
 ;    m_pTrailWeapon_Effect = dynamic_cast<CSwordTrail*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT,
         ENUM_CLASS(LEVEL::STATIC)
@@ -288,19 +291,6 @@ HRESULT CPlayerWeapon::Bind_ShaderResources()
     if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
         return E_FAIL;
 
-    /*const LIGHT_DESC* pLightDesc = m_pGameInstance->Get_LightDesc(0);
-    if (nullptr == pLightDesc)
-        return E_FAIL;
-
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDir", &pLightDesc->vDirection, sizeof(_float4))))
-        return E_FAIL;
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDiffuse", &pLightDesc->vDiffuse, sizeof(_float4))))
-        return E_FAIL;
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightAmbient", &pLightDesc->vAmbient, sizeof(_float4))))
-        return E_FAIL;
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightSpecular", &pLightDesc->vSpecular, sizeof(_float4))))
-        return E_FAIL;*/
-    
 
     return S_OK;
 }

@@ -56,7 +56,7 @@ private:
 	_float                  m_fEmitInterval = { 0.f };  // 1초에 몇 개를 생성할지에 대한 실제 시간 간격
 	_float					m_fElapsedTime = 0.f; // 활성화 후 누적시간
 	_uint                   m_iBurstCount = { 0 };      // 한번에 터뜨릴 파티클 개수
-	_bool					m_bHasBursted = { false };
+	_bool					m_IsHasBursted = { false };
 	
 
 	// Emitter의 고유 속성

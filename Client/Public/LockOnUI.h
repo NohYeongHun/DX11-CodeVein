@@ -36,8 +36,8 @@ public:
     _bool Has_Target() const { return m_pTarget != nullptr; }
     
     // UI 활성화/비활성화
-    void Set_Active(_bool bActive) { m_bActive = bActive; }
-    _bool Is_Active() const { return m_bActive; }
+    void Set_Active(_bool bActive) { m_IsActive = bActive; }
+    _bool Is_Active() const { return m_IsActive; }
 
 private:
     // 월드 좌표를 스크린 좌표로 변환
@@ -54,7 +54,7 @@ private:
     // LockOn 관련
     class CMonster* m_pTarget = { nullptr };
     _float m_fTargetRadius = 1.0f;
-    _bool m_bActive = false;
+    _bool m_IsActive = false;
     
     // 애니메이션
     _float m_fAnimationTime = 0.0f;

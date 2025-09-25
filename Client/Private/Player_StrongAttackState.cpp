@@ -51,6 +51,12 @@ void CPlayer_StrongAttackState::Enter(void* pArg)
 		}
 	}
 
+	STEMINA_CHANGE_DESC SteminaDesc{};
+	SteminaDesc.bIncrease = false;
+	SteminaDesc.fStemina = 20.f;
+	SteminaDesc.fTime = 1.f;
+	m_pGameInstance->Publish(EventType::STEMINA_CHANGE, &SteminaDesc);
+
 	// 이 때 검에 콜라이더 활성화 이런 과정 진행
 }
 

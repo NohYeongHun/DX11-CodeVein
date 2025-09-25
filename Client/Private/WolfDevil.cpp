@@ -182,7 +182,7 @@ HRESULT CWolfDevil::Render()
         if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
             CRASH("Ready Bone Matrices Failed");
 
-        if (FAILED(m_pShaderCom->Begin(0)))
+        if (FAILED(m_pShaderCom->Begin(m_iShaderPath)))
             CRASH("Ready Shader Begin Failed");
 
         if (FAILED(m_pModelCom->Render(i)))
@@ -211,7 +211,8 @@ void CWolfDevil::On_Collision_Enter(CGameObject* pOther)
             // 1. 데미지를 입고.
             Take_Damage(pPlayerWeapon->Get_AttackPower(), pPlayerWeapon);
 
-            // 2. 해당 위치에 검흔 Effect 생성?
+            // 2. 사운드 재생.
+            m_pGameInstance->PlaySoundEffect(L"NormalAttack.wav", 0.3f);
 
             // 3. 무적 버프 추가.
             AddBuff(BUFF_INVINCIBLE);
@@ -257,6 +258,13 @@ void CWolfDevil::Update_AI(_float fTimeDelta)
     // 트리 이후에 상태 값에 대한 초기화를 담당하는 Tick_BuffTimer 실행
     Tick_BuffTimers(fTimeDelta);
 
+    if (HasBuff(CMonster::BUFF_DISSOLVE))
+        m_fCurDissolveTime = m_fMaxDissolveTime - Get_BuffTime(BUFF_DISSOLVE); // 점차 보내는 값이 증가.
+    else if (HasBuff(CMonster::BUFF_REVERSEDISSOLVE))
+        m_fCurDissolveTime = Get_BuffTime(BUFF_REVERSEDISSOLVE); // 점차 값이 감소.
+    else
+        m_fCurDissolveTime = 0.f; // 버프가 사라지면서 잔여값이 남아서 Texture Reverse Dissolve가 모두 동작하지 않음.
+
     /* 콜라이더 활성화 구간 확인 */
     CMonster::Handle_Collider_State();
 
@@ -264,6 +272,42 @@ void CWolfDevil::Update_AI(_float fTimeDelta)
     {
     }
 
+}
+void CWolfDevil::Start_Dissolve(_float fDuration)
+{
+    if (fDuration == 0.f)
+        AddBuff(BUFF_DISSOLVE);
+
+    AddBuff(BUFF_DISSOLVE, fDuration);
+    m_fMaxDissolveTime = Get_BuffTime(BUFF_DISSOLVE);
+    m_fCurDissolveTime = 0.f;
+
+    m_iShaderPath = static_cast<_uint>(ANIMESH_SHADERPATH::DISSOLVE);
+}
+void CWolfDevil::ReverseStart_Dissolve(_float fDuration)
+{
+    if (fDuration == 0.f)
+        AddBuff(BUFF_REVERSEDISSOLVE);
+
+    AddBuff(BUFF_REVERSEDISSOLVE, fDuration);
+    m_fMaxDissolveTime = Get_DefaultBuffTime(BUFF_DISSOLVE);
+    m_iShaderPath = static_cast<_uint>(ANIMESH_SHADERPATH::DISSOLVE);
+}
+void CWolfDevil::End_Dissolve()
+{
+    RemoveBuff(BUFF_DISSOLVE);
+    RemoveBuff(BUFF_REVERSEDISSOLVE);
+    m_iShaderPath = static_cast<_uint>(ANIMESH_SHADERPATH::DEFAULT); // 중요!
+}
+void CWolfDevil::Dead_Action()
+{
+    CMonster::Dead_Action();
+    Start_Dissolve(6.f);
+}
+void CWolfDevil::Hit_Action()
+{
+    CMonster::Hit_Action();
+    m_pGameInstance->PlaySoundEffect(L"Wolf_Hit.wav", 0.3f);
 }
 #pragma endregion
 
@@ -339,6 +383,11 @@ HRESULT CWolfDevil::Initialize_BuffDurations()
     m_BuffDefault_Durations[BUFF_ATTACK_TIME] = 1.f; // 공격 쿨타임.
     m_BuffDefault_Durations[BUFF_DETECT] = 0.5f; // 탐지 쿨타임: 0.2초
 
+
+    // Dissolve
+    m_BuffDefault_Durations[BUFF_DISSOLVE] = 1.f;
+    m_BuffDefault_Durations[BUFF_REVERSEDISSOLVE] = 0.5f;
+    
 
     return S_OK;
 }
@@ -418,6 +467,16 @@ HRESULT CWolfDevil::Ready_Components(WOLFDEVIL_DESC* pDesc)
 
     m_pGameInstance->Add_Collider_To_Manager(m_pColliderCom, ENUM_CLASS(m_eCurLevel));
 
+    // Dissolve Texture
+    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Dissolve"),
+        TEXT("Com_Dissolve"), reinterpret_cast<CComponent**>(&m_pDissolveTexture), nullptr)))
+    {
+        CRASH("Failed Load DissolveTexture");
+        return E_FAIL;
+    }
+    m_fEndReverseDissolveTime = 2.f;
+
+
     return S_OK;
 }
 
@@ -476,6 +535,20 @@ HRESULT CWolfDevil::Ready_Render_Resources()
 
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_Transform_Float4x4(D3DTS::PROJ))))
         return E_FAIL;
+
+    _float fDissolveTime = normalize(m_fCurDissolveTime, 0.f, m_fMaxDissolveTime);
+
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fDissolveTime", &fDissolveTime, sizeof(_float))))
+    {
+        CRASH("Failed Dissolve Time");
+        return E_FAIL;
+    }
+
+    if (FAILED(m_pDissolveTexture->Bind_Shader_Resource(m_pShaderCom, "g_DissolveTexture", 2)))
+    {
+        CRASH("Failed Dissolve Texture");
+        return E_FAIL;
+    }
 
 
     return S_OK;
@@ -613,6 +686,8 @@ void CWolfDevil::Free()
     Safe_Release(m_pTree);
     Safe_Release(m_pWeapon);
     Safe_Release(m_pMonsterHpBar);
+    Safe_Release(m_pDissolveTexture);
+
 }
 
 

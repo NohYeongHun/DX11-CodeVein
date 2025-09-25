@@ -52,7 +52,7 @@ void CLoading_Slot::Update(_float fTimeDelta)
 
 void CLoading_Slot::Late_Update(_float fTimeDelta)
 {
-    if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::UI, this)))
+    if (FAILED(m_pGameInstance->Add_RenderGroup(RENDERGROUP::STATIC_UI, this)))
         return;
 
     CUIObject::Late_Update(fTimeDelta);

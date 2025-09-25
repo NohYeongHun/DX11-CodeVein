@@ -1,5 +1,4 @@
-﻿#include "SkillUI_Icon.h"
-CSkillUI_Icon::CSkillUI_Icon(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿CSkillUI_Icon::CSkillUI_Icon(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CUIObject(pDevice, pContext)
 {
 }

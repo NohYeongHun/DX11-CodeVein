@@ -5,6 +5,9 @@ texture2D g_Texture;
 texture2D g_MaskTexture;
 texture2D g_NoiseTexture;
 
+texture2D g_DiffuseTextures[2];
+
+
 float g_fFillRatio;
 float g_fNoiseTime;
 
@@ -205,61 +208,6 @@ PS_OUT PS_HP_PROGRESSBAR_MAIN(PS_IN In)
     }
 
     return Out;
-    
-    
-    //PS_OUT Out = (PS_OUT) 0;
-
-    //float2 uv = In.vTexcoord;
-    //float4 fillerColor = float4(0.5, 0.5, 0.5, 1); 
-    //float4 fillerBlack = float4(0, 0, 0, 1);
-    ////float4 baseColor = g_Texture.Sample(PointSampler, uv);
-
-    // // 흐르는 효과의 속도를 조절하는 변수
-    //float scrollSpeed = 0.2;
-    
-    //// uv.x 좌표에 시간을 더하여 텍스처를 가로(x축) 방향으로 스크롤
-    //float2 scrolledUv = uv;
-    //scrolledUv.x += g_fNoiseTime * scrollSpeed;
-    
-    //// Image 2 (g_DistortionTexture라고 가정)에서 왜곡 값을 샘플링
-    //// 두 번째 이미지를 텍스처로 로드하고 g_DistortionTexture로 바인딩했다고 가정합니다.
-    //float4 distortion = g_NoiseTexture.Sample(PointSampler, uv);
-    
-    //// 왜곡의 강도를 조절하는 변수 (예: 0.01)
-    //float distortionStrength = 0.05;
-    
-    //// uv 좌표에 왜곡 적용
-    //// distortion.r은 흑백 이미지의 빨간 채널 값을 사용합니다.
-    //// 0.5를 빼서 -0.5 ~ 0.5 범위로 만들어 uv를 양방향으로 이동시킵니다.
-    //float2 distortedUv = uv + (distortion.rg - 0.5) * distortionStrength;
-    
-    //float4 baseColor = g_Texture.Sample(PointSampler, distortedUv);
-    
-    
-    //bool bIsFillGray = uv.x < g_fRightRatio && uv.x > g_fLeftRatio;
-    //bool bIsFill; 
-    
-    //if (g_bIncrease)
-    //    bIsFill = uv.x > g_fLeftRatio; 
-    //else
-    //    bIsFill = uv.x > (1.0 - g_fFillRatio); 
-       
-    
-    //if (bIsFill)
-    //{
-    //    if (bIsFillGray)
-    //    {
-    //        Out.vColor = lerp(baseColor, fillerColor, 0.8f); 
-    //    }
-    //    else
-    //        Out.vColor = fillerBlack; 
-    //}
-    //else
-    //{
-    //    Out.vColor = baseColor;
-    //}
-
-    //return Out;
 }
 
 PS_OUT PS_BLACK_MAIN(PS_IN In)
@@ -426,12 +374,35 @@ PS_OUT PS_MONSTERHP_PROGRESSBAR_MAIN(PS_IN In)
     return Out;
 }
 
+PS_OUT PS_QUEENKNIGHT_ENCOUNTER_MAIN(PS_IN In)
+{
+    PS_OUT Out = (PS_OUT) 0;
+
+    float4 baseColor = g_DiffuseTextures[0].Sample(DefaultSampler, In.vTexcoord);
+    
+
+    // g_fFade에 따라 점차 투명해지기 (0.0 = 완전히 보임, 1.0 = 완전히 투명)
+    float fadeAlpha = 1.0f - saturate(g_fFade);
+    baseColor.a *= fadeAlpha;
+
+    Out.vColor = baseColor;
+
+    return Out;
+}
+
+// Image 1: 메인 UI 텍스처 (Queen's Knight 글자 및 문양)
+// Image 2: 마스크 텍스처 (UI 주변을 어둡게 할 영역을 정의 - 밝은 부분이 어둡게 됨)
+// Image 3: 이펙트 (현재 쉐이더에 사용되지 않음)
+
+
+
+
 
 
 
 technique11 DefaultTechnique
 {
-    pass DefaultPass
+    pass DefaultPass // 0
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_Default, 0);
@@ -441,7 +412,7 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_MAIN();
     }
 
-    pass LoadingSlotPass
+    pass LoadingSlotPass // 1
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_Default, 0);
@@ -451,8 +422,8 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_LOADINGSLOT_MAIN();
     }
 
-    pass SkillSlotPass
-    {
+    pass SkillSlotPass // 2
+    { 
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_Default, 0);
         SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
@@ -461,7 +432,7 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_SKILLSLOT_MAIN();
     }
 
-    pass FadeOutPass
+    pass FadeOutPass // 3
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_Default, 0);
@@ -471,7 +442,7 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_FADEOUT_MAIN();
     }
 
-    pass TitleBackGroundPass // Alpha Blend
+    pass TitleBackGroundPass // 4
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_Default, 0);
@@ -481,7 +452,7 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_TITLE_BACKGROUND_MAIN();
     }
 
-    pass HPProgressBarPass
+    pass HPProgressBarPass // 5
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_Default, 0);
@@ -491,7 +462,7 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_HP_PROGRESSBAR_MAIN();
     }
 
-    pass BlackColorPass
+    pass BlackColorPass // 6
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_Default, 0);
@@ -501,7 +472,7 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_BLACK_MAIN();
     }
 
-    pass LockOnPass
+    pass LockOnPass // 7
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_None, 0);
@@ -512,7 +483,7 @@ technique11 DefaultTechnique
     }
 
 
-    pass FadeInPass
+    pass FadeInPass // 8
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_Default, 0);
@@ -522,7 +493,7 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_FADEIN_MAIN();
     }
     
-    pass MonsterLineSlashPass
+    pass MonsterLineSlashPass // 9
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_Default, 0);
@@ -532,7 +503,7 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_LINESLASH_MAIN();
     }
 
-    pass MonsterHitFlashPass
+    pass MonsterHitFlashPass // 10
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_Default, 0);
@@ -542,7 +513,7 @@ technique11 DefaultTechnique
         PixelShader = compile ps_5_0 PS_HITFLASH_MAIN();
     }
 
-    pass MonsterHpProgressBarPass
+    pass MonsterHpProgressBarPass // 11
     {
         SetRasterizerState(RS_Default);
         SetDepthStencilState(DSS_None, 0);
@@ -551,5 +522,17 @@ technique11 DefaultTechnique
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_MONSTERHP_PROGRESSBAR_MAIN();
     }
+
+    pass QueenKnightEncounterUIPass // 12
+    {
+        SetRasterizerState(RS_Default);
+        SetDepthStencilState(DSS_None, 0);
+        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
+        VertexShader = compile vs_5_0 VS_MAIN();
+        GeometryShader = NULL;
+        PixelShader = compile ps_5_0 PS_QUEENKNIGHT_ENCOUNTER_MAIN();
+    }
+
+  
 
 }

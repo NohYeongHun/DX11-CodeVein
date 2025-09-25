@@ -257,7 +257,7 @@ protected:
     MONSTER_STAT m_MonsterStat = {};
     _float m_fMinDetectionDistance = 5.f;
     _float m_fMinRotationDistance = 2.f;
-    _bool m_bIsCurrentlyDetecting = false;  // 현재 탐지 중인지 상태
+    _bool m_IsCurrentlyDetecting = false;  // 현재 탐지 중인지 상태
 #pragma endregion
 
 
@@ -315,16 +315,31 @@ public:
     
 
 public:
+    virtual void PlayHitSound() {};
+    virtual void PlayWeaponSound() {};
+
+
+
+public:
     /* 콜라이더 제어.*/
     virtual void Enable_Collider(_uint iType) PURE; 
     virtual void Disable_Collider(_uint iType) PURE;
     
     /* Reset 시 파츠 콜라이더 비활성화 */
     virtual void Reset_Part_Colliders();
-    virtual void Dead_Action();
+
 
     /* 무기 회전*/
     virtual void Weapon_Rotation(_uint iPartType, _float3 vRadians, _bool bInverse = false) {};
+
+    /* Hit Action*/
+    virtual void Hit_Action() {};
+    virtual void Hit_EndAction() {};
+
+
+    /* Cut Scene*/
+    virtual void Play_CutScene() {};
+    virtual void End_CutScene() {};
 
 // 특수 조건 : 조우 했는가?
 protected:
@@ -338,6 +353,9 @@ public:
 
     /* Encounter시 실행해야할 작업. */
     virtual void Encounter_Action() {};
+    virtual void Encounter_EndAction() {};
+
+   
 
 
 #pragma endregion
@@ -355,17 +373,37 @@ public:
 public:
     virtual _bool Monster_Dead();
 
+
+public:
+    virtual void Dead_Effect() {};
+    virtual void Dead_Action();
+    virtual void Start_Dissolve(_float fDuration = 0.f) {};
+    virtual void ReverseStart_Dissolve(_float fDuration = 0.f) {}; // Dissolve 역재생
+    virtual void End_Dissolve() {};
+
+protected:
+    _float m_fDissolveTime = {};
+
+    _float m_fMaxDissolveTime = {};
+    _float m_fCurDissolveTime = {};
+
+    _float m_fReverseDissolveTime = {};
+    _float m_fEndReverseDissolveTime = {};
+
+    _bool m_IsDissolve = { false };
+    _bool m_IsReverseDissolve = { false };
+
 #pragma endregion
 
 
 #pragma region 8. 렌더링 제어
 public:
     virtual void Set_Visible(_bool bVisible) {};
-    _bool Is_Visible() const { return m_bVisible; }
+    _bool Is_Visible() const { return m_IsVisible; }
 
 
 protected:
-    _bool m_bVisible = { true };  // 기본적으로 보이는 상태
+    _bool m_IsVisible = { true };  // 기본적으로 보이는 상태
 
 public:
     // 몬스터 LockOn 용도 위치 가져오기.
@@ -401,6 +439,11 @@ protected:
     MONSTERTYPE m_eMonsterType = { MONSTERTYPE::END };
 
     _float m_fOffsetY = {};
+    _bool m_isBgm = { false };
+
+public:
+    void Set_BGM(_bool bIsBgm) { m_isBgm = bIsBgm; }
+
     
 #pragma endregion
 

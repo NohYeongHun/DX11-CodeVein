@@ -112,6 +112,7 @@ HRESULT CPlayer::Initialize_Clone(void* pArg)
     }
 
     
+    ShowCursor(m_IsShowCursor);
 
     return S_OK;
 }
@@ -807,6 +808,12 @@ void CPlayer::Tick_BuffTimers(_float fTimeDelta)
 
 }
 
+/* 스킬 상태일 때 카메라 회전을 막습니다.*/
+void CPlayer::Set_SkillMode(_bool bSkillMode)
+{
+    m_pPlayerCamera->Set_SkillMode(bSkillMode);
+}
+
 
 HRESULT CPlayer::Initialize_BuffDurations()
 {
@@ -856,6 +863,7 @@ void CPlayer::Create_Particle(CParticleSystem::PARTICLE_TYPE eType)
         , TEXT("PARTICLE_SYSTEM"), TEXT("Layer_Effect")
         , 2, ENUM_CLASS(EFFECTTYPE::PARTICLE), &ActivateDesc);
 }
+
 #pragma endregion
 
 
@@ -926,6 +934,7 @@ void CPlayer::On_Collision_Enter(CGameObject* pOther)
 
 
                 Create_HitEffects(vClosestPoint, vAttackDirection);
+                m_pGameInstance->PlaySoundEffect(L"NormalAttack.wav", 0.3f);
 
                 //_float3 vPos = { 0.f, 1.f, 0.f };
                 //CEffect_Pillar::PILLAR_ACTIVATE_DESC EffectPillarDesc{};
@@ -1210,6 +1219,10 @@ void CPlayer::Update_KeyInput()
         m_pGameInstance->Publish<CInventory>(EventType::INVENTORY_DISPLAY, nullptr);
         m_IsInventoryDisplay = !m_IsInventoryDisplay;
         m_pPlayerCamera->Set_InventroyMode(m_IsInventoryDisplay);
+
+        m_IsShowCursor = !m_IsShowCursor;
+        
+        ShowCursor(m_IsShowCursor);
     }
         
 
@@ -1287,6 +1300,11 @@ void CPlayer::Take_Damage(_float fDamage, CEffect_Pillar* pEffectPillar)
     m_pFsmCom->Change_State(PLAYER_STATE::DAMAGE, &damageDesc);
 
     m_pGameInstance->Set_SlowMoment(0.5f, 0.8f);
+}
+
+const _float4x4* CPlayer::Get_BoneMatrix(string BoneName)
+{
+    return m_pModelCom->Get_BoneMatrix(BoneName.c_str());
 }
 
 

@@ -138,6 +138,8 @@ public:
 	void Take_Damage(_float fDamage, class CEffect_Pillar* pEffectPillar);
 
 	LEVEL Get_CurrentLevel() { return m_eCurLevel; }
+
+	const _float4x4* Get_BoneMatrix(string BoneName);
 #pragma endregion
 
 
@@ -183,7 +185,7 @@ private:
 	_float m_fLockOnTimer = 0.0f;                        // LockOn 타이머
 	_float m_fLockOnCheckInterval = 0.5f;                // LockOn 유효성 검사 주기
 	_float m_fLockOnRotationSpeed = 3.0f;                // LockOn 시 회전 속도
-	_bool m_bLockOnRotationEnabled = false;              // LockOn 시 자동 회전 여부
+	_bool m_IsLockOnRotationEnabled = false;              // LockOn 시 자동 회전 여부
 private:
 	class m_pLockOn_Target* m_pTarget = { nullptr };
 #pragma endregion
@@ -222,6 +224,9 @@ public:
 public:
 	void Tick_BuffTimers(_float fTimeDelta);
 
+public:
+	void Set_SkillMode(_bool bSkillMode);
+
 
 private:
 	HRESULT Initialize_BuffDurations();
@@ -249,9 +254,10 @@ public:
 
 #pragma endregion
 
-#pragma region 6. 파티클 시전.
+#pragma region 6. 이펙트
 public:
 	void Create_Particle(CParticleSystem::PARTICLE_TYPE eType);
+
 
 #pragma endregion
 
@@ -267,6 +273,7 @@ private:
 	class CCamera_Player* m_pPlayerCamera = { nullptr };
 	LEVEL m_eCurLevel = { LEVEL::END };
 	_float m_fOffsetY = {};
+	_bool m_IsShowCursor = { false };
 	
 #pragma endregion
 

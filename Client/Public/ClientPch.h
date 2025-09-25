@@ -51,7 +51,17 @@
 #include "Blood_PillarC.h"
 #include "Effect_Pillar.h"
 #include "Effect_Wind.h"
+
+#include "Effect_WindCircle.h"
+
+
+
+#include "Effect_PlayerSkill.h"
+#include "Effect_FloorAura.h"
+#include "Effect_BodyAura.h"
+
 #include "SwordWind.h"
+#include "SwordWindCircle.h"
 
 #include "SwordTrail.h"
 #pragma endregion
@@ -64,6 +74,8 @@
 #include "Camera_Free.h"
 #include "Camera_Player.h"
 /* =========================================== Title Object ===================================== */
+
+#include "Encounter_Title.h"
 #include "Title_BackGround.h"
 #include "TitleText.h"
 #include "Title.h"
@@ -134,6 +146,7 @@
 
 #pragma region Effect
 #include "Slash.h"
+#include "RenketsuSlash.h"
 #include "HitFlashEffect.h"
 #pragma endregion
 

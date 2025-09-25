@@ -41,24 +41,24 @@ HRESULT CBossHpBarUI::Initialize_Clone(void* pArg)
 void CBossHpBarUI::Priority_Update(_float fTimeDelta)
 {
 
-    if (m_bDecrease)
+    if (m_IsDecrease)
     {
         if (m_fRightRatio <= m_fLeftRatio)
         {
             m_fRightRatio = 0;
             m_fLeftRatio = 0;
-            m_bDecrease = false;
+            m_IsDecrease = false;
         }
         else
             m_fRightRatio -= fTimeDelta * 0.2f;
     }
-    if (m_bIncrease)
+    if (m_IsIncrease)
     {
         if (m_fRightRatio <= m_fLeftRatio)
         {
             m_fRightRatio = 0;
             m_fLeftRatio = 0;
-            m_bIncrease = false;
+            m_IsIncrease = false;
         }
         else
             m_fLeftRatio += fTimeDelta * 0.2f;
@@ -121,12 +121,12 @@ void CBossHpBarUI::Render_Text()
 
 void CBossHpBarUI::Increase_Hp(_float fHp, _float fTime)
 {
-    if (m_bDecrease)
+    if (m_IsDecrease)
     {
         m_fLeftRatio = m_fRightRatio;
         m_fHp = m_fHp < fHp ? 0 : m_fHp + fHp;
         m_fRightRatio = static_cast<_float>(m_fHp) / static_cast<_float>(m_fMaxHp);
-        m_bDecrease = false;
+        m_IsDecrease = false;
     }
     else
     {
@@ -135,17 +135,17 @@ void CBossHpBarUI::Increase_Hp(_float fHp, _float fTime)
         m_fRightRatio = static_cast<_float>(m_fHp) / static_cast<_float>(m_fMaxHp);
     }
 
-    m_bIncrease = true;
+    m_IsIncrease = true;
 }
 
 void CBossHpBarUI::Decrease_Hp(_float fHp, _float fTime)
 {
-    if (m_bIncrease)
+    if (m_IsIncrease)
     {
         m_fRightRatio = m_fLeftRatio;
         m_fHp = m_fHp < fHp ? 0 : m_fHp - fHp;
         m_fLeftRatio = static_cast<_float>(m_fHp) / static_cast<_float>(m_fMaxHp);
-        m_bIncrease = false;
+        m_IsIncrease = false;
     }
     else
     {
@@ -154,7 +154,7 @@ void CBossHpBarUI::Decrease_Hp(_float fHp, _float fTime)
         m_fLeftRatio = static_cast<_float>(m_fHp) / static_cast<_float>(m_fMaxHp);
     }
 
-    m_bDecrease = true;
+    m_IsDecrease = true;
 }
 
 
@@ -213,7 +213,7 @@ HRESULT CBossHpBarUI::Ready_Render_Resources()
     if (FAILED(m_pShaderCom->Bind_RawValue("g_fScrollSpeed", static_cast<void*>(&m_fScrollSpeed), sizeof(_float))))
         return E_FAIL;
 
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_bIncrease", static_cast<void*>(&m_bIncrease), sizeof(_bool))))
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_bIncrease", static_cast<void*>(&m_IsIncrease), sizeof(_bool))))
         return E_FAIL;
 
     if (FAILED(m_pTextureCom->Bind_Shader_Resource(m_pShaderCom, "g_Texture", m_iTextureIndex)))

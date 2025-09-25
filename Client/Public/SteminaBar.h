@@ -59,8 +59,8 @@ private:
 	_float  m_fMaxStemina = {};
 	_float	m_fIncreaseSpeed = {};
 
-	_bool  m_bIncrease = { false };
-	_bool  m_bDecrease = { false };
+	_bool  m_IsIncrease = { false };
+	_bool  m_IsDecrease = { false };
 #pragma endregion
 
 	vector<EventType> m_Events = { };

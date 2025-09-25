@@ -424,7 +424,7 @@ void CLoad_Model::Handle_RootMotion(_float fTimeDelta)
 			_float fBlendRatio = m_BlendDesc.fElapsed / m_BlendDesc.fBlendDuration;
 			
 			// 루트모션이 ON인 상태로 전환 중이면 점진적 증가, 루트모션이 OFF인 상태로 전환 중이면 점진적 감소
-			_float fRootMotionScale = m_bRootMotionTranslate ? fBlendRatio : (1.0f - fBlendRatio);
+			_float fRootMotionScale = m_IsRootMotionTranslate ? fBlendRatio : (1.0f - fBlendRatio);
 			vLocalTranslate *= fRootMotionScale;
 		}
 
@@ -432,7 +432,7 @@ void CLoad_Model::Handle_RootMotion(_float fTimeDelta)
 		_vector vWorldTranslate = vLocalTranslate; // 기본값
 
 		// 1. 플레이어 RotMatrix 추출 => 만약 RootMotionRotate 설정을 할것이라면?
-		if (m_bRootMotionRotate)
+		if (m_IsRootMotionRotate)
 		{
 			_matrix playerWorldMatrix = m_pOwner->Get_Transform()->Get_WorldMatrix();
 			_vector playerScale, playerRot, playerTrans;
@@ -442,7 +442,7 @@ void CLoad_Model::Handle_RootMotion(_float fTimeDelta)
 		}
 
 		// 2. 이동값을 월드에 적용할 것인지 애니메이션 에서 설정
-		if (m_bRootMotionTranslate)
+		if (m_IsRootMotionTranslate)
 		{
 			m_pOwner->RootMotion_Translate(vWorldTranslate);
 		}

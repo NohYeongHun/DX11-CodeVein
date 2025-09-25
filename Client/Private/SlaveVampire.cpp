@@ -1,4 +1,5 @@
-﻿CSlaveVampire::CSlaveVampire(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿#include "SlaveVampire.h"
+CSlaveVampire::CSlaveVampire(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
     : CMonster{pDevice, pContext}
 {
 }
@@ -185,7 +186,7 @@ HRESULT CSlaveVampire::Render()
         if (FAILED(m_pModelCom->Bind_BoneMatrices(m_pShaderCom, "g_BoneMatrices", i)))
             CRASH("Ready Bone Matrices Failed");
 
-        if (FAILED(m_pShaderCom->Begin(0)))
+        if (FAILED(m_pShaderCom->Begin(m_iShaderPath)))
             CRASH("Ready Shader Begin Failed");
 
         if (FAILED(m_pModelCom->Render(i)))
@@ -212,11 +213,13 @@ void CSlaveVampire::On_Collision_Enter(CGameObject* pOther)
             Take_Damage(pPlayerWeapon->Get_AttackPower(), pPlayerWeapon);
 
             // 2. 해당 위치에 검흔 Effect 생성?
+            m_pGameInstance->PlaySoundEffect(L"NormalAttack.wav", 0.3f);
 
             // 3. 무적 버프 추가.
             AddBuff(BUFF_INVINCIBLE);
 
             AddBuff(BUFF_HIT);
+
         }
     }
 
@@ -258,6 +261,14 @@ void CSlaveVampire::Update_AI(_float fTimeDelta)
     // 트리 이후에 상태 값에 대한 초기화를 담당하는 Tick_BuffTimer 실행
     Tick_BuffTimers(fTimeDelta);
 
+    if (HasBuff(CMonster::BUFF_DISSOLVE))
+        m_fCurDissolveTime = m_fMaxDissolveTime - Get_BuffTime(BUFF_DISSOLVE); // 점차 보내는 값이 증가.
+    else if (HasBuff(CMonster::BUFF_REVERSEDISSOLVE))
+        m_fCurDissolveTime = Get_BuffTime(BUFF_REVERSEDISSOLVE); // 점차 값이 감소.
+    else
+        m_fCurDissolveTime = 0.f; // 버프가 사라지면서 잔여값이 남아서 Texture Reverse Dissolve가 모두 동작하지 않음.
+
+
     /* 콜라이더 활성화 구간 확인 */
     CMonster::Handle_Collider_State();
 
@@ -265,6 +276,56 @@ void CSlaveVampire::Update_AI(_float fTimeDelta)
     {
     }
 
+    if (HasBuff(CMonster::BUFF_DEAD))
+        return;
+
+    _float fCurrentRatio = m_pModelCom->Get_Current_Ratio();
+    if (m_IsPlayWeaponSound && fCurrentRatio >= m_fPlayAttackSound)
+    {
+        m_IsPlayWeaponSound = false;
+        m_pGameInstance->PlaySoundEffect(L"SlaveVampireAttack.wav", 0.2f);
+    }
+
+}
+void CSlaveVampire::Start_Dissolve(_float fDuration)
+{
+    if (fDuration == 0.f)
+        AddBuff(BUFF_DISSOLVE);
+
+    AddBuff(BUFF_DISSOLVE, fDuration);
+    m_fMaxDissolveTime = Get_BuffTime(BUFF_DISSOLVE);
+    m_fCurDissolveTime = 0.f;
+    //m_fCurDissolveTime = m_fMaxDissovleTime;
+
+    m_iShaderPath = static_cast<_uint>(ANIMESH_SHADERPATH::DISSOLVE);
+    m_pWeapon->Start_Dissolve(fDuration);
+}
+void CSlaveVampire::ReverseStart_Dissolve(_float fDuration)
+{
+    if (fDuration == 0.f)
+        AddBuff(BUFF_REVERSEDISSOLVE);
+
+    AddBuff(BUFF_REVERSEDISSOLVE, fDuration);
+    m_fMaxDissolveTime = Get_DefaultBuffTime(BUFF_DISSOLVE);
+    m_iShaderPath = static_cast<_uint>(ANIMESH_SHADERPATH::DISSOLVE);
+    m_pWeapon->ReverseStart_Dissolve(fDuration);
+}
+void CSlaveVampire::End_Dissolve()
+{
+    RemoveBuff(BUFF_DISSOLVE);
+    RemoveBuff(BUFF_REVERSEDISSOLVE);
+    m_iShaderPath = static_cast<_uint>(ANIMESH_SHADERPATH::DEFAULT); // 중요!
+    m_pWeapon->End_Dissolve();
+}
+void CSlaveVampire::Dead_Action()
+{
+    CMonster::Dead_Action();
+    Start_Dissolve(6.f);
+}
+void CSlaveVampire::Hit_Action()
+{
+    CMonster::Hit_Action();
+    m_pGameInstance->PlaySoundEffect(L"Wolf_Hit.wav", 0.3f);
 }
 #pragma endregion
 
@@ -312,6 +373,9 @@ HRESULT CSlaveVampire::InitializeAction_ToAnimationMap()
 
 
 
+    
+    m_fPlayAttackSound = 68.f / 256.f;
+
 #pragma region COllider 활성화 프레임 관리
     Add_Collider_Frame(m_Action_AnimMap[TEXT("ATTACK")], 70.f / 256.f, 85.f / 256.f, PART_WEAPON);     // Weapon attack
 #pragma endregion
@@ -334,6 +398,12 @@ HRESULT CSlaveVampire::Initialize_BuffDurations()
     m_BuffDefault_Durations[BUFF_ATTACK_TIME] = 1.f; // 공격 쿨타임.
     m_BuffDefault_Durations[BUFF_DETECT] = 1.f; // 탐지 쿨타임: 0.2초
 
+
+    m_BuffDefault_Durations[BUFF_DISSOLVE] = 1.f;
+    m_BuffDefault_Durations[BUFF_REVERSEDISSOLVE] = 0.5f;
+    // 무기의 Dissolve 타임도 지정.
+    m_pWeapon->Set_DissolveTime(1.f);
+    m_pWeapon->Set_ReverseDissolveTime(0.3f);
 
     return S_OK;
 }
@@ -368,6 +438,15 @@ void CSlaveVampire::Disable_Collider(_uint iType)
     default:
         break;
     }
+}
+void CSlaveVampire::PlayHitSound()
+{
+    //m_pGameInstance->PlaySoundEffect(L"SlaveVampireHit.wav", 0.3f);
+}
+
+void CSlaveVampire::PlayWeaponSound()
+{
+    m_IsPlayWeaponSound = true;
 }
 #pragma endregion
 
@@ -409,7 +488,16 @@ HRESULT CSlaveVampire::Ready_Components(SLAVE_VAMPIRE_DSEC* pDesc)
         return E_FAIL;
     }
 
-    cout << "Sphere SlaveVampire Radius : " << SphereDesc.fRadius << endl;
+
+    // Dissolve Texture
+    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Dissolve"),
+        TEXT("Com_Dissolve"), reinterpret_cast<CComponent**>(&m_pDissolveTexture), nullptr)))
+    {
+        CRASH("Failed Load DissolveTexture");
+        return E_FAIL;
+    }
+    m_fEndReverseDissolveTime = 2.f;
+   
 
 
     m_pGameInstance->Add_Collider_To_Manager(m_pColliderCom, ENUM_CLASS(m_eCurLevel));
@@ -472,6 +560,20 @@ HRESULT CSlaveVampire::Ready_Render_Resources()
 
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_Transform_Float4x4(D3DTS::PROJ))))
         return E_FAIL;
+
+    _float fDissolveTime = normalize(m_fCurDissolveTime, 0.f, m_fMaxDissolveTime);
+
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fDissolveTime", &fDissolveTime, sizeof(_float))))
+    {
+        CRASH("Failed Dissolve Time");
+        return E_FAIL;
+    }
+
+    if (FAILED(m_pDissolveTexture->Bind_Shader_Resource(m_pShaderCom, "g_DissolveTexture", 2)))
+    {
+        CRASH("Failed Dissolve Texture");
+        return E_FAIL;
+    }
 
     return S_OK;
 }
@@ -596,6 +698,7 @@ void CSlaveVampire::Free()
     Safe_Release(m_pTree);
     Safe_Release(m_pWeapon);
     Safe_Release(m_pMonsterHpBar);
+    Safe_Release(m_pDissolveTexture);
 }
 
 

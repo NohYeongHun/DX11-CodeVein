@@ -3,6 +3,11 @@
 #include "Base.h"
 #include "Graphic_Device.h"
 
+#pragma region SOUND_MANAGER
+#include "SoundManager.h"
+#pragma endregion
+
+
 #pragma region EVENT
 #include "Event_Manager.h"
 #pragma endregion

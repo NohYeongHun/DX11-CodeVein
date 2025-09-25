@@ -61,6 +61,7 @@ void CSlaveVampireSword::Update(_float fTimeDelta)
         OutputDebugStringA("SlaveVampireWeapon: Socket or Parent matrix is nullptr!\n");
     }
 
+    CWeapon::Update_Timer(fTimeDelta);
     CWeapon::Finalize_Update(fTimeDelta);
 }
 
@@ -125,6 +126,14 @@ HRESULT CSlaveVampireSword::Ready_Components()
     if (FAILED(CGameObject::Add_Component(ENUM_CLASS(m_eCurLevel), TEXT("Prototype_Component_Model_SlaveVampireGreatSword"),
         TEXT("Com_Model"), reinterpret_cast<CComponent**>(&m_pModelCom), &Desc)))
         return E_FAIL;
+
+    // Dissolve Texture
+    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Dissolve"),
+        TEXT("Com_Dissolve"), reinterpret_cast<CComponent**>(&m_pDissolveTexture), nullptr)))
+    {
+        CRASH("Failed Load DissolveTexture");
+        return E_FAIL;
+    }
 
     return S_OK;
 }
@@ -224,6 +233,26 @@ HRESULT CSlaveVampireSword::Bind_ShaderResources()
     if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
     {
         CRASH("Failed BindLight");
+        return E_FAIL;
+    }
+
+    if (FAILED(m_pDissolveTexture->Bind_Shader_Resource(m_pShaderCom, "g_DissolveTexture", 0)))
+    {
+
+        return E_FAIL;
+    }
+        
+
+
+    _float fDissolveTime = {};
+    if (m_IsDissolve)
+        fDissolveTime = normalize(m_fCurDissolveTime, 0.f, m_fMaxDissolveTime);
+    else if (m_IsReverseDissolve)
+        fDissolveTime = normalize(m_fCurDissolveTime, 0.f, m_fMaxReverseDissolveTime);
+
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fDissolveTime", &fDissolveTime, sizeof(_float))))
+    {
+        CRASH("Failed Dissolve Texture");
         return E_FAIL;
     }
 

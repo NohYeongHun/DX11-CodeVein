@@ -44,7 +44,7 @@ private:
 
 private:
     ACTORDIR m_eDamageDirection = ACTORDIR::END;
-    _bool m_bAnimationFinished = false;
+    _bool m_IsAnimationFinished = false;
     _float m_fInvincibilityTime = 0.5f;  // 무적 시간
     _float m_fCurrentInvincibilityTime = 0.f;
 

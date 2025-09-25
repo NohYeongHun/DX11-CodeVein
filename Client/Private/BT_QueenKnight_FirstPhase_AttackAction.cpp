@@ -3,6 +3,8 @@ CBT_QueenKnight_FirstPhase_AttackAction::CBT_QueenKnight_FirstPhase_AttackAction
     : m_pOwner(pOwner)
 {
     m_strTag = L"QueenKnight_FirstComboNodeAction";
+    m_fFirstAttackSoundFrame = 60.f / 194.f;
+    m_fSecondAttackSoundFrame = 52.f / 242.f;
 }
 
 BT_RESULT CBT_QueenKnight_FirstPhase_AttackAction::Perform_Action(_float fTimeDelta)
@@ -22,7 +24,14 @@ BT_RESULT CBT_QueenKnight_FirstPhase_AttackAction::Perform_Action(_float fTimeDe
     case ATTACK_PHASE::SECOND_ATTACK:
         return UpdateSecondAttack(fTimeDelta);
     case ATTACK_PHASE::COMPLETED:
+    {
+        m_IsFirstAttack = false;
+        m_IsSecondAttack = false;
+        m_IsLastAttack = false;
+        m_IsFirstSoundPlay = false;
+        m_IsSecondSoundPlay = false;
         return Complete(fTimeDelta);
+    }
     }
     return BT_RESULT::FAILURE;
 }
@@ -35,6 +44,8 @@ void CBT_QueenKnight_FirstPhase_AttackAction::Reset()
     m_IsFirstAttack = false;
     m_IsSecondAttack = false;
     m_IsLastAttack = false;
+    m_IsFirstSoundPlay = false;
+    m_IsSecondSoundPlay = false;
 }
 
 BT_RESULT CBT_QueenKnight_FirstPhase_AttackAction::EnterAttack(_float fTimeDelta)
@@ -93,6 +104,13 @@ BT_RESULT CBT_QueenKnight_FirstPhase_AttackAction::UpdateFirstAttack(_float fTim
         m_IsFirstAttack = true;
     }
 
+    _float fCurrentRatio = m_pOwner->Get_CurrentAnimationRatio();
+    if (!m_IsFirstSoundPlay && fCurrentRatio > m_fFirstAttackSoundFrame)
+    {
+        m_IsFirstSoundPlay = true;
+        m_pOwner->Play_Sound(CQueenKnight::SOUND_ATTACK);
+    }
+
     
     //if (m_pOwner->Is_Animation_Finished())
     if (m_pOwner->Get_CurrentAnimationRatio() > 0.7f)
@@ -123,6 +141,13 @@ BT_RESULT CBT_QueenKnight_FirstPhase_AttackAction::UpdateSecondAttack(_float fTi
         m_IsSecondAttack = true;
     }
 
+    _float fCurrentRatio = m_pOwner->Get_CurrentAnimationRatio();
+    if (!m_IsSecondSoundPlay && fCurrentRatio > m_fSecondAttackSoundFrame)
+    {
+        m_IsSecondSoundPlay = true;
+        m_pOwner->Play_Sound(CQueenKnight::SOUND_CHOP);
+    }
+
     if (m_pOwner->Is_Animation_Finished())
     {
         m_eAttackPhase = ATTACK_PHASE::COMPLETED;
@@ -134,27 +159,6 @@ BT_RESULT CBT_QueenKnight_FirstPhase_AttackAction::UpdateSecondAttack(_float fTi
         // 2. IDLE 상태로 변경
         m_pOwner->Change_Animation_NonBlend(iNextAnimationIdx);
     }
-
-    //if (!m_IsSecondAttack)
-    //{
-    //    m_pOwner->RotateTurn_ToTargetYaw();
-    //    m_IsSecondAttack = true;
-    //}
-    //
-    //if (m_pOwner->Get_CurrentAnimationRatio() > 0.7f)
-    //{
-    //    m_eAttackPhase = ATTACK_PHASE::LAST_ATTACK;
-
-    //    // 1. 공격 애니메이션 선택
-    //    _uint iNextAnimationIdx = m_pOwner->Find_AnimationIndex(L"PHASE_ATTACK3");
-
-    //    // 2. 공격 상태로 변경
-    //    m_pOwner->Change_Animation_Blend(iNextAnimationIdx, false ,0.2f, true, true, true);
-    //    
-    //    // 3. 콜라이더 상태 초기화
-    //    m_pOwner->Reset_Collider_ActiveInfo();
-    //    
-    //}
 
     return BT_RESULT::RUNNING;
 }

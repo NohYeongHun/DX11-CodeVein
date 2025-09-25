@@ -152,12 +152,12 @@ void CMonsterHpBar::Calculate_Screen_Position(_fvector vMonsterPos)
 
 void CMonsterHpBar::Increase_Hp(_float fHp, _float fTime)
 {
-    if (m_bDecrease)
+    if (m_IsDecrease)
     {
         m_fLeftRatio = m_fRightRatio;
         m_fHp = m_fHp < fHp ? 0 : m_fHp + fHp;
         m_fRightRatio = static_cast<_float>(m_fHp) / static_cast<_float>(m_fMaxHp);
-        m_bDecrease = false;
+        m_IsDecrease = false;
     }
     else
     {
@@ -166,17 +166,17 @@ void CMonsterHpBar::Increase_Hp(_float fHp, _float fTime)
         m_fRightRatio = static_cast<_float>(m_fHp) / static_cast<_float>(m_fMaxHp);
     }
 
-    m_bIncrease = true;
+    m_IsIncrease = true;
 }
 
 void CMonsterHpBar::Decrease_HpUI(_float fHp, _float fTime)
 {
-    if (m_bIncrease)
+    if (m_IsIncrease)
     {
         m_fRightRatio = m_fLeftRatio;
         m_fHp = m_fHp < fHp ? 0 : m_fHp - fHp;
         m_fLeftRatio = static_cast<_float>(m_fHp) / static_cast<_float>(m_fMaxHp);
-        m_bIncrease = false;
+        m_IsIncrease = false;
     }
     else
     {
@@ -185,29 +185,29 @@ void CMonsterHpBar::Decrease_HpUI(_float fHp, _float fTime)
         m_fLeftRatio = static_cast<_float>(m_fHp) / static_cast<_float>(m_fMaxHp);
     }
 
-    m_bDecrease = true;
+    m_IsDecrease = true;
 }
 
 void CMonsterHpBar::Time_Calc(_float fTimeDelta)
 {
-    if (m_bDecrease)
+    if (m_IsDecrease)
     {
         if (m_fRightRatio <= m_fLeftRatio)
         {
             m_fRightRatio = 0;
             m_fLeftRatio = 0;
-            m_bDecrease = false;
+            m_IsDecrease = false;
         }
         else
             m_fRightRatio -= fTimeDelta * 0.2f;
     }
-    if (m_bIncrease)
+    if (m_IsIncrease)
     {
         if (m_fRightRatio <= m_fLeftRatio)
         {
             m_fRightRatio = 0;
             m_fLeftRatio = 0;
-            m_bIncrease = false;
+            m_IsIncrease = false;
         }
         else
             m_fLeftRatio += fTimeDelta * 0.2f;
@@ -250,7 +250,7 @@ HRESULT CMonsterHpBar::Bind_ShaderResources()
     if (FAILED(m_pShaderCom->Bind_RawValue("g_fRightRatio", static_cast<void*>(&m_fRightRatio), sizeof(m_fRightRatio))))
         return E_FAIL;
 
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_bIncrease", static_cast<void*>(&m_bIncrease), sizeof(m_bIncrease))))
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_bIncrease", static_cast<void*>(&m_IsIncrease), sizeof(m_IsIncrease))))
         return E_FAIL;
 
     if (FAILED(m_pTextureCom->Bind_Shader_Resource(m_pShaderCom, "g_Texture", 0)))

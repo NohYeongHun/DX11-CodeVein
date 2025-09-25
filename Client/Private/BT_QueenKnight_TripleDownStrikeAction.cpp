@@ -19,6 +19,8 @@ CBT_QueenKnight_TripleDownStrikeAction::CBT_QueenKnight_TripleDownStrikeAction(C
     m_fAttack_StartRatio = 21.f / 261.f;
     m_fAttack_EndRatio = 40.f / 261.f;
 
+    m_fSkillStart_Ratio = 55.f / 261.f;
+
     m_vDesecndTarget = { 1.f, 1.f, 1.f };
 
 }
@@ -40,7 +42,12 @@ BT_RESULT CBT_QueenKnight_TripleDownStrikeAction::Perform_Action(_float fTimeDel
     case ATTACK_PHASE::DESCEND:
         return Update_Descend(fTimeDelta);
     case ATTACK_PHASE::COMPLETED:
+    {
+        m_IsWarpSound = false;
+        m_IsWarpSkillSound = false;
         return BT_RESULT::SUCCESS;
+    }
+        
     }
 
     return BT_RESULT::FAILURE;
@@ -54,7 +61,7 @@ void CBT_QueenKnight_TripleDownStrikeAction::Reset()
     m_pOwner->Reset_Collider_ActiveInfo();
     m_pOwner->Set_Visible(true);
     m_IsChangeSpeed = false;
-    m_bDissolveCheck = false;
+    m_IsDissolveCheck = false;
 
     m_pOwner->Set_Animation_Speed(m_pOwner->Find_AnimationIndex(L"WARP_END"), 1.2f);
 
@@ -108,10 +115,10 @@ BT_RESULT CBT_QueenKnight_TripleDownStrikeAction::Update_Ascend(_float fTimeDelt
     _vector vOwnerPos = m_pOwner->Get_Transform()->Get_State(STATE::POSITION);
     _float fCurrentRatio = m_pOwner->Get_CurrentAnimationRatio();
 
-    if (!m_bDissolveCheck && !m_pOwner->HasBuff(CMonster::BUFF_DISSOLVE) && fCurrentRatio >= m_fDissolve_StartRatio)
+    if (!m_IsDissolveCheck && !m_pOwner->HasBuff(CMonster::BUFF_DISSOLVE) && fCurrentRatio >= m_fDissolve_StartRatio)
     {
         // 디졸브 시작.
-        m_bDissolveCheck = true; // 이미 Dissolve가 발생했는지?
+        m_IsDissolveCheck = true; // 이미 Dissolve가 발생했는지?
         m_pOwner->Start_Dissolve(1.f);
         //m_pOwner->AddBuff(CMonster::BUFF_DISSOLVE);
 
@@ -123,10 +130,12 @@ BT_RESULT CBT_QueenKnight_TripleDownStrikeAction::Update_Ascend(_float fTimeDelt
         m_pOwner->Move_Direction({ 0.f, 1.f, 0.f }, fTimeDelta * 0.5f);
     }
 
-   /* if (m_bDissolveCheck && !m_pOwner->HasBuff(CMonster::BUFF_DISSOLVE))
+
+    if (!m_IsWarpSound && fCurrentRatio > m_fJump_StartRatio)
     {
-        m_pOwner->Set_Visible(false);
-    }*/
+        m_IsWarpSound = true;
+        m_pOwner->Play_Sound(CQueenKnight::SOUND_WARP_START);
+    }
 
     // 1. 목표 높이까지 도달했는지 확인. 아니면 위로 이동.
     if (m_pOwner->Is_Animation_Finished() && vOwnerPos.m128_f32[1] >= m_vAscendTarget.y)
@@ -154,11 +163,11 @@ BT_RESULT CBT_QueenKnight_TripleDownStrikeAction::Update_Ascend(_float fTimeDelt
         m_pOwner->Create_QueenKnightWarp_Effect_Particle({ 0.f, -1.f, 0.f });
 
 
-        m_bDissolveCheck = false;
+        m_IsDissolveCheck = false;
     }
 
     // DISSOLVE가 끝나면 Reverse Dissolv 시작.
-    if (!m_bDissolveCheck && !m_pOwner->HasBuff(CMonster::BUFF_DISSOLVE))
+    if (!m_IsDissolveCheck && !m_pOwner->HasBuff(CMonster::BUFF_DISSOLVE))
     {
         // 시야에 켜기.
 
@@ -171,14 +180,6 @@ BT_RESULT CBT_QueenKnight_TripleDownStrikeAction::Update_Ascend(_float fTimeDelt
 
 BT_RESULT CBT_QueenKnight_TripleDownStrikeAction::Update_Hang(_float fTimeDelta)
 {
-    // DISSOLVE가 끝나면 Reverse Dissolv 시작.
-    //if (!m_bDissolveCheck && !m_pOwner->HasBuff(CMonster::BUFF_DISSOLVE))
-    //{
-    //    // 시야에 켜기.
-
-    //    // 2. 목표 하강지점 도착했으므로 렌더링 켜기 (시야에서 나타남)
-    //    m_pOwner->ReverseStart_Dissolve(0.3f);
-    //}
 
     // 1. 현재 위치
     _vector vOwnerPos = m_pOwner->Get_Transform()->Get_State(STATE::POSITION);
@@ -232,6 +233,13 @@ BT_RESULT CBT_QueenKnight_TripleDownStrikeAction::Update_Hang(_float fTimeDelta)
 
 BT_RESULT CBT_QueenKnight_TripleDownStrikeAction::Update_Descend(_float fTimeDelta)
 {
+    _float fCurrentRatio = m_pOwner->Get_CurrentAnimationRatio();
+    /*  if (!m_IsWarpSkillSound && fCurrentRatio > m_fSkillStart_Ratio)
+    {
+        m_IsWarpSkillSound = true;
+        m_pOwner->Play_Sound(CQueenKnight::SOUND_WARP_END);
+    }*/
+
     if (m_pOwner->Is_Animation_Finished())
     {
         m_eAttackPhase = ATTACK_PHASE::COMPLETED;

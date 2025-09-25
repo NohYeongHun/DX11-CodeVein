@@ -137,7 +137,7 @@ void CEffectParticle::Late_Update(_float fTimeDelta)
 HRESULT CEffectParticle::Render()
 {
 #ifdef _DEBUG
-    ImGui_Render();
+    //ImGui_Render();
 #endif // _DEBUG
 
     HRESULT hr;
@@ -296,6 +296,20 @@ HRESULT CEffectParticle::Bind_ShaderResources()
     _float fTimeRatio = m_fCurrentTime / m_fDisplayTime;
 
     if (FAILED(m_pShaderCom->Bind_RawValue("g_fTimeRatio", &fTimeRatio, sizeof(_float))))
+    {
+        CRASH("Failed Bind TimeRatio");
+        return E_FAIL;
+    }
+
+    _float fDissolveRatio = m_fCurrentTime / m_fDisplayTime;
+
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fDissolveRatio", &fDissolveRatio, sizeof(_float))))
+    {
+        CRASH("Failed Bind TimeRatio");
+        return E_FAIL;
+    }
+
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fDissolveWeight", &m_fDissolveWeight, sizeof(_float))))
     {
         CRASH("Failed Bind TimeRatio");
         return E_FAIL;
@@ -502,18 +516,18 @@ void CEffectParticle::Set_SpawnSettings(_float fInterval, _uint iCount, _bool bC
 {
     m_fSpawnInterval = fInterval;
     m_iSpawnCount = iCount;
-    m_bContinuousSpawn = bContinuous;
+    m_IsContinuousSpawn = bContinuous;
 }
 
 void CEffectParticle::Start_ContinuousSpawn()
 {
-    m_bContinuousSpawn = true;
+    m_IsContinuousSpawn = true;
     m_fSpawnTimer = 0.0f;
 }
 
 void CEffectParticle::Stop_ContinuousSpawn()
 {
-    m_bContinuousSpawn = false;
+    m_IsContinuousSpawn = false;
     m_fSpawnTimer = 0.0f;
 }
 
@@ -536,10 +550,12 @@ void CEffectParticle::OnActivate(void* pArg)
     Reset_Timer(); // 타이머 초기화
     m_fSpawnTimer = 0.0f; // 스폰 타이머도 초기화
 
-    m_bContinuousSpawn = pDesc->IsSpawn;
+    m_IsContinuousSpawn = pDesc->IsSpawn;
     m_fSpawnInterval = pDesc->fSpawnInterval;
     m_iSpawnCount = pDesc->iSpawnCount;
     m_fChaseTime = pDesc->fChaseTime;
+
+    m_fDissolveWeight = pDesc->fDissolveWeight;
 
     const PARTICLE_INIT_INFO& particleInit = pDesc->particleInitInfo;
 

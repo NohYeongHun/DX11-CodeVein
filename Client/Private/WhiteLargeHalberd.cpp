@@ -55,7 +55,9 @@ void CWhiteLargeHalberd::Update(_float fTimeDelta)
         XMLoadFloat4x4(m_pSocketMatrix) *
         XMLoadFloat4x4(m_pParentMatrix));
 
+    CWeapon::Update_Timer(fTimeDelta);
     CWeapon::Finalize_Update(fTimeDelta);
+    
 }
 
 void CWhiteLargeHalberd::Late_Update(_float fTimeDelta)
@@ -134,6 +136,14 @@ HRESULT CWhiteLargeHalberd::Ready_Components()
         return E_FAIL;
     }
 
+    // Dissolve Texture
+    if (FAILED(CGameObject::Add_Component(ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_Component_Texture_Dissolve"),
+        TEXT("Com_Dissolve"), reinterpret_cast<CComponent**>(&m_pDissolveTexture), nullptr)))
+    {
+        CRASH("Failed Load DissolveTexture");
+        return E_FAIL;
+    }
+
     return S_OK;
 }
 
@@ -182,20 +192,29 @@ HRESULT CWhiteLargeHalberd::Bind_ShaderResources()
     if (FAILED(m_pShaderCom->Bind_Matrix("g_ProjMatrix", m_pGameInstance->Get_Transform_Float4x4(D3DTS::PROJ))))
         return E_FAIL;
 
-    const LIGHT_DESC* pLightDesc = m_pGameInstance->Get_LightDesc(0);
+    /*const LIGHT_DESC* pLightDesc = m_pGameInstance->Get_LightDesc(0);
     if (nullptr == pLightDesc)
-        return E_FAIL;
+        return E_FAIL;*/
 
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDir", &pLightDesc->vDirection, sizeof(_float4))))
-        return E_FAIL;
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightDiffuse", &pLightDesc->vDiffuse, sizeof(_float4))))
-        return E_FAIL;
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightAmbient", &pLightDesc->vAmbient, sizeof(_float4))))
-        return E_FAIL;
-    if (FAILED(m_pShaderCom->Bind_RawValue("g_vLightSpecular", &pLightDesc->vSpecular, sizeof(_float4))))
-        return E_FAIL;
     if (FAILED(m_pShaderCom->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4))))
         return E_FAIL;
+
+
+    if (FAILED(m_pDissolveTexture->Bind_Shader_Resource(m_pShaderCom, "g_DissolveTexture", 0)))
+        return E_FAIL;
+
+    _float fDissolveTime = {};
+    if (m_IsDissolve)
+        fDissolveTime = normalize(m_fCurDissolveTime, 0.f, m_fMaxDissolveTime);
+    else if (m_IsReverseDissolve)
+        fDissolveTime = normalize(m_fCurDissolveTime, 0.f, m_fMaxReverseDissolveTime);
+
+    if (FAILED(m_pShaderCom->Bind_RawValue("g_fDissolveTime", &fDissolveTime, sizeof(_float))))
+    {
+        CRASH("Failed Dissolve Texture");
+        return E_FAIL;
+    }
+
 
     return S_OK;
 }

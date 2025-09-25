@@ -14,7 +14,7 @@ private:
 
     _float m_fReactionTime = 0.f;
     const _float m_fMaxReactionTime = 0.6f;  // 일반 피격은 짧은 경직
-    _bool m_bAnimationStarted = false;
+    _bool m_IsAnimationStarted = false;
 
 public:
     static CBT_SkyBoss_NormalHitReaction* Create(class CSkyBoss* pOwner);

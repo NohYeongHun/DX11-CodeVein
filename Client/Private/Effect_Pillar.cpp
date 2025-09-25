@@ -96,15 +96,13 @@ void CEffect_Pillar::OnActivate(void* pArg)
     m_fAttackPower = pDesc->fAttackPower;
     Reset_Timer();
 
-    // ★★★ 중요: 이미 월드 좌표로 전달받았으므로 그대로 사용 ★★★
     m_pTransformCom->Set_State(STATE::POSITION, m_ActivateDesc.vStartPos);
 
     /* 하위 객체들 Activate 실행 */
-    // ... PillarA, B, C 활성화 코드 ...
     CBlood_PillarA::PILLARA_ACTIVATE_DESC PillarADesc{};
     PillarADesc.vStartPos = { 0.f, 0.f, 0.f }; // 최종 위치는 어차피 곱해진다. => 서서히 조절.
     PillarADesc.fTargetRadius = m_fTargetRadius;
-    PillarADesc.fDecreaseTargetRadius = 1.f;
+    PillarADesc.fDecreaseTargetRadius = 2.f;
     PillarADesc.fTargetHeight = 7.f;
     PillarADesc.fGrowDuration = m_fDuration * 0.5f;
     PillarADesc.fStayDuration = m_fDuration * 0.1f;
@@ -118,7 +116,7 @@ void CEffect_Pillar::OnActivate(void* pArg)
     PillarBDesc.fEmissiveIntensity = 0.5f;
     PillarBDesc.vStartPos = { 0.f, 0.f, 0.f }; // 최종 위치는 어차피 곱해진다. => 서서히 조절.
     PillarBDesc.fTargetRadius = m_fTargetRadius;
-    PillarBDesc.fDecreaseTargetRadius = 1.f;
+    PillarBDesc.fDecreaseTargetRadius = 2.f;
     PillarBDesc.fTargetHeight = 7.f;
     PillarBDesc.fGrowDuration = m_fDuration * 0.5f;
     PillarBDesc.fStayDuration = m_fDuration * 0.1f;
@@ -132,7 +130,7 @@ void CEffect_Pillar::OnActivate(void* pArg)
     PillarCDesc.fEmissiveIntensity = 0.5f;
     PillarCDesc.vStartPos = { 0.f, 0.f, 0.f }; // 최종 위치는 어차피 곱해진다. => 서서히 조절.
     PillarCDesc.fTargetRadius = m_fTargetRadius;
-    PillarCDesc.fDecreaseTargetRadius = 1.f;
+    PillarCDesc.fDecreaseTargetRadius = 2.f;
     PillarCDesc.fTargetHeight = 7.f;
     PillarCDesc.fGrowDuration = m_fDuration * 0.5f;
     PillarCDesc.fStayDuration = m_fDuration * 0.1f;
