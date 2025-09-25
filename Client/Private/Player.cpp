@@ -112,6 +112,7 @@ HRESULT CPlayer::Initialize_Clone(void* pArg)
     }
 
     
+    ShowCursor(m_IsShowCursor);
 
     return S_OK;
 }
@@ -1218,6 +1219,10 @@ void CPlayer::Update_KeyInput()
         m_pGameInstance->Publish<CInventory>(EventType::INVENTORY_DISPLAY, nullptr);
         m_IsInventoryDisplay = !m_IsInventoryDisplay;
         m_pPlayerCamera->Set_InventroyMode(m_IsInventoryDisplay);
+
+        m_IsShowCursor = !m_IsShowCursor;
+        
+        ShowCursor(m_IsShowCursor);
     }
         
 

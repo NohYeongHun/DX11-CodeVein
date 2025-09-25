@@ -273,6 +273,7 @@ private:
 	class CCamera_Player* m_pPlayerCamera = { nullptr };
 	LEVEL m_eCurLevel = { LEVEL::END };
 	_float m_fOffsetY = {};
+	_bool m_IsShowCursor = { false };
 	
 #pragma endregion
 
