@@ -98,12 +98,6 @@ void CLevel_StageOne::Update(_float fTimeDelta)
 		Start_FadeOut();
 	}
 
-	if (m_pGameInstance->Get_KeyUp(DIK_F1))
-	{
-		_uint iLevelID = m_pGameInstance->Get_CurrentLevelID();
-		m_pGameInstance->Publish<CLevel_StageOne>(EventType::OPEN_DEBUG, nullptr);
-		return;
-	}
 
 }
 

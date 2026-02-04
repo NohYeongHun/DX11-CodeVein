@@ -155,13 +155,57 @@ void CSaveFile_Loader::Save_AnimModel(std::ofstream& ofs, CTool_Model* pModel, c
 
 	/* ---------- Material ---------- */
 	ofs.write(reinterpret_cast<const char*>(&animModelInfo.materialVectorSize), sizeof(uint32_t));
+
+	std::ofstream jsonStream("../../SaveFile/player.json");
+
+	json materialJson;
+	materialJson["Materials"] = json::array();
 	for (const MATERIAL_INFO& material : animModelInfo.materialVector)
 	{
+		/* .dat 저장.*/
 		ofs.write(reinterpret_cast<const char*>(&material.materialPathVectorSize), sizeof(uint32_t));
 
 		for (const std::wstring& texPath : material.materialPathVector)
 			WriteWString(ofs, texPath);   // 길이+바이트 순으로
+
+		/* Json 저장 해보기. */
+		
+		/* 한 루프당 사용할 json 객체? */
+		json singleMaterialJson;
+
+		string textureFilePath{};
+
+
+		// Diffuse
+		if (material.materialPathVector[aiTextureType_DIFFUSE].size() > 0)
+		{
+			textureFilePath.assign(material.materialPathVector[aiTextureType_DIFFUSE].begin(),
+				material.materialPathVector[aiTextureType_DIFFUSE].end());
+			singleMaterialJson["DiffuseTexture"] = textureFilePath;
+		}
+
+		// Normal
+		if (material.materialPathVector[aiTextureType_NORMALS].size() > 0)
+		{
+			textureFilePath.assign(material.materialPathVector[aiTextureType_NORMALS].begin(),
+				material.materialPathVector[aiTextureType_NORMALS].end());
+			singleMaterialJson["NormalTexture"] = textureFilePath;
+		}
+
+		// Mask 이건 직접 쓰기?
+
+		// Texture 개수.?
+		//singleMaterialJson["MaskCount"] = iMaskTextureCount;
+
+		// 넣은 객체를 넣어주기.
+		materialJson["Materials"].emplace_back(singleMaterialJson);
 	}
+
+	
+
+	jsonStream << materialJson.dump(4);
+	jsonStream.close();
+
 
 	/* ---------- Bone ---------- */
 	ofs.write(reinterpret_cast<const char*>(&animModelInfo.boneVectorSize), sizeof(uint32_t));

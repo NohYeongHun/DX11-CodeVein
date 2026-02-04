@@ -64,12 +64,12 @@ HRESULT CMainApp::Initialize()
 	}
 
 
-	//if (FAILED(Start_Level(LEVEL::GAMEPLAY)))
-	//	return E_FAIL;
+	if (FAILED(Start_Level(LEVEL::GAMEPLAY)))
+		return E_FAIL;
 
 	//// 원본
-	if (FAILED(Start_Level(LEVEL::LOGO)))
-		return E_FAIL;
+	//if (FAILED(Start_Level(LEVEL::LOGO)))
+	//	return E_FAIL;
 
 	
 	
@@ -91,31 +91,32 @@ HRESULT CMainApp::Render()
 	
 
 	m_pGameInstance->Render_Begin(&vClearColor);
-	m_pImGui_Manager->Render_Begin();
+	//m_pImGui_Manager->Render_Begin();
 
 	m_pGameInstance->Draw();
 
 	
 
 #ifdef _DEBUG
-	ImGuiIO& io = ImGui::GetIO();
 
-	// 기존 Player Debug Window
-	ImVec2 windowPos = ImVec2(0.f, io.DisplaySize.y - 300.f);
-	ImVec2 windowSize = ImVec2(300.f, 300.f);
+	//ImGuiIO& io = ImGui::GetIO();
 
-	ImGui::SetNextWindowPos(windowPos, ImGuiCond_Once);
-	ImGui::SetNextWindowSize(windowSize, ImGuiCond_Once);
-	ImGui::Begin("Information");
+	//// 기존 Player Debug Window
+	//ImVec2 windowPos = ImVec2(0.f, io.DisplaySize.y - 300.f);
+	//ImVec2 windowSize = ImVec2(300.f, 300.f);
+
+	//ImGui::SetNextWindowPos(windowPos, ImGuiCond_Once);
+	//ImGui::SetNextWindowSize(windowSize, ImGuiCond_Once);
+	//ImGui::Begin("Information");
 
 
-	ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
-	ImGui::End();
+	//ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
+	//ImGui::End();
 #endif // _DEBUG
 
 
 
-	m_pImGui_Manager->Render_End();
+	//m_pImGui_Manager->Render_End();
 	m_pGameInstance->Render_End();
 
 	return S_OK;
@@ -191,9 +192,24 @@ HRESULT CMainApp::Ready_Pooling()
 
 	pGameObject = nullptr;
 
+	//CEffect_LungePillar::EFFECT_LUNGEPILLARDESC EffectLunge_PillarDesc{};
+	//// 한번에 1개씩 사용 예정. => 넉넉하게 넣자.
+	//for (_uint i = 0; i < 300; ++i)
+	//{
+	//	pGameObject = dynamic_cast<CGameObject*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT
+	//		, ENUM_CLASS(LEVEL::STATIC), TEXT("Prototype_GameObject_Effect_LungePillar"), &EffectLunge_PillarDesc));
+	//	if (nullptr == pGameObject)
+	//	{
+	//		CRASH("Failed Create GameObject");
+	//		return E_FAIL;
+	//	}
+	//	m_pGameInstance->Add_GameObject_ToPools(TEXT("LUNGE_PILLAR"), ENUM_CLASS(CEffect_LungePillar::EffectType), pGameObject);
+	//}
+
+	//pGameObject = nullptr;
+
 
 	CEffect_Wind::EFFECTWIND_DESC EffectWindDesc{};
-	//한번에 십자모양 12개씩 사용 예정. => 넉넉하게 넣자.
 	for (_uint i = 0; i < 500; ++i)
 	{
 		pGameObject = dynamic_cast<CGameObject*>(m_pGameInstance->Clone_Prototype(PROTOTYPE::GAMEOBJECT

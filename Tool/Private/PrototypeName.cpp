@@ -9,7 +9,7 @@ const MODEL_DESC Model_Prototypes[] =
 	//{ MODELTYPE::NONANIM,  TEXT("MapPart_Side_Floor"),   "../Bin/Resources/Models/Map/BossMap/SideFloor.fbx",   "textures/Floor/" },
 	//{ MODELTYPE::NONANIM,  TEXT("MapPart_Floor"),        "../Bin/Resources/Models/Map/BossMap/Floor.fbx",        "textures/Floor/" },
 	//{ MODELTYPE::NONANIM,  TEXT("MapPart_BossStage"),        "../Bin/Resources/Models/Map/BossMap/BossMap.fbx",        "textures/BossStage/" },
-	//{ MODELTYPE::NONANIM,  TEXT("MapPart_BossStageType1"),        "../Bin/Resources/Models/Map/BossMap/BossMapType1.fbx",        "textures/BossStage/" },
+	{ MODELTYPE::NONANIM,  TEXT("MapPart_BossStageType1"),        "../Bin/Resources/Models/Map/BossMap/BossMapType1.fbx",        "textures/BossStage/" },
 	//{ MODELTYPE::ANIM,  TEXT("Prototype_Component_Model_Player"), "../Bin/Resources/Models/Player/Player.fbx",        "textures/"},
 	//{ MODELTYPE::ANIM,  TEXT("Prototype_Component_Model_SkyBoss"), "../Bin/Resources/Models/SkyBoss/SkyBoss.fbx",        "textures/"},
 
@@ -37,7 +37,8 @@ const MODEL_DESC Model_Prototypes[] =
 	//{MODELTYPE::NONANIM,  TEXT("Prototype_Component_Model_Effect_BloodFloorAura"), "../Bin/Resources/Models/EffectMesh/BloodFloorAura.fbx",        "textures/" },
 	//{MODELTYPE::NONANIM,  TEXT("Prototype_Component_Model_Effect_BloodBodyAura"), "../Bin/Resources/Models/EffectMesh/BloodBodyAura.fbx",        "textures/" },
 	//{MODELTYPE::NONANIM,  TEXT("Prototype_Component_Model_Effect_WindFirst"), "../Bin/Resources/Models/EffectMesh/EffectWind.fbx",        "textures/" },
-	{MODELTYPE::NONANIM,  TEXT("Prototype_Component_Model_Effect_WindFirst"), "../Bin/Resources/Models/EffectMesh/Wind.fbx",        "textures/" },
+	//{MODELTYPE::NONANIM,  TEXT("Prototype_Component_Model_Effect_WindFirst"), "../Bin/Resources/Models/EffectMesh/Wind.fbx",        "textures/" },
+	//{MODELTYPE::NONANIM,  TEXT("Prototype_Component_Model_Effect_Ground"), "../Bin/Resources/Models/EffectMesh/DragonLunge.fbx",        "textures/" },
 	
 	//{ MODELTYPE::ANIM,  TEXT("Prototype_Component_Model_WolfDevil"), "../Bin/Resources/Models/WolfDevil/WolfDevil.fbx",        "textures/"},
 	//{ MODELTYPE::ANIM,  TEXT("Prototype_Component_Model_BlackKnight"), "../Bin/Resources/Models/BlackKnight/BlackKnight.fbx",        "textures/"},

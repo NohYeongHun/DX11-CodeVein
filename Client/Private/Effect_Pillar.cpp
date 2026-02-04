@@ -73,7 +73,7 @@ void CEffect_Pillar::Late_Update(_float fTimeDelta)
 HRESULT CEffect_Pillar::Render()
 {
 #ifdef _DEBUG
-    ImGui_Render();
+    //ImGui_Render();
     m_pColliderCom->Render();
 #endif // DEBUG
 

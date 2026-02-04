@@ -44,9 +44,6 @@ HRESULT CRenderer::Initialize()
     /* Clear Color 문제. */
     m_pGameInstance->Add_RenderTarget(TEXT("Combine_Distortion"), ViewportDesc.Width, ViewportDesc.Height, DXGI_FORMAT_R16G16B16A16_FLOAT, _float4(0.5f, 0.5f, 0.5f, 0.5f));
 
-
-
-
     m_pGameInstance->Add_RenderTarget(TEXT("Target_BrightPass"), ViewportDesc.Width, ViewportDesc.Height, DXGI_FORMAT_R8G8B8A8_UNORM, _float4(0.f, 0.f, 0.f, 1.f));
     m_pGameInstance->Add_RenderTarget(TEXT("Target_BloomBlurX"), ViewportDesc.Width / 8, ViewportDesc.Height / 8, DXGI_FORMAT_R8G8B8A8_UNORM, _float4(0.f, 0.f, 0.f, 1.f));
     m_pGameInstance->Add_RenderTarget(TEXT("Target_BloomBlurY"), ViewportDesc.Width / 8, ViewportDesc.Height / 8, DXGI_FORMAT_R8G8B8A8_UNORM, _float4(0.f, 0.f, 0.f, 1.f));
@@ -109,13 +106,15 @@ HRESULT CRenderer::Initialize()
     m_pGameInstance->Ready_RT_Debug(TEXT("Target_Diffuse"), 150.0f, 150.0f, 300.f, 300.f);
     m_pGameInstance->Ready_RT_Debug(TEXT("Target_Normal"), 150.0f, 450.0f, 300.f, 300.f);
     m_pGameInstance->Ready_RT_Debug(TEXT("Target_Depth"), 150.0f, 750.0f, 300.f, 300.f);
-    m_pGameInstance->Ready_RT_Debug(TEXT("Target_Shade"), 450.0f, 150.0f, 300.f, 300.f); // 오른쪽 위에서 첫번째.
+
+
+    //m_pGameInstance->Ready_RT_Debug(TEXT("Target_Shade"), 450.0f, 150.0f, 300.f, 300.f); // 오른쪽 위에서 첫번째.
     
     m_pGameInstance->Ready_RT_Debug(TEXT("Target_LightDepth"), 450.f, 450.0f, 300.f, 300.f); // 그림자 전용
     m_pGameInstance->Ready_RT_Debug(TEXT("Combine_Shade"), 450.0f, 750.0f, 300.f, 300.f);
 
-    m_pGameInstance->Ready_RT_Debug(TEXT("Target_Distortion"), 750.0f, 150.0f, 300.f, 300.f);
-    m_pGameInstance->Ready_RT_Debug(TEXT("Combine_Distortion"), 750.0f, 450.0f, 300.f, 300.f);
+    //m_pGameInstance->Ready_RT_Debug(TEXT("Target_Distortion"), 750.0f, 150.0f, 300.f, 300.f);
+    //m_pGameInstance->Ready_RT_Debug(TEXT("Combine_Distortion"), 750.0f, 450.0f, 300.f, 300.f);
 
     
   /*  m_pGameInstance->Ready_RT_Debug(TEXT("Target_Distortion"), 150.0f, 150.0f, 300.f, 300.f);
@@ -348,6 +347,7 @@ HRESULT CRenderer::Render_Lights()
     // Depth 기록 => 이부분 다름.
     m_pGameInstance->Bind_RT_ShaderResource(TEXT("Target_Depth"), m_pDefferedShader, "g_DepthTexture");
 
+    // 광원들 각각에 후처리 Shader를 주입해서 그려주기 위함.
     m_pGameInstance->Render_Lights(m_pDefferedShader, m_pVIBuffer);
     m_pGameInstance->End_MRT();
 
@@ -738,7 +738,9 @@ HRESULT CRenderer::Render_Debug()
     if (FAILED(m_pDefferedShader->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
         return E_FAIL;
 
-    //m_pGameInstance->Render_RT_Debug(m_pDefferedShader, m_pVIBuffer);
+    if (m_IsDebugRender)
+        m_pGameInstance->Render_RT_Debug(m_pDefferedShader, m_pVIBuffer);
+    
 
     return S_OK;
 }

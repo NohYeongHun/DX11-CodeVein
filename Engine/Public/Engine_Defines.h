@@ -71,11 +71,11 @@ namespace Engine
 	// 한 메시에서 최대로 사용가능한 Bone의 개수.
     static const unsigned int g_iMaxNumBones = 512;
 
-    const unsigned int g_iMaxWidth = 16384;
-    const unsigned int g_iMaxHeight = 9216;	
+    //const unsigned int g_iMaxWidth = 16384;
+    //const unsigned int g_iMaxHeight = 9216;	
 
-    //const unsigned int g_iMaxWidth = 8192;
-    //const unsigned int g_iMaxHeight = 4608;
+    const unsigned int g_iMaxWidth = 8192;
+    const unsigned int g_iMaxHeight = 4608;
 }
 
 
@@ -105,6 +105,9 @@ __analysis_assume(expr);   \
 }                        \
 }
 
+
+#include "json.hpp"
+using json = nlohmann::json;
 
 #pragma region 헬퍼 함수.
 

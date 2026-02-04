@@ -79,6 +79,7 @@ void CHUD::Update(_float fTimeDelta)
     Desc.pText = TEXT("Action_SkillIcon");
     */
     
+    
 
     /*if (m_pGameInstance->Get_KeyUp(DIK_1))
     {

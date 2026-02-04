@@ -37,7 +37,7 @@ HRESULT CQueenKnightTree::Initialize(void* pArg)
     // 4. 행동 Selector
     pRootSelector->Add_Child(Create_ActionStates_ToSelector());
     
-    // 54. 모두 실패했을 경우.
+    // 5. 모두 실패했을 경우.
     pRootSelector->Add_Child(Create_IdleAction());
     Set_Root_Node(pRootSelector);
 

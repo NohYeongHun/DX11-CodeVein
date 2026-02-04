@@ -82,11 +82,11 @@ HRESULT CInventoryStatus_Info::Render()
         return S_OK;
 
 
-    if (ImGui::IsWindowAppearing())              // 또는 static bool once=true;
-    {
-        ImGui::SetNextWindowPos({ 100, 100 }, ImGuiCond_Appearing);
-        ImGui::SetNextWindowSize({ 460, 240 }, ImGuiCond_Appearing); // ← 원하는 픽셀
-    }
+    //if (ImGui::IsWindowAppearing())              // 또는 static bool once=true;
+    //{
+    //    ImGui::SetNextWindowPos({ 100, 100 }, ImGuiCond_Appearing);
+    //    ImGui::SetNextWindowSize({ 460, 240 }, ImGuiCond_Appearing); // ← 원하는 픽셀
+    //}
 
    
 

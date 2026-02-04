@@ -767,6 +767,9 @@
     <ClInclude Include="..\Public\SoundManager.h">
       <Filter>01. Utility\16. Sound</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\json.hpp">
+      <Filter>99 .Defines</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="GameInstance.inl">

@@ -355,7 +355,6 @@ PS_OUT PS_DIFFUSE_QUEENKNIGHTWARP_MAIN(PS_IN In)
     vector bloomColor = float4(float3(8.0f, 0.01f, 0.01f) * g_fBloomIntensity, 1.0f);
     
     // 3. 마스크가 밝은 부분에 블룸 색상을 더해줍니다.
-    //    fMaskBrightness 값은 이미 위에서 계산되었습니다.
     if (fMaskBrightness > 0.1f) // 임계값은 0.1 ~ 0.5 사이에서 조정
     {
         // vMtrlDiffuse.rgb에 bloomColor.rgb를 더합니다.
@@ -407,7 +406,6 @@ PS_OUT PS_DIFFUSE_EXPLOSION_MAIN(PS_IN In)
     // 기본 블룸 색상 계산
     vector bloomColor = float4(float3(2.5f, 1.8f, 0.5f) * g_fBloomIntensity * 5.f, texColor.a);
     
-    // ▼▼▼ [Emissive 효과 추가] ▼▼▼
     
     // 1. 텍스처의 현재 픽셀 밝기를 계산합니다. (Luminance)
     float fBrightness = dot(texColor.rgb, float3(0.299, 0.587, 0.114));
@@ -542,7 +540,6 @@ PS_OUT PS_PLAYERHIT_PARTICLE(PS_IN In)
 
     }
     
-    // ▼▼▼ [수정] Bloom 효과를 텍스처 색상 기반으로 변경 ▼▼▼
     // 5. Bloom 효과를 기본 재질 색상(vMtrlDiffuse)에 곱해 밝기를 증폭시킵니다.
     // 이렇게 하면 붉은색이 아닌, 원래의 금빛이 더욱 밝아집니다.
     vMtrlDiffuse.rgb *= (1.f + g_fBloomIntensity);

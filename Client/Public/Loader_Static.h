@@ -47,6 +47,7 @@ private:
 	HRESULT Add_Prototype_SwordWind_Effects(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance);
 	HRESULT Add_Prototype_SwordWindCircle_Effects(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance);
 	HRESULT Add_Prototype_BloodAura_Effects(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance);
+	HRESULT Add_Prototype_LungePillar_Effects(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, CGameInstance* pGameInstance);
 
 #pragma endregion
 

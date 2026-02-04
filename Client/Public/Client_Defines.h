@@ -2,7 +2,7 @@
 
 #include "../Default/framework.h"
 #include <process.h>
-
+#include "Client_Info.h"
 #pragma region FMOD
 
 
@@ -14,6 +14,9 @@ namespace Client
 {
 	const unsigned int			g_iWinSizeX = 1920;
 	const unsigned int			g_iWinSizeY = 1080;
+
+	//const unsigned int			g_iWinSizeX = 2560;
+	//const unsigned int			g_iWinSizeY = 1440;
 
 	enum class LEVEL { STATIC, LOADING, LOGO, STAGEONE, GAMEPLAY, DEBUG, END };
 
@@ -45,7 +48,7 @@ namespace Client
 	enum class TRAIL_DIFFUSE : _uint { SWORD = 0, THICK_BLOOD = 1, BLOOD = 2, NONE };
 	enum class ANIMESH_SHADERPATH : _uint { DEFAULT = 0, NORMAL = 1, DISSOLVE = 2, SHADOW = 3, NONE };
 	enum class MESH_SHADERPATH : _uint { DEFAULT = 0, NORMAL = 1, DISSOLVE = 2, BLOOD_PILLARA = 3, BLOOD_PILLARB = 4, BLOOD_PILLARC = 5, SWORD_WIND = 6
-		, SHADOW = 7, BLOOD_CIRCLE = 8, BLOOD_AURA = 9, SWORD_CIRCLE = 10, NONE };
+		, SHADOW = 7, BLOOD_CIRCLE = 8, BLOOD_AURA = 9, SWORD_CIRCLE = 10, LUNGE_PILLAR = 11, NONE };
 	enum class POSTEX_SHADERPATH : _uint { 
 		DEFAULT = 0, LOADINGSLOT = 1, SKILLSLOT = 2,
 		FADEOUT = 3, TITLEBACKGROUND = 4, HPPROGRESSBAR = 5,

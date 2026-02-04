@@ -139,5 +139,3 @@
 #include "Picking.h"
 
 
-
-

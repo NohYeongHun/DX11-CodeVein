@@ -3,11 +3,11 @@
 matrix g_WorldMatrix, g_ViewMatrix, g_ProjMatrix;
 Texture2D g_DiffuseTexture;
 Texture2D g_BloomTexture;
-//float2 g_vTexelSize = float2(1.0f / (1920.f / 4.f), 1.0f / (1080.f / 4.f));
 float2 g_vTexelSize = float2(1.0f / (1920.f / 8.f), 1.0f / (1080.f / 8.f));
 
-float threshold = 0.95f; // ì¡°ì • ê°€ëŠ¥ (ì˜ˆ: 0.8 ~ 0.95)
-float soft = 0.1f; // í˜ì´ë“œ ë²”ìœ„
+
+float threshold = 0.95f; 
+float soft = 0.1f; 
 float g_fBloomIntensity = 2.f;
 
 struct VS_IN
@@ -47,29 +47,30 @@ struct PS_OUT
     float4 vColor : SV_TARGET0;
 };
 
+// ºûÀÌ ¹øÁú ¸¸Å­ ÃæºĞÈ÷ ¹àÀº ºÎºĞ¸¸ °ñ¶ó³»±â À§ÇÔ.
 PS_OUT PS_BLOOMBRIGHT_MAIN(PS_IN In)
 {
     PS_OUT Out = (PS_OUT)0;
     float4 BrightColor = float4(0.0f, 0.0f, 0.0f, 0.0f);
-    float4 originalColor = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
-    float brightness = dot(originalColor.rgb, float3(0.2126f, 0.7152f, 0.0722f));
+    float4 originalColor = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord); // ¿øº» »ö»ó
+    float brightness = dot(originalColor.rgb, float3(0.2126f, 0.7152f, 0.0722f)); // »ó´ë ÈÖµµ °è»ê. (ÀÎ°£ÀÇ ´«À¸·Î º» ¹à±â °è½Ñ)
 
-    float factor = smoothstep(threshold, threshold + soft, brightness);
-    BrightColor = originalColor * factor;
+    float factor = smoothstep(threshold, threshold + soft, brightness); // °æ°è ÇÊÅÍ¸µÀ» À§ÇÔ => ¾îµğ¼­ºÎÅÍ ºû³ª°Ô ÇÒ°ÍÀÎÁö¸¦ °áÁ¤.
+    BrightColor = originalColor * factor; // ¹àÀº ºÎºĞ¸¸ ÃßÃâ => ¾îµÎ¿î ºÎºĞÀº factor°¡ 0¿¡ °¡±î¿öÁ®¼­ °Ë°ÔµÇ°í ¹àÀº ºÎºĞ¸¸ ¿ø·¡ »ö»óÀ» À¯ÁöÇÏ¸ç »ì¾Æ³²À½.
     Out.vColor = BrightColor;
     return Out;
 }
 
+// °¡¿ì½Ã¾È ºí·¯ => ÃßÃâµÈ ¹àÀº ¿µ¿ªÀ» »ç¹æÀ¸·Î ÆÛ¶ß·Á Glow È¿°ú¸¦ ¸¸µå´Â ´Ü°è
+// BLUR_X´Ï±î °¡·Î ¹æÇâÀ¸·Î ºí·¯ Ã³¸® => ºí·¯Ã³¸®¸¦ °¡·Î -> ¼¼·Î ¹æÇâÀ¸·Î ¼öÇàÇÏ¸é N * N ¿¬»êº¸´Ù ÈÎ¾À È¿À²Àû. => ÀÌÁß Æ÷¹®À» 1Áß Æ÷¹® µÎ°³·Î ºĞ¸®ÇÏ¸é ¿¬»ê·®ÀÌ ÁÙ¾îµê
 PS_OUT PS_BLUR_X(PS_IN In)
 {
     PS_OUT Out = (PS_OUT)0;
     float4 vColor = float4(0.0f, 0.0f, 0.0f, 0.0f);
     float weights[5] = {
         0.227027, 0.1945946, 0.1216216, 0.054054, 0.016216
-    }; // ê°€ìš°ì‹œì•ˆ ë¸”ëŸ¬ ê°€ì¤‘ì¹˜
-    //vColor += g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord) * weights[0];
+    }; 
     vColor += g_DiffuseTexture.Sample(ClampSampler, In.vTexcoord) * weights[0];
-    // ìˆ˜í‰ ë°©í–¥ ë¸”ëŸ¬
     for (int i = 1; i < 5; ++i)
     {
         float2 offset = float2(g_vTexelSize.x * i, 0.0f);
@@ -80,16 +81,15 @@ PS_OUT PS_BLUR_X(PS_IN In)
     return Out;
 }
 
+// BLUR_Y´Ï±î ¼¼·Î ¹æÇâÀ¸·Î ºí·¯ Ã³¸®
 PS_OUT PS_BLUR_Y(PS_IN In)
 {
     PS_OUT Out = (PS_OUT)0;
     float4 vColor = float4(0.0f, 0.0f, 0.0f, 0.0f);
     float weights[5] = {
         0.227027, 0.1945946, 0.1216216, 0.054054, 0.016216
-    }; // ê°€ìˆ˜ì´ì•ˆ ë¸”ëŸ¬ ê°€ì¤‘ì¹˜
-    //vColor += g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord) * weights[0];
+    }; 
     vColor += g_DiffuseTexture.Sample(ClampSampler, In.vTexcoord) * weights[0];
-    // ìˆ˜í‰ ë°©í–¥ ë¸”ëŸ¬
     for (int i = 1; i < 5; ++i)
     {
         float2 offset = float2(0.0f, g_vTexelSize.y * i);
@@ -100,15 +100,6 @@ PS_OUT PS_BLUR_Y(PS_IN In)
     return Out;
 }
 
-//PS_OUT PS_SUM_BLUR(PS_IN In)
-//{
-//    PS_OUT Out = (PS_OUT)0;
-//    float4 vColor = float4(0.0f, 0.0f, 0.0f, 0.0f);
-//    vColor += g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
-//    vColor += g_BloomTexture.Sample(DefaultSampler, In.vTexcoord);
-//    Out.vColor = vColor;
-//    return Out;
-//}
 
 PS_OUT PS_SUM_BLUR(PS_IN In)
 {
@@ -117,14 +108,11 @@ PS_OUT PS_SUM_BLUR(PS_IN In)
     float4 vSceneColor = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord); // Combine Texture
     float4 vBloomColor = g_BloomTexture.Sample(DefaultSampler, In.vTexcoord); // Bloom Texture
 
-    // ê¸ˆë¹› ëŠë‚Œì„ ê°•ì¡°í•˜ê¸° ìœ„í•´ ì•½ê°„ì˜ ì˜¤ë Œì§€ìƒ‰ í‹´íŠ¸(Tint)ë¥¼ ê³±í•´ì¤ë‹ˆë‹¤.
-    float3 vBloomTint = float3(1.0f, 0.7f, 0.3f);
-    vBloomColor.rgb *= vBloomTint;
+    //float3 vBloomTint = float3(1.0f, 0.7f, 0.3f);
+    //vBloomColor.rgb *= vBloomTint;
 
-    // C++ì—ì„œ ë°›ì•„ì˜¨ g_fBloomIntensityì™€ ê°™ì€ ë³€ìˆ˜ë¡œ ê°•ë„ ì¡°ì ˆ
     Out.vColor = vSceneColor + vBloomColor * g_fBloomIntensity;
     
-    // (ì„ íƒ) í†¤ ë§¤í•‘ìœ¼ë¡œ ìì—°ìŠ¤ëŸ¬ìš´ ë§ˆë¬´ë¦¬
     Out.vColor.rgb = Out.vColor.rgb / (Out.vColor.rgb + 1.0f);
     
     return Out;

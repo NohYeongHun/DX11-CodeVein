@@ -152,7 +152,6 @@ HRESULT CLoading_BackGround::Ready_Components()
 HRESULT CLoading_BackGround::Ready_Events()
 {
 
-
     // Event 등록
     //m_pGameInstance->Subscribe(EventType::LOAIDNG_DISPLAY, Get_ID(), [this](void* pData)
     //    {

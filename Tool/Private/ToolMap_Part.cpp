@@ -160,11 +160,14 @@ HRESULT CToolMap_Part::Render()
     _uint iNumMeshes = m_pModelCom->Get_NumMeshes();
     for (_uint i = 0; i < iNumMeshes; i++)
     {
-        if (FAILED(m_pModelCom->Bind_Materials(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE, 0)))
+        /*if (FAILED(m_pModelCom->Bind_Materials(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE, 0)))
         {
             CRASH("Failed Bind Diffuse Texture");
             return E_FAIL;
-        }
+        }*/
+
+        if (FAILED(m_pModelCom->Bind_Materials(m_pShaderCom, "g_DiffuseTexture", i, aiTextureType_DIFFUSE, 0)))
+            continue;
 
         // 플레이어 맵 용도 => 주기적으로 주석 했따 안했따하자..
         /*if (FAILED(m_pModelCom->Bind_Materials(m_pShaderCom, "g_NormalTexture", i, aiTextureType_NORMALS, 0)))
@@ -417,3 +420,5 @@ void CToolMap_Part::Free()
     for (auto& pTextureCom : m_pTextureCom)
         Safe_Release(pTextureCom);
 }
+
+

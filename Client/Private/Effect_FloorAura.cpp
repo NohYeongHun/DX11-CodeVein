@@ -101,7 +101,7 @@ HRESULT CEffect_FloorAura::Render()
 {
 	
 #ifdef _DEBUG
-	ImGui_Render();
+	//ImGui_Render();
 #endif // _DEBUG
 
 	if (FAILED(Bind_ShaderResources()))

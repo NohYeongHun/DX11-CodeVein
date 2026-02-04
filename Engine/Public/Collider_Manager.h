@@ -77,6 +77,8 @@ private:
 	unordered_set<pair<CCollider*, CCollider*>
 		, ColliderPairHash, ColliderPairEqual> m_ActiveColliders;
 
+	//vector<pair<CCollider*, CCollider*>> m_Colliders;
+
 
 #pragma endregion
 

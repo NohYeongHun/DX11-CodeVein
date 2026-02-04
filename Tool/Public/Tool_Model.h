@@ -31,13 +31,6 @@ public:
 	_bool Picking(_float3* PickingPoint);
 	
 #pragma region 저장용 함수.
-//public:
-//	const MODEL_INFO& Save_NonAminModel(_fmatrix PreTransformMatrix, _wstring pModelTag);
-//	
-//private:
-//	HRESULT Save_NonAnimMeshes(_fmatrix PreTransformMatrix);
-//	HRESULT Save_NonAnimMarterials();
-
 
 /* 애니메이션 */
 public:

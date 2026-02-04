@@ -224,7 +224,6 @@ void CMap_Tool::Render_SaveLoad()
                 config.flags = ImGuiFileDialogFlags_ConfirmOverwrite;
 
                 ImGuiFileDialog::Instance()->OpenDialog("SaveFileDlgKey", "Choose File", ".dat", config);
-
             }
             ImGui::EndMenu();
         }
@@ -578,7 +577,7 @@ void CMap_Tool::Open_FileDialog()
 {
     IGFD::FileDialogConfig config;
     
-
+   
     switch (m_eSaveType)
     {
     case SAVE_TYPE::MODEL:
@@ -607,12 +606,15 @@ void CMap_Tool::Save_FileDialog()
     
     // FileDialog 창 크기 고정 설정 (너비 1200, 높이 700)
 
+    // 필터 저장 시 목록 수정은 다음과 같이 가능함.
+    const char* filters = ".dat,.json";
+
     switch (m_eSaveType)
     {
     case SAVE_TYPE::MODEL:
         config.path = "../../SaveFile/Model/";
         config.flags = ImGuiFileDialogFlags_ConfirmOverwrite;
-        ImGuiFileDialog::Instance()->OpenDialog("SaveFileDlgKey", "Save Model File", ".dat", config);
+        ImGuiFileDialog::Instance()->OpenDialog("SaveFileDlgKey", "Save Model File", filters, config);
         break;
 
     case SAVE_TYPE::NAVIGATION:

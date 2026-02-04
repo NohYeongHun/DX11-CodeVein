@@ -55,6 +55,12 @@
 #include "Effect_WindCircle.h"
 
 
+#include "Lunge_Pillar.h"
+#include "Effect_LungePillar.h"
+
+
+
+
 
 #include "Effect_PlayerSkill.h"
 #include "Effect_FloorAura.h"
