@@ -7,6 +7,12 @@ namespace Engine
 	// 기능을 인스턴스화 하기 위하여 만들어두는 틀
 
 	template<typename T>
+	float Lerp(T start, T end, float fRatio)
+	{
+		return start + (end - start) * fRatio;
+	}
+
+	template<typename T>
 	void	Safe_Delete(T& Pointer)
 	{
 		if (nullptr != Pointer)

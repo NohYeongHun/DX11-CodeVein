@@ -127,6 +127,8 @@ private:
 	_float m_fTransitionTime = {};       // 전환 진행 시간
 	_float m_fTransitionStartYaw = {};   // 전환 시작시 Yaw
 
+	_float3 m_vTargetLook = {}; // 타겟이 바라보는 방향.
+
 
 #pragma endregion
 
@@ -154,8 +156,7 @@ public:
 private:
 	HRESULT Create_LockOn_UI();
 	void Apply_Shake(_float fTimeDelta);
-	void Calculate_Chase_State(_float fTimeDelta);
-	void Calculate_LockOn_State(_float fTimeDelta);
+	_bool Validate_LockOn_Target();
 
 
 public:

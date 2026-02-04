@@ -67,7 +67,6 @@ void CCamera_Player::Update(_float fTimeDelta)
 
 	Apply_Shake(fTimeDelta);
 	
-
 	// LockOn UI 업데이트
 	if (m_pLockOnUI)
 		Update_LockOn_UI(fTimeDelta);
@@ -108,67 +107,41 @@ HRESULT CCamera_Player::Render()
 }
 
 #pragma region 0. 일반 상태 <- 플레이어 추적.
+
 void CCamera_Player::Update_Chase_Target(_float fTimeDelta)
 {
-	if (nullptr == m_pTarget)
-		return;
+	if (!m_pTarget) return;
 
-	// 1. 타겟(플레이어) 위치 가져오기
-	_vector vTargetPos = m_pTarget->Get_Transform()->Get_State(STATE::POSITION);
-
-	// 2. 마우스 입력 처리
+	// 1. 입력 및 회전값 갱신 (부드러운 회전)
 	Handle_Mouse_Input(fTimeDelta);
 
-	// 3. 부드러운 회전 보간
-	_float fRotationLerpFactor = 1.0f - powf(0.5f, m_fRotationSmoothSpeed * fTimeDelta);
-	m_fYaw = XMScalarNearEqual(m_fYaw, m_fTargetYaw, 0.001f) ? m_fTargetYaw :
-		m_fYaw + (m_fTargetYaw - m_fYaw) * fRotationLerpFactor;
-	m_fPitch = XMScalarNearEqual(m_fPitch, m_fTargetPitch, 0.001f) ? m_fTargetPitch :
-		m_fPitch + (m_fTargetPitch - m_fPitch) * fRotationLerpFactor;
+	_float fLerp = 1.0f - powf(0.5f, m_fRotationSmoothSpeed * fTimeDelta);
+	m_fYaw = Lerp(m_fYaw, m_fTargetYaw, fLerp);
+	m_fPitch = Lerp(m_fPitch, m_fTargetPitch, fLerp);
 
-	// 4. Yaw와 Pitch를 결합한 회전 행렬 생성
-	_matrix matRotY = XMMatrixRotationY(m_fYaw);    // 좌우 회전
-	_matrix matRotX = XMMatrixRotationX(m_fPitch);  // 위아래 회전
-	_matrix matRotation = matRotX * matRotY;              // Pitch * Yaw 순서
+	// 2. 목표 위치 계산
+	// 플레이어 위치 + (회전된 오프셋)
+	_matrix matRot = XMMatrixRotationX(m_fPitch) * XMMatrixRotationY(m_fYaw);
+	_vector vOffset = XMVector3TransformNormal(XMLoadFloat4(&m_vTargetOffset), matRot);
+	_vector vTargetPos = m_pTarget->Get_Transform()->Get_State(STATE::POSITION);
 
-	// 5. 회전된 오프셋 적용
-	_vector vRotatedOffset = XMVector3TransformNormal(XMLoadFloat4(&m_vTargetOffset), matRotation);
+	_vector vDstCamPos = vTargetPos + vOffset;
 
-	// 6. 목표 카메라 위치 계산
-	_vector vTargetCameraPos = vTargetPos + vRotatedOffset;
-	XMStoreFloat4(&m_vTargetCameraPos, vTargetCameraPos);
+	// 3. 부드러운 이동 (감쇠 진동 없는 SmoothDamp 느낌의 Lerp)
+	_vector vCurPos = XMLoadFloat4(&m_vCurrentCameraPos);
+	_float fPosLerp = 1.0f - powf(0.5f, m_fSmoothSpeed * fTimeDelta);
+	_vector vFinalPos = XMVectorLerp(vCurPos, vDstCamPos, fPosLerp);
 
-	// 7. 첫 번째 업데이트인 경우 즉시 목표 위치로 이동
-	if (m_IsFirstUpdate)
-	{
-		m_vCurrentCameraPos = m_vTargetCameraPos;
-		m_IsFirstUpdate = false;
-	}
+	XMStoreFloat4(&m_vCurrentCameraPos, vFinalPos);
 
-	// 8. 부드러운 보간을 사용하여 카메라 위치 업데이트
-	_vector vCurrentPos = XMLoadFloat4(&m_vCurrentCameraPos);
-	_vector vTargetPos_Camera = XMLoadFloat4(&m_vTargetCameraPos);
+	// 4. Transform 적용
+	m_pTransformCom->Set_State(STATE::POSITION, vFinalPos + m_vShakeOffset);
 
-	// 9. Lerp를 사용한 부드러운 이동 
-	_float fLerpFactor = 1.0f - powf(0.5f, m_fSmoothSpeed * fTimeDelta);
-	_vector vSmoothedPos = XMVectorLerp(vCurrentPos, vTargetPos_Camera, fLerpFactor);
-
-	// 10. 현재 위치 업데이트
-	/*XMStoreFloat4(&m_vCurrentCameraPos, vSmoothedPos);
-	m_pTransformCom->Set_State(STATE::POSITION, vSmoothedPos);*/
-	// 10. 현재 위치 업데이트
-	XMStoreFloat4(&m_vCurrentCameraPos, vSmoothedPos);
-	m_pTransformCom->Set_State(STATE::POSITION, vSmoothedPos + m_vShakeOffset);
-
-	// 11. 카메라 방향 설정 (Pitch와 Yaw 적용)
-	_vector vForward = XMVector3TransformNormal(XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f), matRotation);
-	_vector vUp = XMVector3TransformNormal(XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f), matRotation);
-	_vector vRight = XMVector3Cross(vUp, vForward);
-
-	// 12. Transform에 직접 적용
-	m_pTransformCom->Set_State(STATE::RIGHT, XMVector3Normalize(vRight));
-	m_pTransformCom->Set_State(STATE::UP, XMVector3Normalize(vUp));
-	m_pTransformCom->Set_State(STATE::LOOK, XMVector3Normalize(vForward));
+	// 회전: 계산된 회전 행렬을 그대로 Look/Up/Right에 적용 (수동 계산 제거)
+	// 회전 행렬의 각 행(Row)이 곧 로컬 축 벡터입니다.
+	m_pTransformCom->Set_State(STATE::RIGHT, matRot.r[0]);
+	m_pTransformCom->Set_State(STATE::UP, matRot.r[1]);
+	m_pTransformCom->Set_State(STATE::LOOK, matRot.r[2]);
 }
 
 void CCamera_Player::Handle_Mouse_Input(_float fTimeDelta, _float fSensitivityMultiplier)
@@ -288,60 +261,43 @@ void CCamera_Player::Toggle_LockOn_Mode()
 
 void CCamera_Player::Update_LockOn_Camera(_float fTimeDelta)
 {
-	// 1. 락온 모드였거나, 타겟이 죽었는지 체크 후에 락온 모드를 해제합니다.
-	if (!m_pTarget || !m_pLockOnTarget)
+	// 1. 유효성 검사 (타겟 소실/거리 체크)
+	if (!Validate_LockOn_Target())
 	{
-		// 락온 해제
 		Clear_LockOn_Target();
 		return;
 	}
 
-	if (m_pLockOnTarget && (m_pLockOnTarget->HasBuff(CMonster::BUFF_DEAD)
-		|| m_pLockOnTarget->HasBuff(CMonster::BUFF_CORPSE)))
-	{
-		// 락온 해제
-		Clear_LockOn_Target();
-		return;
-	}
-
-	// 2. 타겟과의 거리 체크 (너무 멀면 락온 해제)
+	// 2. 목표 위치 계산
 	_vector vPlayerPos = m_pTarget->Get_Transform()->Get_State(STATE::POSITION);
-	_vector vTargetPos_Enemy = m_pLockOnTarget->Get_Transform()->Get_State(STATE::POSITION);
-	_float fDistance = XMVectorGetX(XMVector3Length(vTargetPos_Enemy - vPlayerPos));
-
-	if (fDistance > m_fMaxLockOnDistance * 1.2f) // 약간의 여유 거리
-	{
-		Clear_LockOn_Target();
-		return;
-	}
-
-	// 3. LockOn 카메라 위치 계산
-	Calculate_LockOn_Camera_Position(fTimeDelta);
-
-	// 4. 부드러운 카메라 이동
-	_vector vCurrentPos = XMLoadFloat4(&m_vCurrentCameraPos);
-	_vector vTargetPos = XMLoadFloat4(&m_vLockOnCameraPos);
-
-	_float fLerpFactor = 1.0f - powf(0.3f, m_fLockOnSmoothSpeed * fTimeDelta); // 0.8f -> 0.3f로 변경 (더 빠른 보간)
-	_vector vSmoothedPos = XMVectorLerp(vCurrentPos, vTargetPos, fLerpFactor);
-
-	// 5. 카메라 위치 설정
-	//XMStoreFloat4(&m_vCurrentCameraPos, vSmoothedPos);
-	//m_pTransformCom->Set_State(STATE::POSITION, vSmoothedPos);
-
-	// 5. 카메라 위치 설정
-	XMStoreFloat4(&m_vCurrentCameraPos, vSmoothedPos);
-	m_pTransformCom->Set_State(STATE::POSITION, vSmoothedPos + m_vShakeOffset);
-
-	// 6. 락온 상태에서는 몬스터를 직접 바라보도록 설정
-	_float3 vTargetPosFloat3;
-	XMStoreFloat3(&vTargetPosFloat3, vTargetPos_Enemy);
-	m_pTransformCom->LookAt(vTargetPosFloat3);
+	_vector vEnemyPos = m_pLockOnTarget->Get_Transform()->Get_State(STATE::POSITION);
 
 
-	// 4. 최종 카메라 위치에 오프셋 적용
+	// 3. 방향벡터를 계산합니다.
+	_vector vLookDir = vPlayerPos - vEnemyPos;
+	vLookDir = XMVector3Normalize(XMVectorSetY(vLookDir, 0.f)); // 수평 방향으로만 계산 => 높이 무시
 
+	// 4. 거리 설정.
+	_float fBackDistance = fabsf(m_vLockOnOffset.z);
+
+	// 5. 목표 위치 => 플레이어 위치에서 '뒤로' 거리만큼 이동 + 위로 높이만큼 이동
+	_vector vDstCamPos = vPlayerPos + (vLookDir * fBackDistance) + XMVectorSet(0.f, m_vLockOnOffset.y, 0.f, 0.f);
+
+	// 6. 부드러운 이동 (감쇠 진동 방지)
+	_vector vCurPos = XMLoadFloat4(&m_vCurrentCameraPos);
+	_float fPosLerp = 1.0f - powf(0.1f, m_fLockOnSmoothSpeed * fTimeDelta);
+	_vector vFinalPos = XMVectorLerp(vCurPos, vDstCamPos, fPosLerp);
+	XMStoreFloat4(&m_vCurrentCameraPos, vFinalPos);
+
+	// 7. Transform 적용
+	m_pTransformCom->Set_State(STATE::POSITION, vFinalPos + m_vShakeOffset);
+
+	// 8. 시선 고정 (LookAt)
+	_float3 vLookAt = {};
+	XMStoreFloat3(&vLookAt, vEnemyPos);
+	m_pTransformCom->LookAt(vLookAt);
 }
+
 
 void CCamera_Player::Clear_LockOn_Target()
 {
@@ -358,10 +314,7 @@ void CCamera_Player::Enable_LockOn_Mode()
 
 	// LockOn 카메라 위치 초기화
 	if (m_pTarget && m_pLockOnTarget)
-	{
 		Calculate_LockOn_Camera_Position(0.0f);
-		// 즉시 이동하지 않고 부드럽게 전환되도록 함
-	}
 
 	// LockOn UI 활성화
 	if (m_pLockOnUI)
@@ -643,15 +596,22 @@ void CCamera_Player::Apply_Shake(_float fTimeDelta)
 	}
 }
 
-void CCamera_Player::Calculate_Chase_State(_float fTimeDelta)
+
+
+
+_bool CCamera_Player::Validate_LockOn_Target()
 {
-	// 1. 마우스 입력에 따른 회전 보간 (부드러운 회전)
-	_float fLerp = 1.0f - powf(0.5f, m_fRotationSmoothSpeed * fTimeDelta);
+
+	if (!m_pTarget || !m_pLockOnTarget)
+		return false;
+
+	if (m_pLockOnTarget && (m_pLockOnTarget->HasBuff(CMonster::BUFF_DEAD)
+		|| m_pLockOnTarget->HasBuff(CMonster::BUFF_CORPSE)))
+		return false;
+
+	return true;
 }
 
-void CCamera_Player::Calculate_LockOn_State(_float fTimeDelta)
-{
-}
 
 CCamera_Player* CCamera_Player::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
