@@ -3,11 +3,6 @@
 CLoad_Channel::CLoad_Channel()
 {
 }
-
-_float Lerp(_float a, _float b, _float t)
-{
-    return a + (b - a) * t;
-}
 /*
     string channelName;
     uint32_t iBoneIndex;

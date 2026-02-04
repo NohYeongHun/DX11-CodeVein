@@ -127,7 +127,6 @@ void CPlayer::Update(_float fTimeDelta)
     CContainerObject::Update(fTimeDelta);
 
     Update_KeyInput();
-
    
     HandleState(fTimeDelta);
     
@@ -493,10 +492,9 @@ void CPlayer::Update_LockOn(_float fTimeDelta)
         m_pLockOn_Target = m_pPlayerCamera->Get_LockOn_Target();
     }
     
-    if (!m_isLockOn || !m_pLockOn_Target)
-        return;
-
-    m_fLockOnTimer += fTimeDelta;
+    if (m_isLockOn && m_pLockOn_Target)
+        m_fLockOnTimer += fTimeDelta;
+    
 }
 
 _bool CPlayer::Is_Valid_LockOn_Target(CGameObject* pTarget)
