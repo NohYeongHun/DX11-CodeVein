@@ -235,6 +235,15 @@ void CGameInstance::Render_End(HWND hWnd)
 	m_pGraphic_Device->Present();
 }
 
+#ifdef _DEBUG
+void CGameInstance::Set_DebugRender(_bool IsDebugRender)
+{
+	m_pRenderer->Set_DebugRender(IsDebugRender);
+}
+#endif // _DEBUG
+
+
+
 _float CGameInstance::Rand_Normal()
 {
 	return static_cast<_float>(rand()) / RAND_MAX;	

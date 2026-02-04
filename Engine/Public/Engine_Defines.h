@@ -106,6 +106,9 @@ __analysis_assume(expr);   \
 }
 
 
+#include "json.hpp"
+using json = nlohmann::json;
+
 #pragma region 헬퍼 함수.
 
 static void WriteWString(std::ofstream& ofs, const std::wstring& ws)

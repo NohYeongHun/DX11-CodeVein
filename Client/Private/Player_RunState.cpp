@@ -212,28 +212,6 @@ void CPlayer_RunState::Change_State(_float fTimeDelta)
 		return;
 	}
 
-	//if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::STRONG_ATTACK))
-	//{
-	//	if (!m_pFsm->Is_CoolTimeEnd(CPlayer::STRONG_ATTACK))
-	//		return;
-	//	
-	//	m_iNextState = CPlayer::PLAYER_STATE::STRONG_ATTACK;
-	//	m_iNextAnimIdx = m_pPlayer->Find_AnimationIndex(TEXT("STRONG_ATTACK1"));
-	//	StrongAttack.iAnimation_Idx = m_iNextAnimIdx;
-	//	
-	//	// 락온 중이면 방향 무시, 일반 상태면 이동 방향 사용
-	//	if (m_pPlayer->Is_LockOn() && m_pPlayer->Has_LockOn_Target())
-	//	{
-	//		StrongAttack.eDirection = ACTORDIR::U; // 락온 중에는 방향 무시 (StrongAttackState에서 타겟 방향으로 회전)
-	//	}
-	//	else
-	//	{
-	//		StrongAttack.eDirection = m_eDir; // 일반 상태에서는 이동 방향 사용
-	//	}
-	//	
-	//	m_pFsm->Change_State(m_iNextState, &StrongAttack);
-	//	return;
-	//}
 
 	if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::ATTACK))
 	{
@@ -258,19 +236,6 @@ void CPlayer_RunState::Change_State(_float fTimeDelta)
 		return;
 	}
 
-	//if (m_pPlayer->Is_KeyPressed(PLAYER_KEY::GUARD))
-	//{
-	//	//달리는 도중에 바꾸면 동작이 어색함.
-	//	if (!m_pFsm->Is_CoolTimeEnd(CPlayer::GUARD))
-	//		return;
-
-	//	m_iNextAnimIdx = m_pPlayer->Find_AnimationIndex(TEXT("GUARD_START"));
-	//	m_iNextState = CPlayer::PLAYER_STATE::GUARD;
-	//	Guard.iAnimation_Idx = m_iNextAnimIdx;
-	//	m_pFsm->Change_State(m_iNextState, &Guard);
-	//	return;
-	//}
-	
 
 	if (m_pPlayer->Is_MovementKeyPressed()) // 입력키 이용 중이라면.
 	{

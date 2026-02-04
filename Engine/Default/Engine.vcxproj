@@ -301,6 +301,7 @@ call copy.bat</Command>
     <ClInclude Include="..\Public\Graphic_Device.h" />
     <ClInclude Include="..\Public\IdGen.h" />
     <ClInclude Include="..\Public\Input_Device.h" />
+    <ClInclude Include="..\Public\json.hpp" />
     <ClInclude Include="..\Public\Layer.h" />
     <ClInclude Include="..\Public\Level.h" />
     <ClInclude Include="..\Public\Level_Manager.h" />

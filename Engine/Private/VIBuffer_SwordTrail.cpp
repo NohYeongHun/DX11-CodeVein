@@ -1,4 +1,5 @@
-﻿CVIBuffer_SwordTrail::CVIBuffer_SwordTrail(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
+﻿#include "VIBuffer_SwordTrail.h"
+CVIBuffer_SwordTrail::CVIBuffer_SwordTrail(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CVIBuffer{ pDevice, pContext }
 {
 }
@@ -150,14 +151,16 @@ HRESULT CVIBuffer_SwordTrail::Update(TRAILPOINT TrailPoint)
 		m_TrailPoints.pop_front();
 	}
 
+	if (m_TrailPoints.size() < 8) return S_OK;
+
 	D3D11_MAPPED_SUBRESOURCE		SubResource;
 
 	//m_pContext->Map(m_pVB, 0, D3D11_MAP_WRITE_NO_OVERWRITE, 0, &SubResource);
 	m_pContext->Map(m_pVB, 0, D3D11_MAP_WRITE_DISCARD, 0, &SubResource);
 
-	VTXPOSTEX* pVertices = (VTXPOSTEX*)SubResource.pData;
+	VTXPOSTEX* pVertices = static_cast<VTXPOSTEX*>(SubResource.pData);
 
-	auto TrailPointIter = m_TrailPoints.begin();
+	/*auto TrailPointIter = m_TrailPoints.begin();
 
 	_vector		vPos[50];
 
@@ -187,7 +190,9 @@ HRESULT CVIBuffer_SwordTrail::Update(TRAILPOINT TrailPoint)
 	if (m_CurrentPointCount >= 2 && m_TrailPoints.size() >= MAX_TRAIL_POINTS)
 	{
 		ApplyInterpolation(pVertices, vector<_vector>(vPos, vPos + m_CurrentPointCount));
-	}
+	}*/
+
+	ApplyInterpolation(pVertices);
 
 #pragma endregion
 
@@ -256,6 +261,65 @@ HRESULT CVIBuffer_SwordTrail::ApplyInterpolation(VTXPOSTEX* pVertices, const vec
 		_uint vertexIndex = (MAX_TRAIL_POINTS - 1 - (endIndex - 1 - i)) * 2;
 		XMStoreFloat3(&pVertices[vertexIndex].vPosition, interpolatedPos);
 	}
+
+	return S_OK;
+}
+
+HRESULT CVIBuffer_SwordTrail::ApplyInterpolation(VTXPOSTEX* pVertices)
+{
+	const int SAMPLES_PER_SEGMENT = 20;
+	_uint vertexIdx = 0;
+
+	// 리스트 내의 '세트(Down/Up)' 개수 계산
+	int numPointSets = static_cast<int>(m_TrailPoints.size() / 2);
+	int numSegments = numPointSets - 3; // 4세트가 있어야 1개 구간 보간 가능
+
+	// 전체 생성될 정점 수 계산 (UV용)
+	float totalExpectedPoints = static_cast<float>(numSegments * SAMPLES_PER_SEGMENT);
+
+	for (int i = 0; i < numSegments; ++i)
+	{
+		// 반복자를 사용하여 현재 보간에 필요한 4개 세트의 시작점 찾기
+		auto it0 = next(m_TrailPoints.begin(), i * 2);       // P(i-1)
+		auto it1 = next(it0, 2);                             // P(i)   <- 여기서부터
+		auto it2 = next(it1, 2);                             // P(i+1) <- 여기까지 보간
+		auto it3 = next(it2, 2);                             // P(i+2)
+
+		for (int j = 0; j < SAMPLES_PER_SEGMENT; ++j)
+		{
+			if (vertexIdx >= (MAX_TRAIL_POINTS * 2) - 2) break;
+
+			float t = static_cast<float>(j) / static_cast<float>(SAMPLES_PER_SEGMENT);
+
+			// Down 라인 보간 (짝수 번째 인덱스들)
+			_vector vD0 = XMLoadFloat3(&(*it0));
+			_vector vD1 = XMLoadFloat3(&(*it1));
+			_vector vD2 = XMLoadFloat3(&(*it2));
+			_vector vD3 = XMLoadFloat3(&(*it3));
+			_vector interDown = XMVectorCatmullRom(vD0, vD1, vD2, vD3, t);
+
+			// Up 라인 보간 (홀수 번째 인덱스들 - 바로 다음 칸)
+			_vector vU0 = XMLoadFloat3(&(*std::next(it0)));
+			_vector vU1 = XMLoadFloat3(&(*std::next(it1)));
+			_vector vU2 = XMLoadFloat3(&(*std::next(it2)));
+			_vector vU3 = XMLoadFloat3(&(*std::next(it3)));
+			_vector interUp = XMVectorCatmullRom(vU0, vU1, vU2, vU3, t);
+
+			float u = static_cast<float>(vertexIdx / 2) / totalExpectedPoints;
+
+			// 정점 기록
+			XMStoreFloat3(&pVertices[vertexIdx].vPosition, interDown);
+			pVertices[vertexIdx].vTexcoord = _float2(u, 1.f);
+			vertexIdx++;
+
+			XMStoreFloat3(&pVertices[vertexIdx].vPosition, interUp);
+			pVertices[vertexIdx].vTexcoord = _float2(u, 0.f);
+			vertexIdx++;
+		}
+	}
+
+	m_CurrentPointCount = vertexIdx;
+	return S_OK;
 
 	return S_OK;
 }

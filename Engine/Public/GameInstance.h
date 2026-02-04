@@ -37,6 +37,9 @@ public:
 	void Render_Begin(const _float4* pClearColor);
 	HRESULT Draw();
 	void Render_End(HWND hWnd = 0);
+#ifdef _DEBUG
+	void Set_DebugRender(_bool IsDebugRender);
+#endif
 public:
 	_float Rand_Normal();
 	_float Rand(_float fMin, _float fMax);

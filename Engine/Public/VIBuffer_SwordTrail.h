@@ -37,6 +37,7 @@ private:
 
 private:
 	HRESULT ApplyInterpolation(VTXPOSTEX* pVertices, const vector<_vector>& positions);
+	HRESULT ApplyInterpolation(VTXPOSTEX* pVertices);
 
 
 public:

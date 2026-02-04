@@ -60,7 +60,7 @@ public:
 
 	_vector Get_RightDirection_NoPitch()
 	{
-			_vector vRight = XMVector3Normalize(Get_State(STATE::RIGHT));
+		_vector vRight = XMVector3Normalize(Get_State(STATE::RIGHT));
 		vRight = XMVectorSetY(vRight, 0.f);  // Pitch 제거
 		return XMVector3Normalize(vRight);
 	}

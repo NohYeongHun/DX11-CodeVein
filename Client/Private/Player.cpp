@@ -339,10 +339,14 @@ void CPlayer::Move_Direction(_fvector vDirection, _float fTimeDelta)
     m_pTransformCom->Move_Direction(vDirection, fTimeDelta, m_pNavigationCom);
 }
 
+#ifdef _DEBUG
 void CPlayer::Debug_CameraVectors()
 {
     m_pPlayerCamera->Debug_CameraVectors();
 }
+#endif // _DEBUG
+
+
 
 void CPlayer::Rotate_Player_To_Camera_Direction()
 {

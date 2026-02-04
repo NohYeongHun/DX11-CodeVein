@@ -750,6 +750,9 @@
     <ClInclude Include="..\Public\Lunge_Pillar.h">
       <Filter>02. GameObject\Effect\Mesh\Player\Skill2\DragonLunge</Filter>
     </ClInclude>
+    <ClInclude Include="..\Public\Client_Info.h">
+      <Filter>99. Defines</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Client.ico">

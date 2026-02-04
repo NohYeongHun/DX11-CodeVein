@@ -47,19 +47,22 @@ struct PS_OUT
     float4 vColor : SV_TARGET0;
 };
 
+// 빛이 번질 만큼 충분히 밝은 부분만 골라내기 위함.
 PS_OUT PS_BLOOMBRIGHT_MAIN(PS_IN In)
 {
     PS_OUT Out = (PS_OUT)0;
     float4 BrightColor = float4(0.0f, 0.0f, 0.0f, 0.0f);
-    float4 originalColor = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
-    float brightness = dot(originalColor.rgb, float3(0.2126f, 0.7152f, 0.0722f));
+    float4 originalColor = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord); // 원본 색상
+    float brightness = dot(originalColor.rgb, float3(0.2126f, 0.7152f, 0.0722f)); // 상대 휘도 계산. (인간의 눈으로 본 밝기 계싼)
 
-    float factor = smoothstep(threshold, threshold + soft, brightness);
-    BrightColor = originalColor * factor;
+    float factor = smoothstep(threshold, threshold + soft, brightness); // 경계 필터링을 위함 => 어디서부터 빛나게 할것인지를 결정.
+    BrightColor = originalColor * factor; // 밝은 부분만 추출 => 어두운 부분은 factor가 0에 가까워져서 검게되고 밝은 부분만 원래 색상을 유지하며 살아남음.
     Out.vColor = BrightColor;
     return Out;
 }
 
+// 가우시안 블러 => 추출된 밝은 영역을 사방으로 퍼뜨려 Glow 효과를 만드는 단계
+// BLUR_X니까 가로 방향으로 블러 처리 => 블러처리를 가로 -> 세로 방향으로 수행하면 N * N 연산보다 훨씬 효율적. => 이중 포문을 1중 포문 두개로 분리하면 연산량이 줄어듦
 PS_OUT PS_BLUR_X(PS_IN In)
 {
     PS_OUT Out = (PS_OUT)0;
@@ -78,6 +81,7 @@ PS_OUT PS_BLUR_X(PS_IN In)
     return Out;
 }
 
+// BLUR_Y니까 세로 방향으로 블러 처리
 PS_OUT PS_BLUR_Y(PS_IN In)
 {
     PS_OUT Out = (PS_OUT)0;
@@ -104,8 +108,8 @@ PS_OUT PS_SUM_BLUR(PS_IN In)
     float4 vSceneColor = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord); // Combine Texture
     float4 vBloomColor = g_BloomTexture.Sample(DefaultSampler, In.vTexcoord); // Bloom Texture
 
-    float3 vBloomTint = float3(1.0f, 0.7f, 0.3f);
-    vBloomColor.rgb *= vBloomTint;
+    //float3 vBloomTint = float3(1.0f, 0.7f, 0.3f);
+    //vBloomColor.rgb *= vBloomTint;
 
     Out.vColor = vSceneColor + vBloomColor * g_fBloomIntensity;
     

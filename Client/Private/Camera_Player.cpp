@@ -40,24 +40,10 @@ HRESULT CCamera_Player::Initialize_Clone(void* pArg)
 	// 마우스 커서 클립 활성화
 	Enable_Mouse_Clip();
 
-#pragma region LOCK ON UI 생성
-	CLockOnUI::LOCKONUI_DESC UIDesc{};
-	UIDesc.fSizeX = 64.0f;
-	UIDesc.fSizeY = 64.0f;
-	UIDesc.eShaderPath = POSTEX_SHADERPATH::LOCKON;
-	m_pLockOnUI = static_cast<CLockOnUI*>(m_pGameInstance->Clone_Prototype(
-		PROTOTYPE::GAMEOBJECT
-		, ENUM_CLASS(LEVEL::STATIC)
-		, TEXT("Prototype_GameObject_LockOnUI"), &UIDesc));
-
-	if (!m_pLockOnUI)
-	{
-		MSG_BOX(TEXT("Failed to create LockOn UI"));
+	if (FAILED(Create_LockOn_UI())) 
 		return E_FAIL;
-	}
 
 	return S_OK;
-#pragma endregion
 
 
 }
@@ -73,57 +59,21 @@ void CCamera_Player::Update(_float fTimeDelta)
 
 	CCamera::Update(fTimeDelta);
 
-	// 1. 마우스 클립 업데이트 => 창 크기를 벗어나지 못하게 함.
-	Update_Mouse_Clip();
-
-
-	if (m_fShakeTime > 0.0f)
-	{
-		// 1. 남은 시간 감소
-		m_fShakeTime -= fTimeDelta;
-
-		// 2. 랜덤 오프셋 생성
-		// -1.0f ~ +1.0f 사이의 랜덤 값을 생성합니다.
-		_float fOffsetX = ((float)rand() / RAND_MAX - 0.5f) * 2.0f;
-		_float fOffsetY = ((float)rand() / RAND_MAX - 0.5f) * 2.0f;
-		_float fOffsetZ = ((float)rand() / RAND_MAX - 0.5f) * 2.0f;
-
-		m_vShakeOffset = XMVectorSet(fOffsetX, fOffsetY, fOffsetZ, 0.0f);
-
-		// 3. 오프셋에 강도를 곱하고 정규화 (방향만 사용)
-		m_vShakeOffset = XMVector3Normalize(m_vShakeOffset) * m_fShakeMagnitude;
-
-		
-
-		// 4. (선택) 시간이 지남에 따라 쉐이킹 강도를 서서히 줄여 부드럽게 멈추게 함
-		m_fShakeMagnitude *= (m_fShakeTime /  m_fShakeDuration);
-	}
-	else
-	{
-		m_fShakeTime = 0.0f;
-		m_fShakeDuration = 0.0f;
-		m_fShakeMagnitude = 0.0f;
-		m_vShakeOffset = XMVectorSet(0.f, 0.f, 0.f, 0.f);
-	}
-
-
 	// 락온 모드에 따라 카메라 업데이트 방식 선택
 	if (m_IsLockOnMode)
-	{
 		Update_LockOn_Camera(fTimeDelta);
-	}
 	else
-	{
 		Update_Chase_Target(fTimeDelta);
-	}
 
-	// LockOn UI 업데이트
-	Update_LockOn_UI(fTimeDelta);
-
-
+	Apply_Shake(fTimeDelta);
 	
 
+	// LockOn UI 업데이트
+	if (m_pLockOnUI)
+		Update_LockOn_UI(fTimeDelta);
 
+	// 1. 마우스 클립 업데이트 => 창 크기를 벗어나지 못하게 함.
+	Update_Mouse_Clip();
 
 	// 파이프라인 업데이트
 	CCamera::Update_PipeLines();
@@ -345,15 +295,6 @@ void CCamera_Player::Update_LockOn_Camera(_float fTimeDelta)
 		Clear_LockOn_Target();
 		return;
 	}
-
-	// 락온 타겟이 죽었는지 확인
-	//if (m_pLockOnTarget && (m_pLockOnTarget->HasBuff(CMonster::BUFF_DEAD)
-	//	|| m_pLockOnTarget->HasBuff(CMonster::BUFF_CORPSE) || !m_pLockOnTarget->Is_Visible()))
-	//{
-	//	// 락온 해제
-	//	Clear_LockOn_Target();
-	//	return;
-	//}
 
 	if (m_pLockOnTarget && (m_pLockOnTarget->HasBuff(CMonster::BUFF_DEAD)
 		|| m_pLockOnTarget->HasBuff(CMonster::BUFF_CORPSE)))
@@ -596,6 +537,7 @@ void CCamera_Player::StartShake(_float duration, _float magnitude)
 	m_fShakeMagnitude = magnitude;
 }
 
+#ifdef _DEBUG
 void CCamera_Player::Debug_CameraVectors()
 {
 	CCamera* pCamera = m_pGameInstance->Get_MainCamera();
@@ -620,10 +562,9 @@ void CCamera_Player::Debug_CameraVectors()
 		std::to_wstring(XMVectorGetZ(vLook)) + L")\n").c_str());
 }
 
-#ifdef _DEBUG
 void CCamera_Player::ImGui_Render()
 {
-	
+
 	ImGuiIO& io = ImGui::GetIO();
 
 	// 기존 Player Debug Window
@@ -651,6 +592,66 @@ void CCamera_Player::ImGui_Render()
 	ImGui::End();
 }
 #endif // _DEBUG
+
+HRESULT CCamera_Player::Create_LockOn_UI()
+{
+	CLockOnUI::LOCKONUI_DESC UIDesc{};
+	UIDesc.fSizeX = 64.0f;
+	UIDesc.fSizeY = 64.0f;
+	UIDesc.eShaderPath = POSTEX_SHADERPATH::LOCKON;
+	m_pLockOnUI = static_cast<CLockOnUI*>(m_pGameInstance->Clone_Prototype(
+		PROTOTYPE::GAMEOBJECT
+		, ENUM_CLASS(LEVEL::STATIC)
+		, TEXT("Prototype_GameObject_LockOnUI"), &UIDesc));
+
+	if (!m_pLockOnUI)
+	{
+		MSG_BOX(TEXT("Failed to create LockOn UI"));
+		return E_FAIL;
+	}
+
+	return S_OK;
+}
+
+void CCamera_Player::Apply_Shake(_float fTimeDelta)
+{
+	if (m_fShakeTime > 0.0f)
+	{
+		// 1. 남은 시간 감소
+		m_fShakeTime -= fTimeDelta;
+
+		// 2. 랜덤 오프셋 생성
+		// -1.0f ~ +1.0f 사이의 랜덤 값을 생성합니다.
+		_float fOffsetX = ((float)rand() / RAND_MAX - 0.5f) * 2.0f;
+		_float fOffsetY = ((float)rand() / RAND_MAX - 0.5f) * 2.0f;
+		_float fOffsetZ = ((float)rand() / RAND_MAX - 0.5f) * 2.0f;
+
+		m_vShakeOffset = XMVectorSet(fOffsetX, fOffsetY, fOffsetZ, 0.0f);
+
+		// 3. 오프셋에 강도를 곱하고 정규화 (방향만 사용)
+		m_vShakeOffset = XMVector3Normalize(m_vShakeOffset) * m_fShakeMagnitude;
+
+		// 4. (선택) 시간이 지남에 따라 쉐이킹 강도를 서서히 줄여 부드럽게 멈추게 함
+		m_fShakeMagnitude *= (m_fShakeTime / m_fShakeDuration);
+	}
+	else
+	{
+		m_fShakeTime = 0.0f;
+		m_fShakeDuration = 0.0f;
+		m_fShakeMagnitude = 0.0f;
+		m_vShakeOffset = XMVectorSet(0.f, 0.f, 0.f, 0.f);
+	}
+}
+
+void CCamera_Player::Calculate_Chase_State(_float fTimeDelta)
+{
+	// 1. 마우스 입력에 따른 회전 보간 (부드러운 회전)
+	_float fLerp = 1.0f - powf(0.5f, m_fRotationSmoothSpeed * fTimeDelta);
+}
+
+void CCamera_Player::Calculate_LockOn_State(_float fTimeDelta)
+{
+}
 
 CCamera_Player* CCamera_Player::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 {
@@ -680,16 +681,16 @@ CGameObject* CCamera_Player::Clone(void* pArg)
 
 void CCamera_Player::Update_LockOn_UI(_float fTimeDelta)
 {
-	if (m_pLockOnUI)
+
+	// UI가 활성화되어 있으면 업데이트 실행
+	if (m_pLockOnUI->Is_Active())
 	{
-		// UI가 활성화되어 있으면 업데이트 실행
-		if (m_pLockOnUI->Is_Active())
-		{
-			// Camera에서 Priority_Update와 Update만 호출 (Late_Update는 렌더링 시스템이 처리)
-			m_pLockOnUI->Priority_Update(fTimeDelta);
-			m_pLockOnUI->Update(fTimeDelta);
-		}
+		// Camera에서 Priority_Update와 Update만 호출 (Late_Update는 렌더링 시스템이 처리)
+		m_pLockOnUI->Priority_Update(fTimeDelta);
+		m_pLockOnUI->Update(fTimeDelta);
 	}
+
+	
 }
 
 void CCamera_Player::Free()

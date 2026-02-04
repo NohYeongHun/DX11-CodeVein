@@ -202,6 +202,7 @@
     <ClInclude Include="..\Public\ClientPch.h" />
     <ClInclude Include="..\Public\Client_Debug.h" />
     <ClInclude Include="..\Public\Client_Defines.h" />
+    <ClInclude Include="..\Public\Client_Info.h" />
     <ClInclude Include="..\Public\EffectParticle.h" />
     <ClInclude Include="..\Public\Effect_BodyAura.h" />
     <ClInclude Include="..\Public\Effect_FloorAura.h" />

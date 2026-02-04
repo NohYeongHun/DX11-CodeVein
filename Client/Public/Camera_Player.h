@@ -74,6 +74,9 @@ private:
 
 #pragma endregion
 
+
+
+
 #pragma region 1. 락온 상태. <-몬스터를 추적하되 플레이어를 동일선상에 둡니다. => 카메라 => 플레이어 등짝 => 몬스터
 public:
 	void Toggle_LockOn_Mode();
@@ -138,10 +141,22 @@ private:
 
 
 #pragma region 99. 디버그 용도
+
+#ifdef _DEBUG
 public:
 	void Debug_CameraVectors();
 	void ImGui_Render();
+#endif
+
 #pragma endregion
+
+
+private:
+	HRESULT Create_LockOn_UI();
+	void Apply_Shake(_float fTimeDelta);
+	void Calculate_Chase_State(_float fTimeDelta);
+	void Calculate_LockOn_State(_float fTimeDelta);
+
 
 public:
 	static CCamera_Player* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext);

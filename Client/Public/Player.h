@@ -150,7 +150,10 @@ public:
 	void Move_By_Camera_Direction_8Way(ACTORDIR eDir, _float fTimeDelta, _float fSpeed);
 	void Move_Direction(_fvector vDirection, _float fTimeDelta);
 	
+#ifdef _DEBUG
 	void Debug_CameraVectors();
+#endif
+	
 	void Rotate_Player_To_Camera_Direction();
 	// 현재 프레임 가져오기.
 #pragma endregion

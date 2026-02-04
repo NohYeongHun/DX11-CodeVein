@@ -344,6 +344,7 @@ _bool CLoad_Model::Play_Animation(_float fTimeDelta)
 		m_Bones, m_isLoop, &m_isFinished, m_BlendDesc, fTimeDelta
 	);
 
+
 	for (_uint i = 0; i < m_Bones.size(); ++i)
 	{
 		m_Bones[i]->Update_CombinedTransformationMatrix(m_PreTransformMatrix, m_Bones);
@@ -351,9 +352,6 @@ _bool CLoad_Model::Play_Animation(_float fTimeDelta)
 		if (i == m_iRoot_BoneIndex)
 			Handle_RootMotion(fTimeDelta);
 	}
-	
-	
-	
 
 	if (m_isFinished)
 		XMStoreFloat4(&m_vOldPos, XMVectorSet(0.f, 0.f, 0.f, 1.f));
@@ -367,7 +365,6 @@ _bool CLoad_Model::Play_Animation(_float fTimeDelta)
 // 4. 문제는 PlayAnimation은 계속 실행되는거야.
 // 5. 그러므로 보간할 키프레임은 고정인데.
 // 6. 다음 애니메이션 키프레임은 계속변경됨.
-
 
 // 블렌딩 상태를 저장합니다.
 void CLoad_Model::Set_BlendInfo(uint32_t iNextAnimIndex, _float fBlendTime, _bool bScale, _bool bRotation, _bool bTranslation)

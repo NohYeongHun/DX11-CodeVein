@@ -25,6 +25,8 @@ public:
 	HRESULT Add_RenderGroup(RENDERGROUP eRenderGroup, class CGameObject* pRenderObject);
 	HRESULT Draw();
 
+
+	void Set_DebugRender(_bool IsDebugRender) { m_IsDebugRender = IsDebugRender; }
 	void Setting_Threshold(_float fThreShold);
 	void Setting_Soft(_float fSoft);
 	
@@ -46,11 +48,13 @@ private:
 
 	list<class CGameObject*>				m_RenderObjects[ENUM_CLASS(RENDERGROUP::END)];
 
+	_bool m_IsDebugRender = { false };
+
 
 #pragma region 장면 캡쳐(직교 투영 텍스쳐)를 만들기 위해 소유해야할 것들.
 private:
 	class CShader* m_pDefferedShader = { nullptr };
-	class CShader* m_pPostLightShader = { nullptr };
+	class CShader* m_pPostLightShader = { nullptr }; // Bloom_Bright Shader
 	class CShader* m_pDistortionShader = { nullptr };
 
 	class CVIBuffer_Rect* m_pVIBuffer = { nullptr };
