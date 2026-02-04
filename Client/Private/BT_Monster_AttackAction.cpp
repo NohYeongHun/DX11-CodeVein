@@ -14,8 +14,6 @@ BT_RESULT CBT_Monster_AttackAction::Perform_Action(_float fTimeDelta)
     {
     case ATTACK_PHASE::NONE:
         return EnterAttack(fTimeDelta);
-   /* case ATTACK_PHASE::ROTATING:
-        return UpdateRotating(fTimeDelta);*/
     case ATTACK_PHASE::LOOP:
         return UpdateAttack(fTimeDelta);
     case ATTACK_PHASE::COMPLETED:

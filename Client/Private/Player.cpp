@@ -174,7 +174,7 @@ void CPlayer::Late_Update(_float fTimeDelta)
 HRESULT CPlayer::Render()
 {
 #ifdef _DEBUG
-    ImGui_Render();
+    //ImGui_Render();
 #endif // _DEBUG
 
 
@@ -1224,6 +1224,31 @@ void CPlayer::Update_KeyInput()
         
         ShowCursor(m_IsShowCursor);
     }
+
+#ifdef _DEBUG
+    HUDEVENT_DESC Desc{};
+    if (m_pGameInstance->Get_KeyUp(DIK_1))
+    {
+        Desc.isVisibility = false;
+        m_pGameInstance->Publish<HUDEVENT_DESC>(EventType::HUD_DISPLAY, &Desc);
+    }
+
+    if (m_pGameInstance->Get_KeyUp(DIK_2))
+    {
+        Desc.isVisibility = true;
+        m_pGameInstance->Publish<HUDEVENT_DESC>(EventType::HUD_DISPLAY, &Desc);
+    }
+
+    if (m_pGameInstance->Get_KeyUp(DIK_3))
+    {
+        m_pGameInstance->Set_DebugRender(false);
+    }
+
+    if (m_pGameInstance->Get_KeyUp(DIK_4))
+    {
+        m_pGameInstance->Set_DebugRender(true);
+    }
+#endif
         
 
     // 방향 계산 추가 => Player State에 추가했음. HandleInput

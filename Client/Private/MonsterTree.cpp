@@ -35,14 +35,13 @@ HRESULT CMonsterTree::Initialize(void* pArg)
     // 2. 조우 상태 행동 추가.
     pRootSelector->Add_Child(Create_EncounterStates_ToSequence());
 
-    // 2. 특수한 상태일때 행동 변경 => 필수.
+    // 3. 특수한 상태일때 행동 변경 => 필수.
     pRootSelector->Add_Child(Create_SpecialStates_ToSelector());
 
-    // 3. 일반 행동 
+    // 4. 일반 행동 
     pRootSelector->Add_Child(Create_ActionStates_ToSelector());
 
-    // 4. 모두 실패했을 경우.
-    //pRootSelector->Add_Child(Create_IdleAction());
+    // 5. 모두 실패했을 경우.
     pRootSelector->Add_Child(Create_IdleAction_ToSequence());
     Set_Root_Node(pRootSelector);
 

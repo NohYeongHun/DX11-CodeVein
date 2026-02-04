@@ -208,6 +208,7 @@ HRESULT CQueenKnight::Render()
 {
 #ifdef _DEBUG
     //ImGui_Render();
+    m_pColliderCom->Render();
 #endif // _DEBUG
 
     if (FAILED(Bind_Shader_Resource()))
@@ -321,6 +322,8 @@ void CQueenKnight::Update_AI(_float fTimeDelta)
     //if (HasBuff(CMonster::BUFF_DISSOLVE))
     //m_fCurDissolveTime = Get_DefaultBuffTime(BUFF_DISSOLVE) - Get_BuffTime(BUFF_DISSOLVE); // 점차 보내는 값이 증가.
 
+
+    // 쉐이더에 보내야 하는 값. (멤버 변수로 소유하다가. 제공해야합니다.)
     if (HasBuff(CMonster::BUFF_DISSOLVE))
         m_fCurDissolveTime = m_fMaxDissolveTime - Get_BuffTime(BUFF_DISSOLVE); // 점차 보내는 값이 증가.
     else if (HasBuff(CMonster::BUFF_REVERSEDISSOLVE))
@@ -631,10 +634,8 @@ HRESULT CQueenKnight::Initialize_BuffDurations()
     m_pShield->Set_ReverseDissolveTime(0.3f);
 
 
-    //m_BuffDefault_Durations[QUEEN_BUFF_PHASE_ATTACK_COOLDOWN] = 999.f;
 
     // 20초마다 돌진 공격 시퀀스 반복.
-    //m_BuffDefault_Durations[QUEEN_BUFF_DASH_ATTACK_COOLDOWN] = 999.f; // 돌진 공격 쿨타임.
     m_BuffDefault_Durations[QUEEN_BUFF_DASH_ATTACK_COOLDOWN] = 20.f; // 돌진 공격 쿨타임.
 
     // 25초마다 내려찍기 공격 시퀀스 반복.

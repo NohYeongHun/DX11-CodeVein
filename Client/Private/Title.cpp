@@ -183,7 +183,7 @@ HRESULT CTitle::Ready_Title_BackGround_Black()
 HRESULT CTitle::Ready_Title_BackGround_White()
 {
     CTitle_BackGround::TITLE_BAKCGROUND_DESC BackGroundDesc{};
-    CUIObject* pUIObject = nullptr;
+    CTitle_BackGround* pUIObject = nullptr;
     BackGroundDesc.fX = 0;
     BackGroundDesc.fY = 0;
     BackGroundDesc.fSizeX = g_iWinSizeX;
@@ -196,7 +196,7 @@ HRESULT CTitle::Ready_Title_BackGround_White()
     BackGroundDesc.strObjTag = TEXT("BackGround White");
     
 
-    pUIObject = dynamic_cast<CUIObject*>(
+    pUIObject = dynamic_cast<CTitle_BackGround*>(
         m_pGameInstance->Clone_Prototype(
             PROTOTYPE::GAMEOBJECT
             , ENUM_CLASS(LEVEL::LOGO)
@@ -206,7 +206,7 @@ HRESULT CTitle::Ready_Title_BackGround_White()
         return E_FAIL;
 
     AddChild(pUIObject);
-    m_TitleBackGruonds[ENUM_CLASS(BackGround::BACKGROUND_WHITE)] = static_cast<CTitle_BackGround*>(pUIObject);
+    m_TitleBackGruonds[ENUM_CLASS(BackGround::BACKGROUND_WHITE)] = pUIObject;
 
 
     return S_OK;
@@ -215,7 +215,7 @@ HRESULT CTitle::Ready_Title_BackGround_White()
 HRESULT CTitle::Ready_Title_BackGround_Modify_Light()
 {
     CTitle_BackGround::TITLE_BAKCGROUND_DESC BackGroundDesc{};
-    CUIObject* pUIObject = nullptr;
+    CTitle_BackGround* pUIObject = nullptr;
     BackGroundDesc.fX = 0;
     BackGroundDesc.fY = 0;
     BackGroundDesc.fSizeX = g_iWinSizeX;
@@ -227,7 +227,7 @@ HRESULT CTitle::Ready_Title_BackGround_Modify_Light()
     BackGroundDesc.fAlpha = 0.23f;
     BackGroundDesc.strObjTag = TEXT("BackGround Modify_Light");
 
-    pUIObject = dynamic_cast<CUIObject*>(
+    pUIObject = dynamic_cast<CTitle_BackGround*>(
         m_pGameInstance->Clone_Prototype(
             PROTOTYPE::GAMEOBJECT
             , ENUM_CLASS(LEVEL::LOGO)
@@ -237,14 +237,15 @@ HRESULT CTitle::Ready_Title_BackGround_Modify_Light()
         return E_FAIL;
 
     AddChild(pUIObject);
-    m_TitleBackGruonds[ENUM_CLASS(BackGround::BACKGROUND_WHITE_MODIFY_LIGHT)] = static_cast<CTitle_BackGround*>(pUIObject);
+    //m_TitleBackGruonds[ENUM_CLASS(BackGround::BACKGROUND_WHITE_MODIFY_LIGHT)] = static_cast<CTitle_BackGround*>(pUIObject);
+    m_TitleBackGruonds[ENUM_CLASS(BackGround::BACKGROUND_WHITE_MODIFY_LIGHT)] = pUIObject;
     return S_OK;
 }
 
 HRESULT CTitle::Ready_Title_BackGround_Light()
 {
     CTitle_BackGround::TITLE_BAKCGROUND_DESC BackGroundDesc{};
-    CUIObject* pUIObject = nullptr;
+    CTitle_BackGround* pUIObject = nullptr;
 
     BackGroundDesc.fX = 0;
     BackGroundDesc.fY = 0;
@@ -257,7 +258,7 @@ HRESULT CTitle::Ready_Title_BackGround_Light()
     BackGroundDesc.fAlpha = 0.66f;
     BackGroundDesc.strObjTag = TEXT("BackGround Light");
 
-    pUIObject = dynamic_cast<CUIObject*>(
+    pUIObject = dynamic_cast<CTitle_BackGround*>(
         m_pGameInstance->Clone_Prototype(
             PROTOTYPE::GAMEOBJECT
             , ENUM_CLASS(LEVEL::LOGO)
@@ -267,7 +268,8 @@ HRESULT CTitle::Ready_Title_BackGround_Light()
         return E_FAIL;
 
     AddChild(pUIObject);
-    m_TitleBackGruonds[ENUM_CLASS(BackGround::BACKGROUND_WHITE_BASE_LIGHT)] = static_cast<CTitle_BackGround*>(pUIObject);
+    //m_TitleBackGruonds[ENUM_CLASS(BackGround::BACKGROUND_WHITE_BASE_LIGHT)] = static_cast<CTitle_BackGround*>(pUIObject);
+    m_TitleBackGruonds[ENUM_CLASS(BackGround::BACKGROUND_WHITE_BASE_LIGHT)] = pUIObject;
 
     return S_OK;
 }
@@ -275,7 +277,7 @@ HRESULT CTitle::Ready_Title_BackGround_Light()
 HRESULT CTitle::Ready_Title_BackGround_White_Shade()
 {
     CTitle_BackGround::TITLE_BAKCGROUND_DESC BackGroundDesc{};
-    CUIObject* pUIObject = nullptr;
+    CTitle_BackGround* pUIObject = nullptr;
     BackGroundDesc.fX = 0;
     BackGroundDesc.fY = 0;
     BackGroundDesc.fSizeX = g_iWinSizeX;
@@ -288,7 +290,7 @@ HRESULT CTitle::Ready_Title_BackGround_White_Shade()
     BackGroundDesc.strObjTag = TEXT("BackGround White Shade");
 
 
-    pUIObject = dynamic_cast<CUIObject*>(
+    pUIObject = dynamic_cast<CTitle_BackGround*>(
         m_pGameInstance->Clone_Prototype(
             PROTOTYPE::GAMEOBJECT
             , ENUM_CLASS(LEVEL::LOGO)
@@ -298,7 +300,8 @@ HRESULT CTitle::Ready_Title_BackGround_White_Shade()
         return E_FAIL;
 
     AddChild(pUIObject);
-    m_TitleBackGruonds[ENUM_CLASS(BackGround::BACKGROUND_WHITE_SHADE)] = static_cast<CTitle_BackGround*>(pUIObject);
+    //m_TitleBackGruonds[ENUM_CLASS(BackGround::BACKGROUND_WHITE_SHADE)] = static_cast<CTitle_BackGround*>(pUIObject);
+    m_TitleBackGruonds[ENUM_CLASS(BackGround::BACKGROUND_WHITE_SHADE)] = pUIObject;
 
     return S_OK;
 }
