@@ -47,6 +47,16 @@ struct PS_OUT
     float4 vColor : SV_TARGET0;
 };
 
+float3 ACESFilm(float3 x)
+{
+    float a = 2.51f;
+    float b = 0.03f;
+    float c = 2.43f;
+    float d = 0.59f;
+    float e = 0.14f;
+    return saturate((x * (a * x + b)) / (x * (c * x + d) + e));
+}
+
 // 빛이 번질 만큼 충분히 밝은 부분만 골라내기 위함.
 PS_OUT PS_BLOOMBRIGHT_MAIN(PS_IN In)
 {
@@ -113,7 +123,22 @@ PS_OUT PS_SUM_BLUR(PS_IN In)
 
     Out.vColor = vSceneColor + vBloomColor * g_fBloomIntensity;
     
-    Out.vColor.rgb = Out.vColor.rgb / (Out.vColor.rgb + 1.0f);
+    
+    //// 휘도 계산용 계수 (표준 수치)
+    //const float3 LUMINANCE_COEFFS = float3(0.2126f, 0.7152f, 0.0722f);
+
+    //// 1. 현재 색상의 휘도(밝기) 추출
+    //float fLuminance = dot(Out.vColor.rgb, LUMINANCE_COEFFS);
+
+    //// 2. 휘도에 대해서만 라인하르트 적용
+    //float fMappedLuminance = fLuminance / (1.0f + fLuminance);
+
+    //// 3. 원래 색상에 (압축된 휘도 / 원래 휘도) 비율을 곱해줌
+    //Out.vColor.rgb *= (fMappedLuminance / fLuminance);
+    
+    Out.vColor.rgb = ACESFilm(Out.vColor.rgb);
+    
+    //Out.vColor.rgb = Out.vColor.rgb / (Out.vColor.rgb + 1.0f);
     
     return Out;
 }
