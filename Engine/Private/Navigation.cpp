@@ -116,9 +116,6 @@ _bool CNavigation::isMove(_fvector vPosition)
 		}
 		else /* 경계에 도달. */
 		{
-			/* 이웃이 없으면 */
-
-
 
 			return false;
 		}
@@ -135,62 +132,25 @@ _bool CNavigation::isMove(_fvector vPosition, _vector* pSlideVector)
 
 	if (true == m_Cells[m_iCurrentCellIndex]->isIn(vLocalPos, &iNeighborIndex, &outLine))
 		return true;
-	else
+
+	if (-1 != iNeighborIndex) /* 이웃이 있으면 */
 	{
-		if (-1 != iNeighborIndex) /* 이웃이 있으면 */
+		while (true)
 		{
-			while (true)
+			if (-1 == iNeighborIndex)
 			{
-				if (-1 == iNeighborIndex)
-				{
-					// 이웃이 없어졌을 때도 슬라이딩 벡터 계산
-					if (pSlideVector && outLine != LINE::END)
-					{
-						_vector vWallNormal = m_Cells[m_iCurrentCellIndex]->Get_LineNormal(outLine);
-						_vector vMovementDir = XMVector3Normalize(vLocalPos - m_Cells[m_iCurrentCellIndex]->Get_Center());
-						
-						// 슬라이딩 벡터 = 이동방향 - (이동방향·벽노멀)×벽노멀
-						_vector vDotProduct = XMVector3Dot(vMovementDir, vWallNormal);
-						*pSlideVector = vMovementDir - XMVectorScale(vWallNormal, XMVectorGetX(vDotProduct));
-						*pSlideVector = XMVector3Normalize(*pSlideVector);
-						
-						// 월드 좌표계로 변환
-						*pSlideVector = XMVector3TransformNormal(*pSlideVector, XMLoadFloat4x4(&m_WorldMatrix));
-					}
-					return false;
-				}
-
-				if (true == m_Cells[iNeighborIndex]->isIn(vLocalPos, &iNeighborIndex))
-					break;
+				CalculateSlideVector(vLocalPos, outLine, pSlideVector);
+				return false;
 			}
-
-			m_iCurrentCellIndex = iNeighborIndex;
-			return true;
-		}
-		else /* 경계에 도달. */
-		{
-			/* 이웃이 없으면 - 슬라이딩 벡터 계산 */
-			if (pSlideVector && outLine != LINE::END)
+			if (true == m_Cells[iNeighborIndex]->isIn(vLocalPos, &iNeighborIndex))
 			{
-				// 벽의 노멀 벡터 가져오기
-				_vector vWallNormal = m_Cells[m_iCurrentCellIndex]->Get_LineNormal(outLine);
-				
-				// 이동하려는 방향 계산 (현재 위치에서 셀 중심으로)
-				_vector vMovementDir = XMVector3Normalize(vLocalPos - m_Cells[m_iCurrentCellIndex]->Get_Center());
-				
-				// 슬라이딩 벡터 계산: 벽을 따라 미끄러지는 방향
-				// 공식: slideVector = movementVector - (movementVector · wallNormal) * wallNormal
-				_vector vDotProduct = XMVector3Dot(vMovementDir, vWallNormal);
-				*pSlideVector = vMovementDir - XMVectorScale(vWallNormal, XMVectorGetX(vDotProduct));
-				*pSlideVector = XMVector3Normalize(*pSlideVector);
-				
-				// 로컬 좌표계에서 월드 좌표계로 변환
-				*pSlideVector = XMVector3TransformNormal(*pSlideVector, XMLoadFloat4x4(&m_WorldMatrix));
+				m_iCurrentCellIndex = iNeighborIndex;
+				return true;
 			}
-
-			return false;
 		}
 	}
+	CalculateSlideVector(vLocalPos, outLine, pSlideVector);
+	return false;
 }
 
 // Y오프셋만 계산.
@@ -359,18 +319,36 @@ void CNavigation::SetUp_Neighbors()
 	}
 }
 
-//CNavigation* CNavigation::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _tchar* pNavigationFilePath)
-//{
-//	CNavigation* pInstance = new CNavigation(pDevice, pContext);
-//
-//	if (FAILED(pInstance->Initialize_Prototype(pNavigationFilePath)))
-//	{
-//		MSG_BOX(TEXT("Failed to Created : CNavigation"));
-//		Safe_Release(pInstance);
-//	}
-//
-//	return pInstance;
-//}
+bool CNavigation::Try_CalculateSlideVector(_fvector vLocalPos, LINE eOutLine, _vector* pSlideVector)
+{
+	if (nullptr == pSlideVector || eOutLine == LINE::END)
+		return false;
+
+	_vector vWallNormal = m_Cells[m_iCurrentCellIndex]->Get_LineNormal(eOutLine);
+	_vector vMovementDir = XMVector3Normalize(vLocalPos - m_Cells[m_iCurrentCellIndex]->Get_Center());
+
+	_vector vDot = XMVector3Dot(vMovementDir, vWallNormal);
+	_vector vSlideDir = vMovementDir - XMVectorScale(vWallNormal, XMVectorGetX(vDot));
+
+	vSlideDir = XMVector3Normalize(vSlideDir);
+	*pSlideVector = XMVector3TransformNormal(vSlideDir, XMLoadFloat4x4(&m_WorldMatrix));
+
+	return true;
+}
+
+void CNavigation::CalculateSlideVector(_fvector vLocalPos, LINE eOutLine, _vector* pSlideVector)
+{
+	if (nullptr == pSlideVector || eOutLine == LINE::END)
+		return;
+
+	_vector vWallNormal = m_Cells[m_iCurrentCellIndex]->Get_LineNormal(eOutLine);
+	_vector vMovementDir = XMVector3Normalize(vLocalPos - m_Cells[m_iCurrentCellIndex]->Get_Center());
+
+	_vector vDotProduct = XMVector3Dot(vMovementDir, vWallNormal);
+	*pSlideVector = vMovementDir - XMVectorScale(vWallNormal, XMVectorGetX(vDotProduct));
+	*pSlideVector = XMVector3Normalize(*pSlideVector);
+	*pSlideVector = XMVector3TransformNormal(*pSlideVector, XMLoadFloat4x4(&m_WorldMatrix));
+}
 
 
 CNavigation* CNavigation::Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _char* pNavigationFilePath)

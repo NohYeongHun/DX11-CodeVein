@@ -155,7 +155,7 @@ HRESULT CRenderer::Draw()
         return E_FAIL;
     
 
-    // 1. G-Buffer 생성 (불투명 객체)
+    // 1. G-Buffer 생성 
     if (FAILED(Render_NonBlend()))
         return E_FAIL;
 
@@ -210,9 +210,6 @@ HRESULT CRenderer::Draw()
 
     if (FAILED(Render_StaticUI()))
         return E_FAIL;
-
-    //if (FAILED(Render_LastEffect()))
-    //    return E_FAIL;
 
     return S_OK;
 }
@@ -317,9 +314,6 @@ HRESULT CRenderer::Render_NonBlend()
 HRESULT CRenderer::Render_Lights()
 {
     // [추가] Light Pass에서 입력으로 사용할 G-Buffer 텍스처들을 미리 해제합니다.
-   // g_NormalTexture(0번), g_DepthTexture(1번) 슬롯을 해제한다고 가정합니다.
-    /*ID3D11ShaderResourceView* pNullSRVs[8] = { nullptr, nullptr };
-    m_pContext->PSSetShaderResources(0, 8, pNullSRVs);*/
 
     /* Shade */
     if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_LightAcc"), nullptr)))
@@ -329,22 +323,13 @@ HRESULT CRenderer::Render_Lights()
     /* Shade타겟 (wsx * wsy) */
     /* 사각형 버퍼 -> 직교투영 -> (wsx * wsy) */
     m_pDefferedShader->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix);
-        
     m_pDefferedShader->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix);
-   
-        
     m_pDefferedShader->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix);
-
     m_pDefferedShader->Bind_Matrix("g_ViewMatrixInv", m_pGameInstance->Get_Transform_Float4x4_Inverse(D3DTS::VIEW));
- 
-        
     m_pDefferedShader->Bind_Matrix("g_ProjMatrixInv", m_pGameInstance->Get_Transform_Float4x4_Inverse(D3DTS::PROJ));
-        
     m_pDefferedShader->Bind_RawValue("g_vCamPosition", m_pGameInstance->Get_CamPosition(), sizeof(_float4));
 
     m_pGameInstance->Bind_RT_ShaderResource(TEXT("Target_Normal"), m_pDefferedShader, "g_NormalTexture");
-    
-    // Depth 기록 => 이부분 다름.
     m_pGameInstance->Bind_RT_ShaderResource(TEXT("Target_Depth"), m_pDefferedShader, "g_DepthTexture");
 
     // 광원들 각각에 후처리 Shader를 주입해서 그려주기 위함.

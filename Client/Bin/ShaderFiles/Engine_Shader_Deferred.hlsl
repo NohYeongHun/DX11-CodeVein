@@ -35,6 +35,8 @@ float2 g_vTexelSize = float2(1.0f / 1280.0f, 1.0f / 720.0f);
 
 float threshold = 0.5f; // 조정 가능 (예: 0.8 ~ 0.95)
 float soft = 0.20f; // 페이드 범위
+float g_fSpecularIntesity = 0.25f;
+
 struct VS_IN
 {
     float3 vPosition : POSITION;
@@ -124,7 +126,7 @@ PS_OUT_LIGHT PS_MAIN_DIRECTIONAL(PS_IN In)
     
     
     Out.vShade = g_vLightDiffuse * saturate(fShade + (g_vLightAmbient * g_vMtrlAmbient));
-    Out.vSpecular = (g_vLightSpecular * g_vMtrlSpecular) * fSpecular;
+    Out.vSpecular = (g_vLightSpecular * g_vMtrlSpecular) * fSpecular * g_fSpecularIntesity;
     
     
     return Out;
@@ -184,20 +186,7 @@ PS_OUT_BACKBUFFER PS_MAIN_COMBINED(PS_IN In)
     PS_OUT_BACKBUFFER Out = (PS_OUT_BACKBUFFER) 0;
     
     
-    // 1. 깊이 텍스처를 샘플링하여 깊이 값을 가져옵니다.
-    //float fDepth = g_DepthTexture.Sample(DefaultSampler, In.vTexcoord).r;
-    
-    //// 2. 깊이 값이 1.0에 가깝다면 (배경이라면) 픽셀 렌더링을 중단합니다.
-    //if (fDepth >= 0.9999f)
-    //{
-    //    discard;
-    //}
-    
-    // 3. (오브젝트가 그려진 경우) 기존 로직을 그대로 수행합니다.
     vector vDiffuse = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
-    
-    //if (vDiffuse.r == 1.f && vDiffuse.g == 0.f && vDiffuse.b == 1.f && vDiffuse.a == 1.f)
-    //    discard;
     
     if (vDiffuse.a == 0.f)
         discard;    
@@ -206,14 +195,12 @@ PS_OUT_BACKBUFFER PS_MAIN_COMBINED(PS_IN In)
     vector vShade = g_ShadeTexture.Sample(DefaultSampler, In.vTexcoord);
     vector vSpecular = g_SpecularTexture.Sample(DefaultSampler, In.vTexcoord);
     
-    //Out.vColor = vDiffuse * vShade + vSpecular;
-    
     /*
     만약 vShade(조명 MRT)가 비어 있거나 0으로 클리어된 상태면, diffuse와 곱하면 전부 검정색 된다.
     → 하지만 디폴트 클리어 컬러가 (1,1,1,1)라서 최소한 흰색 조명은 나와야 하니까, 
     */
     
-    Out.vColor = vDiffuse * vShade;
+    Out.vColor = vDiffuse * vShade + vSpecular;
     
     
      /* 내 픽셀의 광원 기준의 깊이 */ 

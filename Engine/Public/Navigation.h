@@ -67,6 +67,8 @@ private:
 
 private:
 	void SetUp_Neighbors();
+	bool Try_CalculateSlideVector(_fvector vLocalPos, LINE eOutLine, _vector* pSlideVector);
+	void CalculateSlideVector(_fvector vLocalPos, LINE eOutLine, _vector* pSlideVector);
 
 public:
 	//static CNavigation* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _tchar* pNavigationFilePath);

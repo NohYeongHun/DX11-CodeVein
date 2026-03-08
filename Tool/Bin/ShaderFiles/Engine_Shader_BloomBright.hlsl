@@ -116,9 +116,10 @@ PS_OUT PS_SUM_BLUR(PS_IN In)
 
     float3 finalColor = vSceneColor.rgb + vBloomColor.rgb * g_fBloomIntensity;
     finalColor = ACESFilm(finalColor);
-    
     Out.vColor = float4(finalColor, vSceneColor.a);
-    //Out.vColor.rgb = Out.vColor.rgb / (Out.vColor.rgb + 1.0f);
+    
+    //float3 finalColor = vSceneColor.rgb + vBloomColor.rgb * g_fBloomIntensity;
+    //Out.vColor.rgb = finalColor.rgb / (finalColor.rgb + 1.0f); // Reinhard ToneMapping => x / x + 1
     
     return Out;
 }
@@ -135,23 +136,6 @@ technique11 DefaultTechnique
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_BLOOMBRIGHT_MAIN();
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     }
 
     pass GaussianBlurXPass // 1
@@ -163,22 +147,6 @@ technique11 DefaultTechnique
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_BLUR_X();
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     
     }
 
@@ -192,22 +160,6 @@ technique11 DefaultTechnique
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_BLUR_Y();
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     }
     pass SumBlurPass // 3
     {
@@ -218,9 +170,6 @@ technique11 DefaultTechnique
         VertexShader = compile vs_5_0 VS_MAIN();
         GeometryShader = NULL;
         PixelShader = compile ps_5_0 PS_SUM_BLUR();
-    
-    
-    
     }
 
 }
