@@ -161,3 +161,4 @@ BlendState BS_WeightBlend_Client
     SrcBlend[0] = ONE;
     DestBlend[0] = ONE;
 };
+

@@ -297,20 +297,6 @@ PS_OUT_BACKBUFFER PS_MAIN_DISTORTION(PS_IN In)
 // Bloom Bright Pass - 밝은 부분만 추출
 PS_OUT_BACKBUFFER PS_MAIN_BRIGHT_PASS(PS_IN In)
 {
-    //PS_OUT_BACKBUFFER Out = (PS_OUT_BACKBUFFER) 0;
-    //vector vSceneColor = g_sceneTexture.Sample(DefaultSampler, In.vTexcoord);
-
-    //// 원본 색상에서 임계값만큼 밝기를 뺌 (어두운 부분은 음수가 됨)
-    //vector vBrightColor = vSceneColor - g_fBrightThreshold;
-    
-    //// saturate를 통해 0 미만인 값들을 0으로 만듦
-    //Out.vColor = saturate(vBrightColor);
-    
-    //// 알파 값 유지 (필요 시)
-    //Out.vColor.a = vSceneColor.a;
-    
-    //return Out;
-    
     PS_OUT_BACKBUFFER Out = (PS_OUT_BACKBUFFER) 0;
     float4 BrightColor = float4(0.0f, 0.0f, 0.0f, 0.0f);
     float4 originalColor = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);

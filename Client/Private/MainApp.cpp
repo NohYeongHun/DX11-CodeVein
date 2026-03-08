@@ -330,7 +330,7 @@ HRESULT CMainApp::Ready_Pooling()
 	QueenKnightTornadoParticle.fRotationPerSec = XMConvertToRadians(90.f);
 	QueenKnightTornadoParticle.iShaderPath = static_cast<_uint>(POINTDIRPARTICLE_SHADERPATH::TORNADO);
 	QueenKnightTornadoParticle.eParticleType = CEffectParticle::PARTICLE_TYPE_TORNADO; // VIBuffer에 들어감.
-	QueenKnightTornadoParticle.iNumInstance = 500;
+	QueenKnightTornadoParticle.iNumInstance = 200;
 	QueenKnightTornadoParticle.vCenter = { 0.f, 0.f, 0.f };
 
 	/*

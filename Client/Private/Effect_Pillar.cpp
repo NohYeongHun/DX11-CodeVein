@@ -142,7 +142,6 @@ void CEffect_Pillar::OnActivate(void* pArg)
     /* Effect 파티클 활성화 */
     CEffectParticle::EFFECTPARTICLE_ENTER_DESC TornadoDesc{};
 
-    // ★★★ 파티클은 Effect_Pillar와 동일한 위치에서 시작 ★★★
     TornadoDesc.vStartPos = m_pTransformCom->Get_State(STATE::POSITION);
 
     PARTICLE_INIT_INFO Info = {};
@@ -151,7 +150,6 @@ void CEffect_Pillar::OnActivate(void* pArg)
     Info.fRadius = 4.f;
     Info.dir = { 0.f, 1.f, 0.f };
 
-    // ★★★ 파티클의 중심점도 같은 위치로 설정 ★★★
     Info.pos = { 0.f, -1.f, 0.f };
 
     TornadoDesc.particleInitInfo = Info;

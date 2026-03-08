@@ -36,12 +36,6 @@ HRESULT CCell::Initialize(const _float3* pPoints, _int iIndex)
 	if (nullptr == m_pVIBuffer)
 		return E_FAIL;
 
-//#ifdef _DEBUG
-//	m_pVIBuffer = CVIBuffer_Cell::Create(m_pDevice, m_pContext, pPoints);
-//	if (nullptr == m_pVIBuffer)
-//		return E_FAIL;
-//#endif
-
 	return S_OK;
 }
 

@@ -153,7 +153,7 @@ void CQueenKnight::Update(_float fTimeDelta)
 
         // 3. 조우시 쿨타임 부여.
         AddBuff(QUEEN_BUFF_DASH_ATTACK_COOLDOWN);
-        AddBuff(QUEEN_BUFF_DOWN_TRIPLE_STRIKE_COOLDOWN);
+        //AddBuff(QUEEN_BUFF_DOWN_TRIPLE_STRIKE_COOLDOWN);
         m_pGameInstance->PlayBGM(L"BossStage.mp3", 0.1f, true);
     }
     

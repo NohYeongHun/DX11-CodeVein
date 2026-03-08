@@ -1008,6 +1008,7 @@ void CVIBuffer_PointParticleDir_Instance::Create_TornadoParticle(_float3 vCenter
     // ★★★ 전달받은 월드 좌표를 그대로 토네이도 중심점으로 사용 ★★★
     m_vPivot = { 0.f, 0.f, 0.f };
 
+
     _uint uiTotalAvailable = m_DeadParticleIndices.size();
     _uint uiToCreate = min(uiTotalAvailable, m_iNumInstance);
 
@@ -1033,8 +1034,9 @@ void CVIBuffer_PointParticleDir_Instance::Create_TornadoParticle(_float3 vCenter
         _float fInitialAngle = XMConvertToRadians(m_pGameInstance->Rand(0.f, 360.f));
         _float fAngularVelocity = m_pGameInstance->Rand(6.0f, 9.0f) * fLayerSpeedScale;
 
-        _float fInitialRadius = fRadius * 0.1f * fLayerRadiusScale;
-        _float fMaxRadius = fRadius * fLayerRadiusScale * 1.2f;
+        _float fInitialRadius = fRadius * 0.45f * fLayerRadiusScale;
+        _float fMaxRadius = fRadius * 0.75f * fLayerRadiusScale;
+
         _float fRadialExpansion = (fMaxRadius - fInitialRadius) / (fParticleLifeTime * 0.5f);
 
         _float fUpwardSpeed = (fHeight * 0.8f) / fParticleLifeTime;
@@ -1053,12 +1055,17 @@ void CVIBuffer_PointParticleDir_Instance::Create_TornadoParticle(_float3 vCenter
         m_pParticleAttributes[index].fTurbulence = fTurbulence;
         m_pParticleAttributes[index].fPhaseOffset = fPhaseOffset;
 
-        // ★★★ 파티클 정보에도 정확한 중심점 전달 ★★★
         ParticleVertexInfo info{};
         info.lifeTime = fParticleLifeTime;
         info.dir = { 0.f, 1.f, 0.f };
-        info.pos = vCenterPos;      // 월드 좌표 그대로 사용
-        info.initialPos = vCenterPos;
+        _float startAngle = fInitialAngle;
+        _float startRadius = fInitialRadius;
+        info.pos = {
+            vCenterPos.x + cosf(startAngle) * startRadius,
+            vCenterPos.y + m_pGameInstance->Rand(0.f, fHeight * 0.15f),
+            vCenterPos.z + sinf(startAngle) * startRadius
+        };
+        info.initialPos = info.pos;
 
         m_ReadyparticleIndices.emplace(make_pair(index, info));
         uiCreatedCount++;

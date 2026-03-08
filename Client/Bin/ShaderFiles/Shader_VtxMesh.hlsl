@@ -151,6 +151,8 @@ VS_OUT_SHADOW VS_MAIN_SHADOW(VS_IN In)
 }
 
 
+/* 만든 픽셀 각각에 대해서 픽셀 쉐이더를 수행한다. */
+/* 픽셀의 색을 결정한다. */
 struct PS_BACKBUFFER_IN
 {
     float4 vPosition : SV_POSITION;
@@ -163,11 +165,6 @@ struct PS_BACKBUFFER_IN
 
 };
 
-//struct PS_OUT
-//{
-//    float4 vColor : SV_TARGET0;
-//};
-
 struct PS_OUT_BACKBUFFER
 {
     float4 vDiffuse : SV_TARGET0;
@@ -175,8 +172,32 @@ struct PS_OUT_BACKBUFFER
     float4 vDepth : SV_TARGET2;
 };
 
-/* 만든 픽셀 각각에 대해서 픽셀 쉐이더를 수행한다. */
-/* 픽셀의 색을 결정한다. */
+PS_OUT_BACKBUFFER MakeGBufferOut(PS_BACKBUFFER_IN In, float4 color)
+{
+    PS_OUT_BACKBUFFER Out;
+    Out.vDiffuse = color;
+    Out.vNormal = float4(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+    Out.vDepth = float4(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w, 0.f, 0.f);
+    return Out;
+}
+
+float3 GetBloodColor(float2 uv, int texIdx)
+{
+    float4 tex = g_DiffuseTextures[texIdx].Sample(DefaultSampler, uv);
+
+    float3 color = tex.rgb;
+    color.r *= 1.2f;
+    color.g *= 0.15f;
+    color.b *= 0.15f;
+
+    return saturate(color);
+}
+
+float GetNoiseMask(float2 uv, float thresholdMin, float thresholdMax)
+{
+    float n = g_OtherTextures[0].Sample(DefaultSampler, uv).r;
+    return smoothstep(thresholdMin, thresholdMax, n);
+}
 
 
 PS_OUT_BACKBUFFER PS_DEFFERED_OUT(PS_BACKBUFFER_IN In)
@@ -269,447 +290,88 @@ float g_fVerticalFlow = 2.0f;
 
 PS_OUT_BACKBUFFER PS_DEFFERED_BLOODPILLARA_MAIN(PS_BACKBUFFER_IN In)
 {
-    PS_OUT_BACKBUFFER Out = (PS_OUT_BACKBUFFER) 0;
+    float2 uv = In.vTexcoord;
+    uv.y -= g_fTime * 1.2f;
 
-    // -- 1. 높이 기반 소용돌이 강도 계산 --
-    float fHeightRatio = saturate(1.0f - In.vTexcoord.y);
-    float fVortexIntensity = g_fVortexStrength * fHeightRatio * g_fHeightGradient;
-    
-    // -- 2. 극좌표계 변환을 통한 소용돌이 효과 --
-    float2 vCenterUV = float2(0.5f, 0.5f);
-    float2 vToCenter = In.vTexcoord - vCenterUV;
-    
-    float fDistance = length(vToCenter);
-    float fAngle = atan2(vToCenter.y, vToCenter.x);
-    
-    float fVortexRotation = fVortexIntensity / max(fDistance, 0.1f) * g_fTime * g_fVortexSpeed;
-    fAngle += fVortexRotation;
-    
-    float2 vVortexUV = vCenterUV + fDistance * float2(cos(fAngle), sin(fAngle));
-    
-    // -- 3. 다층 노이즈 애니메이션 (점성 효과 추가) --
-    float2 vNoiseUV1 = vVortexUV + float2(0.1f, g_fVerticalFlow * g_fViscosity) * g_fTime * 0.3f;
-    float2 vNoiseUV2 = vVortexUV + float2(-0.15f, g_fVerticalFlow * 0.8f * g_fViscosity) * g_fTime * 0.5f;
-    
-    float2 vDetailUV1 = In.vTexcoord * 2.0f + float2(0.2f, g_fVerticalFlow * 1.5f) * g_fTime * 0.7f;
-    float2 vDetailUV2 = In.vTexcoord * 1.5f + float2(-0.1f, g_fVerticalFlow * 1.2f) * g_fTime * 0.6f;
-    
-    // -- 4. 복합 왜곡 효과 --
-    float2 vVortexDistortion = (g_OtherTextures[0].Sample(DefaultSampler, vNoiseUV1).rg * 2.f - 1.f) * g_fDistortionStrength;
-    float2 vTurbulenceDistortion = (g_OtherTextures[0].Sample(DefaultSampler, vDetailUV1).rg * 2.f - 1.f) * g_fTurbulence * 0.02f;
-    
-    vVortexDistortion *= fHeightRatio * 1.5f;
-    vTurbulenceDistortion *= (1.0f - fHeightRatio * 0.5f);
-    
-    float2 vFinalDistortedUV = In.vTexcoord + vVortexDistortion + vTurbulenceDistortion;
-    
-    float fErosionMask1 = g_OtherTextures[0].Sample(DefaultSampler, vNoiseUV2).r;
-    float fErosionMask2 = g_OtherTextures[0].Sample(DefaultSampler, vDetailUV2).r;
-    
-    float fCombinedErosion = lerp(fErosionMask1, fErosionMask2, fHeightRatio);
-    float fDynamicThreshold = g_fErosionThreshold + sin(g_fTime * 2.0f + fHeightRatio * 3.14159f) * 0.1f;
-    
-    clip(fCombinedErosion - fDynamicThreshold);
-    
-    float2 vBloodFlowUV = vFinalDistortedUV + float2(sin(fAngle) * 0.1f, g_fVerticalFlow * 0.4f) * g_fTime;
-    vector vBloodColor = g_DiffuseTextures[4].Sample(DefaultSampler, vBloodFlowUV);
-    
-    // 디테일 레이어 (추가 깊이감)
-    float2 vDetailFlowUV = vFinalDistortedUV * 0.5f + float2(cos(fAngle) * 0.05f, g_fVerticalFlow * 0.6f) * g_fTime;
-    vector vDetailColor = g_DiffuseTextures[5].Sample(DefaultSampler, vDetailFlowUV);
-    
-    // -- 7. 피 색상 강화 처리 --
-    // 베이스 컬러를 더 진하게 조정
-    vector vFinalColor = vBloodColor;
-    
-    // 붉은색 채널 강화, 다른 채널 억제
-    vFinalColor.r = pow(vFinalColor.r, 0.7f) * 1.2f; // 빨간색 강화
-    vFinalColor.g *= 0.1f; // 녹색 크게 감소
-    vFinalColor.b *= 0.15f; // 파란색 크게 감소
-    
-    // 디테일 색상 블렌딩 (Multiply 블렌딩으로 어둡게)
-    vFinalColor.rgb = vFinalColor.rgb * (vDetailColor.rgb * 0.8f + 0.2f);
-    
-    // 채도 증가
-    float fLuminance = dot(vFinalColor.rgb, float3(0.299f, 0.587f, 0.114f));
-    vFinalColor.rgb = lerp(float3(fLuminance, fLuminance, fLuminance), vFinalColor.rgb, g_fBloodSaturation);
-    
-    // 대비 증가
-    vFinalColor.rgb = saturate((vFinalColor.rgb - 0.5f) * g_fBloodContrast + 0.5f);
-    
-    // 전체적으로 어둡게 (피의 진한 느낌)
-    vFinalColor.rgb *= g_fBloodDarkness;
-    
-    // -- 8. 노이즈 기반 혈흔 패턴 추가 --
-    float fBloodPattern = g_OtherTextures[1].Sample(DefaultSampler, vFinalDistortedUV * 3.0f).r;
-    float fBloodSpots = g_OtherTextures[0].Sample(DefaultSampler, vFinalDistortedUV * 5.0f).g;
-    
-    // 혈흔 패턴을 이용한 추가 어두운 영역
-    float fDarkSpots = saturate(1.0f - fBloodPattern * fBloodSpots);
-    vFinalColor.rgb *= (0.5f + fDarkSpots * 0.5f);
-    
-    // -- 9. 상승 에너지와 소용돌이 효과 --
-    float2 vRisingMaskUV = In.vTexcoord + float2(sin(g_fTime + fAngle) * 0.1f, g_fTime * 2.0f);
-    float fRisingMask = g_OtherTextures[1].Sample(DefaultSampler, vRisingMaskUV).r;
-    
-    float fVortexCore = saturate(1.0f - fDistance * 2.0f);
-    fRisingMask = saturate(fRisingMask + fVortexCore * 0.5f);
-    
-    // 코어 부분은 더 진한 빨간색으로
-    vFinalColor.r += fVortexCore * 0.3f;
-    vFinalColor.rgb = saturate(vFinalColor.rgb);
-    
-    // -- 10. 강화된 프레넬 효과 (가장자리 빛) --
-    vector vViewDir = normalize(g_vCamPosition - In.vWorldPos);
-    float fFresnel = 1.f - saturate(dot(vViewDir.xyz, In.vNormal.xyz));
-    fFresnel = pow(fFresnel, g_fFresnelPower);
-    
-    // 프레넬 색상도 더 진한 빨간색으로
-    vector vDynamicFresnelColor = g_vFresnelColor * (0.5f + fVortexIntensity * 0.3f);
-    vFinalColor.rgb += vDynamicFresnelColor.rgb * fFresnel * 0.3f; // 프레넬 효과 감소
-    
-    // -- 11. 점성 효과 추가 --
-    // 시간에 따른 끈적한 흐름 효과
-    float fViscosityFlow = sin(g_fTime * 0.5f + In.vTexcoord.y * 10.0f) * 0.05f;
-    vFinalColor.rgb *= (1.0f + fViscosityFlow * fHeightRatio);
-    
-    // -- 12. 최종 알파 계산 --
-    float fSoftEdge = saturate((fCombinedErosion - fDynamicThreshold) * 15.f);
-    float fFinalAlpha = vBloodColor.a * fSoftEdge;
-    
-    // 진한 부분은 더 불투명하게
-    fFinalAlpha = saturate(fFinalAlpha * (1.0f + fDarkSpots * 0.5f));
-    fFinalAlpha *= (0.8f + fVortexIntensity * 0.2f);
-    fFinalAlpha *= (1.f - g_fRatio);
-    
-    // -- 13. 최종 색상 클램핑 --
-    vFinalColor.rgb = saturate(vFinalColor.rgb);
-    
-    // 최종 결과 출력
-    Out.vDiffuse = float4(vFinalColor.rgb, fFinalAlpha);
-    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
-    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w, 0.f, 0.f);
-    
-    return Out;
+    float3 color = GetBloodColor(uv, 4);
+
+    float noiseMask = GetNoiseMask(uv * 2.0f, 0.25f, 0.75f);
+    float heightFade = 1.0f - In.vTexcoord.y;
+    float lifeFade = 1.0f - g_fRatio;
+
+    float alpha = noiseMask * heightFade * lifeFade;
+    clip(alpha - 0.05f);
+
+    return MakeGBufferOut(In, float4(color, alpha));
 }
+
 
 PS_OUT_BACKBUFFER PS_DEFFERED_BLOODPILLARB_MAIN(PS_BACKBUFFER_IN In)
 {
-    PS_OUT_BACKBUFFER Out = (PS_OUT_BACKBUFFER) 0;
+    float2 uv = In.vTexcoord;
+    uv.x += g_fTime * 0.3f;
 
-    // -- 1. 높이 기반 소용돌이 강도 계산 --
-    float fHeightRatio = saturate(1.0f - In.vTexcoord.y);
-    float fVortexIntensity = g_fVortexStrength * fHeightRatio * g_fHeightGradient;
-    
-    // -- 2. 극좌표계 변환을 통한 소용돌이 효과 --
-    float2 vCenterUV = float2(0.5f, 0.5f);
-    float2 vToCenter = In.vTexcoord - vCenterUV;
-    
-    float fDistance = length(vToCenter);
-    float fAngle = atan2(vToCenter.y, vToCenter.x);
-    
-    float fVortexRotation = fVortexIntensity / max(fDistance, 0.1f) * g_fTime * g_fVortexSpeed;
-    fAngle += fVortexRotation;
-    
-    float2 vVortexUV = vCenterUV + fDistance * float2(cos(fAngle), sin(fAngle));
-    
-    // -- 3. 다층 노이즈 애니메이션 (점성 효과 추가) --
-    float2 vNoiseUV1 = vVortexUV + float2(0.1f, g_fVerticalFlow * g_fViscosity) * g_fTime * 0.3f;
-    float2 vNoiseUV2 = vVortexUV + float2(-0.15f, g_fVerticalFlow * 0.8f * g_fViscosity) * g_fTime * 0.5f;
-    
-    float2 vDetailUV1 = In.vTexcoord * 2.0f + float2(0.2f, g_fVerticalFlow * 1.5f) * g_fTime * 0.7f;
-    float2 vDetailUV2 = In.vTexcoord * 1.5f + float2(-0.1f, g_fVerticalFlow * 1.2f) * g_fTime * 0.6f;
-    
-    // -- 4. 복합 왜곡 효과 --
-    float2 vVortexDistortion = (g_OtherTextures[0].Sample(DefaultSampler, vNoiseUV1).rg * 2.f - 1.f) * g_fDistortionStrength;
-    float2 vTurbulenceDistortion = (g_OtherTextures[0].Sample(DefaultSampler, vDetailUV1).rg * 2.f - 1.f) * g_fTurbulence * 0.02f;
-    
-    vVortexDistortion *= fHeightRatio * 1.5f;
-    vTurbulenceDistortion *= (1.0f - fHeightRatio * 0.5f);
-    
-    float2 vFinalDistortedUV = In.vTexcoord + vVortexDistortion + vTurbulenceDistortion;
-    
-    // -- 5. 동적 침식 마스크 --
-    float fErosionMask1 = g_OtherTextures[0].Sample(DefaultSampler, vNoiseUV2).r;
-    float fErosionMask2 = g_OtherTextures[0].Sample(DefaultSampler, vDetailUV2).r;
-    
-    float fCombinedErosion = lerp(fErosionMask1, fErosionMask2, fHeightRatio);
-    float fDynamicThreshold = g_fErosionThreshold + sin(g_fTime * 2.0f + fHeightRatio * 3.14159f) * 0.1f;
-    
-    clip(fCombinedErosion - fDynamicThreshold);
-    
-    // -- 6. 강화된 피 텍스처 샘플링 --
-    // 메인 혈액 텍스처 (빨간색 텍스처 사용)
-    float2 vBloodFlowUV = vFinalDistortedUV + float2(sin(fAngle) * 0.1f, g_fVerticalFlow * 0.4f) * g_fTime;
-    vector vBloodColor = g_DiffuseTextures[4].Sample(DefaultSampler, vBloodFlowUV);
-    
-    // 디테일 레이어 (추가 깊이감)
-    float2 vDetailFlowUV = vFinalDistortedUV * 0.5f + float2(cos(fAngle) * 0.05f, g_fVerticalFlow * 0.6f) * g_fTime;
-    vector vDetailColor = g_DiffuseTextures[5].Sample(DefaultSampler, vDetailFlowUV);
-    
-    // -- 7. 피 색상 강화 처리 --
-    // 베이스 컬러를 더 진하게 조정
-    vector vFinalColor = vBloodColor;
-    
-    // 붉은색 채널 강화, 다른 채널 억제
-    vFinalColor.r = pow(vFinalColor.r, 0.7f) * 1.2f; // 빨간색 강화
-    vFinalColor.g *= 0.1f; // 녹색 크게 감소
-    vFinalColor.b *= 0.15f; // 파란색 크게 감소
-    
-    // 디테일 색상 블렌딩 (Multiply 블렌딩으로 어둡게)
-    vFinalColor.rgb = vFinalColor.rgb * (vDetailColor.rgb * 0.8f + 0.2f);
-    
-    // 채도 증가
-    float fLuminance = dot(vFinalColor.rgb, float3(0.299f, 0.587f, 0.114f));
-    vFinalColor.rgb = lerp(float3(fLuminance, fLuminance, fLuminance), vFinalColor.rgb, g_fBloodSaturation);
-    
-    // 대비 증가
-    vFinalColor.rgb = saturate((vFinalColor.rgb - 0.5f) * g_fBloodContrast + 0.5f);
-    
-    // 전체적으로 어둡게 (피의 진한 느낌)
-    vFinalColor.rgb *= g_fBloodDarkness;
-    
-    // -- 8. 노이즈 기반 혈흔 패턴 추가 --
-    float fBloodPattern = g_OtherTextures[1].Sample(DefaultSampler, vFinalDistortedUV * 3.0f).r;
-    float fBloodSpots = g_OtherTextures[0].Sample(DefaultSampler, vFinalDistortedUV * 5.0f).g;
-    
-    // 혈흔 패턴을 이용한 추가 어두운 영역
-    float fDarkSpots = saturate(1.0f - fBloodPattern * fBloodSpots);
-    vFinalColor.rgb *= (0.5f + fDarkSpots * 0.5f);
-    
-    // -- 9. 상승 에너지와 소용돌이 효과 --
-    float2 vRisingMaskUV = In.vTexcoord + float2(sin(g_fTime + fAngle) * 0.1f, g_fTime * 2.0f);
-    float fRisingMask = g_OtherTextures[1].Sample(DefaultSampler, vRisingMaskUV).r;
-    
-    float fVortexCore = saturate(1.0f - fDistance * 2.0f);
-    fRisingMask = saturate(fRisingMask + fVortexCore * 0.5f);
-    
-    // 코어 부분은 더 진한 빨간색으로
-    vFinalColor.r += fVortexCore * 0.3f;
-    vFinalColor.rgb = saturate(vFinalColor.rgb);
-    
-    // -- 10. 강화된 프레넬 효과 (가장자리 빛) --
-    vector vViewDir = normalize(g_vCamPosition - In.vWorldPos);
-    float fFresnel = 1.f - saturate(dot(vViewDir.xyz, In.vNormal.xyz));
-    fFresnel = pow(fFresnel, g_fFresnelPower);
-    
-    // 프레넬 색상도 더 진한 빨간색으로
-    vector vDynamicFresnelColor = g_vFresnelColor * (0.5f + fVortexIntensity * 0.3f);
-    vFinalColor.rgb += vDynamicFresnelColor.rgb * fFresnel * 0.3f; // 프레넬 효과 감소
-    
-    // -- 11. 점성 효과 추가 --
-    // 시간에 따른 끈적한 흐름 효과
-    float fViscosityFlow = sin(g_fTime * 0.5f + In.vTexcoord.y * 10.0f) * 0.05f;
-    vFinalColor.rgb *= (1.0f + fViscosityFlow * fHeightRatio);
-    
-    // -- 12. 최종 알파 계산 --
-    float fSoftEdge = saturate((fCombinedErosion - fDynamicThreshold) * 15.f);
-    float fFinalAlpha = vBloodColor.a * fSoftEdge;
-    
-    // 진한 부분은 더 불투명하게
-    fFinalAlpha = saturate(fFinalAlpha * (1.0f + fDarkSpots * 0.5f));
-    fFinalAlpha *= (0.8f + fVortexIntensity * 0.2f);
-    fFinalAlpha *= (1.f - g_fRatio);
-    
-    // -- 13. 최종 색상 클램핑 --
-    vFinalColor.rgb = saturate(vFinalColor.rgb);
-    
-    // 최종 결과 출력
-    Out.vDiffuse = float4(vFinalColor.rgb, fFinalAlpha);
-    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
-    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w, 0.f, 0.f);
-    
-    return Out;
+    float3 color = GetBloodColor(uv, 4);
+
+    float2 center = In.vTexcoord - float2(0.5f, 0.5f);
+    float radial = 1.0f - saturate(length(center) * 2.0f);
+
+    float noiseMask = GetNoiseMask(uv * 1.5f, 0.2f, 0.8f);
+    float lifeFade = 1.0f - g_fRatio;
+
+    float alpha = radial * noiseMask * lifeFade;
+    clip(alpha - 0.05f);
+
+    return MakeGBufferOut(In, float4(color, alpha));
 }
+
 
 PS_OUT_BACKBUFFER PS_DEFFERED_BLOODPILLARC_MAIN(PS_BACKBUFFER_IN In)
 {
-    PS_OUT_BACKBUFFER Out = (PS_OUT_BACKBUFFER) 0;
+    float2 uv = In.vTexcoord;
+    uv.y -= g_fTime * 1.8f;
+    uv.x += sin(In.vTexcoord.y * 8.0f + g_fTime * 3.0f) * 0.03f;
 
-    // -- 1. 높이 기반 소용돌이 강도 계산 --
-    float fHeightRatio = saturate(1.0f - In.vTexcoord.y);
-    float fVortexIntensity = g_fVortexStrength * fHeightRatio * g_fHeightGradient;
-    
-    // -- 2. 극좌표계 변환을 통한 소용돌이 효과 --
-    float2 vCenterUV = float2(0.5f, 0.5f);
-    float2 vToCenter = In.vTexcoord - vCenterUV;
-    
-    float fDistance = length(vToCenter);
-    float fAngle = atan2(vToCenter.y, vToCenter.x);
-    
-    float fVortexRotation = fVortexIntensity / max(fDistance, 0.1f) * g_fTime * g_fVortexSpeed;
-    fAngle += fVortexRotation;
-    
-    float2 vVortexUV = vCenterUV + fDistance * float2(cos(fAngle), sin(fAngle));
-    
-    // -- 3. 다층 노이즈 애니메이션 (점성 효과 추가) --
-    float2 vNoiseUV1 = vVortexUV + float2(0.1f, g_fVerticalFlow * g_fViscosity) * g_fTime * 0.3f;
-    float2 vNoiseUV2 = vVortexUV + float2(-0.15f, g_fVerticalFlow * 0.8f * g_fViscosity) * g_fTime * 0.5f;
-    
-    float2 vDetailUV1 = In.vTexcoord * 2.0f + float2(0.2f, g_fVerticalFlow * 1.5f) * g_fTime * 0.7f;
-    float2 vDetailUV2 = In.vTexcoord * 1.5f + float2(-0.1f, g_fVerticalFlow * 1.2f) * g_fTime * 0.6f;
-    
-    // -- 4. 복합 왜곡 효과 --
-    float2 vVortexDistortion = (g_OtherTextures[0].Sample(DefaultSampler, vNoiseUV1).rg * 2.f - 1.f) * g_fDistortionStrength;
-    float2 vTurbulenceDistortion = (g_OtherTextures[0].Sample(DefaultSampler, vDetailUV1).rg * 2.f - 1.f) * g_fTurbulence * 0.02f;
-    
-    vVortexDistortion *= fHeightRatio * 1.5f;
-    vTurbulenceDistortion *= (1.0f - fHeightRatio * 0.5f);
-    
-    float2 vFinalDistortedUV = In.vTexcoord + vVortexDistortion + vTurbulenceDistortion;
-    
-    // -- 5. 동적 침식 마스크 --
-    float fErosionMask1 = g_OtherTextures[0].Sample(DefaultSampler, vNoiseUV2).r;
-    float fErosionMask2 = g_OtherTextures[0].Sample(DefaultSampler, vDetailUV2).r;
-    
-    float fCombinedErosion = lerp(fErosionMask1, fErosionMask2, fHeightRatio);
-    float fDynamicThreshold = g_fErosionThreshold + sin(g_fTime * 2.0f + fHeightRatio * 3.14159f) * 0.1f;
-    
-    clip(fCombinedErosion - fDynamicThreshold);
-    
-    // -- 6. 강화된 피 텍스처 샘플링 --
-    // 메인 혈액 텍스처 (빨간색 텍스처 사용)
-    float2 vBloodFlowUV = vFinalDistortedUV + float2(sin(fAngle) * 0.1f, g_fVerticalFlow * 0.4f) * g_fTime;
-    vector vBloodColor = g_DiffuseTextures[4].Sample(DefaultSampler, vBloodFlowUV);
-    
-    // 디테일 레이어 (추가 깊이감)
-    float2 vDetailFlowUV = vFinalDistortedUV * 0.5f + float2(cos(fAngle) * 0.05f, g_fVerticalFlow * 0.6f) * g_fTime;
-    vector vDetailColor = g_DiffuseTextures[5].Sample(DefaultSampler, vDetailFlowUV);
-    
-    // -- 7. 피 색상 강화 처리 --
-    // 베이스 컬러를 더 진하게 조정
-    vector vFinalColor = vBloodColor;
-    
-    // 붉은색 채널 강화, 다른 채널 억제
-    vFinalColor.r = pow(vFinalColor.r, 0.7f) * 1.2f; // 빨간색 강화
-    vFinalColor.g *= 0.1f; // 녹색 크게 감소
-    vFinalColor.b *= 0.15f; // 파란색 크게 감소
-    
-    // 디테일 색상 블렌딩 (Multiply 블렌딩으로 어둡게)
-    vFinalColor.rgb = vFinalColor.rgb * (vDetailColor.rgb * 0.8f + 0.2f);
-    
-    // 채도 증가
-    float fLuminance = dot(vFinalColor.rgb, float3(0.299f, 0.587f, 0.114f));
-    vFinalColor.rgb = lerp(float3(fLuminance, fLuminance, fLuminance), vFinalColor.rgb, g_fBloodSaturation);
-    
-    // 대비 증가
-    vFinalColor.rgb = saturate((vFinalColor.rgb - 0.5f) * g_fBloodContrast + 0.5f);
-    
-    // 전체적으로 어둡게 (피의 진한 느낌)
-    vFinalColor.rgb *= g_fBloodDarkness;
-    
-    // -- 8. 노이즈 기반 혈흔 패턴 추가 --
-    float fBloodPattern = g_OtherTextures[1].Sample(DefaultSampler, vFinalDistortedUV * 3.0f).r;
-    float fBloodSpots = g_OtherTextures[0].Sample(DefaultSampler, vFinalDistortedUV * 5.0f).g;
-    
-    // 혈흔 패턴을 이용한 추가 어두운 영역
-    float fDarkSpots = saturate(1.0f - fBloodPattern * fBloodSpots);
-    vFinalColor.rgb *= (0.5f + fDarkSpots * 0.5f);
-    
-    // -- 9. 상승 에너지와 소용돌이 효과 --
-    float2 vRisingMaskUV = In.vTexcoord + float2(sin(g_fTime + fAngle) * 0.1f, g_fTime * 2.0f);
-    float fRisingMask = g_OtherTextures[1].Sample(DefaultSampler, vRisingMaskUV).r;
-    
-    float fVortexCore = saturate(1.0f - fDistance * 2.0f);
-    fRisingMask = saturate(fRisingMask + fVortexCore * 0.5f);
-    
-    // 코어 부분은 더 진한 빨간색으로
-    vFinalColor.r += fVortexCore * 0.3f;
-    vFinalColor.rgb = saturate(vFinalColor.rgb);
-    
-    // -- 10. 강화된 프레넬 효과 (가장자리 빛) --
-    vector vViewDir = normalize(g_vCamPosition - In.vWorldPos);
-    float fFresnel = 1.f - saturate(dot(vViewDir.xyz, In.vNormal.xyz));
-    fFresnel = pow(fFresnel, g_fFresnelPower);
-    
-    // 프레넬 색상도 더 진한 빨간색으로
-    vector vDynamicFresnelColor = g_vFresnelColor * (0.5f + fVortexIntensity * 0.3f);
-    vFinalColor.rgb += vDynamicFresnelColor.rgb * fFresnel * 0.3f; // 프레넬 효과 감소
-    
-    // -- 11. 점성 효과 추가 --
-    // 시간에 따른 끈적한 흐름 효과
-    float fViscosityFlow = sin(g_fTime * 0.5f + In.vTexcoord.y * 10.0f) * 0.05f;
-    vFinalColor.rgb *= (1.0f + fViscosityFlow * fHeightRatio);
-    
-    // -- 12. 최종 알파 계산 --
-    float fSoftEdge = saturate((fCombinedErosion - fDynamicThreshold) * 15.f);
-    float fFinalAlpha = vBloodColor.a * fSoftEdge;
-    
-    // 진한 부분은 더 불투명하게
-    fFinalAlpha = saturate(fFinalAlpha * (1.0f + fDarkSpots * 0.5f));
-    fFinalAlpha *= (0.8f + fVortexIntensity * 0.2f);
-    fFinalAlpha *= (1.f - g_fRatio);
-    
-    // -- 13. 최종 색상 클램핑 --
-    vFinalColor.rgb = saturate(vFinalColor.rgb);
-    
-    // 최종 결과 출력
-    Out.vDiffuse = float4(vFinalColor.rgb, fFinalAlpha);
-    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
-    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w, 0.f, 0.f);
-    
-    return Out;
+    float3 color = GetBloodColor(uv, 5);
+
+    float noiseMask = GetNoiseMask(uv * 2.5f, 0.35f, 0.8f);
+    float edgeFade = 1.0f - abs(In.vTexcoord.x - 0.5f) * 2.0f;
+    float lifeFade = 1.0f - g_fRatio;
+
+    float alpha = noiseMask * edgeFade * lifeFade;
+    clip(alpha - 0.05f);
+
+    return MakeGBufferOut(In, float4(color, alpha));
 }
-
 
 PS_OUT_BACKBUFFER PS_SWORDWIND_MAIN(PS_BACKBUFFER_IN In)
 {
-    PS_OUT_BACKBUFFER Out = (PS_OUT_BACKBUFFER) 0;
+    float2 uv = In.vTexcoord;
     
-    // UV 스크롤링 적용
-    float2 scrolledUV = In.vTexcoord;
-    scrolledUV.y += g_fRatio * 0.5f; // Y축 스크롤 (위로)
-    scrolledUV.x += sin(g_fRatio * 3.14159f) * 0.2f; // X축 약간의 사인파 움직임
+    // 1. 띠를 따라 흐르는 스크롤
+    uv.y -= g_fTime * 1.5f;
     
-    // 1. Base Color 텍스처 샘플링
-    float4 vMtrlDiffuse = g_DiffuseTextures[6].Sample(DefaultSampler, In.vTexcoord);
+    // 2. 기본 색상
+    float3 color = g_DiffuseTextures[6].Sample(DefaultSampler, In.vTexcoord).rgb;
     
-    // 2. 노이즈 텍스처 샘플링 (스크롤된 UV 사용)
-    float4 vMtrlNoise = g_NoiseTextures[4].Sample(DefaultSampler, scrolledUV);
+    // 3. 약한 노이즈 마스크
+    float noise = g_NoiseTextures[4].Sample(DefaultSampler, uv).r;
+    float flowMask = smoothstep(0.25f, 0.8f, noise);
     
-    // 3. 추가 노이즈 레이어 (다른 속도로 스크롤)
-    float2 scrolledUV2 = In.vTexcoord;
-    scrolledUV2.y -= g_fRatio * 0.3f; // 반대 방향
-    float4 vMtrlNoise2 = g_NoiseTextures[4].Sample(DefaultSampler, scrolledUV2);
+    // 4. 띠 중앙은 진하고 양끝은 약하게
+    float edgeFade = 1.0f - abs(In.vTexcoord.x - 0.5f) * 2.0f;
     
-    // 두 노이즈 텍스처 블렌딩
-    float noiseBlend = (vMtrlNoise.r + vMtrlNoise2.r) * 0.5f;
-    
-    // 4. 시간에 따른 알파 감쇠 (자연스러운 페이드 아웃)
-    float timeFade = 1.0f;
-    
-    // 초반 20%는 페이드 인
+    // 5. 수명 페이드
+    float lifeFade = 1.0f;
     if (g_fRatio < 0.2f)
-    {
-        timeFade = smoothstep(0.0f, 0.2f, g_fRatio);
-    }
-    // 후반 30%에서 페이드 아웃 시작
+        lifeFade = smoothstep(0.0f, 0.2f, g_fRatio);
     else if (g_fRatio > 0.7f)
-    {
-        timeFade = 1.0f - smoothstep(0.7f, 1.0f, g_fRatio);
-    }
+        lifeFade = 1.0f - smoothstep(0.7f, 1.0f, g_fRatio);
     
-    // 5. 최종 알파 계산
-    float finalAlpha = noiseBlend * timeFade;
+    float alpha = flowMask * edgeFade * lifeFade;
+    clip(alpha - 0.05f);
     
-    // 엣지를 더 선명하게 (선택사항)
-    finalAlpha = saturate(finalAlpha * 1.5f - 0.2f);
-    
-    // 6. 색상 계산
-    float3 finalColor = vMtrlDiffuse.rgb;
-    
-    // 시간에 따른 색상 변화 (선택사항)
-    float3 colorTint = lerp(float3(1.0f, 1.0f, 1.0f),
-                            float3(0.8f, 0.9f, 1.0f),
-                            g_fRatio);
-    finalColor *= colorTint;
-    
-    // 최종 출력
-    Out.vDiffuse = float4(finalColor, finalAlpha);
-    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
-    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w, 0.f, 0.f);
-    
-    return Out;
+    return MakeGBufferOut(In, float4(color, alpha));
 }
 
 struct PS_IN_SHADOW
@@ -732,154 +394,56 @@ PS_OUT_SHADOW PS_MAIN_SHADOW(PS_IN_SHADOW In)
     return Out;
 }
 
-
 PS_OUT_BACKBUFFER PS_BLOOD_CIRCLE_MAIN(PS_BACKBUFFER_IN In)
 {
     PS_OUT_BACKBUFFER Out = (PS_OUT_BACKBUFFER) 0;
 
-    // ===== 1. UV 스크롤링 (회전 대신 이동) =====
-    // 평면 UV에서는 스크롤링이 더 자연스러움
-    float2 scrolledUV = In.vTexcoord;
-    scrolledUV.x += g_fTime * 5.f; // 가로 스크롤
-    scrolledUV = frac(scrolledUV); // 0~1 범위로 래핑
+    float2 uv = In.vTexcoord;
+    uv.x += g_fTime * 0.8f;
+    uv = frac(uv);
 
-    // ===== 2. 텍스처 샘플링 =====
-    vector vDiffuseColor = g_DiffuseTexture.Sample(DefaultSampler, scrolledUV);
-    vDiffuseColor.r *= 0.8f; // 빨강 유지
-    vDiffuseColor.g *= 0.05f; // 약간의 녹색
-    vDiffuseColor.b *= 0.0f; // 파랑 제거
+    float4 tex = g_DiffuseTexture.Sample(DefaultSampler, uv);
 
-    // ===== 3. UV 기반 외곽선 (위아래 경계) =====
-    float edgeMask = 0.0f;
-    float edgeThickness = 0.05f; // 외곽선 두께
-    
-    // 위쪽 가장자리 (V값이 1에 가까움)
-    if (In.vTexcoord.y > 1.0f - edgeThickness)
-    {
-        edgeMask = (In.vTexcoord.y - (1.0f - edgeThickness)) / edgeThickness;
-    }
-    
-    // 아래쪽 가장자리 (V값이 0에 가까움)
-    if (In.vTexcoord.y < edgeThickness)
-    {
-        edgeMask = max(edgeMask, 1.0f - (In.vTexcoord.y / edgeThickness));
-    }
+    float3 color = tex.rgb;
+    color.r *= 0.8f;
+    color.g *= 0.15f;
+    color.b *= 0.10f;
 
-    // ===== 4. 색상 처리 =====
-    vector finalColor = vDiffuseColor;
-    
-    // 붉은색 강화
-    finalColor.r = pow(finalColor.r, 0.7f) * 1.2f;
-    finalColor.g *= 0.2f;
-    finalColor.b *= 0.1f;
-    
-    // 외곽선을 검정색으로
-    finalColor.rgb = lerp(finalColor.rgb, float3(0.0f, 0.0f, 0.0f), edgeMask);
+    float alpha = tex.a;
+    alpha *= (1.0f - g_fDissolveTime);
 
-    // ===== 5. 패턴 추가 (선택사항) =====
-    // 세로 줄무늬 효과로 회전 느낌 연출
-    float pattern = sin(In.vTexcoord.x * 20.0f - g_fTime * 5.0f) * 0.2f + 0.8f;
-    finalColor.rgb *= pattern;
-
-    // ===== 6. 알파 처리 =====
-    float fadeAlpha = vDiffuseColor.a;
-    fadeAlpha *= saturate(g_fGrowTime * 3.0f);
-    fadeAlpha *= (1.0f - g_fDissolveTime);
-    
-    
-
-    // ===== 출력 =====
-    Out.vDiffuse = float4(saturate(finalColor.rgb), saturate(fadeAlpha));
-    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
-    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w, 0.f, 0.f);
+    Out.vDiffuse = float4(saturate(color), saturate(alpha));
+    Out.vNormal = float4(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+    Out.vDepth = float4(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w, 0.f, 0.f);
 
     return Out;
 }
-
-
-
 
 PS_OUT_BACKBUFFER PS_BLOOD_BODYAURA_MAIN(PS_BACKBUFFER_IN In)
 {
     PS_OUT_BACKBUFFER Out = (PS_OUT_BACKBUFFER) 0;
-    
-    // ===== 1. 알파(Alpha) 계산: 오라의 '형태' 결정 =====
-    
-    // 1-1. 대각선 방향으로 스크롤되는 UV 생성 (회전 속도 증가)
-    float2 animatedUV = In.vTexcoord;
-    animatedUV.x += g_fTime * 0.7f; // X축 이동 (회전) - 속도 증가
-    animatedUV.y -= g_fTime * 1.2f; // Y축 이동 (상승) - 속도 증가
-    
-    // 1-2. 다층 노이즈로 더 선명한 디테일 생성
-    float noiseMask1 = g_NoiseTextures[5].Sample(DefaultSampler, frac(animatedUV)).r;
-    float noiseMask2 = g_NoiseTextures[5].Sample(DefaultSampler, frac(animatedUV * 2.0f)).r;
-    
-    // 두 노이즈를 곱해서 더 날카로운 엣지 생성
-    float noiseMask = noiseMask1 * noiseMask2;
-    noiseMask = pow(noiseMask, 0.5f); // 감마 보정으로 중간값 강화
-    noiseMask = smoothstep(0.2f, 0.4f, noiseMask); // 더 타이트한 경계
-    
-    // 1-3. 나선형 물결 마스크 (토네이도의 회전 강조)
-    float waveFrequency = 6.0f; // 물결 갯수 증가
-    float waveSpeed = 4.0f; // 회전 속도 증가
-    float spiralOffset = In.vTexcoord.x * 3.14159f; // X 좌표에 따른 위상 차이
-    
-    // 나선형 패턴 생성
-    float wave = sin(In.vTexcoord.y * waveFrequency + g_fTime * waveSpeed + spiralOffset);
-    // 더 선명한 스트라이프를 위해 pow 사용
-    float waveMask = saturate(pow(abs(wave), 0.3f));
-    
-    // 1-4. 높이 마스크 개선 (토네이도 형태 강화)
-    float heightMask = 1.0f;
-    
-    // 아래쪽은 넓게, 위쪽은 좁게 (토네이도 형태)
-    float widthScale = lerp(1.2f, 0.3f, In.vTexcoord.y);
-    float centerDist = abs(In.vTexcoord.x - 0.5f) * 2.0f;
-    float radialMask = 1.0f - smoothstep(0.0f, widthScale, centerDist);
-    
-    // 상하 페이드
-    heightMask *= smoothstep(0.0f, 0.15f, In.vTexcoord.y);
-    heightMask *= (1.0f - smoothstep(0.85f, 1.0f, In.vTexcoord.y));
-    
-    // 1-5. 엣지 강조를 위한 추가 마스크
-    float edgeEnhance = 1.0f - smoothstep(0.6f, 0.9f, noiseMask);
-    edgeEnhance = saturate(edgeEnhance + 0.3f); // 최소값 보장
-    
-    // 최종 알파 계산 (각 요소의 기여도 조정)
-    float finalAlpha = noiseMask * waveMask * heightMask * radialMask * edgeEnhance;
-    
-    // 알파 값 강화 (더 진하게)
-    finalAlpha = pow(finalAlpha, 0.7f); // 감마 보정으로 전체적으로 밝게
-    finalAlpha = saturate(finalAlpha * 1.5f); // 강도 증폭
-    
-    finalAlpha *= (1.0f - g_fDissolveTime); // Dissolve 효과
-    
-    // 더 선명한 컷오프
-    clip(finalAlpha - 0.05f);
-    
-    // ===== 2. 색상(Color) 계산 =====
-    vector baseColor = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord);
-    
-    // 엣지 부분 색상 강조 (선택적)
-    float edgeGlow = 1.0f + (1.0f - noiseMask) * 0.5f;
-    vector finalColor = baseColor * edgeGlow;
-    
-    // ===== 최종 출력 =====
-    Out.vDiffuse = float4(saturate(finalColor.rgb), saturate(finalAlpha));
-    Out.vNormal = vector(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
-    Out.vDepth = vector(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w, 0.f, 0.f);
-    
+
+    float2 uv = frac(In.vTexcoord + float2(g_fTime * 0.4f, -g_fTime * 1.0f));
+    float noise = g_NoiseTextures[5].Sample(DefaultSampler, uv).r;
+
+    float noiseMask = smoothstep(0.3f, 0.75f, noise);
+    float widthMask = 1.0f - abs(In.vTexcoord.x - 0.5f) * 2.0f;
+    float heightMask = smoothstep(0.0f, 0.15f, In.vTexcoord.y) * (1.0f - smoothstep(0.75f, 1.0f, In.vTexcoord.y));
+
+    float alpha = noiseMask * widthMask * heightMask * (1.0f - g_fDissolveTime);
+    clip(alpha - 0.05f);
+
+    float3 color = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord).rgb;
+    Out.vDiffuse = float4(color, alpha);
+    Out.vNormal = float4(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
+    Out.vDepth = float4(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w, 0.f, 0.f);
+
     return Out;
 }
 
 
-// =============================================================
-// 전역 변수 (Global Variables)
-// =============================================================
-
 float g_fEffectDuration;
 
-// 이 셰이더는 g_OtherTextures[5]에 'Black -> White -> Black' 그라디언트 텍스처를 사용해야 합니다.
 
 
 float GenerateGradientMask(float2 uv)
@@ -915,120 +479,6 @@ float GenerateRotatingSlashMask(float2 uv, float time, float bladeCount)
     float radialFade = 1.0f - saturate(dist * 2.0f);
     
     return blade * radialFade;
-}
-
-// 메인 픽셀 셰이더
-PS_OUT_BACKBUFFER PS_SWORDWIND_CIRCLE_MAIN(PS_BACKBUFFER_IN In)
-{
-    PS_OUT_BACKBUFFER Out = (PS_OUT_BACKBUFFER) 0;
-    
-    float fTimeRatio = g_fRatio;
-    float fTime = g_fTime;
-    float fScrollSpeed = g_fScrollSpeed;
-    
-    float2 vScrolledUV = In.vTexcoord;
-    
-    float2 center = float2(0.5f, 0.5f);
-    float2 offset = vScrolledUV - center;
-    float scrollAngle = fTime * fScrollSpeed;
-    float2 rotatedUV;
-    rotatedUV.x = offset.x * cos(scrollAngle) - offset.y * sin(scrollAngle);
-    rotatedUV.y = offset.x * sin(scrollAngle) + offset.y * cos(scrollAngle);
-    vScrolledUV = rotatedUV + center;
-    
-    float4 vBaseColor = g_DiffuseTextures[6].Sample(DefaultSampler, In.vTexcoord);
-    
-    float fGradientMask = GenerateGradientMask(vScrolledUV);
-    
-    float fRadialMask = GenerateRadialGradientMask(In.vTexcoord, 0.1f, 0.5f);
-    
-    float fSlashMask = GenerateRotatingSlashMask(In.vTexcoord, fTime * 2.0f, 4.0f);
-    
-    float fCombinedMask = fGradientMask * fRadialMask; // 두 마스크 곱하기
-    
-    float fTimeFade = 1.0f - fTimeRatio;
-    
-    fTimeFade = smoothstep(0.0f, 1.0f, fTimeFade);
-    
-    float fPulse = 1.0f + sin(fTime * 8.0f) * 0.15f * fTimeFade;
-    
-    float fEdgeGlow = pow(1.0f - fRadialMask, 3.0f) * fTimeFade;
-    float3 vGlowColor = float3(0.3f, 0.6f, 1.0f); // 파란빛 글로우
-    
-    float fFinalAlpha = vBaseColor.a * fCombinedMask * fTimeFade * fPulse;
-    
-    fFinalAlpha = max(fFinalAlpha, 0.05f * fTimeFade);
-    float3 vFinalRGB = vBaseColor.rgb;
-    
-    vFinalRGB += vGlowColor * fEdgeGlow * 0.5f;
-    
-    vFinalRGB *= (1.0f + fTimeFade * 0.5f);
-    
-    // 9. 최종 출력
-    Out.vDiffuse = float4(vFinalRGB, fFinalAlpha);
-    Out.vNormal = float4(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
-    Out.vDepth = float4(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w, 0.f, 0.f);
-    
-    return Out;
-}
-
-float g_fBloomIntensity = 2.f;
-float g_fEmissiveIntensity = 2.f;
-PS_OUT_BACKBUFFER PS_LUNGE_PILLAR_MAIN(PS_BACKBUFFER_IN In)
-{
-    PS_OUT_BACKBUFFER Out = (PS_OUT_BACKBUFFER) 0;
-
-    // 1. 기본 색상.
-    vector vSourDiffuse = g_DiffuseTextures[5].Sample(DefaultSampler, In.vTexcoord);
-    vector vDestDiffuse = float4(0, 0, 0, 1);
-    vector vMask = float4(0, 0, 0, 0);
-    
-    
-    // 2. 마스킹
-    vMask = g_DiffuseTextures[6].Sample(DefaultSampler, In.vTexcoord);
-    vDestDiffuse = g_DiffuseTextures[6].Sample(DefaultSampler, In.vTexcoord);
-   
-    
-     // 3. 색상 버리기.
-    if (vDestDiffuse.r < 0.1f && vDestDiffuse.g < 0.1f && vDestDiffuse.b < 0.1f)
-        discard;
-    
-     // 4. Mask 범위 구하기.
-    vector vMtrlDiffuse = vDestDiffuse * (1.f - vMask) + vSourDiffuse * (vMask);
-    
-     // 5. Emissive 추가 발광효과.
-    float fMaskBrightness = dot(vMask.rgb, float3(0.299, 0.587, 0.114));
-    if (fMaskBrightness > 0.5f)
-    {
-        vector vEmissive = vMask * g_fEmissiveIntensity * 2.0f;
-        vMtrlDiffuse.rgb += vEmissive.rgb;
-    }
-    
-    // 6. Bloom Color 계산
-    float lifeRatio = g_fRatio;
-    float lifeCurve = sin(lifeRatio * 3.14159f);
-
-    vector bloomColor = float4(float3(8.0f, 0.01f, 0.01f) * g_fBloomIntensity, 1.0f);
-    
-    
-      // 7. 밝기 
-    if (fMaskBrightness > 0.1f) // 임계값은 0.1 ~ 0.5 사이에서 조정
-    {
-        // vMtrlDiffuse.rgb에 bloomColor.rgb를 더합니다.
-        // lifeCurve를 곱해줘서 파티클 수명에 따라 자연스럽게 빛나도록 합니다.
-        //vMtrlDiffuse.rgb += bloomColor.rgb * vMask.rgb * lifeCurve;
-        vMtrlDiffuse.rgb += bloomColor.rgb * vMask.rgb;
-    }
-    
-    float fadeAlpha = saturate(0.7f - lifeRatio * lifeRatio); // 기존 코드
-    vMtrlDiffuse.a = fadeAlpha; // 기존 코드
-    
-    Out.vDiffuse = vMtrlDiffuse;
-    
-    Out.vNormal = float4(In.vNormal.xyz * 0.5f + 0.5f, 0.f);
-    Out.vDepth = float4(In.vProjPos.z / In.vProjPos.w, In.vProjPos.w, 0.f, 0.f);
-
-    return Out;
 }
 
 
@@ -1161,33 +611,6 @@ technique11 DefaultTechnique
         //PixelShader = compile ps_5_0 PS_SWORDWIND_IMPROVED();
         PixelShader = compile ps_5_0 PS_BLOOD_BODYAURA_MAIN();
     }
-
-    pass SwordWindCirclePass // 10
-    {
-        SetRasterizerState(RS_Default);
-        SetDepthStencilState(DSS_Default, 0);
-        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
-        
-        VertexShader = compile vs_5_0 VS_MAIN();
-        GeometryShader = NULL;
-        //PixelShader = compile ps_5_0 PS_SWORDWIND_IMPROVED();
-        PixelShader = compile ps_5_0 PS_SWORDWIND_CIRCLE_MAIN();
-    }
-
-    pass LungePillarPass // 11
-    {
-        SetRasterizerState(RS_Default);
-        SetDepthStencilState(DSS_Default, 0);
-        SetBlendState(BS_AlphaBlend, float4(0.f, 0.f, 0.f, 0.f), 0xffffffff);
-        
-        VertexShader = compile vs_5_0 VS_MAIN();
-        GeometryShader = NULL;
-        // 일단 테스트용도.
-        //PixelShader = compile ps_5_0 PS_DEFFERED_BLOODPILLARA_MAIN();
-        PixelShader = compile ps_5_0 PS_LUNGE_PILLAR_MAIN();
-    }
-
-
 
 }
 

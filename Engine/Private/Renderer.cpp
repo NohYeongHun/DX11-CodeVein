@@ -325,9 +325,9 @@ HRESULT CRenderer::Render_Lights()
     if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_LightAcc"), nullptr)))
         return E_FAIL;
 
-    /* Shade타겟을 채워줄 수 있는 리소스를 그려주자 == 쉐이드타겟의 모든 픽셀에 값을 채우낟. */
+    /* Shade타겟을 채워줄 수 있는 리소스를 그려주자 == 쉐이드타겟의 모든 픽셀에 값을 채운다. */
     /* Shade타겟 (wsx * wsy) */
-    /* 삭가형버퍼 -> 직교투영 -> (wsx * wsy) */
+    /* 사각형 버퍼 -> 직교투영 -> (wsx * wsy) */
     m_pDefferedShader->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix);
         
     m_pDefferedShader->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix);
@@ -357,8 +357,7 @@ HRESULT CRenderer::Render_Lights()
 
 HRESULT CRenderer::Render_Combined()
 { 
-    // [추가] Combine Pass에서 입력으로 사용할 모든 G-Buffer와 조명 텍스처들을 미리 해제합니다.
-   // 보통 5-6개 이상 사용되므로, 넉넉하게 8개 슬롯을 모두 비웁니다.
+    // Combine Pass에서 입력으로 사용할 모든 G-Buffer와 조명 텍스처들을 미리 해제합니다.
 
     // 1. Combine_Shade에 렌더링 시작 => Begin MRT 사용시 RenderTarget을 Clear하므로 Begin_MRT를 조심해서 쓸것.
     m_pGameInstance->Begin_MRT(TEXT("MRT_Combine"), nullptr);

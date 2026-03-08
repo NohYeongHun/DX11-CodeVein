@@ -926,28 +926,14 @@ void CPlayer::On_Collision_Enter(CGameObject* pOther)
 
                 _float fSwingLength = XMVectorGetX(XMVector3Length(vAttackDirection));
                 if (fSwingLength < 0.1f)
-                {
                     vAttackDirection = vDir;  // vDir 재사용
-                }
                 else
-                {
                     vAttackDirection = XMVectorScale(vAttackDirection, 1.0f / fSwingLength);
-                }
 
 
                 Create_HitEffects(vClosestPoint, vAttackDirection);
                 m_pGameInstance->PlaySoundEffect(L"NormalAttack.wav", 0.3f);
 
-                //_float3 vPos = { 0.f, 1.f, 0.f };
-                //CEffect_Pillar::PILLAR_ACTIVATE_DESC EffectPillarDesc{};
-                //EffectPillarDesc.eCurLevel = m_eCurLevel;
-                //EffectPillarDesc.vStartPos = XMLoadFloat3(&vPos); // 계산된 위치를 넣어줌
-                //EffectPillarDesc.fDuration = 2.f;
-                //EffectPillarDesc.fAttackPower = static_cast<_float>(m_pGameInstance->Rand_UnsignedInt(150, 200));
-                //// ... 나머지 Desc 내용 채우기 ...
-
-                //m_pGameInstance->Move_Effect_ToObjectLayer(ENUM_CLASS(m_eCurLevel)
-                //    , TEXT("BLOOD_PILLAR"), TEXT("Layer_Effect"), 1, ENUM_CLASS(CEffect_Pillar::EffectType), &EffectPillarDesc);
             }
            
         }
@@ -999,13 +985,9 @@ void CPlayer::On_Collision_Enter(CGameObject* pOther)
 
         _float fSwingLength = XMVectorGetX(XMVector3Length(vAttackDirection));
         if (fSwingLength < 0.1f)
-        {
             vAttackDirection = vDir;  // vDir 재사용
-        }
         else
-        {
             vAttackDirection = XMVectorScale(vAttackDirection, 1.0f / fSwingLength);
-        }
 
 
         Create_HitEffects(vClosestPoint, vAttackDirection);

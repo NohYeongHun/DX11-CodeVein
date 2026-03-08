@@ -49,11 +49,7 @@ struct PS_OUT
 
 float3 ACESFilm(float3 x)
 {
-    float a = 2.51f;
-    float b = 0.03f;
-    float c = 2.43f;
-    float d = 0.59f;
-    float e = 0.14f;
+    const float a = 2.51f; const float b = 0.03f; const float c = 2.43f; const float d = 0.59f; const float e = 0.14f;
     return saturate((x * (a * x + b)) / (x * (c * x + d) + e));
 }
 
@@ -118,26 +114,10 @@ PS_OUT PS_SUM_BLUR(PS_IN In)
     float4 vSceneColor = g_DiffuseTexture.Sample(DefaultSampler, In.vTexcoord); // Combine Texture
     float4 vBloomColor = g_BloomTexture.Sample(DefaultSampler, In.vTexcoord); // Bloom Texture
 
-    //float3 vBloomTint = float3(1.0f, 0.7f, 0.3f);
-    //vBloomColor.rgb *= vBloomTint;
-
-    Out.vColor = vSceneColor + vBloomColor * g_fBloomIntensity;
+    float3 finalColor = vSceneColor.rgb + vBloomColor.rgb * g_fBloomIntensity;
+    finalColor = ACESFilm(finalColor);
     
-    
-    //// 휘도 계산용 계수 (표준 수치)
-    //const float3 LUMINANCE_COEFFS = float3(0.2126f, 0.7152f, 0.0722f);
-
-    //// 1. 현재 색상의 휘도(밝기) 추출
-    //float fLuminance = dot(Out.vColor.rgb, LUMINANCE_COEFFS);
-
-    //// 2. 휘도에 대해서만 라인하르트 적용
-    //float fMappedLuminance = fLuminance / (1.0f + fLuminance);
-
-    //// 3. 원래 색상에 (압축된 휘도 / 원래 휘도) 비율을 곱해줌
-    //Out.vColor.rgb *= (fMappedLuminance / fLuminance);
-    
-    Out.vColor.rgb = ACESFilm(Out.vColor.rgb);
-    
+    Out.vColor = float4(finalColor, vSceneColor.a);
     //Out.vColor.rgb = Out.vColor.rgb / (Out.vColor.rgb + 1.0f);
     
     return Out;
