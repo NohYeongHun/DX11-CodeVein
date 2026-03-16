@@ -295,43 +295,30 @@ void CPlayer::Move_By_Camera_Direction_8Way(ACTORDIR eDir, _float fTimeDelta, _f
 
     vMoveDir = XMVector3Normalize(vMoveDir);
 
-    // 2. 목표 방향 계산 => Yaw 만들기.
     _float x = XMVectorGetX(vMoveDir);
     _float z = XMVectorGetZ(vMoveDir);
     _float fTargetYaw = atan2f(x, z);
 
-    // 3. 각도 정규화
     while (fTargetYaw > XM_PI) fTargetYaw -= XM_2PI;
     while (fTargetYaw < -XM_PI) fTargetYaw += XM_2PI;
 
-    // 4. 현재 회전과 부드러운 보간
     _float fCurrentYaw = m_pTransformCom->GetYawFromQuaternion();
     _float fYawDiff = fTargetYaw - fCurrentYaw;
 
-    // 5. 최단 경로
     while (fYawDiff > XM_PI) fYawDiff -= XM_2PI;
     while (fYawDiff < -XM_PI) fYawDiff += XM_2PI;
 
-    // 6. 회전 속도 조절
     _float fRotationSpeed = 8.0f;
     if (m_pModelCom && m_pModelCom->Is_Blending())
-    {
         fRotationSpeed *= 0.2f;
-    }
 
-    // 7. MaxRotation
     _float fMaxRotation = fRotationSpeed * fTimeDelta;
     if (fabsf(fYawDiff) > fMaxRotation)
-    {
         fYawDiff = (fYawDiff > 0) ? fMaxRotation : -fMaxRotation;
-    }
 
-    // 8. 새로운 회전 적용
     _float fNewYaw = fCurrentYaw + fYawDiff;
     _vector qNewRot = XMQuaternionRotationAxis(XMVectorSet(0.f, 1.f, 0.f, 0.f), fNewYaw);
     m_pTransformCom->Set_Quaternion(qNewRot);
-
-    // 9. 이동 적용
     m_pTransformCom->Move_Direction(vMoveDir, fTimeDelta * fSpeed, m_pNavigationCom);
 }
 
@@ -413,7 +400,7 @@ void CPlayer::Search_LockOn_Target()
     // 카메라 FOV 정보 (카메라에서 가져오거나 하드코딩)
     _float fCameraFovY = m_pPlayerCamera->Get_FovY();
     _float fAspectRatio = m_pPlayerCamera->Get_Aspect();
-    _float fCameraFovX = 2.0f * atanf(tanf(fCameraFovY * 0.5f) * fAspectRatio); // 가로 FOV
+    _float fCameraFovX = 2.0f * atanf(tanf(fCameraFovY * 0.5f) * fAspectRatio);
     _vector vPlayerPos = m_pTransformCom->Get_State(STATE::POSITION);
 
     CGameObject* pBestTarget = nullptr;
@@ -429,23 +416,20 @@ void CPlayer::Search_LockOn_Target()
 
         _vector vTargetPos = pGameObject->Get_Transform()->Get_State(STATE::POSITION);
 
-        // === 1. 카메라 시야 내 체크 ===
         if (!m_pPlayerCamera->Is_In_Camera_Frustum(vTargetPos))
             continue;
 
-        // === 2. 플레이어와의 거리 체크 ===
         _vector vPlayerToTarget = vTargetPos - vPlayerPos;
         _float fDistance = XMVectorGetX(XMVector3Length(vPlayerToTarget));
 
         if (fDistance > m_fLockOnRange || fDistance < 1.0f)
             continue;
 
-        // === 3. 점수 계산 ===
         _float fDistanceScore = (m_fLockOnRange - fDistance) / m_fLockOnRange;
         _float fScreenDistance = m_pPlayerCamera->Get_Screen_Distance_From_Center(vTargetPos);
-        _float fCenterScore = max(0.0f, 1.0f - min(fScreenDistance, 1.0f)); // 정규화
+        _float fCenterScore = max(0.0f, 1.0f - min(fScreenDistance, 1.0f));
 
-        _float fTotalScore = fDistanceScore * 0.3f + fCenterScore * 0.7f; // 화면 중앙 우선
+        _float fTotalScore = fDistanceScore * 0.3f + fCenterScore * 0.7f;
 
         if (fTotalScore > fBestScore)
         {
@@ -464,11 +448,6 @@ void CPlayer::Set_LockOn_Target(CGameObject* pTarget)
     m_isLockOn = true;
     m_fLockOnTimer = 0.0f;
 
-    // 카메라에 LockOn 타겟 설정
-    //if (m_pPlayerCamera)
-    //{
-    //    m_pPlayerCamera->Start_Zoom_In(0.3f);
-    //}
 }
 
 void CPlayer::Clear_LockOn_Target()
@@ -476,12 +455,6 @@ void CPlayer::Clear_LockOn_Target()
     m_pLockOn_Target = nullptr;
     m_isLockOn = false;
     m_fLockOnTimer = 0.0f;
-
-    // 카메라 LockOn 해제
-    //if (m_pPlayerCamera)
-    //{
-    //    m_pPlayerCamera->Start_Zoom_Out(0.3f); 
-    //}
 
 }
 
@@ -504,22 +477,15 @@ _bool CPlayer::Is_Valid_LockOn_Target(CGameObject* pTarget)
     if (!pTarget)
         return false;
 
-    // 1. 객체가 살아있는지 확인
     if (pTarget->Is_Destroy())
         return false;
 
-    // 2. 거리 체크
     _vector vPlayerPos = m_pTransformCom->Get_State(STATE::POSITION);
     _vector vTargetPos = pTarget->Get_Transform()->Get_State(STATE::POSITION);
     _float fDistance = XMVectorGetX(XMVector3Length(vTargetPos - vPlayerPos));
 
     if (fDistance > m_fLockOnRange)
         return false;
-
-    // 3. 추가 조건들 (필요에 따라)
-    // - 적이 스턴 상태인지
-    // - 적이 특정 상태(무적, 숨김 등)인지
-    // - 시야에 가려져 있는지 (레이캐스팅)
 
     return true;
 }

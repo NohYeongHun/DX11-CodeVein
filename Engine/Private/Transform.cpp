@@ -1,4 +1,4 @@
-
+﻿
 CTransform::CTransform(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CComponent{ pDevice, pContext }
 {
@@ -97,37 +97,28 @@ void CTransform::Move_Direction(_vector vDir, _float fTimeDelta)
 
 void CTransform::Move_Direction(_vector vDir, _float fTimeDelta, CNavigation* pNavigation)
 {
-	_float4 vPosition = {};
 	_vector vMovement = vDir * (m_fSpeedPerSec * fTimeDelta);
-
-	XMStoreFloat4(&vPosition, Get_State(STATE::POSITION));
-
-	vPosition.x += XMVectorGetX(vMovement);
-	vPosition.y += XMVectorGetY(vMovement);
-	vPosition.z += XMVectorGetZ(vMovement);
+	_vector vPosition = Get_State(STATE::POSITION) + vMovement;
 
 	if (nullptr == pNavigation)
 	{
-		Set_State(STATE::POSITION, XMLoadFloat4(&vPosition));
+		Set_State(STATE::POSITION, vPosition);
 		m_IsDirty = true;
 	}
 	else
 	{
 		_vector slideVector;
-		if (true == pNavigation->isMove(XMLoadFloat4(&vPosition), &slideVector, vMovement))
+		if (true == pNavigation->isMove(vPosition, &slideVector, vMovement))
 		{
-			// 정상 이동
-			Set_State(STATE::POSITION, XMLoadFloat4(&vPosition));
+			Set_State(STATE::POSITION, vPosition);
 			m_IsDirty = true;
 		}
 		else
 		{
-			// 벽에 막혔을 때 슬라이딩 시도
 			_vector vCurrentPos = Get_State(STATE::POSITION);
 			
-			// 원래 이동량의 크기를 유지하면서 슬라이딩 방향으로 적용
 			_float fOriginalMoveLength = XMVectorGetX(XMVector3Length(vMovement));
-			_float fSlideStrength = 0.8f; // 슬라이딩 강도 (0.0~1.0)
+			_float fSlideStrength = 0.05f;
 			_vector vSlideMovement = slideVector * (fOriginalMoveLength * fSlideStrength);
 			_vector vSlidePosition = vCurrentPos + vSlideMovement;
 			
@@ -136,9 +127,8 @@ void CTransform::Move_Direction(_vector vDir, _float fTimeDelta, CNavigation* pN
 				Set_State(STATE::POSITION, vSlidePosition);
 				m_IsDirty = true;
 			}
-			else
+			/*else
 			{
-				// 슬라이드도 실패 시 경계 밀착 안정화: 절반 거리로 한 번 더 시도
 				vSlideMovement = slideVector * (fOriginalMoveLength * fSlideStrength * 0.5f);
 				vSlidePosition = vCurrentPos + vSlideMovement;
 				if (true == pNavigation->isMove(vSlidePosition))
@@ -146,7 +136,7 @@ void CTransform::Move_Direction(_vector vDir, _float fTimeDelta, CNavigation* pN
 					Set_State(STATE::POSITION, vSlidePosition);
 					m_IsDirty = true;
 				}
-			}
+			}*/
 		}
 	}
 }
@@ -190,7 +180,6 @@ void CTransform::Translate(_fvector vTranslate, CNavigation* pNavigation)
 			// 벽에 막혔을 때 슬라이딩 시도
 			_vector vCurrentPos = Get_State(STATE::POSITION);
 			
-			// 원래 이동량의 크기를 유지하면서 슬라이딩 방향으로 적용
 			_float fOriginalMoveLength = XMVectorGetX(XMVector3Length(vTranslate));
 			_float fSlideStrength = 0.8f; // 슬라이딩 강도 (0.0~1.0)
 			_vector vSlideMovement = slideVector * (fOriginalMoveLength * fSlideStrength);

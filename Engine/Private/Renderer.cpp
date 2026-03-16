@@ -54,7 +54,6 @@ HRESULT CRenderer::Initialize()
     m_pGameInstance->Add_MRT(TEXT("MRT_GameObjects"), TEXT("Target_Diffuse"));
     m_pGameInstance->Add_MRT(TEXT("MRT_GameObjects"), TEXT("Target_Normal"));
     m_pGameInstance->Add_MRT(TEXT("MRT_GameObjects"), TEXT("Target_Depth"));
-    m_pGameInstance->Add_MRT(TEXT("MRT_GameObjects"), TEXT("Target_Emissive"));
 
     m_pGameInstance->Add_MRT(TEXT("MRT_LightAcc"), TEXT("Target_Shade"));
     m_pGameInstance->Add_MRT(TEXT("MRT_LightAcc"), TEXT("Target_Specular"));
@@ -62,19 +61,10 @@ HRESULT CRenderer::Initialize()
     /* MRT Shadow 생성*/
     m_pGameInstance->Add_MRT(TEXT("MRT_Shadow"), TEXT("Target_LightDepth"));
     m_pGameInstance->Add_MRT(TEXT("MRT_Combine"), TEXT("Combine_Shade"));
-    
-    
 
     m_pGameInstance->Add_MRT(TEXT("MRT_BrightPass"), TEXT("Target_BrightPass"));
     m_pGameInstance->Add_MRT(TEXT("MRT_BloomBlurX"), TEXT("Target_BloomBlurX"));
     m_pGameInstance->Add_MRT(TEXT("MRT_BloomBlurY"), TEXT("Target_BloomBlurY"));
-
-
-    /* 최종 과정 */
-    m_pGameInstance->Add_MRT(TEXT("MRT_Distortion"), TEXT("Target_Distortion")); // Distortion 객체들을 그린다.
-    m_pGameInstance->Add_MRT(TEXT("MRT_DistortionCombine"), TEXT("Combine_Distortion")); // Distortion 객체들을 합친다.
-    
-
 
 #pragma endregion
 
@@ -164,34 +154,34 @@ HRESULT CRenderer::Draw()
         return E_FAIL;
     
 
-    // 3. G-Buffer 합성 및 스카이박스 렌더링으로 최종 씬 완성
+   // // 3. G-Buffer 합성 및 스카이박스 렌더링으로 최종 씬 완성
     if (FAILED(Render_Combined()))
         return E_FAIL;
 
     if (FAILED(Render_Blend()))
         return E_FAIL;
 
-   /* if (FAILED(Render_Distortion()))
-        return E_FAIL;
+   ///* if (FAILED(Render_Distortion()))
+   //     return E_FAIL;
 
-    if (FAILED(Render_DistortionCombine()))
-        return E_FAIL;*/
-   
+   // if (FAILED(Render_DistortionCombine()))
+   //     return E_FAIL;*/
+   //
 
-    // 7. 반투명 객체까지 포함된 씬으로 블룸 효과 생성
+   // // 7. 반투명 객체까지 포함된 씬으로 블룸 효과 생성
     if (FAILED(Render_BloomBlur()))
         return E_FAIL;
-    //
-    //// 8. 씬과 블룸 효과를 최종 합성하여 화면에 출력
+   // //
+   // //// 8. 씬과 블룸 효과를 최종 합성하여 화면에 출력
     if (FAILED(Render_BloomCombine()))
         return E_FAIL;
 
 
 
 
-    // 8. NonLight,  등 나머지 렌더링 => 사실상 안씀.
-    if (FAILED(Render_NonLight()))
-        return E_FAIL;
+   // // 8. NonLight,  등 나머지 렌더링 => 사실상 안씀.
+   // if (FAILED(Render_NonLight()))
+   //     return E_FAIL;
 
    
 
@@ -557,12 +547,6 @@ HRESULT CRenderer::Render_BloomBlur()
 
     m_pGameInstance->End_MRT();
 
-
-    // --- 2. Horizontal Blur ---
-   // [수정] 다음 단계의 입력이 될 'Target_BrightPass'가 바인딩된 슬롯을 미리 해제합니다.
-
-
-    // 수평 블러 (BrightPass -> BloomBlur1)
     if (FAILED(m_pGameInstance->Begin_MRT(TEXT("MRT_BloomBlurX"), nullptr)))
         return E_FAIL;
 
@@ -625,16 +609,11 @@ HRESULT CRenderer::Render_BloomCombine()
     _uint iNumViewports = { 1 };
     m_pContext->RSGetViewports(&iNumViewports, &ViewPort);
 
-    // WorldMatrix를 전체 화면 크기로 재설정 (추가!)
-
-    // 백버퍼에 최종 합성
     m_pPostLightShader->Bind_Matrix("g_WorldMatrix", &m_WorldMatrix);
     m_pPostLightShader->Bind_Matrix("g_ViewMatrix", &m_ViewMatrix);
     m_pPostLightShader->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix);
 
-    // 원본 씬과 블룸 텍스처를 바인딩
     m_pGameInstance->Bind_RT_ShaderResource(TEXT("Combine_Shade"), m_pPostLightShader, "g_DiffuseTexture");
-    //m_pGameInstance->Bind_RT_ShaderResource(TEXT("Combine_Distortion"), m_pPostLightShader, "g_DiffuseTexture");
     m_pGameInstance->Bind_RT_ShaderResource(TEXT("Target_BloomBlurY"), m_pPostLightShader, "g_BloomTexture"); // 블룸 텍스쳐. 
 
     _uint iBloomCombineIndex = static_cast<_uint>(SHADER_POSTLIGHT::SUM_BLUR);

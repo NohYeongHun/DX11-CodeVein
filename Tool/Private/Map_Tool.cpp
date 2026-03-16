@@ -70,8 +70,8 @@ void CMap_Tool::Update(_float fTimeDelta)
 {
 
     // Layer Map Parts에 있는 객체들만 피킹 가능.
-    if (m_pGameInstance->Get_MouseKeyUp(MOUSEKEYSTATE::RB))
-        Update_Picking(ENUM_CLASS(m_eCurLevel), TEXT("Layer_Map_Parts"));
+    //if (m_pGameInstance->Get_MouseKeyUp(MOUSEKEYSTATE::RB))
+    //    Update_Picking(ENUM_CLASS(m_eCurLevel), TEXT("Layer_Map_Parts"));
 
 }
 
@@ -799,7 +799,7 @@ void CMap_Tool::Render_NavigationChild()
             m_fClickPoint = m_pNavigation_Manager->Get_ClickedPos();
         }
     }
-    else if (m_pGameInstance->Get_MouseKeyDown(MOUSEKEYSTATE::LB))
+    /*else if (m_pGameInstance->Get_MouseKeyDown(MOUSEKEYSTATE::LB))
     {
         if (m_pPicking_Manager->Picking())
         {
@@ -810,7 +810,7 @@ void CMap_Tool::Render_NavigationChild()
             m_iCellIndex = m_pNavigation_Manager->Get_CurrentCellIndex();
         }
         
-    }
+    }*/
 
     m_pNavigation_Manager->Render();
 

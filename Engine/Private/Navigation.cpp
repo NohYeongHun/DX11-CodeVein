@@ -1,4 +1,4 @@
-#include "Navigation.h"
+﻿#include "Navigation.h"
 
 
 _float4x4 CNavigation::m_WorldMatrix = {};
@@ -126,7 +126,7 @@ _bool CNavigation::isMove(_fvector vPosition)
 _bool CNavigation::isMove(_fvector vPosition, _vector* pSlideVector)
 {
 	_vector vLocalPos = XMVector3TransformCoord(vPosition, XMMatrixInverse(nullptr, XMLoadFloat4x4(&m_WorldMatrix)));
-	_vector vLocalMovementDir = XMVectorZero(); // 레거시: 실제 이동 방향 없음 → CalculateSlideVector 내부에서 fallback 사용
+	_vector vLocalMovementDir = XMVectorZero();
 	return isMove(vPosition, pSlideVector, vLocalMovementDir);
 }
 
