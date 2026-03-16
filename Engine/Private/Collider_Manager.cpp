@@ -51,24 +51,13 @@ HRESULT CCollider_Manager::Clear(_uint iLevelIndex)
 	return S_OK;
 }
 
-// 매 프레임 추가하고 => 충돌 검사 후에 => 매 프레임 제거합니다.
 void CCollider_Manager::Update()
 {
-
-	//OutputDebugWstring(TEXT("콜라이더 등록 개수 : "));
-	//OutPutDebugInt(m_ColliderList.size());
-	
-
-	// 1. 충돌 가능성이 있는 후보 쌍들을 추출.
 	Build_BroadPhase();
-
-	// 2. 실제 충돌 처리.
 	Narrow_Phase();
-
 	m_ActiveColliders.clear();
 }
 
-/* 죽은 것들을 솎아낸다. */
 void CCollider_Manager::Collision_CleanUp()
 {
 	for (_uint levelIndex = 0; levelIndex < m_iNumLevels; ++levelIndex)
@@ -115,36 +104,24 @@ void CCollider_Manager::Build_BroadPhase()
 			pLeft = m_RegisterPools[currentLevel][i];
 			pRight = m_RegisterPools[currentLevel][j];
 			 
-			// 1. null pointer인 객체가 등록되었으므로 Crash
 			if (nullptr == pLeft || nullptr == pRight)
 			{
 				CRASH("Failed Search Collider");
 				return;
 			}
 
-			pLeftOwner = pLeft->Get_Owner();
-			pRightOwner = pRight->Get_Owner();
-
-			//2. 같은 객체인지 체크 (동일 GameObject의 Collider끼리 충돌 방지)
-			if (pLeftOwner == pRightOwner)
+			if (pLeft->Get_Owner() == pRight->Get_Owner() || pLeft == pRight)
 				continue;
 
-			// 3. 같은 Collider인지 체크 (혹시 모를 상황 대비)
-			if (pLeft == pRight)
-				continue;
-
-			// 4. Target Layer가 아닌 경우 무시.
 			if (!pLeft->Has_TargetLayer(pRight))
 				continue;
 
-			// 5. World AABB Bounding과 Collider를 충돌 비교해서 담을 객체인지 확인. 
 			if (pLeft->BroadIntersect(pRight))
-			{
 				m_ActiveColliders.emplace(pLeft, pRight);
-			}
 		}
 	}
 }
+
 
 void CCollider_Manager::Narrow_Phase()
 {

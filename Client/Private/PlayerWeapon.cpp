@@ -100,11 +100,11 @@ void CPlayerWeapon::Late_Update(_float fTimeDelta)
         return;
 
 #ifdef _DEBUG
-    if (FAILED(m_pGameInstance->Add_DebugComponent(m_pColliderCom)))
+   /* if (FAILED(m_pGameInstance->Add_DebugComponent(m_pColliderCom)))
     {
         CRASH("Failed Add DebugComponent");
         return;
-    }
+    }*/
         
 #endif // _DEBUG
 
@@ -118,6 +118,7 @@ HRESULT CPlayerWeapon::Render()
 {
 #ifdef _DEBUG
     //ImGui_Render();
+    m_pColliderCom->Render();
 #endif // _DEBUG
 
     

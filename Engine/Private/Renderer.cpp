@@ -168,16 +168,14 @@ HRESULT CRenderer::Draw()
     if (FAILED(Render_Combined()))
         return E_FAIL;
 
-    // 5. 모든 반투명 객체(HitFlashEffect 포함)를 최종 씬 위에 렌더링
     if (FAILED(Render_Blend()))
         return E_FAIL;
 
-    // 6. Distortion 추가 => 왜곡 효과가 적용되어야할 모든 배경이 그려진 상태
-    if (FAILED(Render_Distortion()))
+   /* if (FAILED(Render_Distortion()))
         return E_FAIL;
 
     if (FAILED(Render_DistortionCombine()))
-        return E_FAIL;
+        return E_FAIL;*/
    
 
     // 7. 반투명 객체까지 포함된 씬으로 블룸 효과 생성
@@ -545,11 +543,11 @@ HRESULT CRenderer::Render_BloomBlur()
 
 
     // 원본 씬 텍스처를 바인딩 => Combine Shader
-    //if (FAILED(m_pGameInstance->Bind_RT_ShaderResource(TEXT("Combine_Shade"), m_pPostLightShader, "g_DiffuseTexture")))
-    //    return E_FAIL;
-
-    if (FAILED(m_pGameInstance->Bind_RT_ShaderResource(TEXT("Combine_Distortion"), m_pPostLightShader, "g_DiffuseTexture")))
+    if (FAILED(m_pGameInstance->Bind_RT_ShaderResource(TEXT("Combine_Shade"), m_pPostLightShader, "g_DiffuseTexture")))
         return E_FAIL;
+
+    /*if (FAILED(m_pGameInstance->Bind_RT_ShaderResource(TEXT("Combine_Distortion"), m_pPostLightShader, "g_DiffuseTexture")))
+        return E_FAIL;*/
 
     // Bright Pass 쉐이더로 렌더링
     _uint iBloomExtractBrgihtindex = static_cast<_uint>(SHADER_POSTLIGHT::BLOOM_EXTRACT_BRGIHT);
@@ -635,8 +633,8 @@ HRESULT CRenderer::Render_BloomCombine()
     m_pPostLightShader->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix);
 
     // 원본 씬과 블룸 텍스처를 바인딩
-    //m_pGameInstance->Bind_RT_ShaderResource(TEXT("Combine_Shade"), m_pPostLightShader, "g_DiffuseTexture");
-    m_pGameInstance->Bind_RT_ShaderResource(TEXT("Combine_Distortion"), m_pPostLightShader, "g_DiffuseTexture");
+    m_pGameInstance->Bind_RT_ShaderResource(TEXT("Combine_Shade"), m_pPostLightShader, "g_DiffuseTexture");
+    //m_pGameInstance->Bind_RT_ShaderResource(TEXT("Combine_Distortion"), m_pPostLightShader, "g_DiffuseTexture");
     m_pGameInstance->Bind_RT_ShaderResource(TEXT("Target_BloomBlurY"), m_pPostLightShader, "g_BloomTexture"); // 블룸 텍스쳐. 
 
     _uint iBloomCombineIndex = static_cast<_uint>(SHADER_POSTLIGHT::SUM_BLUR);
@@ -710,7 +708,7 @@ HRESULT CRenderer::Render_Debug()
     {
         if (nullptr != pDebugCom)
             pDebugCom->Render();
-
+    
         Safe_Release(pDebugCom);
     }
     m_DebugComponent.clear();
@@ -722,8 +720,8 @@ HRESULT CRenderer::Render_Debug()
     if (FAILED(m_pDefferedShader->Bind_Matrix("g_ProjMatrix", &m_ProjMatrix)))
         return E_FAIL;
 
-    if (m_IsDebugRender)
-        m_pGameInstance->Render_RT_Debug(m_pDefferedShader, m_pVIBuffer);
+    /*if (m_IsDebugRender)
+        m_pGameInstance->Render_RT_Debug(m_pDefferedShader, m_pVIBuffer);*/
     
 
     return S_OK;

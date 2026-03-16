@@ -143,11 +143,16 @@ void CHUD::Late_Update(_float fTimeDelta)
 {
     if (!m_IsVisibility)
         return;
+
+    return;
+
     CUIObject::Late_Update(fTimeDelta);
 }
 
 HRESULT CHUD::Render()
 {
+   
+
     if (!m_IsVisibility)
         return S_OK;
 

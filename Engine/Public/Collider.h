@@ -155,6 +155,7 @@ public:
 
 #ifdef _DEBUG
 	HRESULT Render();
+	HRESULT WolrdRender();
 #endif
 
 #ifdef _DEBUG
@@ -170,6 +171,7 @@ private:
 
 	unordered_set<CGameObject*> m_ColliderObjects = {}; // 콜라이더 저장 용도
 	DirectX::XMVECTORF32 m_vColor = { DirectX::Colors::Black };
+	DirectX::XMVECTORF32 m_vWorldColor = { DirectX::Colors::Azure };
 
 
 

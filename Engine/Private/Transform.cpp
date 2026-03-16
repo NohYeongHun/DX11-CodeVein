@@ -1,4 +1,4 @@
-﻿
+
 CTransform::CTransform(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: CComponent{ pDevice, pContext }
 {
@@ -114,7 +114,7 @@ void CTransform::Move_Direction(_vector vDir, _float fTimeDelta, CNavigation* pN
 	else
 	{
 		_vector slideVector;
-		if (true == pNavigation->isMove(XMLoadFloat4(&vPosition), &slideVector))
+		if (true == pNavigation->isMove(XMLoadFloat4(&vPosition), &slideVector, vMovement))
 		{
 			// 정상 이동
 			Set_State(STATE::POSITION, XMLoadFloat4(&vPosition));
@@ -136,7 +136,17 @@ void CTransform::Move_Direction(_vector vDir, _float fTimeDelta, CNavigation* pN
 				Set_State(STATE::POSITION, vSlidePosition);
 				m_IsDirty = true;
 			}
-			// 슬라이딩도 안 되면 이동하지 않음
+			else
+			{
+				// 슬라이드도 실패 시 경계 밀착 안정화: 절반 거리로 한 번 더 시도
+				vSlideMovement = slideVector * (fOriginalMoveLength * fSlideStrength * 0.5f);
+				vSlidePosition = vCurrentPos + vSlideMovement;
+				if (true == pNavigation->isMove(vSlidePosition))
+				{
+					Set_State(STATE::POSITION, vSlidePosition);
+					m_IsDirty = true;
+				}
+			}
 		}
 	}
 }
@@ -169,7 +179,7 @@ void CTransform::Translate(_fvector vTranslate, CNavigation* pNavigation)
 	else
 	{
 		_vector slideVector;
-		if (true == pNavigation->isMove(XMLoadFloat4(&vPosition), &slideVector))
+		if (true == pNavigation->isMove(XMLoadFloat4(&vPosition), &slideVector, vTranslate))
 		{
 			// 정상 이동
 			Set_State(STATE::POSITION, XMLoadFloat4(&vPosition));
@@ -191,7 +201,17 @@ void CTransform::Translate(_fvector vTranslate, CNavigation* pNavigation)
 				Set_State(STATE::POSITION, vSlidePosition);
 				m_IsDirty = true;
 			}
-			// 슬라이딩도 안 되면 이동하지 않음
+			else
+			{
+				// 슬라이드도 실패 시 경계 밀착 안정화: 절반 거리로 한 번 더 시도
+				vSlideMovement = slideVector * (fOriginalMoveLength * fSlideStrength * 0.5f);
+				vSlidePosition = vCurrentPos + vSlideMovement;
+				if (true == pNavigation->isMove(vSlidePosition))
+				{
+					Set_State(STATE::POSITION, vSlidePosition);
+					m_IsDirty = true;
+				}
+			}
 		}
 	}
 }

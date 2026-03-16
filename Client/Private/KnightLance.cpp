@@ -81,11 +81,11 @@ void CKnightLance::Late_Update(_float fTimeDelta)
     }
 
 #ifdef _DEBUG
-    if (FAILED(m_pGameInstance->Add_DebugComponent(m_pColliderCom)))
+   /* if (FAILED(m_pGameInstance->Add_DebugComponent(m_pColliderCom)))
     {
         CRASH("Failed AddDebug Collider");
         return;
-    }
+    }*/
 
 #endif // _DEBUG
 
@@ -111,7 +111,7 @@ HRESULT CKnightLance::Render()
 
 #ifdef _DEBUG
     //ImGui_Render();
-
+    m_pColliderCom->Render();
 #endif // _DEBUG
 
     if (FAILED(Bind_ShaderResources()))

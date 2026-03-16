@@ -72,8 +72,8 @@ void CSlaveVampireSword::Late_Update(_float fTimeDelta)
         return;
 
 #ifdef _DEBUG
-    if (FAILED(m_pGameInstance->Add_DebugComponent(m_pColliderCom)))
-        return;
+    /*if (FAILED(m_pGameInstance->Add_DebugComponent(m_pColliderCom)))
+        return;*/
 #endif // _DEBUG
 
 }

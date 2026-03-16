@@ -74,7 +74,7 @@ HRESULT CEffect_Pillar::Render()
 {
 #ifdef _DEBUG
     //ImGui_Render();
-    m_pColliderCom->Render();
+    //m_pColliderCom->Render();
 #endif // DEBUG
 
     return S_OK;

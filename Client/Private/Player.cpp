@@ -157,11 +157,11 @@ void CPlayer::Late_Update(_float fTimeDelta)
     //    return;
 
 #ifdef _DEBUG
-    if (FAILED(m_pGameInstance->Add_DebugComponent(m_pColliderCom)))
-    {
-        CRASH("Failed Add Debug Collider");
-        return;
-    }
+    //if (FAILED(m_pGameInstance->Add_DebugComponent(m_pColliderCom)))
+    //{
+    //    CRASH("Failed Add Debug Collider");
+    //    return;
+    //}
         
 #endif // _DEBUG
 
@@ -174,6 +174,8 @@ HRESULT CPlayer::Render()
 {
 #ifdef _DEBUG
     //ImGui_Render();
+    m_pColliderCom->Render();
+    //m_pColliderCom->WolrdRender();
 #endif // _DEBUG
 
 

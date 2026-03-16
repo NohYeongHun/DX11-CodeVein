@@ -153,8 +153,8 @@ void CSlaveVampire::Late_Update(_float fTimeDelta)
         return;
 
 #ifdef _DEBUG
-    if (FAILED(m_pGameInstance->Add_DebugComponent(m_pColliderCom)))
-        return;
+ /*   if (FAILED(m_pGameInstance->Add_DebugComponent(m_pColliderCom)))
+        return;*/
 #endif // _DEBUG
     CMonster::Late_Update(fTimeDelta);
 

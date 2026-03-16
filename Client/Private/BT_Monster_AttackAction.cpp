@@ -39,20 +39,12 @@ BT_RESULT CBT_Monster_AttackAction::EnterAttack(_float fTimeDelta)
         CRASH("Failed Tree Attack Enter Logic");
     }
 
-    // 1. 다음 단계로 진행
-    //m_eAttackPhase = ATTACK_PHASE::ROTATING;
-
     m_eAttackPhase = ATTACK_PHASE::LOOP;
     m_pOwner->Set_RootMotionTranslate(true);
-    // 1. 공격 애니메이션 선택
     _uint iNextAnimationIdx = m_pOwner->Find_AnimationIndex(L"ATTACK");
-   
-    m_pOwner->PlayWeaponSound();
-
-    // 2. 공격 상태로 변경
     m_pOwner->Change_Animation_Blend(iNextAnimationIdx);
 
-    // 3. 콜라이더 상태 초기화
+    m_pOwner->PlayWeaponSound();
     m_pOwner->Reset_Collider_ActiveInfo();
 
     return BT_RESULT::RUNNING;
@@ -102,11 +94,8 @@ BT_RESULT CBT_Monster_AttackAction::UpdateAttack(_float fTimeDelta)
 
 BT_RESULT CBT_Monster_AttackAction::EndAttack(_float fTimeDleta)
 {
-
-    // 1. Animation 탐색 시작
     _uint iNextAnimationIdx = m_pOwner->Find_AnimationIndex(L"IDLE");
 
-    // 2. 현재 애니메이션으로 NON 블렌딩하면서 변경. => Idle은 NonBlend로 변경.
     m_pOwner->Change_Animation_NonBlend(iNextAnimationIdx);
     m_pOwner->Set_RootMotionTranslate(false);
     m_pOwner->AddBuff(CMonster::BUFF_ATTACK_TIME);

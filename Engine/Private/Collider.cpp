@@ -231,10 +231,22 @@ HRESULT CCollider::Render()
 
     m_pBounding->Render(m_pBatch, m_vColor);
 
-    //m_pWorldBounding->Render(m_pBatch, m_vColor);
-
     m_pBatch->End();
 
+    return S_OK;
+}
+HRESULT CCollider::WolrdRender()
+{
+    m_pEffect->SetWorld(XMMatrixIdentity());
+    m_pEffect->SetView(m_pGameInstance->Get_Transform_Matrix(D3DTS::VIEW));
+    m_pEffect->SetProjection(m_pGameInstance->Get_Transform_Matrix(D3DTS::PROJ));
+
+    m_pContext->IASetInputLayout(m_pInputLayout);
+    m_pEffect->Apply(m_pContext);
+
+    m_pBatch->Begin();
+    m_pWorldBounding->Render(m_pBatch, m_vColor);
+    m_pBatch->End();
     return S_OK;
 }
 #endif // _DEBUG

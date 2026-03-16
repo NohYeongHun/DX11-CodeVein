@@ -48,7 +48,7 @@ private:
 
 	list<class CGameObject*>				m_RenderObjects[ENUM_CLASS(RENDERGROUP::END)];
 
-	_bool m_IsDebugRender = { false };
+	_bool m_IsDebugRender = { true };
 
 
 #pragma region 장면 캡쳐(직교 투영 텍스쳐)를 만들기 위해 소유해야할 것들.

@@ -94,7 +94,7 @@ HRESULT CQueenKnight::Initialize_Clone(void* pArg)
     _vector qInitRot = XMQuaternionRotationAxis(XMVectorSet(0.f, 1.f, 0.f, 0.f), 0.0f);
     m_pTransformCom->Set_Quaternion(qInitRot);
 
-    _float3 vScale = { 1.5f, 1.5f, 1.5f };
+    _float3 vScale = { 1.2f, 1.2f, 1.2f };
     m_pTransformCom->Set_Scale(vScale);
 
 
@@ -209,6 +209,7 @@ HRESULT CQueenKnight::Render()
 #ifdef _DEBUG
     //ImGui_Render();
     m_pColliderCom->Render();
+    m_pColliderCom->WolrdRender();
 #endif // _DEBUG
 
     if (FAILED(Bind_Shader_Resource()))

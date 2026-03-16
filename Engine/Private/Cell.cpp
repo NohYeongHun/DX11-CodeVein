@@ -1,4 +1,4 @@
-﻿#include "Cell.h"
+#include "Cell.h"
 CCell::CCell(ID3D11Device* pDevice, ID3D11DeviceContext* pContext)
 	: m_pDevice{ pDevice }
 	, m_pContext{ pContext }
@@ -59,20 +59,31 @@ _bool CCell::isIn(_fvector vPosition, _int* pNeighborIndex)
 
 _bool CCell::isIn(_fvector vPosition, _int* pNeighborIndex, LINE* pOutLine)
 {
+	_float fMaxViolation = 0.f;
+	_uint iWorstEdge = static_cast<_uint>(LINE::END);
+
 	for (_uint i = 0; i < ENUM_CLASS(LINE::END); ++i)
 	{
 		_vector	vDir = XMVector3Normalize(vPosition - XMVectorSetW(XMLoadFloat3(&m_vPoints[i]), 1.f));
 		_vector vNormal = XMVector3Normalize(XMLoadFloat3(&m_vNormals[i]));
+		_float fDot = XMVectorGetX(XMVector3Dot(vDir, vNormal));
 
-		if (0 < XMVectorGetX(XMVector3Dot(vDir, vNormal)))
+		if (fDot > 0.f)
 		{
-			*pNeighborIndex = m_iNeighborIndices[i];
-			*pOutLine = static_cast<LINE>(i); // 벗어난 경계선 정보 저장
-
-			return false;
+			if (fDot > fMaxViolation)
+			{
+				fMaxViolation = fDot;
+				iWorstEdge = i;
+			}
 		}
 	}
 
+	if (iWorstEdge < ENUM_CLASS(LINE::END))
+	{
+		*pNeighborIndex = m_iNeighborIndices[iWorstEdge];
+		*pOutLine = static_cast<LINE>(iWorstEdge);
+		return false;
+	}
 	return true;
 }
 

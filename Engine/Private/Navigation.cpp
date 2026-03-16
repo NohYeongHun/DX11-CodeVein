@@ -1,4 +1,4 @@
-﻿#include "Navigation.h"
+#include "Navigation.h"
 
 
 _float4x4 CNavigation::m_WorldMatrix = {};
@@ -126,9 +126,23 @@ _bool CNavigation::isMove(_fvector vPosition)
 _bool CNavigation::isMove(_fvector vPosition, _vector* pSlideVector)
 {
 	_vector vLocalPos = XMVector3TransformCoord(vPosition, XMMatrixInverse(nullptr, XMLoadFloat4x4(&m_WorldMatrix)));
+	_vector vLocalMovementDir = XMVectorZero(); // 레거시: 실제 이동 방향 없음 → CalculateSlideVector 내부에서 fallback 사용
+	return isMove(vPosition, pSlideVector, vLocalMovementDir);
+}
+
+_bool CNavigation::isMove(_fvector vTargetPosition, _vector* pSlideVector, _fvector vMovementDelta)
+{
+	_vector vLocalPos = XMVector3TransformCoord(vTargetPosition, XMMatrixInverse(nullptr, XMLoadFloat4x4(&m_WorldMatrix)));
+	_vector vLocalMovementDir = XMVector3TransformNormal(vMovementDelta, XMMatrixInverse(nullptr, XMLoadFloat4x4(&m_WorldMatrix)));
+	_float fMoveLen = XMVectorGetX(XMVector3Length(vLocalMovementDir));
+	if (fMoveLen > 1e-6f)
+		vLocalMovementDir = XMVector3Normalize(vLocalMovementDir);
+	else
+		vLocalMovementDir = XMVectorZero();
 
 	_int iNeighborIndex = -1;
 	LINE outLine = LINE::END;
+	_int iSlideCellIndex = m_iCurrentCellIndex;
 
 	if (true == m_Cells[m_iCurrentCellIndex]->isIn(vLocalPos, &iNeighborIndex, &outLine))
 		return true;
@@ -139,17 +153,18 @@ _bool CNavigation::isMove(_fvector vPosition, _vector* pSlideVector)
 		{
 			if (-1 == iNeighborIndex)
 			{
-				CalculateSlideVector(vLocalPos, outLine, pSlideVector);
+				CalculateSlideVector(iSlideCellIndex, vLocalPos, vLocalMovementDir, outLine, pSlideVector);
 				return false;
 			}
-			if (true == m_Cells[iNeighborIndex]->isIn(vLocalPos, &iNeighborIndex))
+			iSlideCellIndex = iNeighborIndex;
+			if (true == m_Cells[iNeighborIndex]->isIn(vLocalPos, &iNeighborIndex, &outLine))
 			{
-				m_iCurrentCellIndex = iNeighborIndex;
+				m_iCurrentCellIndex = iSlideCellIndex;
 				return true;
 			}
 		}
 	}
-	CalculateSlideVector(vLocalPos, outLine, pSlideVector);
+	CalculateSlideVector(iSlideCellIndex, vLocalPos, vLocalMovementDir, outLine, pSlideVector);
 	return false;
 }
 
@@ -319,30 +334,19 @@ void CNavigation::SetUp_Neighbors()
 	}
 }
 
-bool CNavigation::Try_CalculateSlideVector(_fvector vLocalPos, LINE eOutLine, _vector* pSlideVector)
+void CNavigation::CalculateSlideVector(_int iCellIndex, _fvector vLocalPos, _fvector vLocalMovementDir, LINE eOutLine, _vector* pSlideVector)
 {
-	if (nullptr == pSlideVector || eOutLine == LINE::END)
-		return false;
-
-	_vector vWallNormal = m_Cells[m_iCurrentCellIndex]->Get_LineNormal(eOutLine);
-	_vector vMovementDir = XMVector3Normalize(vLocalPos - m_Cells[m_iCurrentCellIndex]->Get_Center());
-
-	_vector vDot = XMVector3Dot(vMovementDir, vWallNormal);
-	_vector vSlideDir = vMovementDir - XMVectorScale(vWallNormal, XMVectorGetX(vDot));
-
-	vSlideDir = XMVector3Normalize(vSlideDir);
-	*pSlideVector = XMVector3TransformNormal(vSlideDir, XMLoadFloat4x4(&m_WorldMatrix));
-
-	return true;
-}
-
-void CNavigation::CalculateSlideVector(_fvector vLocalPos, LINE eOutLine, _vector* pSlideVector)
-{
-	if (nullptr == pSlideVector || eOutLine == LINE::END)
+	if (nullptr == pSlideVector || eOutLine == LINE::END || iCellIndex < 0 || iCellIndex >= static_cast<_int>(m_Cells.size()))
 		return;
 
-	_vector vWallNormal = m_Cells[m_iCurrentCellIndex]->Get_LineNormal(eOutLine);
-	_vector vMovementDir = XMVector3Normalize(vLocalPos - m_Cells[m_iCurrentCellIndex]->Get_Center());
+	_vector vWallNormal = m_Cells[iCellIndex]->Get_LineNormal(eOutLine);
+	_vector vMovementDir;
+
+	_float fLen = XMVectorGetX(XMVector3Length(vLocalMovementDir));
+	if (fLen > 1e-6f)
+		vMovementDir = XMVector3Normalize(vLocalMovementDir);
+	else
+		vMovementDir = XMVector3Normalize(vLocalPos - m_Cells[iCellIndex]->Get_Center());
 
 	_vector vDotProduct = XMVector3Dot(vMovementDir, vWallNormal);
 	*pSlideVector = vMovementDir - XMVectorScale(vWallNormal, XMVectorGetX(vDotProduct));

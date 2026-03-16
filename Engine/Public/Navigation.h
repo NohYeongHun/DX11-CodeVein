@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "Component.h"
 
@@ -27,7 +27,8 @@ public:
 
 public:
 	_bool isMove(_fvector vPosition);
-	_bool isMove(_fvector vPosition, _vector* pSlideVector); // 슬라이딩 벡터 포함 버전
+	_bool isMove(_fvector vPosition, _vector* pSlideVector); // 슬라이딩 벡터 포함 버전 (레거시)
+	_bool isMove(_fvector vTargetPosition, _vector* pSlideVector, _fvector vMovementDelta); // 실제 이동 방향 기반 슬라이딩
 
 	
 	_vector Compute_OnCell(_fvector vPosition);
@@ -67,8 +68,7 @@ private:
 
 private:
 	void SetUp_Neighbors();
-	bool Try_CalculateSlideVector(_fvector vLocalPos, LINE eOutLine, _vector* pSlideVector);
-	void CalculateSlideVector(_fvector vLocalPos, LINE eOutLine, _vector* pSlideVector);
+	void CalculateSlideVector(_int iCellIndex, _fvector vLocalPos, _fvector vLocalMovementDir, LINE eOutLine, _vector* pSlideVector);
 
 public:
 	//static CNavigation* Create(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, const _tchar* pNavigationFilePath);
